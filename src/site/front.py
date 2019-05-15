@@ -2,14 +2,32 @@
 
 
 import aiohttp.web
+import os
+
+
+WEBROOT = os.getcwd()
 
 
 async def browse(request):
     return aiohttp.web.FileResponse(
-        '/home/sapenna/s3-object-browser/src/static/html/browse.html'
+        WEBROOT + '/static/html/browse.html'
+    )
+
+
+async def index(request):
+    return aiohttp.web.FileResponse(
+        WEBROOT + '/static/html/index.html'
+    )
+
+
+async def login(request):
+    return aiohttp.web.FileResponse(
+        WEBROOT + '/static/html/login.html'
     )
 
 
 localroutes = [
-    aiohttp.web.get('/browse', browse)
+    aiohttp.web.get('/', index),
+    aiohttp.web.get('/browse', browse),
+    aiohttp.web.get('/login', login),
 ]
