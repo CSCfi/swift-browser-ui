@@ -7,8 +7,7 @@ import os
 import ssl
 
 # Project specific imports
-import front
-import api
+from route import routel
 
 
 PROJECT_ROOT = os.getcwd()
@@ -27,8 +26,7 @@ app.router.add_static(
 
 # Setup all routes from API and frontend modules
 app.add_routes(
-    front.localroutes +
-    api.localroutes
+    routel
 )
 
 # Setup ssl context (FUTURE)

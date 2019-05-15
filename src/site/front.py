@@ -24,10 +24,3 @@ async def login(request):
     return aiohttp.web.FileResponse(
         WEBROOT + '/static/html/login.html'
     )
-
-
-localroutes = [
-    aiohttp.web.get('/', index),
-    aiohttp.web.get('/browse', browse),
-    aiohttp.web.get('/login', login),
-]

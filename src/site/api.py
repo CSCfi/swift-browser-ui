@@ -74,10 +74,3 @@ async def downloadObject(dloadrequest):
     await retws.ping(message='test')
 
     return retws
-
-
-localroutes = [
-    aiohttp.web.get(API_ENDPOINT + '/buckets', listBuckets),
-    aiohttp.web.get(API_ENDPOINT + '/objects', listObjects),
-    aiohttp.web.get(API_ENDPOINT + '/dload', downloadObject),
-]

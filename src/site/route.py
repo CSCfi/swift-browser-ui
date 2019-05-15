@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 """
 Collective module for implementing all the project routes, that are currently
@@ -10,9 +10,37 @@ opinion) and grouped by from which module they can be found. The imported
 modules can be found in the beginning.
 """
 
+
+import aiohttp.web
+
+
 # The project module imports
 import api
 import login
 # For now also import the frontend module, which won't be present in the final
 # version. (The frontend consists of only static HTML, JavaScript and css and
 # thus it can be hosted directly from the Nginx server)
+import front
+
+
+routel = []
+
+
+# Add routes from the module API
+routel.append([
+    aiohttp.web.get(api.API_ENDPOINT + '/buckets', api.listBuckets),
+    aiohttp.web.get(api.API_ENDPOINT + '/dload', api.downloadObject),
+    aiohttp.web.get(api.API_ENDPOINT + '/objects', api.listObjects),
+])
+
+# Add routes from the module login
+routel.append([
+
+])
+
+# Add routes from the module front
+routel.append([
+    aiohttp.web.get('/', front.index),
+    aiohttp.web.get('/browse', front.browse),
+    aiohttp.web.get('/login', front.login),
+])
