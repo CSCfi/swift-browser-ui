@@ -16,7 +16,7 @@ import datetime
 API_ENDPOINT = '/api'
 
 
-async def listBuckets(request):
+async def list_buckets(request):
     """
     The internal API call for fetching a list of buckets available for user
     """
@@ -33,7 +33,7 @@ async def listBuckets(request):
     )
 
 
-async def listObjects(request):
+async def list_objects(request):
     """
     The internal API call for fetching a list of available objects inside
     a specified bucket
@@ -53,7 +53,7 @@ async def listObjects(request):
 
 
 # TODO: refactor object downloadin completely
-async def downloadObject(dloadrequest):
+async def download_object(dloadrequest):
     """
     The internal API call for mapping an object to a websocket, to make enable
     object streaming.
