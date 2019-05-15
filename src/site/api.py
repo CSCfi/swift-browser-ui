@@ -6,6 +6,8 @@ import boto3
 import datetime
 
 
+# TODO: Implement dynamic credential passing
+# TODO: Check if it's necessary to change the API from s3 -> swift
 # Hardcoded s3 access keys for testing purposes, will be redundant when
 # authentication is implemented (hopefully at least)
 ***REMOVED******REMOVED***AWS_ENDPOINT_URL = "http://127.0.0.1:9000"
@@ -50,7 +52,8 @@ async def listObjects(request):
     )
 
 
-async def downloadObject(request):
+# TODO: refactor object downloadin completely
+async def downloadObject(dloadrequest):
     """
     The internal API call for mapping an object to a websocket, to make enable
     object streaming.
@@ -58,13 +61,23 @@ async def downloadObject(request):
     s3 = boto3.client(
         's3',
 ***REMOVED******REMOVED******REMOVED***    )
+    s3object = s3.get_object(
+        Bucket=dloadrequest.query['bucket'],
+        Key=dloadrequest.query['objkey']
+    )
 
-    retws = aiohttp.web.WebSocketResponse()
+    retws = aiohttp.web.WebSocketResponse(
+        compress=False,  # Data already compressed when downloading
+    )
+    await retws.prepare(dloadrequest)
+
+    await retws.ping(message='test')
 
     return retws
 
 
 localroutes = [
     aiohttp.web.get(API_ENDPOINT + '/buckets', listBuckets),
-    aiohttp.web.get(API_ENDPOINT + '/objects', listObjects)
+    aiohttp.web.get(API_ENDPOINT + '/objects', listObjects),
+    aiohttp.web.get(API_ENDPOINT + '/dload', downloadObject),
 ]
