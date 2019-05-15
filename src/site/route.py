@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*- 
+
+"""
+Collective module for implementing all the project routes, that are currently
+in use. Made with the primary purpose of providing a direct and clear picture
+of which url points to which handler.
+
+The handlers are arranged in order of importance (honestly though, it's an
+opinion) and grouped by from which module they can be found. The imported
+modules can be found in the beginning.
+"""
+
+# The project module imports
+import api
+import login
+# For now also import the frontend module, which won't be present in the final
+# version. (The frontend consists of only static HTML, JavaScript and css and
+# thus it can be hosted directly from the Nginx server)
