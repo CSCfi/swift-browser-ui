@@ -60,7 +60,7 @@ var s3list = new Vue ({
                     } 
                 )
         },
-        downloadObject: function ( currentBucket, objectKey ) {
+        downloadObject: function ( objectKey ) {
             // Create a download link for the object specified by the objectKey
             // argument, in the bucket currentBucket (which is the bucket
             // that's currently displayed)
