@@ -26,7 +26,7 @@ Vue.component('object-table-heading', {
 })
 
 Vue.component('object-table-row', {
-    props: ['stobject', 'bucket'],
+    props: ['stobject', 'bucket', 'dloadlink'],
     template: '\
     <tr>\
     <td>{{ bucket }}</td>\
@@ -34,6 +34,6 @@ Vue.component('object-table-row', {
     <td>{{ stobject.LastModified }}</td>\
     <td>{{ stobject.Size }}</td>\
     <td>{{ stobject.Owner.DisplayName }}</td>\
-    <button v-on:click="$emit(\'orowclick\')">Download</button>\
+    <a :href="dloadlink">Download</a>\
     </tr>'
 })

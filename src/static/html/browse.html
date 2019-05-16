@@ -36,7 +36,7 @@
                     v-bind:key='item.Key'
                     v-bind:stobject='item'
                     v-bind:bucket='currentBucket'
-                    v-on:orowclick='downloadObject ( item.Key )'
+                    :dloadlink='item.url'
                 ></tr>
             </table>
         </div>

@@ -27,20 +27,20 @@ routel = []
 
 
 # Add routes from the module API
-routel.append([
+routel = routel + [
     aiohttp.web.get(api.API_ENDPOINT + '/buckets', api.list_buckets),
     aiohttp.web.get(api.API_ENDPOINT + '/dload', api.download_object),
     aiohttp.web.get(api.API_ENDPOINT + '/objects', api.list_objects),
-])
+]
 
 # Add routes from the module login
-routel.append([
+routel = routel + [
 
-])
+]
 
 # Add routes from the module front
-routel.append([
+routel = routel + [
     aiohttp.web.get('/', front.index),
     aiohttp.web.get('/browse', front.browse),
     aiohttp.web.get('/login', front.login),
-])
+]

@@ -52,7 +52,6 @@ async def list_objects(request):
     )
 
 
-# TODO: refactor object downloadin completely
 async def download_object(dloadrequest):
     """
     The internal API call for mapping an object to a websocket, to make enable
@@ -61,16 +60,20 @@ async def download_object(dloadrequest):
     s3 = boto3.client(
         's3',
 ***REMOVED******REMOVED******REMOVED***    )
-    s3object = s3.get_object(
-        Bucket=dloadrequest.query['bucket'],
-        Key=dloadrequest.query['objkey']
+
+    url = s3.generate_presigned_url(
+        'get_object',
+        Params={
+            'Bucket': dloadrequest.query['bucket'],
+            'Key': dloadrequest.query['objkey']
+        },
+        ExpiresIn=600
     )
 
-    retws = aiohttp.web.WebSocketResponse(
-        compress=False,  # Data already compressed when downloading
+    response = aiohttp.web.Response()
+    response.set_status(303)
+    response.headers.add(
+        'Location', url
     )
-    await retws.prepare(dloadrequest)
 
-    await retws.ping(message='test')
-
-    return retws
+    return response

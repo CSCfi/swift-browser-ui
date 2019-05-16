@@ -57,16 +57,11 @@ var s3list = new Vue ({
                         s3list.oList = retJson;
                         s3list.currentBucket = bucket;
                         s3list.buckets = false;s3list.objects = true;
+                        for(i = 0; i < s3list.oList.length; i++) {
+                            s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['Key'];
+                        }
                     } 
                 )
-        },
-        downloadObject: function ( objectKey ) {
-            // Create a download link for the object specified by the objectKey
-            // argument, in the bucket currentBucket (which is the bucket
-            // that's currently displayed)
-            // The function abstracts away any multipart downloads, and handles
-            // them as a stream that can be directly concatenated file after
-            // file. Continuable downloads would be a nice-to-have.
         },
     }
 });
