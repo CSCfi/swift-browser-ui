@@ -6,36 +6,93 @@ A module for handling the project login sessions and requesting the necessary
 tokens.
 """
 
-
+# aiohttp
 import aiohttp.web
-import oic
-import aiohttp_security as sec
-import aiohttp_session as ses
+# Openstack
+import keystoneclient
+import keystoneauth1
+
+import cryptography.fernet
+import hashlib
+import os
 
 
-async def init_session():
+async def disable_cache(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-Cache'
+    response.headers['Expires'] = '0'
+    return response
+
+
+async def handle_login(request):
     """
-    A function for creating a login session for the user.
+    Create new session for the user
     """
+
+    response = aiohttp.web.Response(
+        status=303,
+        reason="Redirection to the application"
+    )
+
+    response = await disable_cache(response)
+
+    ccrypt = request.app['Crypt']
+    cookie = hashlib.sha512(os.urandom(1024)).hexdigest()
+    cookie_crypted = ccrypt.encrypt(cookie.encode('utf-8')).decode('utf-8')
+
+    response.set_cookie(
+        name='S3BROW_SESSION',
+        value=cookie_crypted,
+        max_age=3600,
+    )
+
+    request.app['Sessions'].append(cookie)
+
+    response.headers['Location'] = "/login/websso"
+
+    return response
+
+
+async def decrypt_cookie(request):
+    """
+    Decrypt a cookie
+    """
+    return request.app['Crypt'].decrypt(
+        request.cookies['S3BROW_SESSION'].encode('utf-8')
+    ).decode('utf-8')
+
+
+async def sso_query_begin(request):
+    """
+    Display login page and initiate federated keystone authentication
+    """
+
+    if await decrypt_cookie(request) in request.app['Sessions']:
+        response = aiohttp.web.FileResponse(
+            os.getcwd() + '/static/html/login.html'
+        )
+
+        return await disable_cache(response)
+    else:
+        response = aiohttp.web.Response(
+            status=403,
+            reason="Invalid or no session cookie"
+        )
+        return response
+
+
+async def sso_query_end(request):
     pass
 
 
-async def init_login():
-    """
-    A function for initializing the login for a specific user, will begin by
-    calling the createSession function, then will parse the required
-    redirection for authorization and redirect the user as required.
-    """
-    initResponse = aiohttp.web.Response()
+async def handle_logout(request):
+    cookie_crypted = request.cookies['S3BROW_SESSION']
+    cookie = request.app['Crypt'].decrypt(
+        cookie_crypted.encode('utf-8')
+    ).decode('utf-8')
 
-    return initResponse
+    request.app['Sessions'].remove(cookie)
 
-
-async def handle_oidc_response():
-    """
-    A Function for handling parsing the Oauth2 / OIDC response that's initiated
-    from the initLogin function. (checking the authenticity of the session id,
-    fetching the OIDC response after checking the authenticity of the session
-    and parsing the response)
-    """
-    pass
+    return aiohttp.web.Response(
+        status=204
+    )
