@@ -4,6 +4,7 @@
 import aiohttp.web
 import boto3
 import datetime
+from login import decrypt_cookie
 
 
 # TODO: Check if it's necessary to change the API from s3 -> swift
@@ -16,9 +17,11 @@ async def list_buckets(request):
     """
     The internal API call for fetching a list of buckets available for user
     """
-    # TODO: Perhaps think up a way to keep the s3 sessions persistent?
+    # TODO: Refactor code to store session specific s3 client to app mapping
     try:
-        session = request.cookies['S3BROW_SESSION']
+        if await decrypt_cookie(request) not in request.app['Sessions']:
+            raise KeyError()
+
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
@@ -42,7 +45,8 @@ async def list_objects(request):
     a specified bucket
     """
     try:
-        session = request.cookies['S3BROW_SESSION']
+        if await decrypt_cookie(request) not in request.app['Sessions']:
+            raise KeyError()
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
@@ -68,7 +72,9 @@ async def download_object(dloadrequest):
     object streaming.
     """
     try:
-        session = dloadrequest.cookies['S3BROW_SESSION']
+        if (await decrypt_cookie(dloadrequest) not in
+                dloadrequest.app['Sessions']):
+            raise KeyError()
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
