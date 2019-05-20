@@ -8,6 +8,16 @@
         <title>S3 object browser mockup</title>
     </head>
     <body>
+        <script>
+            window.onbeforeunload = function () {
+                fetch('login/kill', {method: 'GET', credentials: 'include'})
+                    .then(
+                        function ( response ) {
+                            console.log(response.status());
+                        }
+                    )
+            }
+        </script>
         <div id='app'>
             <h1>S3 mockup web application for user {{ user }}</h1>
         </div>
