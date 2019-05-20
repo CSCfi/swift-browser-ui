@@ -21,7 +21,7 @@ var s3list = new Vue ({
         getBuckets: function () {
             // Fetch buckets from the API for the user that's currently logged
             // in
-            fetch('api/buckets')
+            fetch('api/buckets', {method: 'GET', credentials: 'include'})
                 .then(
                     function ( response ) {
                         return response.json();
@@ -45,7 +45,7 @@ var s3list = new Vue ({
             // that's currently logged in.
             var objUrl = new URL( "http://127.0.0.1:8080/api/objects" )
             objUrl.searchParams.append('bucket', bucket)
-            fetch(objUrl)
+            fetch(objUrl, {method: 'GET', credentials: 'include'})
                 .then(
                     function ( response ) {
                         return response.json();
