@@ -1,0 +1,11 @@
+body {
+    margin: 2% 3% 2% 3%;
+}
+
+table {
+    width: 90%;
+}
+
+.btable, .otable, th, tr, td {
+    border: 1px solid black;
+}
