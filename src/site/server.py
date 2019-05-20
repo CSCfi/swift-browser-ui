@@ -6,12 +6,11 @@ import aiohttp.web
 import os
 import ssl
 
-from aiohttp_session import setup as session_setup
-from aiohttp_session.cookie_storage import EncryptedCookieStorage
 import cryptography.fernet
 
-# Project specific imports
-from route import routel
+from front import index, browse
+from login import handle_login, sso_query_begin, sso_query_end, handle_logout
+from api import list_buckets, list_objects, download_object
 
 
 def servinit():
@@ -19,12 +18,15 @@ def servinit():
 
     app = aiohttp.web.Application()
 
-    session_setup(
-        app,
-        EncryptedCookieStorage(
-            cryptography.fernet.Fernet.generate_key().decode('utf-8')
-        )
+    # Mutable_map handles cookie storage, also stores the object that provides
+    # the encryption we use
+    app['Crypt'] = cryptography.fernet.Fernet(
+        cryptography.fernet.Fernet.generate_key()
     )
+    # Session list to quickly validate sessions
+    app['Sessions'] = []
+    # Cookie keyed dictionary to store session data
+    app['Creds'] = {}
 
     # Setup static folder during developement
     app.router.add_static(
@@ -34,10 +36,26 @@ def servinit():
         show_index=True,
     )
 
-    # Setup all routes from API and frontend modules
-    app.add_routes(
-        routel
-    )
+    app.add_routes([
+        aiohttp.web.get('/', index),
+        aiohttp.web.get('/browse', browse),
+    ])
+
+    # Add login routes
+    app.add_routes([
+        aiohttp.web.get('/login', handle_login),
+        aiohttp.web.get('/login/kill', handle_logout),
+        aiohttp.web.get('/login/websso', sso_query_begin),
+        aiohttp.web.get('/display', sso_query_begin),
+        aiohttp.web.post('/display', sso_query_end),
+    ])
+
+    # Add api routes
+    app.add_routes([
+        aiohttp.web.get('/api/buckets', list_buckets),
+        aiohttp.web.get('/api/objects', list_objects),
+        aiohttp.web.get('/api/dload', download_object),
+    ])
 
     # Setup ssl context (FUTURE)
     # sslcontext = ssl.create_default_context()
@@ -49,7 +67,7 @@ def servinit():
     #     'RSA-AES128-SHA256'
     # )
 
-    return app
+    aiohttp.web.run_app(app)
 
 if __name__ == '__main__':
-    aiohttp.web.run_app(servinit())
+    servinit()
