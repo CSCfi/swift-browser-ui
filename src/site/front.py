@@ -9,18 +9,24 @@ WEBROOT = os.getcwd()
 
 
 async def browse(request):
-    return aiohttp.web.FileResponse(
-        WEBROOT + '/static/html/browse.html'
-    )
+    try:
+        session = request.cookies['S3BROW_SESSION']
+        session = session.encode('utf-8')
+        session = request.app['Crypt'].decrypt(session).decode('utf-8')
+        response = aiohttp.web.FileResponse(
+            WEBROOT + '/static/html/browse.html'
+        )
+        return response
+    except KeyError:
+        response = aiohttp.web.Response(
+            status=303,
+            reason="No session token present, have you logged in yet?"
+        )
+        response.headers['Location'] = '/login'
+        return response
 
 
 async def index(request):
     return aiohttp.web.FileResponse(
         WEBROOT + '/static/html/index.html'
-    )
-
-
-async def login(request):
-    return aiohttp.web.FileResponse(
-        WEBROOT + '/static/html/login.html'
     )
