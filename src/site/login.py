@@ -82,7 +82,24 @@ async def sso_query_begin(request):
 
 
 async def sso_query_end(request):
-    pass
+    """
+    Handle the federated authentication return POST by creating the API keys
+    for the session in progress. Redirect to /browse
+    """
+    try:
+        if await decrypt_cookie(request) in request.app['Sessions']:
+            response = aiohttp.web.Response(
+                status=303,
+                reason='Start application'
+            )
+            response.headers['Location'] = '/browse'
+            return response
+    except KeyError:
+        response = aiohttp.web.Response(
+            status=403,
+            reason="Invalid or no session cookie"
+        )
+        return response
 
 
 async def handle_logout(request):
