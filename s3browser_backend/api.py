@@ -4,7 +4,7 @@
 import aiohttp.web
 import boto3
 import datetime
-from login import decrypt_cookie
+from ._convenience import decrypt_cookie
 
 
 # TODO: Check if it's necessary to change the API from s3 -> swift
@@ -25,16 +25,20 @@ async def list_buckets(request):
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
+        # Fetch the information about the user's buckets from API
         ret = s3.list_buckets()['Buckets']
         for i in ret:
+            # Transform the CreationDate into a user readable string, since
+            # the datetime-object is not JSON-serializeable
             i['CreationDate'] = i['CreationDate'].ctime()
 
         return aiohttp.web.json_response(
             ret
         )
+    # If can't find user session, reply with 401
     except KeyError:
         return aiohttp.web.Response(
-            status=403,
+            status=401,
             reason="No user session was found"
         )
 
@@ -50,44 +54,51 @@ async def list_objects(request):
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
+        # Get all objects in the specified bucket
         ret = s3.list_objects(
             Bucket=request.query['bucket']
         )['Contents']
         for i in ret:
+            # Transform the LastModified date value into a user readable
+            # string, since the datetime-object is not JSON-serializeable
             i['LastModified'] = i['LastModified'].ctime()
 
         return aiohttp.web.json_response(
             ret
         )
+    # If can't find user session, reply with 401
     except KeyError:
         return aiohttp.web.Response(
-            status=403,
+            status=401,
             reason="No user session was found"
         )
 
 
 async def download_object(dloadrequest):
     """
-    The internal API call for mapping an object to a websocket, to make enable
-    object streaming.
+    Function to pull a short-lived presigned download URL from the s3 server
     """
+    # TODO: implement exception handling and debug messages for URL fetching
     try:
+        # Check for established session
+        # TODO: change over to API specific cookie
         if (await decrypt_cookie(dloadrequest) not in
                 dloadrequest.app['Sessions']):
             raise KeyError()
+        # Open a client to the server
         s3 = boto3.client(
             's3',
 ***REMOVED******REMOVED******REMOVED***        )
-
+        # Get a presigned url from the server with a 2000ms TTL
         url = s3.generate_presigned_url(
             'get_object',
             Params={
                 'Bucket': dloadrequest.query['bucket'],
                 'Key': dloadrequest.query['objkey']
             },
-            ExpiresIn=1
+            ExpiresIn=2
         )
-
+        # Re-direct the user to the presigned URL
         response = aiohttp.web.Response()
         response.set_status(303)
         response.headers.add(
@@ -95,8 +106,9 @@ async def download_object(dloadrequest):
         )
 
         return response
+    # If can't find user session, reply with 401
     except KeyError:
         return aiohttp.web.Response(
-            status=403,
+            status=401,
             reason="No user session was found"
         )

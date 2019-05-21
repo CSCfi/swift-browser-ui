@@ -8,9 +8,9 @@ import ssl
 
 import cryptography.fernet
 
-from front import index, browse
-from login import handle_login, sso_query_begin, sso_query_end, handle_logout
-from api import list_buckets, list_objects, download_object
+from .front import index, browse
+from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
+from .api import list_buckets, list_objects, download_object
 
 
 def servinit():
@@ -45,8 +45,9 @@ def servinit():
     app.add_routes([
         aiohttp.web.get('/login', handle_login),
         aiohttp.web.get('/login/kill', handle_logout),
-        aiohttp.web.get('/login/websso', sso_query_begin),
-        aiohttp.web.post('/login/websso', sso_query_end),
+        aiohttp.web.get('/login/front', sso_query_begin),
+        aiohttp.web.get('/login/return', sso_query_end),
+        aiohttp.web.post('/login/return', sso_query_end),
     ])
 
     # Add api routes
@@ -56,8 +57,12 @@ def servinit():
         aiohttp.web.get('/api/dload', download_object),
     ])
 
-    # Setup ssl context (FUTURE)
-    # sslcontext = ssl.create_default_context()
+    return app
+
+
+def run_server_secure(app):
+    # Setup ssl context
+    sslcontext = ssl.create_default_context()
     # sslcontext.set_ciphers(
     #     'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE' +
     #     '-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-' +
@@ -65,8 +70,18 @@ def servinit():
     #     'SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-' +
     #     'RSA-AES128-SHA256'
     # )
+    # sslcontext.load_cert_chain(
+    #     'new.cert.cert', 'new.cert.key', 'Summers3'
+    # )
+    aiohttp.web.run_app(
+        app,
+        ssl_context=sslcontext
+    )
 
+
+def run_server_insecure(app):
     aiohttp.web.run_app(app)
 
+
 if __name__ == '__main__':
-    servinit()
+    run_server_insecure(servinit())

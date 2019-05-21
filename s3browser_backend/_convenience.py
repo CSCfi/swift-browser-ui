@@ -3,6 +3,7 @@
 
 from hashlib import sha256
 from os import urandom
+import aiohttp
 
 
 async def disable_cache(response):
@@ -34,3 +35,18 @@ async def generate_cookie(request):
     return cookie, request.app['Crypt'].encrypt(
         cookie.encode('utf-8')
         ).decode('utf-8')
+
+
+async def fetch_unscoped_projects(token_id, session):
+    """
+    Fetch projects available for scoping
+    """
+    # For now just use the first available project
+    pass
+
+
+async def fetch_scoped_token(tokenid, project, session):
+    """
+    Fetch a project scoped token from an unscoped token id
+    """
+    pass
