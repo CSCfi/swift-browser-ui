@@ -16,29 +16,22 @@ import cryptography.fernet
 import hashlib
 import os
 
-
-async def disable_cache(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-Cache'
-    response.headers['Expires'] = '0'
-    return response
+from ._convenience import disable_cache, decrypt_cookie, generate_cookie
+from ._convenience import fetch_unscoped_projects, fetch_scoped_token
 
 
 async def handle_login(request):
     """
-    Create new session for the user
+    Create new session cookie for the user.
     """
-
+    # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
         status=303,
         reason="Redirection to the application"
     )
 
+    cookie, cookie_crypted = await generate_cookie(request)
     response = await disable_cache(response)
-
-    ccrypt = request.app['Crypt']
-    cookie = hashlib.sha512(os.urandom(1024)).hexdigest()
-    cookie_crypted = ccrypt.encrypt(cookie.encode('utf-8')).decode('utf-8')
 
     response.set_cookie(
         name='S3BROW_SESSION',
@@ -48,18 +41,9 @@ async def handle_login(request):
 
     request.app['Sessions'].append(cookie)
 
-    response.headers['Location'] = "/login/websso"
+    response.headers['Location'] = "/login/front"
 
     return response
-
-
-async def decrypt_cookie(request):
-    """
-    Decrypt a cookie
-    """
-    return request.app['Crypt'].decrypt(
-        request.cookies['S3BROW_SESSION'].encode('utf-8')
-    ).decode('utf-8')
 
 
 async def sso_query_begin(request):
@@ -67,48 +51,76 @@ async def sso_query_begin(request):
     Display login page and initiate federated keystone authentication
     """
 
-    if await decrypt_cookie(request) in request.app['Sessions']:
-        response = aiohttp.web.FileResponse(
-            os.getcwd() + '/s3browser_frontend/login.html'
-        )
+    try:
+        if await decrypt_cookie(request) in request.app['Sessions']:
+            response = aiohttp.web.FileResponse(
+                os.getcwd() + '/s3browser_frontend/login.html'
+            )
 
-        return await disable_cache(response)
-    else:
-        response = aiohttp.web.Response(
+            return await disable_cache(response)
+        else:
+            response = aiohttp.web.Response(
+                status=401,
+                reason="Invalid or no session cookie"
+            )
+            return response
+    except KeyError:
+        return await aiohttp.web.Response(
             status=401,
-            reason="Invalid or no session cookie"
+            reason="No session cookie"
         )
-        return response
 
 
 async def sso_query_end(request):
     """
-    Handle the federated authentication return POST by creating the API keys
-    for the session in progress. Redirect to /browse
+    Function for handling login token POST, to fetch the scoped token
+    from the keystone api.
     """
+    # Check for established session
     try:
-        if await decrypt_cookie(request) in request.app['Sessions']:
-            response = aiohttp.web.Response(
-                status=303,
-                reason='Start application'
-            )
-            response.headers['Location'] = '/browse'
-            return response
+        session = await decrypt_cookie(request)
+        if session not in request.app['Sessions']:
+            raise KeyError
     except KeyError:
-        response = aiohttp.web.Response(
+        return await aiohttp.web.Response(
             status=401,
             reason="Invalid or no session cookie"
         )
-        return response
+    # Try getting the token id from form
+    try:
+        print("Got token {token}".format(request.query['tokenid']))
+        unscoped = request.query['tokenid']
+    except KeyError:
+        response = await aiohttp.web.Response(
+            status=400,
+            reason="No Token ID was specified, token id is required"
+        )
+    # Initiate an aiohttp session to be used in fetching the token
+    async with aiohttp.ClientSession() as token_session:
+        # Fetch the project to scope the token for
+        project = await fetch_unscoped_projects(unscoped, token_session)
+        # Fetch the scoped token from the unscoped token
+        scoped = await fetch_scoped_token(unscoped, project, token_session)
+        request.app['Creds'][session] = {
+            'token': scoped,
+            'token_session': token_session
+        }
+
+    # Redirect to the browse page with the correct credentials
+    response = await aiohttp.web.Response(
+        status=302,
+        reason="Start application"
+    )
+
+    response.headers['Location'] = "/browse"
+
+    return response
 
 
 async def handle_logout(request):
     # TODO: add token revokation upon leaving
     # TODO: add EC2 key pair revocation upon leaving
-    cookie_crypted = request.cookies['S3BROW_SESSION']
-    cookie = request.app['Crypt'].decrypt(
-        cookie_crypted.encode('utf-8')
-    ).decode('utf-8')
+    cookie = decrypt_cookie(request)
 
     request.app['Sessions'].remove(cookie)
 
