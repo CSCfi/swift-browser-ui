@@ -17,7 +17,9 @@ import hashlib
 import os
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import session_check
+from ._convenience import session_check, validate_cookie
+from ._convenience import get_availability_from_token
+from ._convenience import initiate_os_session
 
 
 async def handle_login(request):
@@ -90,12 +92,27 @@ async def sso_query_end(request):
         )
         return response
 
+    # Check project availability with a list of domains, save the information
+    # inside the app mapping
+    request.app['Avail'] = await get_availability_from_token(unscoped)
+
+    # Create an auth plugin with first project that was found for the user
+    # (for now)
+    request.app['Auth'] = await validate_cookie(
+        request,
+        request.app['Avail']['projects'][0]
+    )
+
+    # Open an openstack session with the auth plugin we just created
+    # No need to pass auth plugin separately, it's contained inside the
+    # request's app
+    request.app['OS_Session'] = initiate_os_session(request)
+
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
         status=302,
         reason="Start application"
     )
-
     response.headers['Location'] = "/browse"
 
     return response
@@ -103,7 +120,6 @@ async def sso_query_end(request):
 
 async def handle_logout(request):
     # TODO: add token revokation upon leaving
-    # TODO: add EC2 key pair revocation upon leaving
     if session_check(request):
         cookie = await decrypt_cookie(request)
         request.app['Sessions'].remove(cookie)
