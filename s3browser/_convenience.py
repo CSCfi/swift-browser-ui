@@ -4,7 +4,11 @@
 from hashlib import sha256
 from os import urandom
 import aiohttp
+import subprocess
+import json
 
+from keystoneauth1.identity import v3
+import keystoneauth1.session
 
 async def disable_cache(response):
     """
@@ -42,3 +46,67 @@ async def generate_cookie(request):
     return cookie, request.app['Crypt'].encrypt(
         cookie.encode('utf-8')
         ).decode('utf-8')
+
+
+def get_availability_from_token(token):
+    """
+    List available domains and projects for the unscoped token specified.
+
+    Params:
+        token: str
+    Returns:
+        Dictionary containing both the available projects and available domains
+    Return type:
+        dict(keys=('projects', 'domains'))
+    """
+    # Setup things common to every curl command required
+    curl_argv = [
+        'curl', '-s', '-X', 'GET', '-H',
+        'X-Auth-Token: ' + token,
+    ]
+    # Fetch required information from the API with curl
+    output_projects = subprocess.check_output(
+        curl_argv +
+        ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects']
+    )
+    output_domains = subprocess.check_output(
+        curl_argv +
+        ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains']
+    )
+    # Decode and serialize said output to a usable format
+    output_projects = json.loads(output_projects.decode('utf-8'))
+    output_domains = json.loads(output_domains.decode('utf-8'))
+    # For now print debug information
+    print('--PROJECT AND DOMAIN INFORMATION FROM KEYSTONE--')
+    print(output_projects)
+    print(output_domains)
+    print('--END INFORMATION--')
+    # Return all project names and domain names inside a dictionary
+    return {
+        "projects": [
+            p['name'] for p in output_projects['projects']
+        ],
+        "domains": [
+            d['name'] for d in output_domains['domains']
+        ]
+    }
+
+
+async def validate_cookie(request, project):
+    """
+    Validate openstack unscoped token for specified project.
+
+    Params:
+        request: object(aiohttp.web.Request)
+    Returns:
+        A usable authentication plugin 
+    Return type:
+        object(keystoneauth1.identity.v3.Token)
+    """
+    pass
+
+async def initiate_os_session(request):
+    """
+    Initiate an Opestack sdk session with a cookie as an authentication method.
+    """
+    pass
