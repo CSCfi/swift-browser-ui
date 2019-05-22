@@ -1,7 +1,7 @@
 from .server import servinit, run_server_secure
-import s3browser_backend.api
-import s3browser_backend.login
-import s3browser_backend.front
+import s3browser.api
+import s3browser.login
+import s3browser.front
 
 """
 Web application for browsing s3 compliant object storage, with openstack-\
