@@ -17,7 +17,7 @@ import hashlib
 import os
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import fetch_unscoped_projects, fetch_scoped_token
+from ._convenience import session_check
 
 
 async def handle_login(request):
@@ -27,7 +27,7 @@ async def handle_login(request):
     # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
         status=303,
-        reason="Redirection to the application"
+        reason="Redirection to login"
     )
 
     cookie, cookie_crypted = await generate_cookie(request)
@@ -50,25 +50,17 @@ async def sso_query_begin(request):
     """
     Display login page and initiate federated keystone authentication
     """
-
-    try:
-        if await decrypt_cookie(request) in request.app['Sessions']:
-            response = aiohttp.web.FileResponse(
-                os.getcwd() + '/s3browser_frontend/login.html'
-            )
-
-            return await disable_cache(response)
-        else:
-            response = aiohttp.web.Response(
-                status=401,
-                reason="Invalid or no session cookie"
-            )
-            return response
-    except KeyError:
-        return await aiohttp.web.Response(
-            status=401,
-            reason="No session cookie"
+    if await session_check(request):
+        response = aiohttp.web.FileResponse(
+            os.getcwd() + '/s3browser_frontend/login.html'
         )
+        return await disable_cache(response)
+    else:
+        response = aiohttp.web.Response(
+            status=401,
+            reason="Invalid or no session cookie"
+        )
+        return response
 
 
 async def sso_query_end(request):
@@ -77,22 +69,19 @@ async def sso_query_end(request):
     from the keystone api.
     """
     # Check for established session
-    try:
+    if await session_check(request):
         session = await decrypt_cookie(request)
         print(session)
         print(request.app['Sessions'])
-        if session not in request.app['Sessions']:
-            raise KeyError
-    except KeyError:
+    else:
         return aiohttp.web.Response(
             status=401,
             reason="Invalid or no session cookie"
         )
     # Try getting the token id from form
-    if 'tokenid' in request.query:
-        unscoped = request.query['tokenid']
+    if 'token' in request.query:
+        unscoped = request.query['token']
         print("Got token {0}".format(unscoped))
-        print("\n {0}".format(request.query))
     else:
         print("\n {0}".format(request.query))
         response = aiohttp.web.Response(
@@ -100,16 +89,6 @@ async def sso_query_end(request):
             reason="No Token ID was specified, token id is required"
         )
         return response
-    # Initiate an aiohttp session to be used in fetching the token
-    async with aiohttp.ClientSession() as token_session:
-        # Fetch the project to scope the token for
-        project = await fetch_unscoped_projects(unscoped, token_session)
-        # Fetch the scoped token from the unscoped token
-        scoped = await fetch_scoped_token(unscoped, project, token_session)
-        request.app['Creds'][session] = {
-            'token': scoped,
-            'token_session': token_session
-        }
 
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
@@ -125,10 +104,9 @@ async def sso_query_end(request):
 async def handle_logout(request):
     # TODO: add token revokation upon leaving
     # TODO: add EC2 key pair revocation upon leaving
-    cookie = decrypt_cookie(request)
-
-    request.app['Sessions'].remove(cookie)
-
+    if session_check(request):
+        cookie = await decrypt_cookie(request)
+        request.app['Sessions'].remove(cookie)
     return aiohttp.web.Response(
         status=204
     )
