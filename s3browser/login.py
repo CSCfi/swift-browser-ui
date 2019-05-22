@@ -79,22 +79,27 @@ async def sso_query_end(request):
     # Check for established session
     try:
         session = await decrypt_cookie(request)
+        print(session)
+        print(request.app['Sessions'])
         if session not in request.app['Sessions']:
             raise KeyError
     except KeyError:
-        return await aiohttp.web.Response(
+        return aiohttp.web.Response(
             status=401,
             reason="Invalid or no session cookie"
         )
     # Try getting the token id from form
-    try:
-        print("Got token {token}".format(request.query['tokenid']))
+    if 'tokenid' in request.query:
         unscoped = request.query['tokenid']
-    except KeyError:
-        response = await aiohttp.web.Response(
+        print("Got token {0}".format(unscoped))
+        print("\n {0}".format(request.query))
+    else:
+        print("\n {0}".format(request.query))
+        response = aiohttp.web.Response(
             status=400,
             reason="No Token ID was specified, token id is required"
         )
+        return response
     # Initiate an aiohttp session to be used in fetching the token
     async with aiohttp.ClientSession() as token_session:
         # Fetch the project to scope the token for
@@ -107,7 +112,7 @@ async def sso_query_end(request):
         }
 
     # Redirect to the browse page with the correct credentials
-    response = await aiohttp.web.Response(
+    response = aiohttp.web.Response(
         status=302,
         reason="Start application"
     )
