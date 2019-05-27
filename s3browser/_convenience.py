@@ -12,6 +12,10 @@ import keystoneauth1.session
 
 import openstack.connection
 
+
+POUTA_URL = 'https://pouta.csc.fi:5001/v3'
+
+
 async def disable_cache(response):
     """
     A convenience function for adding all required cache disabling headers
@@ -91,9 +95,22 @@ async def get_availability_from_token(token):
     }
 
 
-async def validate_cookie(request, project):
+async def initiate_os_session(auth_plugin):
     """
-    Validate openstack unscoped token for specified project.
+    Initiate new openstack session with the authentication plugin specified in
+    the arguments
+    """
+    ret = keystoneauth1.session.Session(
+        auth=auth_plugin,
+        verify=False,
+    )
+    return ret
+
+
+async def validate_cookie(unscoped, project):
+    """
+    Validate openstack unscoped token for specified project. Function creates
+    an keystoneauth1 authentication plugin for the specific token and project.
 
     Params:
         request: object(aiohttp.web.Request)
@@ -102,14 +119,17 @@ async def validate_cookie(request, project):
     Return type:
         object(keystoneauth1.identity.v3.Token)
     """
-    ret = keystoneauth1.session.Session(
-        auth=request.app['Auth'],
-        verify=False,
+    ret = v3.Token(
+        auth_url=POUTA_URL,
+        token=unscoped,
+        project_id=project,
     )
     return ret
 
+
 async def initiate_os_connection(request):
     """
-    Initiate an Opestack sdk session with a cookie as an authentication method.
+    Initiate an Opestack sdk connection with a cookie as an authentication
+    method.
     """
     pass

@@ -21,6 +21,7 @@ from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import session_check, validate_cookie
 from ._convenience import get_availability_from_token
 from ._convenience import initiate_os_connection
+from ._convenience import initiate_os_session
 
 
 async def handle_login(request):
@@ -111,21 +112,28 @@ async def sso_query_end(request):
         )
         return response
 
+    # Save the unscoped token to the session, as it may be needed for token
+    # re-scoping?
+    request.app['Token'] = unscoped
+
     # Check project availability with a list of domains, save the information
     # inside the app mapping
     request.app['Avail'] = await get_availability_from_token(unscoped)
 
     # Create an auth plugin with first project that was found for the user
     # (for now)
+    # TODO: maybe implement dynamic token rescoping
     request.app['Auth'] = await validate_cookie(
-        request,
+        unscoped,
         request.app['Avail']['projects'][0]
     )
 
     # Open an openstack session with the auth plugin we just created
     # No need to pass auth plugin separately, it's contained inside the
     # request's app
-    request.app['OS_Session'] = initiate_os_connection(request)
+    request.app['OS_Session'] = initiate_os_session(request.app['Auth'])
+
+    # Create the openstack connection
 
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
