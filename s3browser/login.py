@@ -96,7 +96,7 @@ async def sso_query_end(request):
     if 'token' in request.query:
         unscoped = request.query['token']
         request.app['Log'].info(
-            'Got OS token ::{0}:: from address {1} at {2}'.format(
+            'Got OS token ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
                 time.ctime()
@@ -111,18 +111,19 @@ async def sso_query_end(request):
 
     # Save the unscoped token to the session, as it may be needed for token
     # re-scoping?
-    request.app['Token'] = unscoped
+    request.app['Creds'][session]['Token'] = unscoped
 
     # Check project availability with a list of domains, save the information
     # inside the app mapping
-    request.app['Avail'] = await get_availability_from_token(unscoped)
+    request.app['Creds'][session]['Avail'] =\
+        get_availability_from_token(unscoped)
 
     # Create an auth plugin with first project that was found for the user
     # (for now)
     # TODO: maybe implement dynamic token rescoping
-    request.app['Auth'] = await validate_cookie(
+    request.app['Creds'][session]['Auth'] = validate_cookie(
         unscoped,
-        request.app['Avail']['projects'][0]
+        request.app['Creds'][session]['Avail']['projects'][0]
     )
 
     # Open an openstack session with the auth plugin we just created
