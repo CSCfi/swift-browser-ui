@@ -1,4 +1,9 @@
-# -*- coding: utf-8 -*-
+"""
+Miscellaneous convenience functions for authenticating against openstack v3
+identity API, cache manipulation, cookies and such. Also the necessary
+project constants will be kept here, e.g. the authentication endpoint
+URL.
+"""
 
 
 from hashlib import sha256

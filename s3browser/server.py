@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 # Generic imports
 import aiohttp.web
 import os

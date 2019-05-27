@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 """
 A module for handling the project login sessions and requesting the necessary
 tokens.
