@@ -11,14 +11,21 @@ from os import urandom
 import aiohttp
 import subprocess
 import json
+import logging
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
 
 import openstack.connection
+import openstack
 
 
 POUTA_URL = 'https://pouta.csc.fi:5001/v3'
+
+
+keystonelog = logging.getLogger('keystoneauth')
+keystonelog.addHandler(logging.StreamHandler())
+keystonelog.setLevel(logging.INFO)
 
 
 async def disable_cache(response):
@@ -59,7 +66,7 @@ async def generate_cookie(request):
         ).decode('utf-8')
 
 
-async def get_availability_from_token(token):
+def get_availability_from_token(token):
     """
     List available domains and projects for the unscoped token specified.
 
@@ -68,7 +75,7 @@ async def get_availability_from_token(token):
     Returns:
         Dictionary containing both the available projects and available domains
     Return type:
-        dict(keys=('projects', 'domains'))
+        dict(keys=('projects': List(str), 'domains': List(str)))
     """
     # Setup things common to every curl command required
     curl_argv = [
@@ -100,10 +107,17 @@ async def get_availability_from_token(token):
     }
 
 
-async def initiate_os_session(auth_plugin):
+def initiate_os_session(auth_plugin):
     """
     Initiate new openstack session with the authentication plugin specified in
     the arguments
+
+    Params:
+        auth_plugin: keystoneauth1.identity.v3.Token
+    Returns:
+        A usable keystone session object for OS client connections
+    Return type:
+        object(keystoneauth1.session.Session)
     """
     ret = keystoneauth1.session.Session(
         auth=auth_plugin,
@@ -112,7 +126,15 @@ async def initiate_os_session(auth_plugin):
     return ret
 
 
-async def validate_cookie(unscoped, project):
+def generate_ec2_keys(connection):
+    pass
+
+
+def revoke_ec2_keys(connection):
+    pass
+
+
+def validate_cookie(unscoped, project):
     """
     Validate openstack unscoped token for specified project. Function creates
     an keystoneauth1 authentication plugin for the specific token and project.
@@ -132,7 +154,7 @@ async def validate_cookie(unscoped, project):
     return ret
 
 
-async def initiate_os_connection(request):
+def initiate_os_connection(request):
     """
     Initiate an Opestack sdk connection with a cookie as an authentication
     method.
