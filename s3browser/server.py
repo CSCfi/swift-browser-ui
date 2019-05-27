@@ -5,12 +5,18 @@
 import aiohttp.web
 import os
 import ssl
+import logging
 
 import cryptography.fernet
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
 from .api import list_buckets, list_objects, download_object
+
+
+logging.basicConfig(
+    level=logging.DEBUG
+)
 
 
 def servinit():
@@ -23,6 +29,9 @@ def servinit():
     app['Crypt'] = cryptography.fernet.Fernet(
         cryptography.fernet.Fernet.generate_key()
     )
+    # Set application specific logging
+    app['Log'] = logging.getLogger('s3browser')
+    app['Log'].info('Set up logging for the s3browser application')
     # Session list to quickly validate sessions
     app['Sessions'] = []
     # Cookie keyed dictionary to store session data
@@ -80,7 +89,10 @@ def run_server_secure(app):
 
 
 def run_server_insecure(app):
-    aiohttp.web.run_app(app)
+    aiohttp.web.run_app(
+        app,
+        access_log=aiohttp.web.logging.getLogger('aiohttp.access')
+    )
 
 
 if __name__ == '__main__':
