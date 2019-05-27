@@ -8,9 +8,10 @@ from ._convenience import decrypt_cookie
 # Hardcoded s3 access keys for testing purposes, will be redundant when
 # authentication is implemented (hopefully at least)
 ***REMOVED******REMOVED***AWS_ENDPOINT_URL = "http://127.0.0.1:9000"
+SETUP_WITH_S3 = True
 
 
-async def list_buckets(request):
+async def s3_list_buckets(request):
     """
     The internal API call for fetching a list of buckets available for user
     """
@@ -40,7 +41,7 @@ async def list_buckets(request):
         )
 
 
-async def list_objects(request):
+async def s3_list_objects(request):
     """
     The internal API call for fetching a list of available objects inside
     a specified bucket
@@ -71,7 +72,7 @@ async def list_objects(request):
         )
 
 
-async def download_object(dloadrequest):
+async def s3_download_object(dloadrequest):
     """
     Function to pull a short-lived presigned download URL from the s3 server
     """
@@ -109,3 +110,39 @@ async def download_object(dloadrequest):
             status=401,
             reason="No user session was found"
         )
+
+
+async def swift_list_buckets(request):
+    """
+    A function for listing buckets through swift and outputting the necessary
+    information in a JSON response.
+    """
+    pass
+
+
+async def swift_list_objects(request):
+    """
+    A function for listing objects in a given bucket (container) through
+    swift and outputting the necessary information in a JSON response.
+    """
+    pass
+
+
+async def swift_download_object(request):
+    """
+    A function for fetching a temporary pre-signed download URL for a swift
+    object.
+    """
+    pass
+
+
+# Re-map functions that are actually used in the program, depending on which
+# platform to use – s3 or swift
+if SETUP_WITH_S3:
+    list_bucket = s3_list_buckets
+    list_objects = s3_list_objects
+    download_object = s3_download_object
+else:
+    list_bucket = swift_list_buckets
+    list_objects = swift_list_objects
+    download_object = swift_download_object
