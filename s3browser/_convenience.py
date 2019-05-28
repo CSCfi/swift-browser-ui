@@ -28,7 +28,7 @@ keystonelog.addHandler(logging.StreamHandler())
 keystonelog.setLevel(logging.INFO)
 
 
-async def disable_cache(response):
+def disable_cache(response):
     """
     A convenience function for adding all required cache disabling headers
     for web responses, e.g. login window.
@@ -39,7 +39,7 @@ async def disable_cache(response):
     return response
 
 
-async def decrypt_cookie(request):
+def decrypt_cookie(request):
     """
     Decrypt a cookie using the server instance specific fernet key
     """
@@ -48,14 +48,14 @@ async def decrypt_cookie(request):
     ).decode('utf-8')
 
 
-async def session_check(request):
+def session_check(request):
     """
     Check session validity from a request
     """
     return await decrypt_cookie(request) in request.app['Sessions']
 
 
-async def generate_cookie(request):
+def generate_cookie(request):
     """
     Generate an encrypted and unencrypted cookie, for use as a session cookie
     or API key.
@@ -126,15 +126,7 @@ def initiate_os_session(auth_plugin):
     return ret
 
 
-def generate_ec2_keys(connection):
-    pass
-
-
-def revoke_ec2_keys(connection):
-    pass
-
-
-def validate_cookie(unscoped, project):
+def scope_cookie(unscoped, project):
     """
     Validate openstack unscoped token for specified project. Function creates
     an keystoneauth1 authentication plugin for the specific token and project.

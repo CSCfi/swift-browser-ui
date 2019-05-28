@@ -15,7 +15,7 @@ import os
 import time
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import session_check, validate_cookie
+from ._convenience import session_check, scope_cookie
 from ._convenience import get_availability_from_token
 from ._convenience import initiate_os_connection
 from ._convenience import initiate_os_session
@@ -31,8 +31,8 @@ async def handle_login(request):
         reason="Redirection to login"
     )
 
-    cookie, cookie_crypted = await generate_cookie(request)
-    response = await disable_cache(response)
+    cookie, cookie_crypted = generate_cookie(request)
+    response = disable_cache(response)
 
     response.set_cookie(
         name='S3BROW_SESSION',
@@ -59,11 +59,11 @@ async def sso_query_begin(request):
     """
     Display login page and initiate federated keystone authentication
     """
-    if await session_check(request):
+    if session_check(request):
         response = aiohttp.web.FileResponse(
             os.getcwd() + '/s3browser_frontend/login.html'
         )
-        return await disable_cache(response)
+        return disable_cache(response)
     else:
         response = aiohttp.web.Response(
             status=401,
@@ -78,8 +78,8 @@ async def sso_query_end(request):
     from the keystone api.
     """
     # Check for established session
-    if await session_check(request):
-        session = await decrypt_cookie(request)
+    if session_check(request):
+        session = decrypt_cookie(request)
         request.app['Log'].info(
             'Received SSO login from {0} with session {1} :: {2}'.format(
                 request.remote,
@@ -121,7 +121,7 @@ async def sso_query_end(request):
     # Create an auth plugin with first project that was found for the user
     # (for now)
     # TODO: maybe implement dynamic token rescoping
-    request.app['Creds'][session]['Auth'] = validate_cookie(
+    request.app['Creds'][session]['Auth'] = scope_cookie(
         unscoped,
         request.app['Creds'][session]['Avail']['projects'][0]
     )
@@ -146,7 +146,7 @@ async def sso_query_end(request):
 async def handle_logout(request):
     # TODO: add token revokation upon leaving
     if session_check(request):
-        cookie = await decrypt_cookie(request)
+        cookie = decrypt_cookie(request)
         request.app['Sessions'].remove(cookie)
     return aiohttp.web.Response(
         status=204
