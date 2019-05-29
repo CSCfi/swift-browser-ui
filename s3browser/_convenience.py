@@ -16,11 +16,11 @@ import logging
 from keystoneauth1.identity import v3
 import keystoneauth1.session
 
-import openstack.connection
-import openstack
-
+import swiftclient.service
+import swiftclient.client
 
 POUTA_URL = 'https://pouta.csc.fi:5001/v3'
+SWIFT_URL_PREFIX = 'https://object.pouta.csc.fi:443/swift/v1'
 
 
 keystonelog = logging.getLogger('keystoneauth')
@@ -52,7 +52,7 @@ def session_check(request):
     """
     Check session validity from a request
     """
-    return await decrypt_cookie(request) in request.app['Sessions']
+    return decrypt_cookie(request) in request.app['Sessions']
 
 
 def generate_cookie(request):
@@ -107,48 +107,60 @@ def get_availability_from_token(token):
     }
 
 
-def initiate_os_session(auth_plugin):
+# The Openstack SDK functions will be moved to the login.py module, but will
+# be contained here for testing.
+def initiate_os_session(unscoped, project):
     """
-    Initiate new openstack session with the authentication plugin specified in
-    the arguments
+    Initiate new openstack session with the unscoped token and the specified
+    project id
 
     Params:
-        auth_plugin: keystoneauth1.identity.v3.Token
+        unscoped: str
+        project: str
     Returns:
         A usable keystone session object for OS client connections
     Return type:
         object(keystoneauth1.session.Session)
     """
-    ret = keystoneauth1.session.Session(
-        auth=auth_plugin,
-        verify=False,
-    )
-    return ret
-
-
-def scope_cookie(unscoped, project):
-    """
-    Validate openstack unscoped token for specified project. Function creates
-    an keystoneauth1 authentication plugin for the specific token and project.
-
-    Params:
-        request: object(aiohttp.web.Request)
-    Returns:
-        A usable authentication plugin
-    Return type:
-        object(keystoneauth1.identity.v3.Token)
-    """
-    ret = v3.Token(
+    os_auth = v3.Token(
         auth_url=POUTA_URL,
         token=unscoped,
-        project_id=project,
+        project_id=project
     )
-    return ret
+
+    return keystoneauth1.session.Session(
+        auth=os_auth,
+        verify=False,
+    )
 
 
-def initiate_os_connection(request):
+def initiate_os_service(os_session, project):
     """
-    Initiate an Opestack sdk connection with a cookie as an authentication
-    method.
+    Initiate an Opestack sdk connection with a session as an authentication
+    method. Also add the object storage service.
+
+    Params:
+        os_session: object(keystoneauth1.session.Session)
+    Returns:
+        A connection object to Openstack Object store service
+    Return type:
+        object(swiftclient.service.SwiftService)
     """
-    pass
+    # Generate the preauth storage URL for the swift service
+    storage_url = SWIFT_URL_PREFIX + '/AUTH_' + project
+
+    # Set up new options for the swift service, since the defaults won't do
+    sc_new_options = {
+        'os_auth_token': os_session.get_token(),
+        'os_storage_url': SWIFT_URL_PREFIX + '/AUTH_' + project,
+        'os_auth_url': POUTA_URL,
+        'insecure': True,
+        'debug': True,
+        'info': True,
+    }
+
+    os_sc = swiftclient.service.SwiftService(
+        options=sc_new_options
+    )
+
+    return os_sc
