@@ -8,10 +8,10 @@ URL.
 
 from hashlib import sha256
 from os import urandom
-import aiohttp
 import subprocess
 import json
 import logging
+import aiohttp.web
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
@@ -25,7 +25,7 @@ SWIFT_URL_PREFIX = 'https://object.pouta.csc.fi:443/swift/v1'
 
 keystonelog = logging.getLogger('keystoneauth')
 keystonelog.addHandler(logging.StreamHandler())
-keystonelog.setLevel(logging.INFO)
+keystonelog.setLevel(logging.DEBUG)
 
 
 def disable_cache(response):
@@ -53,6 +53,43 @@ def session_check(request):
     Check session validity from a request
     """
     return decrypt_cookie(request) in request.app['Sessions']
+
+
+def api_check(request):
+    """
+    Separate session check for API
+
+    Params:
+        request: object(aiohttp.web.Request)
+    Returns:
+        The correct check failure response, the session cookie otherwise
+    Return type:
+        object(aiohttp.web.Response) or str
+    """
+    if decrypt_cookie(request) in request.app['Sessions']:
+        session = decrypt_cookie(request)
+        ret = session
+    else:
+        ret = aiohttp.web.Response(
+            status=401,
+            reason="Invalid or no session cookie"
+        )
+    if 'ST_conn' not in request.app['Creds'][session].keys():
+        ret = aiohttp.web.Response(
+            status=401,
+            reason="No established swift connection for session"
+        )
+    if 'OS_sess' not in request.app['Creds'][session].keys():
+        ret = aiohttp.web.Response(
+            status=401,
+            reason="No established keystone authentication session"
+        )
+    if 'Avail' not in request.app['Creds'][session].keys():
+        ret = aiohttp.web.Response(
+            status=401,
+            reason="Project availability hasn't been checked before auth"
+        )
+    return ret
 
 
 def generate_cookie(request):
@@ -146,9 +183,6 @@ def initiate_os_service(os_session, project):
     Return type:
         object(swiftclient.service.SwiftService)
     """
-    # Generate the preauth storage URL for the swift service
-    storage_url = SWIFT_URL_PREFIX + '/AUTH_' + project
-
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
