@@ -6,19 +6,12 @@ tokens.
 # aiohttp
 import aiohttp.web
 # Openstack
-import keystoneclient
-import keystoneauth1
-
-import cryptography.fernet
-import hashlib
 import os
 import time
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import session_check, scope_cookie
-from ._convenience import get_availability_from_token
-from ._convenience import initiate_os_connection
-from ._convenience import initiate_os_session
+from ._convenience import get_availability_from_token, session_check
+from ._convenience import initiate_os_session, initiate_os_service
 
 
 async def handle_login(request):
@@ -118,20 +111,17 @@ async def sso_query_end(request):
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
-    # Create an auth plugin with first project that was found for the user
-    # (for now)
-    # TODO: maybe implement dynamic token rescoping
-    request.app['Creds'][session]['Auth'] = scope_cookie(
+    # Open an OS session for the first project that's found for the user.
+    request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
         request.app['Creds'][session]['Avail']['projects'][0]
     )
 
-    # Open an openstack session with the auth plugin we just created
-    # No need to pass auth plugin separately, it's contained inside the
-    # request's app
-    request.app['OS_Session'] = initiate_os_session(request.app['Auth'])
-
-    # Create the openstack connection
+    # Create the swiftclient connection
+    request.app['Creds'][session]['ST_conn'] = initiate_os_service(
+        request.app['Creds'][session]['OS_sess'],
+        request.app['Creds'][session]['Avail']['projectsc'][0],
+    )
 
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
