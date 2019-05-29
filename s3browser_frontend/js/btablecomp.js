@@ -1,7 +1,6 @@
 Vue.component('bucket-table-heading', {
     template: '<tr>\
                 <th>Bucket</th>\
-                <th>Creation date</th>\
               </tr>'
 })
 
@@ -9,7 +8,6 @@ Vue.component('bucket-table-row', {
     props: ['bname', 'bdate',],
     template: '<tr>\
                 <td>{{ bname }}</td>\
-                <td>{{ bdate }}</td>\
                 <button v-on:click="$emit(\'bclick\')">Get objects</button>\
                </tr>'
 })

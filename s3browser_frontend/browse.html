@@ -31,7 +31,6 @@
                     v-for="item in bList"
                     v-bind:key="item.Name"
                     v-bind:bname="item.Name"
-                    v-bind:bdate="item.CreationDate"
                     v-on:bclick="getObjects ( item.Name )"
                 ></tr>
             </table>
