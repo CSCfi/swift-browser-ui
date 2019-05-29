@@ -123,6 +123,17 @@ async def sso_query_end(request):
         request.app['Creds'][session]['Avail']['projectsc'][0],
     )
 
+    # Log information from the connection to make sure that the connetion was
+    # actually established
+    request.app['Log'].info(
+        'The following was gotten as reponse to the new session for ' +
+        '{0}, session: {1} :: {2}\n'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        ) + request.app['Creds'][session]['ST_conn'].stat()
+    )
+
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
         status=302,
@@ -134,9 +145,9 @@ async def sso_query_end(request):
 
 
 async def handle_logout(request):
-    # TODO: add token revokation upon leaving
     if session_check(request):
         cookie = decrypt_cookie(request)
+        request.app['Creds'][cookie]['OS_sess'].invalidate
         request.app['Sessions'].remove(cookie)
     return aiohttp.web.Response(
         status=204
