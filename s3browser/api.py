@@ -1,7 +1,9 @@
 import aiohttp.web
 import boto3
-import datetime
+import time
+
 from ._convenience import decrypt_cookie
+from ._convenience import api_check
 
 
 # TODO: Check if it's necessary to change the API from s3 -> swift
@@ -64,8 +66,8 @@ async def s3_list_objects(request):
         return aiohttp.web.json_response(
             ret
         )
-    # If can't find user session, reply with 401
     except KeyError:
+        # If can't find user session, reply with 401
         return aiohttp.web.Response(
             status=401,
             reason="No user session was found"
@@ -117,7 +119,23 @@ async def swift_list_buckets(request):
     A function for listing buckets through swift and outputting the necessary
     information in a JSON response.
     """
-    pass
+    session = api_check(request)
+    # If api_check has returned an error response, return that
+    if type(session) is not str:
+        return session
+    request.app['Log'].info(
+        'API call for list buckets from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    # The maximum amount of buckets / containers is measured in thousands,
+    # so it's not necessary to think twice about iterating over the whole
+    # response at once
+    for container in request.app['Creds'][session]['ST_conn'].list():
+        pass
 
 
 async def swift_list_objects(request):
@@ -125,7 +143,17 @@ async def swift_list_objects(request):
     A function for listing objects in a given bucket (container) through
     swift and outputting the necessary information in a JSON response.
     """
-    pass
+    session = api_check(request)
+    # If api_check has returned an error response, return that
+    if type(session) is not str:
+        return session
+    request.app['Log'].info(
+        'API call for list objects from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
 
 
 async def swift_download_object(request):
@@ -133,7 +161,17 @@ async def swift_download_object(request):
     A function for fetching a temporary pre-signed download URL for a swift
     object.
     """
-    pass
+    session = api_check(request)
+    # If api_check has returned an error response, return that
+    if type(session) is not str:
+        return session
+    request.app['Log'].info(
+        'API call for download object from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
 
 
 # Re-map functions that are actually used in the program, depending on which
