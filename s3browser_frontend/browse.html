@@ -49,6 +49,16 @@
                 ></tr>
             </table>
         </div>
+        <div id='projectChooser'>
+            <ul>
+                <li
+                    is="project-list-element"
+                    v-for="item in projects"
+                    v-bind:key="item"
+                    v-bind:project="item"
+                ></li>
+            </ul>
+        </div>
         <script src="static/js/browse.js"></script>
     </body>
 </html>
