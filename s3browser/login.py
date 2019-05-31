@@ -147,10 +147,58 @@ async def sso_query_end(request):
     return response
 
 
+async def token_rescope(request):
+    """
+    Rescope the requesting session's token to the new specified project
+    """
+    if session_check(request):
+        session = decrypt_cookie(request)
+        request.app['Log'].info(
+            "Call to rescope token from {0}, sess: {1} :: {2}".format(
+                request.remote,
+                session,
+                time.ctime(),
+            )
+        )
+    else:
+        return aiohttp.web.Response(
+            status=401,
+            reason='No valid session cookie'
+        )
+
+    if (request.query['project'] not in
+            request.app['Creds'][session]['Avail']['projects']):
+        return aiohttp.web.Response(
+            status=403,
+            reason="The project is not available for this token."
+        )
+
+    # Close the old swift connection
+    request.app['Creds'][session]['ST_conn'].close()
+    # Invalidate the old scoped token
+    request.app['Creds'][session]['OS_sess'].invalidate()
+    # Overwrite the old session with a new one, with the updated project id
+    request.app['Creds'][session]['OS_sess'] = initiate_os_session(
+        request.app['Creds'][session]['Token'],
+        request.query['project'],
+    )
+    # Overwrite the old connection with a new one, with the updated keystone
+    # session
+    request.app['Creds'][session]['ST_conn'] = initiate_os_service(
+        request.app['Creds'][session]['OS_sess'],
+        request.query['project'],
+    )
+
+    return aiohttp.web.Response(
+        status=204,
+        reason="Successfully rescoped token."
+    )
+
+
 async def handle_logout(request):
     if session_check(request):
         cookie = decrypt_cookie(request)
-        request.app['Creds'][cookie]['OS_sess'].invalidate
+        request.app['Creds'][cookie]['OS_sess'].invalidate()
         request.app['Sessions'].remove(cookie)
     return aiohttp.web.Response(
         status=204
