@@ -189,6 +189,32 @@ async def swift_download_object(request):
             time.ctime(),
         )
     )
+    return aiohttp.web.Response(
+        status=204,
+        reason="Not yet implemented",
+    )
+
+
+async def os_list_projects(request):
+    """
+    A function for responding with the projects available for the session's
+    unscoped token.
+    """
+    session = api_check(request)
+    if type(session) is not str:
+        return session
+    request.app['Log'].info(
+        'API call for project listing from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    # Return the projects available for the session
+    return aiohttp.web.json_response(
+        request.app['Creds'][session]['Avail']['projects']
+    )
 
 
 # Re-map functions that are actually used in the program, depending on which
