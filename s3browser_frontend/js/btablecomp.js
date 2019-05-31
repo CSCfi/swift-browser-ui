@@ -18,7 +18,6 @@ Vue.component('object-table-heading', {
     <td>Name</td>\
     <td>Last modified</td>\
     <td>Size</td>\
-    <td>Owner</td>\
     <button v-on:click="$emit(\'oheadingclick\')">Back</button>\
     </tr>'
 })
