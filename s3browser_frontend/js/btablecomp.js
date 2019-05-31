@@ -15,7 +15,7 @@ Vue.component('bucket-table-row', {
 Vue.component('object-table-heading', {
     template: '<tr>\
     <td>Bucket</td>\
-    <td>Key</td>\
+    <td>Name</td>\
     <td>Last modified</td>\
     <td>Size</td>\
     <td>Owner</td>\
@@ -28,10 +28,9 @@ Vue.component('object-table-row', {
     template: '\
     <tr>\
     <td>{{ bucket }}</td>\
-    <td>{{ stobject.Key }}</td>\
-    <td>{{ stobject.LastModified }}</td>\
-    <td>{{ stobject.Size }}</td>\
-    <td>{{ stobject.Owner.DisplayName }}</td>\
+    <td>{{ stobject.name }}</td>\
+    <td>{{ stobject.last_modified }}</td>\
+    <td>{{ stobject.bytes }}</td>\
     <a :href="dloadlink">Download</a>\
     </tr>'
 })

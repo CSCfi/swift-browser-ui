@@ -29,9 +29,9 @@
                 <tr
                     is="bucket-table-row"
                     v-for="item in bList"
-                    v-bind:key="item.Name"
-                    v-bind:bname="item.Name"
-                    v-on:bclick="getObjects ( item.Name )"
+                    v-bind:key="item.name"
+                    v-bind:bname="item.name"
+                    v-on:bclick="getObjects ( item.name )"
                 ></tr>
             </table>
             <table id='otable' v-if='objects'>
@@ -42,7 +42,7 @@
                 <tr
                     is="object-table-row"
                     v-for="item in oList"
-                    v-bind:key='item.Key'
+                    v-bind:key='item.hash'
                     v-bind:stobject='item'
                     v-bind:bucket='currentBucket'
                     :dloadlink='item.url'

@@ -6,11 +6,8 @@ from ._convenience import decrypt_cookie
 from ._convenience import api_check
 
 
-# TODO: Check if it's necessary to change the API from s3 -> swift
-# Hardcoded s3 access keys for testing purposes, will be redundant when
-# authentication is implemented (hopefully at least)
-***REMOVED******REMOVED***AWS_ENDPOINT_URL = "http://127.0.0.1:9000"
-SETUP_WITH_S3 = True
+# Toggle S3 function overloading
+SETUP_WITH_S3 = False
 
 
 async def s3_list_buckets(request):
@@ -19,7 +16,7 @@ async def s3_list_buckets(request):
     """
     # TODO: Refactor code to store session specific s3 client to app mapping
     try:
-        if await decrypt_cookie(request) not in request.app['Sessions']:
+        if decrypt_cookie(request) not in request.app['Sessions']:
             raise KeyError()
 
         s3 = boto3.client(
@@ -49,7 +46,7 @@ async def s3_list_objects(request):
     a specified bucket
     """
     try:
-        if await decrypt_cookie(request) not in request.app['Sessions']:
+        if decrypt_cookie(request) not in request.app['Sessions']:
             raise KeyError()
         s3 = boto3.client(
             's3',
@@ -82,7 +79,7 @@ async def s3_download_object(dloadrequest):
     try:
         # Check for established session
         # TODO: change over to API specific cookie
-        if (await decrypt_cookie(dloadrequest) not in
+        if (decrypt_cookie(dloadrequest) not in
                 dloadrequest.app['Sessions']):
             raise KeyError()
         # Open a client to the server
@@ -134,8 +131,16 @@ async def swift_list_buckets(request):
     # The maximum amount of buckets / containers is measured in thousands,
     # so it's not necessary to think twice about iterating over the whole
     # response at once
-    for container in request.app['Creds'][session]['ST_conn'].list():
-        pass
+    containers = [i for i in request.app['Creds'][session]['ST_conn'].list()]
+
+    # For some reason the return value is a generator object, which creates
+    # a list with just a single item -> get this one item as the new value
+    if len(containers) == 1:
+        containers = containers[0]
+
+    return aiohttp.web.json_response(
+        containers['listing']
+    )
 
 
 async def swift_list_objects(request):
@@ -153,6 +158,18 @@ async def swift_list_objects(request):
             session,
             time.ctime(),
         )
+    )
+
+    objects = [i for i in request.app['Creds'][session]['ST_conn'].list(
+        container=request.query['bucket']  # named bucket for compatibility
+    )]
+
+    # Again, get the only item in the generated list
+    if len(objects) == 1:
+        objects = objects[0]
+
+    return aiohttp.web.json_response(
+        objects['listing']
     )
 
 

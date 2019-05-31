@@ -102,6 +102,9 @@ async def sso_query_end(request):
         )
         return response
 
+    # Initiate the credential dictionary
+    request.app['Creds'][session] = {}
+
     # Save the unscoped token to the session, as it may be needed for token
     # re-scoping?
     request.app['Creds'][session]['Token'] = unscoped
@@ -120,7 +123,7 @@ async def sso_query_end(request):
     # Create the swiftclient connection
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.app['Creds'][session]['Avail']['projectsc'][0],
+        request.app['Creds'][session]['Avail']['projects'][0],
     )
 
     # Log information from the connection to make sure that the connetion was
@@ -131,7 +134,7 @@ async def sso_query_end(request):
             request.remote,
             session,
             time.ctime(),
-        ) + request.app['Creds'][session]['ST_conn'].stat()
+        ) + str(request.app['Creds'][session]['ST_conn'].stat())
     )
 
     # Redirect to the browse page with the correct credentials
