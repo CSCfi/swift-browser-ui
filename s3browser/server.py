@@ -8,7 +8,7 @@ import cryptography.fernet
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
-from .api import list_buckets, list_objects, download_object
+from .api import list_buckets, list_objects, download_object, os_list_projects
 
 
 logging.basicConfig(
@@ -61,6 +61,7 @@ def servinit():
         aiohttp.web.get('/api/buckets', list_buckets),
         aiohttp.web.get('/api/objects', list_objects),
         aiohttp.web.get('/api/dload', download_object),
+        aiohttp.web.get('/api/projects', os_list_projects)
     ])
 
     return app
