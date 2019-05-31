@@ -120,10 +120,12 @@ def get_availability_from_token(token):
     ]
     # Fetch required information from the API with curl
     output_projects = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects']
+        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects'],
+        shell=False,
     )
     output_domains = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains']
+        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains'],
+        shell=False,
     )
     # Decode and serialize said output to a usable format
     output_projects = json.loads(output_projects.decode('utf-8'))
