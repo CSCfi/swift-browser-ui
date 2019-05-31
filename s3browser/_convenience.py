@@ -19,6 +19,8 @@ import keystoneauth1.session
 import swiftclient.service
 import swiftclient.client
 
+from cryptography.fernet import InvalidToken
+
 POUTA_URL = 'https://pouta.csc.fi:5001/v3'
 SWIFT_URL_PREFIX = 'https://object.pouta.csc.fi:443/swift/v1'
 
@@ -66,30 +68,36 @@ def api_check(request):
     Return type:
         object(aiohttp.web.Response) or str
     """
-    if decrypt_cookie(request) in request.app['Sessions']:
-        session = decrypt_cookie(request)
-        ret = session
-    else:
-        ret = aiohttp.web.Response(
-            status=401,
-            reason="Invalid or no session cookie"
+    try:
+        if decrypt_cookie(request) in request.app['Sessions']:
+            session = decrypt_cookie(request)
+            ret = session
+            if 'ST_conn' not in request.app['Creds'][session].keys():
+                ret = aiohttp.web.Response(
+                    status=401,
+                    reason="No established swift connection for session"
+                )
+            if 'OS_sess' not in request.app['Creds'][session].keys():
+                ret = aiohttp.web.Response(
+                    status=401,
+                    reason="No established keystone authentication session"
+                )
+            if 'Avail' not in request.app['Creds'][session].keys():
+                ret = aiohttp.web.Response(
+                    status=401,
+                    reason="Project availability hasn't been checked"
+                )
+        else:
+            ret = aiohttp.web.Response(
+                status=401,
+                reason="Invalid or no session cookie"
+            )
+        return ret
+    except InvalidToken:
+        return aiohttp.web.Response(
+            status=403,
+            reason="Stale token"
         )
-    if 'ST_conn' not in request.app['Creds'][session].keys():
-        ret = aiohttp.web.Response(
-            status=401,
-            reason="No established swift connection for session"
-        )
-    if 'OS_sess' not in request.app['Creds'][session].keys():
-        ret = aiohttp.web.Response(
-            status=401,
-            reason="No established keystone authentication session"
-        )
-    if 'Avail' not in request.app['Creds'][session].keys():
-        ret = aiohttp.web.Response(
-            status=401,
-            reason="Project availability hasn't been checked before auth"
-        )
-    return ret
 
 
 def generate_cookie(request):
