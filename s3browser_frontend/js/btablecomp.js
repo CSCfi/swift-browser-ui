@@ -2,7 +2,7 @@ Vue.component('bucket-table-heading', {
     template: '<tr>\
                 <th>Bucket</th>\
               </tr>'
-})
+});
 
 Vue.component('bucket-table-row', {
     props: ['bname', 'bdate',],
@@ -10,7 +10,7 @@ Vue.component('bucket-table-row', {
                 <td>{{ bname }}</td>\
                 <button v-on:click="$emit(\'bclick\')">Get objects</button>\
                </tr>'
-})
+});
 
 Vue.component('object-table-heading', {
     template: '<tr>\
@@ -20,7 +20,7 @@ Vue.component('object-table-heading', {
     <td>Size</td>\
     <button v-on:click="$emit(\'oheadingclick\')">Back</button>\
     </tr>'
-})
+});
 
 Vue.component('object-table-row', {
     props: ['stobject', 'bucket', 'dloadlink'],
@@ -32,4 +32,12 @@ Vue.component('object-table-row', {
     <td>{{ stobject.bytes }}</td>\
     <a :href="dloadlink">Download</a>\
     </tr>'
-})
+});
+
+Vue.component('project-list-element', {
+    props: ['project'],
+    template: '\
+    <li>\
+    {{ project }}\
+    </li>'
+});
