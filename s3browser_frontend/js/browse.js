@@ -8,6 +8,30 @@ var app = new Vue ({
     }
 });
 
+var projectChooser = new Vue({
+    el: '#projectChooser',
+    data: {
+        projects: [],
+    },
+    methods: {
+        getProjects: function () {
+            // Fetch available projects from the API
+            fetch('api/projects', {method: 'GET', credentials: 'include'})
+                .then(
+                    function ( response ) {
+                        return response.json();
+                    }
+                )
+                .then(
+                    function ( retJson ) {
+                        console.log( JSON.stringify( retJson ));
+                        projectChooser.projects = retJson;
+                    }
+                )
+        }
+    },
+});
+
 var s3list = new Vue ({
     el: '#s3list',
     data: {
@@ -67,4 +91,5 @@ var s3list = new Vue ({
     }
 });
 
-s3list.getBuckets()
+s3list.getBuckets();
+projectChooser.getProjects();
