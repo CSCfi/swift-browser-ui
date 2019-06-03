@@ -99,7 +99,7 @@ var s3list = new Vue ({
                         for(i = 0; i < s3list.oList.length; i++) {
                             s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['Key'];
                         }
-                    } 
+                    }
                 )
         },
     }
