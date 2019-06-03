@@ -22,10 +22,13 @@ th, td, tr {
     width: 100%;
     border-bottom: 1px solid #ddd;
     padding: 5px;
+    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
 }
 
 #bucketname:hover {
-    background-color: lightgray;
+    background-color: grey;
+    color: white;
 }
 
 th {
