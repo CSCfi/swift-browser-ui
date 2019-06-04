@@ -1,10 +1,15 @@
-// There is some trickery with tricks with links instead of text, to
-// enable alt focusing to relevant parts of the screen (e.g. back-button,
-// changing to bucket). The reason this is done with links is to prevent
-// having to use a library to implement this basic functionality, there's
-// already vue.js and it can be used to implement link behaviour overriding.
-// Anything on top of that would be unnecessary bloat leading to increased
-// load times.
+// There is some trickery with trickery with buttons instead of regular text,
+// since even though vue.js is completely fine making ordinary text-containing
+// table elements tabbable and clickable, this is NOT considered accessible
+// by the WCAG 2.1 standard. Hence, the content must be made accessible with
+// sequential keyboard usage and must be made to work with the screen readers
+// and other accessibility software available on the market, which in turn
+// requires using the correct html tags for _all_ interactive content on the
+// webpage. The only practical annoyance with this is the unnecessary
+// abundance of css that needs to be written as result. (for making the design
+// language consistent with what a regular user considers to be a table)
+// For a better explanation head to the address:
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex#Accessibility_concerns
 
 // A vue.js component for the bucket table headings. The only column currently
 // is the bucket/container name, so not much needs to be displayed
@@ -20,7 +25,7 @@ Vue.component('bucket-table-heading', {
 Vue.component('bucket-table-row', {
     props: ['bname', 'bdate',],
     template: '<tr>\
-                <td id="bucketname" v-on:click="$emit(\'bclick\')">{{ bname }}</td>\
+                <button id="bucketname" v-on:click="$emit(\'bclick\')">{{ bname }}</button>\
                </tr>'
 });
 
@@ -34,7 +39,7 @@ Vue.component('bucket-table-row', {
 // on the server side)
 Vue.component('object-table-heading', {
     template: '<tr>\
-    <th id="backheading" v-on:click="$emit(\'oheadingclick\')"><a v-on:click.prevent="$emit(\'oheadingclick\')">Back</a></th>\
+    <button id="backbutton" v-on:click="$emit(\'oheadingclick\')">Back</button>\
     <th>Bucket</th>\
     <th>Name</th>\
     <th>Last modified</th>\
