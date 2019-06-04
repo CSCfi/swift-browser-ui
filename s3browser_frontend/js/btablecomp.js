@@ -1,3 +1,11 @@
+// There is some trickery with tricks with links instead of text, to
+// enable alt focusing to relevant parts of the screen (e.g. back-button,
+// changing to bucket). The reason this is done with links is to prevent
+// having to use a library to implement this basic functionality, there's
+// already vue.js and it can be used to implement link behaviour overriding.
+// Anything on top of that would be unnecessary bloat leading to increased
+// load times.
+
 // A vue.js component for the bucket table headings. The only column currently
 // is the bucket/container name, so not much needs to be displayed
 Vue.component('bucket-table-heading', {
@@ -26,7 +34,7 @@ Vue.component('bucket-table-row', {
 // on the server side)
 Vue.component('object-table-heading', {
     template: '<tr>\
-    <th id="backheading" v-on:click="$emit(\'oheadingclick\')">Back</th>\
+    <th id="backheading" v-on:click="$emit(\'oheadingclick\')"><a v-on:click.prevent="$emit(\'oheadingclick\')">Back</a></th>\
     <th>Bucket</th>\
     <th>Name</th>\
     <th>Last modified</th>\
