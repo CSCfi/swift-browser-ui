@@ -10,10 +10,6 @@ import keystoneauth1
 import keystoneauth1.identity.v3 as v3
 
 
-# Example ec2 credentials
-***REMOVED******REMOVED***AWS_ENDPOINT_URL = 'http://127.0.0.1:9000'
-
-
 def getRandom():
     """
     Get 1K of random data
@@ -60,7 +56,7 @@ def s3_generateTestData(key, secret, endpoint):
 
 
 def swift_generate_test_data(
-***REMOVED******REMOVED***    containers=1,  # Create only one test container by default
+    containers=1,  # Create only one test container by default
     objects=50000,  # Default object amount at max 50000 pcs
     max_filesize=1048576,  # Default files at max 1M large
     endpoint='127.0.0.1',  # Assume local testing environment
@@ -74,7 +70,7 @@ def swift_generate_test_data(
     # Setup authentication plugin
     auth_plugin = v3.Password(
         auth_url='http://' + 'endpoint' + ':5000/v3',
-***REMOVED******REMOVED***        domain_id=user_domain_id,
+        domain_id=user_domain_id,
         project_id=user_project_id
     )
     sess = keystoneauth1.session.Session(
@@ -108,7 +104,7 @@ def swift_generate_test_data(
 
 def main():
     swift_generate_test_data(
-***REMOVED******REMOVED***        containers=10,
+        containers=10,
         endpoint='',
         user_project_id='testproj',
     )
