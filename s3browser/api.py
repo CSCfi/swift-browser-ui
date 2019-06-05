@@ -21,7 +21,7 @@ async def s3_list_buckets(request):
 
         s3 = boto3.client(
             's3',
-***REMOVED******REMOVED******REMOVED***        )
+        )
         # Fetch the information about the user's buckets from API
         ret = s3.list_buckets()['Buckets']
         for i in ret:
@@ -50,7 +50,7 @@ async def s3_list_objects(request):
             raise KeyError()
         s3 = boto3.client(
             's3',
-***REMOVED******REMOVED******REMOVED***        )
+        )
         # Get all objects in the specified bucket
         ret = s3.list_objects(
             Bucket=request.query['bucket']
@@ -85,7 +85,7 @@ async def s3_download_object(dloadrequest):
         # Open a client to the server
         s3 = boto3.client(
             's3',
-***REMOVED******REMOVED******REMOVED***        )
+        )
         # Get a presigned url from the server with a 2000ms TTL
         url = s3.generate_presigned_url(
             'get_object',
