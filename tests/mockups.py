@@ -10,8 +10,35 @@ class Mock_Request:
     representation of the requests that will be passed to the functions. (the
     actual request eing a MutableMapping instance)
     """
-    def __init__(self):
-        pass
+    app = None
+    headers = {}
+    cookies = {}
+
+    def set_headers(self, headers):
+        """
+        Set mock request headers.
+        Params:
+            headers: dict
+        """
+        for i in headers.keys():
+            self.headers[i] = headers[i]
+
+    def set_cookies(self, cookies):
+        """
+        Set mock request cookies.
+        Params:
+            cookies: dict
+        """
+        for i in cookies.keys():
+            self.cookies[i] = cookies[i]
+
+    def set_app(self, app):
+        """
+        Set mock request application.
+        Params:
+            app: object(Mock_App)
+        """
+        self.app = app
 
 
 class Mock_App:
