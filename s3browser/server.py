@@ -65,7 +65,7 @@ def servinit():
         aiohttp.web.get('/api/objects', list_objects),
         aiohttp.web.get('/api/dload', download_object),
         aiohttp.web.get('/api/username', get_os_user),
-        aiohttp.web.get('/api/projects', os_list_projects)
+        aiohttp.web.get('/api/projects', os_list_projects),
     ])
 
     return app
