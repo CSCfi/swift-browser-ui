@@ -111,6 +111,28 @@ async def s3_download_object(dloadrequest):
         )
 
 
+async def get_os_user(request):
+    """
+    Function for fetching the user that the OS session has been opened for.
+    """
+    session = api_check(request)
+    if type(session) is not str:
+        return session
+    request.app['Log'].info(
+        'API call for username from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    userid = request.app['Creds'][session]['OS_sess'].get_user_id()
+
+    return aiohttp.web.json_response(
+        userid
+    )
+
+
 async def swift_list_buckets(request):
     """
     A function for listing buckets through swift and outputting the necessary
