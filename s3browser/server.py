@@ -10,6 +10,7 @@ from .front import index, browse
 from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
+from .api import get_os_user
 
 
 logging.basicConfig(

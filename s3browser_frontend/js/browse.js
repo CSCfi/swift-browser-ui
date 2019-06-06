@@ -105,7 +105,6 @@ var s3list = new Vue ({
     }
 });
 
-app.getUser()
-s3list.getBuckets()
+app.getUser();
 s3list.getBuckets();
 projectChooser.getProjects();
