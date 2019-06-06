@@ -4,7 +4,21 @@ var app = new Vue ({
         user: undefined,
     },
     methods: {
-
+        getUser: function () {
+            fetch('api/username', { method: 'GET', credentials: 'include' })
+                .then(
+                    function ( response ) {
+                        return response.json();
+                    }
+                )
+                .then(
+                    function ( retJson ) {
+                        var uname = retJson;
+                        console.log( uname );
+                        app.user = uname;
+                    }
+                )
+        },
     }
 });
 
@@ -67,4 +81,5 @@ var s3list = new Vue ({
     }
 });
 
+app.getUser()
 s3list.getBuckets()
