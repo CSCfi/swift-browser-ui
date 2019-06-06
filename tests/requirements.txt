@@ -4,3 +4,7 @@ python-swiftclient
 aiohttp
 cryptography
 aiounittest
+tox
+bandit
+flake8
+
