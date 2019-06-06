@@ -1,0 +1,6 @@
+boto3
+keystoneauth1
+python-swiftclient
+aiohttp
+cryptography
+aiounittest
