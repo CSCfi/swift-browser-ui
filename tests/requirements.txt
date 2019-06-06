@@ -3,8 +3,8 @@ keystoneauth1
 python-swiftclient
 aiohttp
 cryptography
-aiounittest
 tox
 bandit
 flake8
-
+pytest
+pytest-asyncio
