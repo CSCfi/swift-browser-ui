@@ -44,6 +44,7 @@ def test_api_check_raise_on_no_connection():
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = [cookie]
+    testreq.app['Creds'][cookie] = {}
     testreq.app['Creds'][cookie]['Avail'] = "placeholder"
     testreq.app['Creds'][cookie]['OS_sess'] = "placeholder"
     with pytest.raises(HTTPUnauthorized):
@@ -58,6 +59,7 @@ def test_api_check_raise_on_no_session():
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = [cookie]
+    testreq.app['Creds'][cookie] = {}
     testreq.app['Creds'][cookie]['Avail'] = "placeholder"
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
@@ -70,6 +72,19 @@ def test_api_check_raise_on_no_avail():
     """
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+    testreq.app['Creds'][cookie] = {}
     testreq.app['Sessions'] = [cookie]
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
+
+
+def test_api_check_success():
+    testreq = get_request_with_fernet()
+    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+    testreq.app['Sessions'] = [cookie]
+    testreq.app['Creds'][cookie] = {}
+    testreq.app['Creds'][cookie]['Avail'] = "placeholder"
+    testreq.app['Creds'][cookie]['OS_sess'] = "placeholder"
+    testreq.app['Creds'][cookie]['ST_conn'] = "placeholder"
+    ret = api_check(testreq)
+    assert ret == cookie  # nosec
