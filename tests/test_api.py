@@ -6,7 +6,7 @@ Module for testing s3browser.api
 import pytest
 import json
 from creation import get_request_with_mock_openstack
-from s3browser.api import get_os_user
+from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
 
 
@@ -138,3 +138,18 @@ async def test_list_with_many_objects():
         in request.app['Creds'][cookie]['ST_conn'].containers[container]
     ]
     assert objects == comp  # nosec
+
+
+@pytest.mark.asyncio
+async def test_os_list_projects():
+    """
+    Test function os_list_projects for correct output
+    """
+    cookie, request = get_request_with_mock_openstack()
+    # No need to generate test data, all required stuff can be found in the
+    # mock-app
+    response = await os_list_projects(request)
+    projects = json.loads(response.text)
+    assert (  # nosec
+        projects == request.app['Creds'][cookie]['Avail']['projects']
+    )
