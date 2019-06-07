@@ -14,7 +14,7 @@ def get_request_with_fernet():
     """
     ret = Mock_Request()
     ret.app['Sessions'] = []
-    ret.app['Creds'] = []
+    ret.app['Creds'] = {}
     ret.app['Crypt'] = cryptography.fernet.Fernet(
         cryptography.fernet.Fernet.generate_key()
     )
