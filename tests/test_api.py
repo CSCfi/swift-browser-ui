@@ -1,0 +1,123 @@
+"""
+Module for testing s3browser.api
+"""
+
+
+import pytest
+import json
+from creation import get_request_with_mock_openstack
+from s3browser.api import get_os_user
+from s3browser.api import swift_list_buckets
+
+
+# NOTE: Skipping the s3 functions now, since the acute requirement is swift
+@pytest.mark.asyncio
+async def test_get_os_user():
+    """
+    Test for the API call for fetching the Openstack username
+    """
+    _, request = get_request_with_mock_openstack()
+    response = await get_os_user(request)
+    assert json.loads(response.text) == "test_user_id"  # nosec
+
+
+# Follows the testing of the different list functions
+@pytest.mark.asyncio
+async def test_list_containers_correct():
+    """
+    Test function swift_list_buckets with a correct query
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=100,
+        object_range=(0, 10),
+        size_range=(65535, 262144),
+    )
+    response = await swift_list_buckets(request)
+    buckets = json.loads(response.text)
+    buckets = [i['name'] for i in buckets]
+    comp = [
+        i for i in request.app['Creds'][cookie]['ST_conn'].containers.keys()
+    ]
+    # Test if return all the correct values from the mock service
+    assert buckets == comp  # nosec
+
+
+@pytest.mark.asyncio
+async def test_list_objects_correct():
+    """
+    Test function swift_list_objetcs with a correct query
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=5,
+        object_range=(10, 100000),
+        size_range=(65535, 262144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_wihtout_containers():
+    """
+    Test function swift_list_buckets against a project without object storage
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=3,
+        object_range=(75000, 100000),
+        size_range=(65535, 262144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_with_invalid_container():
+    """
+    Test function swift_list_buckets and swift_list_objects with an invalid
+    container id
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=3,
+        object_range=(75000, 100000),
+        size_range=(65535, 262144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_without_objects():
+    """
+    Test function swift_list_objects without an object query in the request
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=3,
+        object_range=(75000, 100000),
+        size_range=(65535, 262144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_with_many_objects():
+    """
+    Test function swift_list_objects with a large set of objects in the
+    storage
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=3,
+        object_range=(75000, 100000),
+        size_range=(65535, 262144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_list_with_invalid_object():
+    """
+    Test function swift_list-objects with an invalid object query
+    """
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=3,
+        object_range=(75000, 100000),
+        size_range=(65535, 262144),
+    )
