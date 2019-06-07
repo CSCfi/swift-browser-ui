@@ -19,6 +19,8 @@ class Mock_Request:
     app = None
     headers = {}
     cookies = {}
+    query = {}
+    remote = "127.0.0.1"
 
     def __init__(self):
         # Application mutable mapping represented by a dictionary
@@ -99,9 +101,9 @@ class Mock_Service:
                 ret.append({
                     "name": i
                 })
-            return {
+            return [{
                 "listing": ret
-            }
+            }]
         elif container is not None:
             ret = []
             for i in self.containers[container]:
@@ -111,9 +113,9 @@ class Mock_Service:
                     "last_modified": i["last_modified"],
                     "bytes": i["bytes"]
                 })
-            return {
+            return [{
                 "listing": ret
-            }
+            }]
         else:
             return None
 
@@ -145,4 +147,4 @@ class Mock_Session:
         """
         Mock function for fetching the user id from the mock OS Session
         """
-        pass
+        return "test_user_id"
