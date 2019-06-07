@@ -8,6 +8,7 @@ import random
 import hashlib
 import os
 import time
+from swiftclient import ClientException
 
 
 class Mock_Request:
@@ -106,16 +107,21 @@ class Mock_Service:
             }]
         elif container is not None:
             ret = []
-            for i in self.containers[container]:
-                ret.append({
-                    "hash": i["hash"],
-                    "name": i["name"],
-                    "last_modified": i["last_modified"],
-                    "bytes": i["bytes"]
-                })
-            return [{
-                "listing": ret
-            }]
+            try:
+                for i in self.containers[container]:
+                    ret.append({
+                        "hash": i["hash"],
+                        "name": i["name"],
+                        "last_modified": i["last_modified"],
+                        "bytes": i["bytes"]
+                    })
+                return [{
+                    "listing": ret
+                }]
+            except KeyError:
+                raise ClientException(
+                    msg="",
+                )
         else:
             return None
 
