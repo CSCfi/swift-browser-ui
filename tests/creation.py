@@ -36,5 +36,8 @@ def get_request_with_mock_openstack():
     ret.app['Creds'][cookie]['ST_conn'] = Mock_Service()
     # Empty the old container dictionary, because class attributes
     ret.app['Creds'][cookie]['ST_conn'].containers = {}
-    ret.app['Creds'][cookie]['Avail'] = "Placeholder"
+    ret.app['Creds'][cookie]['Avail'] = {
+        "projects": ['test-project-1', 'test-project-2'],
+        "domains": ['default']
+    }
     return cookie, ret
