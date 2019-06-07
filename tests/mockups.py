@@ -8,7 +8,7 @@ import random
 import hashlib
 import os
 import time
-from swiftclient import ClientException
+from swiftclient.service import SwiftError
 
 
 class Mock_Request:
@@ -119,9 +119,7 @@ class Mock_Service:
                     "listing": ret
                 }]
             except KeyError:
-                raise ClientException(
-                    msg="",
-                )
+                raise SwiftError(None, container=container)
         else:
             return None
 
