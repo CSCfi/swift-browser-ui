@@ -7,7 +7,7 @@ import pytest
 import json
 from creation import get_request_with_mock_openstack
 from s3browser.api import get_os_user
-from s3browser.api import swift_list_buckets
+from s3browser.api import swift_list_buckets, swift_list_objects
 
 
 # NOTE: Skipping the s3 functions now, since the acute requirement is swift
@@ -54,6 +54,16 @@ async def test_list_objects_correct():
         object_range=(10, 100000),
         size_range=(65535, 262144),
     )
+    for container in ['test-container-' + str(i) for i in range(0, 5)]:
+        request.query['bucket'] = container
+        response = await swift_list_objects(request)
+        objects = json.loads(response.text)
+        objects = [i['hash'] for i in objects]
+        comp = [
+            i['hash'] for i
+            in request.app['Creds'][cookie]['ST_conn'].containers[container]
+        ]
+        assert objects == comp  # nosec
 
 
 @pytest.mark.asyncio
