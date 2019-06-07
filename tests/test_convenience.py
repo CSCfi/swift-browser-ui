@@ -8,6 +8,8 @@ from creation import get_request_with_fernet
 from aiohttp.web import HTTPForbidden, HTTPUnauthorized
 from s3browser._convenience import api_check, generate_cookie
 
+# NOTE: disable_cache, decrypt_cookie, generate_cookie shouldn't need testing
+# as the functions are simple and self-explanatory.
 
 # The api_check session check function testing – Might seem unnecessary, but
 # are required since e.g. token rescoping can fail the sessions before the
@@ -88,3 +90,12 @@ def test_api_check_success():
     testreq.app['Creds'][cookie]['ST_conn'] = "placeholder"
     ret = api_check(testreq)
     assert ret == cookie  # nosec
+
+# NOTE: the next one in order would be get_availability_from_token, which
+# requires a mock response – maybe implement that in the future
+
+# NOTE: the next one in order would be initiate_os_session, which needn't
+# be tested, as it requires mocking the whole OS
+
+# NOTE: the next would be initiate_os_service, which needn't be tested as
+# it too requires mocking the whole OS
