@@ -73,10 +73,11 @@ async def test_list_wihtout_containers():
     """
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
-        containers=3,
-        object_range=(75000, 100000),
-        size_range=(65535, 262144),
+        containers=0
     )
+    response = await swift_list_buckets(request)
+    containers = json.loads(response.text)
+    assert containers == []  # nosec
 
 
 @pytest.mark.asyncio
