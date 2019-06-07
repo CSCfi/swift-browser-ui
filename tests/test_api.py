@@ -83,15 +83,19 @@ async def test_list_wihtout_containers():
 @pytest.mark.asyncio
 async def test_list_with_invalid_container():
     """
-    Test function swift_list_buckets and swift_list_objects with an invalid
-    container id
+    Test function swift_list_objects with an invalid container id
     """
     cookie, request = get_request_with_mock_openstack()
+    # Let's create some test data anyway
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=3,
-        object_range=(75000, 100000),
+        object_range=(1, 5),
         size_range=(65535, 262144),
     )
+    request.query['bucket'] = "Free buckets causing havoc at the local market"
+    response = await swift_list_objects(request)
+    objects = json.loads(response.text)
+    assert objects == []  # nosec
 
 
 @pytest.mark.asyncio
