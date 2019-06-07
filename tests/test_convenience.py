@@ -11,6 +11,7 @@ from s3browser._convenience import api_check, generate_cookie
 # NOTE: disable_cache, decrypt_cookie, generate_cookie shouldn't need testing
 # as the functions are simple and self-explanatory.
 
+
 # The api_check session check function testing – Might seem unnecessary, but
 # are required since e.g. token rescoping can fail the sessions before the
 # next API call, also might try to use the API while rescoping -> 401
