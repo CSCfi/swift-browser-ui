@@ -105,10 +105,13 @@ async def test_list_without_objects():
     """
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
-        containers=3,
-        object_range=(75000, 100000),
-        size_range=(65535, 262144),
+        containers=1,
+        object_range=(0, 0),
     )
+    request.query['bucket'] = "test-container-0"
+    response = await swift_list_objects(request)
+    objects = json.loads(response.text)
+    assert objects == []  # nosec
 
 
 @pytest.mark.asyncio
@@ -118,21 +121,20 @@ async def test_list_with_many_objects():
     storage
     """
     cookie, request = get_request_with_mock_openstack()
+    # Shouldn't be any reason to test with multiple containers, saves time
+    # this way
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
-        containers=3,
-        object_range=(75000, 100000),
+        containers=1,
+        object_range=(100000, 100000),  # default max container limit
         size_range=(65535, 262144),
     )
-
-
-@pytest.mark.asyncio
-async def test_list_with_invalid_object():
-    """
-    Test function swift_list-objects with an invalid object query
-    """
-    cookie, request = get_request_with_mock_openstack()
-    request.app['Creds'][cookie]['ST_conn'].init_with_data(
-        containers=3,
-        object_range=(75000, 100000),
-        size_range=(65535, 262144),
-    )
+    container = "test-container-0"
+    request.query['bucket'] = container
+    response = await swift_list_objects(request)
+    objects = json.loads(response.text)
+    objects = [i['hash'] for i in objects]
+    comp = [
+        i['hash'] for i
+        in request.app['Creds'][cookie]['ST_conn'].containers[container]
+    ]
+    assert objects == comp  # nosec
