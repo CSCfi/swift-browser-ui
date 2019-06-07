@@ -34,5 +34,7 @@ def get_request_with_mock_openstack():
     ret.app['Creds'][cookie] = {}
     ret.app['Creds'][cookie]['OS_sess'] = Mock_Session()
     ret.app['Creds'][cookie]['ST_conn'] = Mock_Service()
+    # Empty the old container dictionary, because class attributes
+    ret.app['Creds'][cookie]['ST_conn'].containers = {}
     ret.app['Creds'][cookie]['Avail'] = "Placeholder"
     return cookie, ret
