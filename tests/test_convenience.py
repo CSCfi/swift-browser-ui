@@ -93,7 +93,7 @@ def test_api_check_success():
     assert ret == cookie  # nosec
 
 # NOTE: the next one in order would be get_availability_from_token, which
-# requires a mock response – maybe implement that in the future
+# requires a mock OS response – maybe implement that in the future
 
 # NOTE: the next one in order would be initiate_os_session, which needn't
 # be tested, as it requires mocking the whole OS
