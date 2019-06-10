@@ -93,10 +93,13 @@ def test_api_check_success():
     assert ret == cookie  # nosec
 
 # NOTE: the next one in order would be get_availability_from_token, which
-# requires a mock OS response – maybe implement that in the future
+# requires a mock OS response – this cannot be done before the code has
+# been refactored to have non-hardcoded endpoints.
 
 # NOTE: the next one in order would be initiate_os_session, which needn't
 # be tested, as it requires mocking the whole OS
-
 # NOTE: the next would be initiate_os_service, which needn't be tested as
 # it too requires mocking the whole OS
+# Also a noteworthy thing, there probably is no point in directly testing
+# OS SDK / swiftclient, since these are direct wrappers for the correct
+# initialization function.
