@@ -5,7 +5,6 @@ Module for testing s3browser.server
 
 import pytest
 from s3browser.server import servinit
-from aiohttp import web
 
 
 @pytest.mark.asyncio
