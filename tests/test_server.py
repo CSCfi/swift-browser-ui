@@ -1,5 +1,5 @@
 """
-Module for testing s3browser.server
+Module for testing s3browser.server, will also contain the tests for front.py
 """
 
 
