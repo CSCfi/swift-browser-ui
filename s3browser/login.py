@@ -52,17 +52,11 @@ async def sso_query_begin(request):
     """
     Display login page and initiate federated keystone authentication
     """
-    if session_check(request):
-        response = aiohttp.web.FileResponse(
-            os.getcwd() + '/s3browser_frontend/login.html'
-        )
-        return disable_cache(response)
-    else:
-        response = aiohttp.web.Response(
-            status=401,
-            reason="Invalid or no session cookie"
-        )
-        return response
+    session_check(request)
+    response = aiohttp.web.FileResponse(
+        os.getcwd() + '/s3browser_frontend/login.html'
+    )
+    return disable_cache(response)
 
 
 async def sso_query_end(request):
@@ -71,20 +65,15 @@ async def sso_query_end(request):
     from the keystone api.
     """
     # Check for established session
-    if session_check(request):
-        session = decrypt_cookie(request)
-        request.app['Log'].info(
-            'Received SSO login from {0} with session {1} :: {2}'.format(
-                request.remote,
-                session,
-                time.ctime()
-            )
+    session_check(request)
+    session = decrypt_cookie(request)
+    request.app['Log'].info(
+        'Received SSO login from {0} with session {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime()
         )
-    else:
-        return aiohttp.web.Response(
-            status=401,
-            reason="Invalid or no session cookie"
-        )
+    )
     # Try getting the token id from form
     if 'token' in request.query:
         unscoped = request.query['token']
@@ -96,11 +85,9 @@ async def sso_query_end(request):
             )
         )
     else:
-        response = aiohttp.web.Response(
-            status=400,
+        raise aiohttp.web.HTTPClientError(
             reason="No Token ID was specified, token id is required"
         )
-        return response
 
     # Initiate the credential dictionary
     request.app['Creds'][session] = {}
@@ -151,25 +138,19 @@ async def token_rescope(request):
     """
     Rescope the requesting session's token to the new specified project
     """
-    if session_check(request):
-        session = decrypt_cookie(request)
-        request.app['Log'].info(
-            "Call to rescope token from {0}, sess: {1} :: {2}".format(
-                request.remote,
-                session,
-                time.ctime(),
-            )
+    session_check(request)
+    session = decrypt_cookie(request)
+    request.app['Log'].info(
+        "Call to rescope token from {0}, sess: {1} :: {2}".format(
+            request.remote,
+            session,
+            time.ctime(),
         )
-    else:
-        return aiohttp.web.Response(
-            status=401,
-            reason='No valid session cookie'
-        )
+    )
 
     if (request.query['project'] not in
             request.app['Creds'][session]['Avail']['projects']):
-        return aiohttp.web.Response(
-            status=403,
+        raise aiohttp.web.HTTPForbidden(
             reason="The project is not available for this token."
         )
 
