@@ -5,7 +5,7 @@ of the test environment.
 
 
 import cryptography.fernet
-from mockups import Mock_Request, Mock_Service, Mock_Session
+from .mockups import Mock_Request, Mock_Service, Mock_Session
 from s3browser._convenience import generate_cookie
 import logging
 

@@ -5,7 +5,7 @@ Module for testing s3browser.api
 
 import pytest
 import json
-from creation import get_request_with_mock_openstack
+from .creation import get_request_with_mock_openstack
 from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
 

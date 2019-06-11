@@ -4,7 +4,7 @@ Module for testing s3browser._convenience
 
 
 import pytest
-from creation import get_request_with_fernet
+from .creation import get_request_with_fernet
 from aiohttp.web import HTTPUnauthorized
 from s3browser._convenience import api_check, generate_cookie
 
