@@ -116,8 +116,6 @@ async def get_os_user(request):
     Function for fetching the user that the OS session has been opened for.
     """
     session = api_check(request)
-    if type(session) is not str:
-        return session
     request.app['Log'].info(
         'API call for username from {0}, sess: {1} :: {2}'.format(
             request.remote,
@@ -139,9 +137,6 @@ async def swift_list_buckets(request):
     information in a JSON response.
     """
     session = api_check(request)
-    # If api_check has returned an error response, return that
-    if type(session) is not str:
-        return session
     request.app['Log'].info(
         'API call for list buckets from {0}, sess: {1} :: {2}'.format(
             request.remote,
@@ -171,9 +166,6 @@ async def swift_list_objects(request):
     swift and outputting the necessary information in a JSON response.
     """
     session = api_check(request)
-    # If api_check has returned an error response, return that
-    if type(session) is not str:
-        return session
     request.app['Log'].info(
         'API call for list objects from {0}, sess: {1} :: {2}'.format(
             request.remote,
@@ -201,9 +193,6 @@ async def swift_download_object(request):
     object.
     """
     session = api_check(request)
-    # If api_check has returned an error response, return that
-    if type(session) is not str:
-        return session
     request.app['Log'].info(
         'API call for download object from {0}, sess: {1} :: {2}'.format(
             request.remote,
@@ -223,8 +212,6 @@ async def os_list_projects(request):
     unscoped token.
     """
     session = api_check(request)
-    if type(session) is not str:
-        return session
     request.app['Log'].info(
         'API call for project listing from {0}, sess: {1} :: {2}'.format(
             request.remote,
