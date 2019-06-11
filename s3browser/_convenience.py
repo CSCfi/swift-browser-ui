@@ -8,11 +8,11 @@ URL.
 
 from hashlib import sha256
 from os import urandom
-import subprocess  # nosec
 import json
 import logging
 import aiohttp.web
 import re
+import urllib.request
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
@@ -137,7 +137,7 @@ def generate_cookie(request):
         ).decode('utf-8')
 
 
-def get_availability_from_token(token):
+def get_availability_from_token_nocurl(token):
     """
     List available domains and projects for the unscoped token specified.
 
@@ -151,27 +151,33 @@ def get_availability_from_token(token):
     # Check that the token is an actual token
     if not re.match("^[a-f0-9]*$", token):
         return "INVALID"
-    # Setup things common to every curl command required
-    curl_argv = [
-        'curl', '-s', '-X', 'GET', '-H', 'X-Auth-Token: ' + token,
-    ]
-    # Fetch required information from the API with curl
-    output_projects = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects'],
-        shell=False,  # nosec
+
+    # setup token header
+    hdr = {
+        "X-Auth-Token": token,
+    }
+
+    # Check projects from the API
+    prq = urllib.request.Request(
+        POUTA_URL + "/OS-FEDERATION/projects",
+        headers=hdr,
     )
-    output_domains = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains'],
-        shell=False,  # nosec
+    with urllib.request.urlopen(prq) as projects:  # nosec
+        output_projects = json.loads(projects.read().decode('utf-8'))
+
+    # Check domains from the API
+    drq = urllib.request.Request(
+        POUTA_URL + "/OS-FEDERATION/domains",
+        headers=hdr,
     )
-    # Decode and serialize said output to a usable format
-    output_projects = json.loads(output_projects.decode('utf-8'))
-    output_domains = json.loads(output_domains.decode('utf-8'))
-    # For now print debug information
+    with urllib.request.urlopen(drq) as domains:  # nosec
+        output_domains = json.loads(domains.read().decode('utf-8'))
+
     print('--PROJECT AND DOMAIN INFORMATION FROM KEYSTONE--')
     print(output_projects)
     print(output_domains)
     print('--END INFORMATION--')
+
     # Return all project names and domain names inside a dictionary
     return {
         "projects": [
