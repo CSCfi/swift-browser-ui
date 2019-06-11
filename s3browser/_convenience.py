@@ -8,10 +8,11 @@ URL.
 
 from hashlib import sha256
 from os import urandom
-import subprocess
+import subprocess  # nosec
 import json
 import logging
 import aiohttp.web
+import re
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
@@ -147,6 +148,9 @@ def get_availability_from_token(token):
     Return type:
         dict(keys=('projects': List(str), 'domains': List(str)))
     """
+    # Check that the token is an actual token
+    if not re.match("^[a-f0-9]*$", token):
+        return "INVALID"
     # Setup things common to every curl command required
     curl_argv = [
         'curl', '-s', '-X', 'GET', '-H', 'X-Auth-Token: ' + token,
@@ -154,11 +158,11 @@ def get_availability_from_token(token):
     # Fetch required information from the API with curl
     output_projects = subprocess.check_output(
         curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects'],
-        shell=False,
+        shell=False,  # nosec
     )
     output_domains = subprocess.check_output(
         curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains'],
-        shell=False,
+        shell=False,  # nosec
     )
     # Decode and serialize said output to a usable format
     output_projects = json.loads(output_projects.decode('utf-8'))
