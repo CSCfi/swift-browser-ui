@@ -16,5 +16,9 @@ setuptools.setup(
         'cryptography',
         'keystoneauth1',
     ],
+    extras_require={
+          'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
+                   'pytest-asyncio', 'tox',
+                   'flake8', 'flake8-docstrings', 'pytest-aiohttp', 'pytest-xdist']},
     packages=[__name__],
 )
