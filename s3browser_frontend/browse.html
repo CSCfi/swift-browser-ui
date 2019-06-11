@@ -8,6 +8,17 @@
         <title>S3 object browser mockup</title>
     </head>
     <body>
+        <div id='projectChooser'>
+            <ul>
+                <li
+                    is="project-list-element"
+                    v-for="item in projects"
+                    v-bind:key="item"
+                    v-bind:project="item"
+                    v-on:projectclick="changeProject ( item )"
+                ></li>
+            </ul>
+        </div>
         <script>
             window.onbeforeunload = function () {
                 fetch('login/kill', {method: 'GET', credentials: 'include'})
@@ -49,16 +60,6 @@
                     v-on:oheadingclick="bringBucketsFront ()"
                 ></tr>
             </table>
-        </div>
-        <div id='projectChooser'>
-            <ul>
-                <li
-                    is="project-list-element"
-                    v-for="item in projects"
-                    v-bind:key="item"
-                    v-bind:project="item"
-                ></li>
-            </ul>
         </div>
         <script src="static/js/browse.js"></script>
     </body>
