@@ -1,0 +1,32 @@
+cache:
+  paths:
+    - backend/.pip
+    - backend/.tox
+    - frontned/node_modules
+
+stages:
+  - test
+
+test_syntax:
+  stage: test
+  image: python:3.6
+  before_script:
+    - pip --cache-dir=.pip install tox
+  script:
+    - tox -e flake8
+
+test_code_security:
+  stage: test
+  image: python:3.6
+  before_script:
+    - pip --cache-dir=.pip install tox
+  script:   
+    - tox -e bandit
+
+unit_test:
+  stage: test
+  image: python:3.6
+  before_script:
+    - pip --cache-dir=.pip install tox
+  script:   
+    - tox -e pytest
