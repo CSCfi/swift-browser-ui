@@ -54,7 +54,27 @@ def session_check(request):
     """
     Check session validity from a request
     """
-    return decrypt_cookie(request) in request.app['Sessions']
+    try:
+        if decrypt_cookie(request) in request.app['Sessions']:
+            return True
+        else:
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+    except InvalidToken:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
+    except KeyError:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
 
 
 def api_check(request):
