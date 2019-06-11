@@ -137,7 +137,7 @@ def generate_cookie(request):
         ).decode('utf-8')
 
 
-def get_availability_from_token_nocurl(token):
+def get_availability_from_token(token):
     """
     List available domains and projects for the unscoped token specified.
 
