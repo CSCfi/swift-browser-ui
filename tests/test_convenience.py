@@ -9,7 +9,8 @@ from aiohttp.web import HTTPForbidden, HTTPUnauthorized
 from s3browser._convenience import api_check, generate_cookie
 
 # NOTE: disable_cache, decrypt_cookie, generate_cookie shouldn't need testing
-# as the functions are simple and self-explanatory.
+# as the functions are simple and self-explanatory. session_check -function
+# will be re-written soon, so the test shouldn't be implemented yet.
 
 
 # The api_check session check function testing – Might seem unnecessary, but
