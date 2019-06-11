@@ -45,8 +45,6 @@ async def test_working_routes(cli):
     assert response.status != 404  # nosec
     response = await cli.get('/login/front')
     assert response.status != 404  # nosec
-    response = await cli.get('/login/return')
-    assert response.status != 404  # nosec
     response = await cli.get('/login/rescope')
     assert response.status != 404  # nosec
     response = await cli.get('/api/buckets')
