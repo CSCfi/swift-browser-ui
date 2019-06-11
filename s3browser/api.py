@@ -1,6 +1,7 @@
 import aiohttp.web
 import boto3
 import time
+from swiftclient.service import SwiftError
 
 from ._convenience import decrypt_cookie
 from ._convenience import api_check
@@ -136,28 +137,33 @@ async def swift_list_buckets(request):
     A function for listing buckets through swift and outputting the necessary
     information in a JSON response.
     """
-    session = api_check(request)
-    request.app['Log'].info(
-        'API call for list buckets from {0}, sess: {1} :: {2}'.format(
-            request.remote,
-            session,
-            time.ctime(),
+    try:
+        session = api_check(request)
+        request.app['Log'].info(
+            'API call for list buckets from {0}, sess: {1} :: {2}'.format(
+                request.remote,
+                session,
+                time.ctime(),
+            )
         )
-    )
 
-    # The maximum amount of buckets / containers is measured in thousands,
-    # so it's not necessary to think twice about iterating over the whole
-    # response at once
-    containers = [i for i in request.app['Creds'][session]['ST_conn'].list()]
+        # The maximum amount of buckets / containers is measured in thousands,
+        # so it's not necessary to think twice about iterating over the whole
+        # response at once
+        containers = [
+            i for i in request.app['Creds'][session]['ST_conn'].list()
+        ]
 
-    # For some reason the return value is a generator object, which creates
-    # a list with just a single item -> get this one item as the new value
-    if len(containers) == 1:
-        containers = containers[0]
+        # For some reason the return value is a generator object, which creates
+        # a list with just a single item -> get this one item as the new value
+        if len(containers) == 1:
+            containers = containers[0]
 
-    return aiohttp.web.json_response(
-        containers['listing']
-    )
+        return aiohttp.web.json_response(
+            containers['listing']
+        )
+    except SwiftError:
+        return aiohttp.web.json_response([])
 
 
 async def swift_list_objects(request):
@@ -165,26 +171,29 @@ async def swift_list_objects(request):
     A function for listing objects in a given bucket (container) through
     swift and outputting the necessary information in a JSON response.
     """
-    session = api_check(request)
-    request.app['Log'].info(
-        'API call for list objects from {0}, sess: {1} :: {2}'.format(
-            request.remote,
-            session,
-            time.ctime(),
+    try:
+        session = api_check(request)
+        request.app['Log'].info(
+            'API call for list objects from {0}, sess: {1} :: {2}'.format(
+                request.remote,
+                session,
+                time.ctime(),
+            )
         )
-    )
 
-    objects = [i for i in request.app['Creds'][session]['ST_conn'].list(
-        container=request.query['bucket']  # named bucket for compatibility
-    )]
+        objects = [i for i in request.app['Creds'][session]['ST_conn'].list(
+            container=request.query['bucket']  # named bucket for compatibility
+        )]
 
-    # Again, get the only item in the generated list
-    if len(objects) == 1:
-        objects = objects[0]
+        # Again, get the only item in the generated list
+        if len(objects) == 1:
+            objects = objects[0]
 
-    return aiohttp.web.json_response(
-        objects['listing']
-    )
+        return aiohttp.web.json_response(
+            objects['listing']
+        )
+    except SwiftError:
+        return aiohttp.web.json_response([])
 
 
 async def swift_download_object(request):
