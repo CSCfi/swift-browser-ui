@@ -69,7 +69,7 @@ Vue.component('object-table-row', {
 Vue.component('project-list-element', {
     props: ['project'],
     template: '\
-    <li>\
-    <button id="projectbutton" v-on:click="$emit(\'projectclick\')">{{ project }}</button>\
+    <li class="projectlistelement">\
+    <button class="projectbutton" v-on:click="$emit(\'projectclick\')">{{ project }}</button>\
     </li>'
 });
