@@ -5,7 +5,7 @@ Module for testing s3browser._convenience
 
 import pytest
 from creation import get_request_with_fernet
-from aiohttp.web import HTTPForbidden, HTTPUnauthorized
+from aiohttp.web import HTTPUnauthorized
 from s3browser._convenience import api_check, generate_cookie
 
 # NOTE: disable_cache, decrypt_cookie, generate_cookie shouldn't need testing
@@ -33,7 +33,7 @@ def test_api_check_raise_on_invalid_cookie():
     """
     testreq = get_request_with_fernet()
     testreq.app['Sessions'] = []
-    with pytest.raises(HTTPForbidden):
+    with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
 
 
