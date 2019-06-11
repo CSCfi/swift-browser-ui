@@ -17,7 +17,7 @@ var app = new Vue ({
                         console.log( uname );
                         app.user = uname;
                     }
-                )
+                );
         },
     }
 });
@@ -42,7 +42,24 @@ var projectChooser = new Vue({
                         projectChooser.projects = retJson;
                     }
                 )
-        }
+        },
+        changeProject: function ( newProject ) {
+            // Call API to rescope token for a new project
+            var rescopeURL = new URL( "login/rescope", document.location );
+            rescopeURL.searchParams.append( 'project', newProject );
+            fetch( rescopeURL, { method: 'GET', credentials: 'include' } )
+                .then(
+                    function ( response ) {
+                        if ( response.status == 204 ) {
+                            s3list.getBuckets();
+                        }
+                        else {
+                            console.log( "Failed to rescope project" );
+                            console.log( "Not changing anything in the lists for now" );
+                        }
+                    }
+                )
+        },
     },
 });
 
@@ -100,7 +117,7 @@ var s3list = new Vue ({
                             s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['Key'];
                         }
                     }
-                )
+                );
         },
     }
 });
