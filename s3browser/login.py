@@ -101,6 +101,18 @@ async def sso_query_end(request):
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
+    if request.app['Creds'][session]['Avail'] == "INVALID":
+        response = aiohttp.web.Response(
+            status=302
+        )
+        response.headers['Location'] = "/login"
+        response.set_cookie(
+            name="INVALID_TOKEN",
+            value="true",
+            max_age=120,
+        )
+        return response
+
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
