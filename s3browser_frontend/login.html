@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf8"/>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <link rel='stylesheet' href='/static/css/login.css'>
         <title>Login</title>
     </head>
@@ -36,11 +37,12 @@
                 After successfully copying the response token id header, paste it in the
                 following form's text field
             </p>
-            <form action="/login/return">
-                <b>Token ID:</b><br>
+            <form id="retform" action="/login/return">
+                <b>{{ formname }}</b><br>
                 <input id="inputbox" type="text" name="token"><br>
                 <input type="submit">
             </form>
+            <script src="/static/js/login.js"></script>
         </div>
     </body>
 </html>
