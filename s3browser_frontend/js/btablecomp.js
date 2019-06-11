@@ -70,6 +70,6 @@ Vue.component('project-list-element', {
     props: ['project'],
     template: '\
     <li>\
-    {{ project }}\
+    <button id="projectbutton" v-on:click="$emit(\'projectclick\')">{{ project }}</button>\
     </li>'
 });
