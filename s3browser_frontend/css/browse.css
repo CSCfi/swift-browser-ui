@@ -135,12 +135,12 @@ th {
     height: 45px;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
 }
 
-#projectlistelement {
+#projectlistelement, .projectbutton {
     float: left;
-    width: 80px;
+    min-width: 80px;
 }
 
 .projectbutton {
@@ -149,7 +149,7 @@ th {
     padding: 0;
     margin: 0;
     text-decoration: none;
-    display: table-cell;
+    display: block;
     color: black;
     text-align: center;
     -webkit-transition: background-color 0.4s linear, color 0.4s linear;

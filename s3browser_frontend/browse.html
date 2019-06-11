@@ -8,6 +8,16 @@
         <title>S3 object browser mockup</title>
     </head>
     <body>
+        <script>
+            window.onbeforeunload = function () {
+                fetch('login/kill', {method: 'GET', credentials: 'include'})
+                    .then(
+                        function ( response ) {
+                            console.log(response.status());
+                        }
+                    )
+            }
+        </script>
         <div id='projectChooser'>
             <ul id="projectlist">
                 <li
@@ -19,16 +29,6 @@
                 ></li>
             </ul>
         </div>
-        <script>
-            window.onbeforeunload = function () {
-                fetch('login/kill', {method: 'GET', credentials: 'include'})
-                    .then(
-                        function ( response ) {
-                            console.log(response.status());
-                        }
-                    )
-            }
-        </script>
         <div id='app'>
             <h1>Displaying containers for {{ user }}</h1>
         </div>
