@@ -8,10 +8,11 @@ URL.
 
 from hashlib import sha256
 from os import urandom
-import subprocess
 import json
 import logging
 import aiohttp.web
+import re
+import urllib.request
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
@@ -54,7 +55,27 @@ def session_check(request):
     """
     Check session validity from a request
     """
-    return decrypt_cookie(request) in request.app['Sessions']
+    try:
+        if decrypt_cookie(request) in request.app['Sessions']:
+            return True
+        else:
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+    except InvalidToken:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
+    except KeyError:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
 
 
 def api_check(request):
@@ -73,30 +94,35 @@ def api_check(request):
             session = decrypt_cookie(request)
             ret = session
             if 'ST_conn' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="No established swift connection for session"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
             if 'OS_sess' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="No established keystone authentication session"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
             if 'Avail' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="Project availability hasn't been checked"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
         else:
-            ret = aiohttp.web.Response(
-                status=401,
-                reason="Invalid or no session cookie"
+            raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
             )
         return ret
     except InvalidToken:
-        return aiohttp.web.Response(
-            status=403,
-            reason="Stale token"
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
         )
 
 
@@ -122,27 +148,36 @@ def get_availability_from_token(token):
     Return type:
         dict(keys=('projects': List(str), 'domains': List(str)))
     """
-    # Setup things common to every curl command required
-    curl_argv = [
-        'curl', '-s', '-X', 'GET', '-H', 'X-Auth-Token: ' + token,
-    ]
-    # Fetch required information from the API with curl
-    output_projects = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/projects'],
-        shell=False,
+    # Check that the token is an actual token
+    if not re.match("^[a-f0-9]*$", token):
+        return "INVALID"
+
+    # setup token header
+    hdr = {
+        "X-Auth-Token": token,
+    }
+
+    # Check projects from the API
+    prq = urllib.request.Request(
+        POUTA_URL + "/OS-FEDERATION/projects",
+        headers=hdr,
     )
-    output_domains = subprocess.check_output(
-        curl_argv + ['https://pouta.csc.fi:5001/v3/OS-FEDERATION/domains'],
-        shell=False,
+    with urllib.request.urlopen(prq) as projects:  # nosec
+        output_projects = json.loads(projects.read().decode('utf-8'))
+
+    # Check domains from the API
+    drq = urllib.request.Request(
+        POUTA_URL + "/OS-FEDERATION/domains",
+        headers=hdr,
     )
-    # Decode and serialize said output to a usable format
-    output_projects = json.loads(output_projects.decode('utf-8'))
-    output_domains = json.loads(output_domains.decode('utf-8'))
-    # For now print debug information
+    with urllib.request.urlopen(drq) as domains:  # nosec
+        output_domains = json.loads(domains.read().decode('utf-8'))
+
     print('--PROJECT AND DOMAIN INFORMATION FROM KEYSTONE--')
     print(output_projects)
     print(output_domains)
     print('--END INFORMATION--')
+
     # Return all project names and domain names inside a dictionary
     return {
         "projects": [

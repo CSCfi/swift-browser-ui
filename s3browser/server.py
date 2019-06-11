@@ -8,7 +8,9 @@ import cryptography.fernet
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
-from .api import list_buckets, list_objects, download_object, get_os_user
+from .login import token_rescope
+from .api import list_buckets, list_objects, download_object, os_list_projects
+from .api import get_os_user
 
 
 logging.basicConfig(
@@ -54,6 +56,7 @@ def servinit():
         aiohttp.web.get('/login/front', sso_query_begin),
         aiohttp.web.get('/login/return', sso_query_end),
         aiohttp.web.post('/login/return', sso_query_end),
+        aiohttp.web.get('/login/rescope', token_rescope)
     ])
 
     # Add api routes
@@ -62,6 +65,7 @@ def servinit():
         aiohttp.web.get('/api/objects', list_objects),
         aiohttp.web.get('/api/dload', download_object),
         aiohttp.web.get('/api/username', get_os_user),
+        aiohttp.web.get('/api/projects', os_list_projects),
     ])
 
     return app

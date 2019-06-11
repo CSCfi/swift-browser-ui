@@ -17,9 +17,50 @@ var app = new Vue ({
                         console.log( uname );
                         app.user = uname;
                     }
-                )
+                );
         },
     }
+});
+
+var projectChooser = new Vue({
+    el: '#projectChooser',
+    data: {
+        projects: [],
+    },
+    methods: {
+        getProjects: function () {
+            // Fetch available projects from the API
+            fetch('api/projects', {method: 'GET', credentials: 'include'})
+                .then(
+                    function ( response ) {
+                        return response.json();
+                    }
+                )
+                .then(
+                    function ( retJson ) {
+                        console.log( JSON.stringify( retJson ));
+                        projectChooser.projects = retJson;
+                    }
+                )
+        },
+        changeProject: function ( newProject ) {
+            // Call API to rescope token for a new project
+            var rescopeURL = new URL( "login/rescope", document.location );
+            rescopeURL.searchParams.append( 'project', newProject );
+            fetch( rescopeURL, { method: 'GET', credentials: 'include' } )
+                .then(
+                    function ( response ) {
+                        if ( response.status == 204 ) {
+                            s3list.getBuckets();
+                        }
+                        else {
+                            console.log( "Failed to rescope project" );
+                            console.log( "Not changing anything in the lists for now" );
+                        }
+                    }
+                )
+        },
+    },
 });
 
 var s3list = new Vue ({
@@ -75,11 +116,12 @@ var s3list = new Vue ({
                         for(i = 0; i < s3list.oList.length; i++) {
                             s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['Key'];
                         }
-                    } 
-                )
+                    }
+                );
         },
     }
 });
 
-app.getUser()
-s3list.getBuckets()
+app.getUser();
+s3list.getBuckets();
+projectChooser.getProjects();

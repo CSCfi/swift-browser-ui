@@ -1,11 +1,167 @@
 body {
-    margin: 2% 3% 2% 3%;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left: 3%;
+    margin-right: 3%;
+}
+
+#s3list {
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 table {
-    width: 90%;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.btable, .otable, th, tr, td {
-    border: 1px solid black;
+th, td, tr {
+    width: 100%;
+    border-bottom: 1px solid #BBBBBB;
+    padding: 5px;
+    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
+}
+
+#bucketname {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid #BBBBBB;
+    background-color: white;
+    padding: 5px;
+    margin: none;
+    text-decoration: none;
+    display: table-cell;
+    color: black;
+    text-align: left;
+    -webkit-transtion: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
+    width: 100%;
+    height: 100%;
+}
+
+#bucketname:hover {
+    background-color: #888888;
+    color: white;
+}
+
+th {
+    background-color: #CEF0B7;
+    font-weight: normal;
+}
+
+#backheading {
+    color: black;
+    background-color: #CEF0B7;
+    width: 18px;
+}
+
+#backcolumn {
+    color: white;
+    background-color: #EF1D0A;
+    width: 18px;
+}
+
+#backbutton {
+    border: none;
+    background-color: #CEF0B7;
+    padding: 5px;
+    margin: none;
+    text-decoration: none;
+    display: table-cell;
+    color: black;
+    text-align: center;
+    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
+    width: 100%;
+    height: 100%;
+}
+
+#backbutton:hover {
+    color: black;
+    background-color: #BBBBBB;
+}
+
+#backheading:hover {
+    color: black;
+    background-color: #BBBBBB;
+}
+
+#backcolumn:hover {
+    color: black;
+    background-color: #BBBBBB;
+}
+
+#tableaddr:link {
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: none;
+}
+
+#tableaddr:visited {
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: none;
+}
+
+#tableaddr:hover {
+    background-color: lightgray;
+    text-decoration: none;
+}
+
+#tableaddr:active {
+    text-decoration: none;
+    background-color: lightgray;
+}
+
+#projectChooser {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#projectlist {
+    width: 100%;
+    background-color: #CEF0B7;
+    list-style-type: none;
+    height: 45px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+#projectlistelement, .projectbutton {
+    float: left;
+    min-width: 80px;
+}
+
+.projectbutton {
+    border: none;
+    background-color: #CEF0B7;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0.5ch;
+    padding-right: 0.5ch;
+    margin: 0;
+    text-decoration: none;
+    display: block;
+    color: black;
+    text-align: center;
+    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
+    height: 45px;
+    min-width: 50px;
+}
+
+.projectbutton:hover {
+    color: black;
+    background-color: #BBBBBB;
 }
