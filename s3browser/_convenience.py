@@ -73,30 +73,35 @@ def api_check(request):
             session = decrypt_cookie(request)
             ret = session
             if 'ST_conn' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="No established swift connection for session"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
             if 'OS_sess' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="No established keystone authentication session"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
             if 'Avail' not in request.app['Creds'][session].keys():
-                ret = aiohttp.web.Response(
-                    status=401,
-                    reason="Project availability hasn't been checked"
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
                 )
         else:
-            ret = aiohttp.web.Response(
-                status=401,
-                reason="Invalid or no session cookie"
+            raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
             )
         return ret
     except InvalidToken:
-        return aiohttp.web.Response(
-            status=403,
-            reason="Stale token"
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
         )
 
 
