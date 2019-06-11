@@ -1,9 +1,13 @@
 body {
-    margin: 2% 3% 2% 3%;
+    margin: 0;
+    padding: 0;
+    border: none;
 }
 
 h1 {
     font-family: Arial, Helvetica, sans-serif;
+    margin-left: 3%;
+    margin-right: 3%;
 }
 
 #s3list {
@@ -116,4 +120,45 @@ th {
 #tableaddr:active {
     text-decoration: none;
     background-color: lightgray;
+}
+
+#projectChooser {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#projectlist {
+    width: 100%;
+    background-color: #CEF0B7;
+    list-style-type: none;
+    height: 45px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#projectlistelement {
+    float: left;
+    width: 80px;
+}
+
+.projectbutton {
+    border: none;
+    background-color: #CEF0B7;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    display: table-cell;
+    color: black;
+    text-align: center;
+    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
+    transition: background-color 0.4s linear, color 0.4s linear;
+    height: 45px;
+    width: 80px;
+}
+
+.projectbutton:hover {
+    color: black;
+    background-color: #BBBBBB;
 }
