@@ -154,8 +154,6 @@ async def token_rescope(request):
             reason="The project is not available for this token."
         )
 
-    # Close the old swift connection
-    # request.app['Creds'][session]['ST_conn'].close()
     # Invalidate the old scoped token
     request.app['Creds'][session]['OS_sess'].invalidate()
     # Overwrite the old session with a new one, with the updated project id
