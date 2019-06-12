@@ -1,6 +1,9 @@
 import aiohttp.web
 # import boto3
 import time
+import os
+import hashlib
+import hmac
 from swiftclient.service import SwiftError
 
 # from ._convenience import decrypt_cookie
@@ -209,10 +212,47 @@ async def swift_download_object(request):
             time.ctime(),
         )
     )
-    return aiohttp.web.Response(
-        status=204,
-        reason="Not yet implemented",
+
+    serv = request.app['Creds'][session]['ST_conn']
+    stats = serv.stat()
+
+    # Check for the existence of the key headers
+    acc_meta_hdr = serv.stat()['headers']
+    if 'x-account-meta-temp-url-key' in acc_meta_hdr.keys():
+        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
+    elif 'x-acccount-meta-temp-url-key-2' in acc_meta_hdr.keys():
+        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
+    # If the key headers don't exist, assume that the key has to be created by
+    # the service
+    else:
+        # The hash only provides random data for the key, it doesn't have to
+        # be cryptographically secure.
+        temp_url_key = hashlib.sha256(os.urandom(128))
+        pass
+
+    # Generate temporary URL
+    host = "https://object.pouta.csc.fi:443"
+    container = request.query['bucket']
+    object_key = request.query['objkey']
+    expires = int(time.time() + 60 * 15)
+    path = '/v1/%s/%s/%s' % (stats['items'][0][1], container, object_key)
+    hmac_body = '%s\n%s\n%s' % ('GET', expires, path)
+    signature = hmac.new(
+        bytes(temp_url_key),
+        hmac_body.encode('utf-8'),
+        hashlib.sha1,
+    ).hexdigest()
+
+    dloadurl = "{0}{1}?temp_url_sig={2}&temp_url_expires={3}".format(
+        host, path, signature, expires
     )
+
+    response = aiohttp.web.Response(
+        status=302,
+        body="FOUND"
+    )
+    response.headers['Location'] = dloadurl
+    return response
 
 
 async def os_list_projects(request):
