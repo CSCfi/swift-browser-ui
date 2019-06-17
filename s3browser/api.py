@@ -3,11 +3,12 @@ import aiohttp.web
 import time
 import os
 import hashlib
-import hmac
 from swiftclient.service import SwiftError
+from swiftclient.utils import generate_temp_url
 
 # from ._convenience import decrypt_cookie
 from ._convenience import api_check
+from .settings import setd
 
 
 # Toggle S3 function overloading
@@ -217,7 +218,7 @@ async def swift_download_object(request):
     stats = serv.stat()
 
     # Check for the existence of the key headers
-    acc_meta_hdr = serv.stat()['headers']
+    acc_meta_hdr = stats['headers']
     if 'x-account-meta-temp-url-key' in acc_meta_hdr.keys():
         temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
     elif 'x-acccount-meta-temp-url-key-2' in acc_meta_hdr.keys():
@@ -227,24 +228,42 @@ async def swift_download_object(request):
     else:
         # The hash only provides random data for the key, it doesn't have to
         # be cryptographically secure.
-        temp_url_key = hashlib.sha256(os.urandom(128))
-        pass
-
+        temp_url_key = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
+        # This service will use the X-Account-Meta-Temp-URL-Key-2 header for
+        # its own key storage, if no existing keys are provided.
+        meta_options = {
+            "meta": ["Temp-URL-Key-2:{0}".format(
+                temp_url_key
+            )]
+        }
+        retval = serv.post(
+            options=meta_options
+        )
+        if not retval['success']:
+            raise aiohttp.web.HTTPServerError()
+        request.app['Log'].info(
+            "Created a temp url key for account {0} Key:{1} :: {2}".format(
+                stats['items'][0][1], temp_url_key, time.ctime()
+            )
+        )
+    request.app['Log'].debug(
+        "Using {0} as temporary URL key :: {1}".format(
+            temp_url_key, time.ctime()
+        )
+    )
     # Generate temporary URL
-    host = "https://object.pouta.csc.fi:443"
+    host = setd['swift_endpoint_url']
     container = request.query['bucket']
     object_key = request.query['objkey']
-    expires = int(time.time() + 60 * 15)
+    lifetime = 60 * 15
+    # In the path creation, the stats['items'][0][1] is the tenant id from
+    # server statistics, the order should be significant, so this shouldn't
+    # be a problem
     path = '/v1/%s/%s/%s' % (stats['items'][0][1], container, object_key)
-    hmac_body = '%s\n%s\n%s' % ('GET', expires, path)
-    signature = hmac.new(
-        bytes(temp_url_key),
-        hmac_body.encode('utf-8'),
-        hashlib.sha1,
-    ).hexdigest()
 
-    dloadurl = "{0}{1}?temp_url_sig={2}&temp_url_expires={3}".format(
-        host, path, signature, expires
+    dloadurl = (
+        host +
+        generate_temp_url(path, lifetime, temp_url_key, 'GET')
     )
 
     response = aiohttp.web.Response(
