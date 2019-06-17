@@ -140,7 +140,7 @@ class Mock_Service:
 
 class Mock_Session:
     """
-    Mock--up class for the Openstack keystoneauth1 session instance, which
+    Mock-up class for the Openstack keystoneauth1 session instance, which
     contains the relevant methods for querying the OS identity API (aka.
     keystone)
     """
