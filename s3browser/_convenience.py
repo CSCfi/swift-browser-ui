@@ -236,7 +236,8 @@ def initiate_os_service(os_session, project):
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
-        'os_storage_url': setd['swift_endpoint_url'] + '/AUTH_' + project,
+        'os_storage_url': setd['swift_endpoint_url'] +
+        '/v1' + '/AUTH_' + project,
         'os_auth_url': setd['auth_endpoint_url'],
         'insecure': True,
         'debug': True,
