@@ -1,6 +1,5 @@
 # Generic imports
 import aiohttp.web
-import os
 import ssl
 import logging
 
@@ -11,16 +10,10 @@ from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user
-
-
-logging.basicConfig(
-    level=logging.DEBUG
-)
+from .settings import setd
 
 
 def servinit():
-    PROJECT_ROOT = os.getcwd()
-
     app = aiohttp.web.Application()
 
     # Mutable_map handles cookie storage, also stores the object that provides
@@ -36,13 +29,14 @@ def servinit():
     # Cookie keyed dictionary to store session data
     app['Creds'] = {}
 
-    # Setup static folder during developement
-    app.router.add_static(
-        '/static/',
-        path=PROJECT_ROOT + '/s3browser_frontend',
-        name='static',
-        show_index=True,
-    )
+    # Setup static folder during developement, if it has been specified
+    if setd['static_directory'] is not None:
+        app.router.add_static(
+            '/static/',
+            path=setd['static_directory'],
+            name='static',
+            show_index=True,
+        )
 
     app.add_routes([
         aiohttp.web.get('/', index),
