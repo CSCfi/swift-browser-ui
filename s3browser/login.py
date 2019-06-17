@@ -12,6 +12,7 @@ import time
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
 from ._convenience import initiate_os_session, initiate_os_service
+from .settings import setd
 
 
 async def handle_login(request):
@@ -53,10 +54,33 @@ async def sso_query_begin(request):
     Display login page and initiate federated keystone authentication
     """
     session_check(request)
-    response = aiohttp.web.FileResponse(
-        os.getcwd() + '/s3browser_frontend/login.html'
+    # Return the form based login page if the service isn't trusted on the
+    # endpoint
+    if not setd['has_trust']:
+        response = aiohttp.web.FileResponse(
+            os.getcwd() + '/s3browser_frontend/login.html'
+        )
+        return disable_cache(response)
+
+    response = aiohttp.web.Response(
+        status=302,
     )
-    return disable_cache(response)
+
+    response.headers['Location'] = (
+        setd['auth_endpoint_url'] +
+        "/OS-FEDERATION" +
+        "/identity_providers" +
+        "/haka" +
+        "/protocols" +
+        "/saml2" +
+        "/auth" +
+        "/websso" +
+        "?origin={origin}".format(
+            origin=setd['origin_address']
+        )
+    )
+
+    return response
 
 
 async def sso_query_end(request):
@@ -74,6 +98,8 @@ async def sso_query_end(request):
             time.ctime()
         )
     )
+    # Declare the unscoped token
+    unscoped = None
     # Try getting the token id from form
     if 'token' in request.query:
         unscoped = request.query['token']
@@ -84,7 +110,18 @@ async def sso_query_end(request):
                 time.ctime()
             )
         )
-    else:
+    # Try getting the token id from headers
+    if 'X-Auth-Token' in request.headers:
+        unscoped = request.headers['X-Auth-Token']
+        request.app['Log'].info(
+            'Got OS token ::{0}:: from addres {1} :: {2}'.format(
+                unscoped,
+                request.remote,
+                time.ctime()
+            )
+        )
+    # Is there actually a token present?
+    if unscoped is None:
         raise aiohttp.web.HTTPClientError(
             reason="No Token ID was specified, token id is required"
         )
@@ -101,7 +138,11 @@ async def sso_query_end(request):
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
-    if request.app['Creds'][session]['Avail'] == "INVALID":
+    # If we're using the non-WebSSO login, check token validity
+    if (
+        request.app['Creds'][session]['Avail'] == "INVALID" and
+        not setd['has_trust']
+    ):
         response = aiohttp.web.Response(
             status=302
         )
