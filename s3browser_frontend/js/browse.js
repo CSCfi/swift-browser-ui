@@ -113,8 +113,8 @@ var s3list = new Vue ({
                         s3list.oList = retJson;
                         s3list.currentBucket = bucket;
                         s3list.buckets = false;s3list.objects = true;
-                        for(i = 0; i < s3list.oList.length; i++) {
-                            s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['Key'];
+                        for(var i = 0; i < s3list.oList.length; i++) {
+                            s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['name'];
                         }
                     }
                 );
