@@ -68,12 +68,12 @@ async def sso_query_begin(request):
 
     response.headers['Location'] = (
         setd['auth_endpoint_url'] +
+        "/auth"
         "/OS-FEDERATION" +
         "/identity_providers" +
         "/haka" +
         "/protocols" +
         "/saml2" +
-        "/auth" +
         "/websso" +
         "?origin={origin}".format(
             origin=setd['origin_address']

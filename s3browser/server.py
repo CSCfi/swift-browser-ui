@@ -50,7 +50,9 @@ def servinit():
         aiohttp.web.get('/login/front', sso_query_begin),
         aiohttp.web.get('/login/return', sso_query_end),
         aiohttp.web.post('/login/return', sso_query_end),
-        aiohttp.web.get('/login/rescope', token_rescope)
+        aiohttp.web.get('/login/websso', sso_query_end),
+        aiohttp.web.post('/login/websso', sso_query_end),
+        aiohttp.web.get('/login/rescope', token_rescope),
     ])
 
     # Add api routes
