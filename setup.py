@@ -15,6 +15,7 @@ setuptools.setup(
         'python-swiftclient',
         'cryptography',
         'keystoneauth1',
+        'click',
     ],
     extras_require={
           'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
