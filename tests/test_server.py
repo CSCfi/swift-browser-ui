@@ -3,8 +3,14 @@ Module for testing s3browser.server, will also contain the tests for front.py
 """
 
 
+import os
 import pytest
 from s3browser.server import servinit
+from s3browser.settings import setd
+
+
+# Set static folder in settings so it can be tested
+setd['static_directory'] = os.getcwd() + '/s3browser_frontend'
 
 
 @pytest.mark.asyncio
