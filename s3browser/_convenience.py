@@ -16,19 +16,24 @@ import urllib.request
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
+from cryptography.fernet import InvalidToken
 
 import swiftclient.service
 import swiftclient.client
 
-from cryptography.fernet import InvalidToken
 
-POUTA_URL = 'https://pouta.csc.fi:5001/v3'
-SWIFT_URL_PREFIX = 'https://object.pouta.csc.fi:443/swift/v1'
+from .settings import setd
 
 
-keystonelog = logging.getLogger('keystoneauth')
-keystonelog.addHandler(logging.StreamHandler())
-keystonelog.setLevel(logging.DEBUG)
+def setup_logging():
+    keystonelog = logging.getLogger('keystoneauth')
+    keystonelog.addHandler(logging.StreamHandler())
+    if setd['debug']:
+        keystonelog.setLevel(logging.DEBUG)
+    elif setd['verbose']:
+        keystonelog.setLevel(logging.INFO)
+    else:
+        keystonelog.setLevel(logging.WARNING)
 
 
 def disable_cache(response):
@@ -159,7 +164,7 @@ def get_availability_from_token(token):
 
     # Check projects from the API
     prq = urllib.request.Request(
-        POUTA_URL + "/OS-FEDERATION/projects",
+        setd['auth_endpoint_url'] + "/OS-FEDERATION/projects",
         headers=hdr,
     )
     with urllib.request.urlopen(prq) as projects:  # nosec
@@ -167,7 +172,7 @@ def get_availability_from_token(token):
 
     # Check domains from the API
     drq = urllib.request.Request(
-        POUTA_URL + "/OS-FEDERATION/domains",
+        setd['auth_endpoint_url'] + "/OS-FEDERATION/domains",
         headers=hdr,
     )
     with urllib.request.urlopen(drq) as domains:  # nosec
@@ -205,7 +210,7 @@ def initiate_os_session(unscoped, project):
         object(keystoneauth1.session.Session)
     """
     os_auth = v3.Token(
-        auth_url=POUTA_URL,
+        auth_url=setd['auth_endpoint_url'],
         token=unscoped,
         project_id=project
     )
@@ -231,8 +236,8 @@ def initiate_os_service(os_session, project):
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
-        'os_storage_url': SWIFT_URL_PREFIX + '/AUTH_' + project,
-        'os_auth_url': POUTA_URL,
+        'os_storage_url': setd['swift_endpoint_url'] + '/AUTH_' + project,
+        'os_auth_url': setd['auth_endpoint_url'],
         'insecure': True,
         'debug': True,
         'info': True,
