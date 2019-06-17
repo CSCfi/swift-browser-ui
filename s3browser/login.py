@@ -179,7 +179,7 @@ async def sso_query_end(request):
 
     # Redirect to the browse page with the correct credentials
     response = aiohttp.web.Response(
-        status=302,
+        status=303,
         reason="Start application"
     )
     response.headers['Location'] = "/browse"
