@@ -191,10 +191,10 @@ def get_availability_from_token(token):
     # Return all project names and domain names inside a dictionary
     return {
         "projects": [
-            p['id'] for p in output_projects['projects']
+            p for p in output_projects['projects']
         ],
         "domains": [
-            d['name'] for d in output_domains['domains']
+            d for d in output_domains['domains']
         ]
     }
 
