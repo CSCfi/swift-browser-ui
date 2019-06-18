@@ -23,9 +23,9 @@
                 <li
                     is="project-list-element"
                     v-for="item in projects"
-                    v-bind:key="item"
-                    v-bind:project="item"
-                    v-on:projectclick="changeProject ( item )"
+                    v-bind:key="item.id"
+                    v-bind:project="item.name"
+                    v-on:projectclick="changeProject ( item.id )"
                 ></li>
             </ul>
         </div>
