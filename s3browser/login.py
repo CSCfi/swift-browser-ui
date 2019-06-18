@@ -144,13 +144,13 @@ async def sso_query_end(request):
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
-        request.app['Creds'][session]['Avail']['projects'][0]
+        request.app['Creds'][session]['Avail']['projects'][0]['id']
     )
 
     # Create the swiftclient connection
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.app['Creds'][session]['Avail']['projects'][0],
+        request.app['Creds'][session]['Avail']['projects'][0]['id'],
     )
 
     # Log information from the connection to make sure that the connetion was
@@ -183,7 +183,9 @@ async def token_rescope(request):
     )
 
     if (request.query['project'] not in
-            request.app['Creds'][session]['Avail']['projects']):
+        [
+        p['id'] for p in request.app['Creds'][session]['Avail']['projects']
+    ]):
         raise aiohttp.web.HTTPForbidden(
             reason="The project is not available for this token."
         )
