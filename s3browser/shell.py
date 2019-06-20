@@ -166,7 +166,11 @@ def install():
     click.echo('Install the program')
 
 
-if __name__ == "__main__":
+def main():
     cli(
         auto_envvar_prefix='BROWSER'
     )
+
+
+if __name__ == "__main__":
+    main()
