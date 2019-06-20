@@ -25,26 +25,7 @@ async def handle_login(request):
         reason="Redirection to login"
     )
 
-    cookie, cookie_crypted = generate_cookie(request)
-    response = disable_cache(response)
-
-    response.set_cookie(
-        name='S3BROW_SESSION',
-        value=cookie_crypted,
-        max_age=3600,
-    )
-
-    request.app['Sessions'].append(cookie)
-
     response.headers['Location'] = "/login/front"
-
-    request.app['Log'].info(
-        'Established new session for {0} - cookie:{1} - time:{2}'.format(
-            request.remote,
-            cookie,
-            time.ctime()
-        )
-    )
 
     return response
 
@@ -53,7 +34,6 @@ async def sso_query_begin(request):
     """
     Display login page and initiate federated keystone authentication
     """
-    session_check(request)
     # Return the form based login page if the service isn't trusted on the
     # endpoint
     if not setd['has_trust']:
@@ -85,47 +65,64 @@ async def sso_query_begin(request):
 
 async def sso_query_end(request):
     """
-    Function for handling login token POST, to fetch the scoped token
-    from the keystone api.
+    Function for handling login token POST, to fetch the scoped token from
+    the keystone API. Also creates the session for the user.
     """
-    # Check for established session
-    session_check(request)
-    session = decrypt_cookie(request)
-    request.app['Log'].info(
-        'Received SSO login from {0} with session {1} :: {2}'.format(
-            request.remote,
-            session,
-            time.ctime()
-        )
-    )
+    log = request.app['Log']
     # Declare the unscoped token
     unscoped = None
+    formdata = await request.post()
+    log.info(
+        "Got %s in form.", formdata
+    )
+    if 'token' in formdata:
+        unscoped = formdata['token']
+        log.info(
+            'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
+                unscoped,
+                request.remote,
+                time.ctime()
+            )
+        )
     # Try getting the token id from form
-    if 'token' in request.query:
+    if 'token' in request.query and unscoped is None:
         unscoped = request.query['token']
-        request.app['Log'].info(
-            'Got OS token ::{0}:: from address {1} :: {2}'.format(
+        log.info(
+            'Got OS token qstr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
                 time.ctime()
             )
         )
     # Try getting the token id from headers
-    if 'X-Auth-Token' in request.headers:
+    if 'X-Auth-Token' in request.headers and unscoped is None:
         unscoped = request.headers['X-Auth-Token']
-        request.app['Log'].info(
-            'Got OS token ::{0}:: from addres {1} :: {2}'.format(
+        log.info(
+            'Got OS token hdr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
                 time.ctime()
             )
         )
-    # Is there actually a token present?
     if unscoped is None:
         raise aiohttp.web.HTTPClientError(
             reason="No Token ID was specified, token id is required"
         )
 
+    # Now as we have a confirmation of having the token, we can establish
+    # connection and begin the session
+    response = aiohttp.web.Response(
+        status=303
+    )
+    session, cookie_crypted = generate_cookie(request)
+    response = disable_cache(response)
+
+    response.set_cookie(
+        name='S3BROW_SESSION',
+        value=cookie_crypted,
+        max_age=3600,
+    )
+    request.app['Sessions'].append(session)
     # Initiate the credential dictionary
     request.app['Creds'][session] = {}
 
@@ -178,10 +175,6 @@ async def sso_query_end(request):
     )
 
     # Redirect to the browse page with the correct credentials
-    response = aiohttp.web.Response(
-        status=303,
-        reason="Start application"
-    )
     response.headers['Location'] = "/browse"
 
     return response
