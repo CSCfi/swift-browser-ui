@@ -6,7 +6,8 @@ import logging
 import cryptography.fernet
 
 from .front import index, browse
-from .login import handle_login, sso_query_begin, sso_query_end, handle_logout
+from .login import handle_login, sso_query_begin, handle_logout
+from .login import sso_query_end
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user
@@ -48,9 +49,7 @@ def servinit():
         aiohttp.web.get('/login', handle_login),
         aiohttp.web.get('/login/kill', handle_logout),
         aiohttp.web.get('/login/front', sso_query_begin),
-        aiohttp.web.get('/login/return', sso_query_end),
         aiohttp.web.post('/login/return', sso_query_end),
-        aiohttp.web.get('/login/websso', sso_query_end),
         aiohttp.web.post('/login/websso', sso_query_end),
         aiohttp.web.get('/login/rescope', token_rescope),
     ])
@@ -89,7 +88,8 @@ def run_server_secure(app):
 def run_server_insecure(app):
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger('aiohttp.access')
+        access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
+        port=setd['port']
     )
 
 
