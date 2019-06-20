@@ -37,7 +37,7 @@
                 After successfully copying the response token id header, paste it in the
                 following form's text field
             </p>
-            <form id="retform" action="/login/return">
+            <form id="retform" method="POST" action="/login/return">
                 <b>{{ formname }}</b><br>
                 <input id="inputbox" type="text" name="token"><br>
                 <input type="submit">
