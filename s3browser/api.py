@@ -188,6 +188,32 @@ async def os_list_projects(request):
     )
 
 
+async def get_os_active_project(request):
+    """
+    A function for responding with the project that the token is currently
+    scoped for
+    """
+    session = api_check(request)
+    request.app['Log'].info(
+        'API call for current project from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    return aiohttp.web.json_response(
+        request.app['Creds'][session]['active_project']
+    )
+
+
+# Re-map functions that are actually used in the program, depending on which
+# platform to use – s3 or swift
+# if SETUP_WITH_S3:
+#     list_buckets = s3_list_buckets
+#     list_objects = s3_list_objects
+#     download_object = s3_download_object
+# else:
 list_buckets = swift_list_buckets
 list_objects = swift_list_objects
 download_object = swift_download_object
