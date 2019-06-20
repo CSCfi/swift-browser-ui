@@ -16,6 +16,13 @@ var app = new Vue ({
                         var uname = retJson;
                         console.log( uname );
                         app.user = uname;
+                        history.pushState(
+                            {
+                                user: app.user,
+                            },
+                            "userView",
+                            window.location.host + "/browse/" + app.user
+                        );
                     }
                 );
         },
@@ -26,10 +33,12 @@ var projectChooser = new Vue({
     el: '#projectChooser',
     data: {
         projects: [],
+        currentProject: undefined,
     },
     methods: {
         getProjects: function () {
             // Fetch available projects from the API
+            projectChooser.getActiveProject(); 
             fetch('api/projects', {method: 'GET', credentials: 'include'})
                 .then(
                     function ( response ) {
@@ -40,8 +49,16 @@ var projectChooser = new Vue({
                     function ( retJson ) {
                         console.log( JSON.stringify( retJson ));
                         projectChooser.projects = retJson;
+                        history.pushState(
+                            {
+                                user: app.user,
+                                project: currentProject,
+                            },
+                            "projectView",
+                            window.location.host + "/browse/" + app.user + "/" + projectChooser.currentProject,
+                        );
                     }
-                )
+                );
         },
         changeProject: function ( newProject ) {
             // Call API to rescope token for a new project
@@ -51,6 +68,19 @@ var projectChooser = new Vue({
                 .then(
                     function ( response ) {
                         if ( response.status == 204 ) {
+                            projectChooser.currentProject = undefined;
+                            projectChooser.getActiveProject();
+                            if (projectChooser.currentProject == undefined) {
+                                
+                            }
+                            history.pushState(
+                            {
+                                    user: app.user,
+                                    project: currentProject,
+                                },
+                                "projectView",
+                                window.location.host + "/browse/" + app.user + "/" + projectChooser.currentProject,
+                            )
                             s3list.getBuckets();
                         }
                         else {
@@ -59,6 +89,19 @@ var projectChooser = new Vue({
                         }
                     }
                 )
+        },
+        getActiveProject: function () {
+            var getProjectURL = new URL( "api/active", document.location );
+            fetch( getProjectURL, { method: 'GET', credentials: 'include' } )
+                .then(
+                    function ( response ) {
+                        if ( response.status == 200 ) {
+                            var resp = response.json();
+                            console.log("active: " + JSON.stringify(resp));
+                            projectChooser.currentProject = resp['name'];
+                        }
+                    }
+                );
         },
     },
 });
@@ -123,5 +166,5 @@ var s3list = new Vue ({
 });
 
 app.getUser();
-s3list.getBuckets();
 projectChooser.getProjects();
+s3list.getBuckets();
