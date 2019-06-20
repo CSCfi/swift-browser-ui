@@ -153,6 +153,12 @@ async def sso_query_end(request):
         request.app['Creds'][session]['Avail']['projects'][0]['id'],
     )
 
+    # Save the current active project
+    request.app['Creds'][session]['active_project'] = {
+        "name": request.app['Creds'][session]['Avail']['projects'][0]['name'],
+        "id": request.app['Creds'][session]['Avail']['projects'][0]['id'],
+    }
+
     # Log information from the connection to make sure that the connetion was
     # actually established
     request.app['Log'].info(
@@ -203,6 +209,16 @@ async def token_rescope(request):
         request.app['Creds'][session]['OS_sess'],
         request.query['project'],
     )
+
+    # Save the new project as the active project in session
+    new_project_name = [
+        i['name'] for i in request.app['Creds'][session]['Avail']['projects']
+        if i['id'] == request.query['project']
+    ][0]
+    request.app['Creds'][session]['active_project'] = {
+        "name": new_project_name,
+        "id": request.query['project'],
+    }
 
     return aiohttp.web.Response(
         status=204,
