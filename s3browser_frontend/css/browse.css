@@ -26,8 +26,8 @@ th, td, tr {
     width: 100%;
     border-bottom: 1px solid #BBBBBB;
     padding: 5px;
-    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
-    transition: background-color 0.4s linear, color 0.4s linear;
+    -webkit-transition: background-color 0.1s linear, color 0.1s linear;
+    transition: background-color 0.1s linear, color 0.1s linear;
 }
 
 #bucketname {
@@ -42,8 +42,8 @@ th, td, tr {
     display: table-cell;
     color: black;
     text-align: left;
-    -webkit-transtion: background-color 0.4s linear, color 0.4s linear;
-    transition: background-color 0.4s linear, color 0.4s linear;
+    -webkit-transtion: background-color 0.1s linear, color 0.1s linear;
+    transition: background-color 0.1s linear, color 0.1s linear;
     width: 100%;
     height: 100%;
 }
@@ -79,8 +79,8 @@ th {
     display: table-cell;
     color: black;
     text-align: center;
-    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
-    transition: background-color 0.4s linear, color 0.4s linear;
+    -webkit-transition: background-color 0.1s linear, color 0.1s linear;
+    transition: background-color 0.1s linear, color 0.1s linear;
     width: 100%;
     height: 100%;
 }
@@ -155,8 +155,8 @@ th {
     display: block;
     color: black;
     text-align: center;
-    -webkit-transition: background-color 0.4s linear, color 0.4s linear;
-    transition: background-color 0.4s linear, color 0.4s linear;
+    -webkit-transition: background-color 0.1s linear, color 0.1s linear;
+    transition: background-color 0.1s linear, color 0.1s linear;
     height: 45px;
     min-width: 50px;
 }
