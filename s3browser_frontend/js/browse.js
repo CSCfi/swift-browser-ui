@@ -16,13 +16,6 @@ var app = new Vue ({
                         var uname = retJson;
                         console.log( uname );
                         app.user = uname;
-                        history.pushState(
-                            {
-                                user: app.user,
-                            },
-                            "userView",
-                            window.location.host + "/browse/" + app.user
-                        );
                     }
                 );
         },
@@ -49,14 +42,6 @@ var projectChooser = new Vue({
                     function ( retJson ) {
                         console.log( JSON.stringify( retJson ));
                         projectChooser.projects = retJson;
-                        history.pushState(
-                            {
-                                user: app.user,
-                                project: currentProject,
-                            },
-                            "projectView",
-                            window.location.host + "/browse/" + app.user + "/" + projectChooser.currentProject,
-                        );
                     }
                 );
         },
@@ -73,14 +58,6 @@ var projectChooser = new Vue({
                             if (projectChooser.currentProject == undefined) {
                                 
                             }
-                            history.pushState(
-                            {
-                                    user: app.user,
-                                    project: currentProject,
-                                },
-                                "projectView",
-                                window.location.host + "/browse/" + app.user + "/" + projectChooser.currentProject,
-                            )
                             s3list.getBuckets();
                         }
                         else {
