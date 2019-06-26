@@ -45,6 +45,9 @@ def servinit():
     app.add_routes([
         aiohttp.web.get('/', index),
         aiohttp.web.get('/browse', browse),
+        # Route all URLs prefixed by /browse to the browser page, as this is
+        # an spa
+        aiohttp.web.get('/browse/{tail:.*}', browse),
     ])
 
     # Add login routes
