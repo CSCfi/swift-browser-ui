@@ -41,7 +41,7 @@ th, td, tr {
     text-decoration: none;
     display: table-cell;
     color: black;
-    text-align: left;
+    text-align: center, justify;
     -webkit-transtion: background-color 0.1s linear, color 0.1s linear;
     transition: background-color 0.1s linear, color 0.1s linear;
     width: 100%;
@@ -122,7 +122,7 @@ th {
     background-color: lightgray;
 }
 
-#projectChooser {
+#navbar {
     width: 100%;
     margin: 0;
     padding: 0;
@@ -138,9 +138,38 @@ th {
     overflow: auto;
 }
 
-#projectlistelement, .projectbutton {
+.projectlistelement, .projectbutton {
     float: left;
     min-width: 80px;
+}
+
+.userlistelement {
+    float: right;
+    min-width: 80px;
+}
+
+.unamebutton {
+    float: right;
+    border: none;
+    background-color: #CEF0B7;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0.5ch;
+    padding-right: 0.5ch;
+    text-decoration: none;
+    margin: 0;
+    display: block;
+    color: black;
+    text-align: center;
+    -webkit-transition: background-color 0.1s linear, color 0.1s linear;
+    transition: background-color 0.1s linear, color 0.1s linear;
+    height: 45px;
+}
+
+.unamebutton:hover{
+    color: black;
+    background-color: #BBBBBB;
+    cursor: context-menu;
 }
 
 .projectbutton {
@@ -164,4 +193,5 @@ th {
 .projectbutton:hover {
     color: black;
     background-color: #BBBBBB;
+    cursor: pointer;
 }
