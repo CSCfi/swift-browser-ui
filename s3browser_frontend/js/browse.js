@@ -1,147 +1,144 @@
-var app = new Vue ({
-    el: '#app',
-    data: {
-        user: undefined,
-    },
-    methods: {
-        getUser: function () {
-            fetch('api/username', { method: 'GET', credentials: 'include' })
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        var uname = retJson;
-                        console.log( uname );
-                        app.user = uname;
-                    }
-                );
-        },
-    }
+// Depends on vue.js and vue-router, needs ES6 support to work
+
+// To improve readability larger code blocks are separated by a dash-line.
+// This is just to test whether or not this is something I want to start using
+
+// NOTE: All the components used in the routing can be found from the
+// btablecomp.js file.
+
+// The view for the application front page. Currently does nothing as it's not
+// needed yet.
+const FrontPage = Vue.extend({
+    template: '\
+<div>\
+<p>Not yet implemented</p>\
+</div>\
+    ',
 });
 
-var projectChooser = new Vue({
-    el: '#projectChooser',
+// The view for the application user page, e.g. for showing user information in
+// a bit more detail. Currently does nothing as it's not needed yet.
+const UserPage = Vue.extend({
+    template: '\
+<div>\
+<p>Not yet implemented</p>\
+</div>\
+    ',
+});
+
+// ---------------------------------------------------------------------------
+
+// The view for the container list page, will show the user all the containers
+// that are available for the project that's currently being accessed.
+// Data needs to be pulled from the parent class with a function, because
+// vue.js has it's own way of doing things with a strict hierarchy
+const ContainerPage = Vue.extend({
+    data: function () {
+        let vars = {};
+        vars['bList'] = [];
+        if ( app.bList == undefined ) {
+            getBuckets().then( function ( ret ) {
+                vars['bList'] = ret;
+                app.bList = vars['bList']
+            });
+        } else {
+            vars['bList'] = app.bList;
+        }
+        return vars;
+    },
+    template: '\
+<div>\
+    <table id=\'btable\'>\
+        <tr\
+            is="bucket-table-heading"\
+        ></tr>\
+        <tr\
+            is="bucket-table-row"\
+            v-for="item in bList"\
+            v-bind:key="item.name"\
+            v-bind:bname="item.name"\
+            v-bind:baddress="getContainerAddress ( item.name )"\
+            v-on:bclick="showContainer( item.name )"\
+        ></tr>\
+    </table>\
+</div>\
+    ',
+    methods: {
+        getContainerAddress: function ( container ) {
+            return this.$route.params.project + '/' + container;
+        },
+    },
+});
+
+// ---------------------------------------------------------------------------
+
+// The view for the object list page, will show the user all the objects in a
+// specified container that's currently being accessed. Also caches the
+// accessed objects during the session to prevent unnecessary API usage.
+const ObjectPage = Vue.extend({
+    data: function () {
+        let vals = {};
+        vals['oList'] = [];
+        let container = this.$route.params.container;
+        if ( app.oCache[container] == undefined ) {
+            getObjects( this.$route.params.container ).then(
+                function ( ret ) {
+                    vals['oList'] = ret;
+                    app.oCache[container] = vals['oList'];
+                }
+            );
+        } else {
+            vals['oList'] = app.oCache[container];
+        }
+        return vals;
+    },
+    template: '\
+<div>\
+    <table id=\'otable\'>\
+        <tr\
+            is="object-table-heading"\
+            v-on:oheadingclick="$emit(\'oheadingclick\')"\
+        ></tr>\
+        <tr\
+            is="object-table-row"\
+            v-for="item in oList"\
+            v-bind:key=\'item.name\'\
+            v-bind:stobject=\'item\'\
+            v-bind:dloadlink=\'item.url\'\
+            v-on:oheadingclick="$emit( \'oheadingclick\' )"\
+        ></tr>\
+    </table>\
+</div>\
+    ',
+});
+
+// ----------------------------------------------------------------------------
+
+// Define the Vue routes, for now we're using simple routes, in which there is
+// no direct queries, but the actual route endpoint is signified by location
+// in the URL. This is because it's in my opinion simpler, since it makes it
+// possible to e.g. use the URL directly as breadcrumbs.
+const routes = [
+    { path: '/browse', component: FrontPage },
+    { path: '/browse/:user', component: UserPage },
+    { path: '/browse/:user/:project', component: ContainerPage },
+    { path: '/browse/:user/:project/:container', component: ObjectPage },
+    { path: '/placeholder', component: undefined },
+];
+
+const router = new VueRouter({
+    mode: "history",
+    routes: routes,
+});
+
+// Define the single project Vue App
+const app = new Vue({
+    router: router,
     data: {
+        oCache: [],
+        bList: undefined,
         projects: [],
-        currentProject: undefined,
-    },
-    methods: {
-        getProjects: function () {
-            // Fetch available projects from the API
-            projectChooser.getActiveProject(); 
-            fetch('api/projects', {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        projectChooser.projects = retJson;
-                    }
-                );
-        },
-        changeProject: function ( newProject ) {
-            // Call API to rescope token for a new project
-            var rescopeURL = new URL( "login/rescope", document.location );
-            rescopeURL.searchParams.append( 'project', newProject );
-            fetch( rescopeURL, { method: 'GET', credentials: 'include' } )
-                .then(
-                    function ( response ) {
-                        if ( response.status == 204 ) {
-                            projectChooser.currentProject = undefined;
-                            projectChooser.getActiveProject();
-                            if (projectChooser.currentProject == undefined) {
-                                
-                            }
-                            s3list.getBuckets();
-                        }
-                        else {
-                            console.log( "Failed to rescope project" );
-                            console.log( "Not changing anything in the lists for now" );
-                        }
-                    }
-                )
-        },
-        getActiveProject: function () {
-            var getProjectURL = new URL( "api/active", document.location );
-            fetch( getProjectURL, { method: 'GET', credentials: 'include' } )
-                .then(
-                    function ( response ) {
-                        if ( response.status == 200 ) {
-                            var resp = response.json();
-                            console.log("active: " + JSON.stringify(resp));
-                            projectChooser.currentProject = resp['name'];
-                        }
-                    }
-                );
-        },
+        active: "",
+        uname: "",
     },
 });
-
-var s3list = new Vue ({
-    el: '#s3list',
-    data: {
-        bList: [],
-        oList: [],
-        buckets: true,
-        objects: false,
-        currentBucket: '',
-    },
-    methods: {
-        getBuckets: function () {
-            // Fetch buckets from the API for the user that's currently logged
-            // in
-            fetch('api/buckets', {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        s3list.bList = retJson;
-                        s3list.objects = false;s3list.buckets = true;
-                    }
-                )
-        },
-        bringBucketsFront: function() {
-            // Bring bucket view back to the front to prevent unnecessary API
-            // call for diplaying them
-            s3list.objects = false;s3list.buckets = true;
-        },
-        getObjects: function ( bucket ) {
-            // Fetch objects contained in 'bucket' from the API for the user
-            // that's currently logged in.
-            console.log( document.location )
-            var objUrl = new URL( "api/objects", document.location )
-            objUrl.searchParams.append('bucket', bucket)
-            fetch(objUrl, {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        s3list.oList = retJson;
-                        s3list.currentBucket = bucket;
-                        s3list.buckets = false;s3list.objects = true;
-                        for(var i = 0; i < s3list.oList.length; i++) {
-                            s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['name'];
-                        }
-                    }
-                );
-        },
-    }
-});
-
-app.getUser();
-projectChooser.getProjects();
-s3list.getBuckets();
