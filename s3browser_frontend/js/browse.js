@@ -178,6 +178,7 @@ const app = new Vue({
             return retl;
         },
         changeProject: function ( newProject ) {
+            // Re-scope to project given by the user
             changeProjectApi( newProject ).then( function ( ret ) {
                 if ( ret ) {
                     getActiveProject().then( function ( value ) {
