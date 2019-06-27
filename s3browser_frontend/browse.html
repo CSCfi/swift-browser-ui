@@ -42,6 +42,17 @@
                     ></li>
                 </ul>
             </div>
+            <div id="breadcrumb">
+                <ul id="breadcrumb-list">
+                    <li
+                        is="breadcrumb-list-element"
+                        v-for="item in getRouteAsList ()"
+                        v-bind:key="item.alias"
+                        v-bind:alias="item.alias"
+                        v-bind:address="item.address"
+                    ></li>
+                </ul>
+            </div>
             <router-view
             ></router-view>
         </div>
@@ -56,9 +67,10 @@
         getProjects().then( function ( value ) {
             app.projects = value;
         });
-        getActiveProject().then( function ( value ) {
-            app.active = value;
-            app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
-        });
+        if ( document.location.pathname == "/browse" ) {        
+            getActiveProject().then( function ( value ) {
+                app.active = value;
+                app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
+        });}
     </script>
 </html>
