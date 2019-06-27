@@ -58,48 +58,6 @@ th {
     font-weight: normal;
 }
 
-#backheading {
-    color: black;
-    background-color: #CEF0B7;
-    width: 18px;
-}
-
-#backcolumn {
-    color: white;
-    background-color: #EF1D0A;
-    width: 18px;
-}
-
-#backbutton {
-    border: none;
-    background-color: #CEF0B7;
-    padding: 5px;
-    margin: none;
-    text-decoration: none;
-    display: table-cell;
-    color: black;
-    text-align: center;
-    -webkit-transition: background-color 0.1s linear, color 0.1s linear;
-    transition: background-color 0.1s linear, color 0.1s linear;
-    width: 100%;
-    height: 100%;
-}
-
-#backbutton:hover {
-    color: black;
-    background-color: #BBBBBB;
-}
-
-#backheading:hover {
-    color: black;
-    background-color: #BBBBBB;
-}
-
-#backcolumn:hover {
-    color: black;
-    background-color: #BBBBBB;
-}
-
 #tableaddr:link {
     color: black;
     font-family: Arial, Helvetica, sans-serif;
@@ -154,8 +112,8 @@ th {
     background-color: #CEF0B7;
     padding-top: 0;
     padding-bottom: 0;
-    padding-left: 0.5ch;
-    padding-right: 0.5ch;
+    padding-left: 1ch;
+    padding-right: 1ch;
     text-decoration: none;
     margin: 0;
     display: block;
@@ -194,4 +152,28 @@ th {
     color: black;
     background-color: #BBBBBB;
     cursor: pointer;
+}
+
+#breadcrumb {
+    width: 100%;
+    background-color: #FFFFFF;
+    padding: 0;
+    margin: 0;
+}
+
+#breadcrumb-list {
+    width: 100%;
+    list-style-type: none;
+    overflow: auto;
+    border: 5px;
+}
+
+.breadcrumb-element {
+    float: left;
+}
+
+.breadcrumb-link {
+    text-align: center;
+    padding-right: 0.5ch;
+    padding-left: 0.5ch;
 }
