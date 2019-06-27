@@ -135,7 +135,7 @@ const router = new VueRouter({
 const app = new Vue({
     router: router,
     data: {
-        oCache: [],
+        oCache: {},
         bList: undefined,
         projects: [],
         active: "",
@@ -176,6 +176,22 @@ const app = new Vue({
                 });
             };
             return retl;
+        },
+        changeProject: function ( newProject ) {
+            changeProjectApi( newProject ).then( function ( ret ) {
+                if ( ret ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        app.bList = undefined;
+                        app.oCache = {};
+                        app.$router.push(
+                            '/browse/' +
+                            app.uname + '/' +
+                            app.active['name']
+                        );
+                    })
+                };
+            })
         },
     },
 });
