@@ -27,7 +27,7 @@ var getProjects = async function () {
     return projects;
 };
 
-var changeProject = async function ( newProject ) {
+var changeProjectApi = async function ( newProject ) {
     // Change the project that the user is currently browsing
     // Returns true if the project change is successful, otherwise false
     let rescopeURL = new URL( "/login/rescope", document.location.origin );
