@@ -1,6 +1,6 @@
 // Depends on vue.js and vue-router, needs ES6 support to work
 
-// To improve readability larger code blocks are separated by a dash-line.
+// To improve readability some larger code blocks are separated by a dash-line.
 // This is just to test whether or not this is something I want to start using
 
 // NOTE: All the components used in the routing can be found from the
