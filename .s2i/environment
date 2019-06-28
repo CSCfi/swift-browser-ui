@@ -1,0 +1,2 @@
+UPGRADE_PIP_TO_LATEST=1
+APP_SCRIPT=./deploy/app.sh
