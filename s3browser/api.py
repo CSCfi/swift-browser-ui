@@ -207,13 +207,6 @@ async def get_os_active_project(request):
     )
 
 
-# Re-map functions that are actually used in the program, depending on which
-# platform to use – s3 or swift
-# if SETUP_WITH_S3:
-#     list_buckets = s3_list_buckets
-#     list_objects = s3_list_objects
-#     download_object = s3_download_object
-# else:
 list_buckets = swift_list_buckets
 list_objects = swift_list_objects
 download_object = swift_download_object
