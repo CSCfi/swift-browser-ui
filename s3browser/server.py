@@ -1,3 +1,5 @@
+"""s3browser server related convenience functions."""
+
 # Generic imports
 import aiohttp.web
 import ssl
@@ -15,6 +17,7 @@ from .settings import setd
 
 
 def servinit():
+    """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application()
 
     # Mutable_map handles cookie storage, also stores the object that provides
@@ -67,6 +70,12 @@ def servinit():
 
 
 def run_server_secure(app):
+    """
+    Run the server securely with a given ssl context.
+
+    Note that while this function is incomplete, the project is safe to run in
+    production only via a TLS termination proxy with e.g. NGINX.
+    """
     # Setup ssl context
     sslcontext = ssl.create_default_context()
     # sslcontext.set_ciphers(
@@ -86,6 +95,7 @@ def run_server_secure(app):
 
 
 def run_server_insecure(app):
+    """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
         access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
