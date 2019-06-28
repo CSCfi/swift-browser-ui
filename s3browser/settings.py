@@ -34,6 +34,9 @@ static_folder:         Path to the folder that contains the static front-end
 """
 
 
+import logging
+
+
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd = {
@@ -47,3 +50,10 @@ setd = {
     "version": None,
     "static_directory": None,
 }
+
+
+def set_key(key, value, log_message):
+    global setd
+    if value:
+        logging.info(log_message + str(value))
+        setd[key] = value
