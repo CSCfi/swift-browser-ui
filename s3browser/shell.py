@@ -1,6 +1,4 @@
-"""
-CLI for configuring and launching the server.
-"""
+"""CLI for configuring and launching the server."""
 
 
 from .__init__ import __version__
@@ -29,9 +27,7 @@ from ._convenience import setup_logging as conv_setup_logging
     help='Write program logs to a file.'
 )
 def cli(verbose, debug, logfile):
-    """
-    Command line interface for managing s3browser.
-    """
+    """Command line interface for managing s3browser."""
     logging.basicConfig()
     # set version
     setd['version'] = __version__
@@ -106,9 +102,7 @@ def start(
     dry_run,
     set_origin_address,
 ):
-    """
-    Start the browser backend and server
-    """
+    """Start the browser backend and server."""
     logging.debug(
         "Current settings dictionary:\n" + str(setd)
     )
@@ -148,13 +142,12 @@ def start(
 
 @cli.command()
 def install():
-    """
-    Install the browser backend (implemented in the future)
-    """
+    """Install the browser backend (implemented in the future)."""
     click.echo('Install the program')
 
 
 def main():
+    """Run the CLI."""
     cli(
         auto_envvar_prefix='BROWSER'
     )
