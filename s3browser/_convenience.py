@@ -1,8 +1,8 @@
 """
-Miscellaneous convenience functions for authenticating against openstack v3
-identity API, cache manipulation, cookies and such. Also the necessary
-project constants will be kept here, e.g. the authentication endpoint
-URL.
+Miscallaneous convenience functions used during the project.
+
+Module contains funcions for e.g. authenticating agains openstack v3 identity
+API, cache manipulation, cookies etc.
 """
 
 
@@ -26,6 +26,12 @@ from .settings import setd
 
 
 def setup_logging():
+    """
+    Set up logging for the keystoneauth module.
+
+    The keystoneauth module requires more set-up for logging, since its logger
+    doesn't update when the root logger is manipulated for some reason.
+    """
     keystonelog = logging.getLogger('keystoneauth')
     keystonelog.addHandler(logging.StreamHandler())
     if setd['debug']:
@@ -37,10 +43,7 @@ def setup_logging():
 
 
 def disable_cache(response):
-    """
-    A convenience function for adding all required cache disabling headers
-    for web responses, e.g. login window.
-    """
+    """Add cache disabling headers to an aiohttp response."""
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-Cache'
     response.headers['Expires'] = '0'
@@ -48,18 +51,14 @@ def disable_cache(response):
 
 
 def decrypt_cookie(request):
-    """
-    Decrypt a cookie using the server instance specific fernet key
-    """
+    """Decrypt a cookie using the server instance specific fernet key."""
     return request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
     ).decode('utf-8')
 
 
 def session_check(request):
-    """
-    Check session validity from a request
-    """
+    """Check session validity from a request."""
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
             return True
@@ -85,7 +84,11 @@ def session_check(request):
 
 def api_check(request):
     """
-    Separate session check for API
+    Do a session check for the API.
+
+    The API requires a more comprehensive check for session validity, since
+    there is the possibility of the openstack connection not being valid,
+    despite the session existing.
 
     Params:
         request: object(aiohttp.web.Request)
@@ -93,6 +96,7 @@ def api_check(request):
         The correct check failure response, the session cookie otherwise
     Return type:
         object(aiohttp.web.Response) or str
+
     """
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
@@ -133,8 +137,9 @@ def api_check(request):
 
 def generate_cookie(request):
     """
-    Generate an encrypted and unencrypted cookie, for use as a session cookie
-    or API key.
+    Generate an encrypted and unencrypted cookie.
+
+    Returns a tuple containing both the unencrypted and encrypted cookie.
     """
     cookie = sha256(urandom(1024)).hexdigest()
     return cookie, request.app['Crypt'].encrypt(
@@ -198,8 +203,7 @@ def get_availability_from_token(token):
 # be contained here for testing.
 def initiate_os_session(unscoped, project):
     """
-    Initiate new openstack session with the unscoped token and the specified
-    project id
+    Create a new openstack session with the unscoped token and project id.
 
     Params:
         unscoped: str
@@ -223,8 +227,7 @@ def initiate_os_session(unscoped, project):
 
 def initiate_os_service(os_session, project):
     """
-    Initiate an Opestack sdk connection with a session as an authentication
-    method. Also add the object storage service.
+    Create a swiftclient SwiftService connection to object storage.
 
     Params:
         os_session: object(keystoneauth1.session.Session)
@@ -232,6 +235,7 @@ def initiate_os_service(os_session, project):
         A connection object to Openstack Object store service
     Return type:
         object(swiftclient.service.SwiftService)
+
     """
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
