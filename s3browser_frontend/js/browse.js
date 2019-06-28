@@ -194,5 +194,18 @@ const app = new Vue({
                 };
             })
         },
+        logout: function () {
+            // Call API to kill the session immediately
+            let logoutURL = new URL( "/login/kill", document.location.origin );
+            fetch(
+                logoutURL,
+                { method: 'GET', credential: 'include' }
+            ).then( function ( response ) {
+                if ( response.status = 204 ) {
+                    // Impelement a page here to inform the user about a
+                    // successful logout.
+                }
+            })
+        },
     },
 });

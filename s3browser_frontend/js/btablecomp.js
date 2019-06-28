@@ -96,7 +96,16 @@ Vue.component('user-list-element', {
     {{ uname }}</button>\
 </li>\
     ',
-})
+});
+
+Vue.component('user-list-element', {
+    props: ['uname'],
+    template: '\
+<li class    \
+    \
+</li>\
+    '
+});
 
 // A vue.js component for the program breadcrumb
 Vue.component('breadcrumb-list-element', {
@@ -107,4 +116,4 @@ Vue.component('breadcrumb-list-element', {
     {{ alias }}</router-link>\
 </li>\
     ',
-})
+});

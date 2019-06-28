@@ -18,9 +18,12 @@
     <body>
         <script>
             // Call logout if the user leaves the page, since it's not
-            // necessary to hold sessions open
+            // necessary to hold sessions open.
+            // Not using the app.logout function because it has a redirection,
+            // which would mean that the function won't trigger here.
+            //  (insert something about beforeunload event and security here)
             window.onbeforeunload = function () {
-                fetch( 'login/kill', { method: 'GET', credentials: 'include' })
+                fetch( '/login/kill', { method: 'GET', credentials: 'include' })
                     .then(
                         function ( response ) {
                             console.log(response.status());
@@ -31,13 +34,26 @@
         <div id="app">
             <div id='navbar'>
                 <ul id="projectlist">
-                    <li
-                        is="project-list-element"
-                        v-for="item in projects"
-                        v-bind:key="item.id"
-                        v-bind:project="item.name"
-                        v-on:projectclick="changeProject ( item.id )"
-                    ></li>
+                    <li>
+                        <b-dropdown aria-role="list">
+                            <button class="button-is-primary" slot="trigger">
+                                <span>Change Project</span>
+                                <b-icon icon="menu-down"></b-icon>
+                            </button>
+
+                            <b-dropdown-item
+                                v-for="item in projects"
+                                v-bind:key="item.id"
+                                v-on:click="changeProject ( item.id )"
+                                aria-role="listitem"
+                            ><span>{{ item.name }}</span></b-dropdown-item>
+                        </b-dropdown>
+                    </li>
+                    <li>
+                        <span>
+                            Current Project: {{ active }}
+                        </span>
+                    </li>
                     <li 
                         is="user-list-element"
                         :uname="uname"

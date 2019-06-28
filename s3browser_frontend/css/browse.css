@@ -86,9 +86,12 @@ th {
     padding: 0;
 }
 
+#projectlist.li {
+    float: left;
+}
+
 #projectlist {
     width: 100%;
-    background-color: #CEF0B7;
     list-style-type: none;
     height: 45px;
     margin: 0;
@@ -109,7 +112,7 @@ th {
 .unamebutton {
     float: right;
     border: none;
-    background-color: #CEF0B7;
+    background-color: #FFFFFF;
     padding-top: 0;
     padding-bottom: 0;
     padding-left: 1ch;
@@ -132,7 +135,7 @@ th {
 
 .projectbutton {
     border: none;
-    background-color: #CEF0B7;
+    background-color: #FFFFFF;
     padding-top: 0;
     padding-bottom: 0;
     padding-left: 0.5ch;
@@ -159,6 +162,8 @@ th {
     background-color: #FFFFFF;
     padding: 0;
     margin: 0;
+    margin-left: 15px;
+    height: 45px;
 }
 
 #breadcrumb-list {
