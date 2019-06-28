@@ -1,6 +1,8 @@
 """
-Web application for browsing s3 compliant object storage, with openstack-\
-keystone federated authentication integrated. Frontend with static files.
+Web application for browsing s3 compliant object storage.
+
+Uses OS keystone for authentication and python-swiftclient for communicating
+with the object storage.
 """
 
 
