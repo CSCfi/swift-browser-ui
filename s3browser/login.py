@@ -21,7 +21,7 @@ async def handle_login(request):
     """
     # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
-        status=303,
+        status=302,
         reason="Redirection to login"
     )
 
