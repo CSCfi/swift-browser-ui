@@ -1,9 +1,7 @@
 """
-A module containing all of the settings required in a complete global scope,
-e.g. logging filenames, API endpoints, logging levels etc.
+Module containing all of the settings required in the global scope.
 
-The different configs are listed in the defaults.conf, but also here in the
-docstring (the more locations, the better).
+The different configurations are also listed here:
 
 auth_endpoint_url:     The correct address for the relevant Openstack keystone
                        instance, to enable the authentication backend
@@ -53,6 +51,7 @@ setd = {
 
 
 def set_key(key, value, log_message):
+    """Set a key value if it's specified."""
     global setd
     if value:
         logging.info(log_message + str(value))
