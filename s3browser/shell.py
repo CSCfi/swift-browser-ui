@@ -3,18 +3,18 @@ CLI for configuring and launching the server.
 """
 
 
-from .__init__ import VERSION
+from .__init__ import __version__
 import click
 import logging
 
-from .settings import setd
+from .settings import setd, set_key
 from .server import servinit, run_server_insecure
 from ._convenience import setup_logging as conv_setup_logging
 
 
 @click.group()
 @click.version_option(
-    version=VERSION, prog_name="s3browser"
+    version=__version__, prog_name="s3browser"
 )
 @click.option(
     '-v', '--verbose', is_flag=True, default=False,
@@ -34,7 +34,7 @@ def cli(verbose, debug, logfile):
     """
     logging.basicConfig()
     # set version
-    setd['version'] = VERSION
+    setd['version'] = __version__
     # set verbose
     if verbose:
         setd['verbose'] = True
@@ -112,45 +112,33 @@ def start(
     logging.debug(
         "Current settings dictionary:\n" + str(setd)
     )
-    if port:
-        logging.info(
-            "Set the running port as %s.", str(port)
-        )
-        setd['port'] = port
-    if static_directory:
-        logging.info(
-            "Set the static directory location as %s.",
-            static_directory
-        )
-        setd['static_directory'] = static_directory
-    if auth_endpoint_url:
-        logging.info(
-            "Set the authorization endpoint url to %s.",
-            auth_endpoint_url
-        )
-        setd['auth_endpoint_url'] = auth_endpoint_url
-    if has_trust:
-        logging.info(
-            "Assuming the program is trusted on the endpoint? %s",
-            str(has_trust)
-        )
-        setd['has_trust'] = True
-    if swift_endpoint_url:
-        logging.info(
-            "Set object storage endpoint as %s.",
-            swift_endpoint_url
-        )
-        setd['swift_endpoint_url'] = swift_endpoint_url
-    if dry_run:
-        logging.debug(
-            "Not running server, dry-run flagged."
-        )
-    if set_origin_address:
-        logging.info(
-            "Setting login return address to %s",
-            set_origin_address
-        )
-        setd['origin_address'] = set_origin_address
+    set_key("port", port, "Set running port as ")
+    set_key(
+        "static_directory",
+        static_directory,
+        "Set static dir location as "
+    )
+    set_key(
+        "auth_endpoint_url",
+        auth_endpoint_url,
+        "Set auth endpoint url to "
+    )
+    set_key(
+        "has_trust",
+        has_trust,
+        "Assuming the program is trusted for SSO on the endpoint."
+    )
+    set_key(
+        "swift_endpoint_url",
+        swift_endpoint_url,
+        "Set object storage endpoint as "
+    )
+    set_key("dry_run", dry_run, "Not running server, dry-run flagged.")
+    set_key(
+        set_origin_address,
+        set_origin_address,
+        "Setting login return address to "
+    )
     logging.debug(
         "Running settings directory:\n" + str(setd)
     )
