@@ -1,8 +1,8 @@
 """
-Miscellaneous convenience functions for authenticating against openstack v3
-identity API, cache manipulation, cookies and such. Also the necessary
-project constants will be kept here, e.g. the authentication endpoint
-URL.
+Miscallaneous convenience functions used during the project.
+
+Module contains funcions for e.g. authenticating agains openstack v3 identity
+API, cache manipulation, cookies etc.
 """
 
 
@@ -16,26 +16,34 @@ import urllib.request
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
+from cryptography.fernet import InvalidToken
 
 import swiftclient.service
 import swiftclient.client
 
-from cryptography.fernet import InvalidToken
 
-POUTA_URL = 'https://pouta.csc.fi:5001/v3'
-SWIFT_URL_PREFIX = 'https://object.pouta.csc.fi:443/swift/v1'
+from .settings import setd
 
 
-keystonelog = logging.getLogger('keystoneauth')
-keystonelog.addHandler(logging.StreamHandler())
-keystonelog.setLevel(logging.DEBUG)
+def setup_logging():
+    """
+    Set up logging for the keystoneauth module.
+
+    The keystoneauth module requires more set-up for logging, since its logger
+    doesn't update when the root logger is manipulated for some reason.
+    """
+    keystonelog = logging.getLogger('keystoneauth')
+    keystonelog.addHandler(logging.StreamHandler())
+    if setd['debug']:
+        keystonelog.setLevel(logging.DEBUG)
+    elif setd['verbose']:
+        keystonelog.setLevel(logging.INFO)
+    else:
+        keystonelog.setLevel(logging.WARNING)
 
 
 def disable_cache(response):
-    """
-    A convenience function for adding all required cache disabling headers
-    for web responses, e.g. login window.
-    """
+    """Add cache disabling headers to an aiohttp response."""
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-Cache'
     response.headers['Expires'] = '0'
@@ -43,18 +51,14 @@ def disable_cache(response):
 
 
 def decrypt_cookie(request):
-    """
-    Decrypt a cookie using the server instance specific fernet key
-    """
+    """Decrypt a cookie using the server instance specific fernet key."""
     return request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
     ).decode('utf-8')
 
 
 def session_check(request):
-    """
-    Check session validity from a request
-    """
+    """Check session validity from a request."""
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
             return True
@@ -80,7 +84,11 @@ def session_check(request):
 
 def api_check(request):
     """
-    Separate session check for API
+    Do a session check for the API.
+
+    The API requires a more comprehensive check for session validity, since
+    there is the possibility of the openstack connection not being valid,
+    despite the session existing.
 
     Params:
         request: object(aiohttp.web.Request)
@@ -88,6 +96,7 @@ def api_check(request):
         The correct check failure response, the session cookie otherwise
     Return type:
         object(aiohttp.web.Response) or str
+
     """
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
@@ -128,8 +137,9 @@ def api_check(request):
 
 def generate_cookie(request):
     """
-    Generate an encrypted and unencrypted cookie, for use as a session cookie
-    or API key.
+    Generate an encrypted and unencrypted cookie.
+
+    Returns a tuple containing both the unencrypted and encrypted cookie.
     """
     cookie = sha256(urandom(1024)).hexdigest()
     return cookie, request.app['Crypt'].encrypt(
@@ -159,7 +169,7 @@ def get_availability_from_token(token):
 
     # Check projects from the API
     prq = urllib.request.Request(
-        POUTA_URL + "/OS-FEDERATION/projects",
+        setd['auth_endpoint_url'] + "/OS-FEDERATION/projects",
         headers=hdr,
     )
     with urllib.request.urlopen(prq) as projects:  # nosec
@@ -167,7 +177,7 @@ def get_availability_from_token(token):
 
     # Check domains from the API
     drq = urllib.request.Request(
-        POUTA_URL + "/OS-FEDERATION/domains",
+        setd['auth_endpoint_url'] + "/OS-FEDERATION/domains",
         headers=hdr,
     )
     with urllib.request.urlopen(drq) as domains:  # nosec
@@ -193,8 +203,7 @@ def get_availability_from_token(token):
 # be contained here for testing.
 def initiate_os_session(unscoped, project):
     """
-    Initiate new openstack session with the unscoped token and the specified
-    project id
+    Create a new openstack session with the unscoped token and project id.
 
     Params:
         unscoped: str
@@ -205,7 +214,7 @@ def initiate_os_session(unscoped, project):
         object(keystoneauth1.session.Session)
     """
     os_auth = v3.Token(
-        auth_url=POUTA_URL,
+        auth_url=setd['auth_endpoint_url'],
         token=unscoped,
         project_id=project
     )
@@ -218,8 +227,7 @@ def initiate_os_session(unscoped, project):
 
 def initiate_os_service(os_session, project):
     """
-    Initiate an Opestack sdk connection with a session as an authentication
-    method. Also add the object storage service.
+    Create a swiftclient SwiftService connection to object storage.
 
     Params:
         os_session: object(keystoneauth1.session.Session)
@@ -227,12 +235,14 @@ def initiate_os_service(os_session, project):
         A connection object to Openstack Object store service
     Return type:
         object(swiftclient.service.SwiftService)
+
     """
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
-        'os_storage_url': SWIFT_URL_PREFIX + '/AUTH_' + project,
-        'os_auth_url': POUTA_URL,
+        'os_storage_url': setd['swift_endpoint_url'] +
+        '/v1' + '/AUTH_' + project,
+        'os_auth_url': setd['auth_endpoint_url'],
         'insecure': True,
         'debug': True,
         'info': True,

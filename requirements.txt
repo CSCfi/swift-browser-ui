@@ -3,3 +3,4 @@ boto3
 python-swiftclient
 cryptography
 keystoneauth1
+click

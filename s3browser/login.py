@@ -1,7 +1,4 @@
-"""
-A module for handling the project login sessions and requesting the necessary
-tokens.
-"""
+"""A module for handling the project login related tasks."""
 
 # aiohttp
 import aiohttp.web
@@ -12,19 +9,102 @@ import time
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
 from ._convenience import initiate_os_session, initiate_os_service
+from .settings import setd
 
 
 async def handle_login(request):
-    """
-    Create new session cookie for the user.
-    """
+    """Create new session cookie for the user."""
     # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
-        status=303,
+        status=302,
         reason="Redirection to login"
     )
 
-    cookie, cookie_crypted = generate_cookie(request)
+    response.headers['Location'] = "/login/front"
+
+    return response
+
+
+async def sso_query_begin(request):
+    """Display login page and initiate federated keystone authentication."""
+    # Return the form based login page if the service isn't trusted on the
+    # endpoint
+    if not setd['has_trust']:
+        response = aiohttp.web.FileResponse(
+            os.getcwd() + '/s3browser_frontend/login.html'
+        )
+        return disable_cache(response)
+
+    response = aiohttp.web.Response(
+        status=302,
+    )
+
+    response.headers['Location'] = (
+        setd['auth_endpoint_url'] +
+        "/auth"
+        "/OS-FEDERATION" +
+        "/identity_providers" +
+        "/haka" +
+        "/protocols" +
+        "/saml2" +
+        "/websso" +
+        "?origin={origin}".format(
+            origin=setd['origin_address']
+        )
+    )
+
+    return response
+
+
+async def sso_query_end(request):
+    """Handle the login procedure return from SSO or user from POST."""
+    log = request.app['Log']
+    # Declare the unscoped token
+    unscoped = None
+    formdata = await request.post()
+    log.info(
+        "Got %s in form.", formdata
+    )
+    if 'token' in formdata:
+        unscoped = formdata['token']
+        log.info(
+            'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
+                unscoped,
+                request.remote,
+                time.ctime()
+            )
+        )
+    # Try getting the token id from form
+    if 'token' in request.query and unscoped is None:
+        unscoped = request.query['token']
+        log.info(
+            'Got OS token qstr ::{0}:: from address {1} :: {2}'.format(
+                unscoped,
+                request.remote,
+                time.ctime()
+            )
+        )
+    # Try getting the token id from headers
+    if 'X-Auth-Token' in request.headers and unscoped is None:
+        unscoped = request.headers['X-Auth-Token']
+        log.info(
+            'Got OS token hdr ::{0}:: from address {1} :: {2}'.format(
+                unscoped,
+                request.remote,
+                time.ctime()
+            )
+        )
+    if unscoped is None:
+        raise aiohttp.web.HTTPClientError(
+            reason="No Token ID was specified, token id is required"
+        )
+
+    # Now as we have a confirmation of having the token, we can establish
+    # connection and begin the session
+    response = aiohttp.web.Response(
+        status=303
+    )
+    session, cookie_crypted = generate_cookie(request)
     response = disable_cache(response)
 
     response.set_cookie(
@@ -32,63 +112,7 @@ async def handle_login(request):
         value=cookie_crypted,
         max_age=3600,
     )
-
-    request.app['Sessions'].append(cookie)
-
-    response.headers['Location'] = "/login/front"
-
-    request.app['Log'].info(
-        'Established new session for {0} - cookie:{1} - time:{2}'.format(
-            request.remote,
-            cookie,
-            time.ctime()
-        )
-    )
-
-    return response
-
-
-async def sso_query_begin(request):
-    """
-    Display login page and initiate federated keystone authentication
-    """
-    session_check(request)
-    response = aiohttp.web.FileResponse(
-        os.getcwd() + '/s3browser_frontend/login.html'
-    )
-    return disable_cache(response)
-
-
-async def sso_query_end(request):
-    """
-    Function for handling login token POST, to fetch the scoped token
-    from the keystone api.
-    """
-    # Check for established session
-    session_check(request)
-    session = decrypt_cookie(request)
-    request.app['Log'].info(
-        'Received SSO login from {0} with session {1} :: {2}'.format(
-            request.remote,
-            session,
-            time.ctime()
-        )
-    )
-    # Try getting the token id from form
-    if 'token' in request.query:
-        unscoped = request.query['token']
-        request.app['Log'].info(
-            'Got OS token ::{0}:: from address {1} :: {2}'.format(
-                unscoped,
-                request.remote,
-                time.ctime()
-            )
-        )
-    else:
-        raise aiohttp.web.HTTPClientError(
-            reason="No Token ID was specified, token id is required"
-        )
-
+    request.app['Sessions'].append(session)
     # Initiate the credential dictionary
     request.app['Creds'][session] = {}
 
@@ -101,7 +125,11 @@ async def sso_query_end(request):
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
-    if request.app['Creds'][session]['Avail'] == "INVALID":
+    # If we're using the non-WebSSO login, check token validity
+    if (
+        request.app['Creds'][session]['Avail'] == "INVALID" and
+        not setd['has_trust']
+    ):
         response = aiohttp.web.Response(
             status=302
         )
@@ -137,19 +165,13 @@ async def sso_query_end(request):
     )
 
     # Redirect to the browse page with the correct credentials
-    response = aiohttp.web.Response(
-        status=302,
-        reason="Start application"
-    )
     response.headers['Location'] = "/browse"
 
     return response
 
 
 async def token_rescope(request):
-    """
-    Rescope the requesting session's token to the new specified project
-    """
+    """Rescope the requesting session's token to the new project."""
     session_check(request)
     session = decrypt_cookie(request)
     request.app['Log'].info(
@@ -187,6 +209,7 @@ async def token_rescope(request):
 
 
 async def handle_logout(request):
+    """Properly kill the session for the user."""
     if session_check(request):
         cookie = decrypt_cookie(request)
         request.app['Creds'][cookie]['OS_sess'].invalidate()
