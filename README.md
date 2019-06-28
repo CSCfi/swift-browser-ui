@@ -33,8 +33,29 @@ Getting started:
 git clone git@gitlab.csc.fi:CSCCSDP/s3-object-browser.git
 cd s3-object-browser
 pip install -r requirements.txt
-. path_to_envs_file && python -m s3browser.shell start
+pip install .
 ```
+
+After install there should be `s3browser` command available:
+```
+➜ s3browser --help
+Usage: s3browser [OPTIONS] COMMAND [ARGS]...
+
+  Command line interface for managing s3browser.
+
+Options:
+  --version       Show the version and exit.
+  -v, --verbose   Increase program verbosity.
+  -D, --debug     Enable debug level logging.
+  --logfile TEXT  Write program logs to a file.
+  --help          Show this message and exit.
+
+Commands:
+  install  Install the browser backend (implemented in the future)
+  start    Start the browser backend and server
+```
+
+In order to start the server use `s3browser start`.
 
 Additional options can be found with
 ```
