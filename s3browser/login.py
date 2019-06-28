@@ -1,7 +1,4 @@
-"""
-A module for handling the project login sessions and requesting the necessary
-tokens.
-"""
+"""A module for handling the project login related tasks."""
 
 # aiohttp
 import aiohttp.web
@@ -16,9 +13,7 @@ from .settings import setd
 
 
 async def handle_login(request):
-    """
-    Create new session cookie for the user.
-    """
+    """Create new session cookie for the user."""
     # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
         status=302,
@@ -31,9 +26,7 @@ async def handle_login(request):
 
 
 async def sso_query_begin(request):
-    """
-    Display login page and initiate federated keystone authentication
-    """
+    """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted on the
     # endpoint
     if not setd['has_trust']:
@@ -64,10 +57,7 @@ async def sso_query_begin(request):
 
 
 async def sso_query_end(request):
-    """
-    Function for handling login token POST, to fetch the scoped token from
-    the keystone API. Also creates the session for the user.
-    """
+    """Handle the login procedure return from SSO or user from POST."""
     log = request.app['Log']
     # Declare the unscoped token
     unscoped = None
@@ -181,9 +171,7 @@ async def sso_query_end(request):
 
 
 async def token_rescope(request):
-    """
-    Rescope the requesting session's token to the new specified project
-    """
+    """Rescope the requesting session's token to the new project."""
     session_check(request)
     session = decrypt_cookie(request)
     request.app['Log'].info(
@@ -221,6 +209,7 @@ async def token_rescope(request):
 
 
 async def handle_logout(request):
+    """Properly kill the session for the user."""
     if session_check(request):
         cookie = decrypt_cookie(request)
         request.app['Creds'][cookie]['OS_sess'].invalidate()
