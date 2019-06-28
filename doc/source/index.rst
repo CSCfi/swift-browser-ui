@@ -10,6 +10,7 @@ Welcome to s3browser's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+    Usage <usage>
 
 
 Indices and tables
