@@ -163,7 +163,6 @@ async def swift_download_object(request):
 
     response = aiohttp.web.Response(
         status=302,
-        body="FOUND"
     )
     response.headers['Location'] = dloadurl
     return response
