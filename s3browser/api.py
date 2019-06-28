@@ -189,10 +189,7 @@ async def os_list_projects(request):
 
 
 async def get_os_active_project(request):
-    """
-    A function for responding with the project that the token is currently
-    scoped for
-    """
+    """Fetch the project currently displayed to the session."""
     session = api_check(request)
     request.app['Log'].info(
         'API call for current project from {0}, sess: {1} :: {2}'.format(
