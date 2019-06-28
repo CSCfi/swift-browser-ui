@@ -1,3 +1,5 @@
+"""Project functions for handling API requests from front-end."""
+
 import aiohttp.web
 # import boto3
 import time
@@ -12,9 +14,7 @@ from .settings import setd
 
 
 async def get_os_user(request):
-    """
-    Function for fetching the user that the OS session has been opened for.
-    """
+    """Fetch the session owning OS user."""
     session = api_check(request)
     request.app['Log'].info(
         'API call for username from {0}, sess: {1} :: {2}'.format(
@@ -33,8 +33,11 @@ async def get_os_user(request):
 
 async def swift_list_buckets(request):
     """
-    A function for listing buckets through swift and outputting the necessary
-    information in a JSON response.
+    Return necessary information listing swift buckets in a project.
+
+    The function strips out e.g. the information on a success, since that's
+    not necessary in this case and returns a JSON response containing all the
+    necessary data.
     """
     try:
         session = api_check(request)
@@ -67,8 +70,11 @@ async def swift_list_buckets(request):
 
 async def swift_list_objects(request):
     """
-    A function for listing objects in a given bucket (container) through
-    swift and outputting the necessary information in a JSON response.
+    List objects in a given bucket or container.
+
+    The function strips out e.g. the information on a success, since that's
+    not necessary in this case and returns a JSON response containing all the
+    necessasry data.
     """
     try:
         session = api_check(request)
@@ -96,10 +102,7 @@ async def swift_list_objects(request):
 
 
 async def swift_download_object(request):
-    """
-    A function for fetching a temporary pre-signed download URL for a swift
-    object.
-    """
+    """Point a user to a temporary pre-signed download URL."""
     session = api_check(request)
     request.app['Log'].info(
         'API call for download object from {0}, sess: {1} :: {2}'.format(
@@ -169,10 +172,7 @@ async def swift_download_object(request):
 
 
 async def os_list_projects(request):
-    """
-    A function for responding with the projects available for the session's
-    unscoped token.
-    """
+    """Fetch the projects available for the open session."""
     session = api_check(request)
     request.app['Log'].info(
         'API call for project listing from {0}, sess: {1} :: {2}'.format(

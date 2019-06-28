@@ -1,3 +1,1 @@
-"""
-The module containing all s3browser exceptions.
-"""
+"""The module containing all s3browser exceptions."""
