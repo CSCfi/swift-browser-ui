@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 's3browser'
-copyright = '2019, Sampsa Penna'
-author = 'Sampsa Penna'
+copyright = '2019, CSC Developers'
+author = 'CSC Developers'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1rc1'
