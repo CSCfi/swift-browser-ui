@@ -70,21 +70,42 @@ const ContainerPage = Vue.extend({
             },
         ];
         vars['selected'] = vars['bList'][0];
+        vars['isPaginated'] = true;
+        vars['perPage'] = 15;
         return vars;
     },
     template: `
 <div>
+    <b-field grouped group-multiline
+        style="margin-left:5%;"
+    >
+        <b-select v-model="perPage" :disabled="!isPaginated">
+            <option value="5"> 5 per page</option>
+            <option value="10"> 10 per page</option>
+            <option value="15"> 15 per page</option>
+            <option value="25"> 25 per page</option>
+            <option value="50"> 50 per page</option>
+            <option value="100"> 100 per page</option>
+        </b-select>
+        <div class="control is-flex">
+            <b-switch v-model="isPaginated">Paginated</b-switch>
+        </div>
+    </b-field>
     <b-table 
-        style="width: 90%;margin: 5%;"
+        style="width: 90%;margin-left: 5%; margin-right: 5%;"
         :data="bList"
         :columns="bColumns"
         :selected.sync="selected"
         v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
         v-on:keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
         v-on:keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
+        :paginated="isPaginated"
+        :per-page="perPage"
+        :pagination-simple="isPaginated"
         focusable
         hoverable
         detailed
+        narrowed
     ></b-table>
 </div>
     `,
@@ -137,12 +158,29 @@ const ObjectPage = Vue.extend({
             },
         ];
         vals['selected'] = vals['oList'][0];
+        vals['isPaginated'] = true;
+        vals['perPage'] = 15;
         return vals;
     },
     template: `
 <div>
+    <b-field grouped group-multiline
+        style="margin-left:5%;"
+    >
+        <b-select v-model="perPage" :disabled="!isPaginated">
+            <option value="5"> 5 per page</option>
+            <option value="10"> 10 per page</option>
+            <option value="15"> 15 per page</option>
+            <option value="25"> 25 per page</option>
+            <option value="50"> 50 per page</option>
+            <option value="100"> 100 per page</option>
+        </b-select>
+        <div class="control is-flex">
+            <b-switch v-model="isPaginated">Paginated</b-switch>
+        </div>
+    </b-field>
     <b-table
-        style="width: 90%;margin: 5%;"
+        style="width: 90%;margin-left: 5%; margin-right: 5%;"
         :data="oList"
         :columns="oColumns"
         :selected.sync="selected"
@@ -151,6 +189,10 @@ const ObjectPage = Vue.extend({
         detailed
         checkable
         header-checkable
+        narrowed
+        :paginated="isPaginated"
+        :per-page="perPage"
+        :pagination-simple="isPaginated"
     ></b-table>
 </div>
     `,
