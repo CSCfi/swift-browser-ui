@@ -255,6 +255,7 @@ const app = new Vue({
 });
 
 var shiftSizeDivision = function ( vallist ) {
+    'use strict';
     // Javascript won't let us do anything but floating point division by
     // default, so a different approach was chosen.
     //  ( right shift by ten is a faster alias to division by 1024 )
