@@ -9,14 +9,14 @@
         <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.6/dist/vue-router.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
-        <link rel="stylesheet" href="/static/css/browse.css">
+        <!-- <link rel="stylesheet" href="/static/css/browse.css"> -->
         <script src="/static/js/api.js"></script>
         <script src="/static/js/btablecomp.js"></script>
         <script src="/static/js/browse.js"></script>
         <title>Object storage browser</title>
     </head>
     <body>
-        <script>
+        <!-- <script>
             // Call logout if the user leaves the page, since it's not
             // necessary to hold sessions open.
             // Not using the app.logout function because it has a redirection,
@@ -30,38 +30,40 @@
                         }
                     )
             }
-        </script>
+        </script> -->
         <div id="app">
-            <div id='navbar'>
-                <ul id="projectlist">
-                    <li>
-                        <b-dropdown aria-role="list">
-                            <button class="button-is-primary" slot="trigger">
+            <div class='navbar'>
+                <div class="navbar-menu">
+                    <div class="navbar-start">
+                        <div class="navbar-item has-dopdown is-hoverable">
+                            <a class="navbar-link">
                                 <span>Change Project</span>
-                                <b-icon icon="menu-down"></b-icon>
-                            </button>
+                            </a>
 
-                            <b-dropdown-item
-                                v-for="item in projects"
-                                v-bind:key="item.id"
-                                v-on:click="changeProject ( item.id )"
-                                aria-role="listitem"
-                            ><span>{{ item.name }}</span></b-dropdown-item>
-                        </b-dropdown>
-                    </li>
-                    <li>
-                        <span>
-                            Current Project: {{ active }}
-                        </span>
-                    </li>
-                    <li 
-                        is="user-list-element"
-                        :uname="uname"
-                    ></li>
-                </ul>
+                            <div class="navbar-dropdown">
+                                <a
+                                    class="navbar-item"
+                                    v-for="item in projects"
+                                    v-bind:key="item.id"
+                                    v-on:click="changeProject ( item.id )"
+                                ><span>{{ item.name }}</span></a>
+                            </div>
+                        </div>
+                        <div class="navbar-item">
+                            Displaying project {{ this.$route.params.project }}
+                        </div>
+                    </div>
+                    <div class="navbar-end">
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <a class="button is-primary" @click="logout ()">Log out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="breadcrumb">
-                <ul id="breadcrumb-list">
+            <div class="breadcrumb" aria-label="breadcrumbs">
+                <ul id="breadcrumb-list" style="margin-left: 5%; margin-top: 3%;">
                     <li
                         is="breadcrumb-list-element"
                         v-for="item in getRouteAsList ()"

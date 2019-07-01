@@ -43,26 +43,44 @@ const ContainerPage = Vue.extend({
             });
         } else {
             vars['bList'] = app.bList;
-        }
+        };
+        vars['bColumns'] = [
+            {
+                field: "name",
+                label: "Name",
+                sortable: true,
+            },
+            {
+                field: "count",
+                label: "Objects",
+                sortable: true,
+                width: 80,
+            },
+            {
+                field: "bytes",
+                label: "Size",
+                numeric: true,
+                sortable: true,
+                width: 140,
+            },
+        ];
+        vars['selected'] = vars['bList'][0];
         return vars;
     },
-    template: '\
-<div>\
-    <table id=\'btable\'>\
-        <tr\
-            is="bucket-table-heading"\
-        ></tr>\
-        <tr\
-            is="bucket-table-row"\
-            v-for="item in bList"\
-            v-bind:key="item.name"\
-            v-bind:bname="item.name"\
-            v-bind:baddress="getContainerAddress ( item.name )"\
-            v-on:bclick="showContainer( item.name )"\
-        ></tr>\
-    </table>\
-</div>\
-    ',
+    template: `
+<div>
+    <b-table 
+        style="width: 90%;margin: 5%;"
+        :data="bList"
+        :columns="bColumns"
+        :selected.sync="selected"
+        v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
+        focusable
+        hoverable
+        detailed
+    ></b-table>
+</div>
+    `,
     methods: {
         getContainerAddress: function ( container ) {
             return this.$route.params.project + '/' + container;
@@ -89,27 +107,37 @@ const ObjectPage = Vue.extend({
             );
         } else {
             vals['oList'] = app.oCache[container];
-        }
+        };
+        vals['oColumns'] = [
+            {
+                field: "name",
+                label: "Name",
+            },
+            {
+                field: "bytes",
+                label: "Size",
+            },
+            {
+                field: "last_modified",
+                label: "Last Modified",
+            },
+        ];
+        vals['selected'] = vals['oList'][0];
         return vals;
     },
-    template: '\
-<div>\
-    <table id=\'otable\'>\
-        <tr\
-            is="object-table-heading"\
-            v-on:oheadingclick="$emit(\'oheadingclick\')"\
-        ></tr>\
-        <tr\
-            is="object-table-row"\
-            v-for="item in oList"\
-            v-bind:key=\'item.name\'\
-            v-bind:stobject=\'item\'\
-            v-bind:dloadlink=\'item.url\'\
-            v-on:oheadingclick="$emit( \'oheadingclick\' )"\
-        ></tr>\
-    </table>\
-</div>\
-    ',
+    template: `
+<div>
+    <b-table
+        style="width: 90%;margin: 5%;"
+        :data="oList"
+        :columns="oColumns"
+        :selected.sync="selected"
+        focusable
+        hoverable
+        detailed
+    ></b-table>
+</div>
+    `,
 });
 
 // ----------------------------------------------------------------------------
