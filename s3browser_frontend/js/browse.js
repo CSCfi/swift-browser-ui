@@ -203,6 +203,9 @@ const ObjectPage = Vue.extend({
             <li>
                 <b>Type: </b>{{ props.row.content_type }} 
             </li>
+            <li>
+                <b>Download: </b><a :href="props.row.url">Link</a>
+            </li>
             </ul>
         </template>
     </b-table>
@@ -312,8 +315,9 @@ const app = new Vue({
 var shiftSizeDivision = function ( vallist ) {
     'use strict';
     // Javascript won't let us do anything but floating point division by
-    // default, so a different approach was chosen.
-    //  ( right shift by ten is a faster alias to division by 1024 )
+    // default, so a different approach was chosen anyway.
+    //  ( right shift by ten is a faster alias to division by 1024,
+    //  decimal file sizes are heresy and thus can't be enabled )
     switch ( vallist[0] >>> 10 ) {
         case 0:
             return vallist;
