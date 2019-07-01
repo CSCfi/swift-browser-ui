@@ -146,14 +146,17 @@ const ObjectPage = Vue.extend({
             {
                 field: "name",
                 label: "Name",
+                sortable: true,
             },
             {
                 field: "last_modified",
                 label: "Last Modified",
+                sortable: true,
             },
             {
                 field: "size",
                 label: "Size",
+                sortable: true,
             },
         ];
         vals['selected'] = vals['oList'][0];
@@ -186,7 +189,6 @@ const ObjectPage = Vue.extend({
         focusable
         hoverable
         detailed
-        checkable
         header-checkable
         narrowed
         :paginated="isPaginated"
@@ -236,6 +238,7 @@ const app = new Vue({
         projects: [],
         active: "",
         uname: "",
+        multipleProjects: false,
     },
     methods: {
         getRouteAsList: function () {
