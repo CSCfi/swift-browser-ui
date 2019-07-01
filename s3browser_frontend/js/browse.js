@@ -39,6 +39,13 @@ const ContainerPage = Vue.extend({
         if ( app.bList == undefined ) {
             getBuckets().then( function ( ret ) {
                 vars['bList'] = ret;
+
+                for ( let i = 0; i < vars['bList'].length; i++) {
+                    vars['bList'][i]['size'] = getHumanReadableSize(
+                        vars['bList'][i]['bytes']
+                    );
+                };
+
                 app.bList = vars['bList']
             });
         } else {
@@ -57,10 +64,8 @@ const ContainerPage = Vue.extend({
                 width: 80,
             },
             {
-                field: "bytes",
+                field: "size",
                 label: "Size",
-                numeric: true,
-                sortable: true,
                 width: 140,
             },
         ];
@@ -75,6 +80,8 @@ const ContainerPage = Vue.extend({
         :columns="bColumns"
         :selected.sync="selected"
         v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
+        v-on:keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
+        v-on:keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
         focusable
         hoverable
         detailed
@@ -102,6 +109,13 @@ const ObjectPage = Vue.extend({
             getObjects( this.$route.params.container ).then(
                 function ( ret ) {
                     vals['oList'] = ret;
+
+                    for ( let i = 0; i < vals['oList'].length; i++ ) {
+                        vals['oList'][i]['size'] = getHumanReadableSize(
+                            vals['oList'][i]['bytes']
+                        );
+                    };
+
                     app.oCache[container] = vals['oList'];
                 }
             );
@@ -114,12 +128,12 @@ const ObjectPage = Vue.extend({
                 label: "Name",
             },
             {
-                field: "bytes",
-                label: "Size",
-            },
-            {
                 field: "last_modified",
                 label: "Last Modified",
+            },
+            {
+                field: "size",
+                label: "Size",
             },
         ];
         vals['selected'] = vals['oList'][0];
@@ -135,6 +149,8 @@ const ObjectPage = Vue.extend({
         focusable
         hoverable
         detailed
+        checkable
+        header-checkable
     ></b-table>
 </div>
     `,
@@ -237,3 +253,47 @@ const app = new Vue({
         },
     },
 });
+
+var shiftSizeDivision = function ( vallist ) {
+    // Javascript won't let us do anything but floating point division, which
+    // is a no-no. Hence, implement our own.
+    switch ( vallist[0] >>> 10 ) {
+        case 0:
+            return vallist;
+        default:
+            vallist[0] = vallist[0] >>> 10;
+            vallist[1] = vallist[1] + 1;
+            return shiftSizeDivision( vallist );
+    }
+};
+
+var getHumanReadableSize = function ( val ) {
+    // Get a human readable version of the size, which is returned from the
+    // API as bytes, flooring to the most significant size without decimals.
+    
+    // As JS doesn't allow us to natively handle 64 bit integers, ditch all
+    // unnecessary stuff from the value, we only need the significant part.
+    let byteval = val > 4294967296 ? parseInt( val / 1073741824 ) : val;
+    let count = val > 4294967296 ? 3 : 0;
+
+    let human = shiftSizeDivision( [ byteval, count ] );
+    let ret = human[0].toString();
+    switch ( human[1] ) {
+        case 0:
+            ret += " B";
+            break;
+        case 1:
+            ret += " KiB";
+            break;
+        case 2:
+            ret += " MiB";
+            break;
+        case 3:
+            ret += " GiB";
+            break;
+        case 4:
+            ret += " TiB";
+            break;
+    }
+    return ret;
+};
