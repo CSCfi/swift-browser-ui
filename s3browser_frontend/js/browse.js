@@ -104,7 +104,6 @@ const ContainerPage = Vue.extend({
         :pagination-simple="isPaginated"
         focusable
         hoverable
-        detailed
         narrowed
     ></b-table>
 </div>
@@ -193,7 +192,18 @@ const ObjectPage = Vue.extend({
         :paginated="isPaginated"
         :per-page="perPage"
         :pagination-simple="isPaginated"
-    ></b-table>
+    >
+        <template slot="detail" slot-scope="props">
+            <ul>
+            <li>
+                <b>Hash: </b>{{ props.row.hash }}
+            </li>
+            <li>
+                <b>Type: </b>{{ props.row.content_type }} 
+            </li>
+            </ul>
+        </template>
+    </b-table>
 </div>
     `,
 });
