@@ -72,6 +72,9 @@ const ContainerPage = Vue.extend({
         vars['selected'] = vars['bList'][0];
         vars['isPaginated'] = true;
         vars['perPage'] = 15;
+        vars['currentPage'] = (
+            this.$route.query.page ? parseInt(this.$route.query.page) : 1
+        );
         return vars;
     },
     template: `
@@ -96,6 +99,7 @@ const ContainerPage = Vue.extend({
         :data="bList"
         :columns="bColumns"
         :selected.sync="selected"
+        :current-page.sync="currentPage"
         v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
         v-on:keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
         v-on:keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
@@ -162,6 +166,9 @@ const ObjectPage = Vue.extend({
         vals['selected'] = vals['oList'][0];
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
+        vals['currentPage'] = (
+            this.$route.query.page ? parseInt(this.$route.query.page) : 1
+        );
         return vals;
     },
     template: `
@@ -186,6 +193,7 @@ const ObjectPage = Vue.extend({
         :data="oList"
         :columns="oColumns"
         :selected.sync="selected"
+        :current-page.sync="currentPage"
         focusable
         hoverable
         detailed
