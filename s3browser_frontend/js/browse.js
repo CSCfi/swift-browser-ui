@@ -100,6 +100,7 @@ const ContainerPage = Vue.extend({
         :columns="bColumns"
         :selected.sync="selected"
         :current-page.sync="currentPage"
+        v-on:page-change="(page) => addPageToURL ( page )"
         v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
         v-on:keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
         v-on:keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
@@ -115,6 +116,9 @@ const ContainerPage = Vue.extend({
     methods: {
         getContainerAddress: function ( container ) {
             return this.$route.params.project + '/' + container;
+        },
+        addPageToURL: function ( pageNumber ) {
+            this.$router.push( "?page=" + pageNumber )
         },
     },
 });
@@ -202,6 +206,7 @@ const ObjectPage = Vue.extend({
         :paginated="isPaginated"
         :per-page="perPage"
         :pagination-simple="isPaginated"
+        v-on:page-change="( page ) => addPageToURL( page )"
     >
         <template slot="detail" slot-scope="props">
             <ul>
@@ -219,6 +224,11 @@ const ObjectPage = Vue.extend({
     </b-table>
 </div>
     `,
+    methods: {
+        addPageToURL: function ( pageNumber ) {
+            this.$router.push( "?page=" + pageNumber )
+        },
+    },
 });
 
 // ----------------------------------------------------------------------------
