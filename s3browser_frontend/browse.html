@@ -35,8 +35,11 @@
             <div class='navbar'>
                 <div class="navbar-menu">
                     <div class="navbar-start">
-                        <div class="navbar-item has-dopdown is-hoverable">
-                            Current projetct: <a class="navbar-link">
+                        <div 
+                            class="navbar-item has-dopdown is-hoverable"
+                            v-if="multipleProjects"
+                        >
+                            Current project: <a class="navbar-link">
                                 <span>{{ this.$route.params.project }}</span>
                             </a>
 
@@ -48,6 +51,12 @@
                                     v-on:click="changeProject ( item.id )"
                                 ><span>{{ item.name }}</span></a>
                             </div>
+                        </div>
+                        <div
+                            class="navbar-item"
+                            v-if="!multipleProjects"
+                        >
+                        Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
                         </div>
                     </div>
                     <div class="navbar-end">
@@ -83,6 +92,9 @@
         });
         getProjects().then( function ( value ) {
             app.projects = value;
+            if ( app.projects.length > 1 ) {
+                app.multipleProjects = true;
+            }
         });
         if ( document.location.pathname == "/browse" ) {        
             getActiveProject().then( function ( value ) {
