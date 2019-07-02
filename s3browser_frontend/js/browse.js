@@ -119,6 +119,12 @@ const ContainerPage = Vue.extend({
         hoverable
         narrowed
     >
+        <template slot="empty" slot-scope="props">
+            <p
+                style="text-align:center;margin-top:5%;margin-bottom:5%;"
+            >The project doesn't contain any containers</span>
+            </p>
+        </template>
     </b-table>
 </div>
     `,
@@ -166,23 +172,6 @@ const ObjectPage = Vue.extend({
         } else {
             vals['oList'] = app.oCache[container];
         };
-        vals['oColumns'] = [
-            {
-                field: "name",
-                label: "Name",
-                sortable: true,
-            },
-            {
-                field: "last_modified",
-                label: "Last Modified",
-                sortable: true,
-            },
-            {
-                field: "size",
-                label: "Size",
-                sortable: true,
-            },
-        ];
         vals['selected'] = vals['oList'][0];
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
@@ -211,7 +200,6 @@ const ObjectPage = Vue.extend({
     <b-table
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
         :data="oList"
-        :columns="oColumns"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         focusable
@@ -224,6 +212,24 @@ const ObjectPage = Vue.extend({
         :pagination-simple="isPaginated"
         v-on:page-change="( page ) => addPageToURL( page )"
     >
+        <template slot-scope="props">
+            <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="last_modified" label="Last Modified" sortable>
+                {{ props.row.last_modified }}
+            </b-table-column>
+            <b-table-column field="bytes" label="Size" sortable>
+                {{ props.row.size }}
+            </b-table-column>
+            <b-table-column field="url" label="Download" width="50">
+                <a
+                    :href="props.row.url"
+                >
+                    Link
+                </a>
+            </b-table-column>
+        </template>
         <template slot="detail" slot-scope="props">
             <ul>
             <li>
@@ -236,6 +242,11 @@ const ObjectPage = Vue.extend({
                 <b>Download: </b><a :href="props.row.url">Link</a>
             </li>
             </ul>
+        </template>
+        <template slot="empty" slot-scope="props">
+            <p
+                style="width:100%;text-align:center;margin-top:5%;margin-bottom:5%"
+            >This container is empty.</p>
         </template>
     </b-table>
 </div>
