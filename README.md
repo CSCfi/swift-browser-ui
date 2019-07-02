@@ -64,3 +64,7 @@ python -m s3browser.shell start --help
 ```
 
 The current frontend can be found at: `127.0.0.1:8080`.
+
+### License
+
+``s3browser`` and all it sources are released under *MIT License*.
