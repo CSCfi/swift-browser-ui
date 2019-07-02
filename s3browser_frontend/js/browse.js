@@ -52,7 +52,10 @@ const ContainerPage = Vue.extend({
 
                 app.bList = vars['bList']
                 app.isLoading = false;
-            });
+            }).catch( function () {
+                    app.isLoading = false;
+                }
+            );
         } else {
             vars['bList'] = app.bList;
         };
@@ -157,7 +160,9 @@ const ObjectPage = Vue.extend({
                     app.oCache[container] = vals['oList'];
                     app.isLoading = false;
                 }
-            );
+            ).catch( function () {
+                app.isLoading = false;
+            });
         } else {
             vals['oList'] = app.oCache[container];
         };
