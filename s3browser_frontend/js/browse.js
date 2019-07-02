@@ -37,6 +37,7 @@ const ContainerPage = Vue.extend({
         let vars = {};
         vars['bList'] = [];
         if ( app.bList == undefined ) {
+            app.isLoading = true;
             getBuckets().then( function ( ret ) {
                 vars['bList'] = ret;
 
@@ -47,6 +48,7 @@ const ContainerPage = Vue.extend({
                 };
 
                 app.bList = vars['bList']
+                app.isLoading = false;
             });
         } else {
             vars['bList'] = app.bList;
@@ -110,7 +112,8 @@ const ContainerPage = Vue.extend({
         focusable
         hoverable
         narrowed
-    ></b-table>
+    >
+    </b-table>
 </div>
     `,
     methods: {
@@ -134,6 +137,7 @@ const ObjectPage = Vue.extend({
         vals['oList'] = [];
         let container = this.$route.params.container;
         if ( app.oCache[container] == undefined ) {
+            app.isLoading = true;
             getObjects( this.$route.params.container ).then(
                 function ( ret ) {
                     vals['oList'] = ret;
@@ -145,6 +149,7 @@ const ObjectPage = Vue.extend({
                     };
 
                     app.oCache[container] = vals['oList'];
+                    app.isLoading = false;
                 }
             );
         } else {
@@ -260,6 +265,8 @@ const app = new Vue({
         active: "",
         uname: "",
         multipleProjects: false,
+        isLoading: false,
+        isFullPage: true,
     },
     methods: {
         getRouteAsList: function () {
@@ -305,11 +312,13 @@ const app = new Vue({
                         app.active = value;
                         app.bList = undefined;
                         app.oCache = {};
+
                         app.$router.push(
                             '/browse/' +
                             app.uname + '/' +
                             app.active['name']
                         );
+                        app.$router.go(0);
                     })
                 };
             })
