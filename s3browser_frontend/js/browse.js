@@ -59,24 +59,6 @@ const ContainerPage = Vue.extend({
         } else {
             vars['bList'] = app.bList;
         };
-        vars['bColumns'] = [
-            {
-                field: "name",
-                label: "Name",
-                sortable: true,
-            },
-            {
-                field: "count",
-                label: "Objects",
-                sortable: true,
-                width: 80,
-            },
-            {
-                field: "size",
-                label: "Size",
-                width: 140,
-            },
-        ];
         vars['selected'] = vars['bList'][0];
         vars['isPaginated'] = true;
         vars['perPage'] = 15;
@@ -119,6 +101,17 @@ const ContainerPage = Vue.extend({
         hoverable
         narrowed
     >
+        <template slot-scope="props">
+            <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="count" label="Objects" width="120" sortable>
+                {{ props.row.count }}
+            </b-table-column>
+            <b-table-column field="bytes" label="Size" width="120" sortable>
+                {{ props.row.size }}
+            </b-table-column>
+        </template>
         <template slot="empty" slot-scope="props">
             <p
                 style="text-align:center;margin-top:5%;margin-bottom:5%;"
