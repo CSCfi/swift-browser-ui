@@ -39,6 +39,9 @@ const ContainerPage = Vue.extend({
         if ( app.bList == undefined ) {
             app.isLoading = true;
             getBuckets().then( function ( ret ) {
+                if ( ret.status != 200 ) {
+                    app.isLoading = false;
+                }
                 vars['bList'] = ret;
 
                 for ( let i = 0; i < vars['bList'].length; i++) {
@@ -140,6 +143,9 @@ const ObjectPage = Vue.extend({
             app.isLoading = true;
             getObjects( this.$route.params.container ).then(
                 function ( ret ) {
+                    if ( ret.status != 200 ) {
+                        app.isLoading = false;
+                    }
                     vals['oList'] = ret;
 
                     for ( let i = 0; i < vals['oList'].length; i++ ) {
@@ -320,6 +326,9 @@ const app = new Vue({
                         );
                         app.$router.go(0);
                     })
+                }
+                else {
+                    app.$router.push('/browse/' + app.uname);
                 };
             })
         },
