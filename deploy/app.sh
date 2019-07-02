@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo 'Build documentation'
-cd doc
+cd docs
 make html
 echo 'Run HTTP python server documentation'
 cd build/html
