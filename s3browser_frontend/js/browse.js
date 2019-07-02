@@ -1,127 +1,405 @@
-var app = new Vue ({
-    el: '#app',
-    data: {
-        user: undefined,
-    },
-    methods: {
-        getUser: function () {
-            fetch('api/username', { method: 'GET', credentials: 'include' })
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        var uname = retJson;
-                        console.log( uname );
-                        app.user = uname;
-                    }
-                );
-        },
-    }
+// Depends on vue.js and vue-router, needs ES6 support to work
+
+// To improve readability some larger code blocks are separated by a dash-line.
+// This is just to test whether or not this is something I want to start using
+
+// NOTE: All the components used in the routing can be found from the
+// btablecomp.js file.
+
+// The view for the application front page. Currently does nothing as it's not
+// needed yet.
+const FrontPage = Vue.extend({
+    template: '\
+<div>\
+<p>Not yet implemented</p>\
+</div>\
+    ',
 });
 
-var projectChooser = new Vue({
-    el: '#projectChooser',
+// The view for the application user page, e.g. for showing user information in
+// a bit more detail. Currently does nothing as it's not needed yet.
+const UserPage = Vue.extend({
+    template: '\
+<div>\
+<p>Not yet implemented</p>\
+</div>\
+    ',
+});
+
+// ---------------------------------------------------------------------------
+
+// The view for the container list page, will show the user all the containers
+// that are available for the project that's currently being accessed.
+// Data needs to be pulled from the parent class with a function, because
+// vue.js has it's own way of doing things with a strict hierarchy
+const ContainerPage = Vue.extend({
+    data: function () {
+        let vars = {};
+        vars['bList'] = [];
+        if ( app.bList == undefined ) {
+            app.isLoading = true;
+            getBuckets().then( function ( ret ) {
+                if ( ret.status != 200 ) {
+                    app.isLoading = false;
+                }
+                vars['bList'] = ret;
+
+                for ( let i = 0; i < vars['bList'].length; i++) {
+                    vars['bList'][i]['size'] = getHumanReadableSize(
+                        vars['bList'][i]['bytes']
+                    );
+                };
+
+                app.bList = vars['bList']
+                app.isLoading = false;
+            }).catch( function () {
+                    app.isLoading = false;
+                }
+            );
+        } else {
+            vars['bList'] = app.bList;
+        };
+        vars['selected'] = vars['bList'][0];
+        vars['isPaginated'] = true;
+        vars['perPage'] = 15;
+        vars['currentPage'] = (
+            this.$route.query.page ? parseInt(this.$route.query.page) : 1
+        );
+        return vars;
+    },
+    template: `
+<div>
+    <b-field grouped group-multiline
+        style="margin-left:5%;"
+    >
+        <b-select v-model="perPage" :disabled="!isPaginated">
+            <option value="5"> 5 per page</option>
+            <option value="10"> 10 per page</option>
+            <option value="15"> 15 per page</option>
+            <option value="25"> 25 per page</option>
+            <option value="50"> 50 per page</option>
+            <option value="100"> 100 per page</option>
+        </b-select>
+        <div class="control is-flex">
+            <b-switch v-model="isPaginated">Paginated</b-switch>
+        </div>
+    </b-field>
+    <b-table 
+        style="width: 90%;margin-left: 5%; margin-right: 5%;"
+        :data="bList"
+        :columns="bColumns"
+        :selected.sync="selected"
+        :current-page.sync="currentPage"
+        v-on:page-change="(page) => addPageToURL ( page )"
+        v-on:dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
+        v-on:keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
+        v-on:keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
+        :paginated="isPaginated"
+        :per-page="perPage"
+        :pagination-simple="isPaginated"
+        focusable
+        hoverable
+        narrowed
+    >
+        <template slot-scope="props">
+            <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="count" label="Objects" width="120" sortable>
+                {{ props.row.count }}
+            </b-table-column>
+            <b-table-column field="bytes" label="Size" width="120" sortable>
+                {{ props.row.size }}
+            </b-table-column>
+        </template>
+        <template slot="empty" slot-scope="props">
+            <p
+                style="text-align:center;margin-top:5%;margin-bottom:5%;"
+            >The project doesn't contain any containers</span>
+            </p>
+        </template>
+    </b-table>
+</div>
+    `,
+    methods: {
+        getContainerAddress: function ( container ) {
+            return this.$route.params.project + '/' + container;
+        },
+        addPageToURL: function ( pageNumber ) {
+            this.$router.push( "?page=" + pageNumber )
+        },
+    },
+});
+
+// ---------------------------------------------------------------------------
+
+// The view for the object list page, will show the user all the objects in a
+// specified container that's currently being accessed. Also caches the
+// accessed objects during the session to prevent unnecessary API usage.
+const ObjectPage = Vue.extend({
+    data: function () {
+        let vals = {};
+        vals['oList'] = [];
+        let container = this.$route.params.container;
+        if ( app.oCache[container] == undefined ) {
+            app.isLoading = true;
+            getObjects( this.$route.params.container ).then(
+                function ( ret ) {
+                    if ( ret.status != 200 ) {
+                        app.isLoading = false;
+                    }
+                    vals['oList'] = ret;
+
+                    for ( let i = 0; i < vals['oList'].length; i++ ) {
+                        vals['oList'][i]['size'] = getHumanReadableSize(
+                            vals['oList'][i]['bytes']
+                        );
+                    };
+
+                    app.oCache[container] = vals['oList'];
+                    app.isLoading = false;
+                }
+            ).catch( function () {
+                app.isLoading = false;
+            });
+        } else {
+            vals['oList'] = app.oCache[container];
+        };
+        vals['selected'] = vals['oList'][0];
+        vals['isPaginated'] = true;
+        vals['perPage'] = 15;
+        vals['currentPage'] = (
+            this.$route.query.page ? parseInt(this.$route.query.page) : 1
+        );
+        return vals;
+    },
+    template: `
+<div>
+    <b-field grouped group-multiline
+        style="margin-left:5%;"
+    >
+        <b-select v-model="perPage" :disabled="!isPaginated">
+            <option value="5"> 5 per page</option>
+            <option value="10"> 10 per page</option>
+            <option value="15"> 15 per page</option>
+            <option value="25"> 25 per page</option>
+            <option value="50"> 50 per page</option>
+            <option value="100"> 100 per page</option>
+        </b-select>
+        <div class="control is-flex">
+            <b-switch v-model="isPaginated">Paginated</b-switch>
+        </div>
+    </b-field>
+    <b-table
+        style="width: 90%;margin-left: 5%; margin-right: 5%;"
+        :data="oList"
+        :selected.sync="selected"
+        :current-page.sync="currentPage"
+        focusable
+        hoverable
+        detailed
+        header-checkable
+        narrowed
+        :paginated="isPaginated"
+        :per-page="perPage"
+        :pagination-simple="isPaginated"
+        v-on:page-change="( page ) => addPageToURL( page )"
+    >
+        <template slot-scope="props">
+            <b-table-column field="name" label="Name" sortable>
+                {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="last_modified" label="Last Modified" sortable>
+                {{ props.row.last_modified }}
+            </b-table-column>
+            <b-table-column field="bytes" label="Size" sortable>
+                {{ props.row.size }}
+            </b-table-column>
+            <b-table-column field="url" label="Download" width="50">
+                <a
+                    :href="props.row.url"
+                >
+                    Link
+                </a>
+            </b-table-column>
+        </template>
+        <template slot="detail" slot-scope="props">
+            <ul>
+            <li>
+                <b>Hash: </b>{{ props.row.hash }}
+            </li>
+            <li>
+                <b>Type: </b>{{ props.row.content_type }} 
+            </li>
+            <li>
+                <b>Download: </b><a :href="props.row.url">Link</a>
+            </li>
+            </ul>
+        </template>
+        <template slot="empty" slot-scope="props">
+            <p
+                style="width:100%;text-align:center;margin-top:5%;margin-bottom:5%"
+            >This container is empty.</p>
+        </template>
+    </b-table>
+</div>
+    `,
+    methods: {
+        addPageToURL: function ( pageNumber ) {
+            this.$router.push( "?page=" + pageNumber )
+        },
+    },
+});
+
+// ----------------------------------------------------------------------------
+
+// Define the Vue routes, for now we're using simple routes, in which there is
+// no direct queries, but the actual route endpoint is signified by location
+// in the URL. This is because it's in my opinion simpler, since it makes it
+// possible to e.g. use the URL directly as breadcrumbs.
+const routes = [
+    { path: '/browse', component: FrontPage },
+    { path: '/browse/:user', component: UserPage },
+    { path: '/browse/:user/:project', component: ContainerPage },
+    { path: '/browse/:user/:project/:container', component: ObjectPage },
+    { path: '/placeholder', component: undefined },
+];
+
+const router = new VueRouter({
+    mode: "history",
+    routes: routes,
+});
+
+// Define the single project Vue App
+const app = new Vue({
+    router: router,
     data: {
+        oCache: {},
+        bList: undefined,
         projects: [],
+        active: "",
+        uname: "",
+        multipleProjects: false,
+        isLoading: false,
+        isFullPage: true,
     },
     methods: {
-        getProjects: function () {
-            // Fetch available projects from the API
-            fetch('api/projects', {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        projectChooser.projects = retJson;
-                    }
-                )
+        getRouteAsList: function () {
+            // Create a list representation of the current application route
+            // to help in the initialization of the breadcrumb component
+            let retl = [];
+            // retl.push({
+            //     alias: "browse",
+            //     address: ( "/browse" ),
+            // })
+            if ( this.$route.params.user != undefined ) {
+                retl.push({
+                    alias: this.$route.params.user,
+                    address: ( "/browse/" + this.$route.params.user ),
+                });
+            };
+            if ( this.$route.params.project != undefined ) {
+                retl.push({
+                    alias: this.$route.params.project,
+                    address: (
+                        "/browse/" + this.$route.params.user +
+                        "/" + this.$route.params.project                        
+                    ),
+                });
+            };
+            if ( this.$route.params.container != undefined ) {
+                retl.push({
+                    alias: this.$route.params.container,
+                    address: (
+                        "/browse/" + this.$route.params.user +
+                        "/" + this.$route.params.project +
+                        "/" + this.$route.params.container
+                    ),
+                });
+            };
+            return retl;
         },
         changeProject: function ( newProject ) {
-            // Call API to rescope token for a new project
-            var rescopeURL = new URL( "login/rescope", document.location );
-            rescopeURL.searchParams.append( 'project', newProject );
-            fetch( rescopeURL, { method: 'GET', credentials: 'include' } )
-                .then(
-                    function ( response ) {
-                        if ( response.status == 204 ) {
-                            s3list.getBuckets();
-                        }
-                        else {
-                            console.log( "Failed to rescope project" );
-                            console.log( "Not changing anything in the lists for now" );
-                        }
-                    }
-                )
+            // Re-scope to project given by the user
+            changeProjectApi( newProject ).then( function ( ret ) {
+                if ( ret ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        app.bList = undefined;
+                        app.oCache = {};
+
+                        app.$router.push(
+                            '/browse/' +
+                            app.uname + '/' +
+                            app.active['name']
+                        );
+                        app.$router.go(0);
+                    })
+                }
+                else {
+                    app.$router.push('/browse/' + app.uname);
+                };
+            })
+        },
+        logout: function () {
+            // Call API to kill the session immediately
+            let logoutURL = new URL( "/login/kill", document.location.origin );
+            fetch(
+                logoutURL,
+                { method: 'GET', credential: 'include' }
+            ).then( function ( response ) {
+                if ( response.status = 204 ) {
+                    // Impelement a page here to inform the user about a
+                    // successful logout.
+                }
+            })
         },
     },
 });
 
-var s3list = new Vue ({
-    el: '#s3list',
-    data: {
-        bList: [],
-        oList: [],
-        buckets: true,
-        objects: false,
-        currentBucket: '',
-    },
-    methods: {
-        getBuckets: function () {
-            // Fetch buckets from the API for the user that's currently logged
-            // in
-            fetch('api/buckets', {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        s3list.bList = retJson;
-                        s3list.objects = false;s3list.buckets = true;
-                    }
-                )
-        },
-        bringBucketsFront: function() {
-            // Bring bucket view back to the front to prevent unnecessary API
-            // call for diplaying them
-            s3list.objects = false;s3list.buckets = true;
-        },
-        getObjects: function ( bucket ) {
-            // Fetch objects contained in 'bucket' from the API for the user
-            // that's currently logged in.
-            console.log( document.location )
-            var objUrl = new URL( "api/objects", document.location )
-            objUrl.searchParams.append('bucket', bucket)
-            fetch(objUrl, {method: 'GET', credentials: 'include'})
-                .then(
-                    function ( response ) {
-                        return response.json();
-                    }
-                )
-                .then(
-                    function ( retJson ) {
-                        console.log( JSON.stringify( retJson ));
-                        s3list.oList = retJson;
-                        s3list.currentBucket = bucket;
-                        s3list.buckets = false;s3list.objects = true;
-                        for(var i = 0; i < s3list.oList.length; i++) {
-                            s3list.oList[i]['url'] = '/api/dload?bucket=' + s3list.currentBucket + '&objkey=' + s3list.oList[i]['name'];
-                        }
-                    }
-                );
-        },
+var shiftSizeDivision = function ( vallist ) {
+    'use strict';
+    // Javascript won't let us do anything but floating point division by
+    // default, so a different approach was chosen anyway.
+    //  ( right shift by ten is a faster alias to division by 1024,
+    //  decimal file sizes are heresy and thus can't be enabled )
+    switch ( vallist[0] >>> 10 ) {
+        case 0:
+            return vallist;
+        default:
+            vallist[0] = vallist[0] >>> 10;
+            vallist[1] = vallist[1] + 1;
+            return shiftSizeDivision( vallist );
     }
-});
+};
 
-app.getUser();
-s3list.getBuckets();
-projectChooser.getProjects();
+var getHumanReadableSize = function ( val ) {
+    // Get a human readable version of the size, which is returned from the
+    // API as bytes, flooring to the most significant size without decimals.
+    
+    // As JS doesn't allow us to natively handle 64 bit integers, ditch all
+    // unnecessary stuff from the value, we only need the significant part.
+    let byteval = val > 4294967296 ? parseInt( val / 1073741824 ) : val;
+    let count = val > 4294967296 ? 3 : 0;
+
+    let human = shiftSizeDivision( [ byteval, count ] );
+    let ret = human[0].toString();
+    switch ( human[1] ) {
+        case 0:
+            ret += " B";
+            break;
+        case 1:
+            ret += " KiB";
+            break;
+        case 2:
+            ret += " MiB";
+            break;
+        case 3:
+            ret += " GiB";
+            break;
+        case 4:
+            ret += " TiB";
+            break;
+    }
+    return ret;
+};

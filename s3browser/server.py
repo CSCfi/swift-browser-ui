@@ -12,7 +12,7 @@ from .login import handle_login, sso_query_begin, handle_logout
 from .login import sso_query_end
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
-from .api import get_os_user
+from .api import get_os_user, get_os_active_project
 from .settings import setd
 
 
@@ -45,6 +45,9 @@ def servinit():
     app.add_routes([
         aiohttp.web.get('/', index),
         aiohttp.web.get('/browse', browse),
+        # Route all URLs prefixed by /browse to the browser page, as this is
+        # an spa
+        aiohttp.web.get('/browse/{tail:.*}', browse),
     ])
 
     # Add login routes
@@ -64,6 +67,7 @@ def servinit():
         aiohttp.web.get('/api/dload', download_object),
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
+        aiohttp.web.get('/api/active', get_os_active_project),
     ])
 
     return app
