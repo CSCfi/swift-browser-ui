@@ -288,10 +288,10 @@ const app = new Vue({
             // Create a list representation of the current application route
             // to help in the initialization of the breadcrumb component
             let retl = [];
-            retl.push({
-                alias: "browse",
-                address: ( "/browse" ),
-            })
+            // retl.push({
+            //     alias: "browse",
+            //     address: ( "/browse" ),
+            // })
             if ( this.$route.params.user != undefined ) {
                 retl.push({
                     alias: this.$route.params.user,
