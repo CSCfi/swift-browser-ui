@@ -13,19 +13,16 @@ Getting started
     documented here, and everything on this page is only related to the
     running of the program
 
-Dependencies
+Installation
 ------------
-A few things are necessary for the program to work as needed. If you haven’t
-done so already, install the project dependencies now::
+The program can be installed with pip from the git repository::
 
-    # list of the dependencies
-    # aiohttp
-    # python-swiftclient
-    # cryptography
-    # keystoneauth1
-    # click
-    # Installing in project root:
-    pip install -r requirements.txt
+    # Requires python >= 3.6
+    git clone git@gitlab.csc.fi:CSCCSDP/s3-object-browser.git
+    pip install .
+
+When installed the program can be used with the `s3browser` -command, more
+complete instructions can be found below.
 
 Command line interface
 ======================
