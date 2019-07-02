@@ -12,6 +12,11 @@ Welcome to s3browser's documentation!
 
     Usage <usage>
 
+Description
+===========
+A web UI object browser for object storage back-ends using Openstack Keystone
+for authentication. (e.g. CSC Pouta) Uses federated login via HAKA, via the
+endpoints provided by OS Keystone.
 
 Indices and tables
 ==================
