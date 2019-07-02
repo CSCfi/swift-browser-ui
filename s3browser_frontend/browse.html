@@ -104,5 +104,13 @@
                 app.active = value;
                 app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
         });}
+        if ( app.active['name'] != app.$route.params.project ) {
+            getActiveProject().then( function ( value ) {
+                app.active = value;
+                if ( app.active['name'] != app.$route.params.project ) {
+                    app.changeProject( app.$route.params.project );
+                }
+            })
+        }
     </script>
 </html>
