@@ -2,65 +2,115 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <link rel="stylesheet" href="static/css/browse.css">
+        <!-- Maybe these should be bundled to conserve 3rd party -->
+        <!-- CDN bandwidth? (Also could be faster to self-host) -->
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-        <script src="static/js/btablecomp.js"></script>
-        <title>S3 object browser mockup</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.6/dist/vue-router.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
+        <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+        <script src="/static/js/api.js"></script>
+        <script src="/static/js/btablecomp.js"></script>
+        <script src="/static/js/browse.js"></script>
+        <title>Object storage browser</title>
     </head>
     <body>
-        <script>
+        <!-- <script>
+            // Call logout if the user leaves the page, since it's not
+            // necessary to hold sessions open.
+            // Not using the app.logout function because it has a redirection,
+            // which would mean that the function won't trigger here.
+            //  (insert something about beforeunload event and security here)
             window.onbeforeunload = function () {
-                fetch('login/kill', {method: 'GET', credentials: 'include'})
+                fetch( '/login/kill', { method: 'GET', credentials: 'include' })
                     .then(
                         function ( response ) {
                             console.log(response.status());
                         }
                     )
             }
-        </script>
-        <div id='projectChooser'>
-            <ul id="projectlist">
-                <li
-                    is="project-list-element"
-                    v-for="item in projects"
-                    v-bind:key="item"
-                    v-bind:project="item"
-                    v-on:projectclick="changeProject ( item )"
-                ></li>
-            </ul>
+        </script> -->
+        <div id="app">
+            <div class='navbar'>
+                <div class="navbar-menu">
+                    <div class="navbar-start">
+                        <div 
+                            class="navbar-item has-dopdown is-hoverable"
+                            v-if="multipleProjects"
+                        >
+                            Current project: <a class="navbar-link">
+                                <span>{{ this.$route.params.project }}</span>
+                            </a>
+
+                            <div class="navbar-dropdown">
+                                <a
+                                    class="navbar-item"
+                                    v-for="item in projects"
+                                    v-bind:key="item.id"
+                                    v-on:click="changeProject ( item.id )"
+                                ><span>{{ item.name }}</span></a>
+                            </div>
+                        </div>
+                        <div
+                            class="navbar-item"
+                            v-if="!multipleProjects"
+                        >
+                        Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
+                        </div>
+                    </div>
+                    <div class="navbar-end">
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <a class="button is-primary" @click="logout ()">Log out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="breadcrumb" aria-label="breadcrumbs">
+                <ul id="breadcrumb-list" style="margin-left: 5%; margin-top: 3%;">
+                    <li
+                        is="breadcrumb-list-element"
+                        v-for="item in getRouteAsList ()"
+                        v-bind:key="item.alias"
+                        v-bind:alias="item.alias"
+                        v-bind:address="item.address"
+                    ></li>
+                </ul>
+            </div>
+            <router-view></router-view>
+            <b-loading
+                :is-full-page="isFullPage"
+                :active.sync="isLoading"
+                :can-cancel="false"
+            ></b-loading>
         </div>
-        <div id='app'>
-            <h1>Displaying containers for {{ user }}</h1>
-        </div>
-        <div id='s3list'>
-            <table id='btable' v-if='buckets'>
-                <tr
-                    is="bucket-table-heading"
-                ></tr>
-                <tr
-                    is="bucket-table-row"
-                    v-for="item in bList"
-                    v-bind:key="item.name"
-                    v-bind:bname="item.name"
-                    v-on:bclick="getObjects ( item.name )"
-                ></tr>
-            </table>
-            <table id='otable' v-if='objects'>
-                <tr
-                    is="object-table-heading"
-                    v-on:oheadingclick="bringBucketsFront ()"
-                ></tr>
-                <tr
-                    is="object-table-row"
-                    v-for="item in oList"
-                    v-bind:key='item.hash'
-                    v-bind:stobject='item'
-                    v-bind:bucket='currentBucket'
-                    v-bind:dloadlink='item.url'
-                    v-on:oheadingclick="bringBucketsFront ()"
-                ></tr>
-            </table>
-        </div>
-        <script src="static/js/browse.js"></script>
+        <script>app.$mount("#app");</script>
     </body>
+    <script>
+        // Fetch the necessary things from the API upon the initial page load.
+        // After this the pulls will be handled by the router.
+        getUser().then( function ( value ) {
+            app.uname = value;
+        });
+        getProjects().then( function ( value ) {
+            app.projects = value;
+            if ( app.projects.length > 1 ) {
+                app.multipleProjects = true;
+            }
+        });
+        if ( document.location.pathname == "/browse" ) {        
+            getActiveProject().then( function ( value ) {
+                app.active = value;
+                app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
+        });}
+        if ( app.active['name'] != app.$route.params.project ) {
+            getActiveProject().then( function ( value ) {
+                app.active = value;
+                if ( app.active['name'] != app.$route.params.project ) {
+                    app.changeProject( app.$route.params.project );
+                }
+            })
+        }
+    </script>
 </html>

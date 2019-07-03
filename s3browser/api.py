@@ -93,9 +93,23 @@ async def swift_list_objects(request):
         # Again, get the only item in the generated list
         if len(objects) == 1:
             objects = objects[0]
+        else:
+            tmp = []
+            for i in objects:
+                tmp = tmp + i
+            objects = tmp
+
+        ret = objects['listing']
+        for i in range(0, len(ret)):
+            ret[i]['hash'] = ret[i]['hash'].replace('\u0000', '')
+            if 'content_type' not in ret[i].keys():
+                ret[i]['content_type'] = "binary/octet-stream"
+            else:
+                ret[i]['content_type'] = \
+                    ret[i]['content_type'].replace('\u0000', '')
 
         return aiohttp.web.json_response(
-            objects['listing']
+            ret
         )
     except SwiftError:
         return aiohttp.web.json_response([])
@@ -185,6 +199,22 @@ async def os_list_projects(request):
     # Return the projects available for the session
     return aiohttp.web.json_response(
         request.app['Creds'][session]['Avail']['projects']
+    )
+
+
+async def get_os_active_project(request):
+    """Fetch the project currently displayed to the session."""
+    session = api_check(request)
+    request.app['Log'].info(
+        'API call for current project from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    return aiohttp.web.json_response(
+        request.app['Creds'][session]['active_project']
     )
 
 

@@ -23,7 +23,10 @@ setuptools.setup(
     extras_require={
           'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
                    'pytest-asyncio', 'tox',
-                   'flake8', 'flake8-docstrings', 'pytest-aiohttp', 'pytest-xdist']},
+                   'flake8', 'flake8-docstrings', 'pytest-aiohttp', 'pytest-xdist'],
+          'docs': [
+              'sphinx >= 1.4', 'sphinx_rtd_theme']
+        },
     packages=[__name__],
     platforms='any',
     entry_points={

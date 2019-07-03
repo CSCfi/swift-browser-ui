@@ -1,6 +1,7 @@
 aiohttp
-boto3
 python-swiftclient
 cryptography
 keystoneauth1
 click
+sphinx
+sphinx_rtd_theme

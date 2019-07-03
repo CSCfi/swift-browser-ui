@@ -191,10 +191,10 @@ def get_availability_from_token(token):
     # Return all project names and domain names inside a dictionary
     return {
         "projects": [
-            p['id'] for p in output_projects['projects']
+            p for p in output_projects['projects']
         ],
         "domains": [
-            d['name'] for d in output_domains['domains']
+            d for d in output_domains['domains']
         ]
     }
 
@@ -243,7 +243,6 @@ def initiate_os_service(os_session, project):
         'os_storage_url': setd['swift_endpoint_url'] +
         '/v1' + '/AUTH_' + project,
         'os_auth_url': setd['auth_endpoint_url'],
-        'insecure': True,
         'debug': True,
         'info': True,
     }

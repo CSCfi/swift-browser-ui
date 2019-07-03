@@ -30,3 +30,12 @@ unit_test:
     - pip --cache-dir=.pip install tox
   script:   
     - tox -e pytest
+
+docs_test:
+  stage: test
+  image: python:3.6
+  before_script:
+    - pip --cache-dir=.pip install tox
+  script:   
+    - tox -e docs
+
