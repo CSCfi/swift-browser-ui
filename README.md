@@ -1,19 +1,22 @@
 ## s3-object-browser
 
-Python 3.6+ required
-
 ### Description
 
-A web frontend for browsing and downloading objects saved in s3 or swift
+A web frontend for browsing and downloading objects saved in [SWIFT](https://docs.openstack.org/swift/latest/)
 compliant object storage, supporting SSO with SAML2 federated authentication.
+
+Documentation available at: http://docs-object-browser.rahti-int-app.csc.fi/
 
 ### Requirements
 
-The dependencies mentioned in requirements.txt and an account that has access
+Python 3.6+ required
+
+The dependencies mentioned in `requirements.txt` and an account that has access
 rights to CSC Pouta platform, and is taking part to at least one project as
 object stoarge is project specific.
 
 ### Usage
+
 At the current state the program configs can be specified either via environment
 variables or command line arguments. These usage directions assume envvars to be used.
 
@@ -59,8 +62,8 @@ In order to start the server use `s3browser start`.
 
 Additional options can be found with
 ```
-python -m s3browser.shell --help
-python -m s3browser.shell start --help
+s3browser --help
+s3browser start --help
 ```
 
 The current frontend can be found at: `127.0.0.1:8080`.

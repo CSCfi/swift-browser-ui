@@ -6,10 +6,18 @@
 Object browser for CSC Pouta
 ============================
 
-A web UI object browser for object storage back-ends using Openstack Keystone
+A Web UI object browser for object storage back-ends using Openstack Keystone
 for authentication (e.g. `CSC Pouta <https://research.csc.fi/pouta-user-guide>`_).
 It uses federated login via `HAKA <https://rr.funet.fi/haka/>`_, via the
-endpoints provided by OS Keystone.
+endpoints provided by `OpenStack Keystone <https://docs.openstack.org/keystone/latest/>`_.
+
+Out of the box the ``s3browser`` offers:
+
+* UI for browsing `SWIFT objects <https://docs.openstack.org/swift/latest/>`_;
+* support for federated authentication of an user with their HAKA credentials
+  using OpenStack Keystone;
+* UI based on `Vue.js <https://vuejs.org/>`_ with `Buefy framework <https://buefy.org/documentation>`_;
+* asynchronous web server.
 
 
 .. toctree::
