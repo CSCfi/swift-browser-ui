@@ -209,18 +209,29 @@ class Mock_Service:
             return None
 
     def stat(self, container=None, objects=None):
-        """
-        Mock function for the stat() call of the represented class
-        """
-        ret = {}
+        """Mock the stat() call of SwiftService"""
+        ret = {
+            "headers": {},
+            "items": [
+                ("Account", "AUTH_test_account",)
+            ],
+        }
         # Add the tempurl headers to the return dictionary, if they have been
         # initialized
         if self.tempurl_key_1 is not None:
-            pass
+            ret['headers']['x-account-meta-temp-url-key'] = self.tempurl_key_1
         if self.tempurl_key_2 is not None:
-            pass
+            ret['headers']['x-account-meta-temp-url-key-2'] =\
+                self.tempurl_key_2
 
         return ret
+
+    def post(self, options=None):
+        """Mock the post() call of SwiftService."""
+        # Get the URL key 2
+        key = options['meta'][0].split(':')[1]
+        self.tempurl_key_2 = key
+        return {"success": True}
 
 
 class Mock_Session:
