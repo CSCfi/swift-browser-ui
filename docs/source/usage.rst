@@ -49,8 +49,31 @@ application:
 --help                         Help on the CLI usage.
 --version                      Display the program version
 
+
 The server startup
 ~~~~~~~~~~~~~~~~~~
+
+The following command line arguments are available for server startup.
+
+.. code-block:: console
+
+    ➜ s3browser start --help
+    Usage: s3browser start [OPTIONS]
+
+    Start the browser backend and server.
+
+    Options:
+    -p, --port INTEGER         Set the port the server is run on.
+    --static-directory TEXT    Set the static content directory
+    --auth-endpoint-url TEXT   Endpoint for the Openstack keystone API in use.
+    --has-trust                Flag if the program is listed on the
+                                trusted_dashboards in the specified address.
+    --swift-endpoint-url TEXT  Endpoint url for the Openstack swift API in use.
+    --set-origin-address TEXT  Set the address that the program will be
+                                redirected to from WebSSO
+    --help                     Show this message and exit.
+
+
 --port PORT                    Set the port that the server will use.
 --static-directory PATH        Set a directory in which the static content of
                                the UI is located. Used mainly for development
