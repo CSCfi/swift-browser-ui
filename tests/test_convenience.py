@@ -16,9 +16,7 @@ from s3browser.settings import setd
 
 
 def test_setup_logging():
-    """
-    Test that the logging setup function
-    """
+    """Test that the logging setup function works."""
     setup_logging()
     setd['verbose'] = True
     setup_logging()
@@ -27,9 +25,7 @@ def test_setup_logging():
 
 
 def test_disable_cache():
-    """
-    Test that the disable_cache function correctly disables cache
-    """
+    """Test that the disable_cache function correctly disables cache."""
     response = Response(
         status=200,
         body=b'OK'
@@ -43,17 +39,13 @@ def test_disable_cache():
 
 
 def test_generate_cookie():
-    """
-    Test that the cookie generation works as it's supposed to.
-    """
+    """Test that the cookie generation works."""
     testreq = get_request_with_fernet()
     assert generate_cookie(testreq) is not None  # nosec
 
 
 def test_decrypt_cookie():
-    """
-    Test that the cookie decrypt function works as it's supposed to.
-    """
+    """Test that the cookie decrypt function works."""
     testreq = get_request_with_fernet()
     # Generate cookie is tested separately, it can be used for testing the
     # rest of the functions without mockups
@@ -62,20 +54,14 @@ def test_decrypt_cookie():
 
 
 def test_session_check_nocookie():
-    """
-    Test that the ordinary session check function raises a 401 when no token
-    cookie exists
-    """
+    """Test session check raise 401 on non-existing cookie"""
     req = get_request_with_fernet()
     with pytest.raises(HTTPUnauthorized):
         session_check(req)
 
 
 def test_session_check_invtoken():
-    """
-    Test that the ordinary session check function raises a 401 when the cookie
-    is stale
-    """
+    """Test session check raise 401 on a stale cookie."""
     req = get_request_with_fernet()
     _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
     req.app['Crypt'] = cryptography.fernet.Fernet(
@@ -87,9 +73,8 @@ def test_session_check_invtoken():
 
 def test_session_check_nosession():
     """
-    Test that the ordinary session check function raises a 401 when the cookie
-    is not a valid session cookie (i.e. it cannot be found in the open session
-    list)
+    Test session check function raise 401 on invalid session cookie.
+    (i.e. it cannot be found in the open session list)
     """
     req = get_request_with_fernet()
     _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
@@ -100,8 +85,8 @@ def test_session_check_nosession():
 
 def test_session_check_correct():
     """
-    Test that the ordinary session check function result is True, when the
-    request is formed correctly.
+    Test that the ordinary session check function result is True.
+    Test condition when the request is formed correctly.
     """
     req = get_request_with_fernet()
     c, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
@@ -113,9 +98,7 @@ def test_session_check_correct():
 # are required since e.g. token rescoping can fail the sessions before the
 # next API call, also might try to use the API while rescoping -> 401
 def test_api_check_raise_on_no_cookie():
-    """
-    Test that the function raises if there's no session cookie.
-    """
+    """Test raise if there's no session cookie."""
     testreq = get_request_with_fernet()
     _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = []
@@ -124,9 +107,7 @@ def test_api_check_raise_on_no_cookie():
 
 
 def test_api_check_raise_on_invalid_cookie():
-    """
-    Test that the function raises if there's an invalid session cookie.
-    """
+    """Test raise if there's an invalid session cookie."""
     testreq = get_request_with_fernet()
     testreq.app['Sessions'] = []
     with pytest.raises(HTTPUnauthorized):
@@ -137,10 +118,7 @@ def test_api_check_raise_on_invalid_cookie():
 # a reason some of the placeholders are missing in the test functions, to
 # enable testing correct raising order in the same time)
 def test_api_check_raise_on_no_connection():
-    """
-    Test that the function raises if there's no existing OS connection during
-    an API call.
-    """
+    """Test raise if there's no existing OS connection during an API call."""
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = [cookie]
@@ -152,10 +130,7 @@ def test_api_check_raise_on_no_connection():
 
 
 def test_api_check_raise_on_no_session():
-    """
-    Test that the function raises if there's no established OS session during
-    an API call.
-    """
+    """Test raise if there's no established OS session during an API call."""
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = [cookie]
@@ -166,10 +141,7 @@ def test_api_check_raise_on_no_session():
 
 
 def test_api_check_raise_on_no_avail():
-    """
-    Test that the function raises if the availability hasn't been checked
-    before an API call.
-    """
+    """Test raise if the availability wasn't checked before an API call."""
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Creds'][cookie] = {}
@@ -179,10 +151,7 @@ def test_api_check_raise_on_no_avail():
 
 
 def test_api_check_success():
-    """
-    Test that the api_check function runs successfully when everything should
-    be in order.
-    """
+    """Test that the api_check function runs with correct input."""
     testreq = get_request_with_fernet()
     cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = [cookie]
@@ -197,6 +166,11 @@ def test_api_check_success():
 # NOTE: the next one in order would be get_availability_from_token, which
 # requires a mock OS response – this cannot be done before the code has
 # been refactored to have non-hardcoded endpoints.
+
+
+def test_get_availability_from_token():
+    """Test the get_availability_from_token function"""
+    pass
 
 
 # NOTE: the next one in order would be initiate_os_session, which needn't
