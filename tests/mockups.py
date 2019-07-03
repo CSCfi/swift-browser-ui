@@ -8,7 +8,92 @@ import random
 import hashlib
 import os
 import time
+import json
 from swiftclient.service import SwiftError
+
+
+mock_token_project_avail = json.dumps({
+    "projectcs": [
+        {
+            "is_domain": False,
+            "description": "",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "placeholder",
+        },        {
+            "is_domain": False,
+            "description": "Wololo yol aweii",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/wol"
+            },
+            "enabled": True,
+            "id": "wol",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "wol",
+        },        {
+            "is_domain": False,
+            "description": "Hmmph, what is",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/what"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "what",
+        },
+    ],
+})
+
+
+mock_token_domain_avail = json.dumps({"domains": []})
+
+
+mock_token_output = {
+    "projects": [
+        {
+            "is_domain": False,
+            "description": "",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "placeholder",
+        },        {
+            "is_domain": False,
+            "description": "Wololo yol aweii",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/wol"
+            },
+            "enabled": True,
+            "id": "wol",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "wol",
+        },        {
+            "is_domain": False,
+            "description": "Hmmph, what is",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/what"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "what",
+        },
+    ],
+    "domains": [],
+}
 
 
 class Mock_Request:
