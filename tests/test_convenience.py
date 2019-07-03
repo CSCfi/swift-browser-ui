@@ -9,9 +9,12 @@ import cryptography.fernet
 
 
 from .creation import get_request_with_fernet
+from .mockups import mock_token_domain_avail, mock_token_project_avail
+from .mockups import mock_token_output
 from s3browser._convenience import api_check, generate_cookie
 from s3browser._convenience import disable_cache, decrypt_cookie
 from s3browser._convenience import session_check, setup_logging
+from s3browser._convenience import get_availability_from_token
 from s3browser.settings import setd
 
 
@@ -170,7 +173,8 @@ def test_api_check_success():
 
 def test_get_availability_from_token():
     """Test the get_availability_from_token function"""
-    pass
+    # Test with an invalid token
+    assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
 
 
 # NOTE: the next one in order would be initiate_os_session, which needn't
