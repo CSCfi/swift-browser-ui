@@ -10,10 +10,12 @@ import os
 import time
 import json
 from swiftclient.service import SwiftError
+from urllib.error import HTTPError
+from contextlib import contextmanager
 
 
 mock_token_project_avail = json.dumps({
-    "projectcs": [
+    "projects": [
         {
             "is_domain": False,
             "description": "",
@@ -94,6 +96,41 @@ mock_token_output = {
     ],
     "domains": [],
 }
+
+
+@contextmanager
+def urlopen(prq):
+    """Mockup class for opening keystone"""
+    yield Mock_Keystone(prq)
+
+
+class Mock_Keystone:
+    """Mockup class for OS Keystone to enable testing availability."""
+
+    def __init__(self, prq):
+        self.prq = prq
+
+    def read(self):
+        if "X-auth-token" not in self.prq.headers:
+            raise HTTPError(
+                url=None,
+                code=401,
+                msg="Unauthorized",
+                hdrs=self.prq.headers,
+                fp=None
+            )
+        if "projects" in self.prq.full_url:
+            return mock_token_project_avail.encode('utf-8')
+        if "domains" in self.prq.full_url:
+            return mock_token_domain_avail.encode('utf-8')
+        else:
+            raise HTTPError(
+                url=None,
+                code=401,
+                msg="Unauthorized",
+                hdrs=self.prq.headers,
+                fp=None
+            )
 
 
 class Mock_Request:
