@@ -159,17 +159,6 @@ async def sso_query_end(request):
         "id": request.app['Creds'][session]['Avail']['projects'][0]['id'],
     }
 
-    # Log information from the connection to make sure that the connetion was
-    # actually established
-    request.app['Log'].info(
-        'The following was gotten as reponse to the new session for ' +
-        '{0}, session: {1} :: {2}\n'.format(
-            request.remote,
-            session,
-            time.ctime(),
-        ) + str(request.app['Creds'][session]['ST_conn'].stat())
-    )
-
     # Redirect to the browse page with the correct credentials
     response.headers['Location'] = "/browse"
 
