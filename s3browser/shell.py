@@ -4,6 +4,7 @@
 from .__init__ import __version__
 import click
 import logging
+import sys
 
 from .settings import setd, set_key
 from .server import servinit, run_server_insecure
@@ -155,4 +156,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if sys.version_info < (3, 6):
+        logging.error("s3-object-browser requires >= python3.6")
+        sys.exit(1)
     main()

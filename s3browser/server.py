@@ -4,7 +4,7 @@
 import aiohttp.web
 import ssl
 import logging
-
+import sys
 import cryptography.fernet
 
 from .front import index, browse
@@ -112,4 +112,7 @@ def run_server_insecure(app):
 
 
 if __name__ == '__main__':
+    if sys.version_info < (3, 6):
+        logging.error("s3-object-browser requires >= python3.6")
+        sys.exit(1)
     run_server_insecure(servinit())
