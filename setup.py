@@ -14,11 +14,12 @@ setuptools.setup(
     license='MIT',
     install_requires=[
         'aiohttp',
-        'boto3',
         'python-swiftclient',
         'cryptography',
         'keystoneauth1',
         'click',
+        'gunicorn',
+        'uvloop'
     ],
     extras_require={
           'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',

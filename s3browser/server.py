@@ -14,9 +14,13 @@ from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
 from .settings import setd
+import uvloop
+import asyncio
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-def servinit():
+async def servinit():
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application()
 
