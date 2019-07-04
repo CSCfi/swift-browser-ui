@@ -61,9 +61,14 @@ async def swift_list_buckets(request):
         if len(containers) == 1:
             containers = containers[0]
 
-        return aiohttp.web.json_response(
-            containers['listing']
-        )
+            return aiohttp.web.json_response(
+                containers['listing']
+            )
+        # TBD if this is how to implement
+        # for a bucket with no objects
+        elif len(containers) == 0:
+            # return empty object
+            return aiohttp.web.json_response()
     except SwiftError:
         return aiohttp.web.json_response([])
 
