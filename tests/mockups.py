@@ -45,7 +45,7 @@ mock_token_project_avail = json.dumps({
                 "self": "https://place-holder-url:5001/v3/projects/what"
             },
             "enabled": True,
-            "id": "placeholder",
+            "id": "what",
             "parent_id": "default",
             "domain_id": "default",
             "name": "what",
@@ -88,7 +88,7 @@ mock_token_output = {
                 "self": "https://place-holder-url:5001/v3/projects/what"
             },
             "enabled": True,
-            "id": "placeholder",
+            "id": "what",
             "parent_id": "default",
             "domain_id": "default",
             "name": "what",
@@ -96,6 +96,15 @@ mock_token_output = {
     ],
     "domains": [],
 }
+
+
+def return_same_cookie(req):
+    return ("placeholder", "placeholder")
+
+
+def return_project_avail(token):
+    """Return mocked unscoped token availability output"""
+    return mock_token_output
 
 
 @contextmanager
@@ -148,6 +157,7 @@ class Mock_Request:
     def __init__(self):
         # Application mutable mapping represented by a dictionary
         self.app = {}
+        self.post_data = {}
 
     def set_headers(self, headers):
         """
@@ -166,6 +176,14 @@ class Mock_Request:
         """
         for i in cookies.keys():
             self.cookies[i] = cookies[i]
+
+    def set_post(self, data):
+        """Set post data."""
+        self.post_data = data
+
+    async def post(self):
+        """"Return post data."""
+        return self.post_data
 
 
 class Mock_Service:
