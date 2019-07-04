@@ -33,20 +33,21 @@ static_folder:         Path to the folder that contains the static front-end
 
 
 import logging
+import os
 
 
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd = {
-    "auth_endpoint_url": None,
+    "auth_endpoint_url": os.environ.get('BROWSER_START_AUTH_ENDPOINT_URL', None),
     "has_trust": False,
-    "swift_endpoint_url": None,
+    "swift_endpoint_url": os.environ.get('BROWSER_START_SWIFT_ENDPOINT_URL', None),
     "logfile": None,
     "port": 8080,
     "verbose": False,
     "debug": False,
     "version": None,
-    "static_directory": None,
+    "static_directory": os.environ.get('BROWSER_START_STATIC_DIRECTORY', None),
 }
 
 
