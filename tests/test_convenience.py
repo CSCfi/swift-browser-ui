@@ -6,15 +6,19 @@ Module for testing s3browser._convenience
 import pytest
 from aiohttp.web import HTTPUnauthorized, Response
 import cryptography.fernet
+import hashlib
+import os
+from swiftclient.service import SwiftService
+from keystoneauth1.session import Session
 
 
 from .creation import get_request_with_fernet
-from .mockups import mock_token_domain_avail, mock_token_project_avail
-from .mockups import mock_token_output
+from .mockups import mock_token_output, urlopen
 from s3browser._convenience import api_check, generate_cookie
 from s3browser._convenience import disable_cache, decrypt_cookie
 from s3browser._convenience import session_check, setup_logging
 from s3browser._convenience import get_availability_from_token
+from s3browser._convenience import initiate_os_service, initiate_os_session
 from s3browser.settings import setd
 
 
@@ -166,21 +170,46 @@ def test_api_check_success():
     assert ret == cookie  # nosec
 
 
-# NOTE: the next one in order would be get_availability_from_token, which
-# requires a mock OS response – this cannot be done before the code has
-# been refactored to have non-hardcoded endpoints.
-
-
-def test_get_availability_from_token():
+def test_get_availability_from_token(mocker):
     """Test the get_availability_from_token function"""
     # Test with an invalid token
     assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
 
+    # Make the required patches to urllib.request to test the function
+    mocker.patch("urllib.request.urlopen", new=urlopen)
 
-# NOTE: the next one in order would be initiate_os_session, which needn't
-# be tested, as it requires mocking the whole OS
-# NOTE: the next would be initiate_os_service, which needn't be tested as
-# it too requires mocking the whole OS
-# Also a noteworthy thing, there probably is no point in directly testing
-# OS SDK / swiftclient, since these are direct wrappers for the correct
-# initialization function.
+    setd['auth_endpoint_url'] = "http://example.osexampleserver.com:5001/v3"
+
+    # Test with a valid token
+    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+    avail = get_availability_from_token(token)
+
+    assert (  # nosec
+        str(avail['projects']) == str(mock_token_output['projects'])
+    )
+    assert (  # nosec
+        str(avail['domains']) == str(mock_token_output['domains'])
+    )
+
+
+def test_initiate_os_session(mocker):
+    """Test initiate_os_session function"""
+    mocker.patch("s3browser.settings.setd", new={
+        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+    })
+    ret = initiate_os_session(
+        hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
+        "testproject"
+    )
+    assert type(ret) is Session  # nosec
+
+
+def test_initiate_os_service(mocker):
+    """Test initiate_os_servce function"""
+    mocker.patch("s3browser.settings.setd", new={
+        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+    })
+    sess_mock = mocker.MagicMock(Session)
+    ret = initiate_os_service(sess_mock(), 'testprojct')
+    assert type(ret) is SwiftService  # nosec
