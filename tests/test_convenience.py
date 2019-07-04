@@ -172,23 +172,24 @@ def test_api_check_success():
 
 def test_get_availability_from_token(mocker):
     """Test the get_availability_from_token function"""
+    mocker.patch("s3browser._convenience.setd", new={
+        "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
+    })
     # Test with an invalid token
     assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
 
     # Make the required patches to urllib.request to test the function
     mocker.patch("urllib.request.urlopen", new=urlopen)
 
-    setd['auth_endpoint_url'] = "http://example.osexampleserver.com:5001/v3"
-
     # Test with a valid token
     token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
     avail = get_availability_from_token(token)
 
     assert (  # nosec
-        str(avail['projects']) == str(mock_token_output['projects'])
+        avail['projects'] == mock_token_output['projects']
     )
     assert (  # nosec
-        str(avail['domains']) == str(mock_token_output['domains'])
+        avail['domains'] == mock_token_output['domains']
     )
 
 
