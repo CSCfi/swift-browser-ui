@@ -187,7 +187,9 @@ async def token_rescope(request):
         )
 
     # Invalidate the old scoped token
-    request.app['Creds'][session]['OS_sess'].invalidate()
+    request.app['Creds'][session]['OS_sess'].invalidate(
+        request.app['Creds'][session]['OS_sess'].auth
+    )
     # Overwrite the old session with a new one, with the updated project id
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         request.app['Creds'][session]['Token'],
