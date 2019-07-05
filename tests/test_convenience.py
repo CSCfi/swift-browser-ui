@@ -116,6 +116,7 @@ def test_api_check_raise_on_no_cookie():
 def test_api_check_raise_on_invalid_cookie():
     """Test raise if there's an invalid session cookie."""
     testreq = get_request_with_fernet()
+    _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
     testreq.app['Sessions'] = []
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
