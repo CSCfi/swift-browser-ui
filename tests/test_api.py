@@ -6,6 +6,9 @@ import hashlib
 import os
 
 
+from aiohttp.web import HTTPNotFound
+
+
 from .creation import get_request_with_mock_openstack
 from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
@@ -69,9 +72,8 @@ async def test_list_wihtout_containers():
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=0
     )
-    response = await swift_list_buckets(request)
-    containers = json.loads(response.text)
-    assert containers == []  # nosec
+    with pytest.raises(HTTPNotFound):
+        _ = await swift_list_buckets(request)
 
 
 @pytest.mark.asyncio
@@ -99,9 +101,8 @@ async def test_list_without_objects():
         object_range=(0, 0),
     )
     request.query['bucket'] = "test-container-0"
-    response = await swift_list_objects(request)
-    objects = json.loads(response.text)
-    assert objects == []  # nosec
+    with pytest.raises(HTTPNotFound):
+        _ = await swift_list_objects(request)
 
 
 @pytest.mark.asyncio

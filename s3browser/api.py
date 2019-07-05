@@ -86,8 +86,7 @@ async def swift_list_objects(request):
         obj = []
         list(map(lambda i: obj.extend(i['listing']),
                  request.app['Creds'][session]['ST_conn'].list(
-                     container=request.query['bucket']
-                 )))
+                     container=request.query['bucket'])))
 
         if not obj:
             raise aiohttp.web.HTTPNotFound()
