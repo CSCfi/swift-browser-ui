@@ -8,7 +8,142 @@ import random
 import hashlib
 import os
 import time
+import json
 from swiftclient.service import SwiftError
+from urllib.error import HTTPError
+from contextlib import contextmanager
+
+
+mock_token_project_avail = json.dumps({
+    "projects": [
+        {
+            "is_domain": False,
+            "description": "",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "placeholder",
+        },        {
+            "is_domain": False,
+            "description": "Wololo yol aweii",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/wol"
+            },
+            "enabled": True,
+            "id": "wol",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "wol",
+        },        {
+            "is_domain": False,
+            "description": "Hmmph, what is",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/what"
+            },
+            "enabled": True,
+            "id": "what",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "what",
+        },
+    ],
+})
+
+
+mock_token_domain_avail = json.dumps({"domains": []})
+
+
+mock_token_output = {
+    "projects": [
+        {
+            "is_domain": False,
+            "description": "",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            },
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "placeholder",
+        },        {
+            "is_domain": False,
+            "description": "Wololo yol aweii",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/wol"
+            },
+            "enabled": True,
+            "id": "wol",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "wol",
+        },        {
+            "is_domain": False,
+            "description": "Hmmph, what is",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/what"
+            },
+            "enabled": True,
+            "id": "what",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "what",
+        },
+    ],
+    "domains": [],
+}
+
+
+def return_same_cookie(req):
+    return ("placeholder", "placeholder")
+
+
+def return_invalid(req):
+    return "INVALID"
+
+
+def return_project_avail(token):
+    """Return mocked unscoped token availability output"""
+    return mock_token_output
+
+
+@contextmanager
+def urlopen(prq):
+    """Mockup class for opening keystone"""
+    yield Mock_Keystone(prq)
+
+
+class Mock_Keystone:
+    """Mockup class for OS Keystone to enable testing availability."""
+
+    def __init__(self, prq):
+        self.prq = prq
+
+    def read(self):
+        if "X-auth-token" not in self.prq.headers:
+            raise HTTPError(
+                url=None,
+                code=401,
+                msg="Unauthorized",
+                hdrs=self.prq.headers,
+                fp=None
+            )
+        if "projects" in self.prq.full_url:
+            return mock_token_project_avail.encode('utf-8')
+        if "domains" in self.prq.full_url:
+            return mock_token_domain_avail.encode('utf-8')
+        else:
+            raise HTTPError(
+                url=None,
+                code=401,
+                msg="Unauthorized",
+                hdrs=self.prq.headers,
+                fp=None
+            )
 
 
 class Mock_Request:
@@ -26,6 +161,7 @@ class Mock_Request:
     def __init__(self):
         # Application mutable mapping represented by a dictionary
         self.app = {}
+        self.post_data = {}
 
     def set_headers(self, headers):
         """
@@ -44,6 +180,14 @@ class Mock_Request:
         """
         for i in cookies.keys():
             self.cookies[i] = cookies[i]
+
+    def set_post(self, data):
+        """Set post data."""
+        self.post_data = data
+
+    async def post(self):
+        """"Return post data."""
+        return self.post_data
 
 
 class Mock_Service:
@@ -124,18 +268,29 @@ class Mock_Service:
             return None
 
     def stat(self, container=None, objects=None):
-        """
-        Mock function for the stat() call of the represented class
-        """
-        ret = {}
+        """Mock the stat() call of SwiftService"""
+        ret = {
+            "headers": {},
+            "items": [
+                ("Account", "AUTH_test_account",)
+            ],
+        }
         # Add the tempurl headers to the return dictionary, if they have been
         # initialized
         if self.tempurl_key_1 is not None:
-            pass
+            ret['headers']['x-account-meta-temp-url-key'] = self.tempurl_key_1
         if self.tempurl_key_2 is not None:
-            pass
+            ret['headers']['x-account-meta-temp-url-key-2'] =\
+                self.tempurl_key_2
 
         return ret
+
+    def post(self, options=None):
+        """Mock the post() call of SwiftService."""
+        # Get the URL key 2
+        key = options['meta'][0].split(':')[1]
+        self.tempurl_key_2 = key
+        return {"success": True}
 
 
 class Mock_Session:

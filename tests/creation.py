@@ -15,6 +15,10 @@ def get_request_with_fernet():
     Create a request with a working fernet object
     """
     ret = Mock_Request()
+    ret.headers = {}
+    ret.cookies = {}
+    ret.query = {}
+    ret.app = {}
     ret.app['Sessions'] = []
     ret.app['Creds'] = {}
     ret.app['Log'] = logging.getLogger(name="test_logger")
