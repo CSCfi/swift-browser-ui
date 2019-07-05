@@ -11,9 +11,6 @@ from .server import servinit, run_server_insecure
 from ._convenience import setup_logging as conv_setup_logging
 
 
-CONTEXT_SETTINGS = {'auto_envvar_prefix': 'BROWSER'}
-
-
 @click.group()
 @click.version_option(
     version=__version__, prog_name="s3browser"
@@ -68,7 +65,7 @@ def cli(verbose, debug, logfile):
     conv_setup_logging()
 
 
-@cli.command(context_settings=CONTEXT_SETTINGS)
+@cli.command()
 @click.option(
     '-p', '--port', default=8080,
     help='Set the port the server is run on.'
@@ -152,7 +149,9 @@ def install():
 
 def main():
     """Run the CLI."""
-    cli()  # pylint: disable=no-value-for-parameter
+    cli(  # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+        auto_envvar_prefix='BROWSER'
+    )
 
 
 if __name__ == "__main__":
