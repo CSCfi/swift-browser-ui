@@ -221,11 +221,16 @@ async def token_rescope(request):
 async def handle_logout(request):
     """Properly kill the session for the user."""
     if session_check(request):
+        log = request.app['Log']
         cookie = decrypt_cookie(request)
+        log.info("Killing session for %s :: %s",
+                 cookie, time.ctime())
         # Invalidate the tokens that are in use
         request.app['Creds'][cookie]['OS_sess'].invalidate(
             request.app['Creds'][cookie]['OS_sess'].auth
         )
+        log.debug("Invalidated token for session %s :: %s",
+                  cookie, time.ctime())
         # Purge everything related to the former openstack connection
         request.app['Creds'][cookie]['OS_sess'] = None
         request.app['Creds'][cookie]['ST_conn'] = None
@@ -234,8 +239,12 @@ async def handle_logout(request):
         request.app['Creds'][cookie]['active_project'] = None
         # Purge the openstack connection from the server
         request.app['Creds'].pop(cookie)
+        log.debug("Purged connection information for %s :: %s",
+                  cookie, time.ctime())
         # Purge the sessino from the session list
         request.app['Sessions'].remove(cookie)
+        log.debug("Removed session %s from session list :: %s",
+                  cookie, time.ctime())
     return aiohttp.web.Response(
         status=204
     )

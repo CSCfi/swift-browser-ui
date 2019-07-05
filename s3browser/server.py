@@ -5,8 +5,10 @@
 import logging
 import time
 import sys
+import asyncio
 
 
+import uvloop
 import cryptography.fernet
 import aiohttp.web
 
@@ -18,8 +20,6 @@ from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
 from .settings import setd
-import uvloop
-import asyncio
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -130,7 +130,7 @@ def run_server_insecure(app):
             app['Creds'].pop(key)
             logging.debug("Purged connection information for %s :: %s",
                           key, time.ctime())
-            # Purge the sessino from the session list
+            # Purge the session from the session list
             app['Sessions'].remove(key)
             logging.debug("Removed session %s from session list :: %s",
                           key, time.ctime())
