@@ -102,6 +102,10 @@ def return_same_cookie(req):
     return ("placeholder", "placeholder")
 
 
+def return_invalid(req):
+    return "INVALID"
+
+
 def return_project_avail(token):
     """Return mocked unscoped token availability output"""
     return mock_token_output
