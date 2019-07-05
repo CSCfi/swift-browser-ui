@@ -1,7 +1,4 @@
-"""
-Module for testing s3browser._convenience
-"""
-
+"""Module for testing ``s3browser._convenience``."""
 
 import pytest
 from aiohttp.web import HTTPUnauthorized, Response
@@ -61,7 +58,7 @@ def test_decrypt_cookie():
 
 
 def test_session_check_nocookie():
-    """Test session check raise 401 on non-existing cookie"""
+    """Test session check raise 401 on non-existing cookie."""
     req = get_request_with_fernet()
     with pytest.raises(HTTPUnauthorized):
         session_check(req)
@@ -79,8 +76,8 @@ def test_session_check_invtoken():
 
 
 def test_session_check_nosession():
-    """
-    Test session check function raise 401 on invalid session cookie.
+    """Test session check function raise 401 on invalid session cookie.
+
     (i.e. it cannot be found in the open session list)
     """
     req = get_request_with_fernet()
@@ -91,8 +88,8 @@ def test_session_check_nosession():
 
 
 def test_session_check_correct():
-    """
-    Test that the ordinary session check function result is True.
+    """Test that the ordinary session check function result is True.
+
     Test condition when the request is formed correctly.
     """
     req = get_request_with_fernet()
@@ -172,7 +169,7 @@ def test_api_check_success():
 
 
 def test_get_availability_from_token(mocker):
-    """Test the get_availability_from_token function"""
+    """Test the get_availability_from_token function."""
     mocker.patch("s3browser._convenience.setd", new={
         "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
     })
@@ -195,7 +192,7 @@ def test_get_availability_from_token(mocker):
 
 
 def test_initiate_os_session(mocker):
-    """Test initiate_os_session function"""
+    """Test initiate_os_session function."""
     mocker.patch("s3browser.settings.setd", new={
         "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
     })
@@ -207,7 +204,7 @@ def test_initiate_os_session(mocker):
 
 
 def test_initiate_os_service(mocker):
-    """Test initiate_os_servce function"""
+    """Test initiate_os_servce function."""
     mocker.patch("s3browser.settings.setd", new={
         "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",

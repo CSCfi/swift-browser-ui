@@ -1,5 +1,6 @@
-"""
-Module for testing s3browser.server, will also contain the tests for front.py
+"""Module for testing ``s3browser.server``.
+
+Contains the tests for ``front.py``.
 """
 
 
@@ -26,6 +27,7 @@ async def test_servinit():
 # server for testing other modules.
 class AppTestCase(AioHTTPTestCase):
     """Test for Web app.
+
     Testing web app endpoints.
     """
 
@@ -36,14 +38,18 @@ class AppTestCase(AioHTTPTestCase):
     @unittest_run_loop
     async def test_working_routes(self):
         """Test all the specified server routes.
-        
+
         All routes need to
-        work in order for the test to pass, i.e. no 404 is allowed from any of the
+        work in order for the test to pass, i.e. no 404
+        is allowed from any of the
         specified routes in the application back-end.
         """
-        # OPINION: this unit test will fail on the first encountered broken route,
-        # and thus won't check the others. In my opinion it's fine, since the
-        # broken routes can be fixed one at a time. Having all the route checks in
+        # OPINION: this unit test will fail on the first
+        # encountered broken route,
+        # and thus won't check the others.
+        # In my opinion it's fine, since the
+        # broken routes can be fixed one at a time.
+        # Having all the route checks in
         # a single compact function is better overall. – Sampsa Penna
         response = await self.client.request("GET", '/')
         assert response.status != 404  # nosec

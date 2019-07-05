@@ -1,7 +1,4 @@
-"""
-Module for testing s3browser.api
-"""
-
+"""Module for testing ``s3browser.api``."""
 
 import pytest
 import json
@@ -18,9 +15,7 @@ from s3browser.settings import setd
 
 @pytest.mark.asyncio
 async def test_get_os_user():
-    """
-    Test for the API call for fetching the Openstack username
-    """
+    """Test for the API call for fetching the Openstack username."""
     _, request = get_request_with_mock_openstack()
     response = await get_os_user(request)
     assert json.loads(response.text) == "test_user_id"  # nosec
@@ -29,9 +24,7 @@ async def test_get_os_user():
 # Follows the testing of the different list functions
 @pytest.mark.asyncio
 async def test_list_containers_correct():
-    """
-    Test function swift_list_buckets with a correct query
-    """
+    """Test function swift_list_buckets with a correct query."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=100,
@@ -50,9 +43,7 @@ async def test_list_containers_correct():
 
 @pytest.mark.asyncio
 async def test_list_objects_correct():
-    """
-    Test function swift_list_objetcs with a correct query
-    """
+    """Test function swift_list_objetcs with a correct query."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=5,
@@ -73,9 +64,7 @@ async def test_list_objects_correct():
 
 @pytest.mark.asyncio
 async def test_list_wihtout_containers():
-    """
-    Test function swift_list_buckets against a project without object storage
-    """
+    """Test function list buckets on a project without object storage."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=0
@@ -87,9 +76,7 @@ async def test_list_wihtout_containers():
 
 @pytest.mark.asyncio
 async def test_list_with_invalid_container():
-    """
-    Test function swift_list_objects with an invalid container id
-    """
+    """Test function list objects with an invalid container id."""
     cookie, request = get_request_with_mock_openstack()
     # Let's create some test data anyway
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
@@ -105,9 +92,7 @@ async def test_list_with_invalid_container():
 
 @pytest.mark.asyncio
 async def test_list_without_objects():
-    """
-    Test function swift_list_objects without an object query in the request
-    """
+    """Test function list objects without an object query in the request."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=1,
@@ -121,10 +106,7 @@ async def test_list_without_objects():
 
 @pytest.mark.asyncio
 async def test_list_with_many_objects():
-    """
-    Test function swift_list_objects with a large set of objects in the
-    storage
-    """
+    """Test function list objects with a large set of objects."""
     cookie, request = get_request_with_mock_openstack()
     # Shouldn't be any reason to test with multiple containers, saves time
     # this way
@@ -147,9 +129,7 @@ async def test_list_with_many_objects():
 
 @pytest.mark.asyncio
 async def test_os_list_projects():
-    """
-    Test function os_list_projects for correct output
-    """
+    """Test function os_list_projects for correct output."""
     cookie, request = get_request_with_mock_openstack()
     # No need to generate test data, all required stuff can be found in the
     # mock-app

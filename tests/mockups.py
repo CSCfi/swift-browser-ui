@@ -1,6 +1,6 @@
-"""
-This module contains the mock-up classes and functions, used for testing the
-s3browser package.
+"""This module contains the mock-up classes and functions.
+
+It is used for testing the s3browser package.
 """
 
 
@@ -27,7 +27,7 @@ mock_token_project_avail = json.dumps({
             "parent_id": "default",
             "domain_id": "default",
             "name": "placeholder",
-        },        {
+        }, {
             "is_domain": False,
             "description": "Wololo yol aweii",
             "links": {
@@ -38,7 +38,7 @@ mock_token_project_avail = json.dumps({
             "parent_id": "default",
             "domain_id": "default",
             "name": "wol",
-        },        {
+        }, {
             "is_domain": False,
             "description": "Hmmph, what is",
             "links": {
@@ -70,7 +70,7 @@ mock_token_output = {
             "parent_id": "default",
             "domain_id": "default",
             "name": "placeholder",
-        },        {
+        }, {
             "is_domain": False,
             "description": "Wololo yol aweii",
             "links": {
@@ -81,7 +81,7 @@ mock_token_output = {
             "parent_id": "default",
             "domain_id": "default",
             "name": "wol",
-        },        {
+        }, {
             "is_domain": False,
             "description": "Hmmph, what is",
             "links": {
@@ -99,21 +99,23 @@ mock_token_output = {
 
 
 def return_same_cookie(req):
+    """Return same cookie."""
     return ("placeholder", "placeholder")
 
 
 def return_invalid(req):
+    """Return invalid."""
     return "INVALID"
 
 
 def return_project_avail(token):
-    """Return mocked unscoped token availability output"""
+    """Return mocked unscoped token availability output."""
     return mock_token_output
 
 
 @contextmanager
 def urlopen(prq):
-    """Mockup class for opening keystone"""
+    """Mockup class for opening keystone."""
     yield Mock_Keystone(prq)
 
 
@@ -121,9 +123,11 @@ class Mock_Keystone:
     """Mockup class for OS Keystone to enable testing availability."""
 
     def __init__(self, prq):
+        """Initialize Mock keystone."""
         self.prq = prq
 
     def read(self):
+        """Read request."""
         if "X-auth-token" not in self.prq.headers:
             raise HTTPError(
                 url=None,
@@ -147,11 +151,13 @@ class Mock_Keystone:
 
 
 class Mock_Request:
+    """Mock-up class for the aiohttp.web.Request.
+
+    It contains the dictionary
+    representation of the requests that will be passed to the functions.
+    (the actual request eing a MutableMapping instance)
     """
-    Mock-up class for the aiohttp.web.Request, which contains the dictionary
-    representation of the requests that will be passed to the functions. (the
-    actual request eing a MutableMapping instance)
-    """
+
     app = None
     headers = {}
     cookies = {}
@@ -159,13 +165,14 @@ class Mock_Request:
     remote = "127.0.0.1"
 
     def __init__(self):
+        """Initialize Mock request."""
         # Application mutable mapping represented by a dictionary
         self.app = {}
         self.post_data = {}
 
     def set_headers(self, headers):
-        """
-        Set mock request headers.
+        """Set mock request headers.
+
         Params:
             headers: dict
         """
@@ -173,8 +180,8 @@ class Mock_Request:
             self.headers[i] = headers[i]
 
     def set_cookies(self, cookies):
-        """
-        Set mock request cookies.
+        """Set mock request cookies.
+
         Params:
             cookies: dict
         """
@@ -186,17 +193,19 @@ class Mock_Request:
         self.post_data = data
 
     async def post(self):
-        """"Return post data."""
+        """Return post data."""
         return self.post_data
 
 
 class Mock_Service:
-    """
-    Mock-up class for the Openstack service, in this case a swiftclient.Service
+    """Mock-up class for the Openstack service.
+
+    In this case a swiftclient.Service
     instance. Contains the mock-ups for the relevant methods used in this
     project. Also contains functions for generating test data, in case it is
     necessary.
     """
+
     containers = {}  # mock containers as a dictionary
     tempurl_key_1 = None  # Tempurl keys for the stat() command
     tempurl_key_2 = None  # Tempurl keys for the stat() command
@@ -209,9 +218,9 @@ class Mock_Service:
         container_name_prefix="test-container-",
         object_name_prefix=None,  # None for just the hash as name
     ):
-        """
-        Initialize the Mock_Service instance with some test data, that can be
-        used for testing.
+        """Initialize the Mock_Service instance with some test data.
+
+        Data will be used for testing.
         """
         for i in range(0, containers):
             to_add = []
@@ -237,9 +246,7 @@ class Mock_Service:
             self.containers[container_name_prefix + str(i)] = to_add
 
     def list(self, container=None, options=None):
-        """
-        Mock function for the service object / container listings
-        """
+        """Mock function for the service object / container listings."""
         if container is None:
             ret = []
             for i in self.containers.keys():
@@ -268,7 +275,7 @@ class Mock_Service:
             return None
 
     def stat(self, container=None, objects=None):
-        """Mock the stat() call of SwiftService"""
+        """Mock the stat call of SwiftService."""
         ret = {
             "headers": {},
             "items": [
@@ -286,7 +293,7 @@ class Mock_Service:
         return ret
 
     def post(self, options=None):
-        """Mock the post() call of SwiftService."""
+        """Mock the post call of SwiftService."""
         # Get the URL key 2
         key = options['meta'][0].split(':')[1]
         self.tempurl_key_2 = key
@@ -294,16 +301,16 @@ class Mock_Service:
 
 
 class Mock_Session:
+    """Mock-up class for the Openstack keystoneauth1 session instance.
+
+    It contains the relevant methods for querying the OS identity API (aka.
+    keystone).
     """
-    Mock-up class for the Openstack keystoneauth1 session instance, which
-    contains the relevant methods for querying the OS identity API (aka.
-    keystone)
-    """
+
     def __init__(self):
+        """Initialize Mock session."""
         pass
 
     def get_user_id(self):
-        """
-        Mock function for fetching the user id from the mock OS Session
-        """
+        """Mock function for fetching the user id from the mock OS Session."""
         return "test_user_id"

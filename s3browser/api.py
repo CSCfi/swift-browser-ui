@@ -178,10 +178,8 @@ async def swift_download_object(request):
     # be a problem
     path = '/v1/%s/%s/%s' % (stats['items'][0][1], container, object_key)
 
-    dloadurl = (
-        host +
-        generate_temp_url(path, lifetime, temp_url_key, 'GET')
-    )
+    dloadurl = (host +
+                generate_temp_url(path, lifetime, temp_url_key, 'GET'))
 
     response = aiohttp.web.Response(
         status=302,
