@@ -13,7 +13,7 @@ import s3browser.settings
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .mockups import return_project_avail
-from .mockups import return_same_cookie
+from .mockups import return_same_cookie, return_invalid
 
 
 @pytest.mark.asyncio
@@ -225,12 +225,6 @@ async def test_sso_query_end_unsuccessful_missing_token(mocker):
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
     })
 
-    # Patch away the convenience function for checking project availability
-    mocker.patch(
-        "s3browser.login.get_availability_from_token",
-        new=return_project_avail
-    )
-
     mocker.patch(
         "s3browser.login.generate_cookie",
         new=return_same_cookie
@@ -251,6 +245,49 @@ async def test_sso_query_end_unsuccessful_missing_token(mocker):
 
     with pytest.raises(HTTPClientError):
         _ = await s3browser.login.sso_query_end(req)
+
+
+@pytest.mark.asyncio
+async def test_sso_query_end_unsuccessful_invalid_token(mocker):
+    """Test unsuccessful token delivery with an invalid"""
+    mocker.patch("s3browser.login.setd", new={
+        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        "has_trust": False,
+    })
+
+    # Patch away the convenience function for checking project availability
+    mocker.patch(
+        "s3browser.login.get_availability_from_token",
+        new=return_invalid
+    )
+
+    mocker.patch(
+        "s3browser.login.generate_cookie",
+        new=return_same_cookie
+    )
+
+    mocker.patch(
+        "keystoneauth1.identity.v3.Token"
+    )
+    mocker.patch(
+        "keystoneauth1.session.Session"
+    )
+    mocker.patch(
+        "swiftclient.service.SwiftService"
+    )
+
+    req = get_request_with_fernet()
+    session, _ = return_same_cookie(req)
+    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+
+    req.headers['X-Auth-Token'] = token
+
+    resp = await s3browser.login.sso_query_end(req)
+
+    assert resp.status == 302  # nosec
+    assert resp.headers['Location'] == "/login"  # nosec
+    assert "INVALID_TOKEN" in resp.cookies  # nosec
 
 
 @pytest.mark.asyncio
