@@ -9,30 +9,31 @@ setuptools.setup(
     author=__author__,
     author_email="sampsa.penna@csc.fi",
     project_urls={
-          'Source': 'https://gitlab.csc.fi/CSCCSDP/s3-object-browser',
+        'Source': 'https://gitlab.csc.fi/CSCCSDP/s3-object-browser',
     },
     license='MIT',
     install_requires=[
         'aiohttp',
-        'boto3',
         'python-swiftclient',
         'cryptography',
         'keystoneauth1',
         'click',
+        'gunicorn',
+        'uvloop'
     ],
     extras_require={
-          'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
-                   'pytest-asyncio', 'tox',
-                   'flake8', 'flake8-docstrings', 'pytest-aiohttp', 'pytest-xdist'],
-          'docs': [
-              'sphinx >= 1.4', 'sphinx_rtd_theme']
-        },
+        'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
+                 'pytest-asyncio', 'tox', 'pytest-mock',
+                 'flake8', 'flake8-docstrings', 'pytest-aiohttp',
+                 'pytest-xdist'],
+        'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme']
+    },
     packages=[__name__],
     platforms='any',
     entry_points={
-          'console_scripts': [
-              's3browser=s3browser.shell:main',
-          ]
+        'console_scripts': [
+            's3browser=s3browser.shell:main',
+        ]
     },
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -83,8 +83,7 @@ def session_check(request):
 
 
 def api_check(request):
-    """
-    Do a session check for the API.
+    """Do a session check for the API.
 
     The API requires a more comprehensive check for session validity, since
     there is the possibility of the openstack connection not being valid,
@@ -122,9 +121,9 @@ def api_check(request):
                 )
         else:
             raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
             )
         return ret
     except InvalidToken:
@@ -143,8 +142,7 @@ def generate_cookie(request):
     """
     cookie = sha256(urandom(1024)).hexdigest()
     return cookie, request.app['Crypt'].encrypt(
-        cookie.encode('utf-8')
-        ).decode('utf-8')
+        cookie.encode('utf-8')).decode('utf-8')
 
 
 def get_availability_from_token(token):
@@ -226,13 +224,13 @@ def initiate_os_session(unscoped, project):
 
 
 def initiate_os_service(os_session, project):
-    """
-    Create a swiftclient SwiftService connection to object storage.
+    """Create a swiftclient SwiftService connection to object storage.
 
     Params:
         os_session: object(keystoneauth1.session.Session)
     Returns:
         A connection object to Openstack Object store service
+
     Return type:
         object(swiftclient.service.SwiftService)
 

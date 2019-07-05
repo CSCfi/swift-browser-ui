@@ -71,6 +71,7 @@ def setup(app):
     """Add custom stylesheet."""
     app.add_stylesheet('style.css')
 
+
 htmlhelp_basename = 's3browser'
 man_pages = [(master_doc, 's3browser', [author], 1)]
 texinfo_documents = [(master_doc, 's3browser', author, 'Miscellaneous')]

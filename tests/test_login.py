@@ -1,5 +1,4 @@
-"""Test s3browser.login module"""
-
+"""Test ``s3browser.login`` module."""
 
 import pytest
 import hashlib
@@ -18,7 +17,7 @@ from .mockups import return_same_cookie, return_invalid
 
 @pytest.mark.asyncio
 async def test_handle_login():
-    """Test initial login handler"""
+    """Test initial login handler."""
     resp = await s3browser.login.handle_login(None)
     assert resp.headers['Location'] == "/login/front"  # nosec
     assert resp.status == 302  # nosec
@@ -26,7 +25,7 @@ async def test_handle_login():
 
 @pytest.mark.asyncio
 async def test_sso_query_begin_with_trust(mocker):
-    """Test sso query begin function"""
+    """Test sso query begin function."""
     mocker.patch("s3browser.login.setd", new={
         "auth_endpoint_url": "https://example.os.com:5001/v3",
         "origin_address": "https://localhost/login/websso",
@@ -45,7 +44,7 @@ async def test_sso_query_begin_with_trust(mocker):
 
 @pytest.mark.asyncio
 async def test_sso_query_begin_without_trust(mocker):
-    """Test sso query begin without trust"""
+    """Test sso query begin without trust."""
     mocker.patch("s3browser.login.setd", new={
         "auth_endpoint_url": "https://example.os.com:5001/v3",
         "origin_address": "https://localhost/login/websso",
@@ -59,6 +58,7 @@ async def test_sso_query_begin_without_trust(mocker):
 async def test_sso_query_end_successful_http_form(mocker):
     """
     Test sso query end function with correct execution parameters.
+
     This version tests the token delivery in a http encoded form.
     """
     mocker.patch("s3browser.login.setd", new={
@@ -113,6 +113,7 @@ async def test_sso_query_end_successful_http_form(mocker):
 async def test_sso_query_end_successful_url_form(mocker):
     """
     Test sso query end function with correct execution parameters.
+
     This version tests the token delivery in a urlencoded form instead of a
     http encoded one.
     """
@@ -168,6 +169,7 @@ async def test_sso_query_end_successful_url_form(mocker):
 async def test_sso_query_end_successful_header(mocker):
     """
     Test sso query end function with correct execution parameters.
+
     This version tests the token delivery in a HTTP header.
     """
     mocker.patch("s3browser.login.setd", new={
@@ -249,7 +251,7 @@ async def test_sso_query_end_unsuccessful_missing_token(mocker):
 
 @pytest.mark.asyncio
 async def test_sso_query_end_unsuccessful_invalid_token(mocker):
-    """Test unsuccessful token delivery with an invalid"""
+    """Test unsuccessful token delivery with an invalid."""
     mocker.patch("s3browser.login.setd", new={
         "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
@@ -278,7 +280,6 @@ async def test_sso_query_end_unsuccessful_invalid_token(mocker):
     )
 
     req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
     token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
     req.headers['X-Auth-Token'] = token
@@ -292,7 +293,7 @@ async def test_sso_query_end_unsuccessful_invalid_token(mocker):
 
 @pytest.mark.asyncio
 async def test_handle_logout(mocker):
-    """Test the logout function"""
+    """Test the logout function."""
     cookie, req = get_request_with_mock_openstack()
 
     sess_mock = mocker.MagicMock("keystoneauth.session.Session")

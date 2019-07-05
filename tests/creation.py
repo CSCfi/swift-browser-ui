@@ -1,6 +1,6 @@
-"""
-This module contains some frequently used constructors to ease in the building
-of the test environment.
+"""This module contains some frequently used constructors.
+
+The purpose is to ease in the building of the test environment.
 """
 
 
@@ -11,9 +11,7 @@ import logging
 
 
 def get_request_with_fernet():
-    """
-    Create a request with a working fernet object
-    """
+    """Create a request with a working fernet object."""
     ret = Mock_Request()
     ret.headers = {}
     ret.cookies = {}
@@ -29,9 +27,7 @@ def get_request_with_fernet():
 
 
 def get_request_with_mock_openstack():
-    """
-    Create a request with a "working" openstack mock-up service and session
-    """
+    """Create a request with a openstack mock-up service & session."""
     ret = get_request_with_fernet()
     cookie, ret.cookies['S3BROW_SESSION'] = generate_cookie(ret)
     ret.app['Sessions'].append(cookie)

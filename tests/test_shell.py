@@ -1,6 +1,4 @@
-"""
-Module for testing the project command line interface
-"""
+"""Module for testing the project command line interface."""
 
 
 from click.testing import CliRunner
@@ -9,9 +7,7 @@ from s3browser.shell import cli, start
 
 
 def test_shell_cli():
-    """
-    Test that the cli group function runs fully with the wanted parameters
-    """
+    """Test that the cli group function runs with the wanted parameters."""
     # Test if the cli group runs as it should
     runner = CliRunner()
     runner.invoke(
@@ -25,9 +21,7 @@ def test_shell_cli():
 
 
 def test_shell_start():
-    """
-    Test that the cli start function runs fully with the wanted parameters
-    """
+    """Test that the cli start function runs with the wanted parameters."""
     # Test if the start command runs as it should
     runner = CliRunner()
     runner.invoke(
