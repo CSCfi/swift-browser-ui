@@ -220,7 +220,19 @@ async def handle_logout(request):
     """Properly kill the session for the user."""
     if session_check(request):
         cookie = decrypt_cookie(request)
-        request.app['Creds'][cookie]['OS_sess'].invalidate()
+        # Invalidate the tokens that are in use
+        request.app['Creds'][cookie]['OS_sess'].invalidate(
+            request.app['Creds'][cookie]['OS_sess'].auth
+        )
+        # Purge everything related to the former openstack connection
+        request.app['Creds'][cookie]['OS_sess'] = None
+        request.app['Creds'][cookie]['ST_conn'] = None
+        request.app['Creds'][cookie]['Avail'] = None
+        request.app['Creds'][cookie]['Token'] = None
+        request.app['Creds'][cookie]['active_project'] = None
+        # Purge the openstack connection from the server
+        request.app['Creds'].pop(cookie)
+        # Purge the sessino from the session list
         request.app['Sessions'].remove(cookie)
     return aiohttp.web.Response(
         status=204
