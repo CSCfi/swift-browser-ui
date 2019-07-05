@@ -52,22 +52,15 @@ async def swift_list_buckets(request):
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        containers = [
-            i for i in request.app['Creds'][session]['ST_conn'].list()
-        ]
-
-        # For some reason the return value is a generator object, which creates
-        # a list with just a single item -> get this one item as the new value
-        if len(containers) == 1:
-            containers = containers[0]
-
-            return aiohttp.web.json_response(
-                containers['listing']
-            )
+        cont = []
+        list(map(lambda i: cont.extend(i['listing']),
+                 request.app['Creds'][session]['ST_conn'].list()))
         # for a bucket with no objects
-        elif len(containers) == 0:
+        if not cont:
             # return empty object
-            return aiohttp.web.HTTPNotFound()
+            raise aiohttp.web.HTTPNotFound()
+        return aiohttp.web.json_response(cont)
+
     except SwiftError:
         return aiohttp.web.json_response([])
 
@@ -90,31 +83,24 @@ async def swift_list_objects(request):
             )
         )
 
-        objects = [i for i in request.app['Creds'][session]['ST_conn'].list(
-            container=request.query['bucket']  # named bucket for compatibility
-        )]
+        obj = []
+        list(map(lambda i: obj.extend(i['listing']),
+                 request.app['Creds'][session]['ST_conn'].list(
+                     container=request.query['bucket']
+                 )))
 
-        # Again, get the only item in the generated list
-        if len(objects) == 1:
-            objects = objects[0]
-        else:
-            tmp = []
-            for i in objects:
-                tmp = tmp + i
-            objects = tmp
+        if not obj:
+            raise aiohttp.web.HTTPNotFound()
 
-        ret = objects['listing']
-        for i in range(0, len(ret)):
-            ret[i]['hash'] = ret[i]['hash'].replace('\u0000', '')
-            if 'content_type' not in ret[i].keys():
-                ret[i]['content_type'] = "binary/octet-stream"
+        for i in range(0, len(obj)):
+            obj[i]['hash'] = obj[i]['hash'].replace('\u0000', '')
+            if 'content_type' not in obj[i].keys():
+                obj[i]['content_type'] = "binary/octet-stream"
             else:
-                ret[i]['content_type'] = \
-                    ret[i]['content_type'].replace('\u0000', '')
+                obj[i]['content_type'] = \
+                    obj[i]['content_type'].replace('\u0000', '')
 
-        return aiohttp.web.json_response(
-            ret
-        )
+        return aiohttp.web.json_response(obj)
     except SwiftError:
         return aiohttp.web.json_response([])
 
