@@ -1,11 +1,15 @@
 """s3browser server related convenience functions."""
 
 # Generic imports
-import aiohttp.web
-import ssl
+# import ssl
 import logging
+import time
 import sys
+
+
 import cryptography.fernet
+import aiohttp.web
+
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, handle_logout
@@ -77,15 +81,15 @@ async def servinit():
     return app
 
 
-def run_server_secure(app):
-    """
-    Run the server securely with a given ssl context.
+# def run_server_secure(app):
+#     """
+#     Run the server securely with a given ssl context.
 
-    Note that while this function is incomplete, the project is safe to run in
-    production only via a TLS termination proxy with e.g. NGINX.
-    """
+#     While this function is incomplete, the project is safe to run in
+#     production only via a TLS termination proxy with e.g. NGINX.
+#     """
     # Setup ssl context
-    sslcontext = ssl.create_default_context()
+    # sslcontext = ssl.create_default_context()
     # sslcontext.set_ciphers(
     #     'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE' +
     #     '-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-' +
@@ -93,22 +97,44 @@ def run_server_secure(app):
     #     'SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-' +
     #     'RSA-AES128-SHA256'
     # )
-    # sslcontext.load_cert_chain(
-    #     'new.cert.cert', 'new.cert.key', 'Summers3'
-    # )
-    aiohttp.web.run_app(
-        app,
-        ssl_context=sslcontext
-    )
+    # aiohttp.web.run_app(app, ssl_context=sslcontext)
 
 
 def run_server_insecure(app):
     """Run the server without https enabled."""
-    aiohttp.web.run_app(
-        app,
-        access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
-        port=setd['port']
-    )
+    try:
+        aiohttp.web.run_app(
+            app,
+            access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
+            port=setd['port']
+        )
+    finally:
+        logging.info("Gracefully shutting down the program at %s",
+                     time.ctime())
+        while app['Creds'].keys():
+            key = list(app['Creds'].keys())[0]
+            logging.info("Purging session for %s", key)
+            # Invalidate the tokens that are in use
+            app['Creds'][key]['OS_sess'].invalidate(
+                app['Creds'][key]['OS_sess'].auth
+            )
+            logging.debug("Invalidated token for session %s :: %s",
+                          key, time.ctime())
+            # Purge everything related to the former openstack connection
+            app['Creds'][key]['OS_sess'] = None
+            app['Creds'][key]['ST_conn'] = None
+            app['Creds'][key]['Avail'] = None
+            app['Creds'][key]['Token'] = None
+            app['Creds'][key]['active_project'] = None
+            # Purge the openstack connection from the server
+            app['Creds'].pop(key)
+            logging.debug("Purged connection information for %s :: %s",
+                          key, time.ctime())
+            # Purge the sessino from the session list
+            app['Sessions'].remove(key)
+            logging.debug("Removed session %s from session list :: %s",
+                          key, time.ctime())
+        sys.exit(0)
 
 
 if __name__ == '__main__':
