@@ -24,6 +24,35 @@ from .settings import setd
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
+async def kill_sess_on_shutdown(app):
+    """Kill all open sessions and purge their data when killed."""
+    logging.info("Gracefully shutting down the program at %s",
+                 time.ctime())
+    while app['Creds'].keys():
+        key = list(app['Creds'].keys())[0]
+        logging.info("Purging session for %s", key)
+        # Invalidate the tokens that are in use
+        app['Creds'][key]['OS_sess'].invalidate(
+            app['Creds'][key]['OS_sess'].auth
+        )
+        logging.debug("Invalidated token for session %s :: %s",
+                      key, time.ctime())
+        # Purge everything related to the former openstack connection
+        app['Creds'][key]['OS_sess'] = None
+        app['Creds'][key]['ST_conn'] = None
+        app['Creds'][key]['Avail'] = None
+        app['Creds'][key]['Token'] = None
+        app['Creds'][key]['active_project'] = None
+        # Purge the openstack connection from the server
+        app['Creds'].pop(key)
+        logging.debug("Purged connection information for %s :: %s",
+                      key, time.ctime())
+        # Purge the session from the session list
+        app['Sessions'].remove(key)
+        logging.debug("Removed session %s from session list :: %s",
+                      key, time.ctime())
+
+
 async def servinit():
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application()
@@ -78,6 +107,9 @@ async def servinit():
         aiohttp.web.get('/api/active', get_os_active_project),
     ])
 
+    # Add graceful shutdown handler
+    app.on_shutdown.append(kill_sess_on_shutdown)
+
     return app
 
 
@@ -102,39 +134,11 @@ async def servinit():
 
 def run_server_insecure(app):
     """Run the server without https enabled."""
-    try:
-        aiohttp.web.run_app(
-            app,
-            access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
-            port=setd['port']
-        )
-    finally:
-        logging.info("Gracefully shutting down the program at %s",
-                     time.ctime())
-        while app['Creds'].keys():
-            key = list(app['Creds'].keys())[0]
-            logging.info("Purging session for %s", key)
-            # Invalidate the tokens that are in use
-            app['Creds'][key]['OS_sess'].invalidate(
-                app['Creds'][key]['OS_sess'].auth
-            )
-            logging.debug("Invalidated token for session %s :: %s",
-                          key, time.ctime())
-            # Purge everything related to the former openstack connection
-            app['Creds'][key]['OS_sess'] = None
-            app['Creds'][key]['ST_conn'] = None
-            app['Creds'][key]['Avail'] = None
-            app['Creds'][key]['Token'] = None
-            app['Creds'][key]['active_project'] = None
-            # Purge the openstack connection from the server
-            app['Creds'].pop(key)
-            logging.debug("Purged connection information for %s :: %s",
-                          key, time.ctime())
-            # Purge the session from the session list
-            app['Sessions'].remove(key)
-            logging.debug("Removed session %s from session list :: %s",
-                          key, time.ctime())
-        sys.exit(0)
+    aiohttp.web.run_app(
+        app,
+        access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
+        port=setd['port']
+    )
 
 
 if __name__ == '__main__':
