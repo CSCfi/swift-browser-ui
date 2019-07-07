@@ -299,8 +299,10 @@ async def test_handle_logout(mocker):
     sess_mock = mocker.MagicMock("keystoneauth.session.Session")
     req.app['Creds'][cookie]['OS_sess'] = sess_mock()
 
+    sess = req.app['Creds'][cookie]['OS_sess']
+
     resp = await s3browser.login.handle_logout(req)
 
     assert resp.status == 204  # nosec
-    req.app['Creds'][cookie]['OS_sess'].invalidate.assert_called_once()
+    sess.invalidate.assert_called_once()
     assert cookie not in req.app['Sessions']  # nosec

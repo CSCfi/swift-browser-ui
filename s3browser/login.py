@@ -1,10 +1,13 @@
 """A module for handling the project login related tasks."""
 
-# aiohttp
-import aiohttp.web
-# Openstack
+
 import os
 import time
+
+
+# aiohttp
+import aiohttp.web
+
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
@@ -12,9 +15,8 @@ from ._convenience import initiate_os_session, initiate_os_service
 from .settings import setd
 
 
-async def handle_login(request):
+async def handle_login(_):
     """Create new session cookie for the user."""
-    # TODO: Change session cookie to HTTP only after separating cookies
     response = aiohttp.web.Response(
         status=302,
         reason="Redirection to login"
@@ -25,7 +27,7 @@ async def handle_login(request):
     return response
 
 
-async def sso_query_begin(request):
+async def sso_query_begin(_):
     """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted on the
     # endpoint
@@ -127,8 +129,8 @@ async def sso_query_end(request):
 
     # If we're using the non-WebSSO login, check token validity
     if (
-        request.app['Creds'][session]['Avail'] == "INVALID" and
-        not setd['has_trust']
+            request.app['Creds'][session]['Avail'] == "INVALID" and
+            not setd['has_trust']
     ):
         response = aiohttp.web.Response(
             status=302
@@ -177,16 +179,17 @@ async def token_rescope(request):
         )
     )
 
-    if (request.query['project'] not in
-        [
-        p['id'] for p in request.app['Creds'][session]['Avail']['projects']
+    if (request.query['project'] not in [
+            p['id'] for p in request.app['Creds'][session]['Avail']['projects']
     ]):
         raise aiohttp.web.HTTPForbidden(
             reason="The project is not available for this token."
         )
 
     # Invalidate the old scoped token
-    request.app['Creds'][session]['OS_sess'].invalidate()
+    request.app['Creds'][session]['OS_sess'].invalidate(
+        request.app['Creds'][session]['OS_sess'].auth
+    )
     # Overwrite the old session with a new one, with the updated project id
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         request.app['Creds'][session]['Token'],
@@ -218,9 +221,30 @@ async def token_rescope(request):
 async def handle_logout(request):
     """Properly kill the session for the user."""
     if session_check(request):
+        log = request.app['Log']
         cookie = decrypt_cookie(request)
-        request.app['Creds'][cookie]['OS_sess'].invalidate()
+        log.info("Killing session for %s :: %s",
+                 cookie, time.ctime())
+        # Invalidate the tokens that are in use
+        request.app['Creds'][cookie]['OS_sess'].invalidate(
+            request.app['Creds'][cookie]['OS_sess'].auth
+        )
+        log.debug("Invalidated token for session %s :: %s",
+                  cookie, time.ctime())
+        # Purge everything related to the former openstack connection
+        request.app['Creds'][cookie]['OS_sess'] = None
+        request.app['Creds'][cookie]['ST_conn'] = None
+        request.app['Creds'][cookie]['Avail'] = None
+        request.app['Creds'][cookie]['Token'] = None
+        request.app['Creds'][cookie]['active_project'] = None
+        # Purge the openstack connection from the server
+        request.app['Creds'].pop(cookie)
+        log.debug("Purged connection information for %s :: %s",
+                  cookie, time.ctime())
+        # Purge the sessino from the session list
         request.app['Sessions'].remove(cookie)
+        log.debug("Removed session %s from session list :: %s",
+                  cookie, time.ctime())
     return aiohttp.web.Response(
         status=204
     )
