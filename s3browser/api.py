@@ -175,6 +175,11 @@ async def swift_download_object(request):
     return response
 
 
+async def get_metadata(request):
+    """Get metadata for a container or for an object."""
+    pass
+
+
 async def os_list_projects(request):
     """Fetch the projects available for the open session."""
     session = api_check(request)
