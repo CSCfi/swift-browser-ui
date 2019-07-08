@@ -11,6 +11,7 @@ from aiohttp.web import HTTPNotFound
 from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
 from s3browser.api import swift_download_object
+from s3browser.api import get_metadata
 from s3browser.settings import setd
 from .creation import get_request_with_mock_openstack
 
@@ -193,23 +194,139 @@ async def test_swift_download_object():
     assert resp.headers['Location'] is not None  # nosec
 
 
+# Below are the tests for the metadata API endpoint. The account metadata
+# fetches won't be implemented and thus won't be tested, because the account
+# metadata contains sensitive information. (e.g. the tempurl keys)
 @pytest.mark.asyncio
-async def test_swift_get_object_meta_swift():
-    """Test metadata API endpoint when container has swift metadata."""
+async def test_get_container_meta_swift():
+    """Test metadata API endpoint with container metadata."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=1,
         object_range=(1, 1),
         size_range=(252144, 252144),
     )
+    request.app['Creds'][cookie]['ST_conn'].meta = {
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
+    request.app['Creds'][cookie]['ST_conn'].set_swift_meta_container(
+        "test-container-0"
+    )
+
+    # Set up the query string
+    request.query["container"] = "test-container-0"
+
+    resp = await get_metadata(request)
+    resp = json.loads(resp.text)
+
+    assert resp == [[  # nosec
+        "test-container-0", {"example": "example"}
+    ]]
 
 
 @pytest.mark.asyncio
-async def test_swift_get_object_meta_s3():
-    """Test metadata API endpoint when container has s3 metadata."""
+async def test_get_object_meta_swift():
+    """Test metadata API endpoint when object has swift metadata."""
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=1,
         object_range=(1, 1),
         size_range=(252144, 252144),
     )
+    request.app['Creds'][cookie]['ST_conn'].meta = {
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
+    # Get the object key to test with
+    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
+    objkey = list(objs.keys())[0]
+
+    request.app['Creds'][cookie]['ST_conn'].set_swift_meta_object(
+        "test-container-0",
+        objkey
+    )
+
+    # Set up the query string
+    request.query["container"] = "test-container-0"
+    request.query["object"] = objkey
+
+    resp = await get_metadata(request)
+    resp = json.loads(resp.text)
+
+    assert resp == [[  # nosec
+        objkey, {"example": "example"}
+    ]]
+
+
+@pytest.mark.asyncio
+async def test_get_object_meta_s3():
+    """Test metadata API endpoint when object has s3 metadata."""
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=1,
+        object_range=(1, 1),
+        size_range=(252144, 252144),
+    )
+    request.app['Creds'][cookie]['ST_conn'].meta = {
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
+    # Get the object key to test with
+    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
+    objkey = list(objs.keys())[0]
+
+    request.app['Creds'][cookie]['ST_conn'].set_s3_meta_object(
+        "test-container-0",
+        objkey
+    )
+
+    # Set up the query string
+    request.query["container"] = "test-container-0"
+    request.query["object"] = objkey
+
+    resp = await get_metadata(request)
+    resp = json.loads(resp.text)
+
+    assert resp == [[  # nosec
+        objkey, {
+            "s3": {
+                "s3-atime": "1536648772",
+                "s3-ctime": "1536648921",
+                "s3-gid": "101",
+                "s3-gname": "example",
+            }
+        }
+    ]]
+
+
+@pytest.mark.asyncio
+async def test_get_object_meta_swift_whole():
+    """Test metadata API endpoint with containers' objects."""
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=1,
+        object_range=(10),
+        size_range=(252144, 252144),
+    )
+    request.app['Creds'][cookie]['ST_conn'].meta = {
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
+
+    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
+    for key in list(objs.keys()):
+        request.app['Creds'][cookie]['ST_conn'].set_swift_meta_object(
+            "test-container-0",
+            key
+        )
+
+    resp = await get_metadata(request)
+    resp = json.loads(resp.text)
+
+    comp = [
+        [i, {"example": "example"}]
+        for i in objs.keys()
+    ]
+
+    assert resp == comp  # nosec
