@@ -1,14 +1,15 @@
 """Project functions for handling API requests from front-end."""
 
-import aiohttp.web
-# import boto3
 import time
 import os
 import hashlib
+
+
+import aiohttp.web
 from swiftclient.service import SwiftError
 from swiftclient.utils import generate_temp_url
 
-# from ._convenience import decrypt_cookie
+
 from ._convenience import api_check
 from .settings import setd
 
@@ -91,13 +92,15 @@ async def swift_list_objects(request):
         if not obj:
             raise aiohttp.web.HTTPNotFound()
 
-        for i in range(0, len(obj)):
-            obj[i]['hash'] = obj[i]['hash'].replace('\u0000', '')
-            if 'content_type' not in obj[i].keys():
-                obj[i]['content_type'] = "binary/octet-stream"
+        # Some tools leave unicode nulls to e.g. file hashes. These must be
+        # replaced as they break the utf-8 text rendering in browsers for some
+        # reason.
+        for i in obj:
+            i['hash'] = i['hash'].replace('\u0000', '')
+            if 'content_type' not in i.keys():
+                i['content_type'] = 'binary/octet-stream'
             else:
-                obj[i]['content_type'] = \
-                    obj[i]['content_type'].replace('\u0000', '')
+                i['content_type'] = i['content_type'].replace('\u0000', '')
 
         return aiohttp.web.json_response(obj)
     except SwiftError:
