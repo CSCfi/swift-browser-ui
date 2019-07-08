@@ -1,7 +1,4 @@
-"""This module contains the mock-up classes and functions.
-
-It is used for testing the s3browser package.
-"""
+"""Mock-up classes and functions for testing s3browser."""
 
 
 import random
@@ -9,9 +6,11 @@ import hashlib
 import os
 import time
 import json
-from swiftclient.service import SwiftError
 from urllib.error import HTTPError
 from contextlib import contextmanager
+
+
+from swiftclient.service import SwiftError
 
 
 mock_token_project_avail = json.dumps({
@@ -98,17 +97,17 @@ mock_token_output = {
 }
 
 
-def return_same_cookie(req):
+def return_same_cookie(_):
     """Return same cookie."""
     return ("placeholder", "placeholder")
 
 
-def return_invalid(req):
+def return_invalid(_):
     """Return invalid."""
     return "INVALID"
 
 
-def return_project_avail(token):
+def return_project_avail(_):
     """Return mocked unscoped token availability output."""
     return mock_token_output
 
@@ -116,10 +115,10 @@ def return_project_avail(token):
 @contextmanager
 def urlopen(prq):
     """Mockup class for opening keystone."""
-    yield Mock_Keystone(prq)
+    yield MockKeystone(prq)
 
 
-class Mock_Keystone:
+class MockKeystone:
     """Mockup class for OS Keystone to enable testing availability."""
 
     def __init__(self, prq):
@@ -151,7 +150,8 @@ class Mock_Keystone:
 
 
 class Mock_Request:
-    """Mock-up class for the aiohttp.web.Request.
+    """
+    Mock-up class for the aiohttp.web.Request.
 
     It contains the dictionary
     representation of the requests that will be passed to the functions.
@@ -171,7 +171,8 @@ class Mock_Request:
         self.post_data = {}
 
     def set_headers(self, headers):
-        """Set mock request headers.
+        """
+        Set mock request headers.
 
         Params:
             headers: dict
@@ -180,7 +181,8 @@ class Mock_Request:
             self.headers[i] = headers[i]
 
     def set_cookies(self, cookies):
-        """Set mock request cookies.
+        """
+        Set mock request cookies.
 
         Params:
             cookies: dict
@@ -198,7 +200,8 @@ class Mock_Request:
 
 
 class Mock_Service:
-    """Mock-up class for the Openstack service.
+    """
+    Mock-up class for the Openstack service.
 
     In this case a swiftclient.Service
     instance. Contains the mock-ups for the relevant methods used in this
@@ -207,27 +210,28 @@ class Mock_Service:
     """
 
     containers = {}  # mock containers as a dictionary
-    tempurl_key_1 = None  # Tempurl keys for the stat() command
-    tempurl_key_2 = None  # Tempurl keys for the stat() command
+    meta = {
+        # Tempurl kyes for the stat() command
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
 
     def init_with_data(
-        self,
-        containers=0,
-        object_range=(0, 0),
-        size_range=(0, 0),
-        container_name_prefix="test-container-",
-        object_name_prefix=None,  # None for just the hash as name
+            self,
+            containers=0,
+            object_range=(0, 0),
+            size_range=(0, 0),
+            container_name_prefix="test-container-",
+            object_name_prefix=None,  # None for just the hash as name
     ):
-        """Initialize the Mock_Service instance with some test data.
-
-        Data will be used for testing.
-        """
+        """Initialize the Mock_Service instance with some test data."""
         for i in range(0, containers):
             to_add = []
 
             # Iterate over a random amount of objects
             for _ in range(
-                0, random.randint(object_range[0], object_range[1])  # nosec
+                    0, random.randint(object_range[0],  # nosec
+                                      object_range[1])
             ):
                 ohash = hashlib.sha1(os.urandom(256)).hexdigest()  # nosec
                 if object_name_prefix is not None:
@@ -274,34 +278,63 @@ class Mock_Service:
         else:
             return None
 
-    def stat(self, container=None, objects=None):
+    def stat(self, *args):
         """Mock the stat call of SwiftService."""
-        ret = {
-            "headers": {},
-            "items": [
-                ("Account", "AUTH_test_account",)
-            ],
-        }
-        # Add the tempurl headers to the return dictionary, if they have been
-        # initialized
-        if self.tempurl_key_1 is not None:
-            ret['headers']['x-account-meta-temp-url-key'] = self.tempurl_key_1
-        if self.tempurl_key_2 is not None:
-            ret['headers']['x-account-meta-temp-url-key-2'] =\
-                self.tempurl_key_2
+        ret = {}
+        if not args:
+            ret["headers"] = {}
+            ret["items"] = [("Account", "AUTH_test_account",), ]
+            # Add the tempurl headers to the return dictionary, if they have
+            # been initialized
+            if self.meta["tempurl_key_1"] is not None:
+                ret['headers']['x-account-meta-temp-url-key'] = \
+                    self.meta["tempurl_key_1"]
+            if self.meta["tempurl_key_2"] is not None:
+                ret['headers']['x-account-meta-temp-url-key-2'] =\
+                    self.meta["tempurl_key_2"]
+            return ret
 
+        if len(args) == 1:
+            # If the length is exactly one, then only a container was
+            # specified.
+            if "Obj_example" in self.containers[args[0]]["meta"].keys():
+                ret["x-container-meta-obj-example"] = "example"
+            return ret
+
+        # In any other case the query is for an object.
+        if "Obj_example" in self.containers[args[0]][args[1]]["meta"].keys():
+            ret["x-object-meta-obj-example"] = "example"
+        if ("Obj_S3_example" in
+                self.containers[args[0]][args[1]]["meta"].keys()):
+            ret["x-object-meta-s3cmd-attrs"] = \
+                self.containers[args[0]][args[1]]["meta"]["Obj_S3_example"]
         return ret
 
     def post(self, options=None):
         """Mock the post call of SwiftService."""
         # Get the URL key 2
         key = options['meta'][0].split(':')[1]
-        self.tempurl_key_2 = key
+        self.meta["tempurl_key_2"] = key
         return {"success": True}
+
+    def set_swift_meta_container(self, container):
+        """Generate test swift metadata for a container."""
+        self.containers[container]["meta"]["Acc_example"] = "example"
+
+    def set_swift_meta_object(self, container, obj):
+        """Generate test swift metadata for an object."""
+        self.containers[container][obj]["meta"]["Obj_example"] = \
+            "example"
+
+    def set_s3_meta_object(self, container, obj):
+        """Generate test s3 metadata for an object."""
+        self.containers[container][obj]["meta"]["Obj_S3_example"] = \
+            "atime:1536648772/ctime:1536648921/gid:101/gname:example"
 
 
 class Mock_Session:
-    """Mock-up class for the Openstack keystoneauth1 session instance.
+    """
+    Mock-up class for the Openstack keystoneauth1 session instance.
 
     It contains the relevant methods for querying the OS identity API (aka.
     keystone).

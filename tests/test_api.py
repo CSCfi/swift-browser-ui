@@ -1,19 +1,18 @@
 """Module for testing ``s3browser.api``."""
 
-import pytest
 import json
 import hashlib
 import os
 
+import pytest
 
 from aiohttp.web import HTTPNotFound
 
-
-from .creation import get_request_with_mock_openstack
 from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
 from s3browser.api import swift_download_object
 from s3browser.settings import setd
+from .creation import get_request_with_mock_openstack
 
 
 @pytest.mark.asyncio
@@ -176,13 +175,41 @@ async def test_swift_download_object():
     assert resp.headers['Location'] is not None  # nosec
 
     # Case 3: No pre-existing keys
-    request.app['Creds'][cookie]['ST_conn'].tempurl_key_1 = None
-    request.app['Creds'][cookie]['ST_conn'].tempurl_key_2 = None
+    request.app['Creds'][cookie]['ST_conn'].meta = {
+        "tempurl_key_1": None,
+        "tempurl_key_2": None,
+    }
     resp = await swift_download_object(request)
     assert(  # nosec
-        request.app['Creds'][cookie]['ST_conn'].tempurl_key_1 is None
+        request.app['Creds'][cookie]['ST_conn'].meta[
+            "tempurl_key_1"
+        ] is None
     )
     assert(  # nosec
-        request.app['Creds'][cookie]['ST_conn'].tempurl_key_2 is not None
+        request.app['Creds'][cookie]['ST_conn'].meta[
+            "tempurl_key_2"
+        ] is not None
     )
     assert resp.headers['Location'] is not None  # nosec
+
+
+@pytest.mark.asyncio
+async def test_swift_get_object_meta_swift():
+    """Test metadata API endpoint when container has swift metadata."""
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=1,
+        object_range=(1, 1),
+        size_range=(252144, 252144),
+    )
+
+
+@pytest.mark.asyncio
+async def test_swift_get_object_meta_s3():
+    """Test metadata API endpoint when container has s3 metadata."""
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=1,
+        object_range=(1, 1),
+        size_range=(252144, 252144),
+    )
