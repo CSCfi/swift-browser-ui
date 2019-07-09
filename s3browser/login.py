@@ -220,7 +220,7 @@ async def token_rescope(request):
 
 async def handle_logout(request):
     """Properly kill the session for the user."""
-    if session_check(request):
+    if session_check(request) and not setd['set_session_devmode']:
         log = request.app['Log']
         cookie = decrypt_cookie(request)
         log.info("Killing session for %s :: %s",

@@ -63,6 +63,7 @@ setd = {
     "verbose": False,
     "debug": False,
     "version": None,
+    "set_session_devmode": False,
     "static_directory": environ.get('BROWSER_START_STATIC_DIRECTORY',
                                     None),
 }
