@@ -182,11 +182,9 @@ def get_availability_from_token(token):
     with urllib.request.urlopen(drq) as domains:  # nosec
         output_domains = json.loads(domains.read().decode('utf-8'))
 
-    logging.info("%s\n%s\n%s\n%s",
-                 '--PROJECT AND DOMAIN INFORMATION FROM KEYSTONE--',
+    logging.info("%s\n%s",
                  str(output_projects),
-                 str(output_domains),
-                 '--END INFORMATION--')
+                 str(output_domains))
 
     # Return all project names and domain names inside a dictionary
     return {

@@ -36,6 +36,20 @@ import logging
 from os import environ
 
 
+FORMAT = """\
+[%(asctime)s][%(name)s][%(process)d %(processName)s][%(levelname)-8s] \
+(L:%(lineno)s) %(funcName)s: %(message)s\
+"""
+logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
+
+# Log from envvar as well, since the CLI shouldn't be the only option.
+# Semantics are identical with the frontend, so i.e.:
+# BROWSER_VERBOSE (LOGLEVEL INFO), BROWSER_DEBUG (LOGLEVEL DEBUG)
+if environ.get('BROWSER_VERBOSE', None):
+    logging.root.setLevel(logging.INFO)
+if environ.get('BROWSER_DEBUG', None):
+    logging.root.setLevel(logging.DEBUG)
+
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd = {
@@ -56,7 +70,6 @@ setd = {
 
 def set_key(key, value, log_message):
     """Set a key value if it's specified."""
-    global setd
     if value:
-        logging.info(log_message + str(value))
+        logging.info(log_message, str(value))
         setd[key] = value

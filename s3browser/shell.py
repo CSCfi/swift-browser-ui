@@ -1,12 +1,15 @@
 """CLI for configuring and launching the server."""
 
 
-from .__init__ import __version__
-import click
 import logging
 import sys
 
-from .settings import setd, set_key
+
+import click
+
+
+from .__init__ import __version__
+from .settings import setd, set_key, FORMAT
 from .server import servinit, run_server_insecure
 from ._convenience import setup_logging as conv_setup_logging
 
@@ -29,7 +32,6 @@ from ._convenience import setup_logging as conv_setup_logging
 )
 def cli(verbose, debug, logfile):
     """Command line interface for managing s3browser."""
-    logging.basicConfig()
     # set version
     setd['version'] = __version__
     # set verbose
@@ -37,7 +39,7 @@ def cli(verbose, debug, logfile):
         setd['verbose'] = True
         logging.root.setLevel(logging.INFO)
         logging.info(
-            'Set logging level to info. ' +
+            'Set logging level to info. %s',
             'Reason: got flag "--verbose"'
         )
     # set debug
@@ -45,7 +47,7 @@ def cli(verbose, debug, logfile):
         setd['debug'] = True
         logging.root.setLevel(logging.DEBUG)
         logging.info(
-            'Set logging level to debug. ' +
+            'Set logging level to debug. %s',
             'Reason: got flag "--debug"'
         )
     # set logfile
@@ -53,13 +55,14 @@ def cli(verbose, debug, logfile):
         setd['logfile'] = logfile
         new_handler = logging.FileHandler(logfile)
         new_handler.setFormatter(
-            logging.Formatter(logging.BASIC_FORMAT)
+            logging.Formatter(FORMAT)
         )
         logging.root.addHandler(
             new_handler
         )
         logging.info(
-            'Save log information to the file {0}'.format(logfile) +
+            'Save log information to the file %s %s',
+            logfile,
             ' – Reason: got option "--logfile"'
         )
     conv_setup_logging()
@@ -95,47 +98,47 @@ def cli(verbose, debug, logfile):
     help="Set the address that the program will be redirected to from WebSSO"
 )
 def start(
-    port,
-    static_directory,
-    auth_endpoint_url,
-    has_trust,
-    swift_endpoint_url,
-    dry_run,
-    set_origin_address,
+        port,
+        static_directory,
+        auth_endpoint_url,
+        has_trust,
+        swift_endpoint_url,
+        dry_run,
+        set_origin_address,
 ):
     """Start the browser backend and server."""
     logging.debug(
-        "Current settings dictionary:\n" + str(setd)
+        "Current settings dictionary:%s", str(setd)
     )
-    set_key("port", port, "Set running port as ")
+    set_key("port", port, "Set running port as %s")
     set_key(
         "static_directory",
         static_directory,
-        "Set static dir location as "
+        "Set static dir location as %s"
     )
     set_key(
         "auth_endpoint_url",
         auth_endpoint_url,
-        "Set auth endpoint url to "
+        "Set auth endpoint url to %s"
     )
     set_key(
         "has_trust",
         has_trust,
-        "Assuming the program is trusted for SSO on the endpoint."
+        "Assuming the program is trusted for SSO on the endpoint. %s"
     )
     set_key(
         "swift_endpoint_url",
         swift_endpoint_url,
-        "Set object storage endpoint as "
+        "Set object storage endpoint as %s"
     )
-    set_key("dry_run", dry_run, "Not running server, dry-run flagged.")
+    set_key("dry_run", dry_run, "Not running server, dry-run flagged. %s")
     set_key(
+        "set_origin_address",
         set_origin_address,
-        set_origin_address,
-        "Setting login return address to "
+        "Setting login return address to %s"
     )
     logging.debug(
-        "Running settings directory:\n" + str(setd)
+        "Running settings directory:%s", str(setd)
     )
     if not dry_run:
         run_server_insecure(servinit())
