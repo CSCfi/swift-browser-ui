@@ -36,6 +36,12 @@ import logging
 from os import environ
 
 
+FORMAT = """\
+[%(asctime)s][%(name)s][%(process)d %(processName)s][%(levelname)-8s] \
+(L:%(lineno)s) %(funcName)s: %(message)s\
+"""
+logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
+
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd = {
@@ -56,7 +62,6 @@ setd = {
 
 def set_key(key, value, log_message):
     """Set a key value if it's specified."""
-    global setd
     if value:
-        logging.info(log_message + str(value))
+        logging.info(log_message, str(value))
         setd[key] = value
