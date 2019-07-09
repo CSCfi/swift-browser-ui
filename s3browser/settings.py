@@ -42,6 +42,14 @@ FORMAT = """\
 """
 logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
 
+# Log from envvar as well, since the CLI shouldn't be the only option.
+# Semantics are identical with the frontend, so i.e.:
+# BROWSER_VERBOSE (LOGLEVEL INFO), BROWSER_DEBUG (LOGLEVEL DEBUG)
+if environ.get('BROWSER_VERBOSE'):
+    logging.root.setLevel(logging.INFO)
+if environ.get('BROWSER_DEBUG'):
+    logging.root.setLevel(logging.DEBUG)
+
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd = {
