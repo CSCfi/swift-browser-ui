@@ -220,9 +220,9 @@ async def test_get_container_meta_swift():
     resp = await get_metadata(request)
     resp = json.loads(resp.text)
 
-    assert resp == [[  # nosec
-        "test-container-0", {"example": "example"}
-    ]]
+    assert resp == [  # nosec
+        "test-container-0", {"obj-example": "example"}
+    ]
 
 
 @pytest.mark.asyncio
@@ -239,8 +239,13 @@ async def test_get_object_meta_swift():
         "tempurl_key_2": None,
     }
     # Get the object key to test with
-    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
-    objkey = list(objs.keys())[0]
+    objs = request.app['Creds'][cookie]['ST_conn'].containers[
+        "test-container-0"]
+    objkey = [i['name'] for i in objs][0]
+
+    request.app['Creds'][cookie]['ST_conn'].set_swift_meta_container(
+        "test-container-0"
+    )
 
     request.app['Creds'][cookie]['ST_conn'].set_swift_meta_object(
         "test-container-0",
@@ -255,7 +260,7 @@ async def test_get_object_meta_swift():
     resp = json.loads(resp.text)
 
     assert resp == [[  # nosec
-        objkey, {"example": "example"}
+        objkey, {"obj-example": "example"}
     ]]
 
 
@@ -273,8 +278,13 @@ async def test_get_object_meta_s3():
         "tempurl_key_2": None,
     }
     # Get the object key to test with
-    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
-    objkey = list(objs.keys())[0]
+    objs = request.app['Creds'][cookie]['ST_conn'].containers[
+        "test-container-0"]
+    objkey = [i['name'] for i in objs][0]
+
+    request.app['Creds'][cookie]['ST_conn'].set_swift_meta_container(
+        "test-container-0"
+    )
 
     request.app['Creds'][cookie]['ST_conn'].set_s3_meta_object(
         "test-container-0",
@@ -290,11 +300,11 @@ async def test_get_object_meta_s3():
 
     assert resp == [[  # nosec
         objkey, {
-            "s3": {
-                "s3-atime": "1536648772",
-                "s3-ctime": "1536648921",
-                "s3-gid": "101",
-                "s3-gname": "example",
+            "s3cmd-attrs": {
+                "atime": "1536648772",
+                "ctime": "1536648921",
+                "gid": "101",
+                "gname": "example",
             }
         }
     ]]
@@ -306,7 +316,7 @@ async def test_get_object_meta_swift_whole():
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=1,
-        object_range=(10),
+        object_range=(5, 5),
         size_range=(252144, 252144),
     )
     request.app['Creds'][cookie]['ST_conn'].meta = {
@@ -314,19 +324,29 @@ async def test_get_object_meta_swift_whole():
         "tempurl_key_2": None,
     }
 
-    objs = request.app['Creds'][cookie]['ST_conn']["test-container-0"]
-    for key in list(objs.keys()):
+    request.app['Creds'][cookie]['ST_conn'].set_swift_meta_container(
+        "test-container-0"
+    )
+
+    objs = request.app['Creds'][cookie]['ST_conn'].containers[
+        "test-container-0"]
+    for key in [i['name'] for i in objs]:
         request.app['Creds'][cookie]['ST_conn'].set_swift_meta_object(
             "test-container-0",
             key
         )
 
+    request.query["container"] = "test-container-0"
+    request.query["object"] = (
+        "%s,%s,%s,%s,%s" % tuple([i["name"] for i in objs])
+    )
+
     resp = await get_metadata(request)
     resp = json.loads(resp.text)
 
     comp = [
-        [i, {"example": "example"}]
-        for i in objs.keys()
+        [i, {"obj-example": "example"}]
+        for i in [j["name"] for j in objs]
     ]
 
     assert resp == comp  # nosec

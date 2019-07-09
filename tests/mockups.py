@@ -216,6 +216,11 @@ class Mock_Service:
         "tempurl_key_2": None,
     }
 
+    def __init__(self):
+        """."""
+        self.cont_meta = {}
+        self.obj_meta = {}
+
     def init_with_data(
             self,
             containers=0,
@@ -281,8 +286,8 @@ class Mock_Service:
     def stat(self, *args):
         """Mock the stat call of SwiftService."""
         ret = {}
+        ret["headers"] = {}
         if not args:
-            ret["headers"] = {}
             ret["items"] = [("Account", "AUTH_test_account",), ]
             # Add the tempurl headers to the return dictionary, if they have
             # been initialized
@@ -297,17 +302,27 @@ class Mock_Service:
         if len(args) == 1:
             # If the length is exactly one, then only a container was
             # specified.
-            if "Obj_example" in self.containers[args[0]]["meta"].keys():
-                ret["x-container-meta-obj-example"] = "example"
+            if "Acc_example" in self.cont_meta[args[0]].keys():
+                ret['container'] = args[0]
+                ret['headers']["x-container-meta-obj-example"] = "example"
+                ret['success'] = True
             return ret
 
         # In any other case the query is for an object.
-        if "Obj_example" in self.containers[args[0]][args[1]]["meta"].keys():
-            ret["x-object-meta-obj-example"] = "example"
-        if ("Obj_S3_example" in
-                self.containers[args[0]][args[1]]["meta"].keys()):
-            ret["x-object-meta-s3cmd-attrs"] = \
-                self.containers[args[0]][args[1]]["meta"]["Obj_S3_example"]
+        # Iterate over the object query list.
+        ret = []
+        for i in args[1]:
+            to_add = {}
+            to_add["headers"] = {}
+            if "Obj_example" in self.obj_meta[args[0]][i].keys():
+                to_add['headers']["x-object-meta-obj-example"] = "example"
+            if ("Obj_S3_example" in
+                    self.obj_meta[args[0]][i].keys()):
+                to_add['headers']["x-object-meta-s3cmd-attrs"] = \
+                    self.obj_meta[args[0]][i]["Obj_S3_example"]
+            to_add["success"] = True
+            to_add["object"] = i
+            ret.append(to_add)
         return ret
 
     def post(self, options=None):
@@ -319,16 +334,19 @@ class Mock_Service:
 
     def set_swift_meta_container(self, container):
         """Generate test swift metadata for a container."""
-        self.containers[container]["meta"]["Acc_example"] = "example"
+        self.cont_meta[container] = {}
+        self.obj_meta[container] = {}
+        self.cont_meta[container]["Acc_example"] = "example"
 
     def set_swift_meta_object(self, container, obj):
         """Generate test swift metadata for an object."""
-        self.containers[container][obj]["meta"]["Obj_example"] = \
-            "example"
+        self.obj_meta[container][obj] = {}
+        self.obj_meta[container][obj]["Obj_example"] = "example"
 
     def set_s3_meta_object(self, container, obj):
         """Generate test s3 metadata for an object."""
-        self.containers[container][obj]["meta"]["Obj_S3_example"] = \
+        self.obj_meta[container][obj] = {}
+        self.obj_meta[container][obj]["Obj_S3_example"] = \
             "atime:1536648772/ctime:1536648921/gid:101/gname:example"
 
 
