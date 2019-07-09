@@ -19,6 +19,7 @@ from .login import sso_query_end
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
+from .api import get_metadata
 from .settings import setd
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -105,6 +106,7 @@ async def servinit():
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
         aiohttp.web.get('/api/active', get_os_active_project),
+        aiohttp.web.get('/api/meta', get_metadata),
     ])
 
     # Add graceful shutdown handler

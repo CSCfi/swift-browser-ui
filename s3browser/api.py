@@ -175,6 +175,102 @@ async def swift_download_object(request):
     return response
 
 
+async def get_object_metadata(conn, meta_cont, meta_obj):
+    """Get object metadata."""
+    try:
+        res = list(conn.stat(meta_cont, meta_obj))
+
+        # Fail if an object wasn't usable
+        if False in [i['success'] for i in res]:
+            raise aiohttp.web.HTTPNotFound()
+
+        # Filter for metadata not already served with the list request
+        res = [
+            [i['object'], dict(filter(
+                lambda j: "x-object-meta" in j[0],
+                i['headers'].items()
+            ))] for i in res
+        ]
+
+        # Strip unnecessary specifcations from header names and split open s3
+        # information so that it doesn't have to be done in the browser
+        for i in res:
+            i[1] = {
+                k.replace("x-object-meta-", ""): v for k, v in i[1].items()
+            }
+            if "s3cmd-attrs" in i[1].keys():
+                for i in res:
+                    i[1]["s3cmd-attrs"] = {
+                        k: v for k, v in [
+                            i.split(":")
+                            for i in i[1]["s3cmd-attrs"].split("/")
+                        ]
+                    }
+        return res
+    except SwiftError:
+        # Fail if container wasn't found
+        raise aiohttp.web.HTTPNotFound()
+
+
+async def get_metadata(request):
+    """Get metadata for a container or for an object."""
+    session = api_check(request)
+    request.app['Log'].info(
+        'API cal for project listing from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    # Get required variables from query string
+    meta_cont = (
+        request.query['container']
+        if 'container' in request.query.keys()
+        else None
+    )
+    meta_obj = (
+        request.query['object'].split(',')
+        if 'object' in request.query
+        else None
+    )
+
+    # If no container was specified, raise an Unauthorized error – the user is
+    # not meant to see the account metadata information directly since it may
+    # contain sensitive data. This is not needed directly for the UI, but
+    # the API is exposed for the user and thus can't expose any sensitive info
+    if not meta_cont:
+        raise aiohttp.web.HTTPUnauthorized()
+
+    conn = request.app['Creds'][session]['ST_conn']
+
+    # Get container listing if no object list was specified
+    if not meta_obj:
+        ret = conn.stat(meta_cont)
+
+        if not ret['success']:
+            raise aiohttp.web.HTTPNotFound()
+
+        # Strip any unnecessary information from the metadata headers
+        ret['headers'] = dict(filter(
+            lambda i: "x-container-meta" in i[0],
+            ret['headers'].items()
+        ))
+        ret['headers'] = {
+            k.replace("x-container-meta-", ""): v
+            for k, v in ret['headers'].items()
+        }
+
+        return aiohttp.web.json_response(
+            [ret['container'], ret['headers']]
+        )
+    # Otherwise get object listing (object listing won't need to throw an
+    # exception here incase of a failure – the function handles that)
+    return aiohttp.web.json_response(
+        await get_object_metadata(conn, meta_cont, meta_obj)
+    )
+
+
 async def os_list_projects(request):
     """Fetch the projects available for the open session."""
     session = api_check(request)
