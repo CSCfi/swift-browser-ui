@@ -94,6 +94,9 @@ def cli(verbose, debug, logfile):
     '--set-origin-address', default=None, type=str,
     help="Set the address that the program will be redirected to from WebSSO"
 )
+@click.option(
+    '--set-session-devmode', is_flag=True, default=False, hidden=True,
+)
 def start(
     port,
     static_directory,
@@ -102,6 +105,7 @@ def start(
     swift_endpoint_url,
     dry_run,
     set_origin_address,
+    set_session_devmode,
 ):
     """Start the browser backend and server."""
     logging.debug(
@@ -133,6 +137,11 @@ def start(
         set_origin_address,
         set_origin_address,
         "Setting login return address to "
+    )
+    set_key(
+        "set_session_devmode",
+        set_session_devmode,
+        "Disabled logouts for development purposes. "
     )
     logging.debug(
         "Running settings directory:\n" + str(setd)
