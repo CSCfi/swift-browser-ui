@@ -9,7 +9,7 @@ import click
 
 
 from .__init__ import __version__
-from .settings import setd, set_key
+from .settings import setd, set_key, FORMAT
 from .server import servinit, run_server_insecure
 from ._convenience import setup_logging as conv_setup_logging
 
@@ -55,7 +55,7 @@ def cli(verbose, debug, logfile):
         setd['logfile'] = logfile
         new_handler = logging.FileHandler(logfile)
         new_handler.setFormatter(
-            logging.Formatter(logging.BASIC_FORMAT)
+            logging.Formatter(FORMAT)
         )
         logging.root.addHandler(
             new_handler
