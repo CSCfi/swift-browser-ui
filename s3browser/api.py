@@ -178,8 +178,7 @@ async def swift_download_object(request):
 async def get_object_metadata(conn, meta_cont, meta_obj):
     """Get object metadata."""
     try:
-        itr = conn.stat(meta_cont, meta_obj)
-        res = [i for i in itr]
+        res = list(conn.stat(meta_cont, meta_obj))
 
         # Fail if an object wasn't usable
         if False in [i['success'] for i in res]:
@@ -199,13 +198,14 @@ async def get_object_metadata(conn, meta_cont, meta_obj):
             i[1] = {
                 k.replace("x-object-meta-", ""): v for k, v in i[1].items()
             }
-        if "s3cmd-attrs" in i[1].keys():
-            for i in res:
-                i[1]["s3cmd-attrs"] = {
-                    k: v for k, v in [
-                        i.split(":") for i in i[1]["s3cmd-attrs"].split("/")
-                    ]
-                }
+            if "s3cmd-attrs" in i[1].keys():
+                for i in res:
+                    i[1]["s3cmd-attrs"] = {
+                        k: v for k, v in [
+                            i.split(":")
+                            for i in i[1]["s3cmd-attrs"].split("/")
+                        ]
+                    }
         return res
     except SwiftError:
         # Fail if container wasn't found
