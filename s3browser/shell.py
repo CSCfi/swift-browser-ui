@@ -144,7 +144,7 @@ def start(
     set_key(
         "set_session_devmode",
         set_session_devmode,
-        "Disabled logouts for development purposes. "
+        "Disabled logouts for development purposes. %s"
     )
     logging.debug(
         "Running settings directory:%s", str(setd)
