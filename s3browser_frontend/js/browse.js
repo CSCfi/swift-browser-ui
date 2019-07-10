@@ -274,20 +274,19 @@ const ObjectPage = Vue.extend({
             this.$router.push( "?page=" + pageNumber )
         },
         confirmDownload: function () {
-            this.$dialog.confirm({
-                title: "Initiate a big download",
+            this.$snackbar.open({
+                duration: 5000,
                 message: `\
-                The file you're trying to download is large (> 1GB) and thus
-                a confirmation is required before initiating a download. Make
-                sure you have the required space, and then confirm to enable
-                large downloads permanently.`,
-                confirmText: "Enable large downloads",
+                No large (> 1GiB) downloads enabled. Click to enable
+                them for the duration of the session.
+                `,
                 type: "is-success",
-                onConfirm: this.enableDownload,
+                position: "is-top",
+                actionText: "Enable",
+                onAction: this.enableDownload,
             })
         },
         enableDownload: function () {
-            document.cookie = "ENA_DL=\"true\"";
             this.allowLargeDownloads = true;
         },
     },
