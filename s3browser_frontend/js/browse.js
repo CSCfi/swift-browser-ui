@@ -87,7 +87,6 @@ const ContainerPage = Vue.extend({
     <b-table 
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
         :data="bList"
-        :columns="bColumns"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         v-on:page-change="(page) => addPageToURL ( page )"
@@ -168,6 +167,9 @@ const ObjectPage = Vue.extend({
         vals['selected'] = vals['oList'][0];
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
+        if (document.cookie.match("ENA_DL")) {
+            vals['allowLargeDownloads'] = true;
+        } else {vals['allowLargeDownloads'] = false;};
         vals['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
@@ -217,10 +219,17 @@ const ObjectPage = Vue.extend({
             </b-table-column>
             <b-table-column field="url" label="Download" width="50">
                 <a
+                    v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
-                >
-                    Link
-                </a>
+                >Link</a>
+                <a
+                    v-else-if="allowLargeDownloads"
+                    :href="props.row.url"
+                >Link</a>
+                <a
+                    v-else
+                    @click="confirmDownload ()"
+                >Link</a>
             </b-table-column>
         </template>
         <template slot="detail" slot-scope="props">
@@ -232,7 +241,19 @@ const ObjectPage = Vue.extend({
                 <b>Type: </b>{{ props.row.content_type }} 
             </li>
             <li>
-                <b>Download: </b><a :href="props.row.url">Link</a>
+                <b>Download: </b>
+                <a
+                    v-if="props.row.bytes < 1073741824"
+                    :href="props.row.url"
+                >Link</a>
+                <a
+                    v-else-if="allowLargeDownloads"
+                    :href="props.row.url"
+                >Link</a>
+                <a
+                    v-else
+                    @click="confirmDownload ()"
+                >Link</a>
             </li>
             </ul>
         </template>
@@ -247,6 +268,23 @@ const ObjectPage = Vue.extend({
     methods: {
         addPageToURL: function ( pageNumber ) {
             this.$router.push( "?page=" + pageNumber )
+        },
+        confirmDownload: function () {
+            this.$dialog.confirm({
+                title: "Initiate a big download",
+                message: `\
+                The file you're trying to download is large (> 1GB) and thus
+                a confirmation is required before initiating a download. Make
+                sure you have the required space, and then confirm to enable
+                large downloads permanently.`,
+                confirmText: "Enable large downloads",
+                type: "is-success",
+                onConfirm: this.enableDownload,
+            })
+        },
+        enableDownload: function () {
+            document.cookie = "ENA_DL=\"true\"";
+            this.allowLargeDownloads = true;
         },
     },
 });
