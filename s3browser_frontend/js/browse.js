@@ -221,10 +221,12 @@ const ObjectPage = Vue.extend({
                 <a
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
+                    target="_blank"
                 >Link</a>
                 <a
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
+                    target="_blank"
                 >Link</a>
                 <a
                     v-else
@@ -245,10 +247,12 @@ const ObjectPage = Vue.extend({
                 <a
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
+                    target="_blank"
                 >Link</a>
                 <a
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
+                    target="_blank"
                 >Link</a>
                 <a
                     v-else
