@@ -56,8 +56,6 @@ setd = {
     "auth_endpoint_url": environ.get('BROWSER_START_AUTH_ENDPOINT_URL',
                                      None),
     "has_trust": False,
-    "swift_endpoint_url": environ.get('BROWSER_START_SWIFT_ENDPOINT_URL',
-                                      None),
     "logfile": None,
     "port": 8080,
     "verbose": False,

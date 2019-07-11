@@ -363,5 +363,9 @@ class Mock_Session:
         pass
 
     def get_user_id(self):
-        """Mock function for fetching the user id from the mock OS Session."""
+        """Fetch the user id from the mock OS Session."""
         return "test_user_id"
+
+    def get_endpoint(self, service_type=None):
+        """Fetch a service endpoint from the mock OS Session."""
+        return "https://object.example-os.com:443/swift/v1/AUTH_example"

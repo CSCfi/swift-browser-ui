@@ -223,7 +223,7 @@ def initiate_os_session(unscoped, project):
     )
 
 
-def initiate_os_service(os_session, project):
+def initiate_os_service(os_session):
     """
     Create a swiftclient SwiftService connection to object storage.
 
@@ -238,8 +238,7 @@ def initiate_os_service(os_session, project):
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
-        'os_storage_url': (setd['swift_endpoint_url'] +
-                           '/v1' + '/AUTH_' + project),
+        'os_storage_url': os_session.get_endpoint(service_type='object-store'),
         'os_auth_url': setd['auth_endpoint_url'],
         'debug': True,
         'info': True,

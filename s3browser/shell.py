@@ -87,10 +87,6 @@ def cli(verbose, debug, logfile):
           ' specified address.')
 )
 @click.option(
-    '--swift-endpoint-url', default=None, type=str,
-    help="Endpoint url for the Openstack swift API in use."
-)
-@click.option(
     '--dry-run', is_flag=True, default=False, hidden=True,
 )
 @click.option(
@@ -105,7 +101,6 @@ def start(
     static_directory,
     auth_endpoint_url,
     has_trust,
-    swift_endpoint_url,
     dry_run,
     set_origin_address,
     set_session_devmode,
@@ -129,11 +124,6 @@ def start(
         "has_trust",
         has_trust,
         "Assuming the program is trusted for SSO on the endpoint. %s"
-    )
-    set_key(
-        "swift_endpoint_url",
-        swift_endpoint_url,
-        "Set object storage endpoint as %s"
     )
     set_key("dry_run", dry_run, "Not running server, dry-run flagged. %s")
     set_key(

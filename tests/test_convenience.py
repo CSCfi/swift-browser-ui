@@ -200,7 +200,7 @@ def test_initiate_os_session(mocker):
         hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
         "testproject"
     )
-    assert type(ret) is Session  # nosec
+    assert isinstance(ret, Session)  # nosec
 
 
 def test_initiate_os_service(mocker):
@@ -210,5 +210,5 @@ def test_initiate_os_service(mocker):
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
     })
     sess_mock = mocker.MagicMock(Session)
-    ret = initiate_os_service(sess_mock(), 'testprojct')
-    assert type(ret) is SwiftService  # nosec
+    ret = initiate_os_service(sess_mock())
+    assert isinstance(ret, SwiftService)  # nosec

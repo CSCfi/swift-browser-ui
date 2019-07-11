@@ -152,7 +152,6 @@ async def sso_query_end(request):
     # Create the swiftclient connection
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.app['Creds'][session]['Avail']['projects'][0]['id'],
     )
 
     # Save the current active project
@@ -199,7 +198,6 @@ async def token_rescope(request):
     # session
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.query['project'],
     )
 
     # Save the new project as the active project in session
