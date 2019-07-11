@@ -18,7 +18,7 @@ Environment Setup
 
 .. hint:: The command line arguments can also be configured as environment variables,
           the environment variable syntax is documented in the python click
-          documentation [#]_ , the shape of a variable could take the following forms: 
+          documentation [#]_ , the shape of a variable could take the following forms:
 
 
           * ``BROWSER_$ARGUMENT`` - affects every command;
@@ -31,31 +31,27 @@ Variables are depicted in the table below:
 +--------------------------------------+----------+-------------------------------------------------------------------------+
 | ``BROWSER_START_AUTH_ENDPOINT_URL``  |          | Authentication endpoint. Address for OpenStack keystone API ``v3``.     |
 +--------------------------------------+----------+-------------------------------------------------------------------------+
-| ``BROWSER_START_SWIFT_ENDPOINT_URL`` |          | Swift compatible storage endpoint.                                      |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
-| ``BROWSER_START_STATIC_DIRECTORY``   |          | Directory for static content, if running in standalone mode or on a VM. |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
 | ``BROWSER_START_PORT``               | ``8080`` |                                                                         |
 +--------------------------------------+----------+-------------------------------------------------------------------------+
 | ``BROWSER_START_SET_ORIGIN_ADDRESS`` |          | Authentication return address, to which the ``WebSSO`` redirects.       |
 +--------------------------------------+----------+-------------------------------------------------------------------------+
 
+.. hint:: Authentication endpoint can also be specified with any openrc file,
+          which can be usually downloaded from Openstack. The setup script
+          from Openstack might ask for your password, but this isn't a
+          required input and can be left empty.
 
 Example environment variable files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For the Pouta test environment with NGINX TLS termination proxy in use::
 
     export BROWSER_START_AUTH_ENDPOINT_URL="https://pouta-test.csc.fi:5001/v3"
-    export BROWSER_START_SWIFT_ENDPOINT_URL="https://object.pouta-test.csc.fi:443/swift"
-    export BROWSER_START_STATIC_DIRECTORY="s3browser_frontend"
     export BROWSER_START_PORT="8081"
     export BROWSER_START_SET_ORIGIN_ADDRESS="https://vm1950.kaj.pouta.csc.fi:8080/login/websso"
 
 For the Pouta production environment for testing unsecurely without trust::
 
     export BROWSER_START_AUTH_ENDPOINT_URL="https://pouta.csc.fi:5001/v3"
-    export BROWSER_START_SWIFT_ENDPOINT_URL="https://object.pouta.csc.fi:443/swift"
-    export BROWSER_START_STATIC_DIRECTORY="s3browser_frontend"
 
 Setting up TLS termination proxy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
