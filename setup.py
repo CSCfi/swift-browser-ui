@@ -29,6 +29,12 @@ setuptools.setup(
         'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme']
     },
     packages=[__name__],
+    package_data={__name__: [
+        "static/*",
+        "static/js/*",
+        "static/css/*",
+    ]},
+    include_package_data=True,
     platforms='any',
     entry_points={
         'console_scripts': [
