@@ -1,7 +1,8 @@
 """Web frontend functions for stand-alone running."""
 
-import aiohttp.web
 import os
+
+import aiohttp.web
 from ._convenience import session_check
 
 
@@ -17,7 +18,7 @@ async def browse(request):
     return response
 
 
-async def index(request):
+async def index(_):
     """Serve the index page when running without a proxy."""
     return aiohttp.web.FileResponse(
         WEBROOT + '/s3browser_frontend/index.html'

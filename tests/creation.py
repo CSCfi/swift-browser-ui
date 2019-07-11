@@ -1,13 +1,16 @@
-"""This module contains some frequently used constructors.
+"""
+Module that contains some frequently used constructors.
 
 The purpose is to ease in the building of the test environment.
 """
 
 
-import cryptography.fernet
-from .mockups import Mock_Request, Mock_Service, Mock_Session
-from s3browser._convenience import generate_cookie
 import logging
+import cryptography.fernet
+
+from s3browser._convenience import generate_cookie
+
+from .mockups import Mock_Request, Mock_Service, Mock_Session
 
 
 def get_request_with_fernet():

@@ -97,13 +97,13 @@ def cli(verbose, debug, logfile):
     '--set-session-devmode', is_flag=True, default=False, hidden=True,
 )
 def start(
-    port,
-    static_directory,
-    auth_endpoint_url,
-    has_trust,
-    dry_run,
-    set_origin_address,
-    set_session_devmode,
+        port,
+        static_directory,
+        auth_endpoint_url,
+        has_trust,
+        dry_run,
+        set_origin_address,
+        set_session_devmode,
 ):
     """Start the browser backend and server."""
     logging.debug(

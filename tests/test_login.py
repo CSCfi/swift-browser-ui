@@ -1,8 +1,10 @@
 """Test ``s3browser.login`` module."""
 
-import pytest
 import hashlib
 import os
+
+
+import pytest
 from aiohttp.web import HTTPClientError
 
 

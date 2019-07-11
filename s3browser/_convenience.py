@@ -84,20 +84,7 @@ def session_check(request):
 
 
 def api_check(request):
-    """
-    Do a session check for the API.
-
-    The API requires a more comprehensive check for session validity, since
-    there is the possibility of the openstack connection not being valid,
-    despite the session existing.
-    Params:
-        request: object(aiohttp.web.Request)
-    Returns:
-        The correct check failure response, the session cookie otherwise
-    Return type:
-        object(aiohttp.web.Response) or str
-
-    """
+    """Do a more thorough session check for the API."""
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
             session = decrypt_cookie(request)
@@ -224,17 +211,7 @@ def initiate_os_session(unscoped, project):
 
 
 def initiate_os_service(os_session):
-    """
-    Create a swiftclient SwiftService connection to object storage.
-
-    Params:
-        os_session: object(keystoneauth1.session.Session)
-    Returns:
-        A connection object to Openstack Object store service
-    Return type:
-        object(swiftclient.service.SwiftService)
-
-    """
+    """Create a SwiftService connection to object storage."""
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),

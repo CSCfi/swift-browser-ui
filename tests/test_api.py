@@ -13,6 +13,7 @@ from s3browser.api import swift_list_buckets, swift_list_objects
 from s3browser.api import swift_download_object
 from s3browser.api import get_metadata
 from s3browser.settings import setd
+
 from .creation import get_request_with_mock_openstack
 
 
