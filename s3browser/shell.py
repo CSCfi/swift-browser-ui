@@ -74,10 +74,6 @@ def cli(verbose, debug, logfile):
     help='Set the port the server is run on.'
 )
 @click.option(
-    '--static-directory', default=None,
-    help='Set the static content directory'
-)
-@click.option(
     '--auth-endpoint-url', default=None, type=str,
     help="Endpoint for the Openstack keystone API in use."
 )
@@ -141,12 +137,6 @@ def start(
     )
     if not dry_run:
         run_server_insecure(servinit())
-
-
-@cli.command()
-def install():
-    """Install the browser backend (implemented in the future)."""
-    click.echo('Install the program')
 
 
 def main():
