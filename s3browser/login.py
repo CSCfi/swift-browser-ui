@@ -1,7 +1,6 @@
 """A module for handling the project login related tasks."""
 
 
-import os
 import time
 
 
@@ -33,7 +32,7 @@ async def sso_query_begin(_):
     # endpoint
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
-            os.getcwd() + '/s3browser_frontend/login.html'
+            setd['static_directory'] + '/login.html'
         )
         return disable_cache(response)
 
