@@ -16,7 +16,6 @@ from mockups import Mock_Service, Mock_Session
 
 def mock_initiate_os_session(token, _):
     """Create a mock os session object."""
-    print(token)
     return Mock_Session()
 
 
@@ -54,7 +53,6 @@ async def mock_handle_logout(_):
 
 async def mock_graceful_shutdown(_):
     """."""
-    print("Mocking graceful shutdown")
 
 
 @unittest.mock.patch(
