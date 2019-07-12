@@ -23,7 +23,7 @@ copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
 # The full version, including alpha/beta/rc tags
-version = release = '0.1.0-beta'
+version = release = '0.2.0beta1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -70,6 +70,7 @@ html_static_path = ['_static']
 def setup(app):
     """Add custom stylesheet."""
     app.add_stylesheet('style.css')
+
 
 htmlhelp_basename = 's3browser'
 man_pages = [(master_doc, 's3browser', [author], 1)]

@@ -10,9 +10,11 @@ from hashlib import sha256
 from os import urandom
 import json
 import logging
-import aiohttp.web
 import re
 import urllib.request
+
+
+import aiohttp.web
 
 from keystoneauth1.identity import v3
 import keystoneauth1.session
@@ -62,12 +64,11 @@ def session_check(request):
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
             return True
-        else:
-            raise aiohttp.web.HTTPUnauthorized(
-                headers={
-                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                }
-            )
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
     except InvalidToken:
         raise aiohttp.web.HTTPUnauthorized(
             headers={
@@ -83,21 +84,7 @@ def session_check(request):
 
 
 def api_check(request):
-    """
-    Do a session check for the API.
-
-    The API requires a more comprehensive check for session validity, since
-    there is the possibility of the openstack connection not being valid,
-    despite the session existing.
-
-    Params:
-        request: object(aiohttp.web.Request)
-    Returns:
-        The correct check failure response, the session cookie otherwise
-    Return type:
-        object(aiohttp.web.Response) or str
-
-    """
+    """Do a more thorough session check for the API."""
     try:
         if decrypt_cookie(request) in request.app['Sessions']:
             session = decrypt_cookie(request)
@@ -122,9 +109,9 @@ def api_check(request):
                 )
         else:
             raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
             )
         return ret
     except InvalidToken:
@@ -143,8 +130,7 @@ def generate_cookie(request):
     """
     cookie = sha256(urandom(1024)).hexdigest()
     return cookie, request.app['Crypt'].encrypt(
-        cookie.encode('utf-8')
-        ).decode('utf-8')
+        cookie.encode('utf-8')).decode('utf-8')
 
 
 def get_availability_from_token(token):
@@ -183,10 +169,9 @@ def get_availability_from_token(token):
     with urllib.request.urlopen(drq) as domains:  # nosec
         output_domains = json.loads(domains.read().decode('utf-8'))
 
-    print('--PROJECT AND DOMAIN INFORMATION FROM KEYSTONE--')
-    print(output_projects)
-    print(output_domains)
-    print('--END INFORMATION--')
+    logging.info("%s\n%s",
+                 str(output_projects),
+                 str(output_domains))
 
     # Return all project names and domain names inside a dictionary
     return {
@@ -225,23 +210,12 @@ def initiate_os_session(unscoped, project):
     )
 
 
-def initiate_os_service(os_session, project):
-    """
-    Create a swiftclient SwiftService connection to object storage.
-
-    Params:
-        os_session: object(keystoneauth1.session.Session)
-    Returns:
-        A connection object to Openstack Object store service
-    Return type:
-        object(swiftclient.service.SwiftService)
-
-    """
+def initiate_os_service(os_session):
+    """Create a SwiftService connection to object storage."""
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
         'os_auth_token': os_session.get_token(),
-        'os_storage_url': setd['swift_endpoint_url'] +
-        '/v1' + '/AUTH_' + project,
+        'os_storage_url': os_session.get_endpoint(service_type='object-store'),
         'os_auth_url': setd['auth_endpoint_url'],
         'debug': True,
         'info': True,
