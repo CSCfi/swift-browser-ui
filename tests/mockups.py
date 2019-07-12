@@ -258,14 +258,16 @@ class Mock_Service:
         """Mock function for the service object / container listings."""
         if container is None:
             ret = []
-            for i in self.containers.keys():
+            for i in self.containers:
                 ret.append({
-                    "name": i
+                    "name": i,
+                    "count": len(self.containers[i]),
+                    "bytes": sum([j['bytes'] for j in self.containers[i]]),
                 })
             return [{
                 "listing": ret
             }]
-        elif container is not None:
+        if container is not None:
             ret = []
             try:
                 for i in self.containers[container]:
