@@ -12,6 +12,7 @@
         <script src="/static/js/api.js"></script>
         <script src="/static/js/btablecomp.js"></script>
         <script src="/static/js/browse.js"></script>
+        <link rel='stylesheet' href='/static/css/browse.css'>
         <title>Object storage browser</title>
     </head>
     <body>
@@ -31,37 +32,45 @@
             }
         </script>
         <div id="app">
-            <div class='navbar'>
-                <div class="navbar-menu">
-                    <div class="navbar-start">
-                        <div 
-                            class="navbar-item has-dopdown is-hoverable"
-                            v-if="multipleProjects"
-                        >
-                            Current project: <a class="navbar-link">
-                                <span>{{ this.$route.params.project }}</span>
-                            </a>
+            <div class='navbar has-shadow is-spaced'>
+                <div class="container is-fluid">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="#">
+                            <img src="/static/img/csc_logo.svg" alt="CSC IT CENTER FOR SCIENCE">
+                        </a>
+        
+                    </div>
+                    <div class="navbar-menu">
+                        <div class="navbar-start">
+                            <div 
+                                class="navbar-item has-dopdown is-hoverable"
+                                v-if="multipleProjects"
+                            >
+                                Current project: <a class="navbar-link">
+                                    <span>{{ this.$route.params.project }}</span>
+                                </a>
 
-                            <div class="navbar-dropdown">
-                                <a
-                                    class="navbar-item"
-                                    v-for="item in projects"
-                                    v-bind:key="item.id"
-                                    v-on:click="changeProject ( item.id )"
-                                ><span>{{ item.name }}</span></a>
+                                <div class="navbar-dropdown">
+                                    <a
+                                        class="navbar-item"
+                                        v-for="item in projects"
+                                        v-bind:key="item.id"
+                                        v-on:click="changeProject ( item.id )"
+                                    ><span>{{ item.name }}</span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="navbar-item"
+                                v-if="!multipleProjects"
+                            >
+                            Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
                             </div>
                         </div>
-                        <div
-                            class="navbar-item"
-                            v-if="!multipleProjects"
-                        >
-                        Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
-                        </div>
-                    </div>
-                    <div class="navbar-end">
-                        <div class="navbar-item">
-                            <div class="buttons">
-                                <a class="button is-primary" @click="logout ()">Log out</a>
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <div class="buttons">
+                                    <a class="button is-primary" @click="logout ()">Log out</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -84,6 +93,13 @@
                 :active.sync="isLoading"
                 :can-cancel="false"
             ></b-loading>
+        <footer class="footer">
+            <div class="content has-text-centered">
+                <p>
+                <strong>Object browser</strong> developed by <a href="https://csc.fi" alt="CSC - IT Center For Science ">CSC - IT Center For Science</a>.
+                </p>
+            </div>
+        </footer>
         </div>
         <script>app.$mount("#app");</script>
     </body>
