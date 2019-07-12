@@ -33,6 +33,7 @@ setuptools.setup(
         "static/*",
         "static/js/*",
         "static/css/*",
+        "static/img/*"
     ]},
     include_package_data=True,
     platforms='any',
