@@ -1,7 +1,6 @@
 """A module for handling the project login related tasks."""
 
 
-import os
 import time
 
 
@@ -33,7 +32,7 @@ async def sso_query_begin(_):
     # endpoint
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
-            os.getcwd() + '/s3browser_frontend/login.html'
+            setd['static_directory'] + '/login.html'
         )
         return disable_cache(response)
 
@@ -152,7 +151,6 @@ async def sso_query_end(request):
     # Create the swiftclient connection
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.app['Creds'][session]['Avail']['projects'][0]['id'],
     )
 
     # Save the current active project
@@ -199,7 +197,6 @@ async def token_rescope(request):
     # session
     request.app['Creds'][session]['ST_conn'] = initiate_os_service(
         request.app['Creds'][session]['OS_sess'],
-        request.query['project'],
     )
 
     # Save the new project as the active project in session

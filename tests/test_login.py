@@ -1,8 +1,10 @@
 """Test ``s3browser.login`` module."""
 
-import pytest
 import hashlib
 import os
+
+
+import pytest
 from aiohttp.web import HTTPClientError
 
 
@@ -48,7 +50,8 @@ async def test_sso_query_begin_without_trust(mocker):
     mocker.patch("s3browser.login.setd", new={
         "auth_endpoint_url": "https://example.os.com:5001/v3",
         "origin_address": "https://localhost/login/websso",
-        "has_trust": False
+        "has_trust": False,
+        "static_directory": __file__.replace("/settings.py", "") + "/static",
     })
     resp = await s3browser.login.sso_query_begin(None)
     assert resp.status == 200  # nosec

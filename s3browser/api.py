@@ -11,7 +11,6 @@ from swiftclient.utils import generate_temp_url
 
 
 from ._convenience import api_check
-from .settings import setd
 
 
 async def get_os_user(request):
@@ -119,6 +118,7 @@ async def swift_download_object(request):
     )
 
     serv = request.app['Creds'][session]['ST_conn']
+    sess = request.app['Creds'][session]['OS_sess']
     stats = serv.stat()
 
     # Check for the existence of the key headers
@@ -156,14 +156,20 @@ async def swift_download_object(request):
         )
     )
     # Generate temporary URL
-    host = setd['swift_endpoint_url']
+    host = sess.get_endpoint(service_type="object-store").split('/v1')[0]
+    path_begin = sess.get_endpoint(service_type="object-store").replace(
+        host, ""
+    )
+    request.app['Log'].debug(
+        "Using %s as host and %s as path start.", host, path_begin
+    )
     container = request.query['bucket']
     object_key = request.query['objkey']
     lifetime = 60 * 15
     # In the path creation, the stats['items'][0][1] is the tenant id from
     # server statistics, the order should be significant, so this shouldn't
     # be a problem
-    path = '/v1/%s/%s/%s' % (stats['items'][0][1], container, object_key)
+    path = '%s/%s/%s' % (path_begin, container, object_key)
 
     dloadurl = (host +
                 generate_temp_url(path, lifetime, temp_url_key, 'GET'))
@@ -199,13 +205,12 @@ async def get_object_metadata(conn, meta_cont, meta_obj):
                 k.replace("x-object-meta-", ""): v for k, v in i[1].items()
             }
             if "s3cmd-attrs" in i[1].keys():
-                for i in res:
-                    i[1]["s3cmd-attrs"] = {
-                        k: v for k, v in [
-                            i.split(":")
-                            for i in i[1]["s3cmd-attrs"].split("/")
-                        ]
-                    }
+                i[1]["s3cmd-attrs"] = {
+                    k: v for k, v in [
+                        j.split(":")
+                        for j in i[1]["s3cmd-attrs"].split("/")
+                    ]
+                }
         return res
     except SwiftError:
         # Fail if container wasn't found

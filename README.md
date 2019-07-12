@@ -25,8 +25,6 @@ Creating environment variable file for stand-alone use (no TLS proxy):
 # Replace the example URLs with correct ones
 echo '
 export BROWSER_START_AUTH_ENDPOINT_URL="https://keystone-url.example.com:5001/v3"
-export BROWSER_START_SWIFT_ENDPOINT_URL="https://object-storage-url.example.com:443/swift"
-export BROWSER_START_STATIC_DIRECTORY="s3browser_frontend"
 export BROWSER_START_PORT="8080"'\
 |tee -a envs.sh && chmod u+x envs.sh
 ```
@@ -54,7 +52,6 @@ Options:
   --help          Show this message and exit.
 
 Commands:
-  install  Install the browser backend (implemented in the future)
   start    Start the browser backend and server
 ```
 

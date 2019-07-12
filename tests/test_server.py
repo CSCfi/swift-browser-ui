@@ -1,14 +1,20 @@
-"""Module for testing ``s3browser.server``.
+"""
+Module for testing ``s3browser.server``.
 
 Contains the tests for ``front.py``.
 """
 
 
 import os
+
+
 import pytest
+from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+
+
 from s3browser.server import servinit
 from s3browser.settings import setd
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+
 
 # Set static folder in settings so it can be tested
 setd['static_directory'] = os.getcwd() + '/s3browser_frontend'
@@ -26,7 +32,8 @@ async def test_servinit():
 # After testing the server initialization, we can use the correctly starting
 # server for testing other modules.
 class AppTestCase(AioHTTPTestCase):
-    """Test for Web app.
+    """
+    Test Web app.
 
     Testing web app endpoints.
     """
@@ -37,7 +44,8 @@ class AppTestCase(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_working_routes(self):
-        """Test all the specified server routes.
+        """
+        Test all the specified server routes.
 
         All routes need to
         work in order for the test to pass, i.e. no 404

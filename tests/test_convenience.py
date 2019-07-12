@@ -1,22 +1,23 @@
 """Module for testing ``s3browser._convenience``."""
 
+
+import hashlib
+import os
+
 import pytest
 from aiohttp.web import HTTPUnauthorized, Response
 import cryptography.fernet
-import hashlib
-import os
 from swiftclient.service import SwiftService
 from keystoneauth1.session import Session
-
-
-from .creation import get_request_with_fernet
-from .mockups import mock_token_output, urlopen
 from s3browser._convenience import api_check, generate_cookie
 from s3browser._convenience import disable_cache, decrypt_cookie
 from s3browser._convenience import session_check, setup_logging
 from s3browser._convenience import get_availability_from_token
 from s3browser._convenience import initiate_os_service, initiate_os_session
 from s3browser.settings import setd
+
+from .creation import get_request_with_fernet
+from .mockups import mock_token_output, urlopen
 
 
 def test_setup_logging():
@@ -53,8 +54,8 @@ def test_decrypt_cookie():
     testreq = get_request_with_fernet()
     # Generate cookie is tested separately, it can be used for testing the
     # rest of the functions without mockups
-    c, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    assert c == decrypt_cookie(testreq)  # nosec
+    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+    assert cookie == decrypt_cookie(testreq)  # nosec
 
 
 def test_session_check_nocookie():
@@ -76,7 +77,8 @@ def test_session_check_invtoken():
 
 
 def test_session_check_nosession():
-    """Test session check function raise 401 on invalid session cookie.
+    """
+    Test session check function raise 401 on invalid session cookie.
 
     (i.e. it cannot be found in the open session list)
     """
@@ -88,13 +90,14 @@ def test_session_check_nosession():
 
 
 def test_session_check_correct():
-    """Test that the ordinary session check function result is True.
+    """
+    Test that the ordinary session check function result is True.
 
     Test condition when the request is formed correctly.
     """
     req = get_request_with_fernet()
-    c, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-    req.app['Sessions'].append(c)
+    cookie, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
+    req.app['Sessions'].append(cookie)
     assert session_check(req) is True  # nosec
 
 
@@ -200,7 +203,7 @@ def test_initiate_os_session(mocker):
         hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
         "testproject"
     )
-    assert type(ret) is Session  # nosec
+    assert isinstance(ret, Session)  # nosec
 
 
 def test_initiate_os_service(mocker):
@@ -210,5 +213,5 @@ def test_initiate_os_service(mocker):
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
     })
     sess_mock = mocker.MagicMock(Session)
-    ret = initiate_os_service(sess_mock(), 'testprojct')
-    assert type(ret) is SwiftService  # nosec
+    ret = initiate_os_service(sess_mock())
+    assert isinstance(ret, SwiftService)  # nosec
