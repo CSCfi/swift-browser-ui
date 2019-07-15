@@ -10,8 +10,8 @@ import s3browser.server
 
 
 # Import some mock-ups that are already made before
-from mockups import return_project_avail
-from mockups import Mock_Service, Mock_Session
+from .mockups import return_project_avail
+from .mockups import Mock_Service, Mock_Session
 
 
 def mock_initiate_os_session(token, _):
