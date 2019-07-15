@@ -330,6 +330,9 @@ const ObjectPage = Vue.extend({
         },
         enableDownload: function () {
             this.allowLargeDownloads = true;
+            const expiryDate = new Date();
+            expiryDate.setMonth(expiryDate.getMonth() + 1);
+            document.cookie = 'ENA_DL=' + this.allowLargeDownloads + '; path=/; expires=' + expiryDate.toUTCString();
         },
     },
 });
