@@ -3,6 +3,7 @@
 
 from os import environ
 import unittest.mock
+import logging
 
 
 import aiohttp.web
@@ -92,6 +93,8 @@ async def mock_graceful_shutdown(_):
 def run_mock_server():
     """Run test server with mock openstack."""
     # Run the server in an ordinary fashion after patching everything
+    logging.basicConfig()
+    logging.root.setLevel(logging.DEBUG)
     app = s3browser.server.servinit()
     s3browser.server.run_server_insecure(app)
 
