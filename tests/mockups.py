@@ -4,7 +4,7 @@
 import random
 import hashlib
 import os
-import time
+import datetime
 import json
 from urllib.error import HTTPError
 from contextlib import contextmanager
@@ -246,7 +246,7 @@ class Mock_Service:
                 to_add.append({
                     "hash": ohash,
                     "name": oname,
-                    "last_modified": str(time.time()),
+                    "last_modified": datetime.datetime.now().isoformat(),
                     "bytes": random.randint(  # nosec
                         size_range[0], size_range[1]
                     ),
