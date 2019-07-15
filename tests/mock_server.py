@@ -15,6 +15,9 @@ from .mockups import return_project_avail
 from .mockups import Mock_Service, Mock_Session
 
 
+SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))
+
+
 def mock_initiate_os_session(token, _):
     """Create a mock os session object."""
     return Mock_Session()
@@ -85,7 +88,7 @@ async def mock_graceful_shutdown(_):
         "port": 8080,
         "verbose": True,
         "debug": True,
-        "set_session_devmode": True,
+        "set_session_devmode": SESSION_MODE,
         "static_directory":
         s3browser.settings.__file__.replace("/settings.py", "") + "/static"
     }
