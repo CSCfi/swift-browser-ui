@@ -1,3 +1,17 @@
+// Create VueI18n instance with options
+
+function getLangCookie() {
+    let matches = document.cookie.match(new RegExp(
+      "(?:^|; )" + 'lang' + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : 'en';
+  }
+
+const i18n = new VueI18n({
+    locale: getLangCookie(), // set locale
+    messages: langPlaceholders, // set locale messages
+});
+
 // Depends on vue.js and vue-router, needs ES6 support to work
 
 // To improve readability some larger code blocks are separated by a dash-line.
@@ -82,7 +96,7 @@ const ContainerPage = Vue.extend({
             <option value="100"> 100 per page</option>
         </b-select>
         <div class="control is-flex">
-            <b-switch v-model="isPaginated">Paginated</b-switch>
+            <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
     </b-field>
     <b-table 
@@ -104,7 +118,7 @@ const ContainerPage = Vue.extend({
         narrowed
     >
         <template slot-scope="props">
-            <b-table-column field="name" label="Name" sortable>
+            <b-table-column field="name" :label="$t('message.table.name')" sortable>
                 <span v-if="!props.row.bytes">
                     <b-icon icon="folder-outline" size="is-small">
                     </b-icon> 
@@ -116,17 +130,17 @@ const ContainerPage = Vue.extend({
                     <strong> {{ props.row.name }}  </strong>
                 </span>
             </b-table-column>
-            <b-table-column field="count" label="Objects" width="120" sortable>
+            <b-table-column field="count" :label="$t('message.table.objects')" width="120" sortable>
                 {{ props.row.count }}
             </b-table-column>
-            <b-table-column field="bytes" label="Size" width="120" sortable>
+            <b-table-column field="bytes" :label="$t('message.table.size')" width="120" sortable>
                 {{ props.row.size }}
             </b-table-column>
         </template>
         <template slot="empty" slot-scope="props">
             <p
                 style="text-align:center;margin-top:5%;margin-bottom:5%;"
-            >The project doesn't contain any containers</span>
+            >{{ $t('message.emptyProject') }}</span>
             </p>
         </template>
     </b-table>
@@ -205,7 +219,7 @@ const ObjectPage = Vue.extend({
             <option value="100"> 100 per page</option>
         </b-select>
         <div class="control is-flex">
-            <b-switch v-model="isPaginated">Paginated</b-switch>
+            <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
     </b-field>
     <b-table
@@ -226,13 +240,13 @@ const ObjectPage = Vue.extend({
         v-on:page-change="( page ) => addPageToURL( page )"
     >
         <template slot-scope="props">
-            <b-table-column field="name" label="Name" sortable>
+            <b-table-column field="name" :label="$t('message.table.name')" sortable>
                 {{ props.row.name }}
             </b-table-column>
-            <b-table-column field="last_modified" label="Last Modified" sortable>
+            <b-table-column field="last_modified" :label="$t('message.table.modified')" sortable>
                 {{ props.row.last_modified }}
             </b-table-column>
-            <b-table-column field="bytes" label="Size" sortable>
+            <b-table-column field="bytes" :label="$t('message.table.size')" sortable>
                 {{ props.row.size }}
             </b-table-column>
             <b-table-column field="url" label="" width="110">
@@ -240,45 +254,45 @@ const ObjectPage = Vue.extend({
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
                     target="_blank"
-                    :alt="'Donwload link for ' + props.row.name "
+                    :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download
+                </b-icon> {{ $t('message.download') }}
                 </a>
                 <a
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
                     target="_blank"
-                    :alt="'Donwload link for ' + props.row.name "
+                    :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download
+                </b-icon> {{ $t('message.download') }}
                 </a>
                 <a
                     v-else
                     @click="confirmDownload ()"
-                    :alt="'Confirm download large file ' + props.row.name "
+                    :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download
+                </b-icon> {{ $t('message.download') }}
                 </a>
             </b-table-column>
         </template>
         <template slot="detail" slot-scope="props">
             <ul>
             <li>
-                <b>Hash: </b>{{ props.row.hash }}
+                <b>{{ $t('message.table.fileHash') }}: </b>{{ props.row.hash }}
             </li>
             <li>
-                <b>Type: </b>{{ props.row.content_type }} 
+                <b>{{ $t('message.table.fileType') }}: </b>{{ props.row.content_type }} 
             </li>
             <li>
-                <b>File Download: </b>
+                <b>{{ $t('message.table.fileDown') }}: </b>
                 <a
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
                     target="_blank"
-                    :alt="'Donwload link for ' + props.row.name "
+                    :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
                 </b-icon> Download Link
@@ -287,7 +301,7 @@ const ObjectPage = Vue.extend({
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
                     target="_blank"
-                    :alt="'Donwload link for ' + props.row.name "
+                    :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
                 </b-icon> Download Link
@@ -295,7 +309,7 @@ const ObjectPage = Vue.extend({
                 <a
                     v-else
                     @click="confirmDownload ()"
-                    :alt="'Confirm download large file ' + props.row.name "
+                    :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
                 </b-icon> Download Link
@@ -306,11 +320,12 @@ const ObjectPage = Vue.extend({
         <template slot="empty" slot-scope="props">
             <p
                 style="width:100%;text-align:center;margin-top:5%;margin-bottom:5%"
-            >This container is empty.</p>
+            >{{ $t('message.emptyContainer') }}</p>
         </template>
     </b-table>
 </div>
     `,
+    i18n: i18n,
     methods: {
         addPageToURL: function (pageNumber) {
             this.$router.push("?page=" + pageNumber)
@@ -318,13 +333,10 @@ const ObjectPage = Vue.extend({
         confirmDownload: function () {
             this.$snackbar.open({
                 duration: 5000,
-                message: `\
-                No large (> 1GiB) downloads enabled. Click to enable
-                them for the duration of the session.
-                `,
+                message: this.$t('message.largeDownMessage'),
                 type: "is-success",
                 position: "is-top",
-                actionText: "Enable",
+                actionText: this.$t('message.largeDownAction'),
                 onAction: this.enableDownload,
             })
         },
@@ -334,6 +346,7 @@ const ObjectPage = Vue.extend({
             expiryDate.setMonth(expiryDate.getMonth() + 1);
             document.cookie = 'ENA_DL=' + this.allowLargeDownloads + '; path=/; expires=' + expiryDate.toUTCString();
         },
+        
     },
 });
 
@@ -356,9 +369,11 @@ const router = new VueRouter({
     routes: routes,
 });
 
+
 // Define the single project Vue App
 const app = new Vue({
     router: router,
+    i18n,
     data: {
         oCache: {},
         bList: undefined,
@@ -368,6 +383,7 @@ const app = new Vue({
         multipleProjects: false,
         isLoading: false,
         isFullPage: true,
+        langs: ['en', 'fi'],
     },
     methods: {
         getRouteAsList: function () {
@@ -440,6 +456,12 @@ const app = new Vue({
                 }
             })
         },
+        setCookieLang: function() {
+            const expiryDate = new Date();
+            expiryDate.setMonth(expiryDate.getMonth() + 1);
+            document.cookie = 'lang=' + i18n.locale + '; path=/; expires=' + expiryDate.toUTCString();
+            this.$router.go(this.$router.currentRoute);
+        },
     },
 });
 
@@ -496,6 +518,20 @@ var getHumanReadableDate = function (val) {
     var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
                     hour:'2-digit', minute: '2-digit', second: '2-digit' };
     var zone = { timeZone: 'EEST' }; /* For now default to this. */
-    var locale = 'en-GB';  /* To be changed when we are going to switch languages.*/
-    return dateVal.toLocaleDateString(locale, options, zone);
+    switch (i18n.locale) {
+        case 'en':
+            console.log(i18n.locale);
+            langLocale = 'en-GB';
+            break;
+        case 'fi':
+            console.log(i18n.locale);
+            langLocale = 'fi-FI';
+            break;
+        default:
+            langLocale = 'en-GB';
+
+    }
+    return dateVal.toLocaleDateString(langLocale, options, zone);
 }
+
+  
