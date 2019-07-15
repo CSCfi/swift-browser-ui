@@ -36,15 +36,15 @@ const ContainerPage = Vue.extend({
     data: function () {
         let vars = {};
         vars['bList'] = [];
-        if ( app.bList == undefined ) {
+        if (app.bList == undefined) {
             app.isLoading = true;
-            getBuckets().then( function ( ret ) {
-                if ( ret.status != 200 ) {
+            getBuckets().then(function (ret) {
+                if (ret.status != 200) {
                     app.isLoading = false;
                 }
                 vars['bList'] = ret;
 
-                for ( let i = 0; i < vars['bList'].length; i++) {
+                for (let i = 0; i < vars['bList'].length; i++) {
                     vars['bList'][i]['size'] = getHumanReadableSize(
                         vars['bList'][i]['bytes']
                     );
@@ -52,9 +52,9 @@ const ContainerPage = Vue.extend({
 
                 app.bList = vars['bList']
                 app.isLoading = false;
-            }).catch( function () {
-                    app.isLoading = false;
-                }
+            }).catch(function () {
+                app.isLoading = false;
+            }
             );
         } else {
             vars['bList'] = app.bList;
@@ -62,6 +62,7 @@ const ContainerPage = Vue.extend({
         vars['selected'] = vars['bList'][0];
         vars['isPaginated'] = true;
         vars['perPage'] = 15;
+        vars['defaultSortDirection'] = 'asc';
         vars['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
@@ -96,13 +97,24 @@ const ContainerPage = Vue.extend({
         :paginated="isPaginated"
         :per-page="perPage"
         :pagination-simple="isPaginated"
+        :default-sort-direction="defaultSortDirection"
+        default-sort="name"
         focusable
         hoverable
         narrowed
     >
         <template slot-scope="props">
             <b-table-column field="name" label="Name" sortable>
-                {{ props.row.name }}
+                <span v-if="!props.row.bytes">
+                    <b-icon icon="folder-outline" size="is-small">
+                    </b-icon> 
+                   {{ props.row.name }}
+                </span>
+                <span v-else>
+                    <b-icon icon="folder" size="is-small">
+                    </b-icon> 
+                    <strong> {{ props.row.name }}  </strong>
+                </span>
             </b-table-column>
             <b-table-column field="count" label="Objects" width="120" sortable>
                 {{ props.row.count }}
@@ -121,11 +133,11 @@ const ContainerPage = Vue.extend({
 </div>
     `,
     methods: {
-        getContainerAddress: function ( container ) {
+        getContainerAddress: function (container) {
             return this.$route.params.project + '/' + container;
         },
-        addPageToURL: function ( pageNumber ) {
-            this.$router.push( "?page=" + pageNumber )
+        addPageToURL: function (pageNumber) {
+            this.$router.push("?page=" + pageNumber)
         },
     },
 });
@@ -170,9 +182,10 @@ const ObjectPage = Vue.extend({
         vals['selected'] = vals['oList'][0];
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
+        vals['defaultSortDirection'] = 'asc';
         if (document.cookie.match("ENA_DL")) {
             vals['allowLargeDownloads'] = true;
-        } else {vals['allowLargeDownloads'] = false;};
+        } else { vals['allowLargeDownloads'] = false; };
         vals['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
@@ -208,6 +221,8 @@ const ObjectPage = Vue.extend({
         :paginated="isPaginated"
         :per-page="perPage"
         :pagination-simple="isPaginated"
+        :default-sort-direction="defaultSortDirection"
+        default-sort="name"
         v-on:page-change="( page ) => addPageToURL( page )"
     >
         <template slot-scope="props">
@@ -220,21 +235,33 @@ const ObjectPage = Vue.extend({
             <b-table-column field="bytes" label="Size" sortable>
                 {{ props.row.size }}
             </b-table-column>
-            <b-table-column field="url" label="Download" width="50">
+            <b-table-column field="url" label="" width="110">
                 <a
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
                     target="_blank"
-                >Link</a>
+                    :alt="'Donwload link for ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download
+                </a>
                 <a
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
                     target="_blank"
-                >Link</a>
+                    :alt="'Donwload link for ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download
+                </a>
                 <a
                     v-else
                     @click="confirmDownload ()"
-                >Link</a>
+                    :alt="'Confirm download large file ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download
+                </a>
             </b-table-column>
         </template>
         <template slot="detail" slot-scope="props">
@@ -246,21 +273,33 @@ const ObjectPage = Vue.extend({
                 <b>Type: </b>{{ props.row.content_type }} 
             </li>
             <li>
-                <b>Download: </b>
+                <b>File Download: </b>
                 <a
                     v-if="props.row.bytes < 1073741824"
                     :href="props.row.url"
                     target="_blank"
-                >Link</a>
+                    :alt="'Donwload link for ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download Link
+                </a>
                 <a
                     v-else-if="allowLargeDownloads"
                     :href="props.row.url"
                     target="_blank"
-                >Link</a>
+                    :alt="'Donwload link for ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download Link
+                </a>
                 <a
                     v-else
                     @click="confirmDownload ()"
-                >Link</a>
+                    :alt="'Confirm download large file ' + props.row.name "
+                >
+                <b-icon icon="cloud-download" size="is-small">
+                </b-icon> Download Link
+                </a>
             </li>
             </ul>
         </template>
@@ -273,8 +312,8 @@ const ObjectPage = Vue.extend({
 </div>
     `,
     methods: {
-        addPageToURL: function ( pageNumber ) {
-            this.$router.push( "?page=" + pageNumber )
+        addPageToURL: function (pageNumber) {
+            this.$router.push("?page=" + pageNumber)
         },
         confirmDownload: function () {
             this.$snackbar.open({
@@ -339,7 +378,7 @@ const app = new Vue({
             if (this.$route.params.user != undefined) {
                 retl.push({
                     alias: this.$route.params.user,
-                    address: ( "/browse/" + this.$route.params.user ),
+                    address: ("/browse/" + this.$route.params.user),
                 });
             };
             if (this.$route.params.project != undefined) {
@@ -407,13 +446,13 @@ var shiftSizeDivision = function (vallist) {
     // default, so a different approach was chosen anyway.
     //  ( right shift by ten is a faster alias to division by 1024,
     //  decimal file sizes are heresy and thus can't be enabled )
-    switch ( vallist[0] >>> 10 ) {
+    switch (vallist[0] >>> 10) {
         case 0:
             return vallist;
         default:
             vallist[0] = vallist[0] >>> 10;
             vallist[1] = vallist[1] + 1;
-            return shiftSizeDivision( vallist );
+            return shiftSizeDivision(vallist);
     }
 };
 
