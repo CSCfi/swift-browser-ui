@@ -94,7 +94,6 @@ def cli(verbose, debug, logfile):
 )
 def start(
         port,
-        static_directory,
         auth_endpoint_url,
         has_trust,
         dry_run,
@@ -106,11 +105,6 @@ def start(
         "Current settings dictionary:%s", str(setd)
     )
     set_key("port", port, "Set running port as %s")
-    set_key(
-        "static_directory",
-        static_directory,
-        "Set static dir location as %s"
-    )
     set_key(
         "auth_endpoint_url",
         auth_endpoint_url,
