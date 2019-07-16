@@ -362,7 +362,11 @@ class Mock_Session:
 
     def __init__(self):
         """Initialize Mock session."""
-        pass
+        self.auth = None
+
+    def invalidate(self, _):
+        """Mock session invalidation."""
+        return True
 
     def get_user_id(self):
         """Fetch the user id from the mock OS Session."""
