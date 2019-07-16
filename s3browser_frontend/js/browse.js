@@ -77,6 +77,9 @@ const ContainerPage = Vue.extend({
         vars['isPaginated'] = true;
         vars['perPage'] = 15;
         vars['defaultSortDirection'] = 'asc';
+        vars['searchQuery'] = {
+            name: '',
+        };
         vars['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
@@ -98,10 +101,13 @@ const ContainerPage = Vue.extend({
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
+        <b-field grouped position="is-right">
+            <b-input v-model="searchQuery.name" placeholder="Search by Name"/>
+        </b-field>      
     </b-field>
     <b-table 
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
-        :data="bList"
+        :data="filter"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         v-on:page-change="(page) => addPageToURL ( page )"
@@ -151,8 +157,20 @@ const ContainerPage = Vue.extend({
             return this.$route.params.project + '/' + container;
         },
         addPageToURL: function (pageNumber) {
-            this.$router.push("?page=" + pageNumber)
+            this.$router.push("?page=" + pageNumber);
         },
+    },
+    computed: {
+        filter: function() {
+          var name_re = new RegExp(this.searchQuery.name, 'i');
+          var data = [];
+          for (i in app.bList) {
+            if (app.bList[i].name.match(name_re)) {
+                data.push(app.bList[i]);
+            }
+          }
+          return data;
+        }
     },
 });
 
