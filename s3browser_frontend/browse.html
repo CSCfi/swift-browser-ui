@@ -74,7 +74,7 @@
                                     <b-select placeholder="Language" icon="earth"
                                               v-model="$i18n.locale"
                                               v-on:input="setCookieLang ()">
-                                        <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">{{ lang }}</option>
+                                        <option v-for="lang in langs" :key="lang.value" :value="lang.value">{{ lang.ph }}</option>
                                     </b-select>
                                 </b-field>
                             </div>

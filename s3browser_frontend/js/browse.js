@@ -88,12 +88,12 @@ const ContainerPage = Vue.extend({
         style="margin-left:5%;"
     >
         <b-select v-model="perPage" :disabled="!isPaginated">
-            <option value="5"> 5 per page</option>
-            <option value="10"> 10 per page</option>
-            <option value="15"> 15 per page</option>
-            <option value="25"> 25 per page</option>
-            <option value="50"> 50 per page</option>
-            <option value="100"> 100 per page</option>
+            <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
+            <option value="10"> 10 {{ $t('message.table.pageNb') }}</option>
+            <option value="15"> 15 {{ $t('message.table.pageNb') }}</option>
+            <option value="25"> 25 {{ $t('message.table.pageNb') }}</option>
+            <option value="50"> 50 {{ $t('message.table.pageNb') }}</option>
+            <option value="100"> 100 {{ $t('message.table.pageNb') }}</option>
         </b-select>
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
@@ -211,12 +211,12 @@ const ObjectPage = Vue.extend({
         style="margin-left:5%;"
     >
         <b-select v-model="perPage" :disabled="!isPaginated">
-            <option value="5"> 5 per page</option>
-            <option value="10"> 10 per page</option>
-            <option value="15"> 15 per page</option>
-            <option value="25"> 25 per page</option>
-            <option value="50"> 50 per page</option>
-            <option value="100"> 100 per page</option>
+            <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
+            <option value="10"> 10 {{ $t('message.table.pageNb') }}</option>
+            <option value="15"> 15 {{ $t('message.table.pageNb') }}</option>
+            <option value="25"> 25 {{ $t('message.table.pageNb') }}</option>
+            <option value="50"> 50 {{ $t('message.table.pageNb') }}</option>
+            <option value="100"> 100 {{ $t('message.table.pageNb') }}</option>
         </b-select>
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
@@ -325,7 +325,6 @@ const ObjectPage = Vue.extend({
     </b-table>
 </div>
     `,
-    i18n: i18n,
     methods: {
         addPageToURL: function (pageNumber) {
             this.$router.push("?page=" + pageNumber)
@@ -383,7 +382,7 @@ const app = new Vue({
         multipleProjects: false,
         isLoading: false,
         isFullPage: true,
-        langs: ['en', 'fi'],
+        langs: [{ph: 'In English', value: 'en'}, {ph: 'Suomeksi', value: 'fi'}],
     },
     methods: {
         getRouteAsList: function () {
@@ -520,11 +519,9 @@ var getHumanReadableDate = function (val) {
     var zone = { timeZone: 'EEST' }; /* For now default to this. */
     switch (i18n.locale) {
         case 'en':
-            console.log(i18n.locale);
             langLocale = 'en-GB';
             break;
         case 'fi':
-            console.log(i18n.locale);
             langLocale = 'fi-FI';
             break;
         default:
