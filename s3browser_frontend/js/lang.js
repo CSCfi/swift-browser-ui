@@ -26,6 +26,7 @@ const langPlaceholders = {
         largeDownAction: 'Enable',
         emptyContainer: 'This container is empty.',
         emptyProject: 'The project doesn\'t contain any containers.',
+        searchBy: 'Search by Name',
         }
     },
     fi: {
@@ -55,6 +56,7 @@ const langPlaceholders = {
             largeDownAction: 'Enable',
             emptyContainer: 'This container is empty.',
             emptyProject: 'The project doesn\'t contain any containers.',
+            searchBy: 'Search by Name',
         }
     }
 }

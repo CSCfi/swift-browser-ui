@@ -100,7 +100,7 @@ const ContainerPage = Vue.extend({
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control" class="searchBox">
-            <b-input v-model="searchQuery.name" placeholder="Search by Name"/>
+            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>      
     </b-field>
     <b-table 
@@ -239,7 +239,7 @@ const ObjectPage = Vue.extend({
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control" class="searchBox">
-            <b-input v-model="searchQuery.name" placeholder="Search by Name"/>
+            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>
     </b-field>
     <b-table
