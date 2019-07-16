@@ -7,10 +7,12 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.6/dist/vue-router.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.js"></script>
+        <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
         <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
         <script src="/static/js/api.js"></script>
         <script src="/static/js/btablecomp.js"></script>
+        <script src="/static/js/lang.js"></script>
         <script src="/static/js/browse.js"></script>
         <link rel='stylesheet' href='/static/css/browse.css'>
         <title>Object storage browser</title>
@@ -36,7 +38,7 @@
                 <div class="container is-fluid">
                     <div class="navbar-brand">
                         <a class="navbar-item" href="#">
-                            <img src="/static/img/csc_logo.svg" alt="CSC IT CENTER FOR SCIENCE">
+                            <img src="/static/img/csc_logo.svg" :alt="$t('message.cscOrg')">
                         </a>
         
                     </div>
@@ -46,7 +48,7 @@
                                 class="navbar-item has-dopdown is-hoverable"
                                 v-if="multipleProjects"
                             >
-                                Current project: <a class="navbar-link">
+                                {{ $t("message.currentProj") }}: <a class="navbar-link">
                                     <span>{{ this.$route.params.project }}</span>
                                 </a>
 
@@ -68,8 +70,17 @@
                         </div>
                         <div class="navbar-end">
                             <div class="navbar-item">
+                                <b-field class="locale-changer">
+                                    <b-select placeholder="Language" icon="earth"
+                                              v-model="$i18n.locale"
+                                              v-on:input="setCookieLang ()">
+                                        <option v-for="lang in langs" :key="lang.value" :value="lang.value">{{ lang.ph }}</option>
+                                    </b-select>
+                                </b-field>
+                            </div>
+                            <div class="navbar-item">
                                 <div class="buttons">
-                                    <a class="button is-primary" @click="logout ()">Log out</a>
+                                    <a class="button is-primary" @click="logout ()">{{ $t("message.logOut") }}</a>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +107,7 @@
         <footer class="footer">
             <div class="content has-text-centered">
                 <p>
-                <strong>Object browser</strong> developed by <a href="https://csc.fi" alt="CSC - IT Center For Science ">CSC - IT Center For Science</a>.
+                <strong>Object browser</strong> {{ $t("message.devel") }} <a href="https://csc.fi" :alt="$t('message.cscOrg')">{{ $t("message.cscOrg") }}</a>.
                 </p>
             </div>
         </footer>
@@ -128,5 +139,6 @@
                 }
             })
         }
+        // changeLang();
     </script>
 </html>
