@@ -5,3 +5,12 @@
 .footer {
     background-color: #ffffff;
 }
+
+.searchBox {
+    width: 30%;
+    margin-left: auto;
+}
+
+.groupControls {
+    margin: 0 5%;
+}

@@ -77,6 +77,9 @@ const ContainerPage = Vue.extend({
         vars['isPaginated'] = true;
         vars['perPage'] = 15;
         vars['defaultSortDirection'] = 'asc';
+        vars['searchQuery'] = {
+            name: '',
+        };
         vars['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
@@ -84,9 +87,7 @@ const ContainerPage = Vue.extend({
     },
     template: `
 <div>
-    <b-field grouped group-multiline
-        style="margin-left:5%;"
-    >
+    <b-field grouped group-multiline class="groupControls">
         <b-select v-model="perPage" :disabled="!isPaginated">
             <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
             <option value="10"> 10 {{ $t('message.table.pageNb') }}</option>
@@ -98,10 +99,13 @@ const ContainerPage = Vue.extend({
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
+        <b-field class="control" class="searchBox">
+            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
+        </b-field>      
     </b-field>
     <b-table 
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
-        :data="bList"
+        :data="filter"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         v-on:page-change="(page) => addPageToURL ( page )"
@@ -151,8 +155,20 @@ const ContainerPage = Vue.extend({
             return this.$route.params.project + '/' + container;
         },
         addPageToURL: function (pageNumber) {
-            this.$router.push("?page=" + pageNumber)
+            this.$router.push("?page=" + pageNumber);
         },
+    },
+    computed: {
+        filter: function() {
+          var name_re = new RegExp(this.searchQuery.name, 'i');
+          var data = [];
+          for (i in app.bList) {
+            if (app.bList[i].name.match(name_re)) {
+                data.push(app.bList[i]);
+            }
+          }
+          return data;
+        }
     },
 });
 
@@ -197,6 +213,9 @@ const ObjectPage = Vue.extend({
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
         vals['defaultSortDirection'] = 'asc';
+        vals['searchQuery'] = {
+            name: '',
+        };
         if (document.cookie.match("ENA_DL")) {
             vals['allowLargeDownloads'] = true;
         } else { vals['allowLargeDownloads'] = false; };
@@ -207,9 +226,7 @@ const ObjectPage = Vue.extend({
     },
     template: `
 <div>
-    <b-field grouped group-multiline
-        style="margin-left:5%;"
-    >
+    <b-field grouped group-multiline class="groupControls">
         <b-select v-model="perPage" :disabled="!isPaginated">
             <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
             <option value="10"> 10 {{ $t('message.table.pageNb') }}</option>
@@ -221,10 +238,13 @@ const ObjectPage = Vue.extend({
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
+        <b-field class="control" class="searchBox">
+            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
+        </b-field>
     </b-field>
     <b-table
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
-        :data="oList"
+        :data="filter"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         focusable
@@ -346,6 +366,18 @@ const ObjectPage = Vue.extend({
             document.cookie = 'ENA_DL=' + this.allowLargeDownloads + '; path=/; expires=' + expiryDate.toUTCString();
         },
         
+    },
+    computed: {
+        filter: function() {
+          var name_re = new RegExp(this.searchQuery.name, 'i')
+          var data = [];
+          for (i in this._data["oList"]) {
+            if (this._data["oList"][i].name.match(name_re)) {
+                data.push(this._data["oList"][i])
+            }
+          }
+          return data;
+        }
     },
 });
 
