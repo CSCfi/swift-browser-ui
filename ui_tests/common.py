@@ -4,9 +4,10 @@
 import subprocess  # nosec
 import signal
 import time
-
-
 from contextlib import AbstractContextManager
+
+
+from selenium.webdriver import FirefoxProfile
 
 
 def login(driver_instance):
@@ -16,6 +17,18 @@ def login(driver_instance):
     while driver_instance.current_url != \
             "http://localhost:8080/browse/test_user_id/placeholder":
         time.sleep(0.25)
+
+
+def get_cacheless_profile():
+    """Create a cacheless profile for Firefox webdriver."""
+    ret = FirefoxProfile()
+    ret.set_preference(
+        "browser.cache.memory.enable", False
+    )
+    ret.set_preference(
+        "browser.cache.disk.enable", False
+    )
+    return ret
 
 
 class ServerThread(AbstractContextManager):

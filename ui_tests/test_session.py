@@ -9,21 +9,10 @@ import selenium.webdriver
 
 from .common import ServerThread
 from .common import login
+from .common import get_cacheless_profile
 
 
 random.seed(os.urandom(128))
-
-
-def get_cachless_profile():
-    """Create a cacheless profile for Firefox webdriver."""
-    ret = selenium.webdriver.FirefoxProfile()
-    ret.set_preference(
-        "browser.cache.memory.enable", False
-    )
-    ret.set_preference(
-        "browser.cache.disk.enable", False
-    )
-    return ret
 
 
 def test_session_end_button():
@@ -31,7 +20,7 @@ def test_session_end_button():
     with ServerThread():
         try:
             drv = selenium.webdriver.Firefox(
-                firefox_profile=get_cachless_profile()
+                firefox_profile=get_cacheless_profile()
             )
             drv.get("http://localhost:8080")
             login(drv)
@@ -51,7 +40,7 @@ def test_session_end_page_leave():
     with ServerThread():
         try:
             drv = selenium.webdriver.Firefox(
-                firefox_profile=get_cachless_profile()
+                firefox_profile=get_cacheless_profile()
             )
             drv.get("http://localhost:8080")
             login(drv)
