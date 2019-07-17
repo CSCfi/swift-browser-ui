@@ -15,7 +15,7 @@ from .common import get_cacheless_profile
 random.seed(os.urandom(128))
 
 
-def test_session_end_button():
+def test_firefox_session_end_button():
     """Test session logout with the logout button."""
     with ServerThread():
         try:
@@ -35,7 +35,7 @@ def test_session_end_button():
             drv.quit()
 
 
-def test_session_end_page_leave():
+def test_firefox_session_end_page_leave():
     """Test session logout upon the page leave."""
     with ServerThread():
         try:
@@ -54,7 +54,7 @@ def test_session_end_page_leave():
             drv.quit()
 
 
-def test_session_separation_logouts():
+def test_firefox_session_separation_logouts():
     """Test that session logouts stay separate."""
     with ServerThread():
         try:
