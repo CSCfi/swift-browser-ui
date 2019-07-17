@@ -1,5 +1,4 @@
-"""Session tests for the object browser with Firefox."""
-
+"""Session tests for the object browser with Chrome."""
 
 import time
 import random
@@ -9,22 +8,19 @@ import selenium.webdriver
 
 from .common import ServerThread
 from .common import login
-from .common import get_cacheless_profile
 
 
 random.seed(os.urandom(128))
 
 
-def test_firefox_session_end_button():
+def test_chrome_session_end_button():
     """Test session logout with the logout button."""
     with ServerThread():
         try:
-            drv = selenium.webdriver.Firefox(
-                firefox_profile=get_cacheless_profile()
-            )
+            drv = selenium.webdriver.Chrome()
+            drv.maximize_window()
             drv.get("http://localhost:8080")
             login(drv)
-            time.sleep(0.33)
             logout_el = drv.find_element_by_link_text("Log Out")
             logout_el.click()
             time.sleep(0.33)
@@ -36,13 +32,12 @@ def test_firefox_session_end_button():
 
 
 # Remove session tests for page leave logouts, since that might get removed.
-# def test_firefox_session_end_page_leave():
+# def test_chrome_session_end_page_leave():
 #     """Test session logout upon the page leave."""
 #     with ServerThread():
 #         try:
-#             drv = selenium.webdriver.Firefox(
-#                 firefox_profile=get_cacheless_profile()
-#             )
+#             drv = selenium.webdriver.Chrome()
+#             drv.maximize_window()
 #             drv.get("http://localhost:8080")
 #             login(drv)
 #             old_session = drv.current_url
@@ -55,22 +50,20 @@ def test_firefox_session_end_button():
 #             drv.quit()
 
 
-def test_firefox_session_separation_logouts():
+def test_chrome_session_separation_logouts():
     """Test that session logouts stay separate."""
     with ServerThread():
         try:
             # Create three separate sessions (should be enough to test with),
             # this time leaving the caching on.
-            drv_list = [selenium.webdriver.Firefox(
-                firefox_profile=selenium.webdriver.FirefoxProfile()
-            ) for i in range(0, 3)]
+            drv_list = [selenium.webdriver.Chrome() for i in range(0, 3)]
 
             # Navigate to the server and log every instance in
             for drv in drv_list:
+                drv.maximize_window()
                 drv.get("http://localhost:8080")
                 login(drv)
 
-            time.sleep(0.25)
             # Test session logout separation by killing one of the sessions
             to_kill = random.choice(drv_list)  # nosec
             to_kill_logout = to_kill.find_element_by_link_text("Log Out")
