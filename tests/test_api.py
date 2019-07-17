@@ -51,7 +51,7 @@ async def test_list_objects_correct():
     cookie, request = get_request_with_mock_openstack()
     request.app['Creds'][cookie]['ST_conn'].init_with_data(
         containers=5,
-        object_range=(0, 100),
+        object_range=(10, 100),
         size_range=(65535, 262144),
     )
     for container in ['test-container-' + str(i) for i in range(0, 5)]:
