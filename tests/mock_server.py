@@ -6,7 +6,6 @@ import unittest.mock
 import logging
 
 
-import aiohttp.web
 import s3browser.server
 
 
@@ -48,13 +47,6 @@ def mock_initiate_swift_service(_):
     return serv
 
 
-async def mock_handle_logout(_):
-    """."""
-    return aiohttp.web.Response(
-        status=204
-    )
-
-
 async def mock_graceful_shutdown(_):
     """."""
 
@@ -62,10 +54,6 @@ async def mock_graceful_shutdown(_):
 @unittest.mock.patch(
     "s3browser.server.kill_sess_on_shutdown",
     mock_graceful_shutdown
-)
-@unittest.mock.patch(
-    "s3browser.login.handle_logout",
-    mock_handle_logout
 )
 @unittest.mock.patch(
     "s3browser.login.initiate_os_session",
@@ -82,7 +70,7 @@ async def mock_graceful_shutdown(_):
 @unittest.mock.patch.dict(
     s3browser.server.setd,
     {
-        "auth_endpoint_url": "https://example.example-os.com:5001/v3",
+        "auth_endpoint_url": "https://localhost:5001/v3",
         "has_trust": False,
         "logfile": None,
         "port": 8080,

@@ -370,4 +370,4 @@ class Mock_Session:
 
     def get_endpoint(self, service_type=None):
         """Fetch a service endpoint from the mock OS Session."""
-        return "https://object.example-os.com:443/swift/v1/AUTH_example"
+        return "http://localhost:8443/swift/v1/AUTH_example"
