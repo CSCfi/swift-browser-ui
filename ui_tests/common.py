@@ -24,9 +24,10 @@ def check_download(drv):
     time.sleep(0.1)
     drv.switch_to.window(drv.window_handles[1])
     if (
-            "http://localhost:8443/swift/v1/AUTH_example" in drv.current_url
-            and "temp_url_expires" in drv.current_url
-            and "temp_url_sig" in drv.current_url
+            "http://localhost:8443/swift/v1/AUTH_example"
+            in drv.current_url and
+            "temp_url_expires" in drv.current_url and
+            "temp_url_sig" in drv.current_url
     ):
         drv.switch_to.window(drv.window_handles[0])
         return True

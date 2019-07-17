@@ -1,9 +1,6 @@
 """Front-end tests for the object browser, chrome."""
 
 
-import time
-
-
 from .common import handle_chrome_ui_test as handle_ui_test
 from .common import navigate_to_container_with_objects
 from .common import check_download
