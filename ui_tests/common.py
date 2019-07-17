@@ -7,7 +7,111 @@ import time
 from contextlib import AbstractContextManager
 
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver import Firefox
+from selenium.webdriver import Chrome
 from selenium.webdriver import FirefoxProfile
+from selenium.common.exceptions import NoSuchElementException
+
+
+def check_download(drv):
+    """Check if the download link works."""
+    try:
+        drv.find_element_by_link_text("Download").click()
+    except NoSuchElementException:
+        drv.find_element_by_link_text("Lataa").click()
+    time.sleep(0.1)
+    drv.switch_to.window(drv.window_handles[1])
+    if (
+            "http://localhost:8443/swift/v1/AUTH_example" in drv.current_url
+            and "temp_url_expires" in drv.current_url
+            and "temp_url_sig" in drv.current_url
+    ):
+        drv.switch_to.window(drv.window_handles[0])
+        return True
+    drv.switch_to.window(drv.window_handles[0])
+    return False
+
+
+def check_contents(drv):
+    """Check if the open object view contains objects."""
+    # Need to sleep for a moment since the loading screen is displayed for a
+    # moment before the contents are loaded
+    time.sleep(0.15)
+    if "This container" not in drv.page_source:
+        return drv
+    drv.back()
+    drv.find_element_by_tag_name("table").send_keys(Keys.ARROW_DOWN)
+    drv.find_element_by_tag_name("table").send_keys(Keys.ENTER)
+    return check_contents(drv)
+
+
+def navigate_to_container_with_objects(drv):
+    """Navigate to a container that has some objects in it."""
+    # Navigate to the first container and check if there's content in it.
+    (
+        webdriver.common.action_chains.ActionChains(drv)
+        .send_keys(Keys.TAB)  # Switching to the table requires 8 tabs, this
+        .send_keys(Keys.TAB)  # nicely tets the accessibility as well
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.ARROW_DOWN)  # Get the first container in active table
+        .send_keys(Keys.ENTER)  # Hit enter to open container
+        .perform()  # Flush the queue into the window
+    )
+    return check_contents(drv)
+
+
+def switch_to_finnish(drv):
+    """Change localization to Finnish."""
+    webdriver.support.ui.Select(
+        drv.find_element_by_tag_name("select")
+    ).select_by_index(1)
+
+
+def handle_firefox_ui_test(to_run):
+    """Wrap a ui test for Firefox."""
+    with ServerThread():
+        try:
+            drv = get_nav_to_ui(Firefox())
+            drv.maximize_window()
+            to_run(drv)
+        finally:
+            get_nav_out(drv)
+
+
+def handle_chrome_ui_test(to_run):
+    """Wrap a ui test for Chrome."""
+    with ServerThread():
+        try:
+            drv = get_nav_to_ui(Chrome())
+            drv.maximize_window()
+            to_run(drv)
+        finally:
+            get_nav_out(drv)
+
+
+def get_nav_to_ui(drv):
+    """Navigate to the browser UI."""
+    drv.get("http://localhost:8080")
+    login(drv)
+    return drv
+
+
+def get_nav_out(drv):
+    """End the browser session."""
+    try:
+        drv.find_element_by_link_text("Log Out").click()
+    except NoSuchElementException:
+        drv.find_element_by_link_text("Kirjaudu ulos").click()
+    finally:
+        drv.refresh()
+        drv.quit()
 
 
 def login(driver_instance):
