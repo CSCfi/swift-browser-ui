@@ -21,16 +21,19 @@ def check_download(drv):
         drv.find_element_by_link_text("Download").click()
     except NoSuchElementException:
         drv.find_element_by_link_text("Lataa").click()
-    time.sleep(0.1)
+    time.sleep(0.2)
     drv.switch_to.window(drv.window_handles[1])
+    time.sleep(0.1)
     if (
             "http://localhost:8443/swift/v1/AUTH_example"
             in drv.current_url and
             "temp_url_expires" in drv.current_url and
             "temp_url_sig" in drv.current_url
     ):
+        time.sleep(0.1)
         drv.switch_to.window(drv.window_handles[0])
         return True
+    time.sleep(0.1)
     drv.switch_to.window(drv.window_handles[0])
     return False
 
@@ -68,6 +71,17 @@ def navigate_to_container_with_objects(drv):
     return check_contents(drv)
 
 
+def navigate_to_next_container_from_search(drv):
+    """Navigate to the next container."""
+    (
+        webdriver.common.action_chains.ActionChains(drv)
+        .send_keys(Keys.TAB)
+        .send_keys(Keys.ARROW_DOWN)
+        .send_keys(Keys.ENTER)
+        .perform()
+    )
+
+
 def switch_to_finnish(drv):
     """Change localization to Finnish."""
     webdriver.support.ui.Select(
@@ -101,25 +115,27 @@ def get_nav_to_ui(drv):
     """Navigate to the browser UI."""
     drv.get("http://localhost:8080")
     login(drv)
+    time.sleep(0.1)
     return drv
 
 
 def get_nav_out(drv):
     """End the browser session."""
+    time.sleep(0.1)
     try:
         drv.find_element_by_link_text("Log Out").click()
     except NoSuchElementException:
         drv.find_element_by_link_text("Kirjaudu ulos").click()
     finally:
+        time.sleep(0.1)
         drv.refresh()
         drv.quit()
 
 
-def login(driver_instance):
+def login(drv):
     """Log in the user in a specific selenium driver instance."""
-    el = driver_instance.find_element_by_id("inputbox")
-    el.submit()
-    while driver_instance.current_url != \
+    drv.find_element_by_id("inputbox").submit()
+    while drv.current_url != \
             "http://localhost:8080/browse/test_user_id/placeholder":
         time.sleep(0.25)
 
@@ -153,7 +169,7 @@ class ServerThread(AbstractContextManager):
             ],
             stdout=subprocess.PIPE
         )
-        time.sleep(3)
+        time.sleep(3)  # a quick sleep to let the server catch on
 
     def __exit__(self, exc_type, exc_value, traceback):
         """."""
