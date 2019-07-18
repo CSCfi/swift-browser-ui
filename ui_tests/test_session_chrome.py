@@ -23,6 +23,8 @@ def test_chrome_session_end_button():
             opts = selenium.webdriver.chrome.options.Options()
             if os.environ.get("TEST_ENABLE_HEADLESS", None):
                 opts.headless = True
+                opts.add_argument('--no-sandbox')
+                opts.add_argument('--disable-dev-shm-usage')
             drv = selenium.webdriver.Chrome(
                 options=opts
             )
@@ -32,7 +34,7 @@ def test_chrome_session_end_button():
             wait_for_clickable(
                 drv.find_element_by_link_text("Log Out")
             )
-            time.sleep(0.33)
+            time.sleep(3.00)
             drv.execute_script("location.reload(true);")
             time.sleep(0.5)
             assert "Unauthorized" in drv.page_source  # nosec
@@ -67,6 +69,8 @@ def test_chrome_session_separation_logouts():
             opts = selenium.webdriver.chrome.options.Options()
             if os.environ.get("TEST_ENABLE_HEADLESS", None):
                 opts.headless = True
+                opts.add_argument('--no-sandbox')
+                opts.add_argument('--disable-dev-shm-usage')
             # Create three separate sessions (should be enough to test with),
             # this time leaving the caching on.
             drv_list = [selenium.webdriver.Chrome(
@@ -87,6 +91,7 @@ def test_chrome_session_separation_logouts():
             time.sleep(0.25)
             to_kill.quit()
             drv_list.remove(to_kill)
+            time.sleep(3.00)
 
             for drv in drv_list:
                 drv.refresh()

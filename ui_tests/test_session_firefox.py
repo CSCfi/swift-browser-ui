@@ -36,7 +36,7 @@ def test_firefox_session_end_button():
             wait_for_clickable(
                 drv.find_element_by_link_text("Log Out")
             )
-            time.sleep(0.33)
+            time.sleep(3.00)
             drv.execute_script("location.reload(true);")
             time.sleep(0.5)
             assert "Unauthorized" in drv.page_source  # nosec
@@ -94,6 +94,7 @@ def test_firefox_session_separation_logouts():
             time.sleep(0.25)
             to_kill.quit()
             drv_list.remove(to_kill)
+            time.sleep(3.00)
 
             for drv in drv_list:
                 drv.refresh()
