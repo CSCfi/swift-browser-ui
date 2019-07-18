@@ -19,9 +19,14 @@ def test_firefox_session_end_button():
     """Test session logout with the logout button."""
     with ServerThread():
         try:
+            opts = selenium.webdriver.firefox.options.Options()
+            if os.environ.get("TEST_ENABLE_HEADLESS", None):
+                opts.headless = True
             drv = selenium.webdriver.Firefox(
+                options=opts,
                 firefox_profile=get_cacheless_profile()
             )
+            drv.set_window_size(1920, 1080)
             drv.get("http://localhost:8080")
             login(drv)
             time.sleep(0.33)
@@ -59,14 +64,19 @@ def test_firefox_session_separation_logouts():
     """Test that session logouts stay separate."""
     with ServerThread():
         try:
+            opts = selenium.webdriver.firefox.options.Options()
+            if os.environ.get("TEST_ENABLE_HEADLESS"):
+                opts.headless = True
             # Create three separate sessions (should be enough to test with),
             # this time leaving the caching on.
             drv_list = [selenium.webdriver.Firefox(
+                options=opts,
                 firefox_profile=selenium.webdriver.FirefoxProfile()
             ) for i in range(0, 3)]
 
             # Navigate to the server and log every instance in
             for drv in drv_list:
+                drv.set_window_size(1920, 1080)
                 drv.get("http://localhost:8080")
                 login(drv)
 

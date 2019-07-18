@@ -17,8 +17,13 @@ def test_chrome_session_end_button():
     """Test session logout with the logout button."""
     with ServerThread():
         try:
-            drv = selenium.webdriver.Chrome()
-            drv.maximize_window()
+            opts = selenium.webdriver.chrome.options.Options()
+            if os.environ.get("TEST_ENABLE_HEADLESS", None):
+                opts.headless = True
+            drv = selenium.webdriver.Chrome(
+                options=opts
+            )
+            drv.set_window_size(1920, 1080)
             drv.get("http://localhost:8080")
             login(drv)
             logout_el = drv.find_element_by_link_text("Log Out")
@@ -54,13 +59,18 @@ def test_chrome_session_separation_logouts():
     """Test that session logouts stay separate."""
     with ServerThread():
         try:
+            opts = selenium.webdriver.chrome.options.Options()
+            if os.environ.get("TEST_ENABLE_HEADLESS", None):
+                opts.headless = True
             # Create three separate sessions (should be enough to test with),
             # this time leaving the caching on.
-            drv_list = [selenium.webdriver.Chrome() for i in range(0, 3)]
+            drv_list = [selenium.webdriver.Chrome(
+                options=opts
+            ) for i in range(0, 3)]
 
             # Navigate to the server and log every instance in
             for drv in drv_list:
-                drv.maximize_window()
+                drv.set_window_size(1920, 1080)
                 drv.get("http://localhost:8080")
                 login(drv)
 

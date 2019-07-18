@@ -4,6 +4,7 @@
 import subprocess  # nosec
 import signal
 import time
+from os import environ
 from contextlib import AbstractContextManager
 
 
@@ -96,23 +97,35 @@ def switch_to_finnish(drv):
     ).select_by_index(1)
 
 
+# Decorator for a Firefox test
 def handle_firefox_ui_test(to_run):
     """Wrap a ui test for Firefox."""
     with ServerThread():
         try:
-            drv = get_nav_to_ui(Firefox())
-            drv.maximize_window()
+            opts = webdriver.firefox.options.Options()
+            if environ.get("TEST_ENABLE_HEADLESS", None):
+                opts.headless = True
+            drv = get_nav_to_ui(
+                Firefox(options=opts)
+            )
+            drv.set_window_size(1920, 1080)
             to_run(drv)
         finally:
             get_nav_out(drv)
 
 
+# Decorator for a Chrome test
 def handle_chrome_ui_test(to_run):
     """Wrap a ui test for Chrome."""
     with ServerThread():
         try:
-            drv = get_nav_to_ui(Chrome())
-            drv.maximize_window()
+            opts = webdriver.chrome.options.Options()
+            if environ.get("TEST_ENABLE_HEADLESS", None):
+                opts.headless = True
+            drv = get_nav_to_ui(Chrome(
+                options=opts
+            ))
+            drv.set_window_size(1920, 1080)
             to_run(drv)
         finally:
             get_nav_out(drv)
