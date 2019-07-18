@@ -51,6 +51,13 @@ def check_contents(drv):
     return check_contents(drv)
 
 
+def navigate_to_next_full_after_back(drv):
+    """Navigate to a container after getting back from another one."""
+    drv.find_element_by_tag_name("table").send_keys(Keys.ARROW_DOWN)
+    drv.find_element_by_tag_name("table").send_keys(Keys.ENTER)
+    check_contents(drv)
+
+
 def navigate_to_container_with_objects(drv):
     """Navigate to a container that has some objects in it."""
     # Navigate to the first container and check if there's content in it.
