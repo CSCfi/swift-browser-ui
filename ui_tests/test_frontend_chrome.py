@@ -13,6 +13,7 @@ from .common import check_download
 from .common import switch_to_finnish
 from .common import navigate_to_next_container_from_search
 from .common import navigate_to_next_full_after_back
+from .common import wait_for_clickable
 
 
 @pytest.mark.timeout(60)
@@ -45,7 +46,10 @@ def test_find_file_chekcsums():
     @handle_ui_test
     def test_checksum(drv):
         drv = navigate_to_container_with_objects(drv)
-        drv.find_element_by_class_name("chevron-cell").click()
+        time.sleep(0.1)
+        wait_for_clickable(
+            drv.find_element_by_class_name("chevron-cell")
+        )
         # The following finds the first table row with a detail container, and
         # clicks said container open.
         el = (
@@ -65,7 +69,10 @@ def test_find_file_checksums_fin():
     def test_checksum_fin(drv):
         switch_to_finnish(drv)
         drv = navigate_to_container_with_objects(drv)
-        drv.find_element_by_class_name("chevron-cell").click()
+        time.sleep(0.1)
+        wait_for_clickable(
+            drv.find_element_by_class_name("chevron-cell")
+        )
         el = (
             drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
@@ -118,7 +125,9 @@ def test_long_user_session():
         # Switch to finnish and test navigating to the user page.
         switch_to_finnish(drv)
         time.sleep(0.1)
-        drv.find_element_by_link_text("test_user_id").click()
+        wait_for_clickable(
+            drv.find_element_by_link_text("test_user_id")
+        )
         time.sleep(0.1)
         # NOTE: replace this with a proper assertion when the dashboard is
         # implemented
@@ -127,8 +136,10 @@ def test_long_user_session():
         time.sleep(0.1)
         # Perform one hash check still, in Finnish.
         navigate_to_next_full_after_back(drv)
-        time.sleep(0.25)
-        drv.find_element_by_class_name("chevron-cell").click()
+        time.sleep(0.15)
+        wait_for_clickable(
+            drv.find_element_by_class_name("chevron-cell")
+        )
         el = (
             drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")

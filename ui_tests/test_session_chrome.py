@@ -9,6 +9,7 @@ import selenium.webdriver
 
 from .common import ServerThread
 from .common import login
+from .common import wait_for_clickable
 
 
 random.seed(os.urandom(128))
@@ -28,8 +29,9 @@ def test_chrome_session_end_button():
             drv.set_window_size(1920, 1080)
             drv.get("http://localhost:8080")
             login(drv)
-            logout_el = drv.find_element_by_link_text("Log Out")
-            logout_el.click()
+            wait_for_clickable(
+                drv.find_element_by_link_text("Log Out")
+            )
             time.sleep(0.33)
             drv.execute_script("location.reload(true);")
             time.sleep(0.5)
@@ -79,8 +81,9 @@ def test_chrome_session_separation_logouts():
 
             # Test session logout separation by killing one of the sessions
             to_kill = random.choice(drv_list)  # nosec
-            to_kill_logout = to_kill.find_element_by_link_text("Log Out")
-            to_kill_logout.click()
+            wait_for_clickable(
+                to_kill.find_element_by_link_text("Log Out")
+            )
             time.sleep(0.25)
             to_kill.quit()
             drv_list.remove(to_kill)

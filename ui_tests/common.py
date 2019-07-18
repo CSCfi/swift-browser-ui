@@ -14,14 +14,46 @@ from selenium.webdriver import Firefox
 from selenium.webdriver import Chrome
 from selenium.webdriver import FirefoxProfile
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import WebDriverException
+
+
+CLICK_TIMEOUT = 5
+
+
+def wait_for_clickable(element):
+    """Click an element when it's ready."""
+# Get the starting time for timing out if the page is actually hanging
+    s_time = time.time()
+    while time.time() - s_time < CLICK_TIMEOUT:
+        try:
+            element.click()
+            return
+        # If the other content hasn't loaded yet
+        except ElementClickInterceptedException:
+            time.sleep(0.05)
+        except WebDriverException as e:
+            if "not clickable" in e.msg:
+                time.sleep(0.05)
+            else:
+                raise WebDriverException(
+                    msg=e.msg,
+                    screen=e.screen,
+                    stacktrace=e.stacktrace
+                )
+    raise NoSuchElementException()
 
 
 def check_download(drv):
     """Check if the download link works."""
     try:
-        drv.find_element_by_link_text("Download").click()
+        wait_for_clickable(
+            drv.find_element_by_link_text("Download")
+        )
     except NoSuchElementException:
-        drv.find_element_by_link_text("Lataa").click()
+        wait_for_clickable(
+            drv.find_element_by_link_text("Lataa")
+        )
     time.sleep(0.2)
     drv.switch_to.window(drv.window_handles[1])
     time.sleep(0.1)
@@ -92,9 +124,25 @@ def navigate_to_next_container_from_search(drv):
 
 def switch_to_finnish(drv):
     """Change localization to Finnish."""
-    webdriver.support.ui.Select(
-        drv.find_element_by_tag_name("select")
-    ).select_by_index(1)
+    s_time = time.time()
+    while time.time() - s_time < CLICK_TIMEOUT:
+        try:
+            webdriver.support.ui.Select(
+                drv.find_element_by_tag_name("select")
+            ).select_by_index(1)
+            return
+        except ElementClickInterceptedException:
+            time.sleep(0.1)
+        except WebDriverException as e:
+            if "not clickable" in e.msg:
+                time.sleep(0.05)
+            else:
+                raise WebDriverException(
+                    msg=e.msg,
+                    screen=e.screen,
+                    stacktrace=e.stacktrace
+                )
+    raise NoSuchElementException()
 
 
 # Decorator for a Firefox test
@@ -143,9 +191,13 @@ def get_nav_out(drv):
     """End the browser session."""
     time.sleep(0.1)
     try:
-        drv.find_element_by_link_text("Log Out").click()
+        wait_for_clickable(
+            drv.find_element_by_link_text("Log Out")
+        )
     except NoSuchElementException:
-        drv.find_element_by_link_text("Kirjaudu ulos").click()
+        wait_for_clickable(
+            drv.find_element_by_link_text("Kirjaudu ulos")
+        )
     finally:
         time.sleep(0.1)
         drv.refresh()
