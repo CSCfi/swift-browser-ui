@@ -170,6 +170,8 @@ def handle_chrome_ui_test(to_run):
             opts = webdriver.chrome.options.Options()
             if environ.get("TEST_ENABLE_HEADLESS", None):
                 opts.headless = True
+                opts.add_argument('--no-sandbox')
+                opts.add_argument('--disable-dev-shm-usage')
             drv = get_nav_to_ui(Chrome(
                 options=opts
             ))
