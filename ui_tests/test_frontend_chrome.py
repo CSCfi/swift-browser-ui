@@ -40,11 +40,14 @@ def test_find_file_chekcsums():
     def test_checksum(drv):
         drv = navigate_to_container_with_objects(drv)
         drv.find_element_by_class_name("chevron-cell").click()
+        # The following finds the first table row with a detail container, and
+        # clicks said container open.
         el = (
             drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
             .find_element_by_tag_name("li")
         )
+        # Check that the checksum is present.
         assert "Hash" in el.text  # nosec
 
 
@@ -69,6 +72,7 @@ def test_search_a_container():
     # pylint: disable=unused-variable
     @handle_ui_test
     def test_search_bar(drv):
+        # The search box is the only input type form on the page.
         drv.find_element_by_class_name("input").send_keys(
             "test-container-3"
         )
@@ -83,6 +87,7 @@ def test_long_user_session():
     # pylint: disable=unused-variable
     @handle_ui_test
     def test_long_session(drv):
+        # Perform a container search
         time.sleep(0.1)
         drv.find_element_by_class_name("input").send_keys(
             "test-container-4"
@@ -90,22 +95,28 @@ def test_long_user_session():
         time.sleep(0.25)
         navigate_to_next_container_from_search(drv)
         assert "test-container-4" in drv.current_url  # nosec
+        # Go back and check the next container with some objects inside.
         time.sleep(0.1)
         drv.back()
         time.sleep(0.1)
         navigate_to_next_full_after_back(drv)
+        # Test downloading the first object from the newly open container.
         time.sleep(0.25)
         assert check_download(drv)  # nosec
         time.sleep(0.1)
         drv.back()
         time.sleep(0.1)
+        # Switch to finnish and test navigating to the user page.
         switch_to_finnish(drv)
         time.sleep(0.1)
         drv.find_element_by_link_text("test_user_id").click()
         time.sleep(0.1)
+        # NOTE: replace this with a proper assertion when the dashboard is
+        # implemented
         assert "Not yet implemented" in drv.page_source  # nosec
         drv.back()
         time.sleep(0.1)
+        # Perform one hash check still, in Finnish.
         navigate_to_next_full_after_back(drv)
         time.sleep(0.25)
         drv.find_element_by_class_name("chevron-cell").click()

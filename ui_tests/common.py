@@ -159,6 +159,10 @@ def get_cacheless_profile():
     return ret
 
 
+# The server needs to run in a separate thread, and that's easiest to do when
+# running it in a separate process. Thus, a context manager to spin up the
+# test server instance before the tests, and killing the process afterwards
+# to free up the port.
 class ServerThread(AbstractContextManager):
     """Context manager for the test server."""
 
@@ -176,7 +180,7 @@ class ServerThread(AbstractContextManager):
             ],
             stdout=subprocess.PIPE
         )
-        time.sleep(3)  # a quick sleep to let the server catch on
+        # time.sleep(3)  # a quick sleep to let the server catch on
 
     def __exit__(self, exc_type, exc_value, traceback):
         """."""
