@@ -4,6 +4,7 @@ import time
 import random
 import os
 
+import pytest
 import selenium.webdriver
 
 from .common import ServerThread
@@ -13,6 +14,7 @@ from .common import login
 random.seed(os.urandom(128))
 
 
+@pytest.mark.timeout(60)
 def test_chrome_session_end_button():
     """Test session logout with the logout button."""
     with ServerThread():
@@ -55,6 +57,7 @@ def test_chrome_session_end_button():
 #             drv.quit()
 
 
+@pytest.mark.timeout(60)
 def test_chrome_session_separation_logouts():
     """Test that session logouts stay separate."""
     with ServerThread():

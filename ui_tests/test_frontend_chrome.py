@@ -4,6 +4,9 @@
 import time
 
 
+import pytest
+
+
 from .common import handle_chrome_ui_test as handle_ui_test
 from .common import navigate_to_container_with_objects
 from .common import check_download
@@ -12,6 +15,7 @@ from .common import navigate_to_next_container_from_search
 from .common import navigate_to_next_full_after_back
 
 
+@pytest.mark.timeout(60)
 def test_download_from_random_bucket():
     """Test if file download link works and can be navigated to."""
     # Pylint is incorrect on the variable being unused
@@ -23,6 +27,7 @@ def test_download_from_random_bucket():
         assert check_download(drv)  # nosec
 
 
+@pytest.mark.timeout(60)
 def test_download_from_random_bucket_fin():
     """Test if the previous file download test works with finnish local."""
     # pylint: disable=unused-variable
@@ -33,6 +38,7 @@ def test_download_from_random_bucket_fin():
         assert check_download(drv)  # nosec
 
 
+@pytest.mark.timeout(60)
 def test_find_file_chekcsums():
     """Test seeking file checksums from the table listing."""
     # pylint: disable=unused-variable
@@ -51,6 +57,7 @@ def test_find_file_chekcsums():
         assert "Hash" in el.text  # nosec
 
 
+@pytest.mark.timeout(60)
 def test_find_file_checksums_fin():
     """Test seeking file checksums with finnish local."""
     # pylint: disable=unused-variable
@@ -67,6 +74,7 @@ def test_find_file_checksums_fin():
         assert "Tarkistussumma" in el.text  # nosec
 
 
+@pytest.mark.timeout(60)
 def test_search_a_container():
     """Test searching a specific container and navigating to it."""
     # pylint: disable=unused-variable
@@ -82,6 +90,7 @@ def test_search_a_container():
         time.sleep(0.1)
 
 
+@pytest.mark.timeout(60)
 def test_long_user_session():
     """Test the UI for a longer session."""
     # pylint: disable=unused-variable

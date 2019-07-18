@@ -27,7 +27,7 @@ setuptools.setup(
                  'flake8', 'flake8-docstrings', 'pytest-aiohttp',
                  'pytest-xdist'],
         'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme'],
-        'ui_test': ['pytest', 'selenium'],
+        'ui_test': ['pytest', 'selenium', 'pytest-timeout'],
     },
     packages=[__name__],
     package_data={__name__: [
