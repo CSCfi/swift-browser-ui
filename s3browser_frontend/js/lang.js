@@ -19,7 +19,7 @@ const langPlaceholders = {
         },
         largeFileMessage: '',
         download: 'Download',
-        donwloadLink: 'Download Link',
+        downloadLink: 'Download Link',
         downloadAlt: 'Download link for',
         downloadAltLarge: 'Confirm download large file',
         largeDownMessage: 'No large (> 1GiB) downloads enabled. \
@@ -49,7 +49,7 @@ const langPlaceholders = {
             },
             largeFileMessage: '',
             download: 'Lataa',
-            donwloadLink: 'Lataa linkki',
+            downloadLink: 'Lataa linkki',
             downloadAlt: 'Latauslinkki tiedostolle',
             downloadAltLarge: 'Hyväksy suuren tiedoston lataus',
             largeDownMessage: 'Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä \
