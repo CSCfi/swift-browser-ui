@@ -40,7 +40,7 @@ def test_download_from_random_bucket_fin():
 
 
 @pytest.mark.timeout(60)
-def test_find_file_chekcsums():
+def test_find_file_checksums():
     """Test seeking file checksums from the table listing."""
     # pylint: disable=unused-variable
     @handle_ui_test

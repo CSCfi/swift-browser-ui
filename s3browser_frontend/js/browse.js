@@ -315,7 +315,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
                 <a
                     v-else-if="allowLargeDownloads"
@@ -324,7 +324,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
                 <a
                     v-else
@@ -332,7 +332,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
             </li>
             </ul>

@@ -65,7 +65,7 @@
                                 class="navbar-item"
                                 v-if="!multipleProjects"
                             >
-                            Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
+                            {{ $t("message.currentProj") }}: &nbsp;<span>{{ this.$route.params.project }}</span>
                             </div>
                         </div>
                         <div class="navbar-end">
@@ -139,6 +139,5 @@
                 }
             })
         }
-        // changeLang();
     </script>
 </html>
