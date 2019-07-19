@@ -99,7 +99,7 @@ const ContainerPage = Vue.extend({
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
-        <b-field class="control" class="searchBox">
+        <b-field class="control searchBox">
             <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>      
     </b-field>
@@ -238,7 +238,7 @@ const ObjectPage = Vue.extend({
         <div class="control is-flex">
             <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
         </div>
-        <b-field class="control" class="searchBox">
+        <b-field class="control searchBox">
             <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>
     </b-field>
@@ -315,7 +315,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
                 <a
                     v-else-if="allowLargeDownloads"
@@ -324,7 +324,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAlt') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
                 <a
                     v-else
@@ -332,7 +332,7 @@ const ObjectPage = Vue.extend({
                     :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
                 >
                 <b-icon icon="cloud-download" size="is-small">
-                </b-icon> Download Link
+                </b-icon> {{ $t('message.downloadLink') }}
                 </a>
             </li>
             </ul>

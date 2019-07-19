@@ -3,15 +3,18 @@
 
 from os import environ
 import unittest.mock
+import logging
 
 
-import aiohttp.web
 import s3browser.server
 
 
 # Import some mock-ups that are already made before
-from mockups import return_project_avail
-from mockups import Mock_Service, Mock_Session
+from .mockups import return_project_avail
+from .mockups import Mock_Service, Mock_Session
+
+
+SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))
 
 
 def mock_initiate_os_session(token, _):
@@ -44,13 +47,6 @@ def mock_initiate_swift_service(_):
     return serv
 
 
-async def mock_handle_logout(_):
-    """."""
-    return aiohttp.web.Response(
-        status=204
-    )
-
-
 async def mock_graceful_shutdown(_):
     """."""
 
@@ -58,10 +54,6 @@ async def mock_graceful_shutdown(_):
 @unittest.mock.patch(
     "s3browser.server.kill_sess_on_shutdown",
     mock_graceful_shutdown
-)
-@unittest.mock.patch(
-    "s3browser.login.handle_logout",
-    mock_handle_logout
 )
 @unittest.mock.patch(
     "s3browser.login.initiate_os_session",
@@ -78,13 +70,13 @@ async def mock_graceful_shutdown(_):
 @unittest.mock.patch.dict(
     s3browser.server.setd,
     {
-        "auth_endpoint_url": "https://example.example-os.com:5001/v3",
+        "auth_endpoint_url": "https://localhost:5001/v3",
         "has_trust": False,
         "logfile": None,
         "port": 8080,
         "verbose": True,
         "debug": True,
-        "set_session_devmode": True,
+        "set_session_devmode": SESSION_MODE,
         "static_directory":
         s3browser.settings.__file__.replace("/settings.py", "") + "/static"
     }
@@ -92,6 +84,8 @@ async def mock_graceful_shutdown(_):
 def run_mock_server():
     """Run test server with mock openstack."""
     # Run the server in an ordinary fashion after patching everything
+    logging.basicConfig()
+    logging.root.setLevel(logging.DEBUG)
     app = s3browser.server.servinit()
     s3browser.server.run_server_insecure(app)
 

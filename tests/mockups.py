@@ -158,16 +158,14 @@ class Mock_Request:
     (the actual request eing a MutableMapping instance)
     """
 
-    app = None
-    headers = {}
-    cookies = {}
-    query = {}
-    remote = "127.0.0.1"
-
     def __init__(self):
         """Initialize Mock request."""
         # Application mutable mapping represented by a dictionary
         self.app = {}
+        self.headers = {}
+        self.cookies = {}
+        self.query = {}
+        self.remote = "127.0.0.1"
         self.post_data = {}
 
     def set_headers(self, headers):
@@ -209,15 +207,13 @@ class Mock_Service:
     necessary.
     """
 
-    containers = {}  # mock containers as a dictionary
-    meta = {
-        # Tempurl kyes for the stat() command
-        "tempurl_key_1": None,
-        "tempurl_key_2": None,
-    }
-
     def __init__(self):
         """."""
+        self.containers = {}
+        self.meta = {
+            "tempurl_key_1": None,
+            "tempurl_key_2": None,
+        }
         self.cont_meta = {}
         self.obj_meta = {}
 
@@ -362,7 +358,11 @@ class Mock_Session:
 
     def __init__(self):
         """Initialize Mock session."""
-        pass
+        self.auth = None
+
+    def invalidate(self, _):
+        """Mock session invalidation."""
+        return True
 
     def get_user_id(self):
         """Fetch the user id from the mock OS Session."""
@@ -370,4 +370,4 @@ class Mock_Session:
 
     def get_endpoint(self, service_type=None):
         """Fetch a service endpoint from the mock OS Session."""
-        return "https://object.example-os.com:443/swift/v1/AUTH_example"
+        return "http://localhost:8443/swift/v1/AUTH_example"

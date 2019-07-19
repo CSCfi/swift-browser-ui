@@ -18,7 +18,7 @@
         <title>Object storage browser</title>
     </head>
     <body>
-        <script>
+        <!-- <script>
             // Call logout if the user leaves the page, since it's not
             // necessary to hold sessions open.
             // Not using the app.logout function because it has a redirection,
@@ -32,7 +32,7 @@
                         }
                     )
             }
-        </script>
+        </script> -->
         <div id="app">
             <div class='navbar has-shadow is-spaced'>
                 <div class="container is-fluid">
@@ -65,7 +65,7 @@
                                 class="navbar-item"
                                 v-if="!multipleProjects"
                             >
-                            Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
+                            {{ $t("message.currentProj") }}: &nbsp;<span>{{ this.$route.params.project }}</span>
                             </div>
                         </div>
                         <div class="navbar-end">
@@ -117,28 +117,28 @@
     <script>
         // Fetch the necessary things from the API upon the initial page load.
         // After this the pulls will be handled by the router.
-        getUser().then( function ( value ) {
-            app.uname = value;
-        });
-        getProjects().then( function ( value ) {
-            app.projects = value;
-            if ( app.projects.length > 1 ) {
-                app.multipleProjects = true;
-            }
-        });
-        if ( document.location.pathname == "/browse" ) {        
-            getActiveProject().then( function ( value ) {
-                app.active = value;
-                app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
-        });}
-        if ( app.active['name'] != app.$route.params.project ) {
-            getActiveProject().then( function ( value ) {
-                app.active = value;
-                if ( app.active['name'] != app.$route.params.project ) {
-                    app.changeProject( app.$route.params.project );
+        window.onload = function () {
+            getUser().then( function ( value ) {
+                app.uname = value;
+            });
+            getProjects().then( function ( value ) {
+                app.projects = value;
+                if( app.projects.length > 1 ) {app.multipleProjects = true;}
+                if ( document.location.pathname == "/browse" ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
+                    });
                 }
-            })
+                if ( app.active['name'] != app.$route.params.project ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        if ( app.active['name'] != app.$route.params.project ) {
+                            app.changeProject( app.$route.params.project );
+                        }
+                    })
+                }
+            });
         }
-        // changeLang();
     </script>
 </html>
