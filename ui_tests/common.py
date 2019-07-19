@@ -68,17 +68,19 @@ def check_download(drv):
     return False
 
 
-def check_contents(drv):
+def check_contents(drv, arrows=1):
     """Check if the open object view contains objects."""
     # Need to sleep for a moment since the loading screen is displayed for a
     # moment before the contents are loaded
     time.sleep(0.15)
-    if "This container" not in drv.page_source:
+    if ("This container" not in drv.page_source and
+            "Säiliö on" not in drv.page_source):
         return drv
     drv.back()
-    drv.find_element_by_tag_name("table").send_keys(Keys.ARROW_DOWN)
+    for _ in range(0, arrows):
+        drv.find_element_by_tag_name("table").send_keys(Keys.ARROW_DOWN)
     drv.find_element_by_tag_name("table").send_keys(Keys.ENTER)
-    return check_contents(drv)
+    return check_contents(drv, arrows=arrows + 1)
 
 
 def navigate_to_next_full_after_back(drv):
@@ -169,6 +171,7 @@ def get_nav_out(drv):
 
 def login(drv):
     """Log in the user in a specific selenium driver instance."""
+    drv.implicitly_wait(1)
     drv.find_element_by_id("inputbox").submit()
     while drv.current_url != \
             "http://localhost:8080/browse/test_user_id/placeholder":
