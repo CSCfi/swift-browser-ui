@@ -3,7 +3,7 @@
 
 import unittest
 import subprocess  # nosec
-import signal
+import time
 from os import environ
 
 
@@ -29,7 +29,12 @@ class BaseUITestClass(unittest.TestCase):
 
     def tearDown(self):
         """."""
-        self.server_process.send_signal(signal.SIGKILL)
+        self.server_process.terminate()
+        term_time = time.time()
+        while self.server_process.poll is None:
+            if time.time() - term_time > 5:
+                self.server_process.kill()
+            time.sleep(0.1)
 
 
 class FirefoxTestClass(BaseUITestClass):
