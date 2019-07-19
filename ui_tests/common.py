@@ -169,6 +169,7 @@ def get_nav_out(drv):
 
 def login(drv):
     """Log in the user in a specific selenium driver instance."""
+    drv.implicitly_wait(1)
     drv.find_element_by_id("inputbox").submit()
     while drv.current_url != \
             "http://localhost:8080/browse/test_user_id/placeholder":
