@@ -7,6 +7,6 @@ with the object storage.
 
 
 __name__ = 's3browser'
-__version__ = '0.2.1beta1'
+__version__ = '0.2.1beta2'
 __author__ = 'CSC Developers'
 __license__ = 'MIT License'
