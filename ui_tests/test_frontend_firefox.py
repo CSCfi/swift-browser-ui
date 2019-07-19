@@ -7,7 +7,7 @@ import time
 import pytest
 
 
-from .common import handle_firefox_ui_test as handle_ui_test
+from .common_with_unittests import FirefoxTestClass
 from .common import navigate_to_container_with_objects
 from .common import check_download
 from .common import switch_to_finnish
@@ -16,142 +16,119 @@ from .common import navigate_to_next_full_after_back
 from .common import wait_for_clickable
 
 
-@pytest.mark.timeout(60)
-def test_download_from_random_bucket():
-    """Test if file download link works and can be navigated to."""
-    # Pylint is incorrect on the variable being unused
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_download(drv):
-        # Find a container with stuff
-        drv = navigate_to_container_with_objects(drv)
-        # Firefox needs a bit more waiting around, since it renders JS slower
+class TestFirefoxFrontend(FirefoxTestClass):
+    """Test the frontend wiht firefox."""
+
+    @pytest.mark.timeout(60)
+    def test_download_from_random_bucket(self):
+        """Test if file download link works and can be used."""
+        self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
-        assert check_download(drv)  # nosec
+        self.assertTrue(check_download(self.drv))
 
-
-@pytest.mark.timeout(60)
-def test_download_from_random_bucket_fin():
-    """Test if the previous file download test works with finnish local."""
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_download(drv):
-        switch_to_finnish(drv)
-        drv = navigate_to_container_with_objects(drv)
+    @pytest.mark.timeout(60)
+    def test_download_from_random_bucket_fin(self):
+        """Testif the previous file download test works with fi locale."""
+        switch_to_finnish(self.drv)
+        self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
-        assert check_download(drv)  # nosec
+        self.assertTrue(check_download(self.drv))
 
-
-@pytest.mark.timeout(60)
-def test_find_file_checksums():
-    """Test seeking file checksums from the table listing."""
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_checksum(drv):
-        drv = navigate_to_container_with_objects(drv)
+    @pytest.mark.timeout(60)
+    def test_find_file_checksums(self):
+        """Test seeking file checksums from the table listing."""
+        self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
         # The following finds the first table row with a detail container, and
         # clicks said container open.
         wait_for_clickable(
-            drv.find_element_by_class_name("chevron-cell")
+            self.drv.find_element_by_class_name("chevron-cell")
         )
-        el = (
-            drv.find_element_by_class_name("detail-container")
+        element = (
+            self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
             .find_element_by_tag_name("li")
         )
         # Check that the checksum is present.
-        assert "Hash" in el.text  # nosec
+        self.assertIn("Hash", element.text)
 
-
-@pytest.mark.timeout(60)
-def test_find_file_checksums_fin():
-    """Test seeking file checksums with finnish local."""
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_checksum_fin(drv):
+    @pytest.mark.timeout(60)
+    def test_find_file_checksums_fin(self):
+        """Test seeking file checksums with finnish local."""
         # Again firefox needs a bit more waiting around to prevent web driver
         # from crashing (implicit wait would work otherwise, but the problem
         # is that the element is present, it's just obstructed)
         time.sleep(0.1)
-        switch_to_finnish(drv)
+        switch_to_finnish(self.drv)
         time.sleep(0.25)
-        drv = navigate_to_container_with_objects(drv)
+        self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.2)
         wait_for_clickable(
-            drv.find_element_by_class_name("chevron-cell")
+            self.drv.find_element_by_class_name("chevron-cell")
         )
-        el = (
-            drv.find_element_by_class_name("detail-container")
+        element = (
+            self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
             .find_element_by_tag_name("li")
         )
-        assert "Tarkistussumma" in el.text  # nosec
+        self.assertIn("Tarkistussumma", element.text)
 
-
-@pytest.mark.timeout(60)
-def test_search_a_container():
-    """Test searching a specific container and navigating to it."""
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_search_bar(drv):
+    @pytest.mark.timeout(60)
+    def test_search_a_container(self):
+        """Test searching a specific container and navigating to it."""
         # The search box is the only input type form on the page.
-        drv.find_element_by_class_name("input").send_keys(
+        self.drv.find_element_by_class_name("input").send_keys(
             "test-container-3"
         )
         time.sleep(0.25)
-        navigate_to_next_container_from_search(drv)
+        navigate_to_next_container_from_search(self.drv)
         time.sleep(0.25)
-        assert "test-container-3" in drv.current_url  # nosec
+        self.assertIn("test-container-3", self.drv.current_url)
         time.sleep(0.2)
 
-
-@pytest.mark.timeout(60)
-def test_long_user_session():
-    """Test the UI for a longer session."""
-    # pylint: disable=unused-variable
-    @handle_ui_test
-    def test_long_session(drv):
+    @pytest.mark.timeout(60)
+    def test_long_user_session(self):
+        """Test the UI for a longer session."""
         # Perform a container search
         time.sleep(0.1)
-        drv.find_element_by_class_name("input").send_keys(
+        self.drv.find_element_by_class_name("input").send_keys(
             "test-container-4"
         )
         time.sleep(0.25)
-        navigate_to_next_container_from_search(drv)
-        assert "test-container-4" in drv.current_url  # nosec
+        navigate_to_next_container_from_search(self.drv)
+        self.assertIn("test-container-4", self.drv.current_url)
         # Go back and check the next container with some objects inside.
         time.sleep(0.1)
-        drv.back()
+        self.drv.back()
         time.sleep(0.1)
-        navigate_to_next_full_after_back(drv)
+        navigate_to_next_full_after_back(self.drv)
         # Test downloading the first object from the newly open container.
         time.sleep(0.25)
-        assert check_download(drv)  # nosec
+        self.assertTrue(check_download(self.drv))
         time.sleep(0.1)
-        drv.back()
+        self.drv.back()
         time.sleep(0.1)
         # Switch to finnish and test navigating to the user page.
-        switch_to_finnish(drv)
+        switch_to_finnish(self.drv)
         time.sleep(0.25)
         wait_for_clickable(
-            drv.find_element_by_link_text("test_user_id")
+            self.drv.find_element_by_link_text("test_user_id")
         )
         time.sleep(0.1)
         # NOTE: replace this with a proper assertion when the dashboard is
         # implemented
-        assert "Not yet implemented" in drv.page_source  # nosec
-        drv.back()
+        self.assertIn("Not yet implemented", self.drv.page_source)
+        self.drv.back()
         time.sleep(0.1)
         # Perform one hash check still, in Finnish.
-        navigate_to_next_full_after_back(drv)
+        navigate_to_next_full_after_back(self.drv)
         time.sleep(0.25)
         wait_for_clickable(
-            drv.find_element_by_class_name("chevron-cell")
+            self.drv.find_element_by_class_name("chevron-cell")
         )
-        el = (
-            drv.find_element_by_class_name("detail-container")
+        element = (
+            self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
             .find_element_by_tag_name("li")
         )
-        assert "Tarkistussumma" in el.text  # nosec
+        self.assertIn("Tarkistussumma", element.text)
