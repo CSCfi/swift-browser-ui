@@ -26,13 +26,15 @@ setuptools.setup(
                  'pytest-asyncio', 'tox', 'pytest-mock',
                  'flake8', 'flake8-docstrings', 'pytest-aiohttp',
                  'pytest-xdist'],
-        'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme']
+        'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme'],
+        'ui_test': ['pytest', 'selenium', 'pytest-timeout'],
     },
     packages=[__name__],
     package_data={__name__: [
         "static/*",
         "static/js/*",
         "static/css/*",
+        "static/img/*"
     ]},
     include_package_data=True,
     platforms='any',

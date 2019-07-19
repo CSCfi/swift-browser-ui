@@ -5,10 +5,12 @@ cache:
     - frontned/node_modules
 
 stages:
-  - test
+  - Syntax Tests
+  - Base Tests
+  - UI Tests
 
 test_syntax:
-  stage: test
+  stage: Syntax Tests
   image: python:3.6
   before_script:
     - pip --cache-dir=.pip install tox
@@ -16,7 +18,7 @@ test_syntax:
     - tox -e flake8
 
 test_code_security:
-  stage: test
+  stage: Syntax Tests
   image: python:3.6
   before_script:
     - pip --cache-dir=.pip install tox
@@ -24,7 +26,7 @@ test_code_security:
     - tox -e bandit
 
 unit_test:
-  stage: test
+  stage: Base Tests
   image: python:3.6
   before_script:
     - pip --cache-dir=.pip install tox
@@ -32,10 +34,44 @@ unit_test:
     - tox -e pytest
 
 docs_test:
-  stage: test
+  stage: Base Tests
   image: python:3.6
   before_script:
     - pip --cache-dir=.pip install tox
   script:   
     - tox -e docs
+
+UI Pytest Chrome:
+  stage: UI Tests
+  image: python:3.6
+  before_script:
+    - curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
+    - echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get -y update
+    - apt-get -y install google-chrome-stable
+    - wget https://chromedriver.storage.googleapis.com/75.0.3770.140/chromedriver_linux64.zip
+    - unzip chromedriver_linux64.zip
+    - rm chromedriver_linux64.zip
+    - chmod +x chromedriver
+    - cp chromedriver /usr/local/bin/
+    - chromedriver --version
+    - pip --cache-dir=.pip install tox
+  script:
+    - tox -e chrome
+
+UI Pytest Firefox:
+  stage: UI Tests
+  image: python:3.6
+  before_script:
+    - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+    - tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
+    - rm geckodriver-v0.24.0-linux64.tar.gz
+    - chmod +x geckodriver
+    - cp geckodriver /usr/local/bin/
+    - geckodriver --version
+    - apt-get update
+    - apt-get install firefox-esr -y
+    - pip --cache-dir=.pip install tox
+  script:
+    - tox -e firefox
 

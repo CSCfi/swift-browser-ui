@@ -7,15 +7,18 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.6/dist/vue-router.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.js"></script>
+        <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
         <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
         <script src="/static/js/api.js"></script>
         <script src="/static/js/btablecomp.js"></script>
+        <script src="/static/js/lang.js"></script>
         <script src="/static/js/browse.js"></script>
+        <link rel='stylesheet' href='/static/css/browse.css'>
         <title>Object storage browser</title>
     </head>
     <body>
-        <script>
+        <!-- <script>
             // Call logout if the user leaves the page, since it's not
             // necessary to hold sessions open.
             // Not using the app.logout function because it has a redirection,
@@ -29,46 +32,63 @@
                         }
                     )
             }
-        </script>
+        </script> -->
         <div id="app">
-            <div class='navbar'>
-                <div class="navbar-menu">
-                    <div class="navbar-start">
-                        <div 
-                            class="navbar-item has-dopdown is-hoverable"
-                            v-if="multipleProjects"
-                        >
-                            Current project: <a class="navbar-link">
-                                <span>{{ this.$route.params.project }}</span>
-                            </a>
+            <div class='navbar has-shadow is-spaced'>
+                <div class="container is-fluid">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="#">
+                            <img src="/static/img/csc_logo.svg" :alt="$t('message.cscOrg')">
+                        </a>
+        
+                    </div>
+                    <div class="navbar-menu">
+                        <div class="navbar-start">
+                            <div 
+                                class="navbar-item has-dopdown is-hoverable"
+                                v-if="multipleProjects"
+                            >
+                                {{ $t("message.currentProj") }}: <a class="navbar-link">
+                                    <span>{{ this.$route.params.project }}</span>
+                                </a>
 
-                            <div class="navbar-dropdown">
-                                <a
-                                    class="navbar-item"
-                                    v-for="item in projects"
-                                    v-bind:key="item.id"
-                                    v-on:click="changeProject ( item.id )"
-                                ><span>{{ item.name }}</span></a>
+                                <div class="navbar-dropdown">
+                                    <a
+                                        class="navbar-item"
+                                        v-for="item in projects"
+                                        v-bind:key="item.id"
+                                        v-on:click="changeProject ( item.id )"
+                                    ><span>{{ item.name }}</span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="navbar-item"
+                                v-if="!multipleProjects"
+                            >
+                            {{ $t("message.currentProj") }}: &nbsp;<span>{{ this.$route.params.project }}</span>
                             </div>
                         </div>
-                        <div
-                            class="navbar-item"
-                            v-if="!multipleProjects"
-                        >
-                        Current project: &nbsp;<span>{{ this.$route.params.project }}</span>
-                        </div>
-                    </div>
-                    <div class="navbar-end">
-                        <div class="navbar-item">
-                            <div class="buttons">
-                                <a class="button is-primary" @click="logout ()">Log out</a>
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <b-field class="locale-changer">
+                                    <b-select placeholder="Language" icon="earth"
+                                              v-model="$i18n.locale"
+                                              v-on:input="setCookieLang ()">
+                                        <option v-for="lang in langs" :key="lang.value" :value="lang.value">{{ lang.ph }}</option>
+                                    </b-select>
+                                </b-field>
+                            </div>
+                            <div class="navbar-item">
+                                <div class="buttons">
+                                    <a class="button is-primary" @click="logout ()">{{ $t("message.logOut") }}</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="breadcrumb" aria-label="breadcrumbs">
-                <ul id="breadcrumb-list" style="margin-left: 5%; margin-top: 3%;">
+                <ul id="breadcrumb-list" style="margin-left: 5%; margin-top: 1%;">
                     <li
                         is="breadcrumb-list-element"
                         v-for="item in getRouteAsList ()"
@@ -84,33 +104,41 @@
                 :active.sync="isLoading"
                 :can-cancel="false"
             ></b-loading>
+        <footer class="footer">
+            <div class="content has-text-centered">
+                <p>
+                <strong>Object browser</strong> {{ $t("message.devel") }} <a href="https://csc.fi" :alt="$t('message.cscOrg')">{{ $t("message.cscOrg") }}</a>.
+                </p>
+            </div>
+        </footer>
         </div>
         <script>app.$mount("#app");</script>
     </body>
     <script>
         // Fetch the necessary things from the API upon the initial page load.
         // After this the pulls will be handled by the router.
-        getUser().then( function ( value ) {
-            app.uname = value;
-        });
-        getProjects().then( function ( value ) {
-            app.projects = value;
-            if ( app.projects.length > 1 ) {
-                app.multipleProjects = true;
-            }
-        });
-        if ( document.location.pathname == "/browse" ) {        
-            getActiveProject().then( function ( value ) {
-                app.active = value;
-                app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
-        });}
-        if ( app.active['name'] != app.$route.params.project ) {
-            getActiveProject().then( function ( value ) {
-                app.active = value;
-                if ( app.active['name'] != app.$route.params.project ) {
-                    app.changeProject( app.$route.params.project );
+        window.onload = function () {
+            getUser().then( function ( value ) {
+                app.uname = value;
+            });
+            getProjects().then( function ( value ) {
+                app.projects = value;
+                if( app.projects.length > 1 ) {app.multipleProjects = true;}
+                if ( document.location.pathname == "/browse" ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        app.$router.push('/browse/' + app.uname + '/' + app.active['name']);
+                    });
                 }
-            })
+                if ( app.active['name'] != app.$route.params.project ) {
+                    getActiveProject().then( function ( value ) {
+                        app.active = value;
+                        if ( app.active['name'] != app.$route.params.project ) {
+                            app.changeProject( app.$route.params.project );
+                        }
+                    })
+                }
+            });
         }
     </script>
 </html>
