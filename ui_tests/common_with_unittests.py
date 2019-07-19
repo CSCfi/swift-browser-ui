@@ -26,6 +26,7 @@ class BaseUITestClass(unittest.TestCase):
             ],
             stdout=subprocess.PIPE
         )
+        time.sleep(3.0)
 
     def tearDown(self):
         """."""
