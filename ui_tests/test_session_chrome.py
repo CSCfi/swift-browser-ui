@@ -42,25 +42,6 @@ def test_chrome_session_end_button():
             drv.quit()
 
 
-# Remove session tests for page leave logouts, since that might get removed.
-# def test_chrome_session_end_page_leave():
-#     """Test session logout upon the page leave."""
-#     with ServerThread():
-#         try:
-#             drv = selenium.webdriver.Chrome()
-#             drv.maximize_window()
-#             drv.get("http://localhost:8080")
-#             login(drv)
-#             old_session = drv.current_url
-#             drv.get("http://localhost:8080")
-#             time.sleep(0.5)
-#             drv.get(old_session)
-#             time.sleep(0.33)
-#             assert "Unauthorized" in drv.page_source  # nosec
-#         finally:
-#             drv.quit()
-
-
 @pytest.mark.timeout(60)
 def test_chrome_session_separation_logouts():
     """Test that session logouts stay separate."""
