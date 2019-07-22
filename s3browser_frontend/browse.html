@@ -71,7 +71,13 @@
                         <div class="navbar-end">
                             <div class="navbar-item">
                                 <div class="buttons">
-                                    <router-link 
+                                    <router-link
+                                        v-if="$route.params.project == undefined"
+                                        :to="'/browse/' + $route.params.user + '/' + active.name"
+                                        class="button is-primary"
+                                    >Browser</router-link>
+                                    <router-link
+                                        v-else 
                                         :to="'/browse/' + $route.params.user"
                                         class="button is-primary"
                                     >Dashboard</router-link>

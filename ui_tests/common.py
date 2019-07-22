@@ -103,6 +103,7 @@ def navigate_to_container_with_objects(drv):
         .send_keys(Keys.TAB)
         .send_keys(Keys.TAB)
         .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
         .send_keys(Keys.ARROW_DOWN)  # Get the first container in active table
         .send_keys(Keys.ENTER)  # Hit enter to open container
         .perform()  # Flush the queue into the window
