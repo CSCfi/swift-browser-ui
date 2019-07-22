@@ -276,6 +276,33 @@ async def get_metadata(request):
     )
 
 
+async def get_project_metadata(request):
+    """Get the bare minimum required project metadata from OS."""
+    # The project metadata needs to be filtered for sensitive information, as
+    # it contains e.g. temporary URL keys. These keys can be used to pull any
+    # object from the object storage, and thus shouldn't be provided for the
+    # user.
+    session = api_check(request)
+    request.app['Log'].info(
+        'Api call for project metadata check from {0}, sess: {1}'.format(
+            request.remote,
+            session,
+        )
+    )
+
+    conn = request.app['Creds'][session]['ST_conn']
+
+    # Get the account metadata listing
+    ret = dict(conn.stat()['items'])
+    ret = {
+        'Account': ret['Account'],
+        'Containers': ret['Containers'],
+        'Objects': ret['Objects'],
+        'Bytes': ret['Bytes'],
+    }
+    return aiohttp.web.json_response(ret)
+
+
 async def os_list_projects(request):
     """Fetch the projects available for the open session."""
     session = api_check(request)
