@@ -70,6 +70,14 @@
                         </div>
                         <div class="navbar-end">
                             <div class="navbar-item">
+                                <div class="buttons">
+                                    <router-link 
+                                        :to="'/browse/' + $route.params.user"
+                                        class="button is-primary"
+                                    >Dashboard</router-link>
+                                </div>
+                            </div>
+                            <div class="navbar-item">
                                 <b-field class="locale-changer">
                                     <b-select placeholder="Language" icon="earth"
                                               v-model="$i18n.locale"
@@ -138,6 +146,9 @@
                         }
                     })
                 }
+            });
+            getProjectMeta().then( function ( ret ) {
+                app.meta = ret;
             });
         }
     </script>

@@ -49,7 +49,7 @@ const langPlaceholders = {
             },
             largeFileMessage: '',
             download: 'Lataa',
-            downloadLink: 'Lataa linkki',
+            downloadLink: 'Latauslinkki',
             downloadAlt: 'Latauslinkki tiedostolle',
             downloadAltLarge: 'Hyväksy suuren tiedoston lataus',
             largeDownMessage: 'Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä \

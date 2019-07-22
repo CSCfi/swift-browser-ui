@@ -23,21 +23,70 @@ const i18n = new VueI18n({
 // The view for the application front page. Currently does nothing as it's not
 // needed yet.
 const FrontPage = Vue.extend({
-    template: '\
-<div>\
-<p>Not yet implemented</p>\
-</div>\
-    ',
+    template: `
+<div>
+    <p>Not yet implemented</p>
+</div>
+    `,
 });
 
-// The view for the application user page, e.g. for showing user information in
-// a bit more detail. Currently does nothing as it's not needed yet.
+// ---------------------------------------------------------------------------
+
+// The view for the application user page for showing the user information in
+// a bit more detail. Shows e.g. the storage expenditure and the billing unit
+// (BU) usage caused by that.
 const UserPage = Vue.extend({
-    template: '\
-<div>\
-<p>Not yet implemented</p>\
-</div>\
-    ',
+    data: function () {
+        return app.meta;
+    },
+    template: `
+<div class="dashboard">
+    <div class="tile is-parent">
+        <div class="tile is-child is-4 box">
+            <p class="title">Project usage</p>
+            <p>
+                <ul>
+                    <li>Account: {{ Account }}</li>
+                    <li>Containers: {{ Containers }}</li>
+                    <li>Objects: {{ Objects }}</li>
+                    <li>Usage: {{ Size }}</li>
+                </ul>
+            </p>
+        </div>
+        <div class="tile is-child is-8 box">
+            <p class="title">Current billing</p>
+            <progress
+                v-if="Bytes < 1099511627776"
+                class="progress is-success is-large"
+                :value="Bytes"
+                :max="1099511627776"
+            >{{ parseInt(Bytes/1099511627776) }}</progress>
+            <progress
+                v-else
+                class="progress is-danger is-large"
+                :value="Bytes"
+                :max="1099511627776"
+            >{{ parseInt(Bytes/1099511627776) }}</progress>
+            <p>
+                <ul>
+                    <li><b>Project storage usage: </b> {{ Size }} / 1TiB</li>
+                    <li><b>Equals: </b> {{ Billed }} <b>BU / hour </b></li>
+                </ul>
+            </p>
+        </div>
+    </div>
+    <div class="tile is-parent">
+        <div class="tile is-child is-12 box">
+            <p class="title">More information</p>
+            <ul>
+                <li><a href="https://research.csc.fi/pouta-accounting">Pouta billing information</a></li>
+                <li><a href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">Pouta default quotas</a></li>
+                <li><a href="https://my.csc.fi">Information on project billing unit availability etc.</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    `,
 });
 
 // ---------------------------------------------------------------------------
@@ -48,42 +97,42 @@ const UserPage = Vue.extend({
 // vue.js has it's own way of doing things with a strict hierarchy
 const ContainerPage = Vue.extend({
     data: function () {
-        let vars = {};
-        vars['bList'] = [];
+        let vals = {};
+        vals['bList'] = [];
         if (app.bList == undefined) {
             app.isLoading = true;
             getBuckets().then(function (ret) {
                 if (ret.status != 200) {
                     app.isLoading = false;
                 }
-                vars['bList'] = ret;
+                vals['bList'] = ret;
 
-                for (let i = 0; i < vars['bList'].length; i++) {
-                    vars['bList'][i]['size'] = getHumanReadableSize(
-                        vars['bList'][i]['bytes']
+                for (let i = 0; i < vals['bList'].length; i++) {
+                    vals['bList'][i]['size'] = getHumanReadableSize(
+                        vals['bList'][i]['bytes']
                     );
                 };
 
-                app.bList = vars['bList']
+                app.bList = vals['bList']
                 app.isLoading = false;
             }).catch(function () {
                 app.isLoading = false;
             }
             );
         } else {
-            vars['bList'] = app.bList;
+            vals['bList'] = app.bList;
         };
-        vars['selected'] = vars['bList'][0];
-        vars['isPaginated'] = true;
-        vars['perPage'] = 15;
-        vars['defaultSortDirection'] = 'asc';
-        vars['searchQuery'] = {
+        vals['selected'] = vals['bList'][0];
+        vals['isPaginated'] = true;
+        vals['perPage'] = 15;
+        vals['defaultSortDirection'] = 'asc';
+        vals['searchQuery'] = {
             name: '',
         };
-        vars['currentPage'] = (
+        vals['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
-        return vars;
+        return vals;
     },
     template: `
 <div>
@@ -411,6 +460,7 @@ const app = new Vue({
         projects: [],
         active: "",
         uname: "",
+        meta: undefined,
         multipleProjects: false,
         isLoading: false,
         isFullPage: true,
@@ -562,5 +612,3 @@ var getHumanReadableDate = function (val) {
     }
     return dateVal.toLocaleDateString(langLocale, options, zone);
 }
-
-  
