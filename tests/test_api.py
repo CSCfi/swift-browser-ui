@@ -12,6 +12,7 @@ from s3browser.api import get_os_user, os_list_projects
 from s3browser.api import swift_list_buckets, swift_list_objects
 from s3browser.api import swift_download_object
 from s3browser.api import get_metadata
+from s3browser.api import get_project_metadata
 from s3browser.settings import setd
 
 from .creation import get_request_with_mock_openstack
@@ -326,5 +327,30 @@ async def test_get_object_meta_swift_whole():
         [i, {"obj-example": "example"}]
         for i in [j["name"] for j in objs]
     ]
+
+    assert resp == comp  # nosec
+
+
+@pytest.mark.asyncio
+async def test_get_project_metadata():
+    """Test metadata API endpoint for account metadata."""
+    cookie, request = get_request_with_mock_openstack()
+    request.app['Creds'][cookie]['ST_conn'].init_with_data(
+        containers=5,
+        object_range=(100, 100),
+        size_range=(1073741824, 1073741824)
+    )
+
+    # Compare against the bare minimum amount of information required, which
+    # will be what the function should return.
+    comp = {
+        'Account': 'AUTH_test_account',
+        'Containers': 5,
+        'Objects': 500,
+        'Bytes': 536870912000,
+    }
+
+    resp = await get_project_metadata(request)
+    resp = json.loads(resp.text)
 
     assert resp == comp  # nosec
