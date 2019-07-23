@@ -37,7 +37,29 @@ const FrontPage = Vue.extend({
 // (BU) usage caused by that.
 const UserPage = Vue.extend({
     data: function () {
-        return app.meta;
+        return {
+            Containers: undefined,
+            Objects: undefined,
+            Account: undefined,
+            Size: undefined,
+            Billed: undefined,
+            Bytes: undefined,
+        }
+    },
+    methods: {
+        fetchMeta: function () {
+            getProjectMeta().then((ret) => {
+                this.Containers = ret["Containers"];
+                this.Objects = ret["Objects"];
+                this.Account = ret["Account"];
+                this.Size = ret["Size"];
+                this.Billed = ret["Billed"];
+                this.Bytes = ret["Bytes"];
+            })
+        },
+    },
+    beforeMount(){
+        this.fetchMeta();
     },
     template: `
 <div class="dashboard">
