@@ -44,6 +44,7 @@ const UserPage = Vue.extend({
             Size: undefined,
             Billed: undefined,
             Bytes: undefined,
+            DisableTooltip: false,
         }
     },
     methods: {
@@ -57,9 +58,17 @@ const UserPage = Vue.extend({
                 this.Bytes = ret["Bytes"];
             })
         },
+        checkBillingNote: function() {
+            this.DisableTooltip = document.cookie.match("DISABLE_BILLING_NOTE") ? true : false;
+        },
+        disable: function() {
+            this.DisableTooltip = true;
+            document.cookie = "DISABLE_BILLING_NOTE=true"
+        }
     },
     beforeMount(){
         this.fetchMeta();
+        this.checkBillingNote();
     },
     template: `
 <div class="dashboard">
@@ -94,7 +103,29 @@ const UserPage = Vue.extend({
                 >{{ parseInt(Bytes/1099511627776) }}</progress>
                 <p>
                     <ul>
-                        <li><b>{{ $t('message.dashboard.prj_str_usag') }} </b> {{ Size }} / 1TiB</li>
+                        <li>
+                        <b>{{ $t('message.dashboard.prj_str_usag') }} </b> {{ Size }} / 1TiB
+                        <a v-if="!DisableTooltip" @click="disable()">{{ $t('message.dashboard.tooltip_disable') }}</a>
+                        <b-tooltip
+                            v-if="!DisableTooltip"
+                            size="is-large"
+                            :label="$t('message.dashboard.default_notify')"
+                            position="is-right"
+                            multilined
+                            always
+                        >
+                            <b-button class="button is-small is-primary" icon-right="information"></b-button>
+                        </b-tooltip>
+                        <b-tooltip
+                            v-else
+                            size="is-large"
+                            :label="$t('message.dashboard.default_notify')"
+                            position="is-right"
+                            multilined
+                        >
+                            <b-button class="button is-small is-primary" icon-right="information"></b-button>
+                        </b-tooltip>
+                        </li>
                         <li><b>{{ $t('message.dashboard.equals') }} </b> {{ Billed }} <b>BU / hour </b></li>
                     </ul>
                 </p>
