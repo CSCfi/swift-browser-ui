@@ -117,10 +117,10 @@ class TestFirefoxFrontend(FirefoxTestClass):
         time.sleep(0.1)
         # NOTE: replace this with a proper assertion when the dashboard is
         # implemented
-        self.assertIn("Account", self.drv.page_source)
-        self.assertIn("Containers", self.drv.page_source)
-        self.assertIn("Objects", self.drv.page_source)
-        self.assertIn("Usage", self.drv.page_source)
+        self.assertIn("Käyttäjä", self.drv.page_source)
+        self.assertIn("Kontteja", self.drv.page_source)
+        self.assertIn("Objekteja", self.drv.page_source)
+        self.assertIn("Tilankäyttö", self.drv.page_source)
         self.drv.back()
         time.sleep(0.1)
         # Perform one hash check still, in Finnish.
