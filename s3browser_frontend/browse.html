@@ -75,12 +75,12 @@
                                         v-if="$route.params.project == undefined"
                                         :to="'/browse/' + $route.params.user + '/' + active.name"
                                         class="button is-primary"
-                                    >Browser</router-link>
+                                    >{{ $t("message.dashboard.browser") }}</router-link>
                                     <router-link
                                         v-else 
                                         :to="'/browse/' + $route.params.user"
                                         class="button is-primary"
-                                    >Dashboard</router-link>
+                                    >{{ $t("message.dashboard.dashboard") }}</router-link>
                                 </div>
                             </div>
                             <div class="navbar-item">

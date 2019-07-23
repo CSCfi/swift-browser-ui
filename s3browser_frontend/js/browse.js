@@ -66,20 +66,20 @@ const UserPage = Vue.extend({
     <div class="tile is-ancestor">
         <div class="tile is-parent is-horizontal is-4">
             <div class="tile is-child box">
-                <p class="title is-size-5">Project usage</p>
+                <p class="title is-size-5">{{ $t('message.dashboard.prj_usage') }}</p>
                 <p>
                     <ul>
-                        <li>Account: {{ Account }}</li>
-                        <li>Containers: {{ Containers }}</li>
-                        <li>Objects: {{ Objects }}</li>
-                        <li>Usage: {{ Size }}</li>
+                        <li>{{ $t('message.dashboard.account') }} {{ Account }}</li>
+                        <li>{{ $t('message.dashboard.containers') }} {{ Containers }}</li>
+                        <li>{{ $t('message.dashboard.objects') }} {{ Objects }}</li>
+                        <li>{{ $t('message.dashboard.usage') }} {{ Size }}</li>
                     </ul>
                 </p>
             </div>
         </div>
         <div class="tile is-parent is-horizontal is-8">
             <div class="tile is-child box">
-                <p class="title is-size-5">Current billing</p>
+                <p class="title is-size-5">{{ $t('message.dashboard.cur_billing') }}</p>
                 <progress
                     v-if="Bytes < 1099511627776"
                     class="progress is-success is-large"
@@ -94,8 +94,8 @@ const UserPage = Vue.extend({
                 >{{ parseInt(Bytes/1099511627776) }}</progress>
                 <p>
                     <ul>
-                        <li><b>Project storage usage: </b> {{ Size }} / 1TiB</li>
-                        <li><b>Equals: </b> {{ Billed }} <b>BU / hour </b></li>
+                        <li><b>{{ $t('message.dashboard.prj_str_usag') }} </b> {{ Size }} / 1TiB</li>
+                        <li><b>{{ $t('message.dashboard.equals') }} </b> {{ Billed }} <b>BU / hour </b></li>
                     </ul>
                 </p>
             </div>
@@ -104,11 +104,11 @@ const UserPage = Vue.extend({
     <div class="tile is-ancestor">
         <div class="tile is-parent is-horizontal is-12">
             <div class="tile is-child is-12 box">
-                <p class="title is-size-5">More information</p>
+                <p class="title is-size-5">{{ $t('message.dashboard.more_info') }}</p>
                 <ul>
-                    <li><a href="https://research.csc.fi/pouta-accounting">Pouta billing information</a></li>
-                    <li><a href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">Pouta default quotas</a></li>
-                    <li><a href="https://my.csc.fi">Information on project billing unit availability etc.</a></li>
+                    <li><a target="_blank" href="https://research.csc.fi/pouta-accounting">{{ $t('message.dashboard.billing_info') }}</a></li>
+                    <li><a target="_blank" href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">{{ $t('message.dashboard.quota_info') }}</a></li>
+                    <li><a target="_blank" href="https://my.csc.fi">{{ $t('message.dashboard.avail_info') }}</a></li>
                 </ul>
             </div>
         </div>
