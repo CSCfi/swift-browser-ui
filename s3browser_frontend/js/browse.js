@@ -63,48 +63,54 @@ const UserPage = Vue.extend({
     },
     template: `
 <div class="dashboard">
-    <div class="tile is-parent">
-        <div class="tile is-child is-4 box">
-            <p class="title">Project usage</p>
-            <p>
-                <ul>
-                    <li>Account: {{ Account }}</li>
-                    <li>Containers: {{ Containers }}</li>
-                    <li>Objects: {{ Objects }}</li>
-                    <li>Usage: {{ Size }}</li>
-                </ul>
-            </p>
+    <div class="tile is-ancestor">
+        <div class="tile is-parent is-horizontal is-4">
+            <div class="tile is-child box">
+                <p class="title is-size-5">Project usage</p>
+                <p>
+                    <ul>
+                        <li>Account: {{ Account }}</li>
+                        <li>Containers: {{ Containers }}</li>
+                        <li>Objects: {{ Objects }}</li>
+                        <li>Usage: {{ Size }}</li>
+                    </ul>
+                </p>
+            </div>
         </div>
-        <div class="tile is-child is-8 box">
-            <p class="title">Current billing</p>
-            <progress
-                v-if="Bytes < 1099511627776"
-                class="progress is-success is-large"
-                :value="Bytes"
-                :max="1099511627776"
-            >{{ parseInt(Bytes/1099511627776) }}</progress>
-            <progress
-                v-else
-                class="progress is-danger is-large"
-                :value="Bytes"
-                :max="1099511627776"
-            >{{ parseInt(Bytes/1099511627776) }}</progress>
-            <p>
-                <ul>
-                    <li><b>Project storage usage: </b> {{ Size }} / 1TiB</li>
-                    <li><b>Equals: </b> {{ Billed }} <b>BU / hour </b></li>
-                </ul>
-            </p>
+        <div class="tile is-parent is-horizontal is-8">
+            <div class="tile is-child box">
+                <p class="title is-size-5">Current billing</p>
+                <progress
+                    v-if="Bytes < 1099511627776"
+                    class="progress is-success is-large"
+                    :value="Bytes"
+                    :max="1099511627776"
+                >{{ parseInt(Bytes/1099511627776) }}</progress>
+                <progress
+                    v-else
+                    class="progress is-danger is-large"
+                    :value="Bytes"
+                    :max="1099511627776"
+                >{{ parseInt(Bytes/1099511627776) }}</progress>
+                <p>
+                    <ul>
+                        <li><b>Project storage usage: </b> {{ Size }} / 1TiB</li>
+                        <li><b>Equals: </b> {{ Billed }} <b>BU / hour </b></li>
+                    </ul>
+                </p>
+            </div>
         </div>
     </div>
-    <div class="tile is-parent">
-        <div class="tile is-child is-12 box">
-            <p class="title">More information</p>
-            <ul>
-                <li><a href="https://research.csc.fi/pouta-accounting">Pouta billing information</a></li>
-                <li><a href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">Pouta default quotas</a></li>
-                <li><a href="https://my.csc.fi">Information on project billing unit availability etc.</a></li>
-            </ul>
+    <div class="tile is-ancestor">
+        <div class="tile is-parent is-horizontal is-12">
+            <div class="tile is-child is-12 box">
+                <p class="title is-size-5">More information</p>
+                <ul>
+                    <li><a href="https://research.csc.fi/pouta-accounting">Pouta billing information</a></li>
+                    <li><a href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">Pouta default quotas</a></li>
+                    <li><a href="https://my.csc.fi">Information on project billing unit availability etc.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
