@@ -280,14 +280,11 @@ const ContainerPage = Vue.extend({
     },
     computed: {
         filter: function() {
-          var name_re = new RegExp(this.searchQuery.name, 'i');
-          var data = [];
-          for (i in app.bList) {
-            if (app.bList[i].name.match(name_re)) {
-                data.push(app.bList[i]);
-            }
-          }
-          return data;
+            var name_cmp = new RegExp(this.searchQuery.name, 'i');
+            var data = app.bList.filter(
+                element => element.name.match(name_cmp)
+            );
+            return data;
         }
     },
 });
@@ -493,12 +490,9 @@ const ObjectPage = Vue.extend({
     computed: {
         filter: function() {
           var name_re = new RegExp(this.searchQuery.name, 'i')
-          var data = [];
-          for (i in this._data["oList"]) {
-            if (this._data["oList"][i].name.match(name_re)) {
-                data.push(this._data["oList"][i])
-            }
-          }
+          var data = this._data["oList"].filter(
+              element => element.name.match(name_re)
+          )
           return data;
         }
     },
