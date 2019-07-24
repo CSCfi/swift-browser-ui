@@ -2,7 +2,6 @@
 
 
 import subprocess  # nosec
-import signal
 import time
 from contextlib import AbstractContextManager
 
