@@ -126,7 +126,7 @@ const UserPage = Vue.extend({
                             <b-button class="button is-small is-primary" icon-right="information"></b-button>
                         </b-tooltip>
                         </li>
-                        <li><b>{{ $t('message.dashboard.equals') }} </b> {{ Billed }} <b>BU / hour </b></li>
+                        <li><b>{{ $t('message.dashboard.equals') }} </b> {{ Billed }} <b>BU / {{ $t('message.dashboard.hour') }} </b></li>
                     </ul>
                 </p>
             </div>
@@ -137,9 +137,18 @@ const UserPage = Vue.extend({
             <div class="tile is-child is-12 box">
                 <p class="title is-size-5">{{ $t('message.dashboard.more_info') }}</p>
                 <ul>
-                    <li><a target="_blank" href="https://research.csc.fi/pouta-accounting">{{ $t('message.dashboard.billing_info') }}</a></li>
-                    <li><a target="_blank" href="https://research.csc.fi/pouta-object-storage-quotas-and-billing">{{ $t('message.dashboard.quota_info') }}</a></li>
-                    <li><a target="_blank" href="https://my.csc.fi">{{ $t('message.dashboard.avail_info') }}</a></li>
+                    <li><a 
+                        target="_blank"
+                        :href="$t('message.dashboard.pouta_accounting')"
+                    >{{ $t('message.dashboard.billing_info') }}</a></li>
+                    <li><a 
+                        target="_blank"
+                        :href="$t('message.dashboard.pouta_obj_store_quota_info')"
+                    >{{ $t('message.dashboard.quota_info') }}</a></li>
+                    <li><a 
+                        target="_blank" 
+                        :href="$t('message.dashboard.my_csc')"
+                    >{{ $t('message.dashboard.avail_info') }}</a></li>
                 </ul>
             </div>
         </div>
