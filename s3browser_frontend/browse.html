@@ -49,7 +49,7 @@
                                 v-if="multipleProjects"
                             >
                                 {{ $t("message.currentProj") }}: <a class="navbar-link">
-                                    <span>{{ this.$route.params.project }}</span>
+                                    <span>{{ this.active.name }}</span>
                                 </a>
 
                                 <div class="navbar-dropdown">
@@ -65,10 +65,24 @@
                                 class="navbar-item"
                                 v-if="!multipleProjects"
                             >
-                            {{ $t("message.currentProj") }}: &nbsp;<span>{{ this.$route.params.project }}</span>
+                            {{ $t("message.currentProj") }}: &nbsp;<span>{{ this.active.name }}</span>
                             </div>
                         </div>
                         <div class="navbar-end">
+                            <div class="navbar-item">
+                                <div class="buttons">
+                                    <router-link
+                                        v-if="$route.params.project == undefined"
+                                        :to="'/browse/' + $route.params.user + '/' + active.name"
+                                        class="button is-primary"
+                                    >{{ $t("message.dashboard.browser") }}</router-link>
+                                    <router-link
+                                        v-else 
+                                        :to="'/browse/' + $route.params.user"
+                                        class="button is-primary"
+                                    >{{ $t("message.dashboard.dashboard") }}</router-link>
+                                </div>
+                            </div>
                             <div class="navbar-item">
                                 <b-field class="locale-changer">
                                     <b-select placeholder="Language" icon="earth"

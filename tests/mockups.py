@@ -286,7 +286,24 @@ class Mock_Service:
         ret = {}
         ret["headers"] = {}
         if not args:
-            ret["items"] = [("Account", "AUTH_test_account",), ]
+            object_amount = 0
+            bytes_total = 0
+            container_amount = len(self.containers)
+            # Iterate over all containers to figure out the amount of of
+            # objects
+            for i in self.containers:
+                object_amount = object_amount + len(self.containers[i])
+                # Iterate over all objects to get the total storage usage
+                for j in self.containers[i]:
+                    bytes_total = bytes_total + j['bytes']
+            ret["items"] = [
+                ("Account", "AUTH_test_account",),
+                ("Containers", container_amount),
+                ("Objects", object_amount),
+                ("Bytes", bytes_total),
+                ("Random_garbage", "afjf0f3+3++"),
+                ("More_random_garbage", 349000909990),
+            ]
             # Add the tempurl headers to the return dictionary, if they have
             # been initialized
             if self.meta["tempurl_key_1"] is not None:
@@ -300,14 +317,14 @@ class Mock_Service:
         if len(args) == 1:
             # If the length is exactly one, then only a container was
             # specified.
-            if "Acc_example" in self.cont_meta[args[0]].keys():
-                ret['container'] = args[0]
-                ret['headers']["x-container-meta-obj-example"] = "example"
-                ret['success'] = True
-            return ret
+            return self.ret_cont_stat(args)
 
         # In any other case the query is for an object.
         # Iterate over the object query list.
+        return self.ret_obj_stat(args)
+
+    def ret_obj_stat(self, args):
+        """Return object stats from stat query."""
         ret = []
         for i in args[1]:
             to_add = {}
@@ -321,6 +338,16 @@ class Mock_Service:
             to_add["success"] = True
             to_add["object"] = i
             ret.append(to_add)
+        return ret
+
+    def ret_cont_stat(self, args):
+        """Return container stats from stat query."""
+        ret = {}
+        ret['headers'] = {}
+        if "Acc_example" in self.cont_meta[args[0]].keys():
+            ret['container'] = args[0]
+            ret['headers']["x-container-meta-obj-example"] = "example"
+            ret['success'] = True
         return ret
 
     def post(self, options=None):

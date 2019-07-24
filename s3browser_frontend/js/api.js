@@ -92,3 +92,19 @@ var getObjects = async function (container) {
     );
     return objects;
 };
+
+var getProjectMeta = async function () {
+    // Fetch project metadata for the currently active project, containing the
+    // project data usage, container amount and object amount.
+    let metaURL = new URL( "/api/get-project-meta", document.location.origin );
+    let ret = fetch(
+        metaURL, {method: 'GET', credentials: 'include' }
+    ).then( function ( resp ) { return resp.json() } )
+     .then( function ( json_ret ) {
+        let newRet = json_ret;
+        newRet['Size'] = getHumanReadableSize(newRet['Bytes']);
+        newRet['Billed'] = parseFloat(newRet['Bytes'] / 1099511627776 * 3.5).toPrecision(4);
+        return newRet;
+    })
+    return ret;
+}

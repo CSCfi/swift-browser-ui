@@ -83,6 +83,8 @@ class AppTestCase(AioHTTPTestCase):
         assert response.status != 404  # nosec
         response = await self.client.request("GET", '/api/meta')
         assert response.status != 404  # nosec
+        response = await self.client.request("GET", '/api/get-project-meta')
+        assert response.status != 404  # nosec
         # Test all the static folders as well
         response = await self.client.request("GET", '/static/index.html')
         assert response.status != 404  # nosec

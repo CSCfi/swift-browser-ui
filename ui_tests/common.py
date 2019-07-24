@@ -2,7 +2,6 @@
 
 
 import subprocess  # nosec
-import signal
 import time
 from contextlib import AbstractContextManager
 
@@ -97,6 +96,7 @@ def navigate_to_container_with_objects(drv):
         webdriver.common.action_chains.ActionChains(drv)
         .send_keys(Keys.TAB)  # Switching to the table requires 8 tabs, this
         .send_keys(Keys.TAB)  # nicely tets the accessibility as well
+        .send_keys(Keys.TAB)
         .send_keys(Keys.TAB)
         .send_keys(Keys.TAB)
         .send_keys(Keys.TAB)
@@ -216,4 +216,5 @@ class ServerThread(AbstractContextManager):
     def __exit__(self, exc_type, exc_value, traceback):
         """."""
         # Kill the server on exit.
-        self.server_thread.send_signal(signal.SIGINT)
+        self.server_thread.kill()
+        self.server_thread.wait()
