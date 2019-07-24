@@ -217,7 +217,10 @@ const ContainerPage = Vue.extend({
             <option value="100"> 100 {{ $t('message.table.pageNb') }}</option>
         </b-select>
         <div class="control is-flex">
-            <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
+            <b-switch 
+                v-if="bList.length < 500"
+                v-model="isPaginated"
+            >{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control searchBox">
             <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
@@ -356,7 +359,10 @@ const ObjectPage = Vue.extend({
             <option value="100"> 100 {{ $t('message.table.pageNb') }}</option>
         </b-select>
         <div class="control is-flex">
-            <b-switch v-model="isPaginated">{{ $t('message.table.paginated') }}</b-switch>
+            <b-switch
+                v-if="oList.length < 500"
+                v-model="isPaginated"
+            >{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control searchBox">
             <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
