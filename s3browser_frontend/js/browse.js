@@ -309,7 +309,7 @@ const ObjectPage = Vue.extend({
                     vals['oList'] = ret;
 
                     // Purge old cached items from object query cache if the
-                    // cache has grown to be too large (150000).
+                    // cache has grown to be too large (250000).
                     recursivePruneCache(app.oCache);
 
                     app.oCache[container] = vals['oList'];
@@ -683,8 +683,8 @@ var getHumanReadableDate = function (val) {
 
 
 var recursivePruneCache = function (object_cache) {
-    // Prune the object_cache until the cache is < 150000 objects in total
-    if (getNestedObjectTotal(object_cache) > 150000) {
+    // Prune the object_cache until the cache is < 250000 objects in total
+    if (getNestedObjectTotal(object_cache) > 250000) {
         delete bject_cache[Object.keys(object_cache)[0]];
         return recursivePruneCache(object_cache);
     }
