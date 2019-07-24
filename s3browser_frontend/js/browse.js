@@ -178,12 +178,6 @@ const ContainerPage = Vue.extend({
                 }
                 vals['bList'] = ret;
 
-                for (let i = 0; i < vals['bList'].length; i++) {
-                    vals['bList'][i]['size'] = getHumanReadableSize(
-                        vals['bList'][i]['bytes']
-                    );
-                };
-
                 app.bList = vals['bList']
                 app.isLoading = false;
             }).catch(function () {
@@ -261,7 +255,7 @@ const ContainerPage = Vue.extend({
                 {{ props.row.count }}
             </b-table-column>
             <b-table-column field="bytes" :label="$t('message.table.size')" width="120" sortable>
-                {{ props.row.size }}
+                {{ localHumanReadableSize(props.row.bytes) }}
             </b-table-column>
         </template>
         <template slot="empty" slot-scope="props">
@@ -279,6 +273,9 @@ const ContainerPage = Vue.extend({
         },
         addPageToURL: function (pageNumber) {
             this.$router.push("?page=" + pageNumber);
+        },
+        localHumanReadableSize: function (size) {
+            return getHumanReadableSize(size);
         },
     },
     computed: {
@@ -314,14 +311,9 @@ const ObjectPage = Vue.extend({
                     }
                     vals['oList'] = ret;
 
-                    for (let i = 0; i < vals['oList'].length; i++) {
-                        vals['oList'][i]['size'] = getHumanReadableSize(
-                            vals['oList'][i]['bytes']
-                        );
-                        vals['oList'][i]['last_modified'] = getHumanReadableDate(
-                            vals['oList'][i]['last_modified']
-                        );
-                    };
+                    // Purge old cached items from object query cache if the
+                    // cache has grown to be too large (150000).
+                    recursivePruneCache(app.oCache);
 
                     app.oCache[container] = vals['oList'];
                     app.isLoading = false;
@@ -390,10 +382,10 @@ const ObjectPage = Vue.extend({
                 {{ props.row.name }}
             </b-table-column>
             <b-table-column field="last_modified" :label="$t('message.table.modified')" sortable>
-                {{ props.row.last_modified }}
+                {{ localHumanReadableDate(props.row.last_modified) }}
             </b-table-column>
             <b-table-column field="bytes" :label="$t('message.table.size')" sortable>
-                {{ props.row.size }}
+                {{ localHumanReadableSize(props.row.bytes) }}
             </b-table-column>
             <b-table-column field="url" label="" width="110">
                 <a
@@ -491,7 +483,12 @@ const ObjectPage = Vue.extend({
             expiryDate.setMonth(expiryDate.getMonth() + 1);
             document.cookie = 'ENA_DL=' + this.allowLargeDownloads + '; path=/; expires=' + expiryDate.toUTCString();
         },
-        
+        localHumanReadableSize: function ( size ) {
+            return getHumanReadableSize( size );
+        },
+        localHumanReadableDate: function ( date ) {
+            return getHumanReadableDate( date );
+        },
     },
     computed: {
         filter: function() {
@@ -688,4 +685,25 @@ var getHumanReadableDate = function (val) {
 
     }
     return dateVal.toLocaleDateString(langLocale, options, zone);
+}
+
+
+var recursivePruneCache = function (object_cache) {
+    // Prune the object_cache until the cache is < 150000 objects in total
+    if (getNestedObjectTotal(object_cache) > 150000) {
+        delete bject_cache[Object.keys(object_cache)[0]];
+        return recursivePruneCache(object_cache);
+    }
+    return object_cache;
+}
+
+
+var getNestedObjectTotal = function (nested) {
+    // Get the size of a object containing arrays, in the amount of total
+    // array elements
+    let ret = 0;
+    for (var key in nested) {
+        ret += nested[key].length;
+    }
+    return ret;
 }
