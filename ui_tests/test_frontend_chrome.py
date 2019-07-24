@@ -115,8 +115,6 @@ class TestFirefoxFrontend(ChromiumTestClass):
             self.drv.find_element_by_link_text("test_user_id")
         )
         time.sleep(0.1)
-        # NOTE: replace this with a proper assertion when the dashboard is
-        # implemented
         self.assertIn("Käyttäjä", self.drv.page_source)
         self.assertIn("Kontteja", self.drv.page_source)
         self.assertIn("Objekteja", self.drv.page_source)

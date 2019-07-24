@@ -217,4 +217,5 @@ class ServerThread(AbstractContextManager):
     def __exit__(self, exc_type, exc_value, traceback):
         """."""
         # Kill the server on exit.
-        self.server_thread.send_signal(signal.SIGINT)
+        self.server_thread.kill()
+        self.server_thread.wait()
