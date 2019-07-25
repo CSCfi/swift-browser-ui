@@ -66,7 +66,7 @@ const UserPage = Vue.extend({
                 setTimeout(() => {
                     this.DisableTooltip = true
                     document.cookie = "DISABLE_BILLING_NOTE=true"
-                }, 5000)
+                }, 4000)
             }
         }
     },
@@ -191,13 +191,19 @@ const ContainerPage = Vue.extend({
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
         vals['defaultSortDirection'] = 'asc';
-        vals['searchQuery'] = {
-            name: '',
-        };
+        vals['searchQuery'] = ""
         vals['currentPage'] = (
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
         return vals;
+    },
+    watch: {
+        searchQuery: function () {
+            this.debounceFilter();
+        }
+    },
+    created: function () {
+        this.debounceFilter = _.debounce(this.filter, 400);
     },
     template: `
 <div>
@@ -217,12 +223,12 @@ const ContainerPage = Vue.extend({
             >{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control searchBox">
-            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
+            <b-input v-model="searchQuery" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>      
     </b-field>
-    <b-table 
+    <b-table sudo 
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
-        :data="filter"
+        :data="bList"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         v-on:page-change="(page) => addPageToURL ( page )"
@@ -277,14 +283,11 @@ const ContainerPage = Vue.extend({
         localHumanReadableSize: function (size) {
             return getHumanReadableSize(size);
         },
-    },
-    computed: {
         filter: function() {
-            var name_cmp = new RegExp(this.searchQuery.name, 'i');
-            var data = app.bList.filter(
+            var name_cmp = new RegExp(this.searchQuery, 'i');
+            this.bList = app.bList.filter(
                 element => element.name.match(name_cmp)
             );
-            return data;
         }
     },
 });
@@ -325,9 +328,7 @@ const ObjectPage = Vue.extend({
         vals['isPaginated'] = true;
         vals['perPage'] = 15;
         vals['defaultSortDirection'] = 'asc';
-        vals['searchQuery'] = {
-            name: '',
-        };
+        vals['searchQuery'] = "";
         if (document.cookie.match("ENA_DL")) {
             vals['allowLargeDownloads'] = true;
         } else { vals['allowLargeDownloads'] = false; };
@@ -335,6 +336,14 @@ const ObjectPage = Vue.extend({
             this.$route.query.page ? parseInt(this.$route.query.page) : 1
         );
         return vals;
+    },
+    watch: {
+        searchQuery: function () {
+            this.debounceFilter();
+        }
+    },
+    created: function () {
+        this.debounceFilter = _.debounce(this.filter, 400);
     },
     template: `
 <div>
@@ -354,12 +363,12 @@ const ObjectPage = Vue.extend({
             >{{ $t('message.table.paginated') }}</b-switch>
         </div>
         <b-field class="control searchBox">
-            <b-input v-model="searchQuery.name" v-bind:placeholder="$t('message.searchBy')"/>
+            <b-input v-model="searchQuery" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>
     </b-field>
     <b-table
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
-        :data="filter"
+        :data="oList"
         :selected.sync="selected"
         :current-page.sync="currentPage"
         focusable
@@ -486,14 +495,11 @@ const ObjectPage = Vue.extend({
         localHumanReadableDate: function ( date ) {
             return getHumanReadableDate( date );
         },
-    },
-    computed: {
-        filter: function() {
-          var name_re = new RegExp(this.searchQuery.name, 'i')
-          var data = this._data["oList"].filter(
-              element => element.name.match(name_re)
-          )
-          return data;
+        filter: function () {
+            var name_re = new RegExp(this.searchQuery, 'i')
+            this.oList = app.oCache[this.$route.params.container].filter(
+                element => element.name.match(name_re)
+            )
         }
     },
 });
