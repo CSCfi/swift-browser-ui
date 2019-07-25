@@ -7,6 +7,7 @@
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.6/dist/vue-router.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
         <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
         <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
@@ -18,21 +19,6 @@
         <title>Object storage browser</title>
     </head>
     <body>
-        <!-- <script>
-            // Call logout if the user leaves the page, since it's not
-            // necessary to hold sessions open.
-            // Not using the app.logout function because it has a redirection,
-            // which would mean that the function won't trigger here.
-            //  (insert something about beforeunload event and security here)
-            window.onbeforeunload = function () {
-                fetch( '/login/kill', { method: 'GET', credentials: 'include' })
-                    .then(
-                        function ( response ) {
-                            console.log(response.status());
-                        }
-                    )
-            }
-        </script> -->
         <div id="app">
             <div class='navbar has-shadow is-spaced'>
                 <div class="container is-fluid">

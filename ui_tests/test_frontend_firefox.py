@@ -80,7 +80,7 @@ class TestFirefoxFrontend(FirefoxTestClass):
         self.drv.find_element_by_class_name("input").send_keys(
             "test-container-3"
         )
-        time.sleep(0.25)
+        time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         time.sleep(0.25)
         self.assertIn("test-container-3", self.drv.current_url)
@@ -94,7 +94,7 @@ class TestFirefoxFrontend(FirefoxTestClass):
         self.drv.find_element_by_class_name("input").send_keys(
             "test-container-4"
         )
-        time.sleep(0.25)
+        time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         self.assertIn("test-container-4", self.drv.current_url)
         # Go back and check the next container with some objects inside.
