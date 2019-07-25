@@ -26,6 +26,7 @@ Out of the box the ``s3browser`` offers:
 
     Setup Instructions <instructions>
     Usage & Examples  <usage>
+    Python Modules  <code>
 
 .. note:: ``s3browser`` and all it sources are released under *MIT License*.
 

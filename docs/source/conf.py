@@ -14,6 +14,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import datetime
+import sys
+import os
+
+# Get the project root dir
+sys.path.insert(0, os.path.abspath('../../s3browser'))
 
 # -- Project information -----------------------------------------------------
 current_year = str(datetime.date.today().year)
@@ -48,6 +53,8 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 master_doc = 'index'
+
+autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
 
