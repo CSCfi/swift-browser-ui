@@ -226,7 +226,7 @@ const ContainerPage = Vue.extend({
             <b-input v-model="searchQuery" v-bind:placeholder="$t('message.searchBy')"/>
         </b-field>      
     </b-field>
-    <b-table sudo 
+    <b-table
         style="width: 90%;margin-left: 5%; margin-right: 5%;"
         :data="bList"
         :selected.sync="selected"
