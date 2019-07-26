@@ -65,7 +65,6 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/source/_static/images
 docs/_build/
 docs/source/s3browser
 

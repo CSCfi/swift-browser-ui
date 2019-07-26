@@ -144,9 +144,9 @@ def switch_to_finnish(drv):
     raise NoSuchElementException()
 
 
-def get_nav_to_ui(drv):
+def get_nav_to_ui(drv, address="http://localhost:8080"):
     """Navigate to the browser UI."""
-    drv.get("http://localhost:8080")
+    drv.get(address)
     login(drv)
     time.sleep(0.1)
     return drv

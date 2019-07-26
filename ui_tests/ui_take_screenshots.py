@@ -15,6 +15,9 @@ from .common import navigate_to_container_with_objects
 from .common import wait_for_clickable
 
 
+TEST_ADDRESS = "http://localhost:8080"
+
+
 class ObjBrowserScreenshot():
     """Base class to inherit when creating an object browser screenshot."""
 
@@ -55,21 +58,21 @@ class TakeScreenshots(ObjBrowserScreenshot):
 
     def screenshot_login_page(self):
         """Take screenshot of the development login page."""
-        self.drv.get('http://localhost:8080')
+        self.drv.get(TEST_ADDRESS)
         time.sleep(0.25)
         with open(self.img_dir + 'screenshot-login-page', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_front_page(self):
         """Take screenshot of the front page."""
-        get_nav_to_ui(self.drv)
+        get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         time.sleep(0.25)
         with open(self.img_dir + 'screenshot-front-page', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_dashboard(self):
         """Take screenshot of the dashboard."""
-        get_nav_to_ui(self.drv)
+        get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         wait_for_clickable(
             self.drv.find_element_by_link_text("User information")
         )
@@ -79,7 +82,7 @@ class TakeScreenshots(ObjBrowserScreenshot):
 
     def screenshot_object_page(self):
         """Take screenshot of the object page."""
-        get_nav_to_ui(self.drv)
+        get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
         with open(self.img_dir + 'screenshot-object-page', 'wb') as img_f:
@@ -87,7 +90,7 @@ class TakeScreenshots(ObjBrowserScreenshot):
 
     def screenshot_object_details(self):
         """Take screenshot with object details open."""
-        get_nav_to_ui(self.drv)
+        get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
         wait_for_clickable(
