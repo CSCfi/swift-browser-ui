@@ -76,7 +76,7 @@ class TakeScreenshots(ObjBrowserScreenshot):
         wait_for_clickable(
             self.drv.find_element_by_link_text("User information")
         )
-        time.sleep(0.25)
+        time.sleep(5.0)
         with open(self.img_dir + 'screenshot-dashboard', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
