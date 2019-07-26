@@ -14,12 +14,11 @@ help:
 
 .PHONY: help Makefile
 
-clean:
-	rm -rf ./source/_static/images;\
-	$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+html-img:
+	cd ..;python -m ui_tests.ui_take_screenshots;cd docs;\
+	$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
-	cd ..;python -m ui_tests.ui_take_screenshots;cd docs;\
 	$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
