@@ -206,7 +206,7 @@ const ContainerPage = Vue.extend({
         this.debounceFilter = _.debounce(this.filter, 400);
     },
     template: `
-<div>
+<div id="container-table">
     <b-field grouped group-multiline class="groupControls">
         <b-select v-model="perPage" :disabled="!isPaginated">
             <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
@@ -346,7 +346,7 @@ const ObjectPage = Vue.extend({
         this.debounceFilter = _.debounce(this.filter, 400);
     },
     template: `
-<div>
+<div id="object-table">
     <b-field grouped group-multiline class="groupControls">
         <b-select v-model="perPage" :disabled="!isPaginated">
             <option value="5"> 5 {{ $t('message.table.pageNb') }}</option>
