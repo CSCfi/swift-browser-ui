@@ -121,8 +121,9 @@ async def sso_query_end(request):
     # re-scoping?
     request.app['Creds'][session]['Token'] = unscoped
 
-    # Check project availability with a list of domains, save the information
-    # inside the app mapping
+    # If the user didn't specify an existing project when logging in (in the
+    # last active -header), check project availability with a list of domains,
+    # save the information inside the app mapping.
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
@@ -142,10 +143,23 @@ async def sso_query_end(request):
         )
         return response
 
+    if "LAST_ACTIVE" in request.cookies:
+        if (request.cookies["LAST_ACTIVE"] not in [
+                p['id']
+                for p in request.app['Creds'][session]['Avail']['projects']
+        ]):
+            raise aiohttp.web.HTTPForbidden(
+                reason="The project is not available for this token."
+            )
+        project_id = request.cookies["LAST_ACTIVE"]
+    else:
+        project_id = \
+            request.app['Creds'][session]['Avail']['projects'][0]['id']
+
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
-        request.app['Creds'][session]['Avail']['projects'][0]['id']
+        project_id
     )
 
     # Create the swiftclient connection
@@ -153,11 +167,18 @@ async def sso_query_end(request):
         request.app['Creds'][session]['OS_sess'],
     )
 
+    project_name = None
+    for i in request.app['Creds'][session]['Avail']['projects']:
+        if i['id'] == project_id:
+            project_name = i['name']
     # Save the current active project
     request.app['Creds'][session]['active_project'] = {
-        "name": request.app['Creds'][session]['Avail']['projects'][0]['name'],
-        "id": request.app['Creds'][session]['Avail']['projects'][0]['id'],
+        "name": project_name,
+        "id": project_id
     }
+
+    # Set the active project to be the last active project
+    response.set_cookie("LAST_ACTIVE", project_id, expires=2592000)
 
     # Redirect to the browse page with the correct credentials
     response.headers['Location'] = "/browse"
@@ -209,10 +230,21 @@ async def token_rescope(request):
         "id": request.query['project'],
     }
 
-    return aiohttp.web.Response(
-        status=204,
+    response = aiohttp.web.Response(
+        status=303,
         reason="Successfully rescoped token."
     )
+    response.headers["Location"] = "/browse"
+    if "Referer" in request.headers:
+        if len(request.headers["Referer"].split("/")) == 5:
+            response.headers["Location"] = request.headers["Referer"]
+    response.set_cookie(
+        "LAST_ACTIVE",
+        request.app['Creds'][session]['active_project']['id'],
+        expires=2592000
+    )
+
+    return response
 
 
 async def handle_logout(request):

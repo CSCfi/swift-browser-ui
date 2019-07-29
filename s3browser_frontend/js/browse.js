@@ -622,6 +622,11 @@ const app = new Vue({
             document.cookie = 'lang=' + i18n.locale + '; path=/; expires=' + expiryDate.toUTCString();
             this.$router.go(this.$router.currentRoute);
         },
+        getProjectChangeURL ( newProject ) {
+            let rescopeURL = new URL( "/login/rescope", document.location.origin );
+            rescopeURL.searchParams.append( "project", newProject );
+            return rescopeURL.toString();        
+        },
     },
 });
 
