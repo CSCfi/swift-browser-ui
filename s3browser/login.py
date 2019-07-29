@@ -235,6 +235,9 @@ async def token_rescope(request):
         reason="Successfully rescoped token."
     )
     response.headers["Location"] = "/browse"
+    if "Referer" in request.headers:
+        if len(request.headers["Referer"].split("/")) == 5:
+            response.headers["Location"] = request.headers["Referer"]
     response.set_cookie(
         "LAST_ACTIVE",
         request.app['Creds'][session]['active_project']['id'],
