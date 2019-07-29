@@ -73,6 +73,11 @@ const UserPage = Vue.extend({
     beforeMount(){
         this.fetchMeta();
         this.disable();
+        if ( app.active == undefined || app.active == "" ) {
+            getActiveProject().then( function ( value ) {
+                app.active = value;
+            })
+        }
     },
     template: `
 <div class="dashboard">
