@@ -608,7 +608,7 @@ const app = new Vue({
             let logoutURL = new URL("/login/kill", document.location.origin);
             fetch(
                 logoutURL,
-                { method: 'GET', credentials: 'include' }
+                { method: 'GET', credentials: 'same-origin' }
             ).then(function (response) {
                 if (response.status = 204) {
                     // Impelement a page here to inform the user about a
