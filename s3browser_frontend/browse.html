@@ -43,7 +43,7 @@
                                         class="navbar-item"
                                         v-for="item in projects"
                                         v-bind:key="item.id"
-                                        v-on:click="changeProject ( item.id )"
+                                        v-bind:href="getProjectChangeURL ( item.id )"
                                     ><span>{{ item.name }}</span></a>
                                 </div>
                             </div>

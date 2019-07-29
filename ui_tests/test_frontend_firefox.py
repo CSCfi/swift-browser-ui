@@ -28,7 +28,7 @@ class TestFirefoxFrontend(FirefoxTestClass):
 
     @pytest.mark.timeout(60)
     def test_download_from_random_bucket_fin(self):
-        """Testif the previous file download test works with fi locale."""
+        """Test if the previous file download test works with fi locale."""
         switch_to_finnish(self.drv)
         self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)

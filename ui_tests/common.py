@@ -92,21 +92,8 @@ def navigate_to_next_full_after_back(drv):
 def navigate_to_container_with_objects(drv):
     """Navigate to a container that has some objects in it."""
     # Navigate to the first container and check if there's content in it.
-    (
-        webdriver.common.action_chains.ActionChains(drv)
-        .send_keys(Keys.TAB)  # Switching to the table requires 8 tabs, this
-        .send_keys(Keys.TAB)  # nicely tets the accessibility as well
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.TAB)
-        .send_keys(Keys.ARROW_DOWN)  # Get the first container in active table
-        .send_keys(Keys.ENTER)  # Hit enter to open container
-        .perform()  # Flush the queue into the window
-    )
+    drv.find_element_by_tag_name("table").send_keys(Keys.ARROW_DOWN)
+    drv.find_element_by_tag_name("table").send_keys(Keys.ENTER)
     return check_contents(drv)
 
 
