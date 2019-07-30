@@ -25,7 +25,7 @@ setuptools.setup(
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
                  'pytest-asyncio', 'tox', 'pytest-mock',
                  'flake8', 'flake8-docstrings', 'pytest-aiohttp',
-                 'pytest-xdist'],
+                 'pytest-xdist', 'asynctest'],
         'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme', 'selenium'],
         'ui_test': ['pytest', 'selenium', 'pytest-timeout'],
     },
