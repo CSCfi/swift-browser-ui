@@ -50,7 +50,7 @@ def check_download(drv):
         wait_for_clickable(
             drv.find_element_by_link_text("Lataa")
         )
-    time.sleep(0.2)
+    time.sleep(0.3)
     drv.switch_to.window(drv.window_handles[1])
     time.sleep(0.1)
     if (
@@ -151,13 +151,21 @@ def get_nav_out(drv):
             drv.find_element_by_link_text("Kirjaudu ulos")
         )
     finally:
-        time.sleep(0.1)
+        time.sleep(0.25)
         drv.refresh()
         drv.quit()
 
 
 def login(drv):
     """Log in the user in a specific selenium driver instance."""
+    try:
+        wait_for_clickable(
+            drv.find_element_by_link_text("Log In")
+        )
+    except NoSuchElementException:
+        wait_for_clickable(
+            drv.find_element_by_link_text("Kirjaudu sisään")
+        )
     drv.implicitly_wait(1)
     drv.find_element_by_id("inputbox").submit()
     while drv.current_url != \
