@@ -17,6 +17,10 @@ from .mockups import Mock_Service, Mock_Session
 SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))
 
 
+logging.basicConfig()
+logging.root.setLevel(logging.DEBUG)
+
+
 def mock_initiate_os_session(token, _):
     """Create a mock os session object."""
     return Mock_Session()
