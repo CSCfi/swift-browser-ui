@@ -550,10 +550,6 @@ const app = new Vue({
             // Create a list representation of the current application route
             // to help in the initialization of the breadcrumb component
             let retl = [];
-            // retl.push({
-            //     alias: "browse",
-            //     address: ( "/browse" ),
-            // })
             if (this.$route.params.user != undefined) {
                 retl.push({
                     alias: this.$route.params.user,
@@ -601,19 +597,6 @@ const app = new Vue({
                 else {
                     app.$router.push('/browse/' + app.uname);
                 };
-            })
-        },
-        logout: function () {
-            // Call API to kill the session immediately
-            let logoutURL = new URL("/login/kill", document.location.origin);
-            fetch(
-                logoutURL,
-                { method: 'GET', credentials: 'same-origin' }
-            ).then(function (response) {
-                if (response.status = 204) {
-                    // Impelement a page here to inform the user about a
-                    // successful logout.
-                }
             })
         },
         setCookieLang: function() {

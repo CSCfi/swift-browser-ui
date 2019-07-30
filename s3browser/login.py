@@ -274,6 +274,6 @@ async def handle_logout(request):
         request.app['Sessions'].remove(cookie)
         log.debug("Removed session %s from session list :: %s",
                   cookie, time.ctime())
-    return aiohttp.web.Response(
-        status=204
+    return aiohttp.web.FileResponse(
+        setd['static_directory'] + "/index.html"
     )
