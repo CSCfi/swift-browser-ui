@@ -37,7 +37,10 @@ def test_chrome_session_end_button():
             time.sleep(3.00)
             drv.execute_script("location.reload(true);")
             time.sleep(0.5)
-            assert "Unauthorized" in drv.page_source  # nosec
+            assert (  # nosec
+                "Log In" in drv.page_source or
+                "Kirjaudu sisään" in drv.page_source
+            )
         finally:
             drv.quit()
 
@@ -80,7 +83,10 @@ def test_chrome_session_separation_logouts():
 
             # Check that none of the pages were logged out
             for drv in drv_list:
-                assert "Unauthorized" not in drv.page_source  # nosec
+                assert (  # nosec
+                    "Log In" not in drv.page_source and
+                    "Kirjaudu sisään" not in drv.page_source
+                )
 
             # After this we can test that the session border doesn't break,
             # i.e. the two remaining sessions have different content.
