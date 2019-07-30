@@ -14,7 +14,7 @@ import s3browser.settings
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .mockups import return_project_avail
-from .mockups import return_same_cookie, return_invalid
+from .mockups import return_invalid
 
 
 @pytest.mark.asyncio
@@ -76,11 +76,6 @@ async def test_sso_query_end_successful_http_form(mocker):
     )
 
     mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
-
-    mocker.patch(
         "keystoneauth1.identity.v3.Token"
     )
     mocker.patch(
@@ -91,7 +86,6 @@ async def test_sso_query_end_successful_http_form(mocker):
     )
 
     req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
     token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
     req.set_post({
         "token": token
@@ -100,7 +94,8 @@ async def test_sso_query_end_successful_http_form(mocker):
     resp = await s3browser.login.sso_query_end(req)
 
     # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
+    assert req.app['Sessions']  # nosec
+    session = req.app['Sessions'][0]
     assert req.app['Creds'][session]['Token'] is not None  # nosec
     assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
     assert req.app['Creds'][session]['active_project'] == {  # nosec
@@ -131,11 +126,6 @@ async def test_sso_query_end_successful_url_form(mocker):
     )
 
     mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
-
-    mocker.patch(
         "keystoneauth1.identity.v3.Token"
     )
     mocker.patch(
@@ -146,17 +136,15 @@ async def test_sso_query_end_successful_url_form(mocker):
     )
 
     req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
     token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
-
-    session, _ = return_same_cookie(req)
 
     req.query['token'] = token
 
     resp = await s3browser.login.sso_query_end(req)
 
     # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
+    assert req.app['Sessions']  # nosec
+    session = req.app['Sessions'][0]
     assert req.app['Creds'][session]['Token'] is not None  # nosec
     assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
     assert req.app['Creds'][session]['active_project'] == {  # nosec
@@ -187,11 +175,6 @@ async def test_sso_query_end_successful_header(mocker):
     )
 
     mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
-
-    mocker.patch(
         "keystoneauth1.identity.v3.Token"
     )
     mocker.patch(
@@ -202,7 +185,6 @@ async def test_sso_query_end_successful_header(mocker):
     )
 
     req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
     token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
     req.headers['X-Auth-Token'] = token
@@ -210,7 +192,8 @@ async def test_sso_query_end_successful_header(mocker):
     resp = await s3browser.login.sso_query_end(req)
 
     # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
+    assert req.app['Sessions']  # nosec
+    session = req.app['Sessions'][0]
     assert req.app['Creds'][session]['Token'] is not None  # nosec
     assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
     assert req.app['Creds'][session]['active_project'] == {  # nosec
@@ -231,11 +214,6 @@ async def test_sso_query_end_unsuccessful_missing_token(mocker):
     })
 
     mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
-
-    mocker.patch(
         "keystoneauth1.identity.v3.Token"
     )
     mocker.patch(
@@ -246,7 +224,6 @@ async def test_sso_query_end_unsuccessful_missing_token(mocker):
     )
 
     req = get_request_with_fernet()
-    _, _ = return_same_cookie(req)
 
     with pytest.raises(HTTPClientError):
         _ = await s3browser.login.sso_query_end(req)
@@ -265,11 +242,6 @@ async def test_sso_query_end_unsuccessful_invalid_token(mocker):
     mocker.patch(
         "s3browser.login.get_availability_from_token",
         new=return_invalid
-    )
-
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
     )
 
     mocker.patch(

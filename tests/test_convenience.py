@@ -17,6 +17,7 @@ from s3browser._convenience import initiate_os_service, initiate_os_session
 from s3browser.settings import setd
 
 from .creation import get_request_with_fernet
+from .creation import get_full_crypted_session_cookie
 from .mockups import mock_token_output, urlopen
 
 
@@ -96,9 +97,13 @@ def test_session_check_correct():
     Test condition when the request is formed correctly.
     """
     req = get_request_with_fernet()
-    cookie, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-    req.app['Sessions'].append(cookie)
-    assert session_check(req) is True  # nosec
+    cookie, _ = generate_cookie(req)
+
+    req.cookies['S3BROW_SESSION'] = \
+        get_full_crypted_session_cookie(cookie, req.app)
+
+    req.app['Sessions'].append(cookie["id"])
+    assert session_check(req) is None  # nosec
 
 
 # The api_check session check function testing – Might seem unnecessary, but
@@ -128,11 +133,14 @@ def test_api_check_raise_on_invalid_cookie():
 def test_api_check_raise_on_no_connection():
     """Test raise if there's no existing OS connection during an API call."""
     testreq = get_request_with_fernet()
-    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Sessions'] = [cookie]
-    testreq.app['Creds'][cookie] = {}
-    testreq.app['Creds'][cookie]['Avail'] = "placeholder"
-    testreq.app['Creds'][cookie]['OS_sess'] = "placeholder"
+    cookie, _ = generate_cookie(testreq)
+    testreq.cookies['S3BROW_SESSION'] = \
+        get_full_crypted_session_cookie(cookie, testreq.app)
+    session = cookie["id"]
+    testreq.app['Sessions'] = [session]
+    testreq.app['Creds'][session] = {}
+    testreq.app['Creds'][session]['Avail'] = "placeholder"
+    testreq.app['Creds'][session]['OS_sess'] = "placeholder"
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
 
@@ -140,10 +148,13 @@ def test_api_check_raise_on_no_connection():
 def test_api_check_raise_on_no_session():
     """Test raise if there's no established OS session during an API call."""
     testreq = get_request_with_fernet()
-    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Sessions'] = [cookie]
-    testreq.app['Creds'][cookie] = {}
-    testreq.app['Creds'][cookie]['Avail'] = "placeholder"
+    cookie, _ = generate_cookie(testreq)
+    testreq.cookies['S3BROW_SESSION'] = \
+        get_full_crypted_session_cookie(cookie, testreq.app)
+    session = cookie["id"]
+    testreq.app['Sessions'] = [session]
+    testreq.app['Creds'][session] = {}
+    testreq.app['Creds'][session]['Avail'] = "placeholder"
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
 
@@ -151,9 +162,12 @@ def test_api_check_raise_on_no_session():
 def test_api_check_raise_on_no_avail():
     """Test raise if the availability wasn't checked before an API call."""
     testreq = get_request_with_fernet()
-    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Creds'][cookie] = {}
-    testreq.app['Sessions'] = [cookie]
+    cookie, _ = generate_cookie(testreq)
+    testreq.cookies['S3BROW_SESSION'] = \
+        get_full_crypted_session_cookie(cookie, testreq.app)
+    session = cookie["id"]
+    testreq.app['Creds'][session] = {}
+    testreq.app['Sessions'] = [session]
     with pytest.raises(HTTPUnauthorized):
         api_check(testreq)
 
@@ -161,14 +175,17 @@ def test_api_check_raise_on_no_avail():
 def test_api_check_success():
     """Test that the api_check function runs with correct input."""
     testreq = get_request_with_fernet()
-    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Sessions'] = [cookie]
-    testreq.app['Creds'][cookie] = {}
-    testreq.app['Creds'][cookie]['Avail'] = "placeholder"
-    testreq.app['Creds'][cookie]['OS_sess'] = "placeholder"
-    testreq.app['Creds'][cookie]['ST_conn'] = "placeholder"
+    cookie, _ = generate_cookie(testreq)
+    testreq.cookies['S3BROW_SESSION'] = \
+        get_full_crypted_session_cookie(cookie, testreq.app)
+    session = cookie["id"]
+    testreq.app['Sessions'] = [session]
+    testreq.app['Creds'][session] = {}
+    testreq.app['Creds'][session]['Avail'] = "placeholder"
+    testreq.app['Creds'][session]['OS_sess'] = "placeholder"
+    testreq.app['Creds'][session]['ST_conn'] = "placeholder"
     ret = api_check(testreq)
-    assert ret == cookie  # nosec
+    assert ret == cookie["id"]  # nosec
 
 
 def test_get_availability_from_token(mocker):
