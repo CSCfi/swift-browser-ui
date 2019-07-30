@@ -6,6 +6,7 @@ import hashlib
 import os
 import datetime
 import json
+import yarl
 from urllib.error import HTTPError
 from contextlib import contextmanager
 
@@ -166,6 +167,7 @@ class Mock_Request:
         self.cookies = {}
         self.query = {}
         self.remote = "127.0.0.1"
+        self.url = yarl.URL("http://localhost:8080")
         self.post_data = {}
 
     def set_headers(self, headers):
