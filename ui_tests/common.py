@@ -1,9 +1,7 @@
 """Common functions and variables for the UI tests."""
 
 
-import subprocess  # nosec
 import time
-from contextlib import AbstractContextManager
 
 
 from selenium import webdriver
@@ -183,33 +181,3 @@ def get_cacheless_profile():
         "browser.cache.disk.enable", False
     )
     return ret
-
-
-# The server needs to run in a separate thread, and that's easiest to do when
-# running it in a separate process. Thus, a context manager to spin up the
-# test server instance before the tests, and killing the process afterwards
-# to free up the port.
-class ServerThread(AbstractContextManager):
-    """Context manager for the test server."""
-
-    def __init__(self):
-        """."""
-        self.server_thread = None
-
-    def __enter__(self):
-        """."""
-        self.server_thread = subprocess.Popen(  # nosec
-            [
-                "python",
-                "-m",
-                "tests.mock_server"
-            ],
-            stdout=subprocess.PIPE
-        )
-        # time.sleep(3)  # a quick sleep to let the server catch on
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """."""
-        # Kill the server on exit.
-        self.server_thread.kill()
-        self.server_thread.wait()
