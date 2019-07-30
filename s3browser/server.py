@@ -6,12 +6,12 @@ import logging
 import time
 import sys
 import asyncio
-
+import hashlib
+import os
 
 import uvloop
 import cryptography.fernet
 import aiohttp.web
-
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, handle_logout
@@ -64,6 +64,10 @@ async def servinit():
     app['Crypt'] = cryptography.fernet.Fernet(
         cryptography.fernet.Fernet.generate_key()
     )
+    # Create a signature salt to prevent editing the signature on the client
+    # side. Hash function doesn't need to be cryptographically secure, it's
+    # just a convenient way of getting ascii output from byte values.
+    app['Salt'] = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
     # Set application specific logging
     app['Log'] = logging.getLogger('s3browser')
     app['Log'].info('Set up logging for the s3browser application')
