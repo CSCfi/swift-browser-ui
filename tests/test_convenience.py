@@ -3,7 +3,7 @@
 
 import hashlib
 import os
-
+import unittest
 import pytest
 from aiohttp.web import HTTPUnauthorized, Response
 import cryptography.fernet
@@ -188,47 +188,47 @@ def test_api_check_success():
     assert ret == cookie["id"]  # nosec
 
 
-def test_get_availability_from_token(mocker):
+def test_get_availability_from_token():
     """Test the get_availability_from_token function."""
-    mocker.patch("s3browser._convenience.setd", new={
+    with unittest.mock.patch("s3browser._convenience.setd", new={
         "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
-    })
-    # Test with an invalid token
-    assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
+    }):
+        # Test with an invalid token
+        assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
 
-    # Make the required patches to urllib.request to test the function
-    mocker.patch("urllib.request.urlopen", new=urlopen)
+        # Make the required patches to urllib.request to test the function
+        with unittest.mock.patch("urllib.request.urlopen", new=urlopen):
 
-    # Test with a valid token
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
-    avail = get_availability_from_token(token)
+            # Test with a valid token
+            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            avail = get_availability_from_token(token)
 
-    assert (  # nosec
-        avail['projects'] == mock_token_output['projects']
-    )
-    assert (  # nosec
-        avail['domains'] == mock_token_output['domains']
-    )
+            assert (  # nosec
+                avail['projects'] == mock_token_output['projects']
+            )
+            assert (  # nosec
+                avail['domains'] == mock_token_output['domains']
+            )
 
 
-def test_initiate_os_session(mocker):
+def test_initiate_os_session():
     """Test initiate_os_session function."""
-    mocker.patch("s3browser.settings.setd", new={
+    with unittest.mock.patch("s3browser.settings.setd", new={
         "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
-    })
-    ret = initiate_os_session(
-        hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
-        "testproject"
-    )
-    assert isinstance(ret, Session)  # nosec
+    }):
+        ret = initiate_os_session(
+            hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
+            "testproject"
+        )
+        assert isinstance(ret, Session)  # nosec
 
 
-def test_initiate_os_service(mocker):
+def test_initiate_os_service():
     """Test initiate_os_servce function."""
-    mocker.patch("s3browser.settings.setd", new={
+    with unittest.mock.patch("s3browser.settings.setd", new={
         "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
         "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
-    sess_mock = mocker.MagicMock(Session)
-    ret = initiate_os_service(sess_mock())
-    assert isinstance(ret, SwiftService)  # nosec
+    }):
+        sess_mock = unittest.mock.MagicMock(Session)
+        ret = initiate_os_service(sess_mock())
+        assert isinstance(ret, SwiftService)  # nosec

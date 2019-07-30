@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     extras_require={
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage', 'coveralls',
-                 'pytest-asyncio', 'tox', 'pytest-mock',
+                 'pytest-asyncio', 'tox',
                  'flake8', 'flake8-docstrings', 'pytest-aiohttp',
                  'pytest-xdist', 'asynctest'],
         'docs': ['sphinx >= 1.4', 'sphinx_rtd_theme', 'selenium'],

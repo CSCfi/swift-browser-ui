@@ -20,7 +20,7 @@ from .creation import get_request_with_mock_openstack
 
 
 class APITestClass(asynctest.TestCase):
-    """."""
+    """Testing the Object Browser API."""
 
     def setUp(self):
         """Set up necessary mocks."""
