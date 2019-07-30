@@ -278,6 +278,7 @@ async def test_handle_logout(mocker):
 
     resp = await s3browser.login.handle_logout(req)
 
-    assert resp.status == 200  # nosec
+    assert resp.status == 303  # nosec
+    assert resp.headers["Location"] == "/"  # nosec
     sess.invalidate.assert_called_once()
     assert cookie not in req.app['Sessions']  # nosec
