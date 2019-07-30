@@ -34,8 +34,6 @@ def test_chrome_session_end_button():
             wait_for_clickable(
                 drv.find_element_by_link_text("Log Out")
             )
-            time.sleep(3.00)
-            drv.execute_script("location.reload(true);")
             time.sleep(0.5)
             assert (  # nosec
                 "Log In" in drv.page_source or

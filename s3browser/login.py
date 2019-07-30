@@ -294,6 +294,8 @@ async def handle_logout(request):
                     cookie
                 )
             )
-    return aiohttp.web.FileResponse(
-        setd['static_directory'] + "/index.html"
+    response = aiohttp.web.Response(
+        status=303
     )
+    response.headers["Location"] = "/"
+    return response
