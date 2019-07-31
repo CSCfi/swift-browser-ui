@@ -202,7 +202,7 @@ async def sso_query_end(request):
 async def token_rescope(request):
     """Rescope the requesting session's token to the new project."""
     session_check(request)
-    session = decrypt_cookie(request)
+    session = decrypt_cookie(request)["id"]
     request.app['Log'].info(
         "Call to rescope token from {0}, sess: {1} :: {2}".format(
             request.remote,
