@@ -7,8 +7,6 @@ Contains the tests for ``front.py``.
 
 import os
 
-
-import pytest
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 import asynctest
 
