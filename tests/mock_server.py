@@ -77,7 +77,7 @@ async def mock_graceful_shutdown(_):
         "auth_endpoint_url": "https://localhost:5001/v3",
         "has_trust": False,
         "logfile": None,
-        "port": 8080,
+        "port": int(environ.get("TEST_SERVER_PORT", 8080)),
         "verbose": True,
         "debug": True,
         "set_session_devmode": SESSION_MODE,

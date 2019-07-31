@@ -50,6 +50,7 @@ class FirefoxTestClass(BaseUITestClass):
     def tearDown(self):
         """Log out from UI an quit driver."""
         get_nav_out(self.drv)
+        super().tearDown()
 
 
 class ChromiumTestClass(BaseUITestClass):
@@ -70,3 +71,4 @@ class ChromiumTestClass(BaseUITestClass):
     def tearDown(self):
         """Log out from UI an quit driver."""
         get_nav_out(self.drv)
+        super().tearDown()

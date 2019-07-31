@@ -2,6 +2,7 @@
 
 
 import time
+import os
 
 
 from selenium import webdriver
@@ -13,6 +14,7 @@ from selenium.common.exceptions import WebDriverException
 
 
 CLICK_TIMEOUT = 5
+ADDRESS = "http://localhost:" + str(os.environ.get("TEST_SERVER_PORT", 8080))
 
 
 def wait_for_clickable(element):
@@ -129,7 +131,7 @@ def switch_to_finnish(drv):
     raise NoSuchElementException()
 
 
-def get_nav_to_ui(drv, address="http://localhost:8080"):
+def get_nav_to_ui(drv, address=ADDRESS):
     """Navigate to the browser UI."""
     drv.get(address)
     login(drv)
@@ -167,7 +169,7 @@ def login(drv):
     drv.implicitly_wait(1)
     drv.find_element_by_id("inputbox").submit()
     while drv.current_url != \
-            "http://localhost:8080/browse/test_user_id/placeholder":
+            ADDRESS + "/browse/test_user_id/placeholder":
         time.sleep(0.25)
 
 
