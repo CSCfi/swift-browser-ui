@@ -5,6 +5,7 @@ const langPlaceholders = {
             index: {
                 logIn: 'Log In',
             },
+            program_name: 'Object Browser',
             currentProj: 'Current project',
             logOut: 'Log Out',
             cscOrg: 'CSC - IT Center For Science LTD.',
@@ -60,6 +61,7 @@ const langPlaceholders = {
             index: {
                 logIn: 'Kirjaudu sisään',
             },
+            program_name: 'Object Browser',
             currentProj: 'Nykyinen projekti',
             logOut: 'Kirjaudu ulos',
             cscOrg: 'CSC – Tieteen Tietotekniikan Keskus Oy',
