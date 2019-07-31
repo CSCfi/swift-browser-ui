@@ -23,7 +23,6 @@ setd['static_directory'] = os.getcwd() + '/s3browser_frontend'
 class TestServinitMethod(asynctest.TestCase):
     """Small test case for servinit."""
 
-    @pytest.mark.asyncio
     async def test_servinit(self):
         """Test server initialization function execution."""
         # Don't really need much testing here, if the server initialization
