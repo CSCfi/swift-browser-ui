@@ -2,11 +2,11 @@
 
 
 import time
-
+import hashlib
+import json
 
 # aiohttp
 import aiohttp.web
-
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
@@ -105,7 +105,20 @@ async def sso_query_end(request):
     response = aiohttp.web.Response(
         status=303
     )
-    session, cookie_crypted = generate_cookie(request)
+    cookie, _ = generate_cookie(request)
+
+    cookie["referer"] = request.url.host
+    cookie["signature"] = (hashlib.sha256((cookie["id"] +
+                                           cookie["referer"] +
+                                           request.app["Salt"])
+                                          .encode('utf-8'))).hexdigest()
+    session = cookie["id"]
+
+    cookie_crypted = \
+        request.app['Crypt'].encrypt(
+            json.dumps(cookie).encode('utf-8')
+        ).decode('utf-8')
+
     response = disable_cache(response)
 
     response.set_cookie(
@@ -189,7 +202,7 @@ async def sso_query_end(request):
 async def token_rescope(request):
     """Rescope the requesting session's token to the new project."""
     session_check(request)
-    session = decrypt_cookie(request)
+    session = decrypt_cookie(request)["id"]
     request.app['Log'].info(
         "Call to rescope token from {0}, sess: {1} :: {2}".format(
             request.remote,
@@ -249,31 +262,40 @@ async def token_rescope(request):
 
 async def handle_logout(request):
     """Properly kill the session for the user."""
-    if session_check(request) and not setd['set_session_devmode']:
-        log = request.app['Log']
-        cookie = decrypt_cookie(request)
-        log.info("Killing session for %s :: %s",
-                 cookie, time.ctime())
-        # Invalidate the tokens that are in use
-        request.app['Creds'][cookie]['OS_sess'].invalidate(
-            request.app['Creds'][cookie]['OS_sess'].auth
-        )
-        log.debug("Invalidated token for session %s :: %s",
-                  cookie, time.ctime())
-        # Purge everything related to the former openstack connection
-        request.app['Creds'][cookie]['OS_sess'] = None
-        request.app['Creds'][cookie]['ST_conn'] = None
-        request.app['Creds'][cookie]['Avail'] = None
-        request.app['Creds'][cookie]['Token'] = None
-        request.app['Creds'][cookie]['active_project'] = None
-        # Purge the openstack connection from the server
-        request.app['Creds'].pop(cookie)
-        log.debug("Purged connection information for %s :: %s",
-                  cookie, time.ctime())
-        # Purge the sessino from the session list
-        request.app['Sessions'].remove(cookie)
-        log.debug("Removed session %s from session list :: %s",
-                  cookie, time.ctime())
-    return aiohttp.web.Response(
-        status=204
+    if not setd['set_session_devmode']:
+        try:
+            log = request.app['Log']
+            cookie = decrypt_cookie(request)["id"]
+            log.info("Killing session for %s :: %s",
+                     cookie, time.ctime())
+            # Invalidate the tokens that are in use
+            request.app['Creds'][cookie]['OS_sess'].invalidate(
+                request.app['Creds'][cookie]['OS_sess'].auth
+            )
+            log.debug("Invalidated token for session %s :: %s",
+                      cookie, time.ctime())
+            # Purge everything related to the former openstack connection
+            request.app['Creds'][cookie]['OS_sess'] = None
+            request.app['Creds'][cookie]['ST_conn'] = None
+            request.app['Creds'][cookie]['Avail'] = None
+            request.app['Creds'][cookie]['Token'] = None
+            request.app['Creds'][cookie]['active_project'] = None
+            # Purge the openstack connection from the server
+            request.app['Creds'].pop(cookie)
+            log.debug("Purged connection information for %s :: %s",
+                      cookie, time.ctime())
+            # Purge the sessino from the session list
+            request.app['Sessions'].remove(cookie)
+            log.debug("Removed session %s from session list :: %s",
+                      cookie, time.ctime())
+        except aiohttp.web.HTTPUnauthorized:
+            log.info(
+                "Trying to log out an invalidated session: {0}".format(
+                    cookie
+                )
+            )
+    response = aiohttp.web.Response(
+        status=303
     )
+    response.headers["Location"] = "/"
+    return response

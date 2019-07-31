@@ -17,6 +17,10 @@ from .mockups import Mock_Service, Mock_Session
 SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))
 
 
+logging.basicConfig()
+logging.root.setLevel(logging.DEBUG)
+
+
 def mock_initiate_os_session(token, _):
     """Create a mock os session object."""
     return Mock_Session()
@@ -73,7 +77,7 @@ async def mock_graceful_shutdown(_):
         "auth_endpoint_url": "https://localhost:5001/v3",
         "has_trust": False,
         "logfile": None,
-        "port": 8080,
+        "port": int(environ.get("TEST_SERVER_PORT", 8080)),
         "verbose": True,
         "debug": True,
         "set_session_devmode": SESSION_MODE,

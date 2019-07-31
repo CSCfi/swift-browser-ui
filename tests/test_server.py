@@ -7,10 +7,8 @@ Contains the tests for ``front.py``.
 
 import os
 
-
-import pytest
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
-
+import asynctest
 
 from s3browser.server import servinit
 from s3browser.settings import setd
@@ -20,13 +18,15 @@ from s3browser.settings import setd
 setd['static_directory'] = os.getcwd() + '/s3browser_frontend'
 
 
-@pytest.mark.asyncio
-async def test_servinit():
-    """Test server initialization function execution."""
-    # Don't really need much testing here, if the server initialization
-    # executes to the end all is fine.
-    app = await servinit()
-    assert app is not None  # nosec
+class TestServinitMethod(asynctest.TestCase):
+    """Small test case for servinit."""
+
+    async def test_servinit(self):
+        """Test server initialization function execution."""
+        # Don't really need much testing here, if the server initialization
+        # executes to the end all is fine.
+        app = await servinit()
+        self.assertTrue(app is not None)
 
 
 # After testing the server initialization, we can use the correctly starting
@@ -60,43 +60,43 @@ class AppTestCase(AioHTTPTestCase):
         # Having all the route checks in
         # a single compact function is better overall. – Sampsa Penna
         response = await self.client.request("GET", '/')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/browse')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/login')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/login/kill')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/login/front')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/login/rescope')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/buckets')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/objects')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/dload')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/username')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/projects')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/meta')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/api/get-project-meta')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         # Test all the static folders as well
         response = await self.client.request("GET", '/static/index.html')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/browse.html')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/login.html')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/css/login.css')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/css/browse.css')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/js/browse.js')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
         response = await self.client.request("GET", '/static/js/btablecomp.js')
-        assert response.status != 404  # nosec
+        self.assertNotEqual(response.status, 404)
