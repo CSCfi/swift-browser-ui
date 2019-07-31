@@ -7,7 +7,7 @@ from s3browser.shell import cli, start
 
 
 class TestService(unittest.TestCase):
-    """Test shell runs."""
+    """Test cli runs."""
 
     def setUp(self):
         """Set up runner for cli."""
@@ -29,7 +29,7 @@ class TestService(unittest.TestCase):
         self.assertIn('Missing command', result.output)
 
     def test_shell_start_dry(self):
-        """Test that the cli start function runs with the wanted parameters (dry-run)."""
+        """Test that the cli start function runs with dry-run."""
         # Test if the start command runs as it should
         result = self.runner.invoke(
             start, [

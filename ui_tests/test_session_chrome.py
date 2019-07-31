@@ -41,7 +41,8 @@ class TestChromeSession(BaseUITestClass):
             drv.find_element_by_link_text("Log Out")
         )
         time.sleep(0.5)
-        self.assertTrue("Log In" in drv.page_source or "Kirjaudu sisään" in drv.page_source)
+        self.assertTrue("Log In" in drv.page_source or
+                        "Kirjaudu sisään" in drv.page_source)
         drv.quit()
 
     @pytest.mark.timeout(60)
@@ -74,7 +75,8 @@ class TestChromeSession(BaseUITestClass):
 
         # Check that none of the pages were logged out
         for drv in drv_list:
-            self.assertTrue("Log In" not in drv.page_source or "Kirjaudu sisään" not in drv.page_source)
+            self.assertTrue("Log In" not in drv.page_source or
+                            "Kirjaudu sisään" not in drv.page_source)
 
         # After this we can test that the session border doesn't break,
         # i.e. the two remaining sessions have different content.
