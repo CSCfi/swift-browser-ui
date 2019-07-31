@@ -3,8 +3,7 @@
 
 import hashlib
 import os
-
-import pytest
+import unittest
 from aiohttp.web import HTTPUnauthorized, Response
 import cryptography.fernet
 from swiftclient.service import SwiftService
@@ -21,214 +20,204 @@ from .creation import get_full_crypted_session_cookie
 from .mockups import mock_token_output, urlopen
 
 
-def test_setup_logging():
-    """Test that the logging setup function works."""
-    setup_logging()
-    setd['verbose'] = True
-    setup_logging()
-    setd['debug'] = True
-    setup_logging()
+class TestConvenienceFunctions(unittest.TestCase):
+    """Test convenience functions."""
 
+    def setUp(self):
+        """Test that the logging setup function works."""
+        setup_logging()
+        setd['verbose'] = True
+        setup_logging()
+        setd['debug'] = True
+        setup_logging()
 
-def test_disable_cache():
-    """Test that the disable_cache function correctly disables cache."""
-    response = Response(
-        status=200,
-        body=b'OK'
-    )
-    response = disable_cache(response)
-    assert response.headers['Cache-Control'] == (  # nosec
-        "no-cache, no-store, must-revalidate"
-    )
-    assert response.headers['Pragma'] == 'no-Cache'  # nosec
-    assert response.headers['Expires'] == '0'  # nosec
+    def test_disable_cache(self):
+        """Test that the disable_cache function correctly disables cache."""
+        response = Response(
+            status=200,
+            body=b'OK'
+        )
+        response = disable_cache(response)
+        self.assertEqual(response.headers['Cache-Control'], (
+            "no-cache, no-store, must-revalidate"
+        ))
+        self.assertEqual(response.headers['Pragma'], 'no-Cache')
+        self.assertEqual(response.headers['Expires'], '0')
 
+    def test_generate_cookie(self):
+        """Test that the cookie generation works."""
+        testreq = get_request_with_fernet()
+        self.assertTrue(generate_cookie(testreq) is not None)
 
-def test_generate_cookie():
-    """Test that the cookie generation works."""
-    testreq = get_request_with_fernet()
-    assert generate_cookie(testreq) is not None  # nosec
+    def test_decrypt_cookie(self):
+        """Test that the cookie decrypt function works."""
+        testreq = get_request_with_fernet()
+        # Generate cookie is tested separately, it can be used for testing the
+        # rest of the functions without mockups
+        cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+        self.assertEqual(cookie, decrypt_cookie(testreq))
 
+    def test_session_check_nocookie(self):
+        """Test session check raise 401 on non-existing cookie."""
+        req = get_request_with_fernet()
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
 
-def test_decrypt_cookie():
-    """Test that the cookie decrypt function works."""
-    testreq = get_request_with_fernet()
-    # Generate cookie is tested separately, it can be used for testing the
-    # rest of the functions without mockups
-    cookie, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    assert cookie == decrypt_cookie(testreq)  # nosec
+    def test_session_check_invtoken(self):
+        """Test session check raise 401 on a stale cookie."""
+        req = get_request_with_fernet()
+        _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
+        req.app['Crypt'] = cryptography.fernet.Fernet(
+            cryptography.fernet.Fernet.generate_key()
+        )
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
 
+    def test_session_check_nosession(self):
+        """
+        Test session check function raise 401 on invalid session cookie.
 
-def test_session_check_nocookie():
-    """Test session check raise 401 on non-existing cookie."""
-    req = get_request_with_fernet()
-    with pytest.raises(HTTPUnauthorized):
-        session_check(req)
+        (i.e. it cannot be found in the open session list)
+        """
+        req = get_request_with_fernet()
+        _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
+        req.app['Sessions'] = []
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
 
+    def test_session_check_correct(self):
+        """
+        Test that the ordinary session check function result is True.
 
-def test_session_check_invtoken():
-    """Test session check raise 401 on a stale cookie."""
-    req = get_request_with_fernet()
-    _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-    req.app['Crypt'] = cryptography.fernet.Fernet(
-        cryptography.fernet.Fernet.generate_key()
-    )
-    with pytest.raises(HTTPUnauthorized):
-        session_check(req)
+        Test condition when the request is formed correctly.
+        """
+        req = get_request_with_fernet()
+        cookie, _ = generate_cookie(req)
 
+        req.cookies['S3BROW_SESSION'] = \
+            get_full_crypted_session_cookie(cookie, req.app)
 
-def test_session_check_nosession():
-    """
-    Test session check function raise 401 on invalid session cookie.
+        req.app['Sessions'].append(cookie["id"])
+        self.assertTrue(session_check(req) is None)
 
-    (i.e. it cannot be found in the open session list)
-    """
-    req = get_request_with_fernet()
-    _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-    req.app['Sessions'] = []
-    with pytest.raises(HTTPUnauthorized):
-        session_check(req)
+    # The api_check session check function testing – Might seem unnecessary,
+    # but are required since e.g. token rescoping can fail the sessions
+    # before the next API call, also might try to use the API
+    # while rescoping -> 401
+    def test_api_check_raise_on_no_cookie(self):
+        """Test raise if there's no session cookie."""
+        testreq = get_request_with_fernet()
+        _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+        testreq.app['Sessions'] = []
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
 
+    def test_api_check_raise_on_invalid_cookie(self):
+        """Test raise if there's an invalid session cookie."""
+        testreq = get_request_with_fernet()
+        _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+        testreq.app['Sessions'] = []
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
 
-def test_session_check_correct():
-    """
-    Test that the ordinary session check function result is True.
+    # NOTE: The order of operations for these tests is significant
+    # (i.e. there is a reason some of the placeholders are missing
+    # in the test functions,
+    # to enable testing correct raising order in the same time)
+    def test_api_check_raise_on_no_connection(self):
+        """Test raise if there's no existing OS connection on an API call."""
+        testreq = get_request_with_fernet()
+        cookie, _ = generate_cookie(testreq)
+        testreq.cookies['S3BROW_SESSION'] = \
+            get_full_crypted_session_cookie(cookie, testreq.app)
+        session = cookie["id"]
+        testreq.app['Sessions'] = [session]
+        testreq.app['Creds'][session] = {}
+        testreq.app['Creds'][session]['Avail'] = "placeholder"
+        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
 
-    Test condition when the request is formed correctly.
-    """
-    req = get_request_with_fernet()
-    cookie, _ = generate_cookie(req)
+    def test_api_check_raise_on_no_session(self):
+        """Test raise if there's no established OS session on an API call."""
+        testreq = get_request_with_fernet()
+        cookie, _ = generate_cookie(testreq)
+        testreq.cookies['S3BROW_SESSION'] = \
+            get_full_crypted_session_cookie(cookie, testreq.app)
+        session = cookie["id"]
+        testreq.app['Sessions'] = [session]
+        testreq.app['Creds'][session] = {}
+        testreq.app['Creds'][session]['Avail'] = "placeholder"
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
 
-    req.cookies['S3BROW_SESSION'] = \
-        get_full_crypted_session_cookie(cookie, req.app)
+    def test_api_check_raise_on_no_avail(self):
+        """Test raise if the availability wasn't checked before an API call."""
+        testreq = get_request_with_fernet()
+        cookie, _ = generate_cookie(testreq)
+        testreq.cookies['S3BROW_SESSION'] = \
+            get_full_crypted_session_cookie(cookie, testreq.app)
+        session = cookie["id"]
+        testreq.app['Creds'][session] = {}
+        testreq.app['Sessions'] = [session]
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
 
-    req.app['Sessions'].append(cookie["id"])
-    assert session_check(req) is None  # nosec
+    def test_api_check_success(self):
+        """Test that the api_check function runs with correct input."""
+        testreq = get_request_with_fernet()
+        cookie, _ = generate_cookie(testreq)
+        testreq.cookies['S3BROW_SESSION'] = \
+            get_full_crypted_session_cookie(cookie, testreq.app)
+        session = cookie["id"]
+        testreq.app['Sessions'] = [session]
+        testreq.app['Creds'][session] = {}
+        testreq.app['Creds'][session]['Avail'] = "placeholder"
+        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
+        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
+        ret = api_check(testreq)
+        self.assertEqual(ret, cookie["id"])
 
+    def test_get_availability_from_token(self):
+        """Test the get_availability_from_token function."""
+        with unittest.mock.patch("s3browser._convenience.setd", new={
+            "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
+        }):
+            # Test with an invalid token
+            self.assertEqual(get_availability_from_token("awefjoiooivo"),
+                             "INVALID")
 
-# The api_check session check function testing – Might seem unnecessary, but
-# are required since e.g. token rescoping can fail the sessions before the
-# next API call, also might try to use the API while rescoping -> 401
-def test_api_check_raise_on_no_cookie():
-    """Test raise if there's no session cookie."""
-    testreq = get_request_with_fernet()
-    _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Sessions'] = []
-    with pytest.raises(HTTPUnauthorized):
-        api_check(testreq)
+            # Make the required patches to urllib.request to test the function
+            with unittest.mock.patch("urllib.request.urlopen", new=urlopen):
 
+                # Test with a valid token
+                token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+                avail = get_availability_from_token(token)
 
-def test_api_check_raise_on_invalid_cookie():
-    """Test raise if there's an invalid session cookie."""
-    testreq = get_request_with_fernet()
-    _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-    testreq.app['Sessions'] = []
-    with pytest.raises(HTTPUnauthorized):
-        api_check(testreq)
+                self.assertEqual(
+                    avail['projects'], mock_token_output['projects']
+                )
+                self.assertEqual(
+                    avail['domains'], mock_token_output['domains']
+                )
 
+    def test_initiate_os_session(self):
+        """Test initiate_os_session function."""
+        with unittest.mock.patch("s3browser.settings.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            ret = initiate_os_session(
+                hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
+                "testproject"
+            )
+            self.assertIsInstance(ret, Session)  # nosec
 
-# NOTE: The order of operations for these tests is significant (i.e. there is
-# a reason some of the placeholders are missing in the test functions, to
-# enable testing correct raising order in the same time)
-def test_api_check_raise_on_no_connection():
-    """Test raise if there's no existing OS connection during an API call."""
-    testreq = get_request_with_fernet()
-    cookie, _ = generate_cookie(testreq)
-    testreq.cookies['S3BROW_SESSION'] = \
-        get_full_crypted_session_cookie(cookie, testreq.app)
-    session = cookie["id"]
-    testreq.app['Sessions'] = [session]
-    testreq.app['Creds'][session] = {}
-    testreq.app['Creds'][session]['Avail'] = "placeholder"
-    testreq.app['Creds'][session]['OS_sess'] = "placeholder"
-    with pytest.raises(HTTPUnauthorized):
-        api_check(testreq)
-
-
-def test_api_check_raise_on_no_session():
-    """Test raise if there's no established OS session during an API call."""
-    testreq = get_request_with_fernet()
-    cookie, _ = generate_cookie(testreq)
-    testreq.cookies['S3BROW_SESSION'] = \
-        get_full_crypted_session_cookie(cookie, testreq.app)
-    session = cookie["id"]
-    testreq.app['Sessions'] = [session]
-    testreq.app['Creds'][session] = {}
-    testreq.app['Creds'][session]['Avail'] = "placeholder"
-    with pytest.raises(HTTPUnauthorized):
-        api_check(testreq)
-
-
-def test_api_check_raise_on_no_avail():
-    """Test raise if the availability wasn't checked before an API call."""
-    testreq = get_request_with_fernet()
-    cookie, _ = generate_cookie(testreq)
-    testreq.cookies['S3BROW_SESSION'] = \
-        get_full_crypted_session_cookie(cookie, testreq.app)
-    session = cookie["id"]
-    testreq.app['Creds'][session] = {}
-    testreq.app['Sessions'] = [session]
-    with pytest.raises(HTTPUnauthorized):
-        api_check(testreq)
-
-
-def test_api_check_success():
-    """Test that the api_check function runs with correct input."""
-    testreq = get_request_with_fernet()
-    cookie, _ = generate_cookie(testreq)
-    testreq.cookies['S3BROW_SESSION'] = \
-        get_full_crypted_session_cookie(cookie, testreq.app)
-    session = cookie["id"]
-    testreq.app['Sessions'] = [session]
-    testreq.app['Creds'][session] = {}
-    testreq.app['Creds'][session]['Avail'] = "placeholder"
-    testreq.app['Creds'][session]['OS_sess'] = "placeholder"
-    testreq.app['Creds'][session]['ST_conn'] = "placeholder"
-    ret = api_check(testreq)
-    assert ret == cookie["id"]  # nosec
-
-
-def test_get_availability_from_token(mocker):
-    """Test the get_availability_from_token function."""
-    mocker.patch("s3browser._convenience.setd", new={
-        "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
-    })
-    # Test with an invalid token
-    assert get_availability_from_token("awefjoiooivo") == "INVALID"  # nosec
-
-    # Make the required patches to urllib.request to test the function
-    mocker.patch("urllib.request.urlopen", new=urlopen)
-
-    # Test with a valid token
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
-    avail = get_availability_from_token(token)
-
-    assert (  # nosec
-        avail['projects'] == mock_token_output['projects']
-    )
-    assert (  # nosec
-        avail['domains'] == mock_token_output['domains']
-    )
-
-
-def test_initiate_os_session(mocker):
-    """Test initiate_os_session function."""
-    mocker.patch("s3browser.settings.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
-    })
-    ret = initiate_os_session(
-        hashlib.md5(os.urandom(64)).hexdigest(),  # nosec
-        "testproject"
-    )
-    assert isinstance(ret, Session)  # nosec
-
-
-def test_initiate_os_service(mocker):
-    """Test initiate_os_servce function."""
-    mocker.patch("s3browser.settings.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
-    sess_mock = mocker.MagicMock(Session)
-    ret = initiate_os_service(sess_mock())
-    assert isinstance(ret, SwiftService)  # nosec
+    def test_initiate_os_service(self):
+        """Test initiate_os_servce function."""
+        with unittest.mock.patch("s3browser.settings.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        }):
+            sess_mock = unittest.mock.MagicMock(Session)
+            ret = initiate_os_service(sess_mock())
+            self.assertIsInstance(ret, SwiftService)  # nosec
