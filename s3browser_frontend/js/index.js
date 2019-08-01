@@ -19,7 +19,10 @@ const app = new Vue({
         setCookieLang: function() {
             const expiryDate = new Date();
             expiryDate.setMonth(expiryDate.getMonth() + 1);
-            document.cookie = 'lang=' + i18n.locale + '; path=/; expires=' + expiryDate.toUTCString();
+            document.cookie = 'lang=' +
+                              i18n.locale +
+                              '; path=/; expires='
+                              + expiryDate.toUTCString();
         },
     }
 });

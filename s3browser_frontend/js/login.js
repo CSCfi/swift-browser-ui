@@ -5,8 +5,12 @@ var retform = new Vue ({
     },
     methods: {
         "displayInvalid": function () {
-            if ( document.cookie.split(';').filter((item) => item.trim().startsWith('INVALID_TOKEN=')).length ) {
-                retform.formname = "Token id: (Invalid characters in previous token.)";
+            if (
+                document.cookie.split(';')
+                .filter((item) => 
+                item.trim().startsWith('INVALID_TOKEN=')).length ) {
+                    retform.formname = 
+                    "Token id: (Invalid characters in previous token.)";
             }
         }
     }

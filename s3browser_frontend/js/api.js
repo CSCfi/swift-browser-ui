@@ -103,7 +103,8 @@ var getProjectMeta = async function () {
      .then( function ( json_ret ) {
         let newRet = json_ret;
         newRet['Size'] = getHumanReadableSize(newRet['Bytes']);
-        newRet['Billed'] = parseFloat(newRet['Bytes'] / 1099511627776 * 3.5).toPrecision(4);
+        newRet['Billed'] = parseFloat(newRet['Bytes'] / 1099511627776 * 3.5)
+                           .toPrecision(4);
         return newRet;
     })
     return ret;
