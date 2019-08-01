@@ -262,6 +262,16 @@ be run locally.
 
 Documentation
 -------------
+
+Builds
+~~~~~~
+The documentation is automatically built with `sphinx <http://www.sphinx-doc.org/en/master/>`_
+
+Screenshots
+~~~~~~~~~~~
+Selenium and the test server are also used for automating the documentation
+screenshots.
+
 Charts
 ~~~~~~
 The charts in documentation are made with `Dia <http://dia-installer.de/doc/en/index.html>`_. The program is old
