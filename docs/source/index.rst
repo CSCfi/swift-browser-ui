@@ -24,11 +24,12 @@ Out of the box the ``s3browser`` offers:
    :maxdepth: 2
    :caption: Contents:
 
-    Setup Instructions <instructions>
-    Usage & Examples   <usage>
-    Python Modules     <code>
-    User Interface     <ui>
-    Testing            <testing>
+    Setup Instructions       <instructions>
+    Usage & Examples         <usage>
+    Python Modules           <code>
+    User Interface           <ui>
+    Testing                  <testing>
+    Technical documentation  <tech>
 
 
 .. note:: ``s3browser`` and all it sources are released under *MIT License*.
