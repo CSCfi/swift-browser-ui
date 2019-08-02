@@ -50,7 +50,7 @@ async def sso_query_begin(_):
         "/saml2" +
         "/websso" +
         "?origin={origin}".format(
-            origin=setd['origin_address']
+            origin=setd['set_origin_address']
         )
     )
 
