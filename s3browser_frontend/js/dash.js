@@ -60,10 +60,10 @@ const UserPage = Vue.extend({
                 <p class="title is-size-5">{{ $t('message.dashboard.prj_usage') }}</p>
                 <p>
                     <ul>
-                        <li>{{ $t('message.dashboard.account') }} {{ Account }}</li>
-                        <li>{{ $t('message.dashboard.containers') }} {{ Containers }}</li>
-                        <li>{{ $t('message.dashboard.objects') }} {{ Objects }}</li>
-                        <li>{{ $t('message.dashboard.usage') }} {{ Size }}</li>
+                        <li><b>{{ $t('message.dashboard.account') }}:</b> {{ Account }}</li>
+                        <li><b>{{ $t('message.dashboard.containers') }}:</b> {{ Containers }}</li>
+                        <li><b>{{ $t('message.dashboard.objects') }}:</b> {{ Objects }}</li>
+                        <li><b>{{ $t('message.dashboard.usage') }}:</b> {{ Size }}</li>
                     </ul>
                 </p>
             </div>
@@ -86,7 +86,7 @@ const UserPage = Vue.extend({
                 <p>
                     <ul>
                         <li>
-                        <b>{{ $t('message.dashboard.prj_str_usag') }} </b> {{ Size }} / 1TiB
+                        <b>{{ $t('message.dashboard.prj_str_usag') }}: </b> {{ Size }} / 1TiB
                         <b-tooltip
                             v-if="!DisableTooltip"
                             size="is-large"
@@ -108,7 +108,7 @@ const UserPage = Vue.extend({
                         </b-tooltip>
                         </li>
                         <li>
-                            <b>{{ $t('message.dashboard.equals') }} </b>
+                            <b>{{ $t('message.dashboard.equals') }}: </b>
                             {{ Billed }} <b>BU / {{ $t('message.dashboard.hour') }} </b>
                         </li>
                     </ul>
