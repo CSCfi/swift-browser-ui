@@ -8,7 +8,7 @@ const langPlaceholders = {
             program_name: 'Object Browser',
             currentProj: 'Current project',
             logOut: 'Log Out',
-            cscOrg: 'CSC - IT Center For Science LTD.',
+            cscOrg: 'CSC - IT Center For Science LTD',
             devel: 'developed by',
             table: {
                 name: 'Name',
