@@ -34,7 +34,7 @@ Give your branch a short descriptive name (like the names between the `<>` below
 
 ### Coding conventions
 
-We do optimize for readability, and it would be awesome if you go through the code and see what conventions we used so far, some are also explainer here:
+We do optimize for readability, and it would be awesome if you go through the code and see what conventions we've used so far, some are also explained here:
 
 * Indentation should be 4 *spaces*, besides html, for which it's 2
 * 80 character limit is almost strict, but
@@ -45,10 +45,9 @@ We do optimize for readability, and it would be awesome if you go through the co
 
 * Python
 
-    - PEP8 and PEP257 are followed with small variations
-    - Lines are broken after logical operators, not before
-    - Function names mostly follow established conventions
-    - Multiline docstring has a newline after quote marks
+    - [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP257](https://www.python.org/dev/peps/pep-0257/) are followed with small variations
+        * Lines are broken after logical operators, not before
+        * Multiline docstring has a newline after quote marks, the summary doesn't come directly after.
 
 * Javascript
 

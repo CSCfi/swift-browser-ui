@@ -1,13 +1,11 @@
 Architecture
 ============
-The technologies used are documented here, with a sprinkle of useful resources
-to ease in the understanding of the project code. Code itself tries to be
-commented as necessary, but if something doesn't seem comprehensible by
-reading, adding an issue about insufficient documentation is most welcome.
+In this section we would like to emphasize some of the core parts of the
+application and describe their inner-workings.
 
 About login process
 -------------------
-The program uses the WebSSO support provided by Openstack, when the support
+The program uses the WebSSO support provided by `Openstack <https://www.openstack.org/>`_, whenever the support
 has been implemented. At minimum the program requires the Openstack instance
 that it's supposed to be used with to implement the federated authentication,
 in which the non-WebSSO token delivery method can be used.

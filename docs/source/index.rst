@@ -30,7 +30,7 @@ Out of the box the ``s3browser`` offers:
     User Interface           <ui>
     Testing                  <testing>
     Architecture             <tech>
-    Tools / Miscallaneous    <tools>
+    Tools / Miscellaneous    <tools>
 
 
 .. note:: ``s3browser`` and all it sources are released under *MIT License*.
