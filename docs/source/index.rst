@@ -29,7 +29,8 @@ Out of the box the ``s3browser`` offers:
     Python Modules           <code>
     User Interface           <ui>
     Testing                  <testing>
-    Technical documentation  <tech>
+    Architecture             <tech>
+    Tools / Miscallaneous    <tools>
 
 
 .. note:: ``s3browser`` and all it sources are released under *MIT License*.

@@ -1,0 +1,285 @@
+openapi: "3.0.2"
+info:
+  title: "swift-browser-ui-api"
+  description: "Filtered proxied API from Openstack Swift used for a browser application"
+  version: "0.1.0"
+  license:
+    name: MIT
+tags:
+  - name: API Endpoints
+    description: Endpoints for the frontend API
+paths:
+  /api/username:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get Openstack username for the authenticated user.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Username'
+        403:
+          description: Unauthorized
+  /api/projects:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get Openstack projects available for the authenticated user.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+        403:
+          description: Unauthorized
+  /api/active:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the project that the user currently has active.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        403:
+          description: Unauthorized
+  /api/get-project-meta:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the filtered project metadata for the currently active project.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMeta'
+        403:
+          description: Unauthorized
+  /api/buckets:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the listing for containers in the currently active project.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Containers'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/objects:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the listing for objects in a given container.
+      parameters:
+      - name: bucket
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objects'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/dload:
+    get:
+      tags:
+        - API Endpoints
+      summary: Download the object specified in the download link.
+      parameters:
+      - name: bucket
+        in: query
+        description: The container from which to download
+        schema:
+          type: string
+          example: test-container-1
+      - name: objkey
+        in: query
+        description: The object key that is to be queried.
+        schema:
+          type: string
+          example: example-object-name
+      responses:
+        302:
+          description: OK
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/meta:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get container or object(s) metadata.
+      parameters:
+      - name: container
+        in: query
+        description: The container the metadata of which is to be queried, or the container in which the queried objects are.
+        schema:
+          type: string
+          example: test-container-1
+      - name: object
+        in: query
+        description: The comma separated list of objects, the metadata of which is to be queried. (if querying metadata)
+        schema:
+          type: string
+          example: test-object-1,test-object-2,test-object-3
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meta'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+
+components:
+  schemas:
+
+    Username:
+      type: string
+      example: test_user_name
+      description: Openstack username that's authenticated for the session cookie.
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          example: placeholder_openstack_project_id
+          description: Unique ID for identifying the exact project to Openstack.
+        name:
+          type: string
+          example: placeholcer_openstack_project_name
+          description: Projct name, also used for parsing the project URL for e.g. using the object storage
+
+    Projects:
+      type: array
+      items:
+        $ref: '#/components/schemas/Project'
+
+    ProjectMeta:
+      type: object
+      properties:
+        Account:
+          type: string
+          example: AUTH_placeholder_openstack_project_name
+          description: The account used for the project object storage in the currently active project (this is different from the Openstack account)
+        Containers:
+          type: integer
+          example: 10
+          description: The amount of containers in the currently active project.
+        Objects:
+          type: integer
+          example: 200
+          description: The amount of objects in the currently active project.
+        Bytes:
+          type: integer
+          example: 4294967296
+          description: The total amount of storage usage in bytes for the currently active project.
+
+    Container:
+      type: object
+      properties:
+        name:
+          type: string
+          example: test-container-1
+          description: The unique container name, that is used for identifying the container and creating the container URL.
+        count:
+          type: integer
+          example: 10
+          description: The amount of objects in the container.
+        bytes:
+          type: integer
+          example: 4294967296
+          description: The amount of storage used by the objects in the container.
+
+    Containers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Container'
+
+    SwiftObject:
+      type: object
+      properties:
+        hash:
+          type: string
+          example: Picture an example ETag here
+          description: The object hash
+        name:
+          type: string
+          example: example-object
+          description: The unique object name, also used for parsing the object URL.
+        last_modified:
+          type: string
+          example: "2019-08-02T11:07:48.979100"
+          description: The date of last modification for the object
+        bytes:
+          type: integer
+          example: 2048
+          description: The object size in bytes
+        content_type:
+          type: string
+          example: binary/octet-stream
+          description: The object content type.
+
+    Objects:
+      type: array
+      items:
+        $ref: '#/components/schemas/SwiftObject'
+
+    SSSMeta:
+      type: object
+      properties:
+        atime:
+          type: string
+          example: 1536648772
+          description: Time of object addition.
+        gname:
+          type: string
+          example: example-object-name
+          description: S3 generated object name.
+
+    MetaItem:
+      type: object
+      properties:
+        example-metadata:
+          type: string
+          example: example-metadata
+          description: Example metadata key-value pair, there can be an arbitrary amount of keys-value pairs present.
+        s3cmd-attrs:
+          type: object
+          example:
+            $ref: '#/components/schemas/SSSMeta'
+          description: Amazon S3 client created metadata, if that's present.
+
+    Meta:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetaItem'
