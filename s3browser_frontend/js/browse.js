@@ -4,7 +4,7 @@
 
 function getLangCookie() {
     let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + 'lang' + "=([^;]*)"
+        "(?:^|; )" + 'OBJ_UI_LANG' + "=([^;]*)"
     ));
     return matches ? decodeURIComponent(matches[1]) : 'en';
 };
@@ -116,11 +116,17 @@ const app = new Vue({
         setCookieLang: function() {
             const expiryDate = new Date();
             expiryDate.setMonth(expiryDate.getMonth() + 1);
-            document.cookie = 'lang=' + i18n.locale + '; path=/; expires=' + expiryDate.toUTCString();
+            document.cookie = 'OBJ_UI_LANG=' +
+                              i18n.locale +
+                              '; path=/; expires=' +
+                              expiryDate.toUTCString();
             this.$router.go(this.$router.currentRoute);
         },
         getProjectChangeURL ( newProject ) {
-            let rescopeURL = new URL( "/login/rescope", document.location.origin );
+            let rescopeURL = new URL(
+                "/login/rescope",
+                document.location.origin
+            );
             rescopeURL.searchParams.append( "project", newProject );
             return rescopeURL.toString();        
         },
@@ -177,8 +183,15 @@ var getHumanReadableSize = function (val) {
 
 var getHumanReadableDate = function (val) {
     let dateVal = new Date(val);
-    var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                    hour:'2-digit', minute: '2-digit', second: '2-digit' };
+    var options = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour:'2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
     var zone = { timeZone: 'EEST' }; /* For now default to this. */
     switch (i18n.locale) {
         case 'en':

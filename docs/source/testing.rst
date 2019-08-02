@@ -34,8 +34,10 @@ User Interface Testing
 
 User Interface tests are developed using `Selenium Webdriver <https://selenium-python.readthedocs.io>`_,
 and the tests are developed for both Firefox and Chrome web browsers.
-When using `tox` the UI tests are run using a headless browser and this is set by the environment
-variable ``TEST_ENABLE_HEADLESS`` to any value.
+When using `tox` the UI tests are run using a headless browser and this is
+set by the environment variable ``TEST_ENABLE_HEADLESS`` to any value. The
+test server port is changed with the ``TEST_SERVER_PORT`` environment
+variable to enable parallel execution in local testing envinronment.
 
 .. code-block:: console
 
@@ -48,8 +50,8 @@ variable ``TEST_ENABLE_HEADLESS`` to any value.
 UI Screenshots
 ~~~~~~~~~~~~~~
 
-We provide an utility for generating UI screenshots based on the functions implemented in
-the UI testing scenarios. The utility can be run using:
+We provide an utility for generating UI screenshots based on the functions
+implemented in the UI testing scenarios. The utility can be run using:
 
 .. code-block:: console
 

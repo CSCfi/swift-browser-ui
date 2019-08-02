@@ -1,6 +1,6 @@
 function getLangCookie() {
     let matches = document.cookie.match(new RegExp(
-        "(?:^|; )" + 'lang' + "=([^;]*)"
+        "(?:^|; )" + 'OBJ_UI_LANG' + "=([^;]*)"
     ));
     return matches ? decodeURIComponent(matches[1]) : 'en';
 }
@@ -19,7 +19,10 @@ const app = new Vue({
         setCookieLang: function() {
             const expiryDate = new Date();
             expiryDate.setMonth(expiryDate.getMonth() + 1);
-            document.cookie = 'lang=' + i18n.locale + '; path=/; expires=' + expiryDate.toUTCString();
+            document.cookie = 'OBJ_UI_LANG=' +
+                              i18n.locale +
+                              '; path=/; expires='
+                              + expiryDate.toUTCString();
         },
     }
 });
