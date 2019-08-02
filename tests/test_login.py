@@ -2,11 +2,11 @@
 
 import hashlib
 import os
+import unittest
 
 
 import asynctest
 from aiohttp.web import HTTPClientError
-import unittest
 
 import s3browser.login
 import s3browser.settings
@@ -31,9 +31,9 @@ class LoginTestClass(asynctest.TestCase):
     async def test_sso_query_begin_with_trust(self):
         """Test sso query begin function."""
         with unittest.mock.patch("s3browser.login.setd", new={
-            "auth_endpoint_url": "https://example.os.com:5001/v3",
-            "origin_address": "https://localhost/login/websso",
-            "has_trust": True,
+                "auth_endpoint_url": "https://example.os.com:5001/v3",
+                "set_origin_address": "https://localhost/login/websso",
+                "has_trust": True,
         }):
             resp = await s3browser.login.sso_query_begin(None)
             self.assertEqual(resp.status, 302)
@@ -48,11 +48,11 @@ class LoginTestClass(asynctest.TestCase):
     async def test_sso_query_begin_without_trust(self):
         """Test sso query begin without trust."""
         with unittest.mock.patch("s3browser.login.setd", new={
-            "auth_endpoint_url": "https://example.os.com:5001/v3",
-            "origin_address": "https://localhost/login/websso",
-            "has_trust": False,
-            "static_directory": __file__.replace("/settings.py", "") +
-            "/static",
+                "auth_endpoint_url": "https://example.os.com:5001/v3",
+                "origin_address": "https://localhost/login/websso",
+                "has_trust": False,
+                "static_directory": (__file__.replace("/settings.py", "") +
+                                     "/static"),
         }):
             resp = await s3browser.login.sso_query_begin(None)
             self.assertEqual(resp.status, 200)
