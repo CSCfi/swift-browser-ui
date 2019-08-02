@@ -69,6 +69,12 @@ def check_csrf(request):
     # Throw if the cookie originates from incorrect referer (meaning the
     # site's wrong)
     if "Referer" in request.headers.keys():
+        # Pass referer check if we're returning from the login.
+        if request.headers["Referer"] in setd["auth_endpoint_url"]:
+            request.app["Log"].info(
+                "Skipping Referer check due to request coming from OS."
+            )
+            return True
         if (
                 cookie["referer"] not in request.headers["Referer"]
         ):
