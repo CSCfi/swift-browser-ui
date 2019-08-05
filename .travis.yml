@@ -72,9 +72,11 @@ jobs:
       python: 3.6
       before_script:
         - pip install tox-travis
+        - curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
+        - echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
         - sudo apt-get -y update
         - sudo apt-get -y install google-chrome-stable
-        - wget https://chromedriver.storage.googleapis.com/75.0.3770.140/chromedriver_linux64.zip
+        - wget https://chromedriver.storage.googleapis.com/76.0.3809.68/chromedriver_linux64.zip
         - unzip chromedriver_linux64.zip
         - rm chromedriver_linux64.zip
         - chmod +x chromedriver
