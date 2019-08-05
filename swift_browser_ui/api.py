@@ -245,7 +245,7 @@ async def get_metadata(request):
     # contain sensitive data. This is not needed directly for the UI, but
     # the API is exposed for the user and thus can't expose any sensitive info
     if not meta_cont:
-        raise aiohttp.web.HTTPUnauthorized()
+        raise aiohttp.web.HTTPForbidden()
 
     conn = request.app['Creds'][session]['ST_conn']
 

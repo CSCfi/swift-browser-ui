@@ -5,6 +5,15 @@ const langPlaceholders = {
             index: {
                 logIn: 'Log In',
             },
+            error: {
+                frontPage: 'To the Front Page',
+                Unauthorized: '401 – Not logged in',
+                Unauthorized_text: 'The action you want to take requires logging in. You can do so with the button below.',
+                Notfound: '404 – Could not find the page you were looking for.',
+                Notfound_text: 'The front page, however, can be found – in the link below.',
+                Forbidden: '403 – Wait, thats forbidden!',
+                Forbidden_text: 'You are forbidden from doing the previous request. If you are sure you should be allowed to perform said operation, contact the service administrator. Otherwise head back to the front page from the button below.',
+            },
             program_name: 'Object Browser',
             currentProj: 'Current project',
             logOut: 'Log Out',
@@ -60,6 +69,15 @@ const langPlaceholders = {
         message: {
             index: {
                 logIn: 'Kirjaudu sisään',
+            },
+            error: {
+                frontPage: 'Etusivulle',
+                Unauthorized: '401 – Kirjaudu sisään',
+                Unauthorized_text: 'Sivun näyttäminen vaatii sisäänkirjauksen, jonka voit toteuttaa oheisesta painikkeesta.',
+                Notfound: '404 – Etsimääsi sivua ei löydetty.',
+                Notfound_text: 'Etusivun voit löytää alapuolisesta painikkeesta.',
+                Forbidden: '403 – Tuo on kiellettyä.',
+                Forbidden_text: 'Se, mitä ikinä yrititkään äsken tehdä, ei ole sallittua. Mikäli olet sitä mieltä, että yrittämäsi pitäisi olla mahdollista, ota yhteys palvelun ylläpitäjään. Muussa tapauksessa palaa etusivulle oheisesta painikkeesta.',
             },
             program_name: 'Object Browser',
             currentProj: 'Nykyinen projekti',
