@@ -1,8 +1,8 @@
 ## swift-browser-ui
 
-[![Build Status](https://travis-ci.org/CSCfi/swift-browser-ui.svg?branch=master)](https://travis-ci.org/CSCfi/swift-browser-ui)
-[![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=maste)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=maste)
-[![Documentation Status](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.com/CSCfi/swift-browser-ui.svg?branch=master)](https://travis-ci.com/CSCfi/swift-browser-ui)
+[![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=master)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/swift-browser-ui/badge/?version=latest)](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)
 
 ### Description
 
