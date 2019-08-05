@@ -12,7 +12,7 @@ We have templates for submitting new issues, that you can fill out. For example 
 
 ### Submitting changes
 
-When you made some changes you are happy with please send a [GitLab merge Request to s3-object-browser](https://gitlab.csc.fi/CSCCSDP/s3-object-browser/merge_requests/new) with a clear list of what you've done (read more about [merge requests](https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html)). When you create that Merge Request, we will forever be in your debt if you check previous docs for typos.
+When you made some changes you are happy with please send a [GitLab merge Request to swift-browser-ui](https://gitlab.csc.fi/CSCCSDP/swift-browser-ui/merge_requests/new) with a clear list of what you've done (read more about [merge requests](https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html)). When you create that Merge Request, we will forever be in your debt if you check previous docs for typos.
 
 Please follow our Git branches model and coding conventions (both below), and make sure all of your commits are atomic (preferably one feature per commit) and it is recommended a Merge Request addresses one functionality or fixes one bug.
 
@@ -34,10 +34,39 @@ Give your branch a short descriptive name (like the names between the `<>` below
 
 ### Coding conventions
 
-We do optimize for readability, and it would be awesome if you go through the code and see what conventions we used so far:
+We do optimize for readability, and it would be awesome if you go through the code and see what conventions we've used so far, some are also explained here:
 
-  * We follow [pep8](https://www.python.org/dev/peps/pep-0008/) and [pep257](https://www.python.org/dev/peps/pep-0257/) with small exceptions;
-  * We like to keep things simple, so when possible avoid importing any big libraries.
+* Indentation should be 4 *spaces*, besides html, for which it's 2
+* 80 character limit is almost strict, but
+
+    - Can be broken in documentation when hyperlinks go over the limits
+    - Can be broken in html files
+    - Can be broken in js files, but only in html templates
+
+* Python
+
+    - [PEP8](https://www.python.org/dev/peps/pep-0008/) and [PEP257](https://www.python.org/dev/peps/pep-0257/) are followed with small variations
+        * Lines are broken after logical operators, not before
+        * Multiline docstring has a newline after quote marks, the summary doesn't come directly after.
+
+* Javascript
+
+    - Function names use camelCase
+    - Opening brace goes on the line of definition
+    - All statements that can, should end with a semicolon ``;``, even
+        when not strictly required
+    - Code should work in browser as-is, no compilation or building
+        required
+    - Vue templates intentionally break indentation to improve
+        readability (by starting from bottom indentation level)
+    - Use template strings for multiline strings
+
+* HTML (also concerns HTML templates in Javascript)
+
+    - Each attribute should go on their own line if there are more than
+        two attributes present
+
+* We like to keep things simple, so when possible avoid importing any big libraries.
 
 Thanks,
 CSC Developers

@@ -13,7 +13,6 @@ import logging
 import re
 import urllib.request
 
-
 import aiohttp.web
 
 from keystoneauth1.identity import v3
@@ -54,28 +53,89 @@ def disable_cache(response):
 
 def decrypt_cookie(request):
     """Decrypt a cookie using the server instance specific fernet key."""
-    return request.app['Crypt'].decrypt(
+    cookie_json = request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
     ).decode('utf-8')
+    cookie = json.loads(cookie_json)
+    request.app["Log"].debug(
+        "Decrypted cookie: {0}".format(cookie)
+    )
+    return cookie
 
 
-def session_check(request):
-    """Check session validity from a request."""
-    try:
-        if decrypt_cookie(request) in request.app['Sessions']:
+def check_csrf(request):
+    """Check that the signature matches and referrer is correct."""
+    cookie = decrypt_cookie(request)
+    # Throw if the cookie originates from incorrect referer (meaning the
+    # site's wrong)
+    if "Referer" in request.headers.keys():
+        # Pass referer check if we're returning from the login.
+        if request.headers["Referer"] in setd["auth_endpoint_url"]:
+            request.app["Log"].info(
+                "Skipping Referer check due to request coming from OS."
+            )
             return True
+        if (
+                cookie["referer"] not in request.headers["Referer"]
+        ):
+            request.app["Log"].info(
+                "Throw due to invalid referer: {0}".format(
+                    request.headers["Referer"]
+                )
+            )
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+    else:
+        request.app["Log"].debug(
+            "Skipping referral validation due to missing Referer-header."
+        )
+    # Throw if the cookie signature doesn't match (meaning the referer might
+    # have been changed without setting the signature)
+    if (
+            sha256((cookie["id"] +
+                    cookie["referer"] +
+                    request.app["Salt"])
+                   .encode('utf-8'))
+            .hexdigest() != cookie["signature"]
+    ):
+        request.app["Log"].info(
+            "Throw due to invalid referer: {0}".format(
+                request.headers["Referer"]
+            )
+        )
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
+    # If all is well, return True.
+    return True
+
+
+def session_check(request):
+    """Check session validity from a request."""
+    try:
+        cookie = decrypt_cookie(request)
+        if cookie["id"] not in request.app['Sessions']:
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+        check_csrf(request)
+
     except InvalidToken:
+        request.app["Log"].info("Throw due to invalid token.")
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
     except KeyError:
+        request.app["Log"].info("Throw due to nonexistent token.")
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
@@ -86,8 +146,14 @@ def session_check(request):
 def api_check(request):
     """Do a more thorough session check for the API."""
     try:
-        if decrypt_cookie(request) in request.app['Sessions']:
-            session = decrypt_cookie(request)
+        if decrypt_cookie(request)["id"] in request.app['Sessions']:
+            session = decrypt_cookie(request)["id"]
+            if not check_csrf(request):
+                raise aiohttp.web.HTTPUnauthorized(
+                    headers={
+                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                    }
+                )
             ret = session
             if 'ST_conn' not in request.app['Creds'][session].keys():
                 raise aiohttp.web.HTTPUnauthorized(
@@ -128,9 +194,19 @@ def generate_cookie(request):
 
     Returns a tuple containing both the unencrypted and encrypted cookie.
     """
-    cookie = sha256(urandom(1024)).hexdigest()
-    return cookie, request.app['Crypt'].encrypt(
-        cookie.encode('utf-8')).decode('utf-8')
+    cookie = {
+        "id": sha256(urandom(512)).hexdigest(),
+        "referer": None,
+        "signature": None,
+    }
+    # Return a tuple of the session as an encrypted JSON string, and the
+    # cookie itself
+    return (
+        cookie,
+        request.app['Crypt'].encrypt(
+            json.dumps(cookie).encode('utf-8')
+        ).decode('utf-8')
+    )
 
 
 def get_availability_from_token(token):

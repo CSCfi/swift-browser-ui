@@ -1,311 +1,278 @@
-"""Test ``s3browser.login`` module."""
+"""Test ``swift_browser_ui.login`` module."""
 
 import hashlib
 import os
+import unittest
 
 
-import pytest
+import asynctest
 from aiohttp.web import HTTPClientError
 
-
-import s3browser.login
-import s3browser.settings
+import swift_browser_ui.login
+import swift_browser_ui.settings
 
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .mockups import return_project_avail
-from .mockups import return_same_cookie, return_invalid
+from .mockups import return_invalid
+
+_path = "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso"
 
 
-@pytest.mark.asyncio
-async def test_handle_login():
-    """Test initial login handler."""
-    resp = await s3browser.login.handle_login(None)
-    assert resp.headers['Location'] == "/login/front"  # nosec
-    assert resp.status == 302  # nosec
+class LoginTestClass(asynctest.TestCase):
+    """Testing the Object Browser API."""
 
+    async def test_handle_login(self):
+        """Test initial login handler."""
+        resp = await swift_browser_ui.login.handle_login(None)
+        self.assertEqual(resp.headers['Location'], "/login/front")
+        self.assertEqual(resp.status, 302)
 
-@pytest.mark.asyncio
-async def test_sso_query_begin_with_trust(mocker):
-    """Test sso query begin function."""
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "https://example.os.com:5001/v3",
-        "origin_address": "https://localhost/login/websso",
-        "has_trust": True,
-    })
-    resp = await s3browser.login.sso_query_begin(None)
-    assert resp.status == 302  # nosec
-    assert resp.headers['Location'] == (  # nosec
-        "https://example.os.com:5001/v3" +
-        "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso" +
-        "?origin={origin}".format(
-            origin="https://localhost/login/websso"
+    async def test_sso_query_begin_with_trust(self):
+        """Test sso query begin function."""
+        with unittest.mock.patch("swift_browser_ui.login.setd", new={
+                "auth_endpoint_url": "https://example.os.com:5001/v3",
+                "set_origin_address": "https://localhost/login/websso",
+                "has_trust": True,
+        }):
+            resp = await swift_browser_ui.login.sso_query_begin(None)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers['Location'], (
+                "https://example.os.com:5001/v3" +
+                _path +
+                "?origin={origin}".format(
+                    origin="https://localhost/login/websso"
+                )
+            ))
+
+    async def test_sso_query_begin_without_trust(self):
+        """Test sso query begin without trust."""
+        with unittest.mock.patch("swift_browser_ui.login.setd", new={
+                "auth_endpoint_url": "https://example.os.com:5001/v3",
+                "origin_address": "https://localhost/login/websso",
+                "has_trust": False,
+                "static_directory": (__file__.replace("/settings.py", "") +
+                                     "/static"),
+        }):
+            resp = await swift_browser_ui.login.sso_query_begin(None)
+            self.assertEqual(resp.status, 200)
+
+    async def test_sso_query_end_successful_http_form(self):
+        """
+        Test sso query end function with correct execution parameters.
+
+        This version tests the token delivery in a http encoded form.
+        """
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        })
+
+        # Patch away the convenience function for checking project availability
+        patch2 = unittest.mock.patch(
+            "swift_browser_ui.login.get_availability_from_token",
+            new=return_project_avail
         )
-    )
 
+        patch3 = unittest.mock.patch(
+            "keystoneauth1.identity.v3.Token"
+        )
+        patch4 = unittest.mock.patch(
+            "keystoneauth1.session.Session"
+        )
+        patch5 = unittest.mock.patch(
+            "swiftclient.service.SwiftService"
+        )
 
-@pytest.mark.asyncio
-async def test_sso_query_begin_without_trust(mocker):
-    """Test sso query begin without trust."""
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "https://example.os.com:5001/v3",
-        "origin_address": "https://localhost/login/websso",
-        "has_trust": False,
-        "static_directory": __file__.replace("/settings.py", "") + "/static",
-    })
-    resp = await s3browser.login.sso_query_begin(None)
-    assert resp.status == 200  # nosec
+        with patch1, patch2, patch3, patch4, patch5:
+            req = get_request_with_fernet()
+            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            req.set_post({
+                "token": token
+            })
 
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
-@pytest.mark.asyncio
-async def test_sso_query_end_successful_http_form(mocker):
-    """
-    Test sso query end function with correct execution parameters.
+            # Test for the correct values
+            assert req.app['Sessions']  # nosec
+            session = req.app['Sessions'][0]
+            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Creds'][session]['active_project'], {
+                "name": "placeholder",
+                "id": "placeholder",
+            })
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers['Location'], "/browse")
+            self.assertIn("S3BROW_SESSION", resp.cookies)
 
-    This version tests the token delivery in a http encoded form.
-    """
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
+    async def test_sso_query_end_successful_url_form(self):
+        """
+        Test sso query end function with correct execution parameters.
 
-    # Patch away the convenience function for checking project availability
-    mocker.patch(
-        "s3browser.login.get_availability_from_token",
-        new=return_project_avail
-    )
+        This version tests the token delivery in a urlencoded form instead of a
+        http encoded one.
+        """
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        })
 
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
+        patch2 = unittest.mock.patch(
+            "swift_browser_ui.login.get_availability_from_token",
+            new=return_project_avail
+        )
 
-    mocker.patch(
-        "keystoneauth1.identity.v3.Token"
-    )
-    mocker.patch(
-        "keystoneauth1.session.Session"
-    )
-    mocker.patch(
-        "swiftclient.service.SwiftService"
-    )
+        patch3 = unittest.mock.patch(
+            "keystoneauth1.identity.v3.Token"
+        )
+        patch4 = unittest.mock.patch(
+            "keystoneauth1.session.Session"
+        )
+        patch5 = unittest.mock.patch(
+            "swiftclient.service.SwiftService"
+        )
 
-    req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
-    req.set_post({
-        "token": token
-    })
+        with patch1, patch2, patch3, patch4, patch5:
+            req = get_request_with_fernet()
+            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
-    resp = await s3browser.login.sso_query_end(req)
+            req.query['token'] = token
 
-    # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
-    assert req.app['Creds'][session]['Token'] is not None  # nosec
-    assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
-    assert req.app['Creds'][session]['active_project'] == {  # nosec
-        "name": "placeholder",
-        "id": "placeholder",
-    }
-    assert resp.status == 303  # nosec
-    assert resp.headers['Location'] == "/browse"  # nosec
-    assert "S3BROW_SESSION" in resp.cookies  # nosec
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
+            # Test for the correct values
+            assert req.app['Sessions']  # nosec
+            session = req.app['Sessions'][0]
+            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Creds'][session]['active_project'], {
+                "name": "placeholder",
+                "id": "placeholder",
+            })
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers['Location'], "/browse")
+            self.assertIn("S3BROW_SESSION", resp.cookies)
 
-@pytest.mark.asyncio
-async def test_sso_query_end_successful_url_form(mocker):
-    """
-    Test sso query end function with correct execution parameters.
+    async def test_sso_query_end_successful_header(self):
+        """
+        Test sso query end function with correct execution parameters.
 
-    This version tests the token delivery in a urlencoded form instead of a
-    http encoded one.
-    """
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
+        This version tests the token delivery in a HTTP header.
+        """
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        })
 
-    mocker.patch(
-        "s3browser.login.get_availability_from_token",
-        new=return_project_avail
-    )
+        # Patch away the convenience function for checking project availability
+        patch2 = unittest.mock.patch(
+            "swift_browser_ui.login.get_availability_from_token",
+            new=return_project_avail
+        )
 
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
+        patch3 = unittest.mock.patch(
+            "keystoneauth1.identity.v3.Token"
+        )
+        patch4 = unittest.mock.patch(
+            "keystoneauth1.session.Session"
+        )
+        patch5 = unittest.mock.patch(
+            "swiftclient.service.SwiftService"
+        )
 
-    mocker.patch(
-        "keystoneauth1.identity.v3.Token"
-    )
-    mocker.patch(
-        "keystoneauth1.session.Session"
-    )
-    mocker.patch(
-        "swiftclient.service.SwiftService"
-    )
+        with patch1, patch2, patch3, patch4, patch5:
+            req = get_request_with_fernet()
+            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
-    req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            req.headers['X-Auth-Token'] = token
 
-    session, _ = return_same_cookie(req)
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
-    req.query['token'] = token
+            # Test for the correct values
+            assert req.app['Sessions']  # nosec
+            session = req.app['Sessions'][0]
+            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Creds'][session]['active_project'], {
+                "name": "placeholder",
+                "id": "placeholder",
+            })
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers['Location'], "/browse")
+            self.assertIn("S3BROW_SESSION", resp.cookies)
 
-    resp = await s3browser.login.sso_query_end(req)
+    async def test_sso_query_end_unsuccessful_missing_token(self):
+        """Test unsuccessful token delivery with token missing."""
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+        })
 
-    # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
-    assert req.app['Creds'][session]['Token'] is not None  # nosec
-    assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
-    assert req.app['Creds'][session]['active_project'] == {  # nosec
-        "name": "placeholder",
-        "id": "placeholder",
-    }
-    assert resp.status == 303  # nosec
-    assert resp.headers['Location'] == "/browse"  # nosec
-    assert "S3BROW_SESSION" in resp.cookies  # nosec
+        patch2 = unittest.mock.patch(
+            "keystoneauth1.identity.v3.Token"
+        )
+        patch3 = unittest.mock.patch(
+            "keystoneauth1.session.Session"
+        )
+        patch4 = unittest.mock.patch(
+            "swiftclient.service.SwiftService"
+        )
 
+        with patch1, patch2, patch3, patch4:
+            req = get_request_with_fernet()
 
-@pytest.mark.asyncio
-async def test_sso_query_end_successful_header(mocker):
-    """
-    Test sso query end function with correct execution parameters.
+            with self.assertRaises(HTTPClientError):
+                _ = await swift_browser_ui.login.sso_query_end(req)
 
-    This version tests the token delivery in a HTTP header.
-    """
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
+    async def test_sso_query_end_unsuccessful_invalid_token(self):
+        """Test unsuccessful token delivery with an invalid."""
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+            "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "has_trust": False,
+        })
 
-    # Patch away the convenience function for checking project availability
-    mocker.patch(
-        "s3browser.login.get_availability_from_token",
-        new=return_project_avail
-    )
+        # Patch away the convenience function for checking project availability
+        patch2 = unittest.mock.patch(
+            "swift_browser_ui.login.get_availability_from_token",
+            new=return_invalid
+        )
 
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
+        patch3 = unittest.mock.patch(
+            "keystoneauth1.identity.v3.Token"
+        )
+        patch4 = unittest.mock.patch(
+            "keystoneauth1.session.Session"
+        )
+        patch5 = unittest.mock.patch(
+            "swiftclient.service.SwiftService"
+        )
 
-    mocker.patch(
-        "keystoneauth1.identity.v3.Token"
-    )
-    mocker.patch(
-        "keystoneauth1.session.Session"
-    )
-    mocker.patch(
-        "swiftclient.service.SwiftService"
-    )
+        with patch1, patch2, patch3, patch4, patch5:
+            req = get_request_with_fernet()
+            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
-    req = get_request_with_fernet()
-    session, _ = return_same_cookie(req)
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            req.headers['X-Auth-Token'] = token
 
-    req.headers['X-Auth-Token'] = token
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
-    resp = await s3browser.login.sso_query_end(req)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers['Location'], "/login")
+            self.assertIn("INVALID_TOKEN", resp.cookies)
 
-    # Test for the correct values
-    assert session in req.app['Sessions']  # nosec
-    assert req.app['Creds'][session]['Token'] is not None  # nosec
-    assert req.app['Creds'][session]['Avail'] != "INVALID"  # nosec
-    assert req.app['Creds'][session]['active_project'] == {  # nosec
-        "name": "placeholder",
-        "id": "placeholder",
-    }
-    assert resp.status == 303  # nosec
-    assert resp.headers['Location'] == "/browse"  # nosec
-    assert "S3BROW_SESSION" in resp.cookies  # nosec
+    async def test_handle_logout(self):
+        """Test the logout function."""
+        cookie, req = get_request_with_mock_openstack()
 
+        sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
+        req.app['Creds'][cookie]['OS_sess'] = sess_mock()
 
-@pytest.mark.asyncio
-async def test_sso_query_end_unsuccessful_missing_token(mocker):
-    """Test unsuccessful token delivery with token missing."""
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-    })
+        sess = req.app['Creds'][cookie]['OS_sess']
 
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
+        resp = await swift_browser_ui.login.handle_logout(req)
 
-    mocker.patch(
-        "keystoneauth1.identity.v3.Token"
-    )
-    mocker.patch(
-        "keystoneauth1.session.Session"
-    )
-    mocker.patch(
-        "swiftclient.service.SwiftService"
-    )
-
-    req = get_request_with_fernet()
-    _, _ = return_same_cookie(req)
-
-    with pytest.raises(HTTPClientError):
-        _ = await s3browser.login.sso_query_end(req)
-
-
-@pytest.mark.asyncio
-async def test_sso_query_end_unsuccessful_invalid_token(mocker):
-    """Test unsuccessful token delivery with an invalid."""
-    mocker.patch("s3browser.login.setd", new={
-        "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
-        "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
-        "has_trust": False,
-    })
-
-    # Patch away the convenience function for checking project availability
-    mocker.patch(
-        "s3browser.login.get_availability_from_token",
-        new=return_invalid
-    )
-
-    mocker.patch(
-        "s3browser.login.generate_cookie",
-        new=return_same_cookie
-    )
-
-    mocker.patch(
-        "keystoneauth1.identity.v3.Token"
-    )
-    mocker.patch(
-        "keystoneauth1.session.Session"
-    )
-    mocker.patch(
-        "swiftclient.service.SwiftService"
-    )
-
-    req = get_request_with_fernet()
-    token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
-
-    req.headers['X-Auth-Token'] = token
-
-    resp = await s3browser.login.sso_query_end(req)
-
-    assert resp.status == 302  # nosec
-    assert resp.headers['Location'] == "/login"  # nosec
-    assert "INVALID_TOKEN" in resp.cookies  # nosec
-
-
-@pytest.mark.asyncio
-async def test_handle_logout(mocker):
-    """Test the logout function."""
-    cookie, req = get_request_with_mock_openstack()
-
-    sess_mock = mocker.MagicMock("keystoneauth.session.Session")
-    req.app['Creds'][cookie]['OS_sess'] = sess_mock()
-
-    sess = req.app['Creds'][cookie]['OS_sess']
-
-    resp = await s3browser.login.handle_logout(req)
-
-    assert resp.status == 204  # nosec
-    sess.invalidate.assert_called_once()
-    assert cookie not in req.app['Sessions']  # nosec
+        self.assertEqual(resp.status, 303)
+        self.assertEqual(resp.headers['Location'], "/")
+        sess.invalidate.assert_called_once()
+        self.assertNotIn(cookie, req.app['Sessions'])

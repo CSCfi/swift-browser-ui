@@ -1,4 +1,4 @@
-"""s3browser server related convenience functions."""
+"""swift_browser_ui server related convenience functions."""
 
 # Generic imports
 # import ssl
@@ -6,12 +6,12 @@ import logging
 import time
 import sys
 import asyncio
-
+import hashlib
+import os
 
 import uvloop
 import cryptography.fernet
 import aiohttp.web
-
 
 from .front import index, browse
 from .login import handle_login, sso_query_begin, handle_logout
@@ -19,7 +19,7 @@ from .login import sso_query_end
 from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
-from .api import get_metadata
+from .api import get_metadata, get_project_metadata
 from .settings import setd
 
 
@@ -64,9 +64,13 @@ async def servinit():
     app['Crypt'] = cryptography.fernet.Fernet(
         cryptography.fernet.Fernet.generate_key()
     )
+    # Create a signature salt to prevent editing the signature on the client
+    # side. Hash function doesn't need to be cryptographically secure, it's
+    # just a convenient way of getting ascii output from byte values.
+    app['Salt'] = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
     # Set application specific logging
-    app['Log'] = logging.getLogger('s3browser')
-    app['Log'].info('Set up logging for the s3browser application')
+    app['Log'] = logging.getLogger('swift-browser-ui')
+    app['Log'].info('Set up logging for the swift-browser-ui application')
     # Session list to quickly validate sessions
     app['Sessions'] = []
     # Cookie keyed dictionary to store session data
@@ -108,6 +112,7 @@ async def servinit():
         aiohttp.web.get('/api/projects', os_list_projects),
         aiohttp.web.get('/api/active', get_os_active_project),
         aiohttp.web.get('/api/meta', get_metadata),
+        aiohttp.web.get('/api/get-project-meta', get_project_metadata),
     ])
 
     # Add graceful shutdown handler
@@ -146,6 +151,6 @@ def run_server_insecure(app):
 
 if __name__ == '__main__':
     if sys.version_info < (3, 6):
-        logging.error("s3-object-browser requires >= python3.6")
+        logging.error("swift-browser-ui requires >= python3.6")
         sys.exit(1)
     run_server_insecure(servinit())

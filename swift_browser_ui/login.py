@@ -2,11 +2,11 @@
 
 
 import time
-
+import hashlib
+import json
 
 # aiohttp
 import aiohttp.web
-
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
@@ -50,7 +50,7 @@ async def sso_query_begin(_):
         "/saml2" +
         "/websso" +
         "?origin={origin}".format(
-            origin=setd['origin_address']
+            origin=setd['set_origin_address']
         )
     )
 
@@ -105,7 +105,20 @@ async def sso_query_end(request):
     response = aiohttp.web.Response(
         status=303
     )
-    session, cookie_crypted = generate_cookie(request)
+    cookie, _ = generate_cookie(request)
+
+    cookie["referer"] = request.url.host
+    cookie["signature"] = (hashlib.sha256((cookie["id"] +
+                                           cookie["referer"] +
+                                           request.app["Salt"])
+                                          .encode('utf-8'))).hexdigest()
+    session = cookie["id"]
+
+    cookie_crypted = \
+        request.app['Crypt'].encrypt(
+            json.dumps(cookie).encode('utf-8')
+        ).decode('utf-8')
+
     response = disable_cache(response)
 
     response.set_cookie(
@@ -121,8 +134,9 @@ async def sso_query_end(request):
     # re-scoping?
     request.app['Creds'][session]['Token'] = unscoped
 
-    # Check project availability with a list of domains, save the information
-    # inside the app mapping
+    # If the user didn't specify an existing project when logging in (in the
+    # last active -header), check project availability with a list of domains,
+    # save the information inside the app mapping.
     request.app['Creds'][session]['Avail'] =\
         get_availability_from_token(unscoped)
 
@@ -142,10 +156,23 @@ async def sso_query_end(request):
         )
         return response
 
+    if "LAST_ACTIVE" in request.cookies:
+        if (request.cookies["LAST_ACTIVE"] not in [
+                p['id']
+                for p in request.app['Creds'][session]['Avail']['projects']
+        ]):
+            raise aiohttp.web.HTTPForbidden(
+                reason="The project is not available for this token."
+            )
+        project_id = request.cookies["LAST_ACTIVE"]
+    else:
+        project_id = \
+            request.app['Creds'][session]['Avail']['projects'][0]['id']
+
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
-        request.app['Creds'][session]['Avail']['projects'][0]['id']
+        project_id
     )
 
     # Create the swiftclient connection
@@ -153,11 +180,18 @@ async def sso_query_end(request):
         request.app['Creds'][session]['OS_sess'],
     )
 
+    project_name = None
+    for i in request.app['Creds'][session]['Avail']['projects']:
+        if i['id'] == project_id:
+            project_name = i['name']
     # Save the current active project
     request.app['Creds'][session]['active_project'] = {
-        "name": request.app['Creds'][session]['Avail']['projects'][0]['name'],
-        "id": request.app['Creds'][session]['Avail']['projects'][0]['id'],
+        "name": project_name,
+        "id": project_id
     }
+
+    # Set the active project to be the last active project
+    response.set_cookie("LAST_ACTIVE", project_id, expires=2592000)
 
     # Redirect to the browse page with the correct credentials
     response.headers['Location'] = "/browse"
@@ -168,7 +202,7 @@ async def sso_query_end(request):
 async def token_rescope(request):
     """Rescope the requesting session's token to the new project."""
     session_check(request)
-    session = decrypt_cookie(request)
+    session = decrypt_cookie(request)["id"]
     request.app['Log'].info(
         "Call to rescope token from {0}, sess: {1} :: {2}".format(
             request.remote,
@@ -209,39 +243,59 @@ async def token_rescope(request):
         "id": request.query['project'],
     }
 
-    return aiohttp.web.Response(
-        status=204,
+    response = aiohttp.web.Response(
+        status=303,
         reason="Successfully rescoped token."
     )
+    response.headers["Location"] = "/browse"
+    if "Referer" in request.headers:
+        if len(request.headers["Referer"].split("/")) == 5:
+            response.headers["Location"] = request.headers["Referer"]
+    response.set_cookie(
+        "LAST_ACTIVE",
+        request.app['Creds'][session]['active_project']['id'],
+        expires=2592000
+    )
+
+    return response
 
 
 async def handle_logout(request):
     """Properly kill the session for the user."""
-    if session_check(request) and not setd['set_session_devmode']:
-        log = request.app['Log']
-        cookie = decrypt_cookie(request)
-        log.info("Killing session for %s :: %s",
-                 cookie, time.ctime())
-        # Invalidate the tokens that are in use
-        request.app['Creds'][cookie]['OS_sess'].invalidate(
-            request.app['Creds'][cookie]['OS_sess'].auth
-        )
-        log.debug("Invalidated token for session %s :: %s",
-                  cookie, time.ctime())
-        # Purge everything related to the former openstack connection
-        request.app['Creds'][cookie]['OS_sess'] = None
-        request.app['Creds'][cookie]['ST_conn'] = None
-        request.app['Creds'][cookie]['Avail'] = None
-        request.app['Creds'][cookie]['Token'] = None
-        request.app['Creds'][cookie]['active_project'] = None
-        # Purge the openstack connection from the server
-        request.app['Creds'].pop(cookie)
-        log.debug("Purged connection information for %s :: %s",
-                  cookie, time.ctime())
-        # Purge the sessino from the session list
-        request.app['Sessions'].remove(cookie)
-        log.debug("Removed session %s from session list :: %s",
-                  cookie, time.ctime())
-    return aiohttp.web.Response(
-        status=204
+    if not setd['set_session_devmode']:
+        try:
+            log = request.app['Log']
+            cookie = decrypt_cookie(request)["id"]
+            log.info("Killing session for %s :: %s",
+                     cookie, time.ctime())
+            # Invalidate the tokens that are in use
+            request.app['Creds'][cookie]['OS_sess'].invalidate(
+                request.app['Creds'][cookie]['OS_sess'].auth
+            )
+            log.debug("Invalidated token for session %s :: %s",
+                      cookie, time.ctime())
+            # Purge everything related to the former openstack connection
+            request.app['Creds'][cookie]['OS_sess'] = None
+            request.app['Creds'][cookie]['ST_conn'] = None
+            request.app['Creds'][cookie]['Avail'] = None
+            request.app['Creds'][cookie]['Token'] = None
+            request.app['Creds'][cookie]['active_project'] = None
+            # Purge the openstack connection from the server
+            request.app['Creds'].pop(cookie)
+            log.debug("Purged connection information for %s :: %s",
+                      cookie, time.ctime())
+            # Purge the sessino from the session list
+            request.app['Sessions'].remove(cookie)
+            log.debug("Removed session %s from session list :: %s",
+                      cookie, time.ctime())
+        except aiohttp.web.HTTPUnauthorized:
+            log.info(
+                "Trying to log out an invalidated session: {0}".format(
+                    cookie
+                )
+            )
+    response = aiohttp.web.Response(
+        status=303
     )
+    response.headers["Location"] = "/"
+    return response

@@ -16,7 +16,7 @@ from ._convenience import setup_logging as conv_setup_logging
 
 @click.group()
 @click.version_option(
-    version=__version__, prog_name="s3browser"
+    version=__version__, prog_name="swift-browser-ui"
 )
 @click.option(
     '-v', '--verbose', is_flag=True, default=False,
@@ -31,7 +31,7 @@ from ._convenience import setup_logging as conv_setup_logging
     help='Write program logs to a file.'
 )
 def cli(verbose, debug, logfile):
-    """Command line interface for managing s3browser."""
+    """Command line interface for managing swift-browser-ui."""
     # set version
     setd['version'] = __version__
     # set verbose
@@ -142,6 +142,6 @@ def main():
 
 if __name__ == "__main__":
     if sys.version_info < (3, 6):
-        logging.error("s3-object-browser requires >= python3.6")
+        logging.error("swift-browser-ui requires >= python3.6")
         sys.exit(1)
     main()

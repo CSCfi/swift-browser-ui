@@ -2,7 +2,7 @@ var getUser = async function () {
     // Function to get the username of the currently displayed user.
     let getUserURL = new URL( "/api/username", document.location.origin );
     let uname = fetch(
-        getUserURL, { method: 'GET', credentials: 'include' }
+        getUserURL, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function( response ) { return response.json(); }
     ).then(
@@ -15,7 +15,7 @@ var getProjects = async function () {
     // Fetch available projects from the API
     let getProjectsURL = new URL( "/api/projects", document.location.origin );
     let projects = fetch(
-        getProjectsURL, { method: 'GET', credentials: 'include' }
+        getProjectsURL, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function( response ) { return response.json(); }
     ).then(
@@ -33,7 +33,7 @@ var changeProjectApi = async function ( newProject ) {
     let rescopeURL = new URL( "/login/rescope", document.location.origin );
     rescopeURL.searchParams.append( 'project', newProject );
     let ret = fetch(
-        rescopeURL, { method: 'GET', credentials: 'include' }
+        rescopeURL, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function( resp ) {
             return resp.status == 204 ? true : false;
@@ -48,7 +48,7 @@ var getActiveProject = async function () {
     // returns nothing
     let getProjectURL = new URL( "/api/active", document.location.origin );
     let activeProj = fetch(
-        getProjectURL, { method: 'GET', credentials: 'include' }
+        getProjectURL, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function( resp ) {
             return resp.json();
@@ -61,7 +61,7 @@ var getBuckets = async function () {
     let getBucketsUrl = new URL( "/api/buckets", document.location.origin );
     // Fetch containers from the API for the user that's currently logged in
     let buckets = fetch(
-        getBucketsUrl, { method: 'GET', credentials: 'include' }
+        getBucketsUrl, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function ( resp ) { return resp.json() }
     );
@@ -76,7 +76,7 @@ var getObjects = async function (container) {
     // over from S3 to Swift
     objUrl.searchParams.append( 'bucket', container );
     let objects = fetch(
-        objUrl, { method: 'GET', credentials: 'include' }
+        objUrl, { method: 'GET', credentials: 'same-origin' }
     ).then(
         function ( resp ) { return resp.json() }
     ).then(
@@ -92,3 +92,20 @@ var getObjects = async function (container) {
     );
     return objects;
 };
+
+var getProjectMeta = async function () {
+    // Fetch project metadata for the currently active project, containing the
+    // project data usage, container amount and object amount.
+    let metaURL = new URL( "/api/get-project-meta", document.location.origin );
+    let ret = fetch(
+        metaURL, {method: 'GET', credentials: 'same-origin' }
+    ).then( function ( resp ) { return resp.json() } )
+     .then( function ( json_ret ) {
+        let newRet = json_ret;
+        newRet['Size'] = getHumanReadableSize(newRet['Bytes']);
+        newRet['Billed'] = parseFloat(newRet['Bytes'] / 1099511627776 * 3.5)
+                           .toPrecision(4);
+        return newRet;
+    })
+    return ret;
+}

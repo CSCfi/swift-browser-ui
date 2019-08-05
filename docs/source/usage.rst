@@ -7,8 +7,8 @@ Getting started
     running of the program
 
 After the setup has been completed as illustrated in :ref:`setup` the
-server can be used with the ``s3browser`` command, the command line options
-can be found below.
+server can be used with the ``swift-browser-ui`` command, the command line
+options can be found below.
 
 
 Command line interface
@@ -21,10 +21,10 @@ settings, detailed below:
 
 .. code-block:: console
 
-    ➜ s3browser --help
-    Usage: s3browser [OPTIONS] COMMAND [ARGS]...
+    ➜ swift-browser-ui --help
+    Usage: swift-browser-ui [OPTIONS] COMMAND [ARGS]...
 
-    Command line interface for managing s3browser.
+    Command line interface for managing swift-browser-ui.
 
     Options:
     --version       Show the version and exit.
@@ -56,8 +56,8 @@ The following command line arguments are available for server startup.
 
 .. code-block:: console
 
-    ➜ s3browser start --help
-    Usage: s3browser start [OPTIONS]
+    ➜ swift-browser-ui start --help
+    Usage: swift-browser-ui start [OPTIONS]
 
     Start the browser backend and server.
 

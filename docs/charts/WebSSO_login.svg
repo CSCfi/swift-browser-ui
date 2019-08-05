@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="58cm" height="18cm" viewBox="239 198 1149 344" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="689" y="200" width="57.05" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="689" y="200" width="57.05" height="36"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="717.525" y="221.9">
+      <tspan x="717.525" y="221.9">Client</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="699" y1="224.95" x2="736.05" y2="224.95"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="1118" y="200" width="62.05" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1118" y="200" width="62.05" height="36"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="1149.03" y="221.9">
+      <tspan x="1149.03" y="221.9">Server</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="1128" y1="224.95" x2="1170.05" y2="224.95"/>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="307" y="201" width="78.75" height="36"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="307" y="201" width="78.75" height="36"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="346.375" y="222.9">
+      <tspan x="346.375" y="222.9">Keystone</tspan>
+    </text>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" x1="317" y1="225.95" x2="375.75" y2="225.95"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="346.375" y1="237" x2="346.375" y2="320"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="346.375" y1="360" x2="346.375" y2="539"/>
+    <rect style="fill: #ffffff" x="339.375" y="320" width="14" height="40"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="339.375" y="320" width="14" height="40"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="717.525" y1="236" x2="717.525" y2="280"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="717.525" y1="360" x2="717.525" y2="365"/>
+    <rect style="fill: #ffffff" x="710.525" y="280" width="14" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="710.525" y="280" width="14" height="80"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="1149.03" y1="236" x2="1149.03" y2="280"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="1149.03" y1="320" x2="1149.03" y2="325"/>
+    <rect style="fill: #ffffff" x="1142.03" y="280" width="14" height="40"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1142.03" y="280" width="14" height="40"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1125.03" y1="280" x2="724.525" y2="280"/>
+    <polygon style="fill: #000000" points="1125.03,285 1141.03,280 1125.03,275 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1125.03,285 1141.03,280 1125.03,275 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="931" y="293">GET /login</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" x1="741.525" y1="320" x2="1142.03" y2="320"/>
+    <polygon style="fill: #000000" points="741.525,315 725.525,320 741.525,325 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="741.525,315 725.525,320 741.525,325 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="933" y="334">HTTP 302 Redirect to authentication endpoint</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="370.375" y1="320" x2="710.525" y2="320"/>
+    <polygon style="fill: #000000" points="370.375,315 354.375,320 370.375,325 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="370.375,315 354.375,320 370.375,325 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="530" y="333">GET OS-FEDERATION WebSSO endpoint</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" x1="693.525" y1="360" x2="353.375" y2="360"/>
+    <polygon style="fill: #000000" points="693.525,365 709.525,360 693.525,355 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="693.525,365 709.525,360 693.525,355 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="532" y="373">Hidden HTML form Token</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="1149.03" y1="320" x2="1149.03" y2="360"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="1149.03" y1="440" x2="1149.03" y2="542"/>
+    <rect style="fill: #ffffff" x="1142.03" y="360" width="14" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="1142.03" y="360" width="14" height="80"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="1125.03" y1="360" x2="724.525" y2="360"/>
+    <polygon style="fill: #000000" points="1125.03,365 1141.03,360 1125.03,355 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1125.03,365 1141.03,360 1125.03,355 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="933" y="374">POST /login/websso</text>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="717.525" y1="360" x2="717.525" y2="360"/>
+    <line style="fill: none; fill-opacity:0; stroke-width: 1; stroke-dasharray: 8; stroke: #000000" x1="717.525" y1="440" x2="717.525" y2="540"/>
+    <rect style="fill: #ffffff" x="710.525" y="360" width="14" height="80"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="710.525" y="360" width="14" height="80"/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" x1="741.525" y1="440" x2="1142.03" y2="440"/>
+    <polygon style="fill: #000000" points="741.525,435 725.525,440 741.525,445 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="741.525,435 725.525,440 741.525,445 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="934" y="453">Set cookie S3BROW_SESSION + HTTP303 redirect /browse</text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="240,315 323,315 335,327 335,365 240,365 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="240,315 323,315 335,327 335,365 240,365 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="323,315 323,327 335,327 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="247" y="339.9">
+      <tspan x="247" y="339.9">SAML login</tspan>
+      <tspan x="247" y="355.9">process</tspan>
+    </text>
+  </g>
+  <g>
+    <polygon style="fill: #ffffff" points="1161,367 1374.9,367 1386.9,379 1386.9,433 1161,433 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1161,367 1374.9,367 1386.9,379 1386.9,433 1161,433 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 1; stroke: #000000" points="1374.9,367 1374.9,379 1386.9,379 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="1168" y="391.9">
+      <tspan x="1168" y="391.9">Discover token availability</tspan>
+      <tspan x="1168" y="407.9">from Keystone and open</tspan>
+      <tspan x="1168" y="423.9">connection</tspan>
+    </text>
+  </g>
+</svg>

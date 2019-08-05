@@ -1,4 +1,4 @@
-.. s3browser documentation master file, created by
+.. swift-browser-ui documentation master file, created by
    sphinx-quickstart on Fri Jun 28 13:30:19 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -11,7 +11,7 @@ for authentication (e.g. `CSC Pouta <https://research.csc.fi/pouta-user-guide>`_
 It uses federated login via `HAKA <https://rr.funet.fi/haka/>`_, via the
 endpoints provided by `OpenStack Keystone <https://docs.openstack.org/keystone/latest/>`_.
 
-Out of the box the ``s3browser`` offers:
+Out of the box the ``swift-browser-ui`` offers:
 
 * UI for browsing `SWIFT objects <https://docs.openstack.org/swift/latest/>`_;
 * support for federated authentication of an user with their HAKA credentials
@@ -24,10 +24,16 @@ Out of the box the ``s3browser`` offers:
    :maxdepth: 2
    :caption: Contents:
 
-    Setup Instructions <instructions>
-    Usage & Examples  <usage>
+    Setup Instructions       <instructions>
+    Usage & Examples         <usage>
+    Python Modules           <code>
+    User Interface           <ui>
+    Testing                  <testing>
+    Architecture             <tech>
+    Tools / Miscellaneous    <tools>
 
-.. note:: ``s3browser`` and all it sources are released under *MIT License*.
+
+.. note:: ``swift-browser-ui`` and all it sources are released under *MIT License*.
 
 
 Indices and tables

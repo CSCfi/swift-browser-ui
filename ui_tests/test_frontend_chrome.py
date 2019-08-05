@@ -80,7 +80,7 @@ class TestFirefoxFrontend(ChromiumTestClass):
         self.drv.find_element_by_class_name("input").send_keys(
             "test-container-3"
         )
-        time.sleep(0.25)
+        time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         time.sleep(0.25)
         self.assertIn("test-container-3", self.drv.current_url)
@@ -94,7 +94,7 @@ class TestFirefoxFrontend(ChromiumTestClass):
         self.drv.find_element_by_class_name("input").send_keys(
             "test-container-4"
         )
-        time.sleep(0.25)
+        time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         self.assertIn("test-container-4", self.drv.current_url)
         # Go back and check the next container with some objects inside.
@@ -115,9 +115,10 @@ class TestFirefoxFrontend(ChromiumTestClass):
             self.drv.find_element_by_link_text("test_user_id")
         )
         time.sleep(0.1)
-        # NOTE: replace this with a proper assertion when the dashboard is
-        # implemented
-        self.assertIn("Not yet implemented", self.drv.page_source)
+        self.assertIn("Käyttäjä", self.drv.page_source)
+        self.assertIn("Kontteja", self.drv.page_source)
+        self.assertIn("Objekteja", self.drv.page_source)
+        self.assertIn("Tilankäyttö", self.drv.page_source)
         self.drv.back()
         time.sleep(0.1)
         # Perform one hash check still, in Finnish.

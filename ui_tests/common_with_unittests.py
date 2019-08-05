@@ -17,7 +17,7 @@ class BaseUITestClass(unittest.TestCase):
     """Base class for the browsers with server init and teardown."""
 
     def setUp(self):
-        """."""
+        """Start webserver with mock API."""
         self.server_process = subprocess.Popen(  # nosec
             [
                 "python",
@@ -29,20 +29,16 @@ class BaseUITestClass(unittest.TestCase):
         time.sleep(3.0)
 
     def tearDown(self):
-        """."""
-        self.server_process.terminate()
-        term_time = time.time()
-        while self.server_process.poll is None:
-            if time.time() - term_time > 5:
-                self.server_process.kill()
-            time.sleep(0.1)
+        """Terminate mock web server process."""
+        self.server_process.kill()
+        self.server_process.wait()
 
 
 class FirefoxTestClass(BaseUITestClass):
     """Class for testing with Firefox."""
 
     def setUp(self):
-        """."""
+        """Start Firefox Driver and navigate to UI."""
         super().setUp()
         self.opts = webdriver.firefox.options.Options()
         if environ.get("TEST_ENABLE_HEADLESS", None):
@@ -52,15 +48,16 @@ class FirefoxTestClass(BaseUITestClass):
         get_nav_to_ui(self.drv)
 
     def tearDown(self):
-        """."""
+        """Log out from UI an quit driver."""
         get_nav_out(self.drv)
+        super().tearDown()
 
 
 class ChromiumTestClass(BaseUITestClass):
     """Class for testing with Chromium."""
 
     def setUp(self):
-        """."""
+        """Start Chrome Driver and navigate to UI."""
         super().setUp()
         self.opts = webdriver.chrome.options.Options()
         if environ.get("TEST_ENABLE_HEADLESS", None):
@@ -72,5 +69,6 @@ class ChromiumTestClass(BaseUITestClass):
         get_nav_to_ui(self.drv)
 
     def tearDown(self):
-        """."""
+        """Log out from UI an quit driver."""
         get_nav_out(self.drv)
+        super().tearDown()
