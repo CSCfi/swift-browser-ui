@@ -1,5 +1,9 @@
 ## swift-browser-ui
 
+[![Build Status](https://travis-ci.org/CSCfi/swift-browser-ui.svg?branch=master)](https://travis-ci.org/CSCfi/swift-browser-ui)
+[![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=maste)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=maste)
+[![Documentation Status](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)
+
 ### Description
 
 A web frontend for browsing and downloading objects saved in [SWIFT](https://docs.openstack.org/swift/latest/)
