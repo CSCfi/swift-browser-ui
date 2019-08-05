@@ -5,6 +5,8 @@
 A web frontend for browsing and downloading objects saved in [SWIFT](https://docs.openstack.org/swift/latest/)
 compliant object storage, supporting SSO with SAML2 federated authentication.
 
+Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
+
 ### Requirements
 
 Python 3.6+ required
