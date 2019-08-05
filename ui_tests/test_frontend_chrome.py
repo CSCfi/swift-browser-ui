@@ -16,7 +16,7 @@ from .common import navigate_to_next_full_after_back
 from .common import wait_for_clickable
 
 
-class TestFirefoxFrontend(ChromiumTestClass):
+class TestChromeFrontend(ChromiumTestClass):
     """Test the frontend wiht chrome."""
 
     @pytest.mark.timeout(60)
