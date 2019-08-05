@@ -30,7 +30,7 @@ jobs:
       python: 3.6
       before_script:
         - pip install tox-travis
-      script: tox
+      script: tox -e pytest
     - stage: tests
       name: "Documentation Tests"
       python: 3.6
