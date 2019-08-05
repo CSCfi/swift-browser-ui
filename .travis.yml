@@ -1,0 +1,88 @@
+sudo: required
+dist: xenial
+language: python
+
+python: 3.6
+install: true
+
+git:
+  depth: false
+  quiet: true
+
+services: docker
+
+stages:
+  - name: tests
+    if: type IN (push, pull_request)
+  - name: uitests
+    if: type IN (pull_request)
+
+jobs:
+  include:
+    - stage: tests
+      name: "Code Style Check"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+      script: tox -e flake8
+    - stage: tests
+      name: "Unit Tests"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+      script: tox
+    - stage: tests
+      name: "Documentation Tests"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+        - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+        - tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
+        - rm geckodriver-v0.24.0-linux64.tar.gz
+        - chmod +x geckodriver
+        - sudo cp geckodriver /usr/local/bin/
+        - geckodriver --version
+        - sudo apt-get update
+        - sudo apt-get install firefox -y
+      script:
+        - tox -e docs
+    - stage: tests
+      name: "Python Code Security Tests"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+      script: tox -e bandit
+    - stage: uitests
+      name: "Firefox UI Tests"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+        - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+        - tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
+        - rm geckodriver-v0.24.0-linux64.tar.gz
+        - chmod +x geckodriver
+        - sudo cp geckodriver /usr/local/bin/
+        - geckodriver --version
+        - sudo apt-get update
+        - sudo apt-get install firefox -y
+      script:
+        - tox -e firefox
+    - stage: uitests
+      name: "Chrome UI Tests"
+      python: 3.6
+      before_script:
+        - pip install tox-travis
+        - sudo apt-get -y update
+        - sudo apt-get -y install google-chrome-stable
+        - wget https://chromedriver.storage.googleapis.com/75.0.3770.140/chromedriver_linux64.zip
+        - unzip chromedriver_linux64.zip
+        - rm chromedriver_linux64.zip
+        - chmod +x chromedriver
+        - sudo cp chromedriver /usr/local/bin/
+        - sudo chromedriver --version
+      script:
+        - tox -e chrome
+
+
+notifications:
+  email: false
