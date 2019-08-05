@@ -10,7 +10,12 @@ async def browse(request):
     """Serve the browser SPA when running without a proxy."""
     session_check(request)
     response = aiohttp.web.FileResponse(
-        setd['static_directory'] + '/browse.html'
+        setd['static_directory'] + '/browse.html',
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
     )
     return response
 
