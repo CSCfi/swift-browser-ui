@@ -11,7 +11,7 @@ import os
 import json
 
 import cryptography.fernet
-from s3browser._convenience import generate_cookie
+from swift_browser_ui._convenience import generate_cookie
 
 from .mockups import Mock_Request, Mock_Service, Mock_Session
 

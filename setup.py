@@ -1,5 +1,5 @@
 import setuptools
-from s3browser import __name__, __version__, __author__
+from swift_browser_ui import __name__, __version__, __author__
 
 
 setuptools.setup(
@@ -9,7 +9,7 @@ setuptools.setup(
     author=__author__,
     author_email="sampsa.penna@csc.fi",
     project_urls={
-        'Source': 'https://gitlab.csc.fi/CSCCSDP/s3-object-browser',
+        'Source': 'https://gitlab.csc.fi/CSCCSDP/swift-browser-ui',
     },
     license='MIT',
     install_requires=[
@@ -39,7 +39,7 @@ setuptools.setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            's3browser=s3browser.shell:main',
+            'swift-browser-ui=swift_browser_ui.shell:main',
         ]
     },
     classifiers=[

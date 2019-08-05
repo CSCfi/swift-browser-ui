@@ -30,7 +30,7 @@ The different configurations are also listed here:
                         files, only used when the server is deployed without
                         a proxy like Nginx to host the static files, and handle
                         load balancing
-                        Default: $PWD/s3browser_frontend
+                        Default: $PWD/swift_browser_ui_frontend
 
 """
 

@@ -1,11 +1,9 @@
-## s3-object-browser
+## swift-browser-ui
 
 ### Description
 
 A web frontend for browsing and downloading objects saved in [SWIFT](https://docs.openstack.org/swift/latest/)
 compliant object storage, supporting SSO with SAML2 federated authentication.
-
-Documentation available at: http://docs-object-browser.rahti-int-app.csc.fi/
 
 ### Requirements
 
@@ -31,18 +29,18 @@ export BROWSER_START_PORT="8080"'\
 
 Getting started:
 ```
-git clone git@gitlab.csc.fi:CSCCSDP/s3-object-browser.git
-cd s3-object-browser
+git clone git@gitlab.csc.fi:CSCCSDP/swift_browser_ui.git
+cd swift_browser_ui
 pip install -r requirements.txt
 pip install .
 ```
 
-After install there should be `s3browser` command available:
+After install there should be `swift-browser-ui` command available:
 ```
-➜ s3browser --help
-Usage: s3browser [OPTIONS] COMMAND [ARGS]...
+➜ swift-browser-ui --help
+Usage: swift-browser-ui [OPTIONS] COMMAND [ARGS]...
 
-  Command line interface for managing s3browser.
+  Command line interface for managing swift-browser-ui.
 
 Options:
   --version       Show the version and exit.
@@ -55,16 +53,16 @@ Commands:
   start    Start the browser backend and server
 ```
 
-In order to start the server use `s3browser start`.
+In order to start the server use `swift-browser-ui start`.
 
 Additional options can be found with
 ```
-s3browser --help
-s3browser start --help
+swift-browser-ui --help
+swift-browser-ui start --help
 ```
 
 The current frontend can be found at: `127.0.0.1:8080`.
 
 ### License
 
-``s3browser`` and all it sources are released under *MIT License*.
+``swift-browser-ui`` and all it sources are released under *MIT License*.

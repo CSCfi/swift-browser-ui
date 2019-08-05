@@ -1,4 +1,4 @@
-"""Module for testing ``s3browser.api``."""
+"""Module for testing ``swift_browser_ui.api``."""
 
 import json
 import hashlib
@@ -7,12 +7,12 @@ import os
 from aiohttp.web import HTTPNotFound
 import asynctest
 
-from s3browser.api import get_os_user, os_list_projects
-from s3browser.api import swift_list_buckets, swift_list_objects
-from s3browser.api import swift_download_object
-from s3browser.api import get_metadata
-from s3browser.api import get_project_metadata
-from s3browser.settings import setd
+from swift_browser_ui.api import get_os_user, os_list_projects
+from swift_browser_ui.api import swift_list_buckets, swift_list_objects
+from swift_browser_ui.api import swift_download_object
+from swift_browser_ui.api import get_metadata
+from swift_browser_ui.api import get_project_metadata
+from swift_browser_ui.settings import setd
 
 from .creation import get_request_with_mock_openstack
 

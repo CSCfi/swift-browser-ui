@@ -9,7 +9,7 @@ The program can be installed with pip from the git repository:
 .. code-block:: console
 
     # Requires python >= 3.6
-    git clone git@gitlab.csc.fi:CSCCSDP/s3-object-browser.git
+    git clone git@gitlab.csc.fi:CSCCSDP/swift-browser-ui.git
     pip install .
 
 
@@ -75,7 +75,7 @@ configured to use TCP sockets in NGINX, so they’re the directions to use in
 the aforementioned link. Also change the server run command to enable running
 the project as follows::
 
-    command=python3 -m s3browser.shell start --port=808%(process_num)s
+    command=swift-browser-ui start --port=808%(process_num)s
 
 Further reading and citations
 -----------------------------

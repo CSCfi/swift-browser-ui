@@ -1,4 +1,4 @@
-"""s3browser server related convenience functions."""
+"""swift_browser_ui server related convenience functions."""
 
 # Generic imports
 # import ssl
@@ -69,8 +69,8 @@ async def servinit():
     # just a convenient way of getting ascii output from byte values.
     app['Salt'] = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
     # Set application specific logging
-    app['Log'] = logging.getLogger('s3browser')
-    app['Log'].info('Set up logging for the s3browser application')
+    app['Log'] = logging.getLogger('swift-browser-ui')
+    app['Log'].info('Set up logging for the swift-browser-ui application')
     # Session list to quickly validate sessions
     app['Sessions'] = []
     # Cookie keyed dictionary to store session data
@@ -151,6 +151,6 @@ def run_server_insecure(app):
 
 if __name__ == '__main__':
     if sys.version_info < (3, 6):
-        logging.error("s3-object-browser requires >= python3.6")
+        logging.error("swift-browser-ui requires >= python3.6")
         sys.exit(1)
     run_server_insecure(servinit())

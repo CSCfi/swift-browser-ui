@@ -6,7 +6,7 @@ import unittest.mock
 import logging
 
 
-import s3browser.server
+import swift_browser_ui.server
 
 
 # Import some mock-ups that are already made before
@@ -56,23 +56,23 @@ async def mock_graceful_shutdown(_):
 
 
 @unittest.mock.patch(
-    "s3browser.server.kill_sess_on_shutdown",
+    "swift_browser_ui.server.kill_sess_on_shutdown",
     mock_graceful_shutdown
 )
 @unittest.mock.patch(
-    "s3browser.login.initiate_os_session",
+    "swift_browser_ui.login.initiate_os_session",
     mock_initiate_os_session
 )
 @unittest.mock.patch(
-    "s3browser.login.initiate_os_service",
+    "swift_browser_ui.login.initiate_os_service",
     mock_initiate_swift_service
 )
 @unittest.mock.patch(
-    "s3browser.login.get_availability_from_token",
+    "swift_browser_ui.login.get_availability_from_token",
     return_project_avail
 )
 @unittest.mock.patch.dict(
-    s3browser.server.setd,
+    swift_browser_ui.server.setd,
     {
         "auth_endpoint_url": "https://localhost:5001/v3",
         "has_trust": False,
@@ -82,7 +82,8 @@ async def mock_graceful_shutdown(_):
         "debug": True,
         "set_session_devmode": SESSION_MODE,
         "static_directory":
-        s3browser.settings.__file__.replace("/settings.py", "") + "/static"
+        swift_browser_ui.settings.__file__.replace("/settings.py", "") +
+        "/static"
     }
 )
 def run_mock_server():
@@ -90,8 +91,8 @@ def run_mock_server():
     # Run the server in an ordinary fashion after patching everything
     logging.basicConfig()
     logging.root.setLevel(logging.DEBUG)
-    app = s3browser.server.servinit()
-    s3browser.server.run_server_insecure(app)
+    app = swift_browser_ui.server.servinit()
+    swift_browser_ui.server.run_server_insecure(app)
 
 
 if __name__ == '__main__':

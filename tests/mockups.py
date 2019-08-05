@@ -1,4 +1,4 @@
-"""Mock-up classes and functions for testing s3browser."""
+"""Mock-up classes and functions for testing swift_browser_ui."""
 
 
 import random
