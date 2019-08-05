@@ -25,8 +25,8 @@ class ObjBrowserScreenshot():
         """."""
         self.server_process = None
         self.options = None
-        self.img_dir = (__file__.split('s3-object-browser')[0] +
-                        's3-object-browser/docs/source/_static/images/')
+        self.img_dir = (__file__.split('swift-browser-ui')[0] +
+                        'swift-browser-ui/docs/source/_static/images/')
         if not os.path.exists(self.img_dir):
             os.mkdir(self.img_dir)
         self.drv = None

@@ -2,20 +2,21 @@
 Python Modules
 --------------
 
-.. automodule:: s3browser
-   :synopsis: The ``s3browser`` package contains code for Object Browser.
+.. automodule:: swift_browser_ui
+   :synopsis: The ``swift_browser_ui`` package contains code for Object
+              Browser.
 
 .. autosummary::
-    :toctree: s3browser
+    :toctree: swift_browser_ui
 
-    s3browser._convenience
-    s3browser.api
-    s3browser.exceptions
-    s3browser.front
-    s3browser.login
-    s3browser.server
-    s3browser.settings
-    s3browser.shell
+    swift_browser_ui._convenience
+    swift_browser_ui.api
+    swift_browser_ui.exceptions
+    swift_browser_ui.front
+    swift_browser_ui.login
+    swift_browser_ui.server
+    swift_browser_ui.settings
+    swift_browser_ui.shell
 
 
 :ref:`genindex` | :ref:`modindex`

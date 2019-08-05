@@ -1,5 +1,5 @@
 """
-Module for testing ``s3browser.server``.
+Module for testing ``swift_browser_ui.server``.
 
 Contains the tests for ``front.py``.
 """
@@ -10,12 +10,12 @@ import os
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 import asynctest
 
-from s3browser.server import servinit
-from s3browser.settings import setd
+from swift_browser_ui.server import servinit
+from swift_browser_ui.settings import setd
 
 
 # Set static folder in settings so it can be tested
-setd['static_directory'] = os.getcwd() + '/s3browser_frontend'
+setd['static_directory'] = os.getcwd() + '/swift_browser_ui_frontend'
 
 
 class TestServinitMethod(asynctest.TestCase):

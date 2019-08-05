@@ -18,12 +18,12 @@ import sys
 import os
 
 # Get the project root dir
-sys.path.insert(0, os.path.abspath('../../s3browser'))
+sys.path.insert(0, os.path.abspath('../../swift_browser_ui'))
 
 # -- Project information -----------------------------------------------------
 current_year = str(datetime.date.today().year)
 
-project = 's3browser'
+project = 'swit-browser-ui'
 copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
@@ -79,6 +79,6 @@ def setup(app):
     app.add_stylesheet('style.css')
 
 
-htmlhelp_basename = 's3browser'
-man_pages = [(master_doc, 's3browser', [author], 1)]
-texinfo_documents = [(master_doc, 's3browser', author, 'Miscellaneous')]
+htmlhelp_basename = 'swift-browser-ui'
+man_pages = [(master_doc, 'swift-browser-ui', [author], 1)]
+texinfo_documents = [(master_doc, 'swift-browser-ui', author, 'Miscellaneous')]

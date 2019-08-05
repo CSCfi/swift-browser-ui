@@ -1,4 +1,4 @@
-"""Test ``s3browser.login`` module."""
+"""Test ``swift_browser_ui.login`` module."""
 
 import hashlib
 import os
@@ -8,8 +8,8 @@ import unittest
 import asynctest
 from aiohttp.web import HTTPClientError
 
-import s3browser.login
-import s3browser.settings
+import swift_browser_ui.login
+import swift_browser_ui.settings
 
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
@@ -24,18 +24,18 @@ class LoginTestClass(asynctest.TestCase):
 
     async def test_handle_login(self):
         """Test initial login handler."""
-        resp = await s3browser.login.handle_login(None)
+        resp = await swift_browser_ui.login.handle_login(None)
         self.assertEqual(resp.headers['Location'], "/login/front")
         self.assertEqual(resp.status, 302)
 
     async def test_sso_query_begin_with_trust(self):
         """Test sso query begin function."""
-        with unittest.mock.patch("s3browser.login.setd", new={
+        with unittest.mock.patch("swift_browser_ui.login.setd", new={
                 "auth_endpoint_url": "https://example.os.com:5001/v3",
                 "set_origin_address": "https://localhost/login/websso",
                 "has_trust": True,
         }):
-            resp = await s3browser.login.sso_query_begin(None)
+            resp = await swift_browser_ui.login.sso_query_begin(None)
             self.assertEqual(resp.status, 302)
             self.assertEqual(resp.headers['Location'], (
                 "https://example.os.com:5001/v3" +
@@ -47,14 +47,14 @@ class LoginTestClass(asynctest.TestCase):
 
     async def test_sso_query_begin_without_trust(self):
         """Test sso query begin without trust."""
-        with unittest.mock.patch("s3browser.login.setd", new={
+        with unittest.mock.patch("swift_browser_ui.login.setd", new={
                 "auth_endpoint_url": "https://example.os.com:5001/v3",
                 "origin_address": "https://localhost/login/websso",
                 "has_trust": False,
                 "static_directory": (__file__.replace("/settings.py", "") +
                                      "/static"),
         }):
-            resp = await s3browser.login.sso_query_begin(None)
+            resp = await swift_browser_ui.login.sso_query_begin(None)
             self.assertEqual(resp.status, 200)
 
     async def test_sso_query_end_successful_http_form(self):
@@ -63,14 +63,14 @@ class LoginTestClass(asynctest.TestCase):
 
         This version tests the token delivery in a http encoded form.
         """
-        patch1 = unittest.mock.patch("s3browser.login.setd", new={
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
         })
 
         # Patch away the convenience function for checking project availability
         patch2 = unittest.mock.patch(
-            "s3browser.login.get_availability_from_token",
+            "swift_browser_ui.login.get_availability_from_token",
             new=return_project_avail
         )
 
@@ -91,7 +91,7 @@ class LoginTestClass(asynctest.TestCase):
                 "token": token
             })
 
-            resp = await s3browser.login.sso_query_end(req)
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
@@ -113,13 +113,13 @@ class LoginTestClass(asynctest.TestCase):
         This version tests the token delivery in a urlencoded form instead of a
         http encoded one.
         """
-        patch1 = unittest.mock.patch("s3browser.login.setd", new={
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
         })
 
         patch2 = unittest.mock.patch(
-            "s3browser.login.get_availability_from_token",
+            "swift_browser_ui.login.get_availability_from_token",
             new=return_project_avail
         )
 
@@ -139,7 +139,7 @@ class LoginTestClass(asynctest.TestCase):
 
             req.query['token'] = token
 
-            resp = await s3browser.login.sso_query_end(req)
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
@@ -160,14 +160,14 @@ class LoginTestClass(asynctest.TestCase):
 
         This version tests the token delivery in a HTTP header.
         """
-        patch1 = unittest.mock.patch("s3browser.login.setd", new={
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
         })
 
         # Patch away the convenience function for checking project availability
         patch2 = unittest.mock.patch(
-            "s3browser.login.get_availability_from_token",
+            "swift_browser_ui.login.get_availability_from_token",
             new=return_project_avail
         )
 
@@ -187,7 +187,7 @@ class LoginTestClass(asynctest.TestCase):
 
             req.headers['X-Auth-Token'] = token
 
-            resp = await s3browser.login.sso_query_end(req)
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
@@ -204,7 +204,7 @@ class LoginTestClass(asynctest.TestCase):
 
     async def test_sso_query_end_unsuccessful_missing_token(self):
         """Test unsuccessful token delivery with token missing."""
-        patch1 = unittest.mock.patch("s3browser.login.setd", new={
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
         })
@@ -223,11 +223,11 @@ class LoginTestClass(asynctest.TestCase):
             req = get_request_with_fernet()
 
             with self.assertRaises(HTTPClientError):
-                _ = await s3browser.login.sso_query_end(req)
+                _ = await swift_browser_ui.login.sso_query_end(req)
 
     async def test_sso_query_end_unsuccessful_invalid_token(self):
         """Test unsuccessful token delivery with an invalid."""
-        patch1 = unittest.mock.patch("s3browser.login.setd", new={
+        patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
             "has_trust": False,
@@ -235,7 +235,7 @@ class LoginTestClass(asynctest.TestCase):
 
         # Patch away the convenience function for checking project availability
         patch2 = unittest.mock.patch(
-            "s3browser.login.get_availability_from_token",
+            "swift_browser_ui.login.get_availability_from_token",
             new=return_invalid
         )
 
@@ -255,7 +255,7 @@ class LoginTestClass(asynctest.TestCase):
 
             req.headers['X-Auth-Token'] = token
 
-            resp = await s3browser.login.sso_query_end(req)
+            resp = await swift_browser_ui.login.sso_query_end(req)
 
             self.assertEqual(resp.status, 302)
             self.assertEqual(resp.headers['Location'], "/login")
@@ -270,7 +270,7 @@ class LoginTestClass(asynctest.TestCase):
 
         sess = req.app['Creds'][cookie]['OS_sess']
 
-        resp = await s3browser.login.handle_logout(req)
+        resp = await swift_browser_ui.login.handle_logout(req)
 
         self.assertEqual(resp.status, 303)
         self.assertEqual(resp.headers['Location'], "/")

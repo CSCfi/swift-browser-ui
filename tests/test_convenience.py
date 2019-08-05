@@ -1,4 +1,4 @@
-"""Module for testing ``s3browser._convenience``."""
+"""Module for testing ``swift_browser_ui._convenience``."""
 
 
 import hashlib
@@ -8,12 +8,13 @@ from aiohttp.web import HTTPUnauthorized, Response
 import cryptography.fernet
 from swiftclient.service import SwiftService
 from keystoneauth1.session import Session
-from s3browser._convenience import api_check, generate_cookie
-from s3browser._convenience import disable_cache, decrypt_cookie
-from s3browser._convenience import session_check, setup_logging
-from s3browser._convenience import get_availability_from_token
-from s3browser._convenience import initiate_os_service, initiate_os_session
-from s3browser.settings import setd
+from swift_browser_ui._convenience import api_check, generate_cookie
+from swift_browser_ui._convenience import disable_cache, decrypt_cookie
+from swift_browser_ui._convenience import session_check, setup_logging
+from swift_browser_ui._convenience import get_availability_from_token
+from swift_browser_ui._convenience import initiate_os_service
+from swift_browser_ui._convenience import initiate_os_session
+from swift_browser_ui.settings import setd
 
 from .creation import get_request_with_fernet
 from .creation import get_full_crypted_session_cookie
@@ -180,7 +181,7 @@ class TestConvenienceFunctions(unittest.TestCase):
 
     def test_get_availability_from_token(self):
         """Test the get_availability_from_token function."""
-        with unittest.mock.patch("s3browser._convenience.setd", new={
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
             "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
         }):
             # Test with an invalid token
@@ -203,7 +204,7 @@ class TestConvenienceFunctions(unittest.TestCase):
 
     def test_initiate_os_session(self):
         """Test initiate_os_session function."""
-        with unittest.mock.patch("s3browser.settings.setd", new={
+        with unittest.mock.patch("swift_browser_ui.settings.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
         }):
             ret = initiate_os_session(
@@ -214,7 +215,7 @@ class TestConvenienceFunctions(unittest.TestCase):
 
     def test_initiate_os_service(self):
         """Test initiate_os_servce function."""
-        with unittest.mock.patch("s3browser.settings.setd", new={
+        with unittest.mock.patch("swift_browser_ui.settings.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
         }):
