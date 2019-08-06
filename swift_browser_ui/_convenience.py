@@ -83,11 +83,7 @@ def check_csrf(request):
                     request.headers["Referer"]
                 )
             )
-            raise aiohttp.web.HTTPUnauthorized(
-                headers={
-                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                }
-            )
+            raise aiohttp.web.HTTPForbidden()
     else:
         request.app["Log"].debug(
             "Skipping referral validation due to missing Referer-header."
@@ -106,11 +102,7 @@ def check_csrf(request):
                 request.headers["Referer"]
             )
         )
-        raise aiohttp.web.HTTPUnauthorized(
-            headers={
-                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-            }
-        )
+        raise aiohttp.web.HTTPForbidden()
     # If all is well, return True.
     return True
 
