@@ -26,10 +26,11 @@ Out of the box the ``swift-browser-ui`` offers:
 
     Setup Instructions       <instructions>
     Usage & Examples         <usage>
-    Python Modules           <code>
-    User Interface           <ui>
-    Testing                  <testing>
+    Deployment               <deploy>
     Architecture             <tech>
+    User Interface           <ui>
+    Python Modules           <code>
+    Testing                  <testing>
     Tools / Miscellaneous    <tools>
 
 
