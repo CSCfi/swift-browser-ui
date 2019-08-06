@@ -33,6 +33,14 @@ unit_test:
   script:   
     - tox -e pytest
 
+unit_test_37:
+  stage: Base Tests
+  image: python:3.7
+  before_script:
+    - pip --cache-dir=.pip install tox
+  script:   
+    - tox -e pytest
+
 docs_test:
   stage: Base Tests
   image: python:3.6

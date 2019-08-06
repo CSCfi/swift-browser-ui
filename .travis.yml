@@ -2,7 +2,6 @@ sudo: required
 dist: xenial
 language: python
 
-python: 3.6
 install: true
 
 git:
@@ -30,8 +29,14 @@ jobs:
         - pip install tox-travis
       script: tox -e flake8
     - stage: tests
-      name: "Unit Tests"
+      name: "Unit Tests  Python 3.6"
       python: 3.6
+      before_script:
+        - pip install tox-travis
+      script: tox -e pytest
+    - stage: tests
+      name: "Unit Tests Python 3.7"
+      python: 3.7
       before_script:
         - pip install tox-travis
       script: tox -e pytest
