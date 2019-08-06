@@ -54,5 +54,6 @@ setuptools.setup(
         'License :: OSI Approved :: MIT License',
 
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
