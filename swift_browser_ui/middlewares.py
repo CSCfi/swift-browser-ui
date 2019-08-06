@@ -6,45 +6,40 @@ from .settings import setd
 
 
 @web.middleware
-async def unauthorized_middleware(request, handler):
-    """Return a custom page upon an HTTP 401."""
+async def error_middleware(request, handler):
+    """Return the correct HTTP Error page."""
     try:
         response = await handler(request)
-        if response.status != 401:
-            return response
+        if response.status == 401:
+            return web.FileResponse(
+                setd["static_directory"] + "/401.html",
+                status=401
+            )
+        if response.status == 403:
+            return web.FileResponse(
+                setd["static_directory"] + "/403.html",
+                status=403
+            )
+        if response.status == 404:
+            return web.FileResponse(
+                setd["static_directory"] + "/404.html",
+                status=404
+            )
+        return response
     except web.HTTPException as ex:
-        if ex.status != 401:
-            raise
-    return web.FileResponse(
-        setd["static_directory"] + "/401.html"
-    )
-
-
-@web.middleware
-async def forbidden_middleware(request, handler):
-    """Return a custom page upon an HTTP 403."""
-    try:
-        response = await handler(request)
-        if response.status != 403:
-            return response
-    except web.HTTPException as ex:
-        if ex.status != 403:
-            raise
-    return web.FileResponse(
-        setd["static_directory"] + "/403.html"
-    )
-
-
-@web.middleware
-async def not_found_middleware(request, handler):
-    """Return a custom page upon an HTTP 404."""
-    try:
-        response = await handler(request)
-        if response.status != 404:
-            return response
-    except web.HTTPException as ex:
-        if ex.status != 404:
-            raise
-    return web.FileResponse(
-        setd["static_directory"] + "/404.html"
-    )
+        if ex.status == 401:
+            return web.FileResponse(
+                setd["static_directory"] + "/401.html",
+                status=401
+            )
+        if ex.status == 403:
+            return web.FileResponse(
+                setd["static_directory"] + "/403.html",
+                status=403
+            )
+        if ex.status == 404:
+            return web.FileResponse(
+                setd["static_directory"] + "/404.html",
+                status=404
+            )
+        raise

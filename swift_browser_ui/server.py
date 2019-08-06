@@ -21,9 +21,7 @@ from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
 from .api import get_metadata, get_project_metadata
 from .settings import setd
-from .middlewares import unauthorized_middleware
-from .middlewares import forbidden_middleware
-from .middlewares import not_found_middleware
+from .middlewares import error_middleware
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -61,11 +59,7 @@ async def kill_sess_on_shutdown(app):
 async def servinit():
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(
-        middlewares=[
-            unauthorized_middleware,
-            forbidden_middleware,
-            not_found_middleware,
-        ]
+        middlewares=[error_middleware]
     )
 
     # Mutable_map handles cookie storage, also stores the object that provides
