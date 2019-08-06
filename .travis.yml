@@ -16,6 +16,10 @@ stages:
     if: type IN (push, pull_request)
   - name: uitests
     if: type IN (pull_request)
+  - name: image
+    if: branch = master AND type = push
+  - name: image tag
+    if: tag =~ /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
 
 jobs:
   include:
@@ -84,6 +88,20 @@ jobs:
         - sudo chromedriver --version
       script:
         - tox -e chrome
+    - stage: image
+      name: "Image Publish"
+      before_script:
+        - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      script:
+        - docker build -t cscfi/swift-ui . 
+        - docker push cscfi/swift-ui:latest
+    - stage: image tag
+      name: "Image Tag Publish"
+      before_script:
+        - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      script:
+        - docker build -t cscfi/swift-ui:$TRAVIS_TAG . 
+        - docker push cscfi/swift-ui:$TRAVIS_TAG
 
 
 notifications:
