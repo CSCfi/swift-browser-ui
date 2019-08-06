@@ -65,7 +65,7 @@ UI Pytest Chrome:
     - echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
     - apt-get -y update
     - apt-get -y install google-chrome-stable
-    - wget https://chromedriver.storage.googleapis.com/75.0.3770.140/chromedriver_linux64.zip
+    - wget $(echo $(curl https://chromedriver.chromium.org/downloads |grep -o href=\"[^\"]*index\.html\?path.$(google-chrome --version | sed 's/^Google Chrome //g' |grep -o ^[0-9][0-9]\..\.)[^\"]*\" | head -n 1 |sed s/href=\"//g |sed s/\"//g |sed s/index\.html\?path=//g)chromedriver_linux64.zip)
     - unzip chromedriver_linux64.zip
     - rm chromedriver_linux64.zip
     - chmod +x chromedriver
