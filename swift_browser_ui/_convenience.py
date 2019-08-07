@@ -140,12 +140,7 @@ def api_check(request):
     try:
         if decrypt_cookie(request)["id"] in request.app['Sessions']:
             session = decrypt_cookie(request)["id"]
-            if not check_csrf(request):
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
+            check_csrf(request)
             ret = session
             if 'ST_conn' not in request.app['Creds'][session].keys():
                 raise aiohttp.web.HTTPUnauthorized(
