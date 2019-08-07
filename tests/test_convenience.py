@@ -126,10 +126,16 @@ class TestConvenienceFunctions(unittest.TestCase):
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
-    # NOTE: The order of operations for these tests is significant
-    # (i.e. there is a reason some of the placeholders are missing
-    # in the test functions,
-    # to enable testing correct raising order in the same time)
+    def test_api_check_raise_on_invalid_fernet(self):
+        """Test raise if the cryptographic key has changed."""
+        testreq = get_request_with_fernet()
+        _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
+        testreq.app['Crypt'] = cryptography.fernet.Fernet(
+            cryptography.fernet.Fernet.generate_key()
+        )
+        with self.assertRaises(HTTPUnauthorized):
+            api_check(testreq)
+
     def test_api_check_raise_on_no_connection(self):
         """Test raise if there's no existing OS connection on an API call."""
         testreq = get_request_with_fernet()
@@ -153,6 +159,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         session = cookie["id"]
         testreq.app['Sessions'] = [session]
         testreq.app['Creds'][session] = {}
+        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
         testreq.app['Creds'][session]['Avail'] = "placeholder"
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
@@ -166,6 +173,8 @@ class TestConvenienceFunctions(unittest.TestCase):
         session = cookie["id"]
         testreq.app['Creds'][session] = {}
         testreq.app['Sessions'] = [session]
+        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
+        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
