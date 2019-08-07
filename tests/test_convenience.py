@@ -4,7 +4,10 @@
 import hashlib
 import os
 import unittest
+
 from aiohttp.web import HTTPUnauthorized, Response
+from aiohttp.web import HTTPForbidden
+
 import cryptography.fernet
 from swiftclient.service import SwiftService
 from keystoneauth1.session import Session
@@ -14,10 +17,12 @@ from swift_browser_ui._convenience import session_check, setup_logging
 from swift_browser_ui._convenience import get_availability_from_token
 from swift_browser_ui._convenience import initiate_os_service
 from swift_browser_ui._convenience import initiate_os_session
+from swift_browser_ui._convenience import check_csrf
 from swift_browser_ui.settings import setd
 
 from .creation import get_request_with_fernet
 from .creation import get_full_crypted_session_cookie
+from .creation import add_csrf_to_cookie, encrypt_cookie
 from .mockups import mock_token_output, urlopen
 
 
@@ -222,3 +227,64 @@ class TestConvenienceFunctions(unittest.TestCase):
             sess_mock = unittest.mock.MagicMock(Session)
             ret = initiate_os_service(sess_mock())
             self.assertIsInstance(ret, SwiftService)  # nosec
+
+    def test_check_csrf_os_skip(self):
+        """Test check_csrf when skipping referer from OS."""
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            testreq = get_request_with_fernet()
+            cookie, _ = generate_cookie(testreq)
+            cookie = add_csrf_to_cookie(cookie, testreq)
+            encrypt_cookie(cookie, testreq)
+            testreq.headers["Referer"] = "http://example-auth.exampleosep.com"
+            self.assertTrue(check_csrf(testreq))
+
+    def test_check_csrf_incorrect_referer(self):
+        """Test check_csrf when Referer header is incorrect."""
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            testreq = get_request_with_fernet()
+            cookie, _ = generate_cookie(testreq)
+            cookie = add_csrf_to_cookie(cookie, testreq)
+            encrypt_cookie(cookie, testreq)
+            testreq.headers["Referer"] = "http://notlocaclhost:8080"
+            with self.assertRaises(HTTPForbidden):
+                check_csrf(testreq)
+
+    def test_check_csrf_incorrect_signature(self):
+        """Test check_csrf when signature doesn't match."""
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            testreq = get_request_with_fernet()
+            cookie, _ = generate_cookie(testreq)
+            cookie = add_csrf_to_cookie(cookie, testreq, bad_sign=True)
+            encrypt_cookie(cookie, testreq)
+            testreq.headers["Referer"] = "http://localhost:8080"
+            with self.assertRaises(HTTPForbidden):
+                check_csrf(testreq)
+
+    def test_check_csrf_no_referer(self):
+        """Test check_csrf when no Referer header is present."""
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            testreq = get_request_with_fernet()
+            cookie, _ = generate_cookie(testreq)
+            cookie = add_csrf_to_cookie(cookie, testreq)
+            encrypt_cookie(cookie, testreq)
+            self.assertTrue(check_csrf(testreq))
+
+    def test_check_csrf_correct_referer(self):
+        """Test check_csrf when the session is valid."""
+        with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
+            "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"
+        }):
+            testreq = get_request_with_fernet()
+            cookie, _ = generate_cookie(testreq)
+            cookie = add_csrf_to_cookie(cookie, testreq)
+            encrypt_cookie(cookie, testreq)
+            testreq.headers["Referer"] = "http://localhost:8080"
+            self.assertTrue(check_csrf(testreq))
