@@ -62,7 +62,7 @@ async def swift_list_buckets(request):
         return aiohttp.web.json_response(cont)
 
     except SwiftError:
-        return aiohttp.web.json_response([])
+        raise aiohttp.web.HTTPNotFound()
 
 
 async def swift_list_objects(request):
