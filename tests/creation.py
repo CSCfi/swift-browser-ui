@@ -16,6 +16,30 @@ from swift_browser_ui._convenience import generate_cookie
 from .mockups import Mock_Request, Mock_Service, Mock_Session
 
 
+def add_csrf_to_cookie(cookie, req, bad_sign=False):
+    """Add specified csrf test variables to cookie."""
+    # Getting options as a set
+    cookie["referer"] = "http://localhost:8080"
+    if bad_sign:
+        cookie["signature"] = "incorrect"
+    else:
+        cookie["signature"] = (hashlib.sha256((cookie["id"] +
+                                               cookie["referer"] +
+                                               req.app["Salt"])
+                                              .encode('utf-8'))
+                               .hexdigest())
+    return cookie
+
+
+def encrypt_cookie(cookie, req):
+    """Add encrypted cookie to request."""
+    cookie_crypted = \
+        req.app["Crypt"].encrypt(
+            json.dumps(cookie).encode('utf-8')
+        ).decode('utf-8')
+    req.cookies["S3BROW_SESSION"] = cookie_crypted
+
+
 def get_request_with_fernet():
     """Create a request with a working fernet object."""
     ret = Mock_Request()
