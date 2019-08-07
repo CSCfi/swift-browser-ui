@@ -3,15 +3,19 @@
 import json
 import hashlib
 import os
+import unittest
 
 from aiohttp.web import HTTPNotFound
 import asynctest
+
+from swiftclient.service import SwiftError
 
 from swift_browser_ui.api import get_os_user, os_list_projects
 from swift_browser_ui.api import swift_list_buckets, swift_list_objects
 from swift_browser_ui.api import swift_download_object
 from swift_browser_ui.api import get_metadata
 from swift_browser_ui.api import get_project_metadata
+from swift_browser_ui.api import get_os_active_project
 from swift_browser_ui.settings import setd
 
 from .creation import get_request_with_mock_openstack
@@ -48,6 +52,13 @@ class APITestClass(asynctest.TestCase):
         # Test if return all the correct values from the mock service
         self.assertEqual(buckets, comp)
 
+    async def test_list_containers_swift_error(self):
+        """Test function swift_list_buckets when raising SwiftError."""
+        self.request.app['Creds'][self.cookie]['ST_conn'].list = \
+            unittest.mock.Mock(side_effect=SwiftError("..."))
+        with self.assertRaises(HTTPNotFound):
+            _ = await swift_list_buckets(self.request)
+
     async def test_list_objects_correct(self):
         """Test function swift_list_objetcs with a correct query."""
         self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
@@ -66,6 +77,22 @@ class APITestClass(asynctest.TestCase):
                 .containers[container]
             ]
             self.assertEqual(objects, comp)
+
+    async def test_list_objects_with_unicode_nulls(self):
+        """Test function swift_list_objects with unicode nulls in type."""
+        self.request.app["Creds"][self.cookie]["ST_conn"].init_with_data(
+            containers=1,
+            object_range=(0, 10),
+            size_range=(65535, 262144),
+            has_content_type="text/html",
+        )
+        self.request.query["bucket"] = "test-container-0"
+        response = await swift_list_objects(self.request)
+        objects = json.loads(response.text)
+        self.assertEqual(
+            objects[0]["content_type"],
+            "text/html",
+        )
 
     async def test_list_without_containers(self):
         """Test function list buckets on a project without object storage."""
@@ -335,3 +362,16 @@ class APITestClass(asynctest.TestCase):
         resp = json.loads(resp.text)
 
         self.assertEqual(resp, comp)
+
+    async def test_get_os_active_project(self):
+        """Test active project API endpoint."""
+        self.request.app["Creds"][self.cookie]["active_project"] = \
+            "placeholder"
+        resp = await get_os_active_project(self.request)
+        text = json.loads(resp.text)
+        self.assertEqual(resp.status, 200)
+        self.assertEqual(text, "placeholder")
+
+    def tearDown(self):
+        self.cookie = None
+        self.request = None

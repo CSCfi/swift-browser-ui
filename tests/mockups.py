@@ -226,6 +226,7 @@ class Mock_Service:
             size_range=(0, 0),
             container_name_prefix="test-container-",
             object_name_prefix=None,  # None for just the hash as name
+            has_content_type=None,
     ):
         """Initialize the Mock_Service instance with some test data."""
         for i in range(0, containers):
@@ -241,14 +242,17 @@ class Mock_Service:
                     oname = object_name_prefix + ohash
                 else:
                     oname = ohash
-                to_add.append({
+                to_append = {
                     "hash": ohash,
                     "name": oname,
                     "last_modified": datetime.datetime.now().isoformat(),
                     "bytes": random.randint(  # nosec
                         size_range[0], size_range[1]
-                    ),
-                })
+                    )
+                }
+                if has_content_type:
+                    to_append["content_type"] = has_content_type
+                to_add.append(to_append)
 
             self.containers[container_name_prefix + str(i)] = to_add
 
@@ -269,12 +273,15 @@ class Mock_Service:
             ret = []
             try:
                 for i in self.containers[container]:
-                    ret.append({
+                    to_append = {
                         "hash": i["hash"],
                         "name": i["name"],
                         "last_modified": i["last_modified"],
-                        "bytes": i["bytes"]
-                    })
+                        "bytes": i["bytes"],
+                    }
+                    if "content_type" in i.keys():
+                        to_append["content_type"] = i["content_type"]
+                    ret.append(to_append)
                 return [{
                     "listing": ret
                 }]
