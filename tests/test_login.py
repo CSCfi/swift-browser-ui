@@ -3,18 +3,18 @@
 import hashlib
 import os
 import unittest
-
+import json
 
 import asynctest
-from aiohttp.web import HTTPClientError
+from aiohttp.web import HTTPClientError, HTTPForbidden
 
 import swift_browser_ui.login
 import swift_browser_ui.settings
 
-
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .mockups import return_project_avail
 from .mockups import return_invalid
+from .mockups import mock_token_project_avail
 
 _path = "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso"
 
@@ -276,3 +276,40 @@ class LoginTestClass(asynctest.TestCase):
         self.assertEqual(resp.headers['Location'], "/")
         sess.invalidate.assert_called_once()
         self.assertNotIn(cookie, req.app['Sessions'])
+
+    async def test_token_rescope_not_available(self):
+        """Test the token rescope function."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Creds"][session]["Avail"] = \
+            json.loads(mock_token_project_avail)
+        req.query["project"] = "non-existent-project"
+        with self.assertRaises(HTTPForbidden):
+            await swift_browser_ui.login.token_rescope(req)
+
+    async def test_token_rescope_correct(self):
+        """Test the token rescope function with correct request."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Creds"][session]["Avail"] = \
+            json.loads(mock_token_project_avail)
+        req.query["project"] = "wol"
+        req.app["Creds"][session]["Token"] = "not_actually_a_token"  # nosec
+
+        # Set up mockups
+        sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
+        req.app["Creds"][session]["OS_sess"] = sess_mock()
+        patch_os_auth = unittest.mock.patch(
+            "swift_browser_ui.login.initiate_os_service",
+            new=unittest.mock.MagicMock(
+                swift_browser_ui._convenience.initiate_os_service
+            )
+        )
+        patch_os_sess = unittest.mock.patch(
+            "swift_browser_ui.login.initiate_os_session",
+            new=unittest.mock.MagicMock(
+                swift_browser_ui._convenience.initiate_os_session
+            )
+        )
+        with patch_os_auth, patch_os_sess:
+            resp = await swift_browser_ui.login.token_rescope(req)
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers["Location"], "/browse")
