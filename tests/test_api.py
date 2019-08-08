@@ -373,5 +373,6 @@ class APITestClass(asynctest.TestCase):
         self.assertEqual(text, "placeholder")
 
     def tearDown(self):
+        """Test teardown."""
         self.cookie = None
         self.request = None
