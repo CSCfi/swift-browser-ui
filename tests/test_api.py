@@ -82,7 +82,7 @@ class APITestClass(asynctest.TestCase):
         """Test function swift_list_objects with unicode nulls in type."""
         self.request.app["Creds"][self.cookie]["ST_conn"].init_with_data(
             containers=1,
-            object_range=(0, 10),
+            object_range=(1, 10),
             size_range=(65535, 262144),
             has_content_type="text/html",
         )
