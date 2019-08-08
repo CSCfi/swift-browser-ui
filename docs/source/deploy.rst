@@ -15,7 +15,11 @@ Using vanilla docker in order to build the image - the tag can be customised:
 
     $ git clone https://github.com/CSCfi/swift-browser-ui/
     $ docker build -t cscfi/swift-ui .
-    $ docker run -p 5050:5050 cscfi/swift-ui
+    $ docker run -p 8080:8080 cscfi/swift-ui
+    $ # or with environment variables
+    $ docker run -p 8080:8080 \
+                 -e BROWSER_START_AUTH_ENDPOINT_URL=https://pouta.csc.fi:5001/v3 \
+                 cscfi/swift-ui
 
 
 
