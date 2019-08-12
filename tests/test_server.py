@@ -6,12 +6,18 @@ Contains the tests for ``front.py``.
 
 
 import os
+import unittest
+import ssl
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+import aiohttp
 import asynctest
 
-from swift_browser_ui.server import servinit
+from swift_browser_ui.server import servinit, run_server_insecure
+from swift_browser_ui.server import kill_sess_on_shutdown, run_server_secure
 from swift_browser_ui.settings import setd
+
+from .creation import get_request_with_mock_openstack
 
 
 # Set static folder in settings so it can be tested
@@ -27,6 +33,50 @@ class TestServinitMethod(asynctest.TestCase):
         # executes to the end all is fine.
         app = await servinit()
         self.assertTrue(app is not None)
+
+
+class TestServerShutdownHandler(asynctest.TestCase):
+    """Test case for the server graceful shutdown handler."""
+
+    async def test_kill_sess_on_shutdown(self):
+        """Test kill_sess_on_shutdown function."""
+        session, req = get_request_with_mock_openstack()
+
+        await kill_sess_on_shutdown(req.app)
+
+        self.assertNotIn(session, req.app["Creds"].keys())
+
+
+class TestRunServerFunctions(unittest.TestCase):
+    """Test class for server run functions."""
+
+    @staticmethod
+    def mock_ssl_context_creation(purpose=None):
+        """Return a MagicMock instance of an ssl context."""
+        return unittest.mock.MagicMock(ssl.create_default_context)()
+
+    def test_run_server_secure(self):
+        """Test run_server_secure function."""
+        run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
+        patch_run_app = unittest.mock.patch(
+            "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
+        )
+        patch_ssl_defcontext = unittest.mock.patch(
+            "swift_browser_ui.server.ssl.create_default_context",
+            self.mock_ssl_context_creation
+        )
+        with patch_run_app, patch_ssl_defcontext:
+            run_server_secure(None, None, None)
+            run_app_mock.assert_called_once()
+
+    def test_run_server_insecure(self):
+        """Test run_server_insecure function."""
+        run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
+        with unittest.mock.patch(
+                "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
+        ):
+            run_server_insecure(None)
+            run_app_mock.assert_called_once()
 
 
 # After testing the server initialization, we can use the correctly starting
