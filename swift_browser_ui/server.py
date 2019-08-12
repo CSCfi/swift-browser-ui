@@ -1,13 +1,13 @@
 """swift_browser_ui server related convenience functions."""
 
 # Generic imports
-# import ssl
 import logging
 import time
 import sys
 import asyncio
 import hashlib
 import os
+import ssl
 
 import uvloop
 import cryptography.fernet
@@ -124,23 +124,37 @@ async def servinit():
     return app
 
 
-# def run_server_secure(app):
-#     """
-#     Run the server securely with a given ssl context.
+def run_server_secure(app, cert_file, cert_key):
+    """
+    Run the server securely with a given ssl context.
 
-#     While this function is incomplete, the project is safe to run in
-#     production only via a TLS termination proxy with e.g. NGINX.
-#     """
-    # Setup ssl context
-    # sslcontext = ssl.create_default_context()
-    # sslcontext.set_ciphers(
-    #     'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE' +
-    #     '-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-' +
-    #     'AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-' +
-    #     'SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-' +
-    #     'RSA-AES128-SHA256'
-    # )
-    # aiohttp.web.run_app(app, ssl_context=sslcontext)
+    While this function is incomplete, the project is safe to run in
+    production only via a TLS termination proxy with e.g. NGINX.
+    """
+    logger = logging.getLogger("swift-browser-ui")
+    logger.debug("Running server securely.")
+    logger.debug("Setting up SSL context for the server.")
+    sslcontext = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+    cipher_str = (
+        'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE' +
+        '-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-' +
+        'AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-' +
+        'SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-' +
+        'RSA-AES128-SHA256'
+    )
+    logger.debug(
+        "Setting following ciphers for SSL context: \n%s",
+        cipher_str
+    )
+    sslcontext.set_ciphers(cipher_str)
+    logger.debug("Loading cert chain.")
+    sslcontext.load_cert_chain(cert_file, cert_key)
+    aiohttp.web.run_app(
+        app,
+        access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
+        port=setd['port'],
+        ssl_context=sslcontext,
+    )
 
 
 def run_server_insecure(app):
