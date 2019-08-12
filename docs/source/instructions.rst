@@ -55,11 +55,10 @@ For the Pouta production environment for testing unsecurely without trust::
 
 Setting up TLS termination proxy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The backend itself is not meant to be run as standalone in a production
-environment. Therefore in a running config a TLS termination proxy should be
-used to make the service secure. Setting up TLS termination is outside the
-scope of this documentation, but a few useful links are provided along with
-the necessary configs regarding this service. [#]_ [#]_
+The backend can be run in secure mode, i.e. with HTTPS enabled, but for
+scaling up a TLS termination proxy is recommended. Setting up TLS termination
+is outside the scope of this documentation, but a few useful links are
+provided along with the necessary configs regarding this service. [#]_ [#]_
 
 Scaling up the service
 ----------------------
