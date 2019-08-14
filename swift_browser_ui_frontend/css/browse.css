@@ -1,10 +1,6 @@
 .navbar .container .navbar-brand .navbar-item img {
 	max-height: 2.5rem;
 }
-
-.footer {
-    background-color: #ffffff;
-}
 .hero-body #login-center{
     padding: 30px 20px 20px 20px;
 }
@@ -27,4 +23,3 @@
     margin-left: 5%;
     margin-right: 5%;
 }
-

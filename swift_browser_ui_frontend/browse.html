@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
     <script src="https://unpkg.com/vue-i18n/dist/vue-i18n.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.8/dist/buefy.min.css">
+    <link rel="stylesheet" href="/css-conditional/bulma-custom.css">
     <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
     <script src="/static/js/btablecomp.js"></script>
     <script src="/static/js/lang.js"></script>
@@ -23,17 +24,17 @@
   </head>
   <body>
     <div id="app">
-      <div class='navbar has-shadow is-spaced'>
+      <div id="navbar" class='navbar is-spaced has-shadow'>
         <div class="container is-fluid">
           <div class="navbar-brand">
-            <a class="navbar-item" href="#">
+            <a class="navbar-item csclogo" href="#">
               <img src="/static/img/csc_logo.svg" :alt="$t('message.cscOrg')">
             </a>
           </div>
           <div class="navbar-menu">
             <div class="navbar-start">
               <div 
-                class="navbar-item has-dopdown is-hoverable"
+                class="navbar-item is-hoverable"
                 v-if="multipleProjects"
               >
                 {{ $t("message.currentProj") }}: <a class="navbar-link">
@@ -62,18 +63,18 @@
                   <router-link
                     v-if="$route.params.project == undefined"
                     :to="'/browse/' + $route.params.user + '/' + active.name"
-                    class="button is-primary"
+                    class="button is-primary has-text-light"
                   >{{ $t("message.dashboard.browser") }}</router-link>
                   <router-link
                     v-else 
                     :to="'/browse/' + $route.params.user"
-                    class="button is-primary"
+                    class="button is-primary has-text-light"
                   >{{ $t("message.dashboard.dashboard") }}</router-link>
                 </div>
               </div>
               <div class="navbar-item">
                 <b-field class="locale-changer">
-                  <b-select 
+                  <b-select
                       placeholder="Language"
                       icon="earth"
                       v-model="$i18n.locale"
@@ -89,7 +90,7 @@
               <div class="navbar-item">
                   <div class="buttons">
                     <a
-                      class="button is-primary"
+                      class="button is-primary has-text-light"
                       href="/login/kill"
                     >{{ $t("message.logOut") }}</a>
                   </div>
@@ -115,10 +116,10 @@
         :active.sync="isLoading"
         :can-cancel="false"
       ></b-loading>
-    <footer class="footer">
+    <footer id="footer" class="footer">
       <div class="content has-text-centered">
         <p>
-        <strong>{{ $t("message.program_name") }}</strong> {{ $t("message.devel") }}
+        <span class="has-text-weight-bold">{{ $t("message.program_name") }}</span> {{ $t("message.devel") }}
         <a 
           href="https://csc.fi"
           :alt="$t('message.cscOrg')"
