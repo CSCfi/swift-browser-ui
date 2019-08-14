@@ -94,10 +94,10 @@ const ContainerPage = Vue.extend({
                     </b-icon> 
                    {{ props.row.name }}
                 </span>
-                <span v-else>
+                <span v-else class="has-text-weight-bold">
                     <b-icon icon="folder" size="is-small">
                     </b-icon> 
-                    <strong> {{ props.row.name }}  </strong>
+                    {{ props.row.name }}
                 </span>
             </b-table-column>
             <b-table-column field="count" :label="$t('message.table.objects')" width="120" sortable>

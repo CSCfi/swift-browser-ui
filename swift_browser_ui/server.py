@@ -13,7 +13,7 @@ import uvloop
 import cryptography.fernet
 import aiohttp.web
 
-from .front import index, browse
+from .front import index, browse, darktheme
 from .login import handle_login, sso_query_begin, handle_logout
 from .login import sso_query_end
 from .login import token_rescope
@@ -116,6 +116,11 @@ async def servinit():
         aiohttp.web.get('/api/active', get_os_active_project),
         aiohttp.web.get('/api/meta', get_metadata),
         aiohttp.web.get('/api/get-project-meta', get_project_metadata),
+    ])
+
+    # Add miscellaneous routes
+    app.add_routes([
+        aiohttp.web.get('/css-conditional/bulma-custom.css', darktheme)
     ])
 
     # Add graceful shutdown handler
