@@ -113,3 +113,8 @@ venv.bak/
 
 src/server.py
 
+# dia temporary files
+*.dia~
+
+# environment variable files
+setenvs*
