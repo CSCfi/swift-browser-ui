@@ -68,6 +68,9 @@ The following command line arguments are available for server startup.
                                trusted_dashboards in the specified address.
     --set-origin-address TEXT  Set the address that the program will be
                                redirected to from WebSSO
+    --secure                   Enable secure running, i.e. enable HTTPS.
+    --ssl-cert-file TEXT       Specify the certificate to use with SSL.
+    --ssl-cert-key TEXT        Specify the certificate key to use with SSL.
     --help                     Show this message and exit.
 
 
@@ -81,5 +84,11 @@ The following command line arguments are available for server startup.
                                authentication endpoint, i.e. if the program has
                                been listed on the respective Openstack keystone
                                trusted_dashboard list. [#]_
+--secure                       Enable HTTPS on the server, to enable secure
+                               requests if there's no TLS termination proxy.
+--ssl-cert-file TEXT           Specify SSL certificate file. Required when
+                               running in secure mode.
+--ssl-cert-key TEXT            Specify SSL certificate key. Required when
+                               running in secure mode.
 
 .. [#] https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html
