@@ -139,17 +139,18 @@ def run_server_secure(app, cert_file, cert_key):
     logger.debug("Setting up SSL context for the server.")
     sslcontext = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
     cipher_str = (
-        'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE' +
-        '-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-' +
-        'AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-' +
-        'SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-' +
-        'RSA-AES128-SHA256'
+        "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE" +
+        "-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA" +
+        "-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM" +
+        "-SHA256:DHE-RSA-AES256-GCM-SHA384"
     )
     logger.debug(
         "Setting following ciphers for SSL context: \n%s",
         cipher_str
     )
     sslcontext.set_ciphers(cipher_str)
+    sslcontext.options |= ssl.OP_NO_TLSv1
+    sslcontext.options |= ssl.OP_NO_TLSv1_1
     logger.debug("Loading cert chain.")
     sslcontext.load_cert_chain(cert_file, cert_key)
     aiohttp.web.run_app(
