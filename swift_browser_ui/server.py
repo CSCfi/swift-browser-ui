@@ -131,6 +131,9 @@ def run_server_secure(app, cert_file, cert_key):
     While this function is incomplete, the project is safe to run in
     production only via a TLS termination proxy with e.g. NGINX.
     """
+    # The chiphers are from the Mozilla project wiki, as a recommendation for
+    # the most secure and up-to-date build.
+    # https://wiki.mozilla.org/Security/Server_Side_TLS
     logger = logging.getLogger("swift-browser-ui")
     logger.debug("Running server securely.")
     logger.debug("Setting up SSL context for the server.")
