@@ -7,6 +7,6 @@ with the object storage.
 
 
 __name__ = 'swift_browser_ui'
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 __author__ = 'CSC Developers'
 __license__ = 'MIT License'

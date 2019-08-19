@@ -10,7 +10,7 @@ import click
 
 from .__init__ import __version__
 from .settings import setd, set_key, FORMAT
-from .server import servinit, run_server_insecure
+from .server import servinit, run_server_insecure, run_server_secure
 from ._convenience import setup_logging as conv_setup_logging
 
 
@@ -92,6 +92,18 @@ def cli(verbose, debug, logfile):
 @click.option(
     '--set-session-devmode', is_flag=True, default=False, hidden=True,
 )
+@click.option(
+    '--secure', is_flag=True, default=False,
+    help="Enable secure running, i.e. enable HTTPS."
+)
+@click.option(
+    '--ssl-cert-file', default=None, type=str,
+    help="Specify the certificate to use with SSL."
+)
+@click.option(
+    '--ssl-cert-key', default=None, type=str,
+    help="Specify the certificate key to use with SSL."
+)
 def start(
         port,
         auth_endpoint_url,
@@ -99,6 +111,9 @@ def start(
         dry_run,
         set_origin_address,
         set_session_devmode,
+        secure,
+        ssl_cert_file,
+        ssl_cert_key,
 ):
     """Start the browser backend and server."""
     logging.debug(
@@ -129,8 +144,10 @@ def start(
     logging.debug(
         "Running settings directory:%s", str(setd)
     )
-    if not dry_run:
+    if not dry_run and not secure:
         run_server_insecure(servinit())
+    if not dry_run and secure:
+        run_server_secure(servinit(), ssl_cert_file, ssl_cert_key)
 
 
 def main():
