@@ -52,37 +52,37 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 401 middleware when the 401 status is returned."""
         resp = await error_middleware(None, return_401_handler)
         self.assertEqual(resp.status, 401)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_401_exception(self):
         """Test 401 middleware when the 401 status is risen."""
         resp = await error_middleware(True, return_401_handler)
         self.assertEqual(resp.status, 401)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_403_return(self):
         """Test 403 middleware when the 403 status is returned."""
         resp = await error_middleware(None, return_403_handler)
         self.assertEqual(resp.status, 403)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_403_exception(self):
         """Test 403 middleware when the 403 status is risen."""
         resp = await error_middleware(True, return_403_handler)
         self.assertEqual(resp.status, 403)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_404_return(self):
         """Test 404 middleware when the 404 status is returned."""
         resp = await error_middleware(None, return_404_handler)
         self.assertEqual(resp.status, 404)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_404_exception(self):
         """Test 404 middlewrae when the 404 status is risen."""
         resp = await error_middleware(True, return_404_handler)
         self.assertEqual(resp.status, 404)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_error_middleware_no_error(self):
         """Test the general error middleware with correct status."""
