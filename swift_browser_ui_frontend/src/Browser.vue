@@ -46,3 +46,31 @@
     </footer>
   </div>
 </template>
+
+<style>
+.navbar .container .navbar-brand .navbar-item img {
+	max-height: 2.5rem;
+}
+.hero-body #login-center{
+    padding: 30px 20px 20px 20px;
+}
+
+.hero-body .footer {
+    margin:15px 0;
+    padding:0;
+}
+
+.searchBox {
+    width: 30%;
+    margin-left: auto;
+}
+
+.groupControls {
+    margin: 0 5%;
+}
+
+.dashboard {
+    margin-left: 5%;
+    margin-right: 5%;
+}
+</style>
