@@ -93,7 +93,11 @@
 </template>
 
 <script>
+import getProjectMeta from "@/api";
+import getActiveProject from "@/api";
+
 export default {
+  name: "Dashboard",
   // The view for the application user page for showing the user information in
   // a bit more detail. Shows e.g. the storage expenditure and the billing unit
   // (BU) usage caused by that.
@@ -101,12 +105,12 @@ export default {
     // Since we don't need the app for caching, we can use a more elegant
     // way of declaring the instance data
     return {
-      Containers: undefined,
-      Objects: undefined,
-      Account: undefined,
-      Size: undefined,
-      Billed: undefined,
-      Bytes: undefined,
+      Containers: 0,
+      Objects: 0,
+      Account: "",
+      Size: 0,
+      Billed: 0,
+      Bytes: 0,
       DisableTooltip: false,
     }
   },
@@ -141,9 +145,10 @@ export default {
     // Fetch relevant things upon initializing the class instance
     this.fetchMeta();
     this.disable();
-    if ( app.active == undefined || app.active == "" ) {
+    if ( this.$store.state.active == undefined ||
+         this.$store.state.active == "" ) {
       getActiveProject().then( function ( value ) {
-        app.active = value;
+        this.$store.commit("setActive", value)
       })
     }
   },
