@@ -1,8 +1,8 @@
 // Project main imports
 import Vue from "vue";
-import App from "./Browser.vue";
+import App from "@/pages/Browser.vue";
 import Buefy from "buefy";
-import router from "./router";
+import router from "@/common/router";
 import VueI18n from "vue-i18n";
 
 // Project Vue components
@@ -10,15 +10,15 @@ import BrowserNavbar from "@/components/BrowserNavbar.vue";
 import BreadcrumbListElement from "@/components/Breadcrumb.vue";
 
 // Project JS functions
-import getLangCookie from "@/conv";
-import translations from "@/lang";
-import { getUser } from "@/api";
-import { getProjects } from "@/api";
-import getActiveProject from "@/api";
-import { changeProjectApi } from "@/api";
+import getLangCookie from "@/common/conv";
+import translations from "@/common/lang";
+import { getUser } from "@/common/api";
+import { getProjects } from "@/common/api";
+import getActiveProject from "@/common/api";
+import { changeProjectApi } from "@/common/api";
 
 // Import project state
-import store from "@/store";
+import store from "@/common/store";
 
 // Import project css
 import "buefy/dist/buefy.css";

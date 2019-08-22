@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import { getProjectMeta } from "@/api";
+import { getProjectMeta } from "@/common/api";
 
 export default {
   name: "Dashboard",

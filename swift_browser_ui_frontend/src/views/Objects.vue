@@ -182,8 +182,8 @@
 </template>
 
 <script>
-import { getObjects } from "@/api";
-import { getHumanReadableSize } from "@/conv";
+import { getObjects } from "@/common/api";
+import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 
 export default {
