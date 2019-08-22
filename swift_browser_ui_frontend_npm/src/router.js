@@ -1,17 +1,28 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import App from './views/Containers.vue'
+import Vue from "vue";
+import Router from "vue-router";
+import Dashboard from "@/views/Dashboard.vue";
+import Containers from "@/views/Containers.vue";
+import Objects from "@/views/Objects.vue";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+  mode: "history",
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: App
+      path: "/browse/:user",
+      name: "Dashboard",
+      component: Dashboard,
     },
-  ]
-})
+    {
+      path: "/browse/:user/:project",
+      name: "Containers",
+      component: Containers,
+    },
+    {
+      path: "/browse/:user/:project/:container",
+      name: "Objects",
+      component: Objects,
+    },
+  ],
+});
