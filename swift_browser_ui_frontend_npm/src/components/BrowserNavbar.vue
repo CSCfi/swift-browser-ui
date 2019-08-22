@@ -108,7 +108,7 @@ export default {
       const expiryDate = new Date();
       expiryDate.setMonth(expiryDate.getMonth() + 1);
       document.cookie = "OBJ_UI_LANG=" +
-        i18n.locale +
+        this.$i18n.locale +
         "; path=/; expires="
         + expiryDate.toUTCString();
     },
