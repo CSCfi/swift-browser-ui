@@ -109,44 +109,75 @@ class AppTestCase(AioHTTPTestCase):
         # broken routes can be fixed one at a time.
         # Having all the route checks in
         # a single compact function is better overall. – Sampsa Penna
-        response = await self.client.request("GET", '/')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/browse')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/login')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/login/kill')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/login/front')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/login/rescope')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/buckets')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/objects')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/dload')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/username')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/projects')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/meta')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/api/get-project-meta')
-        self.assertNotEqual(response.status, 404)
-        # Test all the static folders as well
-        response = await self.client.request("GET", '/static/index.html')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/browse.html')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/login.html')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/css/login.css')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/css/browse.css')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/js/browse.js')
-        self.assertNotEqual(response.status, 404)
-        response = await self.client.request("GET", '/static/js/btablecomp.js')
-        self.assertNotEqual(response.status, 404)
+        new_setd = {
+            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
+        }
+        patch_setd_front = unittest.mock.patch(
+            "swift_browser_ui.front.setd",
+            new=new_setd,
+        )
+        patch_setd_middleware = unittest.mock.patch(
+            "swift_browser_ui.middlewares.setd",
+            new=new_setd,
+        )
+        patch_setd_login = unittest.mock.patch(
+            "swift_browser_ui.login.setd",
+            new=new_setd,
+        )
+        with patch_setd_front, patch_setd_middleware, patch_setd_login:
+            response = await self.client.request("GET", '/')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/browse')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/login')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/login/kill')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/login/front')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/login/rescope')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/buckets')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/objects')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/dload')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/username')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/projects')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/api/meta')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET",
+                '/api/get-project-meta',
+            )
+            self.assertNotEqual(response.status, 404)
+            # Test all the static folders as well
+            response = await self.client.request("GET", '/static/index.html')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/static/browse.html')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", '/static/login.html')
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET",
+                '/static/css/login.css',
+            )
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET",
+                '/static/css/browse.css',
+            )
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET",
+                '/static/js/browse.js',
+            )
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET",
+                '/static/js/btablecomp.js',
+            )
+            self.assertNotEqual(response.status, 404)

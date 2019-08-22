@@ -25,7 +25,7 @@ class FrontendTestCase(AioHTTPTestCase):
     async def test_browse(self):
         """Test /browse handler."""
         patch_setd = unittest.mock.patch("swift_browser_ui.front.setd", new={
-            "static_directory": os.getcwd() + "/swift_browser_ui_frontend"
+            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
         })
         patch_check = unittest.mock.patch(
             "swift_browser_ui.front.session_check",
@@ -41,7 +41,7 @@ class FrontendTestCase(AioHTTPTestCase):
     async def test_index(self):
         """Test / handler."""
         patch_setd = unittest.mock.patch("swift_browser_ui.front.setd", new={
-            "static_directory": os.getcwd() + "/swift_browser_ui_frontend"
+            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
         })
         patch_check = unittest.mock.patch(
             "swift_browser_ui.front.session_check",
