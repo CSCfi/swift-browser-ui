@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "./Login.vue";
+import App from "@/pages/Login.vue";
 
 new Vue ({
   data: {

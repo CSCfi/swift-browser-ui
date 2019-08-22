@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { recursivePruneCache } from "@/conv";
+import { recursivePruneCache } from "@/common/conv";
 
 Vue.use(Vuex);
 

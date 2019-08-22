@@ -114,8 +114,8 @@
 </template>
 
 <script>
-import { getBuckets } from "@/api";
-import { getHumanReadableSize } from "@/conv";
+import { getBuckets } from "@/common/api";
+import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 
 export default {

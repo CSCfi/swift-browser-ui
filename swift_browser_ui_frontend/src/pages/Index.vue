@@ -14,7 +14,7 @@
             <div class="columns is-centered">
               <a href="#">
                 <img
-                  src="./assets/csc_logo.svg"
+                  src="@/assets/csc_logo.svg"
                   :alt="$t('message.cscOrg')"
                 >
               </a>

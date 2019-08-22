@@ -1,11 +1,11 @@
 import Vue from "vue";
-import App from "@/Index.vue";
+import App from "@/pages/Index.vue";
 import Buefy from "buefy";
 import VueI18n from "vue-i18n";
 import "buefy/dist/buefy.css";
 
-import getLangCookie from "@/conv";
-import translations from "@/lang";
+import getLangCookie from "@/common/conv";
+import translations from "@/common/lang";
 
 Vue.config.productiontip = true;
 
@@ -18,13 +18,13 @@ const i18n = new VueI18n({
 });
 
 new Vue({
-  name: "Unauthorized",
+  name: "Notfound",
   i18n,
   data: {
     notindex: true,
-    unauth: true,
+    unauth: false,
     forbid: false,
-    notfound: false,
+    notfound: true,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
   },
   methods: {
