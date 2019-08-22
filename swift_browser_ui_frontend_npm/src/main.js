@@ -12,6 +12,10 @@ import BreadcrumbListElement from "@/components/Breadcrumb.vue";
 // Project JS functions
 import getLangCookie from "@/conv";
 import translations from "@/lang";
+import { getUser } from "@/api";
+import { getProjects } from "@/api";
+import getActiveProject from "@/api";
+import { changeProjectApi } from "@/api";
 
 // Import project state
 import store from "@/store";
@@ -57,6 +61,33 @@ new Vue({
       return this.$store.state.isLoading;
     },
   },
+  beforeMount() {
+    getUser().then(( value ) => {
+      this.$store.commit("setUname", value);
+    });
+    getProjects().then((value) => {
+      this.$store.commit("setProjects", value);
+      if (document.location.pathname == "/browse") {
+        getActiveProject().then((value) => {
+          this.$store.commit("setActive", value);
+          this.$router.push(
+            "/browse/" +
+            this.$store.state.uname +
+            "/" +
+            this.$store.state.active["name"]
+          );
+        });
+      }
+      if (this.$store.state.active["name"] != this.$route.params.project) {
+        getActiveProject().then((value) => {
+          this.$store.commit("setActive", value);
+          if (value["name"] != this.$route.params.project) {
+            this.changeProject(this.$route.params.project);
+          }
+        });
+      }
+    });
+  },
   methods: {
     getRouteAsList: function () {
       // Create a list representation of the current application route
@@ -88,6 +119,26 @@ new Vue({
         });
       }
       return retl;
+    },
+    changeProject: function (newProject) {
+      // Re-scope login to project given as a parameter.
+      changeProjectApi(newProject).then((ret) => {
+        if (ret) {
+          getActiveProject().then((value) => {
+            this.$store.commit("setActive", value);
+            this.$store.commit("updateContainers", undefined);
+            this.$store.commit("eraseObjects");
+            this.$router.push(
+              "/browse/" +
+              this.$store.state.uname + "/" +
+              this.$store.state.active["name"]
+            );
+            this.$router.go(0);
+          });
+        } else{
+          this.$router.push("/browse/" + this.$store.state.uname);
+        }
+      });
     },
   },
   ...App,

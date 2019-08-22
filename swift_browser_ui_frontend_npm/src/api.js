@@ -1,6 +1,6 @@
 // API fetch functions.
 
-import getHumanReadableSize from "@/conv";
+import { getHumanReadableSize } from "@/conv";
 
 export async function getUser () {
   // Function to get the username of the currently displayed user.

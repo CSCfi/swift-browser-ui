@@ -44,41 +44,41 @@
       </b-field>
     </b-field>
     <b-table
+      focusable
+      detailed
+      hoverable
+      narrowed
+      header-checkable
       style="width: 90%;margin-left: 5%; margin-right: 5%;"
+      default-sort="name"
       :data="oList"
       :selected.sync="selected"
       :current-page.sync="currentPage"
-      focusable
-      hoverable
-      detailed
-      header-checkable
-      narrowed
       :paginated="isPaginated"
       :per-page="perPage"
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
-      default-sort="name"
       @page-change="( page ) => addPageToURL( page )"
     >
       <template slot-scope="props">
         <b-table-column
+          sortable
           field="name"
           :label="$t('message.table.name')"
-          sortable
         >
           {{ props.row.name }}
         </b-table-column>
         <b-table-column
+          sortable
           field="last_modified"
           :label="$t('message.table.modified')"
-          sortable
         >
           {{ getHumanReadableDate(props.row.last_modified) }}
         </b-table-column>
         <b-table-column
+          sortable
           field="bytes"
           :label="$t('message.table.size')"
-          sortable
         >
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
@@ -182,69 +182,69 @@
 </template>
 
 <script>
-import getObjects from "@/api";
-import recursivePruneCache from "@/api";
-import getHumanReadableDate from "@/conv";
-import getHumanReadableSize from "@/conv";
+import { getObjects } from "@/api";
+import { getHumanReadableSize } from "@/conv";
 import debounce from "lodash/debounce";
 
 export default {
   name: "Objects",
   data: function () {
-    let vals = {};
-    vals["oList"] = [];
-    // The container queried is specified by the route
-    let container = this.$route.params.container;
-    // If the object listing isn't cached, pull it from the API using a
-    // convenience function in api.js
-    if (app.oCache[container] == undefined) {
-      app.isLoading = true;
-      getObjects(this.$route.params.container).then(
-        function (ret) {
-          if (ret.status != 200) {
-            app.isLoading = false;
-          }
-          vals["oList"] = ret;
-
-          // Purge old cached items from object query cache if the
-          // cache has grown to be too large (250000).
-          recursivePruneCache(app.oCache);
-
-          app.oCache[container] = vals["oList"];
-          app.isLoading = false;
-        }
-      ).catch(function () {
-        app.isLoading = false;
-      });
-    } else {
-      vals["oList"] = app.oCache[container];
-    }
-    vals["selected"] = vals["oList"][0];
-    vals["isPaginated"] = true;
-    vals["perPage"] = 15;
-    vals["defaultSortDirection"] = "asc";
-    vals["searchQuery"] = "";
-    // Large downloads are prevented by default, but can be enabled with a
-    // button for the duration of the session
-    if (document.cookie.match("ENA_DL")) {
-      vals["allowLargeDownloads"] = true;
-    } else { vals["allowLargeDownloads"] = false; }
-    // Get the current page to navigate to directly, if that's specified
-    vals["currentPage"] = (
-      this.$route.query.page ? parseInt(this.$route.query.page) : 1
-    );
-    return vals;
+    return {
+      oList: [],
+      objects: [],
+      selected: undefined,
+      isPaginated: true,
+      perPage: 15,
+      defaultSortDirection: "asc",
+      searchQuery: "",
+      currentPage: 1,
+    };
   },
-  // Search function specific things are also commented in containers.js
   watch: {
     searchQuery: function () {
+      // Run debounced search every time the search box input changes
       this.debounceFilter();
+    },
+    objects: function () {
+      this.oList = this.objects;
     },
   },
   created: function () {
+    // Lodash debounce to prevent the search execution from executing on
+    // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
   },
+  beforeMount () {
+    this.fetchObjects();
+    this.getDirectCurrentPage();
+    this.checkLargeDownloads();
+  },
   methods: {
+    fetchObjects: function () {
+      // Get the object listing from the API if the listing hasn't yet 
+      // been cached
+      let container = this.$route.params.container;
+      if(this.$store.state.objectCache[container] == undefined) {
+        this.$store.commit("setLoading", true);
+        getObjects(container).then((ret) => {
+          if (ret.status != 200) {
+            this.$store.commit("setLoading", false);
+          }
+          this.$store.commit("updateObjects", [container, ret]);
+          this.objects = ret;
+          this.$store.commit("setLoading", false);
+        }).catch(() => {
+          this.$store.commit("setLoading", false);
+        });
+      } else {
+        this.objects = this.$store.state.objectCache[container];
+      }
+    },
+    checkLargeDownloads: function () {
+      if (document.cookie.match("ENA_DL")) {
+        this.allowLargeDownloads = true;
+      }
+    },
     addPageToURL: function (pageNumber) {
       this.$router.push("?page=" + pageNumber);
     },
@@ -270,13 +270,19 @@ export default {
         "; path=/; expires=" +
         expiryDate.toUTCString();
     },
+    getDirectCurrentPage: function () {
+      this.currentPage = this.$route.query.page ?
+        parseInt(this.$route.query.page) :
+        1;
+    },
     // Make human readable translation functions available in instance
     // namespace
     localHumanReadableSize: function ( size ) {
       return getHumanReadableSize( size );
     },
-    getHumanReadableDate: function ( date ) {
+    getHumanReadableDate: function ( val ) {
       let dateVal = new Date(val);
+      let langLocale = "en-GB";
       var options = {
         weekday: "short",
         year: "numeric",
@@ -287,7 +293,7 @@ export default {
         second: "2-digit",
       };
       var zone = { timeZone: "EEST" };
-      switch (i18n.locale) {
+      switch (this.$i18n.locale) {
         case "en":
           langLocale = "en-GB";
           break;
@@ -301,7 +307,7 @@ export default {
     },
     filter: function () {
       var name_re = new RegExp(this.searchQuery, "i");
-      this.oList = app.oCache[this.$route.params.container].filter(
+      this.oList = this.objects.filter(
         element => element.name.match(name_re)
       );
     },

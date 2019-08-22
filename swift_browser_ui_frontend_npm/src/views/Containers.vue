@@ -114,8 +114,8 @@
 </template>
 
 <script>
-import getBuckets from "@/api";
-import getHumanReadableSize from "@/conv";
+import { getBuckets } from "@/api";
+import { getHumanReadableSize } from "@/conv";
 import debounce from "lodash/debounce";
 
 export default {
@@ -123,6 +123,7 @@ export default {
   data: function () {
     return {
       bList: [],
+      containers: [],
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -136,26 +137,38 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
+    containers: function () {
+      this.bList = this.containers;
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
   },
+  beforeMount () {
+    this.fetchContainers();
+    this.getDirectCurrentPage();
+  },
   methods: {
-    getContainers: function () {
+    fetchContainers: function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
-      this.$store.commit("setLoading", true);
-      getBuckets().then((ret) => {
-        if (ret.status != 200) {
+      if(this.$store.state.containerCache.length < 1) {
+        this.$store.commit("setLoading", true);
+        getBuckets().then((ret) => {
+          if (ret.status != 200) {
+            this.$store.commit("setLoading", false);
+          }
+          this.$store.commit("updateContainers", ret);
+          this.containers = ret;
           this.$store.commit("setLoading", false);
-        }
-        this.$store.commit("updateContainers", ret);
-        this.$store.commit("setLoading", false);
-      }).catch(() => {
-        this.$store.commit("setLoading", false);
-      });
+        }).catch(() => {
+          this.$store.commit("setLoading", false);
+        });
+      } else {
+        this.containers = this.$store.state.containerCache;
+      }
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link
@@ -169,6 +182,11 @@ export default {
     getContainerAddress: function (container) {
       return this.$route.params.project + "/" + container;
     },
+    getDirectCurrentPage: function () {
+      this.currentPage = this.$route.query.page ?
+        parseInt(this.$route.query.page) :
+        1;
+    },
     addPageToURL: function (pageNumber) {
       // Add pagination current page number to the URL in query string
       this.$router.push("?page=" + pageNumber);
@@ -179,13 +197,10 @@ export default {
     },
     filter: function() {
       var name_cmp = new RegExp(this.searchQuery, "i");
-      this.bList = this.$state.store.containerCache.filter(
+      this.bList = this.containers.filter(
         element => element.name.match(name_cmp)
       );
     },
-  },
-  beforeMount () {
-    this.getContainers();
   },
 };
 </script>
