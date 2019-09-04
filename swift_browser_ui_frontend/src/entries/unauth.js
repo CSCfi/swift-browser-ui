@@ -2,10 +2,12 @@ import Vue from "vue";
 import App from "@/pages/Index.vue";
 import Buefy from "buefy";
 import VueI18n from "vue-i18n";
-import "buefy/dist/buefy.css";
 
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
+
+// Import project css
+import "buefy/dist/buefy.css";
 
 Vue.config.productiontip = true;
 
