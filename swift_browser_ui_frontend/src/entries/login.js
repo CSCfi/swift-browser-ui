@@ -1,6 +1,9 @@
 import Vue from "vue";
 import App from "@/pages/Login.vue";
 
+// Import project css
+import "buefy/dist/buefy.css";
+
 new Vue ({
   data: {
     formname: "Token id:",

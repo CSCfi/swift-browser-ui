@@ -39,7 +39,7 @@ const store = new Vuex.Store({
     },
     setProjects (state, newProjects) {
       // Update the project listing in store
-      state.active = newProjects;
+      state.projects = newProjects;
       if (newProjects.length > 1) {
         state.multipleProjects = true;
       } else {
