@@ -154,30 +154,3 @@ class AppTestCase(AioHTTPTestCase):
                 '/api/get-project-meta',
             )
             self.assertNotEqual(response.status, 404)
-            # Test all the static folders as well
-            response = await self.client.request("GET", '/static/index.html')
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/static/browse.html')
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/static/login.html')
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request(
-                "GET",
-                '/static/css/login.css',
-            )
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request(
-                "GET",
-                '/static/css/browse.css',
-            )
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request(
-                "GET",
-                '/static/js/browse.js',
-            )
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request(
-                "GET",
-                '/static/js/btablecomp.js',
-            )
-            self.assertNotEqual(response.status, 404)
