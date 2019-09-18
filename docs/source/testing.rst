@@ -55,4 +55,4 @@ implemented in the UI testing scenarios. The utility can be run using:
 
 .. code-block:: console
 
-    $ python -m ui_tests.ui_take_screenshots
+    $ python -m tests.ui.ui_take_screenshots
