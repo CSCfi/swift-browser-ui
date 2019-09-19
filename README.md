@@ -20,7 +20,7 @@ Python 3.6+ required
 The dependencies mentioned in `requirements.txt` and an account that has access
 rights to [CSC Pouta](https://research.csc.fi/pouta-user-guide) platform, 
 and is taking part to at least one project as
-object stoarge is project specific.
+object storage is project specific.
 
 ### Usage
 
