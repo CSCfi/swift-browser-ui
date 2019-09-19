@@ -60,6 +60,7 @@
         "vue/script-indent": ["error", 2, {
             "baseIndent": 0,
             "switchCase": 1
-        }]
+        }],
+        "vue/require-prop-types": [0]
     }
 }

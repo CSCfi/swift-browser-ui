@@ -26,7 +26,8 @@
           the console
         </li>
         <li>
-          Copy the contents of the <b>X-Subject-Token</b> header from the response
+          Copy the contents of the <b>X-Subject-Token</b> header from the
+          response
         </li>
       </ol>
     </p>

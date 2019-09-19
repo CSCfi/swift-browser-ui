@@ -57,9 +57,9 @@
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
       @page-change="(page) => addPageToURL ( page )"
-      @dblclick="(row) => $router.push( getContainerAddress ( row['name'] ) )"
-      @keyup.native.enter="$router.push( getContainerAddress ( selected['name'] ))"
-      @keyup.native.space="$router.push( getContainerAddress ( selected['name'] ))"
+      @dblclick="(row) => $router.push( getConAddr ( row['name'] ) )"
+      @keyup.native.enter="$router.push( getConAddr ( selected['name'] ))"
+      @keyup.native.space="$router.push( getConAddr ( selected['name'] ))"
     >
       <template slot-scope="props">
         <b-table-column
@@ -179,7 +179,7 @@ export default {
         this.$router.push("?page=" + this.currentPage);
       }
     },
-    getContainerAddress: function (container) {
+    getConAddr: function (container) {
       return this.$route.params.project + "/" + container;
     },
     getDirectCurrentPage: function () {
