@@ -2,7 +2,7 @@
   <div>
     <h2>Object browser login progress</h2>
     <p class="maintext">
-      <br>The current login process requires you to log in by fetching an
+      <br>The current login process requires logging in by fetching an
       unscoped token from the Openstack's keystone API. The server will handle
       scoping the token, logging in to the Openstack API, fetching all
       necessary information and revoking the token upon leaving the site.

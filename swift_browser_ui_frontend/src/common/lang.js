@@ -9,15 +9,15 @@ const translations = {
       error: {
         frontPage: "To the Front Page",
         Unauthorized: "401 – Not logged in",
-        Unauthorized_text: "The action you want to take requires logging" +
-                           "in. You can do so with the button below.",
-        Notfound: "404 – Could not find the page you were looking for.",
+        Unauthorized_text: "The action requested requires logging" +
+                           "in. Use the button below to Log in.",
+        Notfound: "404 – Could not find the page that was requested.",
         Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
         Forbidden: "403 – Wait, thats forbidden!",
-        Forbidden_text: "You are forbidden from doing the previous request. " +
-                        "If you are sure you should be allowed to perform " +
-                        "said operation, contact the service administrator. " +
+        Forbidden_text: "The previous request could not be fulfilled. " +
+                        "If said operation should be allowed to be " +
+                        "performed, contact the service administrator. " +
                         "Otherwise head back to the front page from the " +
                         "button below.",
       },
@@ -56,9 +56,9 @@ const translations = {
         hour: "hour",
         default_notify: "The information on consumed billing units and the " +
                         "available quota is derived from the default Pouta " +
-                        "values. If you have a separate pricing contract " +
-                        "with CSC the values specific to your project may " +
-                        "vary.",
+                        "values. If there's a separate pricing contract " +
+                        "with CSC for the project used, the values " +
+                        "specific the project may vary.",
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",
@@ -85,15 +85,15 @@ const translations = {
         frontPage: "Etusivulle",
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
-                           "jonka voit toteuttaa oheisesta painikkeesta.",
-        Notfound: "404 – Etsimääsi sivua ei löydetty.",
-        Notfound_text: "Etusivun voit löytää alapuolisesta painikkeesta.",
+                           "jonka voi toteuttaa oheisesta painikkeesta.",
+        Notfound: "404 – Etsittyä sivua ei löydetty.",
+        Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
         Forbidden: "403 – Tuo on kiellettyä.",
-        Forbidden_text: "Se, mitä ikinä yrititkään äsken tehdä, ei ole " +
-                        "sallittua. Mikäli olet sitä mieltä, että yrittämäsi" +
-                        " pitäisi olla mahdollista, ota yhteys palvelun " +
-                        "ylläpitäjään. Muussa tapauksessa palaa etusivulle " +
-                        "oheisesta painikkeesta.",
+        Forbidden_text: "Edellinen operaatio ei ole sallittu. Mikäli " +
+                        "kyseisen operaation tulisi olla sallittu, ota " +
+                        "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
+                        "paluu etusivulle on mahdollista oheisesta " +
+                        "painikkeesta",
       },
       program_name: "Object Browser",
       currentProj: "Nykyinen projekti",
@@ -131,9 +131,9 @@ const translations = {
         hour: "tunti",
         default_notify: "Esitetty tieto laskutusysiköiden kulutuksesta ja " +
                         "käyttörajoista on laskettu Poudan oletusarvojen " +
-                        "mukaan. Jos projektillanne on erillinen sopimus " +
-                        "laskutuksesta CSC:n kanssa, tarkat arvot voivat " +
-                        "poiketa näytetyistä.",
+                        "mukaan. Jos käytetylle projektille on erillinen " +
+                        "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
+                        "voivat poiketa näytetyistä.",
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",

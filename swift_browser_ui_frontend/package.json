@@ -6,7 +6,6 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "start": "serve -l 8080 -s dist",
     "build-devel": "vue-cli-service build --mode development"
   },
   "dependencies": {
