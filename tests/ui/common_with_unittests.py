@@ -22,7 +22,7 @@ class BaseUITestClass(unittest.TestCase):
             [
                 "python",
                 "-m",
-                "tests.mock_server"
+                "tests.unit.mock_server"
             ],
             stdout=subprocess.PIPE
         )
