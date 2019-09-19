@@ -40,6 +40,10 @@ Getting started:
 ```
 git clone git@gitlab.csc.fi:CSCCSDP/swift_browser_ui.git
 cd swift_browser_ui
+cd swift_browser_ui_frontend
+npm install
+npm run build
+cd ..
 pip install -r requirements.txt
 pip install .
 ```

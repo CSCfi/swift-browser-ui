@@ -23,27 +23,46 @@ stages:
 jobs:
   include:
     - stage: tests
-      name: "Code Style Check"
+      name: "Code Style Check Python"
       python: 3.6
       before_script:
         - pip install tox-travis
       script: tox -e flake8
     - stage: tests
+      name: "Code Style Check Javascript"
+      node_js: "12"
+      before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+      script: npm run lint
+    - stage: tests
       name: "Unit Tests  Python 3.6"
       python: 3.6
       before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+        - npm run build
+        - cd ..
         - pip install tox-travis
       script: tox -e pytest
     - stage: tests
       name: "Unit Tests Python 3.7"
       python: 3.7
       before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+        - npm run build
+        - cd ..
         - pip install tox-travis
       script: tox -e pytest
     - stage: tests
       name: "Documentation Tests"
       python: 3.6
       before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+        - npm run build
+        - cd ..
         - pip install tox-travis
         - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
         - tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
@@ -65,6 +84,10 @@ jobs:
       name: "Firefox UI Tests"
       python: 3.6
       before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+        - npm run build
+        - cd ..
         - pip install tox-travis
         - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
         - tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
@@ -80,6 +103,10 @@ jobs:
       name: "Chrome UI Tests"
       python: 3.6
       before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+        - npm run build
+        - cd ..
         - pip install tox-travis
         - curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
         - echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
