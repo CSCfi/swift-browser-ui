@@ -23,11 +23,18 @@ stages:
 jobs:
   include:
     - stage: tests
-      name: "Code Style Check"
+      name: "Code Style Check Python"
       python: 3.6
       before_script:
         - pip install tox-travis
       script: tox -e flake8
+    - stage: tests
+      name: "Code Style Check Javascript"
+      node_js: "12"
+      before_script:
+        - cd swift_browser_ui_frontend
+        - npm install
+      script: npm run lint
     - stage: tests
       name: "Unit Tests  Python 3.6"
       python: 3.6
