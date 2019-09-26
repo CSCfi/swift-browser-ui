@@ -46,6 +46,7 @@
     <b-table
       focusable
       hoverable
+      detailed
       narrowed
       style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="name"
@@ -102,6 +103,27 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
       </template>
+      <template
+        slot="detail"
+        slot-scope="props"
+      >
+        <ul>
+          <li>
+            <a
+              @click="shareModalIsActive = true"
+            >
+              {{ $t('message.share.share_cont') }}
+            </a>
+          </li>
+        </ul>    
+        
+        <b-modal
+          :active.sync="shareModalIsActive"
+          has-modal-card
+        >
+          <Sharing :container="props.row.name" />
+        </b-modal>
+      </template>
       <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%;"
@@ -117,9 +139,11 @@
 import { getBuckets } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import Sharing from "@/components/Sharing";
 
 export default {
   name: "Containers",
+  components: {Sharing},
   data: function () {
     return {
       bList: [],
@@ -130,6 +154,7 @@ export default {
       defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
+      shareModalIsActive: false,
     };
   },
   watch: {
