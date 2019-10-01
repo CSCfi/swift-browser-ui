@@ -10,7 +10,7 @@ async def has_access_handler(request):
 
     # Check for incorrect client query here
 
-    access_list = request.app.db_conn.get_access_list(request.query.user)
+    access_list = request.app["db_conn"].get_access_list(request.query["user"])
     if not access_list:
         raise aiohttp.web.HTTPNotFound()
     return aiohttp.web.json_response(access_list)
@@ -22,10 +22,10 @@ async def access_details_handler(request):
 
     # Check for incorrect client query here
 
-    access_details = request.app.db_conn.get_access_container_details(
-        request.query.user,
-        request.query.owner,
-        request.query.container
+    access_details = request.app["db_conn"].get_access_container_details(
+        request.query["user"],
+        request.query["owner"],
+        request.query["container"]
     )
     if not access_details:
         raise aiohttp.web.HTTPNotFound()
@@ -38,8 +38,8 @@ async def gave_access_handler(request):
 
     # Check for incorrect client query here
 
-    shared_list = request.app.db_conn.get_shared_list(
-        request.query.user
+    shared_list = request.app["db_conn"].get_shared_list(
+        request.query["user"]
     )
     if not shared_list:
         raise aiohttp.web.HTTPNotFound()
@@ -52,9 +52,9 @@ async def shared_details_handler(request):
 
     # Check for incorrect client query here
 
-    shared_details = request.app.db_conn.get_shared_container_details(
-        request.query.user,
-        request.query.container
+    shared_details = request.app["db_conn"].get_shared_container_details(
+        request.query["user"],
+        request.query["container"]
     )
     if not shared_details:
         raise aiohttp.web.HTTPNotFound()
@@ -67,12 +67,12 @@ async def share_container_handler(request):
 
     # Check for incorrect client query here
 
-    request.app.db_conn.add_share(
-        request.query.owner,
-        request.query.container,
-        request.query.user.split(","),
-        request.query.access.split(","),
-        request.query.address
+    request.app["db_conn"].add_share(
+        request.query["owner"],
+        request.query["container"],
+        request.query["user"].split(","),
+        request.query["access"].split(","),
+        request.query["address"]
     )
 
     return aiohttp.web.Response(
@@ -87,11 +87,11 @@ async def unshare_container_handler(request):
 
     # Check for incorrect client query here
 
-    request.app.db_conn.remove_share(
-        request.query.owner,
-        request.query.container,
-        request.query.user.split(","),
-        request.query.access.split(",")
+    request.app["db_conn"].remove_share(
+        request.query["owner"],
+        request.query["container"],
+        request.query["user"].split(","),
+        request.query["access"].split(",")
     )
 
     return aiohttp.web.Response(
