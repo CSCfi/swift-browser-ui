@@ -16,14 +16,20 @@ setuptools.setup(
     },
     licnese="MIT",
     install_requires=[
-
+        "aiohttp",
+        "uvloop",
     ],
     extras_require={
         "test": ["tox", "pytest", "pytest-cov", "coverage", "flake8",
-                 "flake8-doctsrings", "asynctest"],
+                 "flake8-docstrings", "asynctest"],
     },
     packages=[__name__],
     platforms="any",
+    entry_points={
+        "console_scripts": [
+            "swift-x-account-sharing=swift_x_account_sharing.server:main",
+        ],
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
 
