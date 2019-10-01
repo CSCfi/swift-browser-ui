@@ -21,8 +21,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HasAccess"
-         401:
-          description: Unauthorized
+        401:
+         description: Unauthorized
   /container-details:
     get:
       tags:
@@ -108,12 +108,8 @@ paths:
           type: string
           example: "r,l,w"
       responses:
-        200:
+        204:
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessfulShare"
         401:
           description: Unauthorized
         404:
@@ -143,14 +139,67 @@ paths:
           type: string
           example: "r,l,w"
       responses:
-        200:
+        204:
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessfulRevoke"
         401:
           description: Unauthorized
         404:
           description: Not Found
 
+components:
+  schemas:
+
+    ListedContainer:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+
+    DetailedContainer:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+        shared:
+          type: string
+          description: The user the container was shared to.
+          example: AUTH_otherexample
+        address:
+          type: string
+          description: The URL of the container.
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
+        rights:
+          type: string
+          description: The rights that the user has / was given to.
+
+    HasAccess:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedContainer"
+
+    GetDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
+
+    GaveAccess:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedContainer"
+
+    SharedDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
