@@ -1,0 +1,156 @@
+openapi: "3.0.2"
+info:
+  title: "swift-x-account-sharing"
+  description: "Database and API for storing / querying Openstack Swift ACL information"
+  version: "0.1.0"
+  license:
+    name: MIT
+tags:
+  - name: API Endpoints
+    description: Endpoints for sharing information queries
+paths:
+  /has-access:
+    get:
+      tags:
+        - API Endpoints
+      summary: List container names that have been shared to the user.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HasAccess"
+         401:
+          description: Unauthorized
+  /container-details:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get details of a container that has been shared to the user.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDetails"
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /gave-access:
+    get:
+      tags:
+        - API Endpoints
+      summary: List container names that the user has shared to someone else.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GaveAccess"
+        401:
+          description: Unauthorized
+  /shared-details:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get details of a container that the user has shared.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /share-container:
+    post:
+      tags:
+        - API Endpoints
+      summary: Grant specified access to container to the user/users specified in the query.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be shared.
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is shared to.
+        schema:
+          type: string
+          example: "user1,user2,user3,user4"
+      - name: access
+        in: query
+        description: The access types to be granted.
+        schema:
+          type: string
+          example: "r,l,w"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessfulShare"
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /unshare-container:
+    post:
+      tags:
+        - API Endpoints
+      summary: Revoke specified access to container from the user/users specified in the query.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be revoked.
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is revoked from.
+        schema:
+          type: string
+          example: "user1,user2,user3,user4"
+      - name: access
+        in: query
+        description: The access types to be revoked.
+        schema:
+          type: string
+          example: "r,l,w"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessfulRevoke"
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+
