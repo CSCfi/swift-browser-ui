@@ -26,7 +26,7 @@ from .dict_db import InMemDB
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-def init_server():
+async def init_server():
     """Initialize the server."""
     app = aiohttp.web.Application()
 
