@@ -14,6 +14,13 @@ paths:
       tags:
         - API Endpoints
       summary: List container names that have been shared to the user.
+      parameters:
+      - name: user
+        in: query
+        description: The user querying
+        schema:
+          type: string
+          example: AUTH_example
       responses:
         200:
           description: OK
@@ -23,7 +30,7 @@ paths:
                 $ref: "#/components/schemas/HasAccess"
         401:
          description: Unauthorized
-  /container-details:
+  /access-details:
     get:
       tags:
         - API Endpoints
@@ -35,6 +42,18 @@ paths:
         schema:
           type: string
           example: test-container-1
+      - name: user
+        in: query
+        description: The user querying
+        schema:
+          type: string
+          example: AUTH_example
+      - name: owner
+        in: query
+        description: The container owner
+        schema:
+          type: string
+          example: AUTH_otherexample
       responses:
         200:
           description: OK
@@ -51,6 +70,12 @@ paths:
       tags:
         - API Endpoints
       summary: List container names that the user has shared to someone else.
+      parameters:
+      - name: user
+        description: The user requesting the shared container listing.
+        schema:
+          type: string
+          example: AUTH_example
       responses:
         200:
           description: OK
@@ -72,6 +97,12 @@ paths:
         schema:
           type: string
           example: test-container-1
+      - name: user
+        in: query
+        description: The user that is requesting the sharing details.
+        schema:
+          type: string
+          example: AUTH_example
       responses:
         200:
           description: OK
@@ -100,13 +131,25 @@ paths:
         description: The user / users that the container is shared to.
         schema:
           type: string
-          example: "user1,user2,user3,user4"
+          example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
       - name: access
         in: query
         description: The access types to be granted.
         schema:
           type: string
           example: "r,l,w"
+      - name: owner
+        in: query
+        description: The owner of the container to be shared.
+        schema:
+          type: string
+          example: AUTH_example
+      - name: address
+        in: query
+        description: The address of the container to be shared.
+        schema:
+          type: string
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
       responses:
         204:
           description: OK
@@ -197,7 +240,7 @@ components:
     GaveAccess:
       type: array
       items:
-        $ref: "#/components/schemas/ListedContainer"
+        $ref: "#/components/schemas/DetailedContainer"
 
     SharedDetails:
       type: array
