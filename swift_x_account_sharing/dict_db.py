@@ -43,9 +43,9 @@ class InMemDB():
         for key in userlist:
             for i in self.shares:
                 if (
-                        i.owner == owner
-                        and i.container == container
-                        and i.sharedTo == key
+                        i["owner"] == owner
+                        and i["container"] == container
+                        and i["sharedTo"] == key
                 ):
                     new_access = []
                     if "-r" not in access:
@@ -60,7 +60,7 @@ class InMemDB():
                             "container": container,
                             "sharedTo": key,
                             "access": new_access,
-                            "address": i.address,
+                            "address": i["address"],
                         })
                     self.shares.remove(i)
         if new_shares:
@@ -72,10 +72,10 @@ class InMemDB():
         """Get the containers that are shared to specified user."""
         access_list = []
         for i in self.shares:
-            if i.sharedTo == user:
+            if i["sharedTo"] == user:
                 access_list.append({
-                    "container": i.container,
-                    "owner": i.owner,
+                    "container": i["container"],
+                    "owner": i["owner"],
                 })
         return access_list
 
@@ -83,9 +83,9 @@ class InMemDB():
         """Get the containers that the user has shared."""
         shared_list = []
         for i in self.shares:
-            if i.owner == user:
-                if i.container not in shared_list:
-                    shared_list.append(i.container)
+            if i["owner"] == user:
+                if i["container"] not in shared_list:
+                    shared_list.append(i["container"])
         return shared_list
 
     def get_access_container_details(self, user, owner, container):
@@ -93,9 +93,9 @@ class InMemDB():
         # Required to be unique
         for i in self.shares:
             if (
-                    i.owner == owner
-                    and i.container == container
-                    and i.sharedTo == user
+                    i["owner"] == owner
+                    and i["container"] == container
+                    and i["sharedTo"] == user
             ):
                 return i
         return None
@@ -105,8 +105,8 @@ class InMemDB():
         shared_containers = []
         for i in self.shares:
             if (
-                    i.owner == owner
-                    and i.container == container
+                    i["owner"] == owner
+                    and i["container"] == container
             ):
                 shared_containers.append(i)
         if not shared_containers:
@@ -114,7 +114,7 @@ class InMemDB():
         return {
             "owner": owner,
             "container": container,
-            "sharedTo": [i.sharedTo for i in shared_containers],
-            "access": shared_containers[0].access,
-            "address": shared_containers[0].address
+            "sharedTo": [i["sharedTo"] for i in shared_containers],
+            "access": shared_containers[0]["access"],
+            "address": shared_containers[0]["address"]
         }

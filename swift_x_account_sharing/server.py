@@ -48,7 +48,7 @@ def run_server_devel(app):
     """Run the server in development mode (without HTTPS)."""
     aiohttp.web.run_app(
         app,
-        access_log=logging.getLogger("aiohttp.access"),
+        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
         port=8080
     )
 
