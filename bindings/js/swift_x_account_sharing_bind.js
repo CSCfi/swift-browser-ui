@@ -1,21 +1,13 @@
 // Swift cross account container sharing API JavaScript bindings module.
 
-function parse_userlist_string (users) {
-    // Parse the list of users into a comma separated list
+function parse_list_string (to_parse) {
+    // Parse the JS list into comma separated values in string.
     let ret = "";
-    users.forEach(user => {
+    to_parse.forEach(user => {
         ret = ret.concat(user, ",");
     });
     return ret.slice(0, ret.length - 1);
-};
-
-function parse_rights_string (rights) {
-    let ret = "";
-    rights.forEach(right => {
-        ret = ret.concat(right, ",");
-    });
-    return ret.slice(0, ret.length - 1)
-};
+}
 
 export async function x_account_api_get_access (
     username
@@ -88,8 +80,8 @@ export async function x_account_api_share_new_access(
     let url = new URL(
         "/share/".concat(username, "/", container), document.location
     );
-    url.searchParams.append("user", parse_userlist_string(userlist));
-    url.searchParams.append("access", parse_rights_string(accesslist));
+    url.searchParams.append("user", parse_list_string(userlist));
+    url.searchParams.append("access", parse_list_string(accesslist));
     url.searchParams.append("address", address);
     let shared = fetch(
         url, {method: "POST"}
@@ -109,8 +101,8 @@ export async function x_account_api_share_edit_access(
     let url = new URL(
         "/share/".concat(username, "/", container), document.location
     );
-    url.searchParams.append("user", parse_userlist_string(userlist));
-    url.searchParams.append("access", parse_rights_string(accesslist));
+    url.searchParams.append("user", parse_list_string(userlist));
+    url.searchParams.append("access", parse_list_string(accesslist));
     let shared = fetch(
         url, {method: "PATCH"}
     ).then(
@@ -128,7 +120,7 @@ export async function x_account_api_share_delete_access(
     let url = new URL(
         "/share/".concat(username, "/", container), document.location
     );
-    url.searchParams.append("user", parse_userlist_string(userlist));
+    url.searchParams.append("user", parse_list_string(userlist));
     let deleted = fetch(
         url, {method: "DELETE"}
     ).then(
