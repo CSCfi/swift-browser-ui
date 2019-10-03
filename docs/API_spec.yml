@@ -18,6 +18,7 @@ paths:
       - name: user
         in: path
         description: The user querying
+        required: true
         schema:
           type: string
           example: AUTH_example
@@ -39,18 +40,21 @@ paths:
       - name: container
         in: path
         description: The container that is to be queried.
+        required: true
         schema:
           type: string
           example: test-container-1
       - name: user
         in: path
         description: The user querying
+        required: true
         schema:
           type: string
           example: AUTH_example
       - name: owner
         in: query
         description: The container owner
+        required: true
         schema:
           type: string
           example: AUTH_otherexample
@@ -63,15 +67,16 @@ paths:
                 $ref: "#/components/schemas/GetDetails"
         400:
           description: Client Error
-  /share/{user}:
+  /share/{owner}:
     get:
       tags:
         - API Endpoints
       summary: List container names that the user has shared to someone else.
       parameters:
-      - name: user
+      - name: owner
         in: path
         description: The user requesting the shared container listing.
+        required: true
         schema:
           type: string
           example: AUTH_example
@@ -84,7 +89,7 @@ paths:
                 $ref: "#/components/schemas/GaveAccess"
         400:
           description: Client Error
-  /share/{user}/{container}:
+  /share/{owner}/{container}:
     get:
       tags:
         - API Endpoints
@@ -93,12 +98,14 @@ paths:
       - name: container
         in: path
         description: The container that is to be queried.
+        required: true
         schema:
           type: string
           example: test-container-1
-      - name: user
+      - name: owner
         in: path
         description: The user that is requesting the sharing details.
+        required: true
         schema:
           type: string
           example: AUTH_example
@@ -111,7 +118,6 @@ paths:
                 $ref: "#/components/schemas/SharedDetails"
         400:
           description: Client Error
-  /share/{user}/{container}:
     post:
       tags:
         - API Endpoints
@@ -120,30 +126,35 @@ paths:
       - name: container
         in: path
         description: The container that is to be shared.
+        required: true
         schema:
           type: string
           example: test-container-1
       - name: user
         in: query
         description: The user / users that the container is shared to.
+        required: true
         schema:
           type: string
           example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
       - name: access
         in: query
         description: The access types to be granted.
+        required: true
         schema:
           type: string
           example: "r,l,w"
       - name: owner
         in: path
         description: The owner of the container to be shared.
+        required: true
         schema:
           type: string
           example: AUTH_example
       - name: address
         in: query
         description: The address of the container to be shared.
+        required: true
         schema:
           type: string
           example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
@@ -156,7 +167,6 @@ paths:
                 $ref: "#/components/schemas/SharedDetails"
         400:
           description: Client Error
-  /share/{user}/{container}:
     patch:
       tags:
         - API Endpoints
@@ -165,24 +175,28 @@ paths:
       - name: container
         in: path
         description: The container that is to be edited.
+        required: true
         schema:
           type: string
           example: test-container-1
       - name: user
         in: query
         description: The user / users that the container is shared to.
+        required: true
         schema:
           type: string
           example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
       - name: access
         in: query
         description: The access types to be granted.
+        required: true
         schema:
           type: string
           example: "r,l,w"
       - name: owner
         in: path
         description: The owner of the container to be edited.
+        required: true
         schema:
           type: string
           example: AUTH_example
@@ -195,7 +209,6 @@ paths:
                 $ref: "#/components/schemas/SharedDetails"
         400:
           description: Client Error
-  /share/{user}/{container}:
     delete:
       tags:
         - API Endpoints
@@ -204,18 +217,21 @@ paths:
       - name: container
         in: path
         description: The container that is to be revoked.
+        required: true
         schema:
           type: string
           example: test-container-1
       - name: user
         in: query
         description: The user / users that the container is revoked from.
+        required: true
         schema:
           type: string
           example: "user1,user2,user3,user4"
       - name: owner
         in: path
         description: The owner of the shared container.
+        required: true
         schema:
           type: string
           example: test-container-1
