@@ -36,8 +36,10 @@ class InMemDB():
                 "address": address
             })
 
-    def remove_share(self, owner, container, userlist, access):
-        """Remove a share action from the database."""
+    def edit_share(self, owner, container, userlist, access):
+        """Edit a share action in the database."""
+        if not access:
+            return
         new_shares = []
         # For now iterate over whole list
         for key in userlist:
@@ -47,25 +49,31 @@ class InMemDB():
                         and i["container"] == container
                         and i["sharedTo"] == key
                 ):
-                    new_access = []
-                    if "-r" not in access:
-                        new_access.append("r")
-                    if "-w" not in access:
-                        new_access.append("w")
-                    if "-l" not in access:
-                        new_access.append("l")
-                    if new_access:
-                        new_shares.append({
-                            "owner": owner,
-                            "container": container,
-                            "sharedTo": key,
-                            "access": new_access,
-                            "address": i["address"],
-                        })
+                    new_shares.append({
+                        "owner": owner,
+                        "container": container,
+                        "sharedTo": key,
+                        "access": access,
+                        "address": i["address"],
+                    })
                     self.shares.remove(i)
         if new_shares:
             for i in new_shares:
                 self.shares.append(i)
+
+    def delete_share(self, owner, container, userlist):
+        """Remove a share action from the database."""
+        deleted = []
+        for key in userlist:
+            for i in self.shares:
+                if(
+                        i["owner"] == owner
+                        and i["contaner"] == container
+                        and i["sharedTo"] == key
+                ):
+                    deleted.append(i)
+                    self.shares.remove(i)
+        return deleted
 
     def get_access_list(self, user):
         # Assume no duplicates
@@ -98,7 +106,7 @@ class InMemDB():
                     and i["sharedTo"] == user
             ):
                 return i
-        return None
+        return {}
 
     def get_shared_container_details(self, owner, container):
         """Get shared container details for sharer."""
@@ -110,7 +118,7 @@ class InMemDB():
             ):
                 shared_containers.append(i)
         if not shared_containers:
-            return None
+            return {}
         return {
             "owner": owner,
             "container": container,

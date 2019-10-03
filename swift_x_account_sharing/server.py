@@ -16,7 +16,8 @@ from .api import (
     gave_access_handler,
     shared_details_handler,
     share_container_handler,
-    unshare_container_handler
+    delete_share_handler,
+    edit_share_handler,
 )
 
 
@@ -33,12 +34,13 @@ async def init_server():
     app["db_conn"] = InMemDB()
 
     app.add_routes([
-        aiohttp.web.get("/has-access", has_access_handler),
-        aiohttp.web.get("/access-details", access_details_handler),
-        aiohttp.web.get("/gave-access", gave_access_handler),
-        aiohttp.web.get("/shared-details", shared_details_handler),
-        aiohttp.web.post("/share-container", share_container_handler),
-        aiohttp.web.post("/unshare-container", unshare_container_handler),
+        aiohttp.web.get("/access/{user}", has_access_handler),
+        aiohttp.web.get("/access/{user}/{container}", access_details_handler),
+        aiohttp.web.get("/share/{owner}", gave_access_handler),
+        aiohttp.web.get("/share/{owner}/{container}", shared_details_handler),
+        aiohttp.web.post("/share/{owner}/{container}", share_container_handler),
+        aiohttp.web.patch("/share/{owner}/{contanier}", edit_share_handler),
+        aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
     ])
 
     return app
