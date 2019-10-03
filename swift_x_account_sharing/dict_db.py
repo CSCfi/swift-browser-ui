@@ -4,7 +4,11 @@
 # queries into the final database should probably require the same things.
 
 
+import logging
 import json
+
+
+MODULE_LOGGER = logging.getLogger("dict_db")
 
 
 class InMemDB():
@@ -27,19 +31,23 @@ class InMemDB():
     def add_share(self, owner, container, userlist, access, address):
         """Add a share action to database."""
         # Now assuming that there are no duplicates
+        new_shares = []
         for key in userlist:
-            self.shares.append({
+            new_share = {
                 "owner": owner,
                 "container": container,
                 "sharedTo": key,
                 "access": access,
                 "address": address
-            })
+            }
+            self.shares.append(new_share)
+            new_shares.append(new_share)
+        return new_shares
 
     def edit_share(self, owner, container, userlist, access):
         """Edit a share action in the database."""
         if not access:
-            return
+            return []
         new_shares = []
         # For now iterate over whole list
         for key in userlist:
@@ -60,6 +68,7 @@ class InMemDB():
         if new_shares:
             for i in new_shares:
                 self.shares.append(i)
+        return new_shares
 
     def delete_share(self, owner, container, userlist):
         """Remove a share action from the database."""

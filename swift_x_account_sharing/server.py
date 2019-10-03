@@ -24,6 +24,9 @@ from .api import (
 from .dict_db import InMemDB
 
 
+logging.basicConfig(level=logging.DEBUG)
+
+
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
