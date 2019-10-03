@@ -1,8 +1,10 @@
 """Async Python bindings for the swift-x-account-sharing backend."""
 
 
-import aiohttp
 import json
+
+
+import aiohttp
 
 
 class SwiftXAccountSharing:
