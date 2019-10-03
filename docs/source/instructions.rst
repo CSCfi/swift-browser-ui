@@ -9,7 +9,7 @@ The program can be installed with pip from the git repository:
 .. code-block:: console
 
     # Requires python >= 3.6
-    git clone git@gitlab.csc.fi:CSCCSDP/swift-browser-ui.git
+    git clone git@github.com:CSCfi/swift-browser-ui.git
     pip install .
 
 

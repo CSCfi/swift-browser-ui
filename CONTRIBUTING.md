@@ -14,7 +14,7 @@ We have templates for submitting new issues, that you can fill out. For example 
 
 ### Submitting changes
 
-When you made some changes you are happy with please send a [GitLab merge Request to swift-browser-ui](https://github.com/CSCfi/swift-browser-ui/pull_requests/new/devel) with a clear list of what you've done (read more about [pull requests]https://help.github.com/en/articles/about-pull-requests)). When you create that Merge Request, we will forever be in your debt if you check previous docs for typos.
+When you made some changes you are happy with please send a [Github Pull Request to swift-browser-ui](https://github.com/CSCfi/swift-browser-ui/pull_requests/new/devel) with a clear list of what you've done (read more about [pull requests]https://help.github.com/en/articles/about-pull-requests)). When you create that Merge Request, we will forever be in your debt if you check previous docs for typos.
 
 Please follow our Git branches model and coding conventions (both below), and make sure all of your commits are atomic (preferably one feature per commit) and it is recommended a Merge Request addresses one functionality or fixes one bug.
 
