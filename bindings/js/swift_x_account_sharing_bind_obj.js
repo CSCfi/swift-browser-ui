@@ -91,8 +91,8 @@ class SwiftXAccountSharing {
         let url = new URL(
             "/share/".concat(username, "/", container), this.address
         );
-        url.searchParams.append("user", parse_list_string(userlist));
-        url.searchParams.append("access", parse_list_string(accesslist));
+        url.searchParams.append("user", this._parse_list_string(userlist));
+        url.searchParams.append("access", this._parse_list_string(accesslist));
         url.searchParams.append("address", address);
         let shared = fetch(
             url, {method: "POST"}
@@ -112,8 +112,8 @@ class SwiftXAccountSharing {
         let url = new URL(
             "/share/".concat(username, "/", container), this.address
         );
-        url.searchParams.append("user", parse_list_string(userlist));
-        url.searchParams.append("access", parse_list_string(accesslist));
+        url.searchParams.append("user", this._parse_list_string(userlist));
+        url.searchParams.append("access", this._parse_list_string(accesslist));
         let shared = fetch(
             url, {method: "PATCH"}
         ).then(
@@ -131,7 +131,7 @@ class SwiftXAccountSharing {
         let url = new URL(
             "/share/".concat(username, "/", container), this.address
         );
-        url.searchParams.append("user", parse_list_string(userlist));
+        url.searchParams.append("user", this._parse_list_string(userlist));
         let deleted = fetch(
             url, {method: "DELETE"}
         ).then(
