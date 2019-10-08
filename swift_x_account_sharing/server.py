@@ -22,6 +22,7 @@ from .api import (
 
 
 from .dict_db import InMemDB
+import os
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -30,11 +31,30 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
+def resume_on_start(app):
+    """Resume old instance from start."""
+    # If using dict_db read the database on disk, if it exists
+    if (
+            isinstance(app["db_conn"], InMemDB)
+            and os.path.exists("swift-x-account-sharing.inmemdb")
+    ):
+        app["db_conn"].load_from_file("swift-x-account-sharing.inmemdb")
+
+
+async def save_on_shutdown(app):
+    """Flush the database on shutdown."""
+    # If using dict_db dump the database on disk, using default file.
+    if isinstance(app["db_conn"], InMemDB):
+        app["db_conn"].export_to_file("swift-x-account-sharing.inmemdb")
+
+
 async def init_server():
     """Initialize the server."""
     app = aiohttp.web.Application()
 
     app["db_conn"] = InMemDB()
+
+    resume_on_start(app)
 
     app.add_routes([
         aiohttp.web.get("/access/{user}", has_access_handler),
@@ -45,6 +65,8 @@ async def init_server():
         aiohttp.web.patch("/share/{owner}/{contanier}", edit_share_handler),
         aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
     ])
+
+    app.on_shutdown.append(save_on_shutdown)
 
     return app
 
