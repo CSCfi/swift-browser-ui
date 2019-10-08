@@ -77,7 +77,7 @@ class InMemDB():
             for i in self.shares:
                 if(
                         i["owner"] == owner
-                        and i["contaner"] == container
+                        and i["container"] == container
                         and i["sharedTo"] == key
                 ):
                     deleted.append(i)
