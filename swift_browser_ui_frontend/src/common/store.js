@@ -20,6 +20,7 @@ const store = new Vuex.Store({
       {ph: "In English", value: "en"},
       {ph: "Suomeksi", value: "fi"},
     ],
+    client: undefined,
   },
   mutations: {
     updateContainers (state, newList) {
@@ -56,6 +57,9 @@ const store = new Vuex.Store({
     },
     setLoading (state, newValue) {
       state.isLoading = newValue;
+    },
+    setSharingClient (state, newClient) {
+      state.client = newClient;
     },
   },
 });
