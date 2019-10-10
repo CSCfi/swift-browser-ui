@@ -32,7 +32,6 @@
       hoverable
       narrowed
       detailed
-      style="width:90%;margin-left:5%;margin-right:5%"
       default-sort="name"
       :data="sharedOutList"
       :selected.sync="selected"

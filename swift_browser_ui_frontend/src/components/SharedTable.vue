@@ -31,7 +31,6 @@
       focusable
       hoverable
       narrowed
-      style="width:90%;margin-left:5%;margin-right:5%"
       default-sort="name"
       :data="sharedList"
       :selected.sync="selected"
@@ -89,7 +88,7 @@ export default {
     };
   },
   beforeMount () {
-    this.getSharedContainers()
+    this.getSharedContainers();
   },
   methods: {
     getSharedContainers: function () {
@@ -104,8 +103,8 @@ export default {
         this.$route.params.user,
         "/", row.owner,
         "/", row.container
-      )
+      );
     },
   },
-}
+};
 </script>

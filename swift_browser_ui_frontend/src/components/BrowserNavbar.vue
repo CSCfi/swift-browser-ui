@@ -63,6 +63,17 @@
             </div>
           </div>
           <div class="navbar-item">
+            <div class="buttons">
+              <router-link
+                v-if="$route.params.project"
+                :to="'/browse/shared/'.concat(active.id)"
+                class="button is-primary has-text-light"
+              >
+                {{ $t("message.share.shared") }}
+              </router-link>
+            </div>
+          </div>
+          <div class="navbar-item">
             <b-field class="locale-changer">
               <b-select
                 v-model="$i18n.locale"
