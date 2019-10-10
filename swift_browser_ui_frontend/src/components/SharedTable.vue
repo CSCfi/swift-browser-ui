@@ -99,7 +99,7 @@ export default {
       );
     },
     getConAddr: function (row) {
-      return "/shared/".concat(
+      return "/browse/shared/".concat(
         this.$route.params.user,
         "/", row.owner,
         "/", row.container

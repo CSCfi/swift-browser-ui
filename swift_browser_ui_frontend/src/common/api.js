@@ -97,6 +97,32 @@ export async function getObjects (container) {
   return objects;
 }
 
+export async function getSharedObjects (container, url) {
+  // Fetch objects contained in a container from the API for the user
+  // that's currently logged in.
+  let objUrl = new URL( "/api/shared", document.location.origin );
+  // Search parameter named bucket to avoid changing the API after changing
+  // over from S3 to Swift
+  objUrl.searchParams.append( "storageurl", url);
+  objUrl.searchParams.append( "container", container );
+  let objects = fetch(
+    objUrl, { method: "GET", credentials: "same-origin" }
+  ).then(
+    function ( resp ) { return resp.json(); }
+  ).then(
+    function( ret ) {
+      for ( let i = 0; i < ret.length; i++ ) {
+        ret[i]["url"] = (
+          "/api/dload?bucket=" + container +
+          "&objkey=" + ret[i]["name"]
+        );
+      }
+      return ret;
+    }
+  );
+  return objects;
+}
+
 export async function getProjectMeta () {
   // Fetch project metadata for the currently active project, containing
   // the project data usage, container amount and object amount.
