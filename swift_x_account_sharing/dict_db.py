@@ -127,11 +127,5 @@ class InMemDB():
             ):
                 shared_containers.append(i)
         if not shared_containers:
-            return {}
-        return {
-            "owner": owner,
-            "container": container,
-            "sharedTo": [i["sharedTo"] for i in shared_containers],
-            "access": shared_containers[0]["access"],
-            "address": shared_containers[0]["address"]
-        }
+            return []
+        return shared_containers
