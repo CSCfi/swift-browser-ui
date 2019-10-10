@@ -48,9 +48,20 @@
 </template>
 
 <style>
+html, body {
+  height: 100%;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .navbar .container .navbar-brand .navbar-item img {
 	max-height: 2.5rem;
 }
+
 .hero-body #login-center{
     padding: 30px 20px 20px 20px;
 }
@@ -72,5 +83,9 @@
 .dashboard {
     margin-left: 5%;
     margin-right: 5%;
+}
+
+.footer {
+  flex-shrink: 0;
 }
 </style>

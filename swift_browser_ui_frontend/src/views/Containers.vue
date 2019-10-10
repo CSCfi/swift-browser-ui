@@ -204,3 +204,8 @@ export default {
   },
 };
 </script>
+<style>
+#container-table {
+  flex: 1 0 auto;
+}
+</style>
