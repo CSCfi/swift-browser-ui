@@ -273,7 +273,7 @@ def initiate_os_session(unscoped, project):
     )
 
 
-def initiate_os_service(os_session):
+def initiate_os_service(os_session, url=None):
     """Create a SwiftService connection to object storage."""
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {
@@ -283,6 +283,9 @@ def initiate_os_service(os_session):
         'debug': True,
         'info': True,
     }
+
+    if url:
+        sc_new_options["os_storage_url"] = url
 
     os_sc = swiftclient.service.SwiftService(
         options=sc_new_options

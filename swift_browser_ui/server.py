@@ -20,6 +20,7 @@ from .login import token_rescope
 from .api import list_buckets, list_objects, download_object, os_list_projects
 from .api import get_os_user, get_os_active_project
 from .api import get_metadata, get_project_metadata
+from .api import swift_list_shared_objects
 from .settings import setd
 from .middlewares import error_middleware
 
@@ -111,6 +112,7 @@ async def servinit():
         aiohttp.web.get('/api/buckets', list_buckets),
         aiohttp.web.get('/api/bucket/objects', list_objects),
         aiohttp.web.get('/api/object/dload', download_object),
+        aiohttp.web.get('/api/shared', swift_list_shared_objects),
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
         aiohttp.web.get('/api/project/active', get_os_active_project),
