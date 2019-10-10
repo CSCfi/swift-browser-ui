@@ -1,6 +1,7 @@
 """Sharing backend server module."""
 
 
+import os
 import sys
 import logging
 import asyncio
@@ -19,10 +20,8 @@ from .api import (
     delete_share_handler,
     edit_share_handler,
 )
-
-
 from .dict_db import InMemDB
-import os
+from .cors import add_cors
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,7 +49,9 @@ async def save_on_shutdown(app):
 
 async def init_server():
     """Initialize the server."""
-    app = aiohttp.web.Application()
+    app = aiohttp.web.Application(
+        middlewares=[add_cors]
+    )
 
     app["db_conn"] = InMemDB()
 
@@ -76,7 +77,7 @@ def run_server_devel(app):
     aiohttp.web.run_app(
         app,
         access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
-        port=8080
+        port=9090
     )
 
 

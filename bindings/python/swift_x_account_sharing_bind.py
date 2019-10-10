@@ -15,9 +15,13 @@ class SwiftXAccountSharing:
         self.url = url
         self.session = aiohttp.ClientSession()
 
-    def __del__(self):
+    async def __aenter__(self):
         """."""
-        self.session.close()
+        return self
+
+    async def __aexit__(self, *excinfo):
+        """."""
+        await self.session.close()
 
     @staticmethod
     def parse_list_to_string(to_parse):
