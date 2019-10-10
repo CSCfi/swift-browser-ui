@@ -8,7 +8,7 @@ class SwiftXAccountSharing {
     ) {
       this.address = address;
     }
-  
+
     _parse_list_string (
       to_parse
     ) {
@@ -19,7 +19,7 @@ class SwiftXAccountSharing {
       });
       return ret.slice(0, ret.length - 1);
     }
-  
+
     async get_access (
       username
     ) {
@@ -32,7 +32,7 @@ class SwiftXAccountSharing {
       );
       return containers;
     }
-  
+
     async get_access_details (
       username,
       container,
@@ -50,7 +50,7 @@ class SwiftXAccountSharing {
       );
       return details;
     }
-  
+
     async get_share (
       username
     ) {
@@ -63,7 +63,7 @@ class SwiftXAccountSharing {
       );
       return shared;
     }
-      
+
     async get_share_details(
       username,
       container
@@ -79,7 +79,7 @@ class SwiftXAccountSharing {
       );
       return details;
     }
-  
+
     async share_new_access(
       username,
       container,
@@ -101,7 +101,7 @@ class SwiftXAccountSharing {
       );
       return shared;
     }
-  
+
     async share_edit_access(
       username,
       container,
@@ -121,7 +121,7 @@ class SwiftXAccountSharing {
       );
       return shared;
     }
-  
+
     async share_delete_access(
       username,
       container,
@@ -143,6 +143,6 @@ class SwiftXAccountSharing {
       return deleted;
     }    
   }
-  
+
   export default SwiftXAccountSharing;
   
