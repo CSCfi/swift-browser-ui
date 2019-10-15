@@ -21,42 +21,42 @@ def logout(l_instance):
 def api_containers(l_instance):
     """Get container listing."""
     l_instance.client.get(
-        "/buckets"
+        "/api/buckets"
     )
 
 
 def api_objects(l_instance):
     """Get object listing."""
     l_instance.client.get(
-        "/bucket/objects?bucket=test-container-0"
+        "/api/bucket/objects?bucket=test-container-0"
     )
 
 
 def api_active(l_instance):
     """Get active project."""
     l_instance.client.get(
-        "/project/active"
+        "/api/project/active"
     )
 
 
 def api_projects(l_instance):
     """Get available projects."""
     l_instance.client.get(
-        "/projects"
+        "/api/projects"
     )
 
 
 def api_username(l_instance):
     """Get the username."""
     l_instance.client.get(
-        "/username"
+        "/api/username"
     )
 
 
 def api_project_meta(l_instance):
     """Get the project metadata."""
     l_instance.client.get(
-        "/project/meta"
+        "/api/project/meta"
     )
 
 

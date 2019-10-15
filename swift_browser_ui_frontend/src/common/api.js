@@ -4,7 +4,7 @@ import { getHumanReadableSize } from "@/common/conv";
 
 export async function getUser () {
   // Function to get the username of the currently displayed user.
-  let getUserURL = new URL( "/username", document.location.origin );
+  let getUserURL = new URL( "/api/username", document.location.origin );
   let uname = fetch(
     getUserURL, { method: "GET", credentials: "same-origin" }
   ).then(
@@ -17,7 +17,7 @@ export async function getUser () {
 
 export async function getProjects () {
   // Fetch available projects from the API
-  let getProjectsURL = new URL( "/projects", document.location.origin );
+  let getProjectsURL = new URL( "/api/projects", document.location.origin );
   let projects = fetch(
     getProjectsURL, { method: "GET", credentials: "same-origin" }
   ).then(
@@ -49,7 +49,8 @@ export default async function getActiveProject () {
   // Fetch the active project from the API
   // Returns the active project name if the fetch is successful, otherwise
   // returns nothing
-  let getProjectURL = new URL( "/project/active", document.location.origin );
+  let getProjectURL = new URL( "/api/project/active", 
+    document.location.origin );
   let activeProj = fetch(
     getProjectURL, { method: "GET", credentials: "same-origin" }
   ).then(
@@ -61,7 +62,7 @@ export default async function getActiveProject () {
 }
 
 export async function getBuckets () {
-  let getBucketsUrl = new URL( "/buckets", document.location.origin );
+  let getBucketsUrl = new URL( "/api/buckets", document.location.origin );
   // Fetch containers from the API for the user that's currently logged in
   let buckets = fetch(
     getBucketsUrl, { method: "GET", credentials: "same-origin" }
@@ -74,7 +75,7 @@ export async function getBuckets () {
 export async function getObjects (container) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL( "/bucket/objects", document.location.origin );
+  let objUrl = new URL( "/api/bucket/objects", document.location.origin );
   // Search parameter named bucket to avoid changing the API after changing
   // over from S3 to Swift
   objUrl.searchParams.append( "bucket", container );
@@ -86,7 +87,7 @@ export async function getObjects (container) {
     function( ret ) {
       for ( let i = 0; i < ret.length; i++ ) {
         ret[i]["url"] = (
-          "/object/dload?bucket=" + container +
+          "/api/object/dload?bucket=" + container +
           "&objkey=" + ret[i]["name"]
         );
       }
@@ -99,7 +100,7 @@ export async function getObjects (container) {
 export async function getProjectMeta () {
   // Fetch project metadata for the currently active project, containing
   // the project data usage, container amount and object amount.
-  let metaURL = new URL( "/project/meta", document.location.origin );
+  let metaURL = new URL( "/api/project/meta", document.location.origin );
   let ret = fetch(
     metaURL, {method: "GET", credentials: "same-origin" }
   ).then( function ( resp ) { return resp.json(); } )

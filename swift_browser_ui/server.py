@@ -108,14 +108,14 @@ async def servinit():
 
     # Add api routes
     app.add_routes([
-        aiohttp.web.get('/buckets', list_buckets),
-        aiohttp.web.get('/bucket/objects', list_objects),
-        aiohttp.web.get('/object/dload', download_object),
-        aiohttp.web.get('/username', get_os_user),
-        aiohttp.web.get('/projects', os_list_projects),
-        aiohttp.web.get('/project/active', get_os_active_project),
-        aiohttp.web.get('/bucket/meta', get_metadata),
-        aiohttp.web.get('/project/meta', get_project_metadata),
+        aiohttp.web.get('/api/buckets', list_buckets),
+        aiohttp.web.get('/api/bucket/objects', list_objects),
+        aiohttp.web.get('/api/object/dload', download_object),
+        aiohttp.web.get('/api/username', get_os_user),
+        aiohttp.web.get('/api/projects', os_list_projects),
+        aiohttp.web.get('/api/project/active', get_os_active_project),
+        aiohttp.web.get('/api/bucket/meta', get_metadata),
+        aiohttp.web.get('/api/project/meta', get_project_metadata),
     ])
 
     # Add graceful shutdown handler
