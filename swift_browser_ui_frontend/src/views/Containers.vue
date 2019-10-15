@@ -1,5 +1,5 @@
 <template>
-  <div id="container-table">
+  <div id="container-table" class="contents">
     <b-field
       grouped
       group-multiline
@@ -204,8 +204,3 @@ export default {
   },
 };
 </script>
-<style>
-#container-table {
-  flex: 1 0 auto;
-}
-</style>

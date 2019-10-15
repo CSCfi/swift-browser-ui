@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="mainContainer">
     <BrowserNavbar
       :langs="langs"
       :multiple-projects="multipleProjects"
@@ -52,10 +52,13 @@ html, body {
   height: 100%;
 }
 
-#app {
+#mainContainer {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+.contents {
+  flex: 1 0 auto;
 }
 
 .navbar .container .navbar-brand .navbar-item img {
