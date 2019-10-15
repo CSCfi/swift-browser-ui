@@ -1,7 +1,7 @@
 <template>
   <div
     id="navbar"
-    class="navbar is-spaced has-shadow"
+    class="navbar has-shadow"
   >
     <div class="container is-fluid">
       <div class="navbar-brand">

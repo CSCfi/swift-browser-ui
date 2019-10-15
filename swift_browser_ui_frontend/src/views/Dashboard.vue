@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard contents">
     <div class="tile is-ancestor">
       <div class="tile is-parent is-horizontal is-4">
         <div class="tile is-child box">

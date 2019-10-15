@@ -1,5 +1,5 @@
 <template>
-  <div id="object-table">
+  <div id="object-table" class="contents">
     <b-field
       grouped
       group-multiline
