@@ -9,7 +9,7 @@ tags:
   - name: API Endpoints
     description: Endpoints for the frontend API
 paths:
-  /api/username:
+  /username:
     get:
       tags:
         - API Endpoints
@@ -23,7 +23,7 @@ paths:
                 $ref: '#/components/schemas/Username'
         403:
           description: Unauthorized
-  /api/projects:
+  /projects:
     get:
       tags:
         - API Endpoints
@@ -37,7 +37,7 @@ paths:
                 $ref: '#/components/schemas/Projects'
         403:
           description: Unauthorized
-  /api/active:
+  /project/active:
     get:
       tags:
         - API Endpoints
@@ -51,7 +51,7 @@ paths:
                 $ref: '#/components/schemas/Project'
         403:
           description: Unauthorized
-  /api/get-project-meta:
+  /project/meta:
     get:
       tags:
         - API Endpoints
@@ -65,7 +65,7 @@ paths:
                 $ref: '#/components/schemas/ProjectMeta'
         403:
           description: Unauthorized
-  /api/buckets:
+  /buckets:
     get:
       tags:
         - API Endpoints
@@ -81,7 +81,7 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/objects:
+  /bucket/objects:
     get:
       tags:
         - API Endpoints
@@ -104,7 +104,7 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/dload:
+  /object/dload:
     get:
       tags:
         - API Endpoints
@@ -129,7 +129,7 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/meta:
+  /bucket/meta:
     get:
       tags:
         - API Endpoints
