@@ -112,7 +112,7 @@ async def servinit():
         aiohttp.web.get('/api/buckets', list_buckets),
         aiohttp.web.get('/api/bucket/objects', list_objects),
         aiohttp.web.get('/api/object/dload', download_object),
-        aiohttp.web.get('/api/shared', swift_list_shared_objects),
+        aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
         aiohttp.web.get('/api/project/active', get_os_active_project),

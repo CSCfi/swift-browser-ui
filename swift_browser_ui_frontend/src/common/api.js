@@ -100,7 +100,7 @@ export async function getObjects (container) {
 export async function getSharedObjects (container, url) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL( "/api/shared", document.location.origin );
+  let objUrl = new URL( "/api/shared/objects", document.location.origin );
   // Search parameter named bucket to avoid changing the API after changing
   // over from S3 to Swift
   objUrl.searchParams.append( "storageurl", url);
