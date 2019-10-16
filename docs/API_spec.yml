@@ -2,7 +2,7 @@ openapi: "3.0.2"
 info:
   title: "swift-x-account-sharing"
   description: "Database and API for storing / querying Openstack Swift ACL information"
-  version: "0.1.1"
+  version: "0.1.0"
   license:
     name: MIT
 tags:
