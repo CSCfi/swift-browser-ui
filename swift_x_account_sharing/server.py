@@ -62,7 +62,8 @@ async def init_server():
         aiohttp.web.get("/access/{user}/{container}", access_details_handler),
         aiohttp.web.get("/share/{owner}", gave_access_handler),
         aiohttp.web.get("/share/{owner}/{container}", shared_details_handler),
-        aiohttp.web.post("/share/{owner}/{container}", share_container_handler),
+        aiohttp.web.post("/share/{owner}/{container}",
+                         share_container_handler),
         aiohttp.web.patch("/share/{owner}/{contanier}", edit_share_handler),
         aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
     ])

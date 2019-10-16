@@ -1,6 +1,3 @@
-"""."""
-
-
 import setuptools
 from swift_x_account_sharing import __name__, __version__, __author__
 
