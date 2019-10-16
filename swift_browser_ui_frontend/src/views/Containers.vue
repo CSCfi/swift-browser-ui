@@ -1,5 +1,8 @@
 <template>
-  <div id="container-table" class="contents">
+  <div
+    id="container-table"
+    class="contents"
+  >
     <b-field
       grouped
       group-multiline

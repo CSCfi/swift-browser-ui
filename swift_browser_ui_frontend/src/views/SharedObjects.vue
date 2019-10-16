@@ -179,7 +179,6 @@ export default {
     fetchObjects: function () {
       // Get the object listing from the API if the listing hasn't yet 
       // been cached
-      let container = this.$route.params.container;
       this.$store.state.client.get_access_details(
         this.$route.params.user,
         this.$route.params.container,
@@ -189,13 +188,13 @@ export default {
           return getSharedObjects(
             this.$route.params.container,
             ret.address
-          )
+          );
         }
       ).then(
         (ret) => {
           this.objects = ret;
         }
-      )
+      );
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {

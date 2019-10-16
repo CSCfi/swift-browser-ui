@@ -83,7 +83,7 @@ import SharedDetails from "@/components/SharedDetails";
 
 export default {
   components: {
-    SharedDetails
+    SharedDetails,
   },
   data: function () {
     return {
@@ -92,7 +92,7 @@ export default {
       perPage: 15,
       defaultSortDirection: "asc",
       currentPage: 1,
-    }
+    };
   },
   beforeMount () {
     this.getSharedContainers();
@@ -105,6 +105,6 @@ export default {
         (ret) => {this.sharedOutList = ret;}
       );
     },
-  }
-}
+  },
+};
 </script>

@@ -1,8 +1,8 @@
 <template>
   <div id="shared-tabs">
     <b-tabs
-      type="is-toggle"
       v-model="activeTab"
+      type="is-toggle"
       expanded
       style="width:90%;margin-left:5%;margin-right:5%;"
     >
@@ -31,7 +31,7 @@ export default {
   data: function () {
     return {
       activeTab: 0,
-    }
-  }
-}
+    };
+  },
+};
 </script>
