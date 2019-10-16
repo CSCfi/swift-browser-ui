@@ -10,3 +10,13 @@ containers have been shared, by whom and to whom. The backend is meant
 to be used as a solution to centrally share the container access
 information in a given user pool, and thus isn't baked into the Openstack
 native command line tools.
+
+The default port for the service is 9090.
+
+### Usage
+```pip install . && swift-x-account-sharing```
+
+### Access
+The backend can be accessed with the API specified in the `API_spec.yml`
+file, and also with the binding modules contained in the `bindings`
+directory.
