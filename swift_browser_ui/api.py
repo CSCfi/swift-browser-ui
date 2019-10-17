@@ -10,7 +10,7 @@ from swiftclient.service import SwiftError
 from swiftclient.utils import generate_temp_url
 
 
-from ._convenience import api_check
+from ._convenience import api_check, initiate_os_service
 
 
 async def get_os_user(request):
@@ -102,6 +102,52 @@ async def swift_list_objects(request):
                 i['content_type'] = i['content_type'].replace('\u0000', '')
 
         return aiohttp.web.json_response(obj)
+    except SwiftError:
+        return aiohttp.web.json_response([])
+
+
+async def swift_list_shared_objects(request):
+    """
+    List objects in a shared container.
+
+    The function strips out e.g. the information on a success, since that's
+    not necessary in this case and returns a JSON response containing all the
+    necessary data.
+    """
+    try:
+        session = api_check(request)
+        request.app["Log"].info(
+            "API call for list shared objects from %s, sess: %s :: %s",
+            request.remote,
+            session,
+            time.ctime()
+        )
+
+        # Establish a temporary Openstack SwiftService connection
+        tmp_serv = initiate_os_service(
+            request.app["Creds"][session]["OS_sess"],
+            url=request.query["storageurl"]
+        )
+
+        obj = []
+        list(map(lambda i: obj.extend(i["listing"]),
+                 tmp_serv.list(
+                     container=request.query["container"])))
+        if not obj:
+            raise aiohttp.web.HTTPNotFound()
+
+        # Some tools leave unicode nulls to e.g. file hashes. These must be
+        # replaced as they break the utf-8 text rendering in browsers for some
+        # reason.
+        for i in obj:
+            i['hash'] = i['hash'].replace('\u0000', '')
+            if 'content_type' not in i.keys():
+                i['content_type'] = 'binary/octet-stream'
+            else:
+                i['content_type'] = i['content_type'].replace('\u0000', '')
+
+        return aiohttp.web.json_response(obj)
+
     except SwiftError:
         return aiohttp.web.json_response([])
 

@@ -2,7 +2,7 @@ openapi: "3.0.2"
 info:
   title: "swift-browser-ui-api"
   description: "Filtered proxied API from Openstack Swift used for a browser application"
-  version: "0.1.0"
+  version: "0.2.0"
   license:
     name: MIT
 tags:
@@ -100,6 +100,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Objects'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /shared/objects:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the listing for objects in a known shared container.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Objects"
         403:
           description: Unauthorized
         404:

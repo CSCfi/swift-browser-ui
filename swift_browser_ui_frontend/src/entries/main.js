@@ -17,6 +17,9 @@ import { getProjects } from "@/common/api";
 import getActiveProject from "@/common/api";
 import { changeProjectApi } from "@/common/api";
 
+// Import Sharing API
+import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
+
 // Import project state
 import store from "@/common/store";
 
@@ -87,6 +90,10 @@ new Vue({
         });
       }
     });
+    this.$store.commit(
+      "setSharingClient",
+      new SwiftXAccountSharing("http://localhost:9090")
+    );
   },
   methods: {
     getRouteAsList: function () {
