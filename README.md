@@ -17,6 +17,6 @@ The default port for the service is 9090.
 ```pip install . && swift-x-account-sharing```
 
 ### Access
-The backend can be accessed with the API specified in the `API_spec.yml`
+The backend can be accessed with the API specified in the [API_spec.yml](docs/API_spec.yml)
 file, and also with the binding modules contained in the `bindings`
 directory.
