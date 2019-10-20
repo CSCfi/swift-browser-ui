@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/CSCfi/swift-x-account-sharing.svg?branch=master)](https://travis-ci.com/CSCfi/swift-x-account-sharing)
+
 ### swift-x-account-sharing – OS swift container sharing backend
 Openstack Swift Access Control Lists don't natively implement querying
 for containers that are shared for specific user. (i.e. if the user has
