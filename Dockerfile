@@ -6,8 +6,11 @@ RUN apk add --update \
 
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
-RUN cd /root/swift_ui/swift_browser_ui_frontend \\
-    && npm install \\
+RUN cd /root/swift_ui/swift_browser_ui_frontend \
+    && git clone --verbose https://github.com/CSCfi/swift-x-account-sharing.git \
+    && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common/swift_x_account_sharing_bind.js \
+    && rm -rf swift-x-account-sharing \
+    && npm install \
     && npm run build
 
 FROM python:3.7-alpine3.9 as BACKEND
