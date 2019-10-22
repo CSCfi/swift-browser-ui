@@ -156,11 +156,34 @@ paths:
     get:
       tags:
         - API Endpoints
-      summary: Get container or object(s) metadata.
+      summary: Get container metadata.
       parameters:
       - name: container
         in: query
-        description: The container the metadata of which is to be queried, or the container in which the queried objects are.
+        description: The container the metadata of which is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meta'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /bucket/object/meta:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get object(s) metadata.
+      parameters:
+      - name: container
+        in: query
+        description: The container in which the queried objects are.
         schema:
           type: string
           example: test-container-1
@@ -181,7 +204,6 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-
 components:
   schemas:
 

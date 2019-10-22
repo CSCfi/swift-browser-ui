@@ -263,7 +263,46 @@ async def get_object_metadata(conn, meta_cont, meta_obj):
         raise aiohttp.web.HTTPNotFound()
 
 
-async def get_metadata(request):
+async def get_metadata_bucket(request):
+    """Get metadata for a container."""
+    session = api_check(request)
+    request.app['Log'].info(
+        'API cal for project listing from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    # Get required variables from query string
+    meta_cont = (
+        request.query['container']
+        if 'container' in request.query.keys()
+        else None
+    )
+    conn = request.app['Creds'][session]['ST_conn']
+    # Get container listing if no object list was specified
+    ret = conn.stat(meta_cont)
+
+    if not ret['success']:
+        raise aiohttp.web.HTTPNotFound()
+
+    # Strip any unnecessary information from the metadata headers
+    ret['headers'] = dict(filter(
+        lambda i: "x-container-meta" in i[0],
+        ret['headers'].items()
+    ))
+    ret['headers'] = {
+        k.replace("x-container-meta-", ""): v
+        for k, v in ret['headers'].items()
+    }
+
+    return aiohttp.web.json_response(
+        [ret['container'], ret['headers']]
+    )
+
+
+async def get_metadata_object(request):
     """Get metadata for a container or for an object."""
     session = api_check(request)
     request.app['Log'].info(
@@ -295,26 +334,6 @@ async def get_metadata(request):
 
     conn = request.app['Creds'][session]['ST_conn']
 
-    # Get container listing if no object list was specified
-    if not meta_obj:
-        ret = conn.stat(meta_cont)
-
-        if not ret['success']:
-            raise aiohttp.web.HTTPNotFound()
-
-        # Strip any unnecessary information from the metadata headers
-        ret['headers'] = dict(filter(
-            lambda i: "x-container-meta" in i[0],
-            ret['headers'].items()
-        ))
-        ret['headers'] = {
-            k.replace("x-container-meta-", ""): v
-            for k, v in ret['headers'].items()
-        }
-
-        return aiohttp.web.json_response(
-            [ret['container'], ret['headers']]
-        )
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
     return aiohttp.web.json_response(

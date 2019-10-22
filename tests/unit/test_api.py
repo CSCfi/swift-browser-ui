@@ -13,7 +13,8 @@ from swiftclient.service import SwiftError
 from swift_browser_ui.api import get_os_user, os_list_projects
 from swift_browser_ui.api import swift_list_buckets, swift_list_objects
 from swift_browser_ui.api import swift_download_object
-from swift_browser_ui.api import get_metadata
+from swift_browser_ui.api import get_metadata_object
+from swift_browser_ui.api import get_metadata_bucket
 from swift_browser_ui.api import get_project_metadata
 from swift_browser_ui.api import get_os_active_project
 from swift_browser_ui.settings import setd
@@ -210,7 +211,7 @@ class APITestClass(asynctest.TestCase):
         # Set up the query string
         self.request.query["container"] = "test-container-0"
 
-        resp = await get_metadata(self.request)
+        resp = await get_metadata_bucket(self.request)
         resp = json.loads(resp.text)
 
         expected = [  # nosec
@@ -248,7 +249,7 @@ class APITestClass(asynctest.TestCase):
         self.request.query["container"] = "test-container-0"
         self.request.query["object"] = objkey
 
-        resp = await get_metadata(self.request)
+        resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
         expected = [[
             objkey, {"obj-example": "example"}
@@ -285,7 +286,7 @@ class APITestClass(asynctest.TestCase):
         self.request.query["container"] = "test-container-0"
         self.request.query["object"] = objkey
 
-        resp = await get_metadata(self.request)
+        resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
 
         expected = [[  # nosec
@@ -330,7 +331,7 @@ class APITestClass(asynctest.TestCase):
             "%s,%s,%s,%s,%s" % tuple([i["name"] for i in objs])
         )
 
-        resp = await get_metadata(self.request)
+        resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
 
         comp = [
