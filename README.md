@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/CSCfi/swift-x-account-sharing.svg?branch=master)](https://travis-ci.com/CSCfi/swift-x-account-sharing)
+
 ### swift-x-account-sharing – OS swift container sharing backend
 Openstack Swift Access Control Lists don't natively implement querying
 for containers that are shared for specific user. (i.e. if the user has
@@ -17,6 +19,6 @@ The default port for the service is 9090.
 ```pip install . && swift-x-account-sharing```
 
 ### Access
-The backend can be accessed with the API specified in the `API_spec.yml`
+The backend can be accessed with the API specified in the [API_spec.yml](docs/API_spec.yml)
 file, and also with the binding modules contained in the `bindings`
 directory.
