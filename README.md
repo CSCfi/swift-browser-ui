@@ -18,7 +18,28 @@ The default port for the service is 9090.
 ### Usage
 ```pip install . && swift-x-account-sharing```
 
+The swift-x-account-sharing can use two different database styles for
+storing the sharing information. The software defaults to an in-memory
+database implemented in Python, but the preferred alternative for
+production is PostgreSQL.
+
+The PostgreSQL implementation can be enabled via environment variables,
+that are
+* SHARING_DB_POSTGRES; if found in environmen, uses PostgreSQL.
+* SHARING_DB_PASSWORD; REQUIRED; The password used in connecting to the
+  database.
+* SHARING_DB_USER; DEFAULT: sharing; The user used for the database
+  access.
+* SHARING_DB_HOST; DEFAULT: localhost; The host of the database server.
+* SHARING_DB_NAME; DEFAULT: swiftsharing; The database that the backend
+  needs to connect to.
+
 ### Access
+<<<<<<< HEAD
 The backend can be accessed with the API specified in the [API_spec.yml](docs/API_spec.yml)
 file, and also with the binding modules contained in the `bindings`
+=======
+The backend can be accessed with the API specified in the `API_spec.yml`
+file, wrapped in the binding modules contained in the `bindings`
+>>>>>>> Add envvar information to README.
 directory.
