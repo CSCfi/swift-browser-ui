@@ -18,17 +18,17 @@ class InMemDB():
         """."""
         self.shares = []
 
-    def export_to_file(self, filename):
+    async def export_to_file(self, filename):
         """Export the database to file."""
         with open(filename, "w") as f:
             f.write(json.dumps(self.shares))
 
-    def load_from_file(self, filename):
+    async def load_from_file(self, filename):
         """Load the database from file."""
         with open(filename, "r") as f:
             self.shares = json.loads("".join(f.readlines()))
 
-    def add_share(self, owner, container, userlist, access, address):
+    async def add_share(self, owner, container, userlist, access, address):
         """Add a share action to database."""
         # Now assuming that there are no duplicates
         new_shares = []
@@ -44,7 +44,7 @@ class InMemDB():
             new_shares.append(new_share)
         return new_shares
 
-    def edit_share(self, owner, container, userlist, access):
+    async def edit_share(self, owner, container, userlist, access):
         """Edit a share action in the database."""
         if not access:
             return []
@@ -70,7 +70,7 @@ class InMemDB():
                 self.shares.append(i)
         return new_shares
 
-    def delete_share(self, owner, container, userlist):
+    async def delete_share(self, owner, container, userlist):
         """Remove a share action from the database."""
         deleted = []
         for key in userlist:
@@ -84,7 +84,7 @@ class InMemDB():
                     self.shares.remove(i)
         return deleted
 
-    def get_access_list(self, user):
+    async def get_access_list(self, user):
         # Assume no duplicates
         """Get the containers that are shared to specified user."""
         access_list = []
@@ -96,7 +96,7 @@ class InMemDB():
                 })
         return access_list
 
-    def get_shared_list(self, user):
+    async def get_shared_list(self, user):
         """Get the containers that the user has shared."""
         shared_list = []
         for i in self.shares:
@@ -105,7 +105,7 @@ class InMemDB():
                     shared_list.append(i["container"])
         return shared_list
 
-    def get_access_container_details(self, user, owner, container):
+    async def get_access_container_details(self, user, owner, container):
         """Get shared container details for accessee."""
         # Required to be unique
         for i in self.shares:
@@ -117,7 +117,7 @@ class InMemDB():
                 return i
         return {}
 
-    def get_shared_container_details(self, owner, container):
+    async def get_shared_container_details(self, owner, container):
         """Get shared container details for sharer."""
         shared_containers = []
         for i in self.shares:

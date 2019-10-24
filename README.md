@@ -35,11 +35,6 @@ that are
   needs to connect to.
 
 ### Access
-<<<<<<< HEAD
 The backend can be accessed with the API specified in the [API_spec.yml](docs/API_spec.yml)
 file, and also with the binding modules contained in the `bindings`
-=======
-The backend can be accessed with the API specified in the `API_spec.yml`
-file, wrapped in the binding modules contained in the `bindings`
->>>>>>> Add envvar information to README.
 directory.

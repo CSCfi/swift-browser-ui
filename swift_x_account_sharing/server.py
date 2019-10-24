@@ -38,7 +38,7 @@ async def resume_on_start(app):
             isinstance(app["db_conn"], InMemDB)
             and os.path.exists("swift-x-account-sharing.inmemdb")
     ):
-        app["db_conn"].load_from_file("swift-x-account-sharing.inmemdb")
+        await app["db_conn"].load_from_file("swift-x-account-sharing.inmemdb")
     if isinstance(app["db_conn"], DBConn):
         await app["db_conn"].open()
 
@@ -47,7 +47,7 @@ async def save_on_shutdown(app):
     """Flush the database on shutdown."""
     # If using dict_db dump the database on disk, using default file.
     if isinstance(app["db_conn"], InMemDB):
-        app["db_conn"].export_to_file("swift-x-account-sharing.inmemdb")
+        await app["db_conn"].export_to_file("swift-x-account-sharing.inmemdb")
     if isinstance(app["db_conn"], DBConn):
         await app["db_conn"].close()
 
