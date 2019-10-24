@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-def resume_on_start(app):
+async def resume_on_start(app):
     """Resume old instance from start."""
     # If using dict_db read the database on disk, if it exists
     if (
@@ -39,6 +39,8 @@ def resume_on_start(app):
             and os.path.exists("swift-x-account-sharing.inmemdb")
     ):
         app["db_conn"].load_from_file("swift-x-account-sharing.inmemdb")
+    if isinstance(app["db_conn"], DBConn):
+        await app["db_conn"].open()
 
 
 async def save_on_shutdown(app):
@@ -47,7 +49,7 @@ async def save_on_shutdown(app):
     if isinstance(app["db_conn"], InMemDB):
         app["db_conn"].export_to_file("swift-x-account-sharing.inmemdb")
     if isinstance(app["db_conn"], DBConn):
-        app["db_conn"].close()
+        await app["db_conn"].close()
 
 
 async def init_server():
@@ -58,7 +60,7 @@ async def init_server():
 
     app["db_conn"] = DBConn()
 
-    resume_on_start(app)
+    await resume_on_start(app)
 
     app.add_routes([
         aiohttp.web.get("/access/{user}", has_access_handler),

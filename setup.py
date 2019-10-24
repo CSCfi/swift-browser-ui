@@ -15,6 +15,7 @@ setuptools.setup(
     install_requires=[
         "aiohttp",
         "uvloop",
+        "asyncpg",
     ],
     extras_require={
         "test": ["tox", "pytest", "pytest-cov", "coverage", "flake8",

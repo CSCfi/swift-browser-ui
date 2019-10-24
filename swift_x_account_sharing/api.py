@@ -16,7 +16,7 @@ async def has_access_handler(request):
 
     # Check for incorrect client query here
 
-    access_list = request.app["db_conn"].get_access_list(
+    access_list = await request.app["db_conn"].get_access_list(
         request.match_info["user"]
     )
 
@@ -34,7 +34,7 @@ async def access_details_handler(request):
 
     # Check for incorrect client query here
 
-    access_details = request.app["db_conn"].get_access_container_details(
+    access_details = await request.app["db_conn"].get_access_container_details(
         request.match_info["user"],
         request.query["owner"],
         request.match_info["container"]
@@ -54,7 +54,7 @@ async def gave_access_handler(request):
 
     # Check for incorrect client query here
 
-    shared_list = request.app["db_conn"].get_shared_list(
+    shared_list = await request.app["db_conn"].get_shared_list(
         request.match_info["owner"]
     )
 
@@ -73,7 +73,7 @@ async def shared_details_handler(request):
 
     # Check for incorrect client query here
 
-    shared_details = request.app["db_conn"].get_shared_container_details(
+    shared_details = await request.app["db_conn"].get_shared_container_details(
         request.match_info["owner"],
         request.match_info["container"]
     )
@@ -93,7 +93,7 @@ async def share_container_handler(request):
 
     # Check for incorrect client query here
 
-    shared = request.app["db_conn"].add_share(
+    shared = await request.app["db_conn"].add_share(
         request.match_info["owner"],
         request.match_info["container"],
         request.query["user"].split(","),
@@ -115,7 +115,7 @@ async def edit_share_handler(request):
 
     # Check for incorrect client query here
 
-    edited = request.app["db_conn"].edit_share(
+    edited = await request.app["db_conn"].edit_share(
         request.match_info["owner"],
         request.match_info["container"],
         request.query["user"].split(","),
@@ -136,7 +136,7 @@ async def delete_share_handler(request):
 
     # Check for incorrect client query here
 
-    deleted = request.app["db_conn"].delete_share(
+    deleted = await request.app["db_conn"].delete_share(
         request.match_info["owner"],
         request.match_info["container"],
         request.query["user"].split(",")
