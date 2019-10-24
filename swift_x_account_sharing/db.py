@@ -10,11 +10,11 @@ class DBConn:
     """Class for the account sharing database functionality."""
 
     def __init__(self):
-        """."""
+        """Initialize connection variable."""
         self.conn = None
 
     async def open(self):
-        """."""
+        """Initialize the database connection."""
         self.conn = await asyncpg.connect(
             password=os.environ.get("SHARING_DB_PASSWORD", None),
             user=os.environ.get("SHARING_DB_USER", "sharing"),
@@ -23,7 +23,7 @@ class DBConn:
         )
 
     async def close(self):
-        """."""
+        """Safely close the database connection."""
         await self.conn.close()
 
     async def _init_db(self):
@@ -39,12 +39,6 @@ class DBConn:
                     sharingdate TIMESTAMP,
                     address TEXT           NOT NULL,
                     PRIMARY KEY(container, container_owner, recipient)
-                );
-                CREATE TABLE IF NOT EXISTS Requests_FIMM(
-                    batch TEXT,
-                    recipient TEXT         NOT NULL,
-                    container_owner TEXT   NOT NULL,
-                    PRIMARY KEY(batch)
                 );
             """)
 
@@ -76,7 +70,7 @@ class DBConn:
         return True
 
     async def edit_share(self, owner, container, userlist, access):
-        """."""
+        """Edit a share action in the database."""
         async with self.conn.transaction():
             for key in userlist:
                 await self.conn.execute(
@@ -100,7 +94,7 @@ class DBConn:
         return True
 
     async def delete_share(self, owner, container, userlist):
-        """."""
+        """Delete a share action from the database."""
         async with self.conn.transaction():
             for key in userlist:
                 await self.conn.execute(
@@ -119,7 +113,7 @@ class DBConn:
         return True
 
     async def get_access_list(self, user):
-        """."""
+        """Get the containers shared to the specified user."""
         query = await self.conn.fetch(
             """
             SELECT container, container_owner
@@ -136,7 +130,7 @@ class DBConn:
         ]
 
     async def get_shared_list(self, user):
-        """."""
+        """Get the containers that the user has shared."""
         query = await self.conn.fetch(
             """
             SELECT DISTINCT container
@@ -152,7 +146,7 @@ class DBConn:
         ]
 
     async def get_access_container_details(self, user, owner, container):
-        """."""
+        """Get shared container details for share receiver."""
         query = await self.conn.fetchrow(
             """
             SELECT
@@ -190,7 +184,7 @@ class DBConn:
         }
 
     async def get_shared_container_details(self, owner, container):
-        """."""
+        """Get shared container details for sharer."""
         query = await self.conn.fetch(
             """
             SELECT
