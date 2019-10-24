@@ -57,10 +57,13 @@ if environ.get('BROWSER_DEBUG', None):
 # overloaded as necessary.
 setd = {
     "auth_endpoint_url": environ.get(
-        'BROWSER_START_AUTH_ENDPOINT_URL',
+        "BROWSER_START_AUTH_ENDPOINT_URL",
         environ.get(
-            'OS_AUTH_URL', None
+            "OS_AUTH_URL", None
         )),
+    "sharing_endpoint": environ.get(
+        "BROWSER_START_SHARING_ENDPOINT_URL", False
+    ),
     "has_trust": False,
     "logfile": None,
     "port": 8080,

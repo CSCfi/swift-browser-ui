@@ -23,6 +23,7 @@ from .api import get_metadata_object, get_metadata_bucket, get_project_metadata
 from .api import swift_list_shared_objects
 from .settings import setd
 from .middlewares import error_middleware
+from .discover import handle_discover
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -119,6 +120,11 @@ async def servinit():
         aiohttp.web.get('/api/bucket/meta', get_metadata_bucket),
         aiohttp.web.get('/api/bucket/object/meta', get_metadata_object),
         aiohttp.web.get('/api/project/meta', get_project_metadata),
+    ])
+
+    # Add discovery routes
+    app.add_routes([
+        aiohttp.web.get('/discover', handle_discover)
     ])
 
     # Add graceful shutdown handler
