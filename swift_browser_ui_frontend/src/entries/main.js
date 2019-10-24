@@ -90,10 +90,17 @@ new Vue({
         });
       }
     });
-    this.$store.commit(
-      "setSharingClient",
-      new SwiftXAccountSharing("http://localhost:9090")
-    );
+    fetch("/discover")
+    .then((resp) => {
+      return resp.json();
+    }).then((ret) => {
+      if (ret.sharing_endpoint) {
+        this.$store.commit(
+          "setSharingClient",
+          new SwiftXAccountSharing(ret.sharing_endpoint)
+        );
+      }
+    });
   },
   methods: {
     getRouteAsList: function () {
