@@ -21,6 +21,7 @@ from .api import (
     edit_share_handler,
 )
 from .dict_db import InMemDB
+from .db import DBConn
 from .cors import add_cors
 
 
@@ -45,6 +46,8 @@ async def save_on_shutdown(app):
     # If using dict_db dump the database on disk, using default file.
     if isinstance(app["db_conn"], InMemDB):
         app["db_conn"].export_to_file("swift-x-account-sharing.inmemdb")
+    if isinstance(app["db_conn"], DBConn):
+        app["db_conn"].close()
 
 
 async def init_server():
@@ -53,7 +56,7 @@ async def init_server():
         middlewares=[add_cors]
     )
 
-    app["db_conn"] = InMemDB()
+    app["db_conn"] = DBConn()
 
     resume_on_start(app)
 
