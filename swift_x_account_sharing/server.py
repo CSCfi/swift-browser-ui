@@ -58,7 +58,10 @@ async def init_server():
         middlewares=[add_cors]
     )
 
-    app["db_conn"] = DBConn()
+    if os.environ.get("SHARING_DB_POSTGRES", None):
+        app["db_conn"] = DBConn()
+    else:
+        app["db_conn"] = InMemDB()
 
     await resume_on_start(app)
 
