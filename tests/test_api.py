@@ -15,7 +15,7 @@ from swift_x_account_sharing.api import (
     gave_access_handler,
     shared_details_handler,
     share_container_handler,
-    # unshare_container_handler
+    delete_share_handler
 )
 
 
@@ -30,7 +30,7 @@ class APITestClass(asynctest.TestCase):
         self.mock_request = SimpleNamespace(**{
             "app": {
                 "db_conn":
-                    unittest.mock.MagicMock(InMemDB)()
+                    asynctest.MagicMock(InMemDB())
             },
             "query": {
                 "user": "AUTH_example",
@@ -87,8 +87,8 @@ class APITestClass(asynctest.TestCase):
             print(resp)
             self.assertEqual(resp.status, 204)
 
-    # async def test_endpoint_unshare_container_correct(self):
-    #     """Test the unshare_container endpoint for conformmity."""
-    #     with self.patch_json_dump:
-    #         resp = await unshare_container_handler(self.mock_request)
-    #         self.assertEqual(resp.status, 204)
+    async def test_endpoint_delete_share_correct(self):
+        """Test the delete_share endpoint for conformmity."""
+        with self.patch_json_dump:
+            resp = await delete_share_handler(self.mock_request)
+            self.assertEqual(resp.status, 204)
