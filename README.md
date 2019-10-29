@@ -25,8 +25,8 @@ production is PostgreSQL.
 
 The PostgreSQL implementation can be enabled via environment variables,
 that are
-* SHARING_DB_POSTGRES; if found in environmen, uses PostgreSQL.
-* SHARING_DB_PASSWORD; REQUIRED; The password used in connecting to the
+* SHARING_DB_POSTGRES; if found in environment, uses PostgreSQL.
+* SHARING_DB_PASSWORD; REQUIRED; The password used for connecting to the
   database.
 * SHARING_DB_USER; DEFAULT: sharing; The user used for the database
   access.
