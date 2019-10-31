@@ -22,13 +22,22 @@ from .api import (
 )
 from .dict_db import InMemDB
 from .db import DBConn
-from .cors import add_cors
+from .middleware import (
+    add_cors,
+    check_db_conn
+)
 
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+
+async def kill(seconds, value):
+    """Kill the application after an elapsed time."""
+    await asyncio.sleep(seconds)
+    sys.exit(value)
 
 
 async def resume_on_start(app):
@@ -55,7 +64,7 @@ async def save_on_shutdown(app):
 async def init_server():
     """Initialize the server."""
     app = aiohttp.web.Application(
-        middlewares=[add_cors]
+        middlewares=[add_cors, check_db_conn]
     )
 
     if os.environ.get("SHARING_DB_POSTGRES", None):
@@ -63,7 +72,7 @@ async def init_server():
     else:
         app["db_conn"] = InMemDB()
 
-    await resume_on_start(app)
+    asyncio.ensure_future(resume_on_start(app))
 
     app.add_routes([
         aiohttp.web.get("/access/{user}", has_access_handler),
