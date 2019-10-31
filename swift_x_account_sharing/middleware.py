@@ -19,8 +19,8 @@ async def add_cors(request, handler):
 async def check_db_conn(request, handler):
     """Check if an established database connection exists."""
     if (
-            isinstance(request.app["db_conn"], DBConn) and
-            request.app["db_conn"].conn is None
+            isinstance(request.app["db_conn"], DBConn)
+            and request.app["db_conn"].conn is None
     ):
         raise aiohttp.web.HTTPServiceUnavailable(
             reason="No database connection."

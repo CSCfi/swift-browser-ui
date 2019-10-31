@@ -54,11 +54,11 @@ async def access_details_handler(request):
     # Check for incorrect client query here
 
     try:
-        access_details = await request.app["db_conn"].get_access_container_details(
-            request.match_info["user"],
-            request.query["owner"],
-            request.match_info["container"]
-        )
+        access_details = \
+            await request.app["db_conn"].get_access_container_details(
+                request.match_info["user"],
+                request.query["owner"],
+                request.match_info["container"])
     except InterfaceError:
         handle_dropped_connection(request)
 
@@ -99,10 +99,10 @@ async def shared_details_handler(request):
     # Check for incorrect client query here
 
     try:
-        shared_details = await request.app["db_conn"].get_shared_container_details(
-            request.match_info["owner"],
-            request.match_info["container"]
-        )
+        shared_details = \
+            await request.app["db_conn"].get_shared_container_details(
+                request.match_info["owner"],
+                request.match_info["container"])
     except InterfaceError:
         handle_dropped_connection(request)
 
