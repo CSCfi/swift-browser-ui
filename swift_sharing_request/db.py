@@ -27,7 +27,7 @@ class DBConn:
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest")
                 )
-            except ConnectionError:
+            except (ConnectionError, OSError):
                 self.conn = None
                 slp = random.randint(5, 15)  # noseq
                 self.log.log(
