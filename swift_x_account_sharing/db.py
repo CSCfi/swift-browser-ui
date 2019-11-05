@@ -31,13 +31,18 @@ class DBConn:
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing")
                 )
-            except (ConnectionError, OSError):
+            except (ConnectionError, OSError) as exp:
                 self.conn = None
                 slp = random.randint(5, 15)  # noseq
                 self.log.error(
                     "Failed to establish database connection. "
                     "Retrying in %s seconds...",
                     slp
+                )
+                self.log.log(
+                    logging.ERROR,
+                    "Failure information: %s",
+                    str(exp)
                 )
                 await asyncio.sleep(slp)
 
