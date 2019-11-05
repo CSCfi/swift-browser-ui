@@ -31,7 +31,7 @@ class DBConn:
                 self.conn = None
                 slp = random.randint(5, 15)  # noseq
                 self.log.log(
-                    logging.error,
+                    logging.ERROR,
                     "Failed to establish database connection. "
                     "Retrying in %d seconds...",
                     slp
