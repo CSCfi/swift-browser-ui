@@ -43,6 +43,10 @@ class DBConn:
         if self.conn is not None:
             await self.conn.close()
 
+    async def erase(self):
+        """Erase a failed connection."""
+        self.conn = None
+
     async def add_request(self, user, container, owner):
         """Add an access request to the database."""
         async with self.conn.transaction():
