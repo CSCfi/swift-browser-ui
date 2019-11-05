@@ -42,6 +42,21 @@ class DBConn:
                     str(exp)
                 )
                 await asyncio.sleep(slp)
+            except asyncpg.InvalidPasswordError as exp:
+                self.log.log(
+                    logging.ERROR,
+                    "Invalid password for database. Info: %s",
+                    str(exp)
+                )
+                self.log.log(
+                    logging.ERROR,
+                    "User: %s, Password: %s",
+                    os.environ.get("REQUEST_DB_USER", "request"),
+                    os.environ.get("REQUEST_DB_PASSWORD", None)
+                )
+                self.conn = None
+                slp = random.randint(5, 15)
+                await asyncio.sleep(slp)
 
     async def close(self):
         """Gracefully close the database."""
