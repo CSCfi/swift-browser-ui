@@ -19,6 +19,7 @@ from .api import (
     handle_container_request_listing,
     handle_user_share_request_delete
 )
+from .db import DBConn
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,6 +42,8 @@ async def init_server():
     app = aiohttp.web.Application(
         middlewares=[add_cors, check_db_conn]
     )
+
+    app["db_conn"] = DBConn()
 
     app.add_routes([
         aiohttp.web.post("/request/user/{user}/{container}",
