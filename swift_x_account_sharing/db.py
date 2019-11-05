@@ -31,7 +31,7 @@ class DBConn:
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing")
                 )
-            except ConnectionError:
+            except (ConnectionError, OSError):
                 self.conn = None
                 slp = random.randint(5, 15)  # noseq
                 self.log.error(
