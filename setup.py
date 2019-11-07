@@ -21,7 +21,7 @@ setuptools.setup(
         "test": ["tox", "pytest", "pytest-cov", "coverage", "flake8",
                  "flake8-docstrings", "asynctest"],
     },
-    packages=[__name__],
+    packages=["swift_sharing_request", "swift_sharing_request.bindings"],
     platforms="any",
     entry_points={
         "console_scripts": [
