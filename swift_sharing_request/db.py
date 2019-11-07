@@ -98,7 +98,14 @@ class DBConn:
             """,
             user
         )
-        return query
+        return [
+            {
+                "container": rec["container"],
+                "user": rec["recipient"],
+                "owner": rec["container_owner"],
+                "date": rec["created"].isoformat(),
+            } for rec in query
+        ]
 
     async def get_request_made(self, user):
         """Get the requests made by the getter."""
@@ -111,7 +118,14 @@ class DBConn:
             """,
             user
         )
-        return query
+        return [
+            {
+                "container": rec["container"],
+                "user": rec["recipient"],
+                "owner": rec["container_owner"],
+                "date": rec["created"].isoformat(),
+            } for rec in query
+        ]
 
     async def get_request_container(self, container):
         """Get the requests made for a container."""
@@ -124,7 +138,14 @@ class DBConn:
             """,
             container
         )
-        return query
+        return [
+            {
+                "container": rec["container"],
+                "user": rec["recipient"],
+                "owner": rec["container_owner"],
+                "date": rec["created"].isoformat(),
+            } for rec in query
+        ]
 
     async def delete_request(self, container, owner, recipient):
         """Delete an access request from the database."""
