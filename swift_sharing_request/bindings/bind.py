@@ -8,7 +8,7 @@ import aiohttp
 
 
 class SwiftSharingRequest:
-    """Swift X Account Sharing backend client."""
+    """Swift Sharing Request backend client."""
 
     def __init__(self, url):
         """."""
@@ -25,7 +25,7 @@ class SwiftSharingRequest:
 
     async def add_access_request(self, user, container, owner):
         """Add a request for container access."""
-        url = "{0}/request/user/{user}/{container}".format(
+        url = "{0}/request/user/{1}/{2}".format(
             self.url,
             user,
             container

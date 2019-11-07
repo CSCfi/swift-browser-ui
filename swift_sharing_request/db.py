@@ -29,7 +29,7 @@ class DBConn:
                 )
             except (ConnectionError, OSError) as exp:
                 self.conn = None
-                slp = random.randint(5, 15)  # noseq
+                slp = random.randint(5, 15)  # nosec
                 self.log.log(
                     logging.ERROR,
                     "Failed to establish database connection. "
@@ -50,12 +50,11 @@ class DBConn:
                 )
                 self.log.log(
                     logging.ERROR,
-                    "User: %s, Password: %s",
+                    "User: %s",
                     os.environ.get("REQUEST_DB_USER", "request"),
-                    os.environ.get("REQUEST_DB_PASSWORD", None)
                 )
                 self.conn = None
-                slp = random.randint(5, 15)
+                slp = random.randint(5, 15)  # nosec
                 await asyncio.sleep(slp)
 
     async def close(self):
@@ -66,6 +65,19 @@ class DBConn:
     async def erase(self):
         """Erase a failed connection."""
         self.conn = None
+
+    @staticmethod
+    async def parse_query(query):
+        """Parse a database query list to JSON serializable form."""
+        return [
+            {
+                "container": rec["container"],
+                "user": rec["recipient"],
+                "owner": rec["container_owner"],
+                "date": rec["created"].isoformat(),
+            } for rec in query
+        ]
+
 
     async def add_request(self, user, container, owner):
         """Add an access request to the database."""
@@ -98,14 +110,7 @@ class DBConn:
             """,
             user
         )
-        return [
-            {
-                "container": rec["container"],
-                "user": rec["recipient"],
-                "owner": rec["container_owner"],
-                "date": rec["created"].isoformat(),
-            } for rec in query
-        ]
+        return await self.parse_query(query)
 
     async def get_request_made(self, user):
         """Get the requests made by the getter."""
@@ -118,14 +123,7 @@ class DBConn:
             """,
             user
         )
-        return [
-            {
-                "container": rec["container"],
-                "user": rec["recipient"],
-                "owner": rec["container_owner"],
-                "date": rec["created"].isoformat(),
-            } for rec in query
-        ]
+        return await self.parse_query(query)
 
     async def get_request_container(self, container):
         """Get the requests made for a container."""
@@ -138,14 +136,7 @@ class DBConn:
             """,
             container
         )
-        return [
-            {
-                "container": rec["container"],
-                "user": rec["recipient"],
-                "owner": rec["container_owner"],
-                "date": rec["created"].isoformat(),
-            } for rec in query
-        ]
+        return await self.parse_query(query)
 
     async def delete_request(self, container, owner, recipient):
         """Delete an access request from the database."""
