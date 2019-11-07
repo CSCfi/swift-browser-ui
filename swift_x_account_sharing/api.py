@@ -2,12 +2,28 @@
 
 
 import logging
-
+import asyncio
 
 import aiohttp.web
+from asyncpg import InterfaceError
 
 
 MODULE_LOGGER = logging.getLogger("api")
+
+
+def handle_dropped_connection(request):
+    """Handle dropped database connection."""
+    MODULE_LOGGER.log(
+        logging.ERROR,
+        "Lost database connection, reconnecting..."
+    )
+    request.app["db_conn"].erase()
+    asyncio.ensure_future(
+        request.app["db_conn"].open()
+    )
+    raise aiohttp.web.HTTPServiceUnavailable(
+        reason="No database connection."
+    )
 
 
 async def has_access_handler(request):
@@ -16,9 +32,12 @@ async def has_access_handler(request):
 
     # Check for incorrect client query here
 
-    access_list = request.app["db_conn"].get_access_list(
-        request.match_info["user"]
-    )
+    try:
+        access_list = await request.app["db_conn"].get_access_list(
+            request.match_info["user"]
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -34,11 +53,14 @@ async def access_details_handler(request):
 
     # Check for incorrect client query here
 
-    access_details = request.app["db_conn"].get_access_container_details(
-        request.match_info["user"],
-        request.query["owner"],
-        request.match_info["container"]
-    )
+    try:
+        access_details = \
+            await request.app["db_conn"].get_access_container_details(
+                request.match_info["user"],
+                request.query["owner"],
+                request.match_info["container"])
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -54,9 +76,12 @@ async def gave_access_handler(request):
 
     # Check for incorrect client query here
 
-    shared_list = request.app["db_conn"].get_shared_list(
-        request.match_info["owner"]
-    )
+    try:
+        shared_list = await request.app["db_conn"].get_shared_list(
+            request.match_info["owner"]
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -73,10 +98,13 @@ async def shared_details_handler(request):
 
     # Check for incorrect client query here
 
-    shared_details = request.app["db_conn"].get_shared_container_details(
-        request.match_info["owner"],
-        request.match_info["container"]
-    )
+    try:
+        shared_details = \
+            await request.app["db_conn"].get_shared_container_details(
+                request.match_info["owner"],
+                request.match_info["container"])
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -93,13 +121,16 @@ async def share_container_handler(request):
 
     # Check for incorrect client query here
 
-    shared = request.app["db_conn"].add_share(
-        request.match_info["owner"],
-        request.match_info["container"],
-        request.query["user"].split(","),
-        request.query["access"].split(","),
-        request.query["address"]
-    )
+    try:
+        shared = await request.app["db_conn"].add_share(
+            request.match_info["owner"],
+            request.match_info["container"],
+            request.query["user"].split(","),
+            request.query["access"].split(","),
+            request.query["address"]
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -115,12 +146,15 @@ async def edit_share_handler(request):
 
     # Check for incorrect client query here
 
-    edited = request.app["db_conn"].edit_share(
-        request.match_info["owner"],
-        request.match_info["container"],
-        request.query["user"].split(","),
-        request.query["access"].split(",")
-    )
+    try:
+        edited = await request.app["db_conn"].edit_share(
+            request.match_info["owner"],
+            request.match_info["container"],
+            request.query["user"].split(","),
+            request.query["access"].split(",")
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -136,11 +170,14 @@ async def delete_share_handler(request):
 
     # Check for incorrect client query here
 
-    deleted = request.app["db_conn"].delete_share(
-        request.match_info["owner"],
-        request.match_info["container"],
-        request.query["user"].split(",")
-    )
+    try:
+        deleted = await request.app["db_conn"].delete_share(
+            request.match_info["owner"],
+            request.match_info["container"],
+            request.query["user"].split(",")
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,

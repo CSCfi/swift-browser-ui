@@ -9,18 +9,18 @@ class SwiftXAccountSharing {
     this.address = address;
   }
 
-  _parse_list_string (
-    to_parse
+  _parseListString (
+    toParse
   ) {
     // Parse the JS list into comma separated values in string.
     let ret = "";
-    to_parse.forEach(user => {
+    toParse.forEach(user => {
       ret = ret.concat(user, ",");
     });
     return ret.slice(0, ret.length - 1);
   }
 
-  async get_access (
+  async getAccess (
     username
   ) {
     // List the containers the user has been given access to.
@@ -33,7 +33,7 @@ class SwiftXAccountSharing {
     return containers;
   }
 
-  async get_access_details (
+  async getAccessDetails (
     username,
     container,
     owner
@@ -51,7 +51,7 @@ class SwiftXAccountSharing {
     return details;
   }
 
-  async get_share (
+  async getShare (
     username
   ) {
     // List the containers the user has shared to another user / users.
@@ -64,7 +64,7 @@ class SwiftXAccountSharing {
     return shared;
   }
 
-  async get_share_details(
+  async getShareDetails(
     username,
     container
   ) {
@@ -80,7 +80,7 @@ class SwiftXAccountSharing {
     return details;
   }
 
-  async share_new_access(
+  async shareNewAccess(
     username,
     container,
     userlist,
@@ -91,8 +91,8 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/share/".concat(username, "/", container), this.address
     );
-    url.searchParams.append("user", this._parse_list_string(userlist));
-    url.searchParams.append("access", this._parse_list_string(accesslist));
+    url.searchParams.append("user", this._parseListString(userlist));
+    url.searchParams.append("access", this._parseListString(accesslist));
     url.searchParams.append("address", address);
     let shared = fetch(
       url, {method: "POST"}
@@ -102,7 +102,7 @@ class SwiftXAccountSharing {
     return shared;
   }
 
-  async share_edit_access(
+  async shareEditAccess(
     username,
     container,
     userlist,
@@ -112,8 +112,8 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/share/".concat(username, "/", container), this.address
     );
-    url.searchParams.append("user", this._parse_list_string(userlist));
-    url.searchParams.append("access", this._parse_list_string(accesslist));
+    url.searchParams.append("user", this._parseListString(userlist));
+    url.searchParams.append("access", this._parseListString(accesslist));
     let shared = fetch(
       url, {method: "PATCH"}
     ).then(
@@ -122,7 +122,7 @@ class SwiftXAccountSharing {
     return shared;
   }
 
-  async share_delete_access(
+  async shareDeleteAccess(
     username,
     container,
     userlist
@@ -131,7 +131,7 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/share/".concat(username, "/", container), this.address
     );
-    url.searchParams.append("user", this._parse_list_string(userlist));
+    url.searchParams.append("user", this._parseListString(userlist));
     let deleted = fetch(
       url, {method: "DELETE"}
     ).then(
