@@ -30,7 +30,8 @@ class SwiftSharingRequest {
   async listMadeRequests(
     username
   ) {
-    let url = new URL("/request/user/".concat(username));
+    let url = new URL("/request/user/".concat(username),
+                      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -42,7 +43,8 @@ class SwiftSharingRequest {
   async listOwnedRequests(
     username
   ) {
-    let url = new URL("/request/owner/".concat(username));
+    let url = new URL("/request/owner/".concat(username),
+                      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -54,7 +56,8 @@ class SwiftSharingRequest {
   async listContainerRequests(
     container
   ) {
-    let url = new URL("/request/container/".concat(container));
+    let url = new URL("/request/container/".concat(container),
+                      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -70,7 +73,7 @@ class SwiftSharingRequest {
   ) {
     // Delete the details of an existing share action.
     let url = new URL(
-    "/request/user/".concat(username, "/", container), this.address
+      "/request/user/".concat(username, "/", container), this.address
     );
     url.searchParams.append("owner", owner);
     let deleted = fetch(
