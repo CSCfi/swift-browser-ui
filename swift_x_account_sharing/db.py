@@ -33,7 +33,7 @@ class DBConn:
                 )
             except (ConnectionError, OSError) as exp:
                 self.conn = None
-                slp = random.randint(5, 15)  # noseq
+                slp = random.randint(5, 15)  # nosec
                 self.log.error(
                     "Failed to establish database connection. "
                     "Retrying in %s seconds...",
@@ -53,34 +53,17 @@ class DBConn:
                 )
                 self.log.log(
                     logging.ERROR,
-                    "User: %s, Password: %s",
+                    "User: %s",
                     os.environ.get("SHARING_DB_USER", "request"),
-                    os.environ.get("SHARING_DB_PASSWORD", None)
                 )
                 self.conn = None
-                slp = random.randint(5, 15)
+                slp = random.randint(5, 15)  # nosec
                 await asyncio.sleep(slp)
 
     async def close(self):
         """Safely close the database connection."""
         if self.conn is not None:
             await self.conn.close()
-
-    async def _init_db(self):
-        """Create the database with the wanted schema if it doesn't exist."""
-        async with self.conn.transaction():
-            self.conn.execute("""
-                CREATE TABLE IF NOT EXISTS Shares(
-                    container TEXT,
-                    container_owner TEXT,
-                    recipient TEXT,
-                    r_read BOOL,
-                    r_write BOOL,
-                    sharingdate TIMESTAMP,
-                    address TEXT           NOT NULL,
-                    PRIMARY KEY(container, container_owner, recipient)
-                );
-            """)
 
     async def add_share(self, owner, container, userlist, access, address):
         """Add a share action to the database."""

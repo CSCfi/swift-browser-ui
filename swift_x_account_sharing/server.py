@@ -34,12 +34,6 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def kill(seconds, value):
-    """Kill the application after an elapsed time."""
-    await asyncio.sleep(seconds)
-    sys.exit(value)
-
-
 async def resume_on_start(app):
     """Resume old instance from start."""
     # If using dict_db read the database on disk, if it exists
@@ -72,8 +66,6 @@ async def init_server():
     else:
         app["db_conn"] = InMemDB()
 
-    asyncio.ensure_future(resume_on_start(app))
-
     app.add_routes([
         aiohttp.web.get("/access/{user}", has_access_handler),
         aiohttp.web.get("/access/{user}/{container}", access_details_handler),
@@ -85,6 +77,7 @@ async def init_server():
         aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
     ])
 
+    app.on_startup.append(resume_on_start)
     app.on_shutdown.append(save_on_shutdown)
 
     return app
