@@ -2,6 +2,9 @@
 
 
 import os
+import logging
+import asyncio
+import random
 
 import asyncpg
 
@@ -12,19 +15,56 @@ class DBConn:
     def __init__(self):
         """Initialize connection variable."""
         self.conn = None
+        self.log = logging.getLogger("db")
+
+    def erase(self):
+        """Erase the connection."""
+        self.conn = None
 
     async def open(self):
         """Initialize the database connection."""
-        self.conn = await asyncpg.connect(
-            password=os.environ.get("SHARING_DB_PASSWORD", None),
-            user=os.environ.get("SHARING_DB_USER", "sharing"),
-            host=os.environ.get("SHARING_DB_HOST", "localhost"),
-            database=os.environ.get("SHARING_DB_NAME", "swiftsharing")
-        )
+        while self.conn is None:
+            try:
+                self.conn = await asyncpg.connect(
+                    password=os.environ.get("SHARING_DB_PASSWORD", None),
+                    user=os.environ.get("SHARING_DB_USER", "sharing"),
+                    host=os.environ.get("SHARING_DB_HOST", "localhost"),
+                    database=os.environ.get("SHARING_DB_NAME", "swiftsharing")
+                )
+            except (ConnectionError, OSError) as exp:
+                self.conn = None
+                slp = random.randint(5, 15)  # noseq
+                self.log.error(
+                    "Failed to establish database connection. "
+                    "Retrying in %s seconds...",
+                    slp
+                )
+                self.log.log(
+                    logging.ERROR,
+                    "Failure information: %s",
+                    str(exp)
+                )
+                await asyncio.sleep(slp)
+            except asyncpg.InvalidPasswordError as exp:
+                self.log.log(
+                    logging.ERROR,
+                    "Invalid password for database. Info: %s",
+                    str(exp)
+                )
+                self.log.log(
+                    logging.ERROR,
+                    "User: %s, Password: %s",
+                    os.environ.get("SHARING_DB_USER", "request"),
+                    os.environ.get("SHARING_DB_PASSWORD", None)
+                )
+                self.conn = None
+                slp = random.randint(5, 15)
+                await asyncio.sleep(slp)
 
     async def close(self):
         """Safely close the database connection."""
-        await self.conn.close()
+        if self.conn is not None:
+            await self.conn.close()
 
     async def _init_db(self):
         """Create the database with the wanted schema if it doesn't exist."""
