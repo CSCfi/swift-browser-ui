@@ -32,12 +32,12 @@ async def handle_share_request_post(request):
 
     # Check for incorrect client query here
 
-    container = request.match_info("container")
-    user = request.match_info("user")
+    container = request.match_info["container"]
+    user = request.match_info["user"]
     owner = request.query["owner"]
 
     try:
-        request.app["db_conn"].add_request(
+        await request.app["db_conn"].add_request(
             user,
             container,
             owner
@@ -59,10 +59,10 @@ async def handle_user_owned_request_listing(request):
 
     # Check for incorrect client query here
 
-    user = request.match_info("user")
+    user = request.match_info["user"]
 
     try:
-        ret = request.app["db_conn"].get_request_owned(user)
+        ret = await request.app["db_conn"].get_request_owned(user)
     except InterfaceError:
         handle_dropped_connection(request)
 
@@ -75,10 +75,10 @@ async def handle_user_made_request_listing(request):
 
     # Check for incorrect client query here
 
-    user = request.match_info("user")
+    user = request.match_info["user"]
 
     try:
-        ret = request.app["db_conn"].get_request_made(user)
+        ret = await request.app["db_conn"].get_request_made(user)
     except InterfaceError:
         handle_dropped_connection(request)
 
@@ -91,10 +91,10 @@ async def handle_container_request_listing(request):
 
     # Check for incorrect client query here
 
-    container = request.match_info("container")
+    container = request.match_info["container"]
 
     try:
-        ret = request.app["db_conn"].get_request_container(container)
+        ret = await request.app["db_conn"].get_request_container(container)
     except InterfaceError:
         handle_dropped_connection(request)
 
@@ -107,12 +107,12 @@ async def handle_user_share_request_delete(request):
 
     # Check for incorrect client query here
 
-    container = request.match_info("container")
-    user = request.match_info("user")
+    container = request.match_info["container"]
+    user = request.match_info["user"]
     owner = request.query["owner"]
 
     try:
-        request.app["db_conn"].delete_request(container, owner, user)
+        await request.app["db_conn"].delete_request(container, owner, user)
     except InterfaceError:
         handle_dropped_connection(request)
 

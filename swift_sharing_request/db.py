@@ -27,21 +27,57 @@ class DBConn:
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest")
                 )
-            except ConnectionError:
+            except (ConnectionError, OSError) as exp:
                 self.conn = None
-                slp = random.randint(5, 15)  # noseq
+                slp = random.randint(5, 15)  # nosec
                 self.log.log(
-                    logging.error,
+                    logging.ERROR,
                     "Failed to establish database connection. "
                     "Retrying in %d seconds...",
                     slp
                 )
+                self.log.log(
+                    logging.ERROR,
+                    "Failure information: %s",
+                    str(exp)
+                )
+                await asyncio.sleep(slp)
+            except asyncpg.InvalidPasswordError as exp:
+                self.log.log(
+                    logging.ERROR,
+                    "Invalid password for database. Info: %s",
+                    str(exp)
+                )
+                self.log.log(
+                    logging.ERROR,
+                    "User: %s",
+                    os.environ.get("REQUEST_DB_USER", "request"),
+                )
+                self.conn = None
+                slp = random.randint(5, 15)  # nosec
                 await asyncio.sleep(slp)
 
     async def close(self):
         """Gracefully close the database."""
         if self.conn is not None:
             await self.conn.close()
+
+    async def erase(self):
+        """Erase a failed connection."""
+        self.conn = None
+
+    @staticmethod
+    async def parse_query(query):
+        """Parse a database query list to JSON serializable form."""
+        return [
+            {
+                "container": rec["container"],
+                "user": rec["recipient"],
+                "owner": rec["container_owner"],
+                "date": rec["created"].isoformat(),
+            } for rec in query
+        ]
+
 
     async def add_request(self, user, container, owner):
         """Add an access request to the database."""
@@ -74,7 +110,7 @@ class DBConn:
             """,
             user
         )
-        return query
+        return await self.parse_query(query)
 
     async def get_request_made(self, user):
         """Get the requests made by the getter."""
@@ -87,7 +123,7 @@ class DBConn:
             """,
             user
         )
-        return query
+        return await self.parse_query(query)
 
     async def get_request_container(self, container):
         """Get the requests made for a container."""
@@ -100,7 +136,7 @@ class DBConn:
             """,
             container
         )
-        return query
+        return await self.parse_query(query)
 
     async def delete_request(self, container, owner, recipient):
         """Delete an access request from the database."""
