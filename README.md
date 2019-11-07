@@ -12,7 +12,7 @@ environment variables:
 REQUEST_DB_PASSWORD="database password"
 REQUEST_DB_USER="database user"
 REQUEST_DB_HOST="database host"
-REQUEST_DB_DATABASE="the databse used by swift-sharing-request"
+REQUEST_DB_DATABASE="the database used by swift-sharing-request"
 ```
 
 Swift-sharing-request can be run with the following command after all the
