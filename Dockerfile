@@ -11,7 +11,6 @@ COPY swift_x_account_sharing /root/swift_sharing/swift_x_account_sharing
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_sharing/requirements.txt \
-    && pip install gunicorn \
     && pip install /root/swift_sharing
 
 FROM python:3.7-alpine3.9
