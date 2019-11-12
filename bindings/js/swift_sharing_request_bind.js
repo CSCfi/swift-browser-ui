@@ -1,22 +1,22 @@
 // Swift cross account container sharing API JavaScript bindings module.
 
 class SwiftSharingRequest {
-// Swift sharing request backend client.
-
+  // Swift sharing request backend client.
+  
   constructor (
-      address
+    address
   ) {
-      this.address = address;
+    this.address = address;
   }
 
   async addAccessRequest(
-      username,
-      container,
-      owner
+    username,
+    container,
+    owner
   ) {
     // Add a request for container access.
     let url = new URL("/request/user/".concat(username, "/", container),
-                      this.address);
+      this.address);
     url.searchParams.append("owner", owner);
 
     let resp = fetch(
@@ -31,7 +31,7 @@ class SwiftSharingRequest {
     username
   ) {
     let url = new URL("/request/user/".concat(username),
-                      this.address);
+      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -44,7 +44,7 @@ class SwiftSharingRequest {
     username
   ) {
     let url = new URL("/request/owner/".concat(username),
-                      this.address);
+      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -57,7 +57,7 @@ class SwiftSharingRequest {
     container
   ) {
     let url = new URL("/request/container/".concat(container),
-                      this.address);
+      this.address);
     let resp = fetch(
       url, {method: "GET"}
     ).then(
@@ -67,9 +67,9 @@ class SwiftSharingRequest {
   }
 
   async shareDeleteAccess(
-      username,
-      container,
-      owner
+    username,
+    container,
+    owner
   ) {
     // Delete the details of an existing share action.
     let url = new URL(
