@@ -62,6 +62,17 @@
         >
           {{ getHumanReadableDate( props.row.date ) }}
         </b-table-column>
+        <b-table-column
+          field="delete"
+          label=""
+        >
+          <button
+            class="button is-danger"
+            @click="deleteShareRequest(props.row.container, props.row.owner)"
+          >
+            Cancel
+          </button>
+        </b-table-column>
       </template>
     </b-table>
   </div>
@@ -115,6 +126,16 @@ export default {
         (ret) => {this.requestedSharesList = ret;}
       );
     },
+    deleteShareRequest: function(
+      container,
+      owner
+    ) {
+      this.$store.state.requestClient.shareDeleteAccess(
+        this.$route.params.user,
+        container,
+        owner,
+      )
+    }
   }
 }
 </script>
