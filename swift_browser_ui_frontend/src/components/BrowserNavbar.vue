@@ -62,7 +62,10 @@
               </router-link>
             </div>
           </div>
-          <div class="navbar-item">
+          <div
+            class="navbar-item"
+            v-if="$store.state.client"
+          >
             <div class="buttons">
               <router-link
                 v-if="$route.params.project"

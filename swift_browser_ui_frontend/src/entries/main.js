@@ -17,8 +17,9 @@ import { getProjects } from "@/common/api";
 import getActiveProject from "@/common/api";
 import { changeProjectApi } from "@/common/api";
 
-// Import Sharing API
+// Import Sharing and Request API
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
+import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import project state
 import store from "@/common/store";
@@ -91,16 +92,22 @@ new Vue({
       }
     });
     fetch("/discover")
-    .then((resp) => {
-      return resp.json();
-    }).then((ret) => {
-      if (ret.sharing_endpoint) {
-        this.$store.commit(
-          "setSharingClient",
-          new SwiftXAccountSharing(ret.sharing_endpoint)
-        );
-      }
-    });
+      .then((resp) => {
+        return resp.json();
+      }).then((ret) => {
+        if (ret.sharing_endpoint) {
+          this.$store.commit(
+            "setSharingClient",
+            new SwiftXAccountSharing(ret.sharing_endpoint)
+          );
+        }
+        if (ret.request_endpoint) {
+          this.$store.commit(
+            "setRequestClient",
+            new SwiftSharingRequest(ret.request_endpoint)
+          );
+        }
+      });
   },
   methods: {
     getRouteAsList: function () {

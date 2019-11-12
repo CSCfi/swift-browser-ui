@@ -12,6 +12,12 @@
       <b-tab-item :label="$t('message.share.from_me')">
         <SharedOutTable />
       </b-tab-item>
+      <b-tab-item
+        v-if="$store.state.requestClient"
+        :label="'Request sharing'"
+      >
+        <RequestSharing />
+      </b-tab-item>
     </b-tabs>
   </div>
 </template>
@@ -21,12 +27,15 @@
 import SharedTable from "@/components/SharedTable";
 // Import table for the containers shared by the querying user
 import SharedOutTable from "@/components/SharedOutTable";
+// Import table for requesting access to a container
+import RequestSharing from "@/components/RequestSharing";
 
 export default {
   name: "Shared",
   components: {
     SharedTable,
     SharedOutTable,
+    RequestSharing,
   },
   data: function () {
     return {

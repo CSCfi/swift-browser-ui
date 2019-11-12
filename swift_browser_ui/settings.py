@@ -62,7 +62,10 @@ setd = {
             "OS_AUTH_URL", None
         )),
     "sharing_endpoint": environ.get(
-        "BROWSER_START_SHARING_ENDPOINT_URL", False
+        "BROWSER_START_SHARING_ENDPOINT_URL", None
+    ),
+    "request_endpoint": environ.get(
+        "BROWSER_START_REQUEST_ENDPOINT_URL", None
     ),
     "has_trust": False,
     "logfile": None,
