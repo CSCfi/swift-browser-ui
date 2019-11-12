@@ -20,6 +20,7 @@ from .api import (
     handle_user_share_request_delete
 )
 from .db import DBConn
+from .preflight import handle_delete_preflight
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -46,6 +47,8 @@ async def init_server():
     app["db_conn"] = DBConn()
 
     app.add_routes([
+        aiohttp.web.options("/request/user/{user}/{container}",
+                            handle_delete_preflight),
         aiohttp.web.post("/request/user/{user}/{container}",
                          handle_share_request_post),
         aiohttp.web.delete("/request/user/{user}/{container}",
