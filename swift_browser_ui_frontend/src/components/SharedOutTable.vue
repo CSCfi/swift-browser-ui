@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     getSharedContainers: function () {
-      this.$store.state.client.get_share(
+      this.$store.state.client.getShare(
         this.$route.params.user
       ).then(
         (ret) => {this.sharedOutList = ret;}

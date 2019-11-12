@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     getSharedDetails: function () {
-      this.$store.state.client.get_share_details(
+      this.$store.state.client.getShareDetails(
         this.$route.params.user,
         this.container
       ).then((ret) => {
