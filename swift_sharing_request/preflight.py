@@ -9,7 +9,7 @@ async def handle_delete_preflight(_):
     resp = aiohttp.web.Response(
         headers={
             "Access-Control-Allow-Methods": "POST, OPTIONS, DELETE",
-            "Access-Control-Max-Age": 84600,
+            "Access-Control-Max-Age": "84600",
         }
     )
     return resp
