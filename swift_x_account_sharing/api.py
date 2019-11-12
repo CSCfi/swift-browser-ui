@@ -53,16 +53,6 @@ async def access_details_handler(request):
 
     # Check for incorrect client query here
 
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "User: " + request.match_info["user"])
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Onwer: " + request.query["owner"])
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Container: " + request.match_info["container"])
-
     try:
         access_details = \
             await request.app["db_conn"].get_access_container_details(
