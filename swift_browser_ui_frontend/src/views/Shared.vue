@@ -30,7 +30,7 @@ import SharedTable from "@/components/SharedTable";
 import SharedOutTable from "@/components/SharedOutTable";
 // Import table for requesting access to a container
 import RequestSharing from "@/components/RequestSharing";
-import ShareRequests from "@/components/ShareRequests"
+import ShareRequests from "@/components/ShareRequests";
 
 export default {
   name: "Shared",

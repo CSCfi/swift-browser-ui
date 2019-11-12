@@ -40,7 +40,6 @@
 <script>
 export default {
   name: "RequestSharing",
-  components: [ShareRequests],
   data () {
     return {
       container: "",
