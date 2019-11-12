@@ -1,3 +1,4 @@
 asyncpg
 aiohttp
 uvloop
+gunicorn==19.9.0

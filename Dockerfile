@@ -11,7 +11,6 @@ COPY swift_sharing_request /root/swift_request/swift_sharing_request
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_request/requirements.txt \
-    && pip install gunicorn \
     && pip install /root/swift_request
 
 FROM python:3.7-alpine3.9
