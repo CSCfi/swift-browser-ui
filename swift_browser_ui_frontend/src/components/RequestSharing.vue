@@ -34,14 +34,10 @@
         </button>
       </p>
     </b-field>
-    <ShareRequests />
   </section>
 </template>
 
 <script>
-
-import ShareRequests from "@/components/ShareRequests";
-
 export default {
   name: "RequestSharing",
   components: [ShareRequests],

@@ -17,6 +17,7 @@
         :label="'Request sharing'"
       >
         <RequestSharing />
+        <ShareRequests />
       </b-tab-item>
     </b-tabs>
   </div>
@@ -29,6 +30,7 @@ import SharedTable from "@/components/SharedTable";
 import SharedOutTable from "@/components/SharedOutTable";
 // Import table for requesting access to a container
 import RequestSharing from "@/components/RequestSharing";
+import ShareRequests from "@/components/ShareRequests"
 
 export default {
   name: "Shared",
@@ -36,6 +38,7 @@ export default {
     SharedTable,
     SharedOutTable,
     RequestSharing,
+    ShareRequests,
   },
   data: function () {
     return {
