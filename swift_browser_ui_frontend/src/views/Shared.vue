@@ -6,10 +6,14 @@
       expanded
       style="width:90%;margin-left:5%;margin-right:5%;"
     >
-      <b-tab-item :label="$t('message.share.to_me')">
+      <b-tab-item
+        :label="$t('message.share.to_me')"
+      >
         <SharedTable />
       </b-tab-item>
-      <b-tab-item :label="$t('message.share.from_me')">
+      <b-tab-item
+        :label="$t('message.share.from_me')"
+      >
         <SharedOutTable />
       </b-tab-item>
       <b-tab-item
