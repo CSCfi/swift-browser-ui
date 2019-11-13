@@ -67,14 +67,14 @@
           label=""
           width="40"
         >
-          <button
-            class="button is-danger"
+          <b-button
+            type="is-danger"
             @click="deleteShareRequest(props.row.container, props.row.owner)"
             outlined
             size="is-small"
           >
             Cancel
-          </button>
+          </b-button>
         </b-table-column>
       </template>
     </b-table>
