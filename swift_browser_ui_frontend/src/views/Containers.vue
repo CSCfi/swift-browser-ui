@@ -105,7 +105,27 @@
         >
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
+        <b-table-column
+          field="share"
+          label=""
+          width="40"
+        >
+          <b-button
+            type="is-primary"
+            icon-right="share"
+            @click="shareModalIsActive = true"
+            outlined
+          />
+        </b-table-column>
+
+        <b-modal
+          :active.sync="shareModalIsActive"
+          has-modal-card
+        >
+          <Sharing :container="props.row.name" />
+        </b-modal>
       </template>
+      <!--
       <template
         slot="detail"
         slot-scope="props"
@@ -127,6 +147,7 @@
           <Sharing :container="props.row.name" />
         </b-modal>
       </template>
+-->
       <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%;"

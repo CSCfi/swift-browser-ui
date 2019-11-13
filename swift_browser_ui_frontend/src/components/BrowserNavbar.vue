@@ -63,8 +63,8 @@
             </div>
           </div>
           <div
-            class="navbar-item"
             v-if="$store.state.client"
+            class="navbar-item"
           >
             <div class="buttons">
               <router-link

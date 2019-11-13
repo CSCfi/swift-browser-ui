@@ -69,6 +69,7 @@
           <button
             class="button is-danger"
             @click="deleteShareRequest(props.row.container, props.row.owner)"
+            outlined
           >
             Cancel
           </button>
@@ -134,8 +135,8 @@ export default {
         this.$route.params.user,
         container,
         owner,
-      )
-    }
-  }
-}
+      );
+    },
+  },
+};
 </script>
