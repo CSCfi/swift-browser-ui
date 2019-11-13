@@ -115,6 +115,7 @@
             icon-right="share"
             @click="shareModalIsActive = true"
             outlined
+            size="is-small"
           />
         </b-table-column>
 
