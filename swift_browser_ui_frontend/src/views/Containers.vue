@@ -111,12 +111,22 @@
           width="40"
         >
           <b-button
+            v-if="selected==props.row"
             type="is-primary"
             icon-right="share"
             @click="shareModalIsActive = true"
             outlined
             size="is-small"
+            inverted
           />
+          <b-button
+            v-else
+            type="is-primary"
+            icon-right="share"
+            @click="shareModalIsActive = true"
+            outlined
+            size="is-small"
+          >
         </b-table-column>
 
         <b-modal
