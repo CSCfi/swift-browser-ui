@@ -69,7 +69,7 @@
             <div class="buttons">
               <router-link
                 v-if="$route.params.project"
-                :to="'/browse/shared/'.concat(active.id)"
+                :to="'/browse/sharing/to/'.concat(active.id)"
                 class="button is-primary has-text-light"
               >
                 {{ $t("message.share.shared") }}
