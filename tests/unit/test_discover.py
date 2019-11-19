@@ -17,6 +17,7 @@ class DiscoverTestClass(asynctest.TestCase):
             "swift_browser_ui.discover.setd",
             new={
                 "sharing_endpoint": "http://example",
+                "request_endpoint": "http://example",
             }
         )
         with patch_setd:
