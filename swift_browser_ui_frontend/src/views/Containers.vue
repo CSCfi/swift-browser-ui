@@ -114,19 +114,19 @@
             v-if="selected==props.row"
             type="is-primary"
             icon-right="share"
-            @click="shareModalIsActive = true"
             outlined
             size="is-small"
             inverted
+            @click="shareModalIsActive = true"
           />
           <b-button
             v-else
             type="is-primary"
             icon-right="share"
-            @click="shareModalIsActive = true"
             outlined
             size="is-small"
-          >
+            @click="shareModalIsActive = true"
+          />
         </b-table-column>
 
         <b-modal

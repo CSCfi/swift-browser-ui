@@ -82,6 +82,7 @@
 import SharedDetails from "@/components/SharedDetails";
 
 export default {
+  name: "SharedOutTable",
   components: {
     SharedDetails,
   },

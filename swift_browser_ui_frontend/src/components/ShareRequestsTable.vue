@@ -69,9 +69,9 @@
         >
           <b-button
             type="is-danger"
-            @click="deleteShareRequest(props.row.container, props.row.owner)"
             outlined
             size="is-small"
+            @click="deleteShareRequest(props.row.container, props.row.owner)"
           >
             Cancel
           </b-button>
@@ -83,7 +83,7 @@
 
 <script>
 export default {
-  name: "ShareRequests",
+  name: "ShareRequestsTable",
   data () {
     return {
       perPage: 10,
@@ -137,7 +137,9 @@ export default {
         this.$route.params.user,
         container,
         owner,
-      );
+      ).then(() => {
+        this.$router.go();
+      });
     },
   },
 };
