@@ -13,11 +13,11 @@ import RequestSharing from "@/components/RequestSharing";
 
 export default {
   name: "ShareRequests",
-  components: [
+  components: {
     SharedMenu,
     ShareRequestsTable,
     RequestSharing,
-  ],
+  },
   data () {
     return {};
   },

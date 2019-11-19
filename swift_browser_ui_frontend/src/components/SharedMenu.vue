@@ -5,19 +5,19 @@
         label="Shared to the project"
         icon="folder-shared"
         tag="router-link"
-        :to="SharedTo"
+        :to="{name :'SharedTo' ,params: {user: $route.params.user}}"
       />
       <b-menu-item
         label="Shared from the project"
         icon="share"
         tag="router-link"
-        :to="SharedFrom"
+        :to="{name: 'SharedFrom', params: {user: $route.params.user}}"
       />
       <b-menu-item
         label="Request access"
         icon="folder-plus"
         tag="router-link"
-        :to="ShareRequests"
+        :to="{name: 'ShareRequests', params: {user: $route.params.user}}"
       />
     </b-menu-list>
   </b-menu>

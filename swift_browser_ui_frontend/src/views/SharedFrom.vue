@@ -11,10 +11,10 @@ import SharedOutTable from "@/components/SharedOutTable";
 
 export default {
   name: "SharedFrom",
-  components: [
+  components: {
     SharedOutTable,
     SharedMenu,
-  ],
+  },
   data () {
     return {};
   },
