@@ -55,9 +55,14 @@ async def handle_validate_authentication(
         handler: AIOHTTP_HANDLER,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
-    signature = request.query["signature"]
-    validity = request.query["valid"]
-    path = request.url.path
+    try:
+        signature = request.query["signature"]
+        validity = request.query["valid"]
+        path = request.url.path
+    except KeyError:
+        raise aiohttp.web.HTTPClientError(
+            reason="Query string missing validity or signature."
+        )
 
     if not await test_signature(
             request.app["tokens"],
