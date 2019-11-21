@@ -24,6 +24,7 @@ from .api import swift_list_shared_objects
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
+from .signature import handle_signature_request
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -108,6 +109,11 @@ async def servinit():
         aiohttp.web.get('/login/rescope', token_rescope),
     ])
 
+    # Add signature endpoint
+    app.add_routes([
+        aiohttp.web.get('/sign/{valid}', handle_signature_request)
+    ])
+
     # Add api routes
     app.add_routes([
         aiohttp.web.get('/api/buckets', list_buckets),
@@ -140,7 +146,7 @@ def run_server_secure(app, cert_file, cert_key):
     While this function is incomplete, the project is safe to run in
     production only via a TLS termination proxy with e.g. NGINX.
     """
-    # The chiphers are from the Mozilla project wiki, as a recommendation for
+    # The ciphers are from the Mozilla project wiki, as a recommendation for
     # the most secure and up-to-date build.
     # https://wiki.mozilla.org/Security/Server_Side_TLS
     logger = logging.getLogger("swift-browser-ui")
