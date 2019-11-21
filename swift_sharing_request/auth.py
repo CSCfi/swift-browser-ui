@@ -45,8 +45,10 @@ async def test_signature(
                     digestmod="sha256"
                 ).hexdigest() == signature
         ):
-            return True
-    return False
+            return
+    raise aiohttp.web.HTTPUnauthorized(
+        reason="Missing valid query signature"
+    )
 
 
 @aiohttp.web.middleware
@@ -64,13 +66,10 @@ async def handle_validate_authentication(
             reason="Query string missing validity or signature."
         )
 
-    if not await test_signature(
-            request.app["tokens"],
-            signature,
-            validity + path
-    ):
-        raise aiohttp.web.HTTPUnauthorized(
-            reason="Missing valid query signature"
-        )
+    await test_signature(
+        request.app["tokens"],
+        signature,
+        validity + path
+    )
 
     return await handler(request)
