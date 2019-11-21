@@ -98,13 +98,19 @@ new Vue({
         if (ret.sharing_endpoint) {
           this.$store.commit(
             "setSharingClient",
-            new SwiftXAccountSharing(ret.sharing_endpoint)
+            new SwiftXAccountSharing(
+              ret.sharing_endpoint,
+              document.location.origin
+            )
           );
         }
         if (ret.request_endpoint) {
           this.$store.commit(
             "setRequestClient",
-            new SwiftSharingRequest(ret.request_endpoint)
+            new SwiftSharingRequest(
+              ret.request_endpoint,
+              document.location.origin
+            )
           );
         }
       });
