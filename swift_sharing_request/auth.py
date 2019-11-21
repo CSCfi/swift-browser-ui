@@ -22,7 +22,7 @@ async def read_in_keys(
         app: aiohttp.web.Application
 ):
     """Read in keys to the application."""
-    keys = os.environ.get("REQUEST_AUTH_KEYS", None)
+    keys = os.environ.get("SWIFT_UI_API_AUTH_TOKENS", None)
     app["tokens"] = keys.split(",") if keys is not None else []
     if app["tokens"]:
         app["tokens"] = [
