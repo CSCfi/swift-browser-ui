@@ -21,6 +21,10 @@ from .api import (
 )
 from .db import DBConn
 from .preflight import handle_delete_preflight
+from .auth import (
+    read_in_keys,
+    handle_validate_authentication,
+)
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,10 +45,11 @@ async def graceful_shutdown(app):
 async def init_server():
     """Initialize the sharing request server."""
     app = aiohttp.web.Application(
-        middlewares=[add_cors, check_db_conn]
+        middlewares=[add_cors, check_db_conn, handle_validate_authentication]
     )
 
     app["db_conn"] = DBConn()
+    app["tokens"] = []
 
     app.add_routes([
         aiohttp.web.options("/request/user/{user}/{container}",
@@ -62,6 +67,7 @@ async def init_server():
     ])
 
     app.on_startup.append(resume_on_start)
+    app.on_startup.append(read_in_keys)
     app.on_shutdown.append(graceful_shutdown)
 
     return app
