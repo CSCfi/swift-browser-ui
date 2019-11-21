@@ -15,7 +15,7 @@ import hmac
 import aiohttp.web
 
 
-AIOHTTP_HANDLER = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
+AiohttpHandler = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
 
 
 async def read_in_keys(
@@ -38,13 +38,12 @@ async def test_signature(
     """Validate signature against the given tokens."""
     byte_message = message.encode("utf-8")
     for token in tokens:
-        if (
-                hmac.new(
-                    key=token,
-                    msg=byte_message,
-                    digestmod="sha256"
-                ).hexdigest() == signature
-        ):
+        digest = hmac.new(
+            token,
+            byte_message,
+            digestmod="sha256"
+        ).hexdigest()
+        if digest == signature:
             return
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"
@@ -54,7 +53,7 @@ async def test_signature(
 @aiohttp.web.middleware
 async def handle_validate_authentication(
         request: aiohttp.web.Request,
-        handler: AIOHTTP_HANDLER,
+        handler: AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
     try:
