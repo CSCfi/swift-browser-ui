@@ -26,6 +26,10 @@ from .middleware import (
     add_cors,
     check_db_conn
 )
+from .auth import (
+    read_in_keys,
+    handle_validate_authentication
+)
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -58,7 +62,7 @@ async def save_on_shutdown(app):
 async def init_server():
     """Initialize the server."""
     app = aiohttp.web.Application(
-        middlewares=[add_cors, check_db_conn]
+        middlewares=[add_cors, check_db_conn, handle_validate_authentication]
     )
 
     if os.environ.get("SHARING_DB_POSTGRES", None):
@@ -78,6 +82,7 @@ async def init_server():
     ])
 
     app.on_startup.append(resume_on_start)
+    app.on_startup.append(read_in_keys)
     app.on_shutdown.append(save_on_shutdown)
 
     return app
