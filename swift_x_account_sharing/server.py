@@ -31,6 +31,7 @@ from .auth import (
     read_in_keys,
     handle_validate_authentication,
 )
+from .preflight import handle_delete_preflight
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -89,6 +90,8 @@ async def init_server() -> aiohttp.web.Application:
                          share_container_handler),
         aiohttp.web.patch("/share/{owner}/{contanier}", edit_share_handler),
         aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
+        aiohttp.web.options("/share/{owner}/{container}",
+                            handle_delete_preflight),
     ])
 
     app.on_startup.append(resume_on_start)
