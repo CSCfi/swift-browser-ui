@@ -77,6 +77,8 @@
 </template>
 
 <script>
+import debounce from "lodash/debounce";
+
 export default {
   data: function () {
     return {
@@ -96,7 +98,11 @@ export default {
         this.$route.params.user
       ).then(
         (ret) => {this.sharedList = ret;}
-      );
+      ).catch((error) => {
+        if (error.name == "TypeError") {
+          debounce(this.getSharedContainers, wait=50);
+        }
+      });
     },
     getConAddr: function (row) {
       return "/browse/shared/".concat(

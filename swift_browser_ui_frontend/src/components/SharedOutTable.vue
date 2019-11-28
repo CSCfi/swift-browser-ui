@@ -104,7 +104,11 @@ export default {
         this.$route.params.user
       ).then(
         (ret) => {this.sharedOutList = ret;}
-      );
+      ).catch((error) => {
+        if (error.name == "TypeError") {
+          debounce(this.getSharedContainers, wait=50);
+        }
+      });
     },
   },
 };

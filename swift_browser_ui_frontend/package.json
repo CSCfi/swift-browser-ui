@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "private": true,
   "scripts": {
-    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request",
+    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cd swift-x-account-sharing && git checkout feature/authentication && cd .. && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cd swift-sharing-request && git checkout feature/authentication && cd .. && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",

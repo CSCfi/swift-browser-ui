@@ -52,7 +52,9 @@ export default {
         this.$route.params.user,
         this.container,
         this.owner
-      );
+      ).then(() => {
+        this.$router.go();
+      });
     },
   },
 };

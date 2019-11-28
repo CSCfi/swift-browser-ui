@@ -127,7 +127,11 @@ export default {
         this.$route.params.user
       ).then(
         (ret) => {this.requestedSharesList = ret;}
-      );
+      ).catch((error) => {
+        if (error.name == "TypeError") {
+          debounce(this.getShareRequests, wait=50);
+        }
+      });
     },
     deleteShareRequest: function(
       container,
