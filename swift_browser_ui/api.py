@@ -423,8 +423,3 @@ async def get_os_active_project(
     return aiohttp.web.json_response(
         request.app['Creds'][session]['active_project']
     )
-
-
-list_buckets = swift_list_buckets
-list_objects = swift_list_objects
-download_object = swift_download_object

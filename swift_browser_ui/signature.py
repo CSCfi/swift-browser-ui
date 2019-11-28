@@ -29,13 +29,17 @@ async def handle_signature_request(
 
     try:
         digest = hmac.new(
-            key=setd["sharing_request_token"],
+            key=setd["sharing_request_token"].encode("utf-8"),
             msg=to_sign,
             digestmod="sha256"
         ).hexdigest()
     except KeyError:
         raise aiohttp.web.HTTPNotImplemented(
-            reason="Server doesn't have signing persmissions"
+            reason="Server doesn't have signing permissions"
+        )
+    except AttributeError:
+        raise aiohttp.web.HTTPNotImplemented(
+            reason="Server doesn't have signing permissions"
         )
 
     return aiohttp.web.json_response({

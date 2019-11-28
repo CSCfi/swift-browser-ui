@@ -69,7 +69,7 @@ setd = {
     ),
     "sharing_request_token": environ.get(
         "SWIFT_UI_SHARING_REQUEST_TOKEN", None
-    ).encode("utf-8"),
+    ),
     "has_trust": False,
     "logfile": None,
     "port": 8080,

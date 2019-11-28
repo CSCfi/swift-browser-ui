@@ -13,14 +13,29 @@ import uvloop
 import cryptography.fernet
 import aiohttp.web
 
-from .front import index, browse
-from .login import handle_login, sso_query_begin, handle_logout
-from .login import sso_query_end
-from .login import token_rescope
-from .api import list_buckets, list_objects, download_object, os_list_projects
-from .api import get_os_user, get_os_active_project
-from .api import get_metadata_object, get_metadata_bucket, get_project_metadata
-from .api import swift_list_shared_objects
+from .front import (
+    index,
+    browse
+)
+from .login import (
+    handle_login,
+    handle_logout,
+    sso_query_begin,
+    sso_query_end,
+    token_rescope,
+)
+from .api import (
+    swift_list_buckets,
+    swift_list_objects,
+    swift_download_object,
+    os_list_projects,
+    get_os_user,
+    get_os_active_project,
+    get_metadata_object,
+    get_metadata_bucket,
+    get_project_metadata,
+    swift_list_shared_objects
+)
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
@@ -118,9 +133,9 @@ async def servinit() -> aiohttp.web.Application:
 
     # Add api routes
     app.add_routes([
-        aiohttp.web.get('/api/buckets', list_buckets),
-        aiohttp.web.get('/api/bucket/objects', list_objects),
-        aiohttp.web.get('/api/object/dload', download_object),
+        aiohttp.web.get('/api/buckets', swift_list_buckets),
+        aiohttp.web.get('/api/bucket/objects', swift_list_objects),
+        aiohttp.web.get('/api/object/dload', swift_download_object),
         aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
