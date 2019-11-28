@@ -30,7 +30,9 @@ from .signature import handle_signature_request
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def kill_sess_on_shutdown(app):
+async def kill_sess_on_shutdown(
+        app: aiohttp.web.Application
+):
     """Kill all open sessions and purge their data when killed."""
     logging.info("Gracefully shutting down the program at %s",
                  time.ctime())
@@ -59,7 +61,7 @@ async def kill_sess_on_shutdown(app):
                       key, time.ctime())
 
 
-async def servinit():
+async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(
         middlewares=[error_middleware]
@@ -139,7 +141,11 @@ async def servinit():
     return app
 
 
-def run_server_secure(app, cert_file, cert_key):
+def run_server_secure(
+        app: aiohttp.web.Application,
+        cert_file: str,
+        cert_key: str
+):
     """
     Run the server securely with a given ssl context.
 
@@ -176,7 +182,9 @@ def run_server_secure(app, cert_file, cert_key):
     )
 
 
-def run_server_insecure(app):
+def run_server_insecure(
+        app: aiohttp.web.Application
+):
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
