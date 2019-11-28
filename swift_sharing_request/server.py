@@ -10,14 +10,15 @@ import uvloop
 
 from .middleware import (
     add_cors,
-    check_db_conn
+    check_db_conn,
+    catch_uniqueness_error,
 )
 from .api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
     handle_user_made_request_listing,
     handle_container_request_listing,
-    handle_user_share_request_delete
+    handle_user_share_request_delete,
 )
 from .db import DBConn
 from .preflight import handle_delete_preflight
@@ -31,21 +32,30 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def resume_on_start(app):
+async def resume_on_start(
+        app: aiohttp.web.Application
+):
     """Resume old instance on start."""
     await app["db_conn"].open()
 
 
-async def graceful_shutdown(app):
+async def graceful_shutdown(
+        app: aiohttp.web.Application
+):
     """Correctly close the service."""
     if app["db_conn"] is not None:
         await app["db_conn"].close()
 
 
-async def init_server():
+async def init_server() -> aiohttp.web.Application:
     """Initialize the sharing request server."""
     app = aiohttp.web.Application(
-        middlewares=[add_cors, check_db_conn, handle_validate_authentication]
+        middlewares=[
+            add_cors,
+            check_db_conn,
+            handle_validate_authentication,
+            catch_uniqueness_error,
+        ]
     )
 
     app["db_conn"] = DBConn()
@@ -73,7 +83,9 @@ async def init_server():
     return app
 
 
-def run_server_devel(app):
+def run_server_devel(
+        app: aiohttp.web.Application
+):
     """Run the server in development mode (without HTTPS)."""
     aiohttp.web.run_app(
         app,
