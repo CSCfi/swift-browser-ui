@@ -24,11 +24,12 @@ from .dict_db import InMemDB
 from .db import DBConn
 from .middleware import (
     add_cors,
-    check_db_conn
+    check_db_conn,
+    catch_uniqueness_error
 )
 from .auth import (
     read_in_keys,
-    handle_validate_authentication
+    handle_validate_authentication,
 )
 
 
@@ -38,7 +39,9 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def resume_on_start(app):
+async def resume_on_start(
+        app: aiohttp.web.Application
+):
     """Resume old instance from start."""
     # If using dict_db read the database on disk, if it exists
     if (
@@ -50,7 +53,9 @@ async def resume_on_start(app):
         await app["db_conn"].open()
 
 
-async def save_on_shutdown(app):
+async def save_on_shutdown(
+        app: aiohttp.web.Application
+):
     """Flush the database on shutdown."""
     # If using dict_db dump the database on disk, using default file.
     if isinstance(app["db_conn"], InMemDB):
@@ -59,10 +64,15 @@ async def save_on_shutdown(app):
         await app["db_conn"].close()
 
 
-async def init_server():
+async def init_server() -> aiohttp.web.Application:
     """Initialize the server."""
     app = aiohttp.web.Application(
-        middlewares=[add_cors, check_db_conn, handle_validate_authentication]
+        middlewares=[
+            add_cors,
+            check_db_conn,
+            handle_validate_authentication,
+            catch_uniqueness_error,
+        ]
     )
 
     if os.environ.get("SHARING_DB_POSTGRES", None):
@@ -88,7 +98,9 @@ async def init_server():
     return app
 
 
-def run_server_devel(app):
+def run_server_devel(
+        app: aiohttp.web.Application
+):
     """Run the server in development mode (without HTTPS)."""
     aiohttp.web.run_app(
         app,
