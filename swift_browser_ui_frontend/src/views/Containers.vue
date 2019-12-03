@@ -49,7 +49,6 @@
     <b-table
       focusable
       hoverable
-      detailed
       narrowed
       style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="name"
