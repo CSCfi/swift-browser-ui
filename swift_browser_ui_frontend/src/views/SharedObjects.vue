@@ -180,7 +180,7 @@ export default {
       // Get the object listing from the API if the listing hasn't yet 
       // been cached
       this.$store.state.client.getAccessDetails(
-        this.$route.params.user,
+        this.$route.params.project,
         this.$route.params.container,
         this.$route.params.owner
       ).then(
