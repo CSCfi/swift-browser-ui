@@ -1,10 +1,27 @@
 <template>
   <section>
-    <SharedMenu />
-    <RequestSharing />
-    <ShareRequestsTable />
+    <div class="sharing-view">
+      <SharedMenu />
+      <div class="requestview">
+        <RequestSharing />
+        <ShareRequestsTable />
+      </div>
+    </div>
   </section>
 </template>
+
+<style scoped>
+.sharing-view {
+  display: flex;
+  width: 90%;
+}
+#SharedMenu {
+  flex: 1 1 auto;
+}
+.requestview {
+  flex: 4 1 auto;
+}
+</style>
 
 <script>
 import SharedMenu from "@/components/SharedMenu";
