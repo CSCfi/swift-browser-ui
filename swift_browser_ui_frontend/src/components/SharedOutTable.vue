@@ -78,6 +78,12 @@
   </div>
 </template>
 
+<style scoped>
+#shared-out-table {
+  width: 100%;
+}
+</style>
+
 <script>
 import SharedDetails from "@/components/SharedDetails";
 import delay from "lodash/delay";

@@ -76,10 +76,17 @@
   </div>
 </template>
 
+<style scoped>
+#shared-table {
+  width: 100%;
+}
+</style>
+
 <script>
 import delay from "lodash/delay";
 
 export default {
+  name: "SharedTable",
   data: function () {
     return {
       sharedList: [],
