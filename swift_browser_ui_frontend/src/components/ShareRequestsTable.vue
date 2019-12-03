@@ -127,7 +127,7 @@ export default {
     getShareRequests: function () {
       if (this.$store.state.client) {
         this.$store.state.requestClient.listMadeRequests(
-          this.$route.params.user
+          this.$route.params.project
         ).then(
           (ret) => {this.requestedSharesList = ret;}
         );
@@ -141,7 +141,7 @@ export default {
       owner
     ) {
       this.$store.state.requestClient.shareDeleteAccess(
-        this.$route.params.user,
+        this.$route.params.project,
         container,
         owner,
       ).then(() => {

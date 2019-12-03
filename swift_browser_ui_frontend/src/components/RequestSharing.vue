@@ -49,7 +49,7 @@ export default {
   methods: {
     requestShare: function () {
       this.$store.state.requestClient.addAccessRequest(
-        this.$route.params.user,
+        this.$route.params.project,
         this.container,
         this.owner
       ).then(() => {

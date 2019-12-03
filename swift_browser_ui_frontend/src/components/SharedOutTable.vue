@@ -103,7 +103,7 @@ export default {
     getSharedContainers: function () {
       if (this.$store.state.client) {
         this.$store.state.client.getShare(
-          this.$route.params.user
+          this.$route.params.project
         ).then(
           (ret) => {this.sharedOutList = ret;}
         );

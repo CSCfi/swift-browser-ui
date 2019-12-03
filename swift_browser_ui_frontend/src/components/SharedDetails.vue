@@ -33,7 +33,7 @@ export default {
   methods: {
     getSharedDetails: function () {
       this.$store.state.client.getShareDetails(
-        this.$route.params.user,
+        this.$route.params.project,
         this.container
       ).then((ret) => {
         this.allDetails = ret;

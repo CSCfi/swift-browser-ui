@@ -96,7 +96,7 @@ export default {
     getSharedContainers: function () {
       if (this.$store.state.client) {
         this.$store.state.client.getAccess(
-          this.$route.params.user
+          this.$route.params.project
         ).then(
           (ret) => {this.sharedList = ret;}
         );
@@ -107,7 +107,7 @@ export default {
     },
     getConAddr: function (row) {
       return "/browse/shared/".concat(
-        this.$route.params.user,
+        this.$route.params.project,
         "/", row.owner,
         "/", row.container
       );

@@ -14,22 +14,22 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/browse/sharing/to/:user",
+      path: "/browse/sharing/to/:project",
       name: "SharedTo",
       component: SharedTo,
     },
     {
-      path: "/browse/sharing/from/:user",
+      path: "/browse/sharing/from/:project",
       name: "SharedFrom",
       component: SharedFrom,
     },
     {
-      path: "/browse/sharing/requests/:user",
+      path: "/browse/sharing/requests/:project",
       name: "ShareRequests",
       component: ShareRequests,
     },
     {
-      path: "/browse/shared/:user/:owner/:container",
+      path: "/browse/shared/:project/:owner/:container",
       name: "SharedObjects",
       component: SharedObjects,
     },

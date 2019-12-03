@@ -44,10 +44,5 @@ export default {
     RequestSharing,
     ShareRequests,
   },
-  data: function () {
-    return {
-      activeTab: 0,
-    };
-  },
 };
 </script>
