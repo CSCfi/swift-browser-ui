@@ -80,6 +80,7 @@
 
 <script>
 import SharedDetails from "@/components/SharedDetails";
+import delay from "lodash/delay";
 
 export default {
   name: "SharedOutTable",
@@ -100,15 +101,16 @@ export default {
   },
   methods: {
     getSharedContainers: function () {
-      this.$store.state.client.getShare(
-        this.$route.params.user
-      ).then(
-        (ret) => {this.sharedOutList = ret;}
-      ).catch((error) => {
-        if (error.name == "TypeError") {
-          debounce(this.getSharedContainers, wait=50);
-        }
-      });
+      if (this.$store.state.client) {
+        this.$store.state.client.getShare(
+          this.$route.params.user
+        ).then(
+          (ret) => {this.sharedOutList = ret;}
+        );
+      }
+      else {
+        delay(this.getSharedContainers, 100);
+      }
     },
   },
 };

@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import debounce from "lodash/debounce";
+import delay from "lodash/delay";
 
 export default {
   data: function () {
@@ -94,15 +94,16 @@ export default {
   },
   methods: {
     getSharedContainers: function () {
-      this.$store.state.client.getAccess(
-        this.$route.params.user
-      ).then(
-        (ret) => {this.sharedList = ret;}
-      ).catch((error) => {
-        if (error.name == "TypeError") {
-          debounce(this.getSharedContainers, wait=50);
-        }
-      });
+      if (this.$store.state.client) {
+        this.$store.state.client.getAccess(
+          this.$route.params.user
+        ).then(
+          (ret) => {this.sharedList = ret;}
+        );
+      }
+      else {
+        delay(this.getSharedContainers, 100);
+      }
     },
     getConAddr: function (row) {
       return "/browse/shared/".concat(

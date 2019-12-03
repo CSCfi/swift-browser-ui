@@ -82,6 +82,8 @@
 </template>
 
 <script>
+import delay from "lodash/delay";
+
 export default {
   name: "ShareRequestsTable",
   data () {
@@ -123,15 +125,16 @@ export default {
       return dateVal.toLocaleDateString(langLocale, options, zone);
     },
     getShareRequests: function () {
-      this.$store.state.requestClient.listMadeRequests(
-        this.$route.params.user
-      ).then(
-        (ret) => {this.requestedSharesList = ret;}
-      ).catch((error) => {
-        if (error.name == "TypeError") {
-          debounce(this.getShareRequests, wait=50);
-        }
-      });
+      if (this.$store.state.client) {
+        this.$store.state.requestClient.listMadeRequests(
+          this.$route.params.user
+        ).then(
+          (ret) => {this.requestedSharesList = ret;}
+        );
+      }
+      else {
+        delay(this.getShareRequests, 100);
+      }
     },
     deleteShareRequest: function(
       container,
