@@ -10,10 +10,13 @@
 <style scoped>
 .sharing-view {
   display: flex;
-  width: 90%;
+  padding-left: 3%;
+  padding-right: 3%;
+  width: auto;
 }
-#ShareMenu {
+#SharedMenu {
   flex: 1 1 auto;
+  padding-right: 1%
 }
 #SharedOutTable {
   flex: 4 1 auto;

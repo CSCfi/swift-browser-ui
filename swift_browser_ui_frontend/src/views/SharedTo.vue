@@ -10,10 +10,13 @@
 <style scoped>
 .sharing-view {
   display: flex;
-  width: 90%;
+  padding-left: 3%;
+  padding-right: 3%;
+  width: auto;
 }
-#ShareMenu {
+#SharedMenu {
   flex: 1 1 auto;
+  padding-right: 1%
 }
 #SharedTable {
   flex: 4 1 auto;
@@ -21,13 +24,13 @@
 </style>
 
 <script>
-import ShareMenu from "@/components/SharedMenu";
+import SharedMenu from "@/components/SharedMenu";
 import SharedTable from "@/components/SharedTable";
 
 export default {
   name: "SharedTo",
   components: {
-    ShareMenu,
+    SharedMenu,
     SharedTable,
   },
   data () {
