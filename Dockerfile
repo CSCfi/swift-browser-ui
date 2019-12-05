@@ -8,11 +8,9 @@ COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && git clone --verbose https://github.com/CSCfi/swift-x-account-sharing.git \
-    && cd swift-x-account-sharing && git checkout feature/authentication && cd .. \
     && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common/swift_x_account_sharing_bind.js \
     && rm -rf swift-x-account-sharing \
     && git clone --verbose https://github.com/CSCfi/swift-sharing-request.git \
-    && cd swift-sharing-request && git checkout feature/authentication && cd .. \
     && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common/swift_sharing_request_bind.js \
     && rm -rf swift-sharing-request \
     && npm install \
