@@ -102,7 +102,8 @@ const translations = {
       emptyContainer: "This container is empty.",
       emptyProject: "The project doesn't contain any containers.",
       emptyShared: "No containers have been shared to the project.",
-      emptyRequested: "No shared containers have been requested for the project.",
+      emptyRequested: "No shared containers have been requested for the " +
+                      "project.",
       searchBy: "Search by Name",
       sharing: "Sharing - ",
       containers: "Containers - ",

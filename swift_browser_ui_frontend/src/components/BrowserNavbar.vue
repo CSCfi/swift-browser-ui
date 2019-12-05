@@ -58,8 +58,10 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                v-if="!($route.name == 'Containers' || $route.name == 'Objects')"
-                :to="{name: 'Containers', params: {user: uname, project: active.name}}"
+                v-if="!($route.name == 'Containers'
+                  ||$route.name == 'Objects')"
+                :to="{name: 'Containers',
+                      params: {user: uname, project: active.name}}"
                 class="button is-primary has-text-light"
               >
                 {{ $t("message.dashboard.browser") }}

@@ -77,7 +77,7 @@
           </b-button>
         </b-table-column>
       </template>
-      <template slot=empty>
+      <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%"
         >
