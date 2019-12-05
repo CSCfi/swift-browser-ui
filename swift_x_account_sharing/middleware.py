@@ -4,6 +4,7 @@
 import typing
 
 import aiohttp.web
+from asyncpg import UniqueViolationError
 
 from .db import DBConn
 
@@ -37,6 +38,7 @@ async def check_db_conn(
             reason="No database connection."
         )
     return await handler(request)
+
 
 @aiohttp.web.middleware
 async def catch_uniqueness_error(
