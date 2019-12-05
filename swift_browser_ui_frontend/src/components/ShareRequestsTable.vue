@@ -44,21 +44,21 @@
         <b-table-column
           sortable
           field="container"
-          label="container"
+          :label="$t('message.share.container')"
         >
           {{ props.row.container }}
         </b-table-column>
         <b-table-column
           sortable
           field="owner"
-          label="owner"
+          :label="$t('message.share.owner')"
         >
           {{ props.row.owner }}
         </b-table-column>
         <b-table-column
           sortable
           field="created"
-          label="created"
+          :label="$t('message.share.created')"
         >
           {{ getHumanReadableDate( props.row.date ) }}
         </b-table-column>
@@ -73,9 +73,16 @@
             size="is-small"
             @click="deleteShareRequest(props.row.container, props.row.owner)"
           >
-            Cancel
+            {{ $t('message.share.cancel') }}
           </b-button>
         </b-table-column>
+      </template>
+      <template slot=empty>
+        <p
+          style="text-align:center;margin-top:5%;margin-bottom:5%"
+        >
+          {{ $t('message.emptyRequested') }}
+        </p>
       </template>
     </b-table>
   </div>

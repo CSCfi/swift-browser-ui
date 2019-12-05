@@ -129,13 +129,14 @@ new Vue({
       if (this.$route.params.project != undefined) {
         if (this.$route.path.match("sharing") != null) {
           retl.push({
-            alias: "sharing - " + this.$store.state.active.name,
+            alias: this.$t("message.sharing") + this.$store.state.active.name,
             address: {name: "SharedTo"},
           });
         }
         else {
           retl.push({
-            alias: "Containers - " + this.$store.state.active.name,
+            alias: this.$t("message.containers")
+                   + this.$store.state.active.name,
             address: {name: "Containers"},
           });
         }

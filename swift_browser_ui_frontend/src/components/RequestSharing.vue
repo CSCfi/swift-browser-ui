@@ -2,8 +2,8 @@
   <section>
     <b-field
       horizontal
-      label="Container / Identifier" 
-      message="The requested container name."
+      :label="$t('message.request.container')"
+      :message="$t('message.request.container_message')"
     >
       <b-input 
         v-model="container"
@@ -14,8 +14,8 @@
 
     <b-field
       horizontal
-      label="Owner"
-      message="The requested container owner."
+      :label="$t('message.request.owner')"
+      :message="$t('message.request.owner_message')"
     >
       <b-input
         v-model="owner"
@@ -30,7 +30,7 @@
           class="button is-primary"
           @click="requestShare ()"
         >
-          Request
+          {{ $t('message.request.request') }}
         </button>
       </p>
     </b-field>

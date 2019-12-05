@@ -6,13 +6,16 @@
     >
       <ul>
         <li>
-          Shared to: {{ details.sharedTo }}
+          {{ $t('message.share.shared_details_to') }}
+          {{ details.sharedTo }}
         </li>
         <li>
-          Container address: {{ details.address }}
+          {{ $t('message.share.shared_details_address') }}
+          {{ details.address }}
         </li>
         <li>
-          Given Rights: {{ details.access }}
+          {{ $t('message.share.shared_details_rights') }}
+          {{ details.access }}
         </li>
       </ul>
     </li>

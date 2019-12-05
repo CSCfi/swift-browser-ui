@@ -18,7 +18,7 @@
       </b-tab-item>
       <b-tab-item
         v-if="$store.state.requestClient"
-        :label="'Request sharing'"
+        :label="$t('message.share.request_sharing')"
       >
         <RequestSharing />
         <ShareRequests />
