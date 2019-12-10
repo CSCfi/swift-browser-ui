@@ -11,7 +11,6 @@ COPY swift_x_account_sharing /root/swift_sharing/swift_x_account_sharing
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_sharing/requirements.txt \
-    && pip install gunicorn \
     && pip install /root/swift_sharing
 
 FROM python:3.7-alpine3.9
@@ -35,5 +34,8 @@ WORKDIR /app
 COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
+
+RUN adduser --disabled-password --no-create-home swiftsharing
+USER swiftsharing
 
 ENTRYPOINT ["/bin/sh", "-c", "/app/app.sh"]

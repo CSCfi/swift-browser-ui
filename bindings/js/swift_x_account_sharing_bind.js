@@ -4,9 +4,11 @@ class SwiftXAccountSharing {
   // Swift cross account sharing backend client.
   
   constructor (
-    address
+    address,
+    signatureAddress = "",
   ) {
     this.address = address;
+    this.signatureAddress = signatureAddress;
   }
 
   _parseListString (
@@ -20,11 +22,37 @@ class SwiftXAccountSharing {
     return ret.slice(0, ret.length - 1);
   }
 
+  async _getSignature(
+    validFor,
+    toSign
+  ) {
+    // Get a signature for an API call.
+    if (this.signatureAddress != "") {
+      let signatureUrl = new URL("/sign/".concat(validFor), this.signatureAddress);
+      signatureUrl.searchParams.append("path", toSign);
+      let signed = await fetch(
+        signatureUrl, {method: "GET", credentials: "same-origin"}
+      );
+      return signed.json();
+    }
+    else {
+      return undefined;
+    }
+  }
+
   async getAccess (
     username
   ) {
     // List the containers the user has been given access to.
     let url = new URL("/access/".concat(username), this.address);
+
+    let signed = await this._getSignature(
+      60,
+      "/access/".concat(username)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let containers = fetch(
       url, {method: "GET"}
     ).then(
@@ -42,6 +70,14 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/access/".concat(username, "/", container), this.address
     );
+
+    let signed = await this._getSignature(
+      60,
+      "/access/".concat(username, "/", container)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     url.searchParams.append("owner", owner);
     let details = fetch(
       url, {method: "GET"}
@@ -56,6 +92,14 @@ class SwiftXAccountSharing {
   ) {
     // List the containers the user has shared to another user / users.
     let url = new URL("/share/".concat(username), this.address);
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let shared = fetch(
       url, {method: "GET"}
     ).then(
@@ -72,6 +116,14 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/share/".concat(username, "/", container), this.address
     );
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username, "/", container)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let details = fetch(
       url, {method: "GET"}
     ).then(
@@ -94,6 +146,14 @@ class SwiftXAccountSharing {
     url.searchParams.append("user", this._parseListString(userlist));
     url.searchParams.append("access", this._parseListString(accesslist));
     url.searchParams.append("address", address);
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username, "/", container)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let shared = fetch(
       url, {method: "POST"}
     ).then(
@@ -114,6 +174,14 @@ class SwiftXAccountSharing {
     );
     url.searchParams.append("user", this._parseListString(userlist));
     url.searchParams.append("access", this._parseListString(accesslist));
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username, "/", container)
+    );
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let shared = fetch(
       url, {method: "PATCH"}
     ).then(
@@ -132,6 +200,14 @@ class SwiftXAccountSharing {
       "/share/".concat(username, "/", container), this.address
     );
     url.searchParams.append("user", this._parseListString(userlist));
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username, "/", container)
+    );
+
     let deleted = fetch(
       url, {method: "DELETE"}
     ).then(

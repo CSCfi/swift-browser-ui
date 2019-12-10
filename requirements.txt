@@ -1,3 +1,4 @@
 aiohttp
 uvloop
 asyncpg
+gunicorn>=20.0.1
