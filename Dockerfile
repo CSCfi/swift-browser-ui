@@ -35,4 +35,7 @@ COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 
+RUN adduser --disabled-password --no-create-home swiftsharing
+USER swiftsharing
+
 ENTRYPOINT ["/bin/sh", "-c", "/app/app.sh"]
