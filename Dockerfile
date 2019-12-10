@@ -11,7 +11,6 @@ COPY swift_sharing_request /root/swift_request/swift_sharing_request
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_request/requirements.txt \
-    && pip install gunicorn \
     && pip install /root/swift_request
 
 FROM python:3.7-alpine3.9
@@ -35,5 +34,8 @@ WORKDIR /app
 COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
+
+RUN adduser --disabled-password --no-create-home swiftrequest
+USER swiftrequest
 
 ENTRYPOINT ["/bin/sh", "-c", "/app/app.sh"]

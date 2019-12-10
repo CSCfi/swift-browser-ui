@@ -78,7 +78,6 @@ class DBConn:
             } for rec in query
         ]
 
-
     async def add_request(self, user, container, owner):
         """Add an access request to the database."""
         async with self.conn.transaction():
