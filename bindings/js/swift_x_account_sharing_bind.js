@@ -28,7 +28,8 @@ class SwiftXAccountSharing {
   ) {
     // Get a signature for an API call.
     if (this.signatureAddress != "") {
-      let signatureUrl = new URL("/sign/".concat(validFor), this.signatureAddress);
+      let signatureUrl = new URL("/sign/".concat(validFor),
+        this.signatureAddress);
       signatureUrl.searchParams.append("path", toSign);
       let signed = await fetch(
         signatureUrl, {method: "GET", credentials: "same-origin"}
