@@ -4,7 +4,6 @@
       :langs="langs"
       :multiple-projects="multipleProjects"
       :projects="projects"
-      :active="active"
     />
     <div
       class="breadcrumb"

@@ -78,10 +78,18 @@
   </div>
 </template>
 
+<style scoped>
+#shared-out-table {
+  width: 100%;
+}
+</style>
+
 <script>
 import SharedDetails from "@/components/SharedDetails";
+import delay from "lodash/delay";
 
 export default {
+  name: "SharedOutTable",
   components: {
     SharedDetails,
   },
@@ -99,11 +107,16 @@ export default {
   },
   methods: {
     getSharedContainers: function () {
-      this.$store.state.client.get_share(
-        this.$route.params.user
-      ).then(
-        (ret) => {this.sharedOutList = ret;}
-      );
+      if (this.$store.state.client) {
+        this.$store.state.client.getShare(
+          this.$route.params.project
+        ).then(
+          (ret) => {this.sharedOutList = ret;}
+        );
+      }
+      else {
+        delay(this.getSharedContainers, 100);
+      }
     },
   },
 };

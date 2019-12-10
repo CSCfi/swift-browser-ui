@@ -76,8 +76,17 @@
   </div>
 </template>
 
+<style scoped>
+#shared-table {
+  width: 100%;
+}
+</style>
+
 <script>
+import delay from "lodash/delay";
+
 export default {
+  name: "SharedTable",
   data: function () {
     return {
       sharedList: [],
@@ -92,15 +101,20 @@ export default {
   },
   methods: {
     getSharedContainers: function () {
-      this.$store.state.client.get_access(
-        this.$route.params.user
-      ).then(
-        (ret) => {this.sharedList = ret;}
-      );
+      if (this.$store.state.client) {
+        this.$store.state.client.getAccess(
+          this.$route.params.project
+        ).then(
+          (ret) => {this.sharedList = ret;}
+        );
+      }
+      else {
+        delay(this.getSharedContainers, 100);
+      }
     },
     getConAddr: function (row) {
       return "/browse/shared/".concat(
-        this.$route.params.user,
+        this.$route.params.project,
         "/", row.owner,
         "/", row.container
       );

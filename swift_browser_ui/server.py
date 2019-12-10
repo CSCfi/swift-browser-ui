@@ -13,22 +13,41 @@ import uvloop
 import cryptography.fernet
 import aiohttp.web
 
-from .front import index, browse
-from .login import handle_login, sso_query_begin, handle_logout
-from .login import sso_query_end
-from .login import token_rescope
-from .api import list_buckets, list_objects, download_object, os_list_projects
-from .api import get_os_user, get_os_active_project
-from .api import get_metadata_object, get_metadata_bucket, get_project_metadata
-from .api import swift_list_shared_objects
+from .front import (
+    index,
+    browse
+)
+from .login import (
+    handle_login,
+    handle_logout,
+    sso_query_begin,
+    sso_query_end,
+    token_rescope,
+)
+from .api import (
+    swift_list_buckets,
+    swift_list_objects,
+    swift_download_object,
+    os_list_projects,
+    get_os_user,
+    get_os_active_project,
+    get_metadata_object,
+    get_metadata_bucket,
+    get_project_metadata,
+    swift_list_shared_objects
+)
 from .settings import setd
 from .middlewares import error_middleware
+from .discover import handle_discover
+from .signature import handle_signature_request
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def kill_sess_on_shutdown(app):
+async def kill_sess_on_shutdown(
+        app: aiohttp.web.Application
+):
     """Kill all open sessions and purge their data when killed."""
     logging.info("Gracefully shutting down the program at %s",
                  time.ctime())
@@ -57,7 +76,7 @@ async def kill_sess_on_shutdown(app):
                       key, time.ctime())
 
 
-async def servinit():
+async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(
         middlewares=[error_middleware]
@@ -107,11 +126,16 @@ async def servinit():
         aiohttp.web.get('/login/rescope', token_rescope),
     ])
 
+    # Add signature endpoint
+    app.add_routes([
+        aiohttp.web.get('/sign/{valid}', handle_signature_request)
+    ])
+
     # Add api routes
     app.add_routes([
-        aiohttp.web.get('/api/buckets', list_buckets),
-        aiohttp.web.get('/api/bucket/objects', list_objects),
-        aiohttp.web.get('/api/object/dload', download_object),
+        aiohttp.web.get('/api/buckets', swift_list_buckets),
+        aiohttp.web.get('/api/bucket/objects', swift_list_objects),
+        aiohttp.web.get('/api/object/dload', swift_download_object),
         aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),
         aiohttp.web.get('/api/username', get_os_user),
         aiohttp.web.get('/api/projects', os_list_projects),
@@ -121,20 +145,29 @@ async def servinit():
         aiohttp.web.get('/api/project/meta', get_project_metadata),
     ])
 
+    # Add discovery routes
+    app.add_routes([
+        aiohttp.web.get('/discover', handle_discover)
+    ])
+
     # Add graceful shutdown handler
     app.on_shutdown.append(kill_sess_on_shutdown)
 
     return app
 
 
-def run_server_secure(app, cert_file, cert_key):
+def run_server_secure(
+        app: aiohttp.web.Application,
+        cert_file: str,
+        cert_key: str
+):
     """
     Run the server securely with a given ssl context.
 
     While this function is incomplete, the project is safe to run in
     production only via a TLS termination proxy with e.g. NGINX.
     """
-    # The chiphers are from the Mozilla project wiki, as a recommendation for
+    # The ciphers are from the Mozilla project wiki, as a recommendation for
     # the most secure and up-to-date build.
     # https://wiki.mozilla.org/Security/Server_Side_TLS
     logger = logging.getLogger("swift-browser-ui")
@@ -164,7 +197,9 @@ def run_server_secure(app, cert_file, cert_key):
     )
 
 
-def run_server_insecure(app):
+def run_server_insecure(
+        app: aiohttp.web.Application
+):
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,

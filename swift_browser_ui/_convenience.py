@@ -12,6 +12,7 @@ import json
 import logging
 import re
 import urllib.request
+import typing
 
 import aiohttp.web
 
@@ -43,7 +44,9 @@ def setup_logging():
         keystonelog.setLevel(logging.WARNING)
 
 
-def disable_cache(response):
+def disable_cache(
+        response: aiohttp.web.Response
+) -> aiohttp.web.Response:
     """Add cache disabling headers to an aiohttp response."""
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-Cache'
@@ -51,7 +54,9 @@ def disable_cache(response):
     return response
 
 
-def decrypt_cookie(request):
+def decrypt_cookie(
+        request: aiohttp.web.Request
+) -> dict:
     """Decrypt a cookie using the server instance specific fernet key."""
     cookie_json = request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
@@ -63,7 +68,9 @@ def decrypt_cookie(request):
     return cookie
 
 
-def check_csrf(request):
+def check_csrf(
+        request: aiohttp.web.Request
+) -> bool:
     """Check that the signature matches and referrer is correct."""
     cookie = decrypt_cookie(request)
     # Throw if the cookie originates from incorrect referer (meaning the
@@ -107,7 +114,9 @@ def check_csrf(request):
     return True
 
 
-def session_check(request):
+def session_check(
+        request: aiohttp.web.Request
+):
     """Check session validity from a request."""
     try:
         cookie = decrypt_cookie(request)
@@ -135,7 +144,9 @@ def session_check(request):
         )
 
 
-def api_check(request):
+def api_check(
+        request: aiohttp.web.Request
+) -> str:
     """Do a more thorough session check for the API."""
     try:
         if decrypt_cookie(request)["id"] in request.app['Sessions']:
@@ -175,7 +186,9 @@ def api_check(request):
         )
 
 
-def generate_cookie(request):
+def generate_cookie(
+        request: aiohttp.web.Request
+) -> typing.Tuple[dict, str]:
     """
     Generate an encrypted and unencrypted cookie.
 
@@ -196,7 +209,9 @@ def generate_cookie(request):
     )
 
 
-def get_availability_from_token(token):
+def get_availability_from_token(
+        token: str
+) -> dict:
     """
     List available domains and projects for the unscoped token specified.
 
@@ -249,7 +264,10 @@ def get_availability_from_token(token):
 
 # The Openstack SDK functions will be moved to the login.py module, but will
 # be contained here for testing.
-def initiate_os_session(unscoped, project):
+def initiate_os_session(
+        unscoped: str,
+        project: str
+) -> keystoneauth1.session.Session:
     """
     Create a new openstack session with the unscoped token and project id.
 
@@ -273,7 +291,10 @@ def initiate_os_session(unscoped, project):
     )
 
 
-def initiate_os_service(os_session, url=None):
+def initiate_os_service(
+        os_session,
+        url: str = None
+) -> swiftclient.service.SwiftService:
     """Create a SwiftService connection to object storage."""
     # Set up new options for the swift service, since the defaults won't do
     sc_new_options = {

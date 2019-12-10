@@ -6,4 +6,4 @@ click
 sphinx
 sphinx_rtd_theme
 uvloop
-gunicorn
+gunicorn>=20.0.1

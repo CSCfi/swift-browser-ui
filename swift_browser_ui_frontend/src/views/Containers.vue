@@ -49,7 +49,6 @@
     <b-table
       focusable
       hoverable
-      detailed
       narrowed
       style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="name"
@@ -105,7 +104,38 @@
         >
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
+        <b-table-column
+          field="share"
+          label=""
+          width="40"
+        >
+          <b-button
+            v-if="selected==props.row"
+            type="is-primary"
+            icon-right="share"
+            outlined
+            size="is-small"
+            inverted
+            @click="shareModalIsActive = true"
+          />
+          <b-button
+            v-else
+            type="is-primary"
+            icon-right="share"
+            outlined
+            size="is-small"
+            @click="shareModalIsActive = true"
+          />
+        </b-table-column>
+
+        <b-modal
+          :active.sync="shareModalIsActive"
+          has-modal-card
+        >
+          <Sharing :container="props.row.name" />
+        </b-modal>
       </template>
+      <!--
       <template
         slot="detail"
         slot-scope="props"
@@ -127,6 +157,7 @@
           <Sharing :container="props.row.name" />
         </b-modal>
       </template>
+-->
       <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%;"

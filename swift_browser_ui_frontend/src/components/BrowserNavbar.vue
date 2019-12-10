@@ -47,15 +47,8 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                v-if="$route.params.project == undefined"
-                :to="'/browse/' + $route.params.user + '/' + active.name"
-                class="button is-primary has-text-light"
-              >
-                {{ $t("message.dashboard.browser") }}
-              </router-link>
-              <router-link
-                v-else 
-                :to="'/browse/' + $route.params.user"
+                v-if="!($route.name == 'Dashboard')"
+                :to="{name: 'Dashboard', params: {user: uname}}"
                 class="button is-primary has-text-light"
               >
                 {{ $t("message.dashboard.dashboard") }}
@@ -65,8 +58,28 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                v-if="$route.params.project"
-                :to="'/browse/shared/'.concat(active.id)"
+                v-if="!($route.name == 'Containers'
+                  ||$route.name == 'Objects')"
+                :to="{name: 'Containers',
+                      params: {user: uname, project: active.name}}"
+                class="button is-primary has-text-light"
+              >
+                {{ $t("message.dashboard.browser") }}
+              </router-link>
+            </div>
+          </div>
+          <div
+            v-if="$store.state.client"
+            class="navbar-item"
+          >
+            <div class="buttons">
+              <router-link
+                v-if="!(
+                  $route.name == 'SharedTo' ||
+                  $route.name == 'SharedFrom' ||
+                  $route.name == 'ShareRequests'
+                )"
+                :to="{name: 'SharedTo', params: {project: active.id}}"
                 class="button is-primary has-text-light"
               >
                 {{ $t("message.share.shared") }}
@@ -112,8 +125,15 @@ export default {
     "langs",
     "multipleProjects",
     "projects",
-    "active",
   ],
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
+    uname () {
+      return this.$store.state.uname;
+    },
+  },
   methods: {
     setCookieLang: function() {
       const expiryDate = new Date();

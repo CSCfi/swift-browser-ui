@@ -6,7 +6,9 @@ from .settings import setd
 from ._convenience import session_check
 
 
-async def browse(request):
+async def browse(
+        request: aiohttp.web.Request
+) -> aiohttp.web.FileResponse:
     """Serve the browser SPA when running without a proxy."""
     session_check(request)
     response = aiohttp.web.FileResponse(
@@ -20,7 +22,7 @@ async def browse(request):
     return response
 
 
-async def index(_):
+async def index(_) -> aiohttp.web.FileResponse:
     """Serve the index page when running without a proxy."""
     return aiohttp.web.FileResponse(
         setd['static_directory'] + '/index.html'

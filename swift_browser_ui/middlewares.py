@@ -1,11 +1,16 @@
 """Middlewares for the swift-browser-ui."""
 
+
+import typing
+
 from aiohttp import web
 
 from .settings import setd
 
 
-def return_error_response(error_code):
+def return_error_response(
+        error_code: int
+) -> web.Response:
     """Return the correct error page with correct status code."""
     with open(
             setd["static_directory"] + "/" + str(error_code) + ".html"
@@ -23,7 +28,10 @@ def return_error_response(error_code):
 
 
 @web.middleware
-async def error_middleware(request, handler):
+async def error_middleware(
+        request: web.Request,
+        handler: typing.Callable[[web.Request], web.Response]
+) -> web.Response:
     """Return the correct HTTP Error page."""
     try:
         response = await handler(request)

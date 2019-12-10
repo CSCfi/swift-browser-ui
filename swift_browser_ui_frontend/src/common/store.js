@@ -21,6 +21,7 @@ const store = new Vuex.Store({
       {ph: "Suomeksi", value: "fi"},
     ],
     client: undefined,
+    requestClient: undefined,
   },
   mutations: {
     updateContainers (state, newList) {
@@ -60,6 +61,9 @@ const store = new Vuex.Store({
     },
     setSharingClient (state, newClient) {
       state.client = newClient;
+    },
+    setRequestClient (state, newClient) {
+      state.requestClient = newClient;
     },
   },
 });

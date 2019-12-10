@@ -3,8 +3,10 @@ import Router from "vue-router";
 import Dashboard from "@/views/Dashboard.vue";
 import Containers from "@/views/Containers.vue";
 import Objects from "@/views/Objects.vue";
-import Shared from "@/views/Shared.vue";
-import SharedObjects from "@/views/SharedObjects.vue";
+import SharedObjects from "@/views/SharedObjects";
+import ShareRequests from "@/views/ShareRequests";
+import SharedTo from "@/views/SharedTo";
+import SharedFrom from "@/views/SharedFrom";
 
 Vue.use(Router);
 
@@ -12,12 +14,22 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/browse/shared/:user",
-      name: "Shared",
-      component: Shared,
+      path: "/browse/sharing/to/:project",
+      name: "SharedTo",
+      component: SharedTo,
     },
     {
-      path: "/browse/shared/:user/:owner/:container",
+      path: "/browse/sharing/from/:project",
+      name: "SharedFrom",
+      component: SharedFrom,
+    },
+    {
+      path: "/browse/sharing/requests/:project",
+      name: "ShareRequests",
+      component: ShareRequests,
+    },
+    {
+      path: "/browse/shared/:project/:owner/:container",
       name: "SharedObjects",
       component: SharedObjects,
     },
