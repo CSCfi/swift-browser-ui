@@ -38,7 +38,7 @@ export BROWSER_START_PORT="8080"'\
 
 Getting started:
 ```
-git clone git@gitlab.csc.fi:CSCCSDP/swift_browser_ui.git
+git clone git@github.com:CSCfi/swift-browser-ui.git
 cd swift_browser_ui
 cd swift_browser_ui_frontend
 npm install

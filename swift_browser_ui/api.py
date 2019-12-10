@@ -3,17 +3,19 @@
 import time
 import os
 import hashlib
-
+import typing
 
 import aiohttp.web
 from swiftclient.service import SwiftError
+from swiftclient.service import SwiftService  # for type hints
 from swiftclient.utils import generate_temp_url
 
+from ._convenience import api_check, initiate_os_service
 
-from ._convenience import api_check
 
-
-async def get_os_user(request):
+async def get_os_user(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Fetch the session owning OS user."""
     session = api_check(request)
     request.app['Log'].info(
@@ -31,7 +33,9 @@ async def get_os_user(request):
     )
 
 
-async def swift_list_buckets(request):
+async def swift_list_buckets(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """
     Return necessary information listing swift buckets in a project.
 
@@ -65,7 +69,9 @@ async def swift_list_buckets(request):
         raise aiohttp.web.HTTPNotFound()
 
 
-async def swift_list_objects(request):
+async def swift_list_objects(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """
     List objects in a given bucket or container.
 
@@ -106,7 +112,57 @@ async def swift_list_objects(request):
         return aiohttp.web.json_response([])
 
 
-async def swift_download_object(request):
+async def swift_list_shared_objects(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """
+    List objects in a shared container.
+
+    The function strips out e.g. the information on a success, since that's
+    not necessary in this case and returns a JSON response containing all the
+    necessary data.
+    """
+    try:
+        session = api_check(request)
+        request.app["Log"].info(
+            "API call for list shared objects from %s, sess: %s :: %s",
+            request.remote,
+            session,
+            time.ctime()
+        )
+
+        # Establish a temporary Openstack SwiftService connection
+        tmp_serv = initiate_os_service(
+            request.app["Creds"][session]["OS_sess"],
+            url=request.query["storageurl"]
+        )
+
+        obj = []
+        list(map(lambda i: obj.extend(i["listing"]),
+                 tmp_serv.list(
+                     container=request.query["container"])))
+        if not obj:
+            raise aiohttp.web.HTTPNotFound()
+
+        # Some tools leave unicode nulls to e.g. file hashes. These must be
+        # replaced as they break the utf-8 text rendering in browsers for some
+        # reason.
+        for i in obj:
+            i['hash'] = i['hash'].replace('\u0000', '')
+            if 'content_type' not in i.keys():
+                i['content_type'] = 'binary/octet-stream'
+            else:
+                i['content_type'] = i['content_type'].replace('\u0000', '')
+
+        return aiohttp.web.json_response(obj)
+
+    except SwiftError:
+        return aiohttp.web.json_response([])
+
+
+async def swift_download_object(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Point a user to a temporary pre-signed download URL."""
     session = api_check(request)
     request.app['Log'].info(
@@ -181,7 +237,11 @@ async def swift_download_object(request):
     return response
 
 
-async def get_object_metadata(conn, meta_cont, meta_obj):
+async def get_object_metadata(
+        conn: SwiftService,
+        meta_cont: str,
+        meta_obj: str
+) -> typing.List[dict]:
     """Get object metadata."""
     try:
         res = list(conn.stat(meta_cont, meta_obj))
@@ -217,7 +277,50 @@ async def get_object_metadata(conn, meta_cont, meta_obj):
         raise aiohttp.web.HTTPNotFound()
 
 
-async def get_metadata(request):
+async def get_metadata_bucket(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Get metadata for a container."""
+    session = api_check(request)
+    request.app['Log'].info(
+        'API cal for project listing from {0}, sess: {1} :: {2}'.format(
+            request.remote,
+            session,
+            time.ctime(),
+        )
+    )
+
+    # Get required variables from query string
+    meta_cont = (
+        request.query['container']
+        if 'container' in request.query.keys()
+        else None
+    )
+    conn = request.app['Creds'][session]['ST_conn']
+    # Get container listing if no object list was specified
+    ret = conn.stat(meta_cont)
+
+    if not ret['success']:
+        raise aiohttp.web.HTTPNotFound()
+
+    # Strip any unnecessary information from the metadata headers
+    ret['headers'] = dict(filter(
+        lambda i: "x-container-meta" in i[0],
+        ret['headers'].items()
+    ))
+    ret['headers'] = {
+        k.replace("x-container-meta-", ""): v
+        for k, v in ret['headers'].items()
+    }
+
+    return aiohttp.web.json_response(
+        [ret['container'], ret['headers']]
+    )
+
+
+async def get_metadata_object(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Get metadata for a container or for an object."""
     session = api_check(request)
     request.app['Log'].info(
@@ -249,26 +352,6 @@ async def get_metadata(request):
 
     conn = request.app['Creds'][session]['ST_conn']
 
-    # Get container listing if no object list was specified
-    if not meta_obj:
-        ret = conn.stat(meta_cont)
-
-        if not ret['success']:
-            raise aiohttp.web.HTTPNotFound()
-
-        # Strip any unnecessary information from the metadata headers
-        ret['headers'] = dict(filter(
-            lambda i: "x-container-meta" in i[0],
-            ret['headers'].items()
-        ))
-        ret['headers'] = {
-            k.replace("x-container-meta-", ""): v
-            for k, v in ret['headers'].items()
-        }
-
-        return aiohttp.web.json_response(
-            [ret['container'], ret['headers']]
-        )
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
     return aiohttp.web.json_response(
@@ -276,7 +359,9 @@ async def get_metadata(request):
     )
 
 
-async def get_project_metadata(request):
+async def get_project_metadata(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Get the bare minimum required project metadata from OS."""
     # The project metadata needs to be filtered for sensitive information, as
     # it contains e.g. temporary URL keys. These keys can be used to pull any
@@ -303,7 +388,9 @@ async def get_project_metadata(request):
     return aiohttp.web.json_response(ret)
 
 
-async def os_list_projects(request):
+async def os_list_projects(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Fetch the projects available for the open session."""
     session = api_check(request)
     request.app['Log'].info(
@@ -320,7 +407,9 @@ async def os_list_projects(request):
     )
 
 
-async def get_os_active_project(request):
+async def get_os_active_project(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Fetch the project currently displayed to the session."""
     session = api_check(request)
     request.app['Log'].info(
@@ -334,8 +423,3 @@ async def get_os_active_project(request):
     return aiohttp.web.json_response(
         request.app['Creds'][session]['active_project']
     )
-
-
-list_buckets = swift_list_buckets
-list_objects = swift_list_objects
-download_object = swift_download_object

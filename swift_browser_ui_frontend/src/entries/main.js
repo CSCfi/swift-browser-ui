@@ -17,6 +17,10 @@ import { getProjects } from "@/common/api";
 import getActiveProject from "@/common/api";
 import { changeProjectApi } from "@/common/api";
 
+// Import Sharing and Request API
+import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
+import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
+
 // Import project state
 import store from "@/common/store";
 
@@ -87,37 +91,64 @@ new Vue({
         });
       }
     });
+    fetch("/discover")
+      .then((resp) => {
+        return resp.json();
+      }).then((ret) => {
+        if (ret.sharing_endpoint) {
+          this.$store.commit(
+            "setSharingClient",
+            new SwiftXAccountSharing(
+              ret.sharing_endpoint,
+              document.location.origin
+            )
+          );
+        }
+        if (ret.request_endpoint) {
+          this.$store.commit(
+            "setRequestClient",
+            new SwiftSharingRequest(
+              ret.request_endpoint,
+              document.location.origin
+            )
+          );
+        }
+      });
   },
   methods: {
     getRouteAsList: function () {
       // Create a list representation of the current application route
-      // to help in the initialization of the breadcrumb component
+      // to be used in the initialization of the breadcrumb component
       let retl = [];
-      if (this.$route.params.user != undefined) {
-        retl.push({
-          alias: this.$route.params.user,
-          address: ("/browse/" + this.$route.params.user),
-        });
-      }
+      
+      retl.push({
+        alias: this.$store.state.uname,
+        address: {name: "Dashboard"},
+      });
+
       if (this.$route.params.project != undefined) {
-        retl.push({
-          alias: this.$route.params.project,
-          address: (
-            "/browse/" + this.$route.params.user +
-            "/" + this.$route.params.project
-          ),
-        });
+        if (this.$route.path.match("sharing") != null) {
+          retl.push({
+            alias: this.$t("message.sharing") + this.$store.state.active.name,
+            address: {name: "SharedTo"},
+          });
+        }
+        else {
+          retl.push({
+            alias: this.$t("message.containers")
+                   + this.$store.state.active.name,
+            address: {name: "Containers"},
+          });
+        }
       }
+
       if (this.$route.params.container != undefined) {
         retl.push({
           alias: this.$route.params.container,
-          address: (
-            "/browse/" + this.$route.params.user +
-            "/" + this.$route.params.project +
-            "/" + this.$route.params.container
-          ),
+          address: {name: "Objects"},
         });
       }
+
       return retl;
     },
     changeProject: function (newProject) {

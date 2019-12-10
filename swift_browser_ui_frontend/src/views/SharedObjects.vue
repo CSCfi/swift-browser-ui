@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="object-table"
-    class="contents"
-  >
+  <div id="object-table">
     <b-field
       grouped
       group-multiline
@@ -31,14 +28,6 @@
           100 {{ $t('message.table.pageNb') }}
         </option>
       </b-select>
-      <div class="control is-flex">
-        <b-switch
-          v-if="oList.length < 500"
-          v-model="isPaginated"
-        >
-          {{ $t('message.table.paginated') }}
-        </b-switch>
-      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -136,41 +125,6 @@
             <b>{{ $t('message.table.fileType') }}: </b>
             {{ props.row.content_type }} 
           </li>
-          <li>
-            <b>{{ $t('message.table.fileDown') }}: </b>
-            <a
-              v-if="props.row.bytes < 1073741824"
-              :href="props.row.url"
-              target="_blank"
-              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            >
-              <b-icon
-                icon="cloud-download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-            <a
-              v-else-if="allowLargeDownloads"
-              :href="props.row.url"
-              target="_blank"
-              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            >
-              <b-icon
-                icon="cloud-download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-            <a
-              v-else
-              :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-              @click="confirmDownload ()"
-            >
-              <b-icon
-                icon="cloud-download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-          </li>
         </ul>
       </template>
       <template slot="empty">
@@ -185,7 +139,7 @@
 </template>
 
 <script>
-import { getObjects } from "@/common/api";
+import { getSharedObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 
@@ -220,28 +174,27 @@ export default {
   beforeMount () {
     this.fetchObjects();
     this.getDirectCurrentPage();
-    this.checkLargeDownloads();
   },
   methods: {
     fetchObjects: function () {
       // Get the object listing from the API if the listing hasn't yet 
       // been cached
-      let container = this.$route.params.container;
-      if(this.$store.state.objectCache[container] == undefined) {
-        this.$store.commit("setLoading", true);
-        getObjects(container).then((ret) => {
-          if (ret.status != 200) {
-            this.$store.commit("setLoading", false);
-          }
-          this.$store.commit("updateObjects", [container, ret]);
+      this.$store.state.client.getAccessDetails(
+        this.$route.params.project,
+        this.$route.params.container,
+        this.$route.params.owner
+      ).then(
+        (ret) => {
+          return getSharedObjects(
+            this.$route.params.container,
+            ret.address
+          );
+        }
+      ).then(
+        (ret) => {
           this.objects = ret;
-          this.$store.commit("setLoading", false);
-        }).catch(() => {
-          this.$store.commit("setLoading", false);
-        });
-      } else {
-        this.objects = this.$store.state.objectCache[container];
-      }
+        }
+      );
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {

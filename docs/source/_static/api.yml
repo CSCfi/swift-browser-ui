@@ -2,14 +2,14 @@ openapi: "3.0.2"
 info:
   title: "swift-browser-ui-api"
   description: "Filtered proxied API from Openstack Swift used for a browser application"
-  version: "0.1.0"
+  version: "0.2.0"
   license:
     name: MIT
 tags:
   - name: API Endpoints
     description: Endpoints for the frontend API
 paths:
-  /api/username:
+  /username:
     get:
       tags:
         - API Endpoints
@@ -23,7 +23,7 @@ paths:
                 $ref: '#/components/schemas/Username'
         403:
           description: Unauthorized
-  /api/projects:
+  /projects:
     get:
       tags:
         - API Endpoints
@@ -37,7 +37,7 @@ paths:
                 $ref: '#/components/schemas/Projects'
         403:
           description: Unauthorized
-  /api/active:
+  /project/active:
     get:
       tags:
         - API Endpoints
@@ -51,7 +51,7 @@ paths:
                 $ref: '#/components/schemas/Project'
         403:
           description: Unauthorized
-  /api/get-project-meta:
+  /project/meta:
     get:
       tags:
         - API Endpoints
@@ -65,7 +65,7 @@ paths:
                 $ref: '#/components/schemas/ProjectMeta'
         403:
           description: Unauthorized
-  /api/buckets:
+  /buckets:
     get:
       tags:
         - API Endpoints
@@ -81,7 +81,7 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/objects:
+  /bucket/objects:
     get:
       tags:
         - API Endpoints
@@ -104,7 +104,30 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/dload:
+  /shared/objects:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get the listing for objects in a known shared container.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Objects"
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /object/dload:
     get:
       tags:
         - API Endpoints
@@ -129,15 +152,38 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/meta:
+  /bucket/meta:
     get:
       tags:
         - API Endpoints
-      summary: Get container or object(s) metadata.
+      summary: Get container metadata.
       parameters:
       - name: container
         in: query
-        description: The container the metadata of which is to be queried, or the container in which the queried objects are.
+        description: The container the metadata of which is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meta'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /bucket/object/meta:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get object(s) metadata.
+      parameters:
+      - name: container
+        in: query
+        description: The container in which the queried objects are.
         schema:
           type: string
           example: test-container-1
@@ -158,7 +204,6 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-
 components:
   schemas:
 

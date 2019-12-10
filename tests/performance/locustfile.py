@@ -28,14 +28,14 @@ def api_containers(l_instance):
 def api_objects(l_instance):
     """Get object listing."""
     l_instance.client.get(
-        "/api/objects?bucket=test-container-0"
+        "/api/bucket/objects?bucket=test-container-0"
     )
 
 
 def api_active(l_instance):
     """Get active project."""
     l_instance.client.get(
-        "/api/active"
+        "/api/project/active"
     )
 
 
@@ -56,7 +56,7 @@ def api_username(l_instance):
 def api_project_meta(l_instance):
     """Get the project metadata."""
     l_instance.client.get(
-        "/api/get-project-meta"
+        "/api/project/meta"
     )
 
 

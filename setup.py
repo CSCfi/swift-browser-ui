@@ -9,7 +9,7 @@ setuptools.setup(
     author=__author__,
     author_email="sampsa.penna@csc.fi",
     project_urls={
-        'Source': 'https://gitlab.csc.fi/CSCCSDP/swift-browser-ui',
+        'Source': 'https://github.com/CSCfi/swift-browser-ui',
     },
     license='MIT',
     install_requires=[

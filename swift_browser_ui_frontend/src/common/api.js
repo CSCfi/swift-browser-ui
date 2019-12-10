@@ -49,7 +49,8 @@ export default async function getActiveProject () {
   // Fetch the active project from the API
   // Returns the active project name if the fetch is successful, otherwise
   // returns nothing
-  let getProjectURL = new URL( "/api/active", document.location.origin );
+  let getProjectURL = new URL( "/api/project/active", 
+    document.location.origin );
   let activeProj = fetch(
     getProjectURL, { method: "GET", credentials: "same-origin" }
   ).then(
@@ -74,10 +75,36 @@ export async function getBuckets () {
 export async function getObjects (container) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL( "/api/objects", document.location.origin );
+  let objUrl = new URL( "/api/bucket/objects", document.location.origin );
   // Search parameter named bucket to avoid changing the API after changing
   // over from S3 to Swift
   objUrl.searchParams.append( "bucket", container );
+  let objects = fetch(
+    objUrl, { method: "GET", credentials: "same-origin" }
+  ).then(
+    function ( resp ) { return resp.json(); }
+  ).then(
+    function( ret ) {
+      for ( let i = 0; i < ret.length; i++ ) {
+        ret[i]["url"] = (
+          "/api/object/dload?bucket=" + container +
+          "&objkey=" + ret[i]["name"]
+        );
+      }
+      return ret;
+    }
+  );
+  return objects;
+}
+
+export async function getSharedObjects (container, url) {
+  // Fetch objects contained in a container from the API for the user
+  // that's currently logged in.
+  let objUrl = new URL( "/api/shared/objects", document.location.origin );
+  // Search parameter named bucket to avoid changing the API after changing
+  // over from S3 to Swift
+  objUrl.searchParams.append( "storageurl", url);
+  objUrl.searchParams.append( "container", container );
   let objects = fetch(
     objUrl, { method: "GET", credentials: "same-origin" }
   ).then(
@@ -99,7 +126,7 @@ export async function getObjects (container) {
 export async function getProjectMeta () {
   // Fetch project metadata for the currently active project, containing
   // the project data usage, container amount and object amount.
-  let metaURL = new URL( "/api/get-project-meta", document.location.origin );
+  let metaURL = new URL( "/api/project/meta", document.location.origin );
   let ret = fetch(
     metaURL, {method: "GET", credentials: "same-origin" }
   ).then( function ( resp ) { return resp.json(); } )

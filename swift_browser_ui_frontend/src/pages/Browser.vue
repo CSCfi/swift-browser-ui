@@ -1,10 +1,9 @@
 <template>
-  <div>
+  <div id="mainContainer">
     <BrowserNavbar
       :langs="langs"
       :multiple-projects="multipleProjects"
       :projects="projects"
-      :active="active"
     />
     <div
       class="breadcrumb"
@@ -48,9 +47,23 @@
 </template>
 
 <style>
+html, body {
+  height: 100%;
+}
+
+#mainContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.contents {
+  flex: 1 0 auto;
+}
+
 .navbar .container .navbar-brand .navbar-item img {
 	max-height: 2.5rem;
 }
+
 .hero-body #login-center{
     padding: 30px 20px 20px 20px;
 }
@@ -72,5 +85,9 @@
 .dashboard {
     margin-left: 5%;
     margin-right: 5%;
+}
+
+.footer {
+  flex-shrink: 0;
 }
 </style>
