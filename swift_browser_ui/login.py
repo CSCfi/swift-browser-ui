@@ -4,9 +4,12 @@
 import time
 import hashlib
 import json
+import re
 
 # aiohttp
 import aiohttp.web
+
+import urllib.error
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
@@ -14,22 +17,27 @@ from ._convenience import initiate_os_session, initiate_os_service
 from .settings import setd
 
 
-async def handle_login(_):
+async def handle_login(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Create new session cookie for the user."""
     response = aiohttp.web.Response(
         status=302,
         reason="Redirection to login"
     )
 
+    # Add a cookie for navigating
+    if "navto" in request.query.keys():
+        response.set_cookie("NAV_TO", request.query["navto"], expires=3600)
+
     response.headers['Location'] = "/login/front"
 
     return response
 
 
-async def sso_query_begin(_):
+async def sso_query_begin(_) -> aiohttp.web.Response:
     """Display login page and initiate federated keystone authentication."""
-    # Return the form based login page if the service isn't trusted on the
-    # endpoint
+    # Return the form based login page if the service isn't trusted
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
             setd['static_directory'] + '/login.html'
@@ -57,7 +65,9 @@ async def sso_query_begin(_):
     return response
 
 
-async def sso_query_end(request):
+async def sso_query_end(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle the login procedure return from SSO or user from POST."""
     log = request.app['Log']
     # Declare the unscoped token
@@ -97,11 +107,17 @@ async def sso_query_end(request):
         )
     if unscoped is None:
         raise aiohttp.web.HTTPClientError(
-            reason="No Token ID was specified, token id is required"
+            reason="Token missing from query"
+        )
+    if not (
+            re.match("[a-f0-9]{32}", unscoped) and
+            len(unscoped) == 32
+    ):
+        raise aiohttp.web.HTTPClientError(
+            reason="Token is malformed"
         )
 
-    # Now as we have a confirmation of having the token, we can establish
-    # connection and begin the session
+    # Establish connection and begin session
     response = aiohttp.web.Response(
         status=303
     )
@@ -130,31 +146,17 @@ async def sso_query_end(request):
     # Initiate the credential dictionary
     request.app['Creds'][session] = {}
 
-    # Save the unscoped token to the session, as it may be needed for token
-    # re-scoping?
+    # Save the unscoped token to the session, as it's needed for re-scoping
     request.app['Creds'][session]['Token'] = unscoped
 
-    # If the user didn't specify an existing project when logging in (in the
-    # last active -header), check project availability with a list of domains,
-    # save the information inside the app mapping.
-    request.app['Creds'][session]['Avail'] =\
-        get_availability_from_token(unscoped)
-
-    # If we're using the non-WebSSO login, check token validity
-    if (
-            request.app['Creds'][session]['Avail'] == "INVALID" and
-            not setd['has_trust']
-    ):
-        response = aiohttp.web.Response(
-            status=302
+    # Check token availability
+    try:
+        request.app['Creds'][session]['Avail'] =\
+            get_availability_from_token(unscoped)
+    except urllib.error.HTTPError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Token no longer valid"
         )
-        response.headers['Location'] = "/login"
-        response.set_cookie(
-            name="INVALID_TOKEN",
-            value="true",
-            max_age=120,
-        )
-        return response
 
     if "LAST_ACTIVE" in request.cookies:
         if (request.cookies["LAST_ACTIVE"] not in [
@@ -193,13 +195,19 @@ async def sso_query_end(request):
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id, expires=2592000)
 
-    # Redirect to the browse page with the correct credentials
-    response.headers['Location'] = "/browse"
+    # Redirect to the browse page
+    if "NAV_TO" in request.cookies.keys():
+        response.headers['Location'] = request.cookies["NAV_TO"]
+        response.del_cookie("NAV_TO")
+    else:
+        response.headers['Location'] = "/browse"
 
     return response
 
 
-async def token_rescope(request):
+async def token_rescope(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Rescope the requesting session's token to the new project."""
     session_check(request)
     session = decrypt_cookie(request)["id"]
@@ -260,7 +268,9 @@ async def token_rescope(request):
     return response
 
 
-async def handle_logout(request):
+async def handle_logout(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Properly kill the session for the user."""
     if not setd['set_session_devmode']:
         try:

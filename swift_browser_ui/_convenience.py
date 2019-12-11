@@ -10,7 +10,6 @@ from hashlib import sha256
 from os import urandom
 import json
 import logging
-import re
 import urllib.request
 import typing
 
@@ -222,10 +221,6 @@ def get_availability_from_token(
     Return type:
         dict(keys=('projects': List(str), 'domains': List(str)))
     """
-    # Check that the token is an actual token
-    if not re.match("^[a-f0-9]*$", token):
-        return "INVALID"
-
     # setup token header
     hdr = {
         "X-Auth-Token": token,
