@@ -40,6 +40,7 @@ from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
 from .signature import handle_signature_request
+from .misc_handlers import handle_bounce_direct_access_request
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -148,6 +149,12 @@ async def servinit() -> aiohttp.web.Application:
     # Add discovery routes
     app.add_routes([
         aiohttp.web.get('/discover', handle_discover)
+    ])
+
+    # Add direct routes
+    app.add_routes([
+        aiohttp.web.get('/direct/request',
+                        handle_bounce_direct_access_request)
     ])
 
     # Add graceful shutdown handler
