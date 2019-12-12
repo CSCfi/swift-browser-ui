@@ -1,8 +1,8 @@
 <template>
   <section>
     <b-field
-      label="Project"
       v-if="projects.length > 1"
+      label="Project"
     >
       <b-select
         :placeholder="active.name"
@@ -18,6 +18,7 @@
       </b-select>
     </b-field>
     <b-field
+      v-else
       horizontal
       :label="$t('message.request.container')"
       :message="$t('message.request.container_message')"
@@ -57,6 +58,8 @@
 </template>
 
 <script>
+import delay from "lodash/delay";
+
 export default {
   name: "DirectRequest",
   data () {
@@ -64,7 +67,6 @@ export default {
       container: "",
       owner: "",
       project: "",
-      chosen: "",
     };
   },
   computed: {
@@ -76,9 +78,9 @@ export default {
     },
   },
   beforeMount () {
-    this.project = active.id
-    checkMultiProject();
-    this.setParams();
+    this.setActive(50)
+    this.checkMultiProject(50);
+    this.setParams(50);
   },
   methods: {
     requestShare: function () {
@@ -90,25 +92,40 @@ export default {
         this.$router.go();
       });
     },
-    setParams: function () {
-      this.container = this.$route.query.container;
-      this.owner = this.$route.query.owner;
+    setActive: function (wait) {
+      try {
+        this.project = this.active.id;
+      } catch(ReferenceError) {
+        delay(this.setActive, wait, [wait * 2])
+      }
     },
-    checkMultiProject: function () {
-      if (projects.length > 1) {
-        this.$buefy.notification.open({
-          indefinite: true,
-          message: "Account has access to multiple projects. " +
-          "Please verify that the correct project is set active in the " +
-          "menu, and submit the request with the Request button.",
-          type: "is-danger"
-        })
+    setParams: function (wait) {
+      try {
+        this.container = this.$route.query.container;
+        this.owner = this.$route.query.owner;
+      } catch (ReferenceError) {
+        delay(this.setParams, wait, [wait * 2]);
       }
+    },
+    checkMultiProject: function (wait) {
+      try {
+        if (this.projects.length > 1) {
+          this.$buefy.notification.open({
+            indefinite: true,
+            message: "Account has access to multiple projects. " +
+            "Please verify that the correct project is set active in the " +
+            "menu, and submit the request with the Request button.",
+            type: "is-danger"
+          });
+        }
 
-      else {
-        this.requestShare()
+        else {
+          this.requestShare();
+        }
+      } catch (ReferenceError) {
+        delay(this.checkMultiProject, wait, [wait * 2]);
       }
-    }
+    },
   },
 };
 </script>
