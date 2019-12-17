@@ -45,7 +45,7 @@ class SwiftSharingRequest:
 
         params = {
             "owner": owner,
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         }
 
@@ -65,7 +65,7 @@ class SwiftSharingRequest:
         signature = sign_api_request(path)
 
         params = {
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         }
 
@@ -85,7 +85,7 @@ class SwiftSharingRequest:
         signature = sign_api_request(path)
 
         params = {
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         }
 
@@ -105,7 +105,7 @@ class SwiftSharingRequest:
         signature = sign_api_request(path)
 
         params = {
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         }
 
@@ -129,7 +129,7 @@ class SwiftSharingRequest:
 
         params = {
             "owner": owner,
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         }
 
