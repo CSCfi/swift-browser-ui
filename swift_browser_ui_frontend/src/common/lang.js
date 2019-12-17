@@ -83,6 +83,7 @@ const translations = {
         shared_details_to: "Shared to: ",
         shared_details_address: "Container address: ",
         shared_details_rights: "Rights given: ",
+        created: "Created",
       },
       request: {
         container: "Container / Identfier",
@@ -144,6 +145,7 @@ const translations = {
         fileType: "Tyyppi",
         fileDown: "Tiedoston lataus",
         owner: "Säiliön omistaja",
+        created: "Luotu",
       },
       dashboard: {
         prj_usage: "Projektin resurssienkäyttö",
