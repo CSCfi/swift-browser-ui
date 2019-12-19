@@ -115,3 +115,102 @@ class DBConnTestClass(asynctest.TestCase):
             await self.db.open()
             await self.db.close()
             self.db.conn.close.assert_awaited_once()
+
+
+class DBMethodTestCase(asynctest.TestCase):
+    """Test database query methods."""
+
+    def setUp(self):
+        """Set up required mocks."""
+        self.connection_transaction_mock = asynctest.MagicMock(
+            asyncpg.Connection.transaction
+        )
+
+        self.asyncpg_connection_mock = SimpleNamespace(**{
+            "fetch": asynctest.CoroutineMock(
+                return_value=[{
+                    "container": "test-container",
+                    "container_owner": "test-owner",
+                    "recipient": "test-receiver",
+                    "address": "test-address",
+                    "r_read": True,
+                    "r_write": True,
+                }]
+            ),
+            "fetchrow": asynctest.CoroutineMock(
+                return_value={
+                    "r_read": True,
+                    "r_write": True,
+                    "container": "test-container",
+                    "container_owner": "test-owner",
+                    "recipient": "test-recipient",
+                    "address": "test-address",
+                }
+            ),
+            "execute": asynctest.CoroutineMock(),
+            "transaction": self.connection_transaction_mock
+        })
+
+        self.db = DBConn()
+        self.db.conn = self.asyncpg_connection_mock
+
+    async def test_add_share(self):
+        """Test add_share method."""
+        await self.db.add_share(
+            "test-owner",
+            "test-container",
+            ["test-user1", "test-user2", "test-user3", "test-user4"],
+            ["r"],
+            "http://test-address/"
+        )
+        self.db.conn.execute.assert_awaited()
+
+    async def test_edit_share(self):
+        """Test edit_share method."""
+        await self.db.edit_share(
+            "test-owner",
+            "test-container",
+            ["test-user1", "test-user2", "test-user3", "test-user4"],
+            ["r"]
+        )
+        self.db.conn.execute.assert_awaited()
+
+    async def test_delete_share(self):
+        """Test delete_share method."""
+        await self.db.delete_share(
+            "test-owner",
+            "test-container",
+            ["test-user1", "test-user2", "test-user3"]
+        )
+        self.db.conn.execute.assert_awaited()
+
+    async def test_get_access_list(self):
+        """Test get_access_list method."""
+        await self.db.get_access_list(
+            "test-user"
+        )
+        self.db.conn.fetch.assert_awaited_once()
+
+    async def test_get_shared_list(self):
+        """Test get_shared_list method."""
+        await self.db.get_shared_list(
+            "test-user"
+        )
+        self.db.conn.fetch.assert_awaited_once()
+
+    async def test_get_access_container_details(self):
+        """Test get_access_container_details method."""
+        await self.db.get_access_container_details(
+            "test-user",
+            "test-owner",
+            "test-container"
+        )
+        self.db.conn.fetchrow.assert_awaited_once()
+
+    async def test_get_shared_container_details(self):
+        """Test get_shared_container_details_method."""
+        await self.db.get_shared_container_details(
+            "test-owner",
+            "test-container"
+        )
+        self.db.conn.fetch.assert_awaited_once()
