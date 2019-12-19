@@ -2,6 +2,7 @@
 
 
 import unittest
+from types import SimpleNamespace
 
 
 import asynctest
@@ -16,16 +17,16 @@ class DBConnTestClass(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.asyncpg_connection_mock = asynctest.MagicMock(
-            asyncpg.Connection
-        )
+        self.asyncpg_connection_mock = SimpleNamespace(**{
+            "close": asynctest.CoroutineMock()
+        })
         self.patch_asyncpg_connection = unittest.mock.patch(
             "swift_x_account_sharing.db.asyncpg.Connection",
             new=self.asyncpg_connection_mock
         )
 
         self.asyncpg_connect_mock = asynctest.CoroutineMock(
-            return_value=self.asyncpg_connection_mock(),
+            return_value=self.asyncpg_connection_mock,
         )
         self.patch_asyncpg_connect = unittest.mock.patch(
             "swift_x_account_sharing.db.asyncpg.connect",
@@ -105,3 +106,12 @@ class DBConnTestClass(asynctest.TestCase):
                 self.asyncpg_connect_mock_invalid_pwd.assert_called()
                 self.asyncio_sleep_mock.assert_awaited_once()
                 self.assertIsNone(self.db.conn)
+
+    async def test_db_connection_close(self):
+        """Test closing the database connection."""
+        with self.patch_asyncpg_connection, \
+                self.patch_asyncpg_connect, \
+                self.patch_os_environ_get:
+            await self.db.open()
+            await self.db.close()
+            self.db.conn.close.assert_awaited_once()
