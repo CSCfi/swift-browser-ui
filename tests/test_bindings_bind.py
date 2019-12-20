@@ -11,20 +11,52 @@ import asynctest
 from swift_x_account_sharing.bindings.bind import SwiftXAccountSharing
 
 
-class MockRequestContextManager:
+class MockRequestContextManager(asynctest.TestCase):
     """Mock class for aiohttp request context manager."""
 
     def __init__(self, *args, **kwargs):
         """."""
-
-    async def __aenter__(self, *args, **kwargs):
-        """."""
-        return SimpleNamespace(**{
+        self.resp = SimpleNamespace(**{
             "text": asynctest.CoroutineMock(
                 return_value="[]"
             ),
             "status": 204
         })
+
+    async def __aenter__(self, *args, **kwargs):
+        """."""
+        return self.resp
+
+
+class MockGenericContextManager(MockRequestContextManager):
+    """Mock class for aiohttp context manager."""
+
+    def __init__(self, *args, **kwargs):
+        """."""
+        super(MockGenericContextManager, self).__init__(
+            self,
+            *args,
+            **kwargs
+        )
+
+    async def __aexit__(self, *excinfo):
+        """Perform assertions done upon exit."""
+        self.resp.text.assert_awaited()
+
+
+# Delete method mock context manager won't have any assertions in the
+# __aexit__ method, since there's no real assertable functionality.
+# Functionality will be tested in integration testing.
+class MockDeleteContextManager(MockRequestContextManager):
+    """Mock class for aiohttp delete context manager."""
+
+    def __init__(self, *args, **kwargs):
+        """."""
+        super(MockDeleteContextManager, self).__init__(
+            self,
+            *args,
+            **kwargs
+        )
 
     async def __aexit__(self, *excinfo):
         """."""
@@ -37,10 +69,10 @@ class BindingsClassTestCase(asynctest.TestCase):
         """Set up relevant mocks."""
         self.session_mock = SimpleNamespace(**{
             "close": asynctest.CoroutineMock(),
-            "get": MockRequestContextManager,
-            "post": MockRequestContextManager,
-            "patch": MockRequestContextManager,
-            "delete": MockRequestContextManager,
+            "get": MockGenericContextManager,
+            "post": MockGenericContextManager,
+            "patch": MockGenericContextManager,
+            "delete": MockDeleteContextManager,
         })
         self.session_open_mock = unittest.mock.Mock(
             return_value=self.session_mock
