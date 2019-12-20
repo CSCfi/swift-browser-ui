@@ -43,7 +43,7 @@ class SwiftXAccountSharing:
             username: str
     ) -> typing.List[dict]:
         """List the containers the user has been given access to."""
-        path = "/access/{0}".format_map(username)
+        path = "/access/{0}".format(username)
         url = self.url + path
 
         params = sign_api_request(path)
