@@ -43,7 +43,7 @@ class SwiftXAccountSharing:
             username: str
     ) -> typing.List[dict]:
         """List the containers the user has been given access to."""
-        path = "/access/{0}".format(username)
+        path = f"/access/{username}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -58,10 +58,7 @@ class SwiftXAccountSharing:
             owner: str
     ) -> dict:
         """Get details from a container the user has been given access to."""
-        path = "/access/{0}/{1}".format(
-            username,
-            container
-        )
+        path = f"/access/{username}/{container}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -75,7 +72,7 @@ class SwiftXAccountSharing:
             username: str
     ) -> typing.List[dict]:
         """List the containers the user has shared to another user / users."""
-        path = "/share/{0}".format(username)
+        path = f"/share/{username}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -89,10 +86,7 @@ class SwiftXAccountSharing:
             container: str
     ) -> dict:
         """Get details from a container the user has given access to."""
-        path = "/share/{0}/{1}".format(
-            username,
-            container
-        )
+        path = f"/share/{username}/{container}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -109,10 +103,7 @@ class SwiftXAccountSharing:
             address: str
     ) -> dict:
         """Upload details about a new share action."""
-        path = "/share/{0}/{1}".format(
-            username,
-            container
-        )
+        path = f"/share/{username}/{container}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -134,10 +125,7 @@ class SwiftXAccountSharing:
             accesslist: typing.List[str]
     ) -> dict:
         """Edit the details of an existing share action."""
-        path = "/share/{0}/{1}".format(
-            username,
-            container
-        )
+        path = f"/share/{username}/{container}"
         url = self.url + path
 
         params = sign_api_request(path)
@@ -156,10 +144,7 @@ class SwiftXAccountSharing:
             userlist: typing.List[str]
     ) -> bool:
         """Delete the details of an existing share action."""
-        path = "/share/{0}/{1}".format(
-            username,
-            container
-        )
+        path = f"/share/{username}/{container}"
         url = self.url + path
 
         params = sign_api_request(path)
