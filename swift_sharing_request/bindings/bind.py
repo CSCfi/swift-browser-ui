@@ -2,15 +2,20 @@
 
 
 import json
-
+import typing
 
 import aiohttp
+
+from .signature import sign_api_request
 
 
 class SwiftSharingRequest:
     """Swift Sharing Request backend client."""
 
-    def __init__(self, url):
+    def __init__(
+            self,
+            url: str
+    ):
         """."""
         self.url = url
         self.session = aiohttp.ClientSession()
@@ -23,60 +28,109 @@ class SwiftSharingRequest:
         """."""
         await self.session.close()
 
-    async def add_access_request(self, user, container, owner):
+    async def add_access_request(
+            self,
+            user: str,
+            container: str,
+            owner: str
+    ) -> dict:
         """Add a request for container access."""
-        url = "{0}/request/user/{1}/{2}".format(
-            self.url,
+        path = "/request/user/{0}/{1}".format(
             user,
             container
         )
+        url = self.url + path
+
+        signature = sign_api_request(path)
+
         params = {
             "owner": owner,
+            "valid": signature["valid"],
+            "signature": signature["signature"],
         }
 
         async with self.session.post(url, params=params) as resp:
             return json.loads(await resp.text())
 
-    async def list_made_requests(self, user):
+    async def list_made_requests(
+            self,
+            user: str
+    ) -> typing.List[dict]:
         """List requests made by user."""
-        url = "{0}/request/user/{1}".format(
-            self.url,
+        path = "/request/user/{0}".format(
             user
         )
+        url = self.url + path
 
-        async with self.session.get(url) as resp:
+        signature = sign_api_request(path)
+
+        params = {
+            "valid": signature["valid"],
+            "signature": signature["signature"],
+        }
+
+        async with self.session.get(url, params=params) as resp:
             return json.loads(await resp.text())
 
-    async def list_owned_requests(self, user):
+    async def list_owned_requests(
+            self,
+            user: str
+    ) -> typing.List[dict]:
         """List requests owned by the user."""
-        url = "{0}/request/owner/{1}".format(
-            self.url,
+        path = "/request/owner/{0}".format(
             user
         )
+        url = self.url + path
 
-        async with self.session.get(url) as resp:
+        signature = sign_api_request(path)
+
+        params = {
+            "valid": signature["valid"],
+            "signature": signature["signature"],
+        }
+
+        async with self.session.get(url, params=params) as resp:
             return json.loads(await resp.text())
 
-    async def list_container_requests(self, container):
+    async def list_container_requests(
+            self,
+            container: str
+    ) -> typing.List[dict]:
         """List requests made for a container."""
-        url = "{0}/request/container/{1}".format(
-            self.url,
+        path = "/request/container/{0}".format(
             container
         )
+        url = self.url + path
 
-        async with self.session.get(url) as resp:
+        signature = sign_api_request(path)
+
+        params = {
+            "valid": signature["valid"],
+            "signature": signature["signature"],
+        }
+
+        async with self.session.get(url, params=params) as resp:
             return json.loads(await resp.text())
 
     async def share_delete_access(
             self,
-            username,
-            container,
-            owner
-    ):
+            username: str,
+            container: str,
+            owner: str
+    ) -> bool:
         """Delete the details of an existing access request."""
-        url = "{0}/request/user/{1}/{2}".format(self.url, username, container)
+        path = "/request/user/{0}/{1}".format(
+            username,
+            container
+        )
+        url = self.url + path
+
+        signature = sign_api_request(path)
+
         params = {
             "owner": owner,
+            "valid": signature["valid"],
+            "signature": signature["signature"],
         }
 
         async with self.session.delete(url, params=params) as resp:
