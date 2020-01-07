@@ -35,10 +35,7 @@ class SwiftSharingRequest:
             owner: str
     ) -> dict:
         """Add a request for container access."""
-        path = "/request/user/{0}/{1}".format(
-            user,
-            container
-        )
+        path = f"/request/user/{user}/{container}"
         url = self.url + path
 
         signature = sign_api_request(path)
@@ -57,9 +54,7 @@ class SwiftSharingRequest:
             user: str
     ) -> typing.List[dict]:
         """List requests made by user."""
-        path = "/request/user/{0}".format(
-            user
-        )
+        path = f"/request/user/{user}"
         url = self.url + path
 
         signature = sign_api_request(path)
@@ -77,9 +72,7 @@ class SwiftSharingRequest:
             user: str
     ) -> typing.List[dict]:
         """List requests owned by the user."""
-        path = "/request/owner/{0}".format(
-            user
-        )
+        path = f"/request/owner/{user}"
         url = self.url + path
 
         signature = sign_api_request(path)
@@ -97,9 +90,7 @@ class SwiftSharingRequest:
             container: str
     ) -> typing.List[dict]:
         """List requests made for a container."""
-        path = "/request/container/{0}".format(
-            container
-        )
+        path = f"/request/container/{container}"
         url = self.url + path
 
         signature = sign_api_request(path)
@@ -119,10 +110,7 @@ class SwiftSharingRequest:
             owner: str
     ) -> bool:
         """Delete the details of an existing access request."""
-        path = "/request/user/{0}/{1}".format(
-            username,
-            container
-        )
+        path = "/request/user/{username}/{container}"
         url = self.url + path
 
         signature = sign_api_request(path)
