@@ -109,7 +109,6 @@ class APITestClass(asynctest.TestCase):
         self.json_mock.return_value.status = 204
         with self.patch_json_dump:
             resp = await share_container_handler(self.mock_request)
-            print(resp)
             self.assertEqual(resp.status, 204)
 
     async def test_endpoint_edit_share_correct(self):
