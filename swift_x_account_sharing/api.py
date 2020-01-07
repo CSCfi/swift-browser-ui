@@ -184,9 +184,6 @@ async def delete_share_handler(request):
         "Deleted following shares: %s", str(deleted)
     )
 
-    if not deleted:
-        raise aiohttp.web.HTTPNotFound()
-
     return aiohttp.web.Response(
         status=204,
         body="OK"
