@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <div class="contents">
     <b-field
       v-if="projects.length > 1"
       horizontal
@@ -56,7 +56,7 @@
         </button>
       </p>
     </b-field>
-  </section>
+  </div>
 </template>
 
 <script>

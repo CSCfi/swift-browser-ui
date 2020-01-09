@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <div>
     <b-field
       horizontal
       :label="$t('message.request.container')"
@@ -34,7 +34,7 @@
         </button>
       </p>
     </b-field>
-  </section>
+  </div>
 </template>
 
 <script>
