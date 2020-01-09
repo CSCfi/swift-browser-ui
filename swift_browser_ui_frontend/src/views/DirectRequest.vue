@@ -2,6 +2,7 @@
   <section>
     <b-field
       v-if="projects.length > 1"
+      horizontal
       label="Project"
     >
       <b-select
@@ -13,7 +14,7 @@
           :key="item.id"
           :value="item.id"
         >
-          {{ project.name }}
+          {{ item.name }}
         </option>
       </b-select>
     </b-field>
@@ -43,7 +44,9 @@
       />
     </b-field>
 
-    <b-field>
+    <b-field
+      horizontal
+    >
       <p class="control">
         <button
           class="button is-primary"
