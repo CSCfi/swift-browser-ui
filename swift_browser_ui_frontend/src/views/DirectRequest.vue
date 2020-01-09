@@ -5,20 +5,19 @@
       label="Project"
     >
       <b-select
-        :placeholder="active.name"
         v-model="project"
+        :placeholder="active.name"
       >
         <option
           v-for="item in projects"
-          :value="item.id"
           :key="item.id"
+          :value="item.id"
         >
           {{ project.name }}
         </option>
       </b-select>
     </b-field>
     <b-field
-      v-else
       horizontal
       :label="$t('message.request.container')"
       :message="$t('message.request.container_message')"
@@ -78,7 +77,7 @@ export default {
     },
   },
   beforeMount () {
-    this.setActive(50)
+    this.setActive(50);
     this.checkMultiProject(50);
     this.setParams(50);
   },
@@ -96,7 +95,7 @@ export default {
       try {
         this.project = this.active.id;
       } catch(ReferenceError) {
-        delay(this.setActive, wait, [wait * 2])
+        delay(this.setActive, wait, [wait * 2]);
       }
     },
     setParams: function (wait) {
@@ -113,9 +112,9 @@ export default {
           this.$buefy.notification.open({
             indefinite: true,
             message: "Account has access to multiple projects. " +
-            "Please verify that the correct project is set active in the " +
-            "menu, and submit the request with the Request button.",
-            type: "is-danger"
+              "Please verify that the correct project is set active in the " +
+              "menu, and submit the request with the Request button.",
+            type: "is-danger",
           });
         }
 
