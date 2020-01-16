@@ -1,10 +1,10 @@
 <template>
-  <div class="contents">
+  <section class="contents">
     <div class="sharing-view">
       <SharedMenu />
       <SharedTable />
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>

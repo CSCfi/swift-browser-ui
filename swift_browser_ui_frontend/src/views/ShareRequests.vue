@@ -1,5 +1,5 @@
 <template>
-  <div class="contents">
+  <section class="contents">
     <div class="sharing-view">
       <SharedMenu />
       <div class="requestview">
@@ -7,7 +7,7 @@
         <ShareRequestsTable />
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
