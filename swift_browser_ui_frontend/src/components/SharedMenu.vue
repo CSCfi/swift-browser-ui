@@ -3,7 +3,7 @@
     <b-menu-list>
       <b-menu-item
         :label="$t('message.share.to_me')"
-        icon="folder-shared"
+        icon="folder-account"
         tag="router-link"
         :to="{name :'SharedTo' ,params: {project: $route.params.project}}"
       />

@@ -7,7 +7,7 @@
       <div class="navbar-brand">
         <a
           class="navbar-item csclogo"
-          href="#"
+          :href="'/browse/'.concat(uname)"
         >
           <img
             src="@/assets/csc_logo.svg"

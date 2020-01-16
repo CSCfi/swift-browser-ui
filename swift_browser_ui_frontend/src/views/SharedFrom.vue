@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="contents">
     <div class="sharing-view">
       <SharedMenu />
       <SharedOutTable />
