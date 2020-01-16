@@ -3,7 +3,7 @@
     <b-field
       v-if="projects.length > 1"
       horizontal
-      label="Project"
+      :label="$t('message.request.project')"
     >
       <b-select
         v-model="project"
@@ -114,9 +114,7 @@ export default {
         if (this.projects.length > 1) {
           this.$buefy.notification.open({
             indefinite: true,
-            message: "Account has access to multiple projects. " +
-              "Please verify that the correct project is set active in the " +
-              "menu, and submit the request with the Request button.",
+            message: this.$t("message.request.multi_project"),
             type: "is-danger",
           });
         }
