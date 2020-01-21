@@ -118,3 +118,5 @@ src/server.py
 
 # environment variable files
 setenvs*
+swift_browser_ui_frontend/src/common/swift_sharing_request_bind.js
+swift_browser_ui_frontend/src/common/swift_x_account_sharing_bind.js
