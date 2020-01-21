@@ -1,5 +1,8 @@
 <template>
-  <div id="shared-out-table">
+  <div 
+    id="shared-out-table"
+    class="column"
+  >
     <b-field
       grouped
       group-multiline

@@ -1,5 +1,6 @@
 <template>
   <div id="requested-shares-table">
+    <hr>
     <b-field
       grouped
       grouped-multiline
@@ -87,6 +88,13 @@
     </b-table>
   </div>
 </template>
+
+<style scoped>
+#requested-shares-table {
+  margin-top: 20px;
+}
+</style>
+
 
 <script>
 import delay from "lodash/delay";

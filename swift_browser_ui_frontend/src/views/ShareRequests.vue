@@ -1,8 +1,10 @@
 <template>
   <section class="contents">
-    <div class="sharing-view">
-      <SharedMenu />
-      <div class="requestview">
+    <div class="sharing-view columns">
+      <SharedMenu 
+        class="column is-one-fifth"
+      />
+      <div class="requestview column">
         <RequestSharing />
         <ShareRequestsTable />
       </div>
@@ -13,8 +15,8 @@
 <style scoped>
 .sharing-view {
   display: flex;
-  padding-left: 3%;
-  padding-right: 3%;
+  padding-left: 5%;
+  padding-right: 5%;
   width: auto;
 }
 #SharedMenu {

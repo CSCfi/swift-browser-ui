@@ -47,9 +47,10 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                v-if="!($route.name == 'Dashboard')"
                 :to="{name: 'Dashboard', params: {user: uname}}"
-                class="button is-primary has-text-light"
+                :class="!($route.name == 'Dashboard') ? 
+                  'button is-primary is-outlined' : 
+                  'button is-primary has-text-light'"
               >
                 {{ $t("message.dashboard.dashboard") }}
               </router-link>
@@ -58,11 +59,12 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                v-if="!($route.name == 'Containers'
-                  ||$route.name == 'Objects')"
                 :to="{name: 'Containers',
                       params: {user: uname, project: active.name}}"
-                class="button is-primary has-text-light"
+                :class="!($route.name == 'Containers'
+                  || $route.name == 'Objects') ? 
+                  'button is-primary is-outlined' : 
+                  'button is-primary has-text-light'"
               >
                 {{ $t("message.dashboard.browser") }}
               </router-link>
@@ -74,13 +76,13 @@
           >
             <div class="buttons">
               <router-link
-                v-if="!(
-                  $route.name == 'SharedTo' ||
-                  $route.name == 'SharedFrom' ||
-                  $route.name == 'ShareRequests'
-                )"
                 :to="{name: 'SharedTo', params: {project: active.id}}"
-                class="button is-primary has-text-light"
+                :class="
+                  !($route.name == 'SharedTo' ||
+                    $route.name == 'SharedFrom' || 
+                    $route.name == 'ShareRequests') ? 
+                    'button is-primary is-outlined' : 
+                    'button is-primary has-text-light'"
               >
                 {{ $t("message.share.shared") }}
               </router-link>
@@ -107,7 +109,7 @@
           <div class="navbar-item">
             <div class="buttons">
               <a
-                class="button is-primary has-text-light"
+                class="button is-primary is-outlined"
                 href="/login/kill"
               >{{ $t("message.logOut") }}</a>
             </div>
