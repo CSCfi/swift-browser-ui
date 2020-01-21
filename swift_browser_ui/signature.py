@@ -89,7 +89,10 @@ async def handle_form_post_signature(
     )
 
     signature = hmac.new(
-        temp_url_key, hmac_body, digestmod="sha1").hexdigest()
+        temp_url_key.encode('utf-8'),
+        hmac_body.encode('utf-8'),
+        digestmod="sha1"
+    ).hexdigest()
 
     return aiohttp.web.json_response({
         "signature": signature,
