@@ -6,7 +6,7 @@ API, cache manipulation, cookies etc.
 """
 
 
-from hashlib import sha256
+from hashlib import sha256, md5
 from os import urandom
 import json
 import logging
@@ -308,3 +308,26 @@ def initiate_os_service(
     )
 
     return os_sc
+
+
+async def get_tempurl_key(
+        connection
+) -> str:
+    """Get the correct temp URL key from Openstack."""
+    stats = connection.stat()
+
+    # Check for the existence of the key headers
+    try:
+        acc_meta_hdr = stats['headers']
+        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
+    except KeyError:
+        try:
+            temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
+        # If key headers don't exist, generate a new temporary URL
+        except KeyError:
+            temp_url_key = md5(urandom(128)).hexdigest()  # nosec
+            meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
+            retval = connection.post(options=meta_options)
+            if not retval['success']:
+                raise aiohttp.web.HTTPServerError()
+    return temp_url_key

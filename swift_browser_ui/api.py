@@ -1,8 +1,6 @@
 """Project functions for handling API requests from front-end."""
 
 import time
-import os
-import hashlib
 import typing
 
 import aiohttp.web
@@ -10,7 +8,7 @@ from swiftclient.service import SwiftError
 from swiftclient.service import SwiftService  # for type hints
 from swiftclient.utils import generate_temp_url
 
-from ._convenience import api_check, initiate_os_service
+from ._convenience import api_check, initiate_os_service, get_tempurl_key
 
 
 async def get_os_user(
@@ -175,41 +173,10 @@ async def swift_download_object(
 
     serv = request.app['Creds'][session]['ST_conn']
     sess = request.app['Creds'][session]['OS_sess']
-    stats = serv.stat()
 
-    # Check for the existence of the key headers
-    acc_meta_hdr = stats['headers']
-    if 'x-account-meta-temp-url-key' in acc_meta_hdr.keys():
-        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
-    elif 'x-acccount-meta-temp-url-key-2' in acc_meta_hdr.keys():
-        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
-    # If the key headers don't exist, assume that the key has to be created by
-    # the service
-    else:
-        # The hash only provides random data for the key, it doesn't have to
-        # be cryptographically secure.
-        temp_url_key = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
-        # This service will use the X-Account-Meta-Temp-URL-Key-2 header for
-        # its own key storage, if no existing keys are provided.
-        meta_options = {
-            "meta": ["Temp-URL-Key-2:{0}".format(
-                temp_url_key
-            )]
-        }
-        retval = serv.post(
-            options=meta_options
-        )
-        if not retval['success']:
-            raise aiohttp.web.HTTPServerError()
-        request.app['Log'].info(
-            "Created a temp url key for account {0} Key:{1} :: {2}".format(
-                stats['items'][0][1], temp_url_key, time.ctime()
-            )
-        )
+    temp_url_key = await get_tempurl_key(serv)
     request.app['Log'].debug(
-        "Using {0} as temporary URL key :: {1}".format(
-            temp_url_key, time.ctime()
-        )
+        "Using %s as temporary URL key", temp_url_key
     )
     # Generate temporary URL
     host = sess.get_endpoint(service_type="object-store").split('/v1')[0]
@@ -225,7 +192,7 @@ async def swift_download_object(
     # In the path creation, the stats['items'][0][1] is the tenant id from
     # server statistics, the order should be significant, so this shouldn't
     # be a problem
-    path = '%s/%s/%s' % (path_begin, container, object_key)
+    path = f'{path_begin}/{container}/{object_key}'
 
     dloadurl = (host +
                 generate_temp_url(path, lifetime, temp_url_key, 'GET'))
