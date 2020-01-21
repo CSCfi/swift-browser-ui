@@ -72,8 +72,8 @@ async def handle_form_post_signature(
         host, ""
     )
 
-    container = request.query["container"]
-    object_prefix = request.query["prefix"]
+    container = request.match_info["container"]
+    object_prefix = request.match_info["prefix"]
     max_file_count = request.query["count"]
     max_file_size = "5368709120"
 

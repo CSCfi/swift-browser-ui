@@ -136,7 +136,7 @@ async def servinit() -> aiohttp.web.Application:
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
     ])
     app.add_routes([
-        aiohttp.web.get('/uploda/{container}/{prefix}',
+        aiohttp.web.get('/upload/{container}/{prefix}',
                         handle_form_post_signature)
     ])
 
