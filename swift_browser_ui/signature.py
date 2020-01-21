@@ -7,7 +7,7 @@ import time
 import aiohttp.web
 
 from .settings import setd
-from ._convenience import session_check
+from ._convenience import session_check, api_check, get_tempurl_key
 
 
 async def handle_signature_request(
@@ -45,4 +45,58 @@ async def handle_signature_request(
     return aiohttp.web.json_response({
         "signature": digest,
         "valid_until": valid_until,
+    })
+
+
+async def handle_form_post_signature(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle call for a form signature."""
+    session = api_check(request)
+    request.app['Log'].info(
+        'API call for download object from %s, sess. %s',
+        request.remote,
+        session
+    )
+
+    serv = request.app['Creds'][session]['ST_conn']
+    sess = request.app['Creds'][session]['OS_sess']
+
+    temp_url_key = await get_tempurl_key(serv)
+    request.app['Log'].debug(
+        "Using %s as temporary URL key.", temp_url_key
+    )
+
+    host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
+    path_begin = sess.get_endpoint(service_type="object-store").replace(
+        host, ""
+    )
+
+    container = request.query["container"]
+    object_prefix = request.query["prefix"]
+    max_file_count = request.query["count"]
+    max_file_size = "5368709120"
+
+    expires = int(time.time() + 60 * 15)
+    path = f'{path_begin}/{container}/{object_prefix}'
+
+    hmac_body = '%s\n%s\n%s\n%s\n%s' % (
+        path,
+        "",
+        max_file_size,
+        max_file_count,
+        expires
+    )
+
+    signature = hmac.new(
+        temp_url_key, hmac_body, digestmod="sha1").hexdigest()
+
+    return aiohttp.web.json_response({
+        "signature": signature,
+        "max_file_size": str(max_file_size),
+        "max_file_count": max_file_count,
+        "expires": expires,
+        "path": path,
+        "container": container,
+        "prefix": object_prefix,
     })

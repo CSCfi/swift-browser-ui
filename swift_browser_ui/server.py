@@ -43,7 +43,7 @@ from .api import (
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
-from .signature import handle_signature_request
+from .signature import handle_signature_request, handle_form_post_signature
 from .misc_handlers import handle_bounce_direct_access_request
 
 
@@ -134,6 +134,10 @@ async def servinit() -> aiohttp.web.Application:
     # Add signature endpoint
     app.add_routes([
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
+    ])
+    app.add_routes([
+        aiohttp.web.get('/uploda/{container}/{prefix}',
+                        handle_form_post_signature)
     ])
 
     # Add api routes
