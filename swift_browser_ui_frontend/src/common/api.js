@@ -97,7 +97,10 @@ export async function getObjects (container) {
   return objects;
 }
 
-export async function getSharedObjects (container, url) {
+export async function getSharedObjects (
+  container,
+  url
+) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
   let objUrl = new URL( "/api/shared/objects", document.location.origin );
@@ -128,7 +131,7 @@ export async function getProjectMeta () {
   // the project data usage, container amount and object amount.
   let metaURL = new URL( "/api/project/meta", document.location.origin );
   let ret = fetch(
-    metaURL, {method: "GET", credentials: "same-origin" }
+    metaURL, { method: "GET", credentials: "same-origin" }
   ).then( function ( resp ) { return resp.json(); } )
     .then( function ( json_ret ) {
       let newRet = json_ret;
@@ -205,4 +208,26 @@ export async function getSharedContainerAddress () {
     addrURL, {method: "GET", credentials: "same-origin"}
   );
   return ret.json();
+}
+
+
+export async function getUploadSignature (
+  container,
+  prefix,
+  count
+) {
+  // Get a signature for Swift FormPost upload
+  let signURL = new URL( "/upload/".concat(
+    container,
+    "/",
+    prefix
+  ), document.location.origin);
+  signURL.searchParams.append("count", count);
+
+  let ret = fetch(
+    signURL, { method: "GET", credentials: "same-origin" }
+  ).then(
+    (resp) => { return resp.json(); }
+  );
+  return ret;
 }
