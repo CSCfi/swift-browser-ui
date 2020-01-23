@@ -135,6 +135,8 @@ const translations = {
       searchBy: "Search by Name",
       sharing: "Sharing - ",
       containers: "Containers - ",
+      upload: " Upload",
+      uploadfolder: " Upload Folder",
     },
   },
   fi: {
@@ -270,6 +272,8 @@ const translations = {
       searchBy: "Etsi nimellä",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
+      upload: " Lähetä",
+      uploadfolder: " Lähetä kansio",
     },
   },
 };
