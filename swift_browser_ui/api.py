@@ -5,7 +5,7 @@ import typing
 
 import aiohttp.web
 from swiftclient.service import SwiftError
-from swiftclient.service import SwiftService  # for type hints
+from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
 from ._convenience import api_check, initiate_os_service, get_tempurl_key
@@ -65,6 +65,35 @@ async def swift_list_buckets(
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
+
+
+async def swift_create_container(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Create a new container according to the name specified."""
+    try:
+        session = api_check(request)
+        request.app['Log'].info(
+            'API call for bucket creation from %s, sess %s',
+            request.remote,
+            session
+        )
+        # Shamelessly use private methods from SwiftService to avoid writing
+        # own implementation
+        res = request.app['Creds'][session]['ST_conn']._create_container_job(
+            get_conn(request.app['Creds'][session]['ST_conn']._options),
+            request.match_info["container"]
+        )
+    except SwiftError:
+        raise aiohttp.web.HTTPServerError(
+            reason="Container creation failure"
+        )
+    # Return HTTPCreated upon a successful creation
+    if res["success"]:
+        return aiohttp.web.Response(status=201)
+    raise aiohttp.web.HTTPClientError(
+        reason=res["error"]
+    )
 
 
 async def swift_list_objects(

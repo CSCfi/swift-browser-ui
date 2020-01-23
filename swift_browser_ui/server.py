@@ -39,6 +39,7 @@ from .api import (
     remove_container_acl,
     add_project_container_acl,
     get_shared_container_address,
+    swift_create_container,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -143,6 +144,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add api routes
     app.add_routes([
         aiohttp.web.get('/api/buckets', swift_list_buckets),
+        aiohttp.web.get('/api/containers/{container}', swift_create_container),
         aiohttp.web.get('/api/bucket/objects', swift_list_objects),
         aiohttp.web.get('/api/object/dload', swift_download_object),
         aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),
