@@ -231,3 +231,20 @@ export async function getUploadSignature (
   );
   return ret;
 }
+
+
+export async function swiftCreateContainer (
+  container
+) {
+  // Create a container matching the specified name.
+  let fetchURL = new URL( "/api/containers/".concat(
+    container
+  ));
+
+  let ret = await fetch(
+    fetchURL, { method: "PUT", credentials: "same-origin" }
+  );
+  if (ret.status != 201) {
+    throw new Error("Container creation not successful.");
+  }
+}
