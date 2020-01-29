@@ -219,10 +219,12 @@ export async function getUploadSignature (
   // Get a signature for Swift FormPost upload
   let signURL = new URL( "/upload/".concat(
     container,
-    "/",
-    prefix
   ), document.location.origin);
+
   signURL.searchParams.append("count", count);
+  if (prefix) {
+    signURL.searchParams.append("prefix", prefix);
+  }
 
   let ret = fetch(
     signURL, { method: "GET", credentials: "same-origin" }
@@ -239,7 +241,7 @@ export async function swiftCreateContainer (
   // Create a container matching the specified name.
   let fetchURL = new URL( "/api/containers/".concat(
     container
-  ));
+  ), document.location.origin);
 
   let ret = await fetch(
     fetchURL, { method: "PUT", credentials: "same-origin" }

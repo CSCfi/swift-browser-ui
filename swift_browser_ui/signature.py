@@ -73,12 +73,17 @@ async def handle_form_post_signature(
     )
 
     container = request.match_info["container"]
-    object_prefix = request.match_info["prefix"]
+    try:
+        object_prefix = request.query["prefix"]
+    except KeyError:
+        object_prefix = ""
     max_file_count = request.query["count"]
     max_file_size = "5368709120"
 
     expires = int(time.time() + 60 * 15)
-    path = f'{path_begin}/{container}/{object_prefix}'
+    path = f'{path_begin}/{container}/'
+    if object_prefix:
+        path = path + object_prefix
 
     hmac_body = '%s\n%s\n%s\n%s\n%s' % (
         path,
@@ -99,6 +104,7 @@ async def handle_form_post_signature(
         "max_file_size": str(max_file_size),
         "max_file_count": max_file_count,
         "expires": expires,
+        "host": host,
         "path": path,
         "container": container,
         "prefix": object_prefix,

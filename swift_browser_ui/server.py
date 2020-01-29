@@ -137,14 +137,14 @@ async def servinit() -> aiohttp.web.Application:
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
     ])
     app.add_routes([
-        aiohttp.web.get('/upload/{container}/{prefix}',
+        aiohttp.web.get('/upload/{container}',
                         handle_form_post_signature)
     ])
 
     # Add api routes
     app.add_routes([
         aiohttp.web.get('/api/buckets', swift_list_buckets),
-        aiohttp.web.get('/api/containers/{container}', swift_create_container),
+        aiohttp.web.put('/api/containers/{container}', swift_create_container),
         aiohttp.web.get('/api/bucket/objects', swift_list_objects),
         aiohttp.web.get('/api/object/dload', swift_download_object),
         aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),

@@ -39,31 +39,7 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <b-field class="file">
-        <b-upload 
-          v-model="files"
-          multiple
-          native
-        >
-          <a class="button is-primary is-outlined">
-            <b-icon icon="upload" />
-            {{ $t('message.upload') }}
-          </a>
-        </b-upload>
-      </b-field>
-      <b-field class="file">
-        <b-upload
-          v-model="folders"
-          webkitdirectory
-          multiple
-          native
-        >
-          <a class="button is-primary is-outlined">
-            <b-icon icon="folder-upload" />
-            {{ $t('message.uploadfolder') }}
-          </a>
-        </b-upload>
-      </b-field>
+      <FolderUploadForm />
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -175,12 +151,16 @@
 </template>
 
 <script>
-import { getBuckets } from "@/common/api";
+import {
+  getBuckets,
+} from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import FolderUploadForm from "@/components/FolderUpload";
 
 export default {
   name: "Containers",
+  components: {FolderUploadForm},
   data: function () {
     return {
       bList: [],
