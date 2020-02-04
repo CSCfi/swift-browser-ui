@@ -323,7 +323,7 @@ async def get_tempurl_key(
     except KeyError:
         try:
             temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
-        # If key headers don't exist, generate a new temporary URL
+        # If key headers don't exist, generate a new temporary URL key
         except KeyError:
             temp_url_key = md5(urandom(128)).hexdigest()  # nosec
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
@@ -331,3 +331,30 @@ async def get_tempurl_key(
             if not retval['success']:
                 raise aiohttp.web.HTTPServerError()
     return temp_url_key
+
+
+async def get_container_tempurl_key(
+        connection,
+        container,
+) -> str:
+    """Get the correct temp URL key for container operations."""
+    stats = connection.stat(container=container)
+
+    # Check for the existence of the key headers
+    try:
+        cont_meta_hdr = stats['headers']
+        temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key']
+    except KeyError:
+        try:
+            temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key-2']
+        # If key headers don't exist generate a new temporary URL key
+        except KeyError:
+            temp_cont_key = md5(urandom(128)).hexdigest()  # nosec
+            meta_options = {"meta": [f'Temp-URL-Key-2:{temp_cont_key}']}
+            retval = connection.post(
+                container=container,
+                options=meta_options
+            )
+            if not retval['success']:
+                raise aiohttp.web.HTTPServerError()
+    return temp_cont_key

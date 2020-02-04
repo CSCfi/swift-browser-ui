@@ -61,8 +61,12 @@ async def handle_form_post_signature(
 
     serv = request.app['Creds'][session]['ST_conn']
     sess = request.app['Creds'][session]['OS_sess']
+    container = request.match_info["container"]
 
-    temp_url_key = await get_tempurl_key(serv)
+    temp_url_key = await get_tempurl_key(
+        serv,
+        # container
+    )
     request.app['Log'].debug(
         "Using %s as temporary URL key.", temp_url_key
     )
@@ -72,15 +76,14 @@ async def handle_form_post_signature(
         host, ""
     )
 
-    container = request.match_info["container"]
     try:
         object_prefix = request.query["prefix"]
     except KeyError:
         object_prefix = ""
-    max_file_count = request.query["count"]
-    max_file_size = "5368709120"
+    max_file_count = int(request.query["count"])
+    max_file_size = 5368709120
 
-    expires = int(time.time() + 60 * 15)
+    expires = int(time.time() + 84600)
     path = f'{path_begin}/{container}/'
     if object_prefix:
         path = path + object_prefix
@@ -101,7 +104,7 @@ async def handle_form_post_signature(
 
     return aiohttp.web.json_response({
         "signature": signature,
-        "max_file_size": str(max_file_size),
+        "max_file_size": max_file_size,
         "max_file_count": max_file_count,
         "expires": expires,
         "host": host,

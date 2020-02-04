@@ -3,7 +3,7 @@
     enctype="multipart/form-data"
     method="post"
     name="contFolders"
-    @submit.prevent="folderUpload ()"
+    @submit.prevent="callUpload ()"
   >
     <input
       id="directoryFileList"
@@ -28,7 +28,13 @@ import {
 export default {
   name: "FolderUploadForm",
   methods: {
-    folderUpload: function () {
+    callUpload: function () {
+      // Wrapper for the asynchronous upload function
+      this.folderUpload().then(() => {
+        console.log("Called folder upload");
+      });
+    },
+    folderUpload: async function () {
       // Upload a folder using Openstack Swift FormPost API
 
       let containerName = "swift-browser-ui-upload-".concat(
@@ -41,30 +47,30 @@ export default {
       let uploadData = new FormData(form);
 
       console.log("Creating container");
-      swiftCreateContainer(containerName).then(
-        getUploadSignature(
-          containerName,
-          undefined,
-          files.files.length
-        ).then((signature) => {
-          console.log(signature);
-          uploadData.append("redirect", "");
-          uploadData.append("max_file_size", signature.max_file_size);
-          uploadData.append("max_file_count", signature.max_file_count);
-          uploadData.append("expores", signature.expires);
-          uploadData.append("signature", signature.signature);
+      await swiftCreateContainer(containerName);
+      console.log("Container creation successful");
 
-          let address = signature.host.concat(
-            signature.path
-          );
-          return new URL(address);
-        }).then((uploadUrl) => {
-          fetch(uploadUrl, {
-            method: "POST",
-            body: uploadData,
-          });
-        })
+      let signature = await getUploadSignature(
+        containerName,
+        undefined,
+        files.files.length
       );
+      console.log(signature);
+
+      uploadData.append("redirect", "");
+      uploadData.append("max_file_size", signature.max_file_size);
+      uploadData.append("max_file_count", signature.max_file_count);
+      uploadData.append("expires", signature.expires);
+      uploadData.append("signature", signature.signature);
+
+      let address = new URL(signature.host.concat(signature.path));
+
+      console.log(uploadData);
+
+      await fetch(address, {
+        method: "POST",
+        body: uploadData,
+      });
       console.log("File upload successful");
     },
   },
