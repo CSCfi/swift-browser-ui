@@ -1,38 +1,42 @@
 <template>
   <section>
-    <b-field
-      horizontal
-      :label="$t('message.request.container')"
-      :message="$t('message.request.container_message')"
-    >
-      <b-input 
-        v-model="container"
-        name="container"
+    <b-field grouped>
+      <b-field
+        horizontal
+        :label="$t('message.request.container')"
+        :message="$t('message.request.container_message')"
         expanded
-      />
-    </b-field>
+      >
+        <b-input 
+          v-model="container"
+          name="container"
+          expanded
+        />
+      </b-field>
 
-    <b-field
-      horizontal
-      :label="$t('message.request.owner')"
-      :message="$t('message.request.owner_message')"
-    >
-      <b-input
-        v-model="owner"
-        name="owner"
+      <b-field
+        horizontal
+        :label="$t('message.request.owner')"
+        :message="$t('message.request.owner_message')"
         expanded
-      />
-    </b-field>
+      >
+        <b-input
+          v-model="owner"
+          name="owner"
+          expanded
+        />
+      </b-field>
 
-    <b-field>
-      <p class="control">
-        <button
-          class="button is-primary"
-          @click="requestShare ()"
-        >
-          {{ $t('message.request.request') }}
-        </button>
-      </p>
+      <b-field>
+        <p class="control">
+          <button
+            class="button is-primary"
+            @click="requestShare ()"
+          >
+            {{ $t('message.request.request') }}
+          </button>
+        </p>
+      </b-field>
     </b-field>
   </section>
 </template>

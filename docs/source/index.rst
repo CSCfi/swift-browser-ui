@@ -7,7 +7,7 @@ Object browser for CSC Pouta
 ============================
 
 A Web UI object browser for object storage back-ends using Openstack Keystone
-for authentication (e.g. `CSC Pouta <https://research.csc.fi/pouta-user-guide>`_).
+for authentication (e.g. `CSC Pouta <https://docs.csc.fi/cloud/pouta/>`_).
 It uses federated login via `HAKA <https://rr.funet.fi/haka/>`_, via the
 endpoints provided by `OpenStack Keystone <https://docs.openstack.org/keystone/latest/>`_.
 

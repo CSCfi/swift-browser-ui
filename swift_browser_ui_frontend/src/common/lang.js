@@ -83,13 +83,19 @@ const translations = {
         shared_details_to: "Shared to: ",
         shared_details_address: "Container address: ",
         shared_details_rights: "Rights given: ",
+        created: "Created",
       },
       request: {
+        project: "Project",
         container: "Container / Identfier",
         container_message: "The requested container name",
         owner: "Owner",
         owner_message: "The requested container owner",
         request: "Request",
+        multi_project: "Account has access to multiple projects. " +
+                       "Please verify that the correct project is set " +
+                       "active in the menu, and submit the request with " +
+                       "the Request button.",
       },
       largeFileMessage: "",
       download: "Download",
@@ -144,6 +150,7 @@ const translations = {
         fileType: "Tyyppi",
         fileDown: "Tiedoston lataus",
         owner: "Säiliön omistaja",
+        created: "Luotu",
       },
       dashboard: {
         prj_usage: "Projektin resurssienkäyttö",
@@ -193,11 +200,16 @@ const translations = {
         shared_details_rights: "Annetut oikeudet: ",
       },
       request: {
+        project: "Projekti",
         container: "Säiliö / tunniste",
         container_message: "Jaettavaksi pyydetyn säiliön nimi",
         owner: "Omistaja",
         owner_message: "Jaettavaksi pyydetyn säiliön omistaja",
         request: "Pyydä jakoa",
+        multi_project: "Käyttäjällä on pääsy useisiin projekteihin. " +
+                       "Tarkistathan, että haluttu projekti on valittu " +
+                       "valikossa, ja lisää pyyntö Pyydä jakoa " +
+                       "-painikkeella.",
       },
       largeFileMessage: "",
       download: "Lataa",

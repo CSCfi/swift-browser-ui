@@ -71,25 +71,25 @@ new Vue({
     });
     getProjects().then((value) => {
       this.$store.commit("setProjects", value);
-      if (document.location.pathname == "/browse") {
-        getActiveProject().then((value) => {
-          this.$store.commit("setActive", value);
+
+      getActiveProject().then((value) => {
+        this.$store.commit("setActive", value);
+        if (
+          value.name != this.$route.params.project &&
+          this.$route.params.project != undefined
+        ) {
+          this.changeProject(this.$route.params.project);
+        }
+        if (document.location.pathname == "/browse") {
           this.$router.push(
-            "/browse/" +
-            this.$store.state.uname +
-            "/" +
-            this.$store.state.active["name"]
+            "/browse/".concat(
+              this.$store.state.uname,
+              "/",
+              value.name
+            )
           );
-        });
-      }
-      if (this.$store.state.active["name"] != this.$route.params.project) {
-        getActiveProject().then((value) => {
-          this.$store.commit("setActive", value);
-          if (value["name"] != this.$route.params.project) {
-            this.changeProject(this.$route.params.project);
-          }
-        });
-      }
+        }
+      });
     });
     fetch("/discover")
       .then((resp) => {

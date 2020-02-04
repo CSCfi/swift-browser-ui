@@ -4,9 +4,10 @@ import hashlib
 import os
 import unittest
 import json
+import types
 
 import asynctest
-from aiohttp.web import HTTPClientError, HTTPForbidden
+import aiohttp
 
 import swift_browser_ui.login
 import swift_browser_ui.settings
@@ -24,7 +25,11 @@ class LoginTestClass(asynctest.TestCase):
 
     async def test_handle_login(self):
         """Test initial login handler."""
-        resp = await swift_browser_ui.login.handle_login(None)
+        mock_req = types.SimpleNamespace(**{
+            "query": {"navto": "http://example"}
+        })
+        resp = await swift_browser_ui.login.handle_login(mock_req)
+
         self.assertEqual(resp.headers['Location'], "/login/front")
         self.assertEqual(resp.status, 302)
 
@@ -222,7 +227,7 @@ class LoginTestClass(asynctest.TestCase):
         with patch1, patch2, patch3, patch4:
             req = get_request_with_fernet()
 
-            with self.assertRaises(HTTPClientError):
+            with self.assertRaises(aiohttp.web.HTTPClientError):
                 _ = await swift_browser_ui.login.sso_query_end(req)
 
     async def test_sso_query_end_unsuccessful_invalid_token(self):
@@ -251,15 +256,13 @@ class LoginTestClass(asynctest.TestCase):
 
         with patch1, patch2, patch3, patch4, patch5:
             req = get_request_with_fernet()
-            token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            # token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
+            token = "incorrect_token"  # nosec
 
             req.headers['X-Auth-Token'] = token
 
-            resp = await swift_browser_ui.login.sso_query_end(req)
-
-            self.assertEqual(resp.status, 302)
-            self.assertEqual(resp.headers['Location'], "/login")
-            self.assertIn("INVALID_TOKEN", resp.cookies)
+            with self.assertRaises(aiohttp.web.HTTPClientError):
+                await swift_browser_ui.login.sso_query_end(req)
 
     async def test_handle_logout(self):
         """Test the logout function."""
@@ -283,7 +286,7 @@ class LoginTestClass(asynctest.TestCase):
         req.app["Creds"][session]["Avail"] = \
             json.loads(mock_token_project_avail)
         req.query["project"] = "non-existent-project"
-        with self.assertRaises(HTTPForbidden):
+        with self.assertRaises(aiohttp.web.HTTPForbidden):
             await swift_browser_ui.login.token_rescope(req)
 
     async def test_token_rescope_correct(self):

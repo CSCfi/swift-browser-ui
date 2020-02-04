@@ -167,7 +167,10 @@ def login(drv):
             drv.find_element_by_link_text("Kirjaudu sisään")
         )
     drv.implicitly_wait(1)
-    drv.find_element_by_id("inputbox").submit()
+
+    login_field = drv.find_element_by_id("inputbox")
+    login_field.send_keys("abcdefabcdefabcdefabcdefabcdefab")
+    login_field.submit()
     while drv.current_url != \
             ADDRESS + "/browse/test_user_id/placeholder":
         time.sleep(0.25)

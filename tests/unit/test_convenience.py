@@ -198,9 +198,6 @@ class TestConvenienceFunctions(unittest.TestCase):
         with unittest.mock.patch("swift_browser_ui._convenience.setd", new={
             "auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"
         }):
-            # Test with an invalid token
-            self.assertEqual(get_availability_from_token("awefjoiooivo"),
-                             "INVALID")
 
             # Make the required patches to urllib.request to test the function
             with unittest.mock.patch("urllib.request.urlopen", new=urlopen):

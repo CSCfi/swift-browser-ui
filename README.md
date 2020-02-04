@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/CSCfi/swift-browser-ui.svg?branch=master)](https://travis-ci.com/CSCfi/swift-browser-ui)
 [![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=master)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/swift-browser-ui/badge/?version=latest)](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)
-[![](https://images.microbadger.com/badges/image/cscfi/swift-ui.svg)](https://microbadger.com/images/cscfi/swift-ui "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/cscfi/swift-ui.svg)](https://microbadger.com/images/cscfi/swift-ui "Get your own version badge on microbadger.com")
 
 
 ### Description
@@ -18,7 +18,7 @@ Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
 Python 3.6+ required
 
 The dependencies mentioned in `requirements.txt` and an account that has access
-rights to [CSC Pouta](https://research.csc.fi/pouta-user-guide) platform, 
+rights to [CSC Pouta](https://docs.csc.fi/cloud/pouta/) platform, 
 and is taking part to at least one project as
 object storage is project specific.
 
