@@ -25,7 +25,8 @@ class DBConn:
                     password=os.environ.get("REQUEST_DB_PASSWORD", None),
                     user=os.environ.get("REQUEST_DB_USER", "request"),
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
-                    database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest")
+                    database=os.environ.get("REQUEST_DB_DATABASE",
+                                            "swiftrequest")
                 )
             except (ConnectionError, OSError) as exp:
                 self.conn = None
@@ -62,7 +63,7 @@ class DBConn:
         if self.conn is not None:
             await self.conn.close()
 
-    async def erase(self):
+    def erase(self):
         """Erase a failed connection."""
         self.conn = None
 
