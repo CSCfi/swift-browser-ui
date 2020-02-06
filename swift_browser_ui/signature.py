@@ -7,7 +7,7 @@ import time
 import aiohttp.web
 
 from .settings import setd
-from ._convenience import session_check, api_check, get_tempurl_key
+from ._convenience import session_check, api_check, get_container_tempurl_key
 
 
 async def handle_signature_request(
@@ -63,9 +63,9 @@ async def handle_form_post_signature(
     sess = request.app['Creds'][session]['OS_sess']
     container = request.match_info["container"]
 
-    temp_url_key = await get_tempurl_key(
+    temp_url_key = await get_container_tempurl_key(
         serv,
-        # container
+        container
     )
     request.app['Log'].debug(
         "Using %s as temporary URL key.", temp_url_key
