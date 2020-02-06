@@ -39,6 +39,7 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
+      <FileUploadForm />
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -187,10 +188,12 @@
 <script>
 import { getObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
+import FileUploadForm from "@/components/FileUpload";
 import debounce from "lodash/debounce";
 
 export default {
   name: "Objects",
+  components: { FileUploadForm },
   data: function () {
     return {
       oList: [],
