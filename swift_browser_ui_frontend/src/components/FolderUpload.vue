@@ -52,8 +52,8 @@ export default {
 
       let signature = await getUploadSignature(
         containerName,
-        undefined,
-        files.files.length
+        files.files.length,
+        undefined
       );
       console.log(signature);
 

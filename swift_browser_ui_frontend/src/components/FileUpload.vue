@@ -31,7 +31,7 @@
     >
     <input
       type="file"
-      name="testfile"
+      name="to-upload"
       @change="prepareSignature"
     >
     <input type="submit">
@@ -60,14 +60,16 @@ export default {
       // Prepare signature for the file upload.
       getUploadSignature(
         this.$route.params.container,
+        1,
         "",
-        1
+        document.location
       ).then((ret) => {
         this.address = ret.host.concat(ret.path);
         this.max_file_size = ret.max_file_size;
         this.max_file_count= ret.max_file_count;
         this.expires = ret.expires;
         this.signature = ret.signature;
+        this.redirect = document.location.toString();
       });
     },
   },

@@ -213,8 +213,9 @@ export async function getSharedContainerAddress () {
 
 export async function getUploadSignature (
   container,
+  count,
   prefix,
-  count
+  redirect
 ) {
   // Get a signature for Swift FormPost upload
   let signURL = new URL( "/upload/".concat(
@@ -224,6 +225,9 @@ export async function getUploadSignature (
   signURL.searchParams.append("count", count);
   if (prefix) {
     signURL.searchParams.append("prefix", prefix);
+  }
+  if (redirect) {
+    signURL.searchParams.append("redirect", redirect);
   }
 
   let ret = fetch(
