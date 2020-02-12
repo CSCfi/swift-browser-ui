@@ -73,7 +73,7 @@ setd = {
     "has_trust": environ.get(
         "BROWSER_START_HAS_TRUST", False
     ),
-    "set_origin_access": environ.get(
+    "set_origin_address": environ.get(
         "BROWSER_START_SET_ORIGIN_ADDRESS", None
     ),
     "logfile": None,
