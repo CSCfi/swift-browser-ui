@@ -1,9 +1,18 @@
 <template>
   <section>
     <b-button
+      v-if="!isLoading"
       is-primary
       is-inverted
       @click="syncShares"
+    >
+      {{ $t('message.discover.sync_shares') }}
+    </b-button>
+    <b-button
+      v-else
+      is-primary
+      is-inverted
+      loading
     >
       {{ $t('message.discover.sync_shares') }}
     </b-button>
@@ -15,8 +24,14 @@ import {getAccessControlMeta} from "@/common/api";
 
 export default {
   name: "ACLDiscoverButton",
+  data: function () {
+    return {
+      isLoading: false,
+    };
+  },
   methods: {
     syncShares: function () {
+      this.isLoading = true;
       getAccessControlMeta().then(async (acl) => {
         let amount = 0;
         let aclmeta = acl.access;
@@ -71,6 +86,7 @@ export default {
             type: "is-success",
           });
         }
+        this.isLoading = false;
       });
     },
     checkDuplicate: async function (
