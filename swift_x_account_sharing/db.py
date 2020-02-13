@@ -148,7 +148,10 @@ class DBConn:
         )
 
         return [
-            {"container": i["container"], "owner": i["container_owner"]}
+            {
+                "container": i["container"],
+                "owner": i["container_owner"]
+            }
             for i in query
         ]
 
@@ -156,17 +159,15 @@ class DBConn:
         """Get the containers that the user has shared."""
         query = await self.conn.fetch(
             """
-            SELECT DISTINCT container
+            SELECT DISTINCT
+                container
             FROM Shares
             WHERE container_owner = $1
             """,
             user,
         )
 
-        return [
-            {"container": i["container"]}
-            for i in query
-        ]
+        return [i["container"] for i in query]
 
     async def get_access_container_details(self, user, owner, container):
         """Get shared container details for share receiver."""
