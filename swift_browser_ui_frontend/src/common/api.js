@@ -139,3 +139,13 @@ export async function getProjectMeta () {
     });
   return ret;
 }
+
+
+export async function getAccessControlMeta () {
+  // Fetch the ACL metadata for all project containers.
+  let metaURL = new URL( "/api/project/acl", document.location.origin );
+  let ret = fetch(
+    metaURL, {method: "GET", credentials: "same-origin" }
+  ).then(function (ret) {return ret.json();});
+  return ret;
+}

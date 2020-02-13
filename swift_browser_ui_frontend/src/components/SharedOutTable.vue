@@ -29,6 +29,7 @@
           100 {{ $t('message.table.pageNb') }}
         </option>
       </b-select>
+      <ACLDiscoverButton />
     </b-field>
     <b-table
       focusable
@@ -89,12 +90,14 @@
 
 <script>
 import SharedDetails from "@/components/SharedDetails";
+import ACLDiscoverButton from "@/components/ACLDiscover";
 import delay from "lodash/delay";
 
 export default {
   name: "SharedOutTable",
   components: {
     SharedDetails,
+    ACLDiscoverButton,
   },
   data: function () {
     return {
