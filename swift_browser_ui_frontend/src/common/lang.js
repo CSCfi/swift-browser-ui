@@ -39,6 +39,12 @@ const translations = {
         owner: "Container owner",
         created: "Created",
       },
+      discover: {
+        sync_shares: "Synchronize shared containers",
+        sync_success_template: "Successfully synchronized ",
+        sync_success_concat: " shared containers",
+        sync_failure_template: "No new shared containers to synchronize.",
+      },
       dashboard: {
         prj_usage: "Project usage",
         account: "Account",
@@ -151,6 +157,12 @@ const translations = {
         fileDown: "Tiedoston lataus",
         owner: "Säiliön omistaja",
         created: "Luotu",
+      },
+      discover: {
+        sync_shares: "Synkronoi jaetut säiliöt",
+        sync_success_template: "Synkronoitiin ",
+        sync_success_concat: " jaettua säiliötä",
+        sync_failure_template: "Ei uusia jaettuja säiliöitä synkronoitavaksi.",
       },
       dashboard: {
         prj_usage: "Projektin resurssienkäyttö",

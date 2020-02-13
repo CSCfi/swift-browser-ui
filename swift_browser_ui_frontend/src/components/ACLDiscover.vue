@@ -5,7 +5,7 @@
       is-inverted
       @click="syncShares"
     >
-      Discover shares
+      {{ $t('message.discover.sync_shares') }}
     </b-button>
   </section>
 </template>
@@ -59,15 +59,15 @@ export default {
         }
         if (amount > 1) {
           this.$buefy.toast.open({
-            message: "Successfully synchronized ".concat(
+            message: this.$t("message.discover.sync_success_template").concat(
               amount,
-              " shares"
+              this.$t("message.discover.sync_success_concat")
             ),
             type: "is-success",
           });
         } else {
           this.$buefy.toast.open({
-            message: "No new sharing information to synchronize.",
+            message: this.$t("message.discover.sync_failure_template"),
             type: "is-success",
           });
         }
