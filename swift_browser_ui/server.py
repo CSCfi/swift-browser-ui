@@ -34,7 +34,8 @@ from .api import (
     get_metadata_object,
     get_metadata_bucket,
     get_project_metadata,
-    swift_list_shared_objects
+    swift_list_shared_objects,
+    get_access_control_metadata,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -144,6 +145,7 @@ async def servinit() -> aiohttp.web.Application:
         aiohttp.web.get('/api/bucket/meta', get_metadata_bucket),
         aiohttp.web.get('/api/bucket/object/meta', get_metadata_object),
         aiohttp.web.get('/api/project/meta', get_project_metadata),
+        aiohttp.web.get('/api/project/acl', get_access_control_metadata),
     ])
 
     # Add discovery routes

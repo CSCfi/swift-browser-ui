@@ -423,3 +423,50 @@ async def get_os_active_project(
     return aiohttp.web.json_response(
         request.app['Creds'][session]['active_project']
     )
+
+
+async def get_access_control_metadata(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Fetch a compilation of ACL information for sharing discovery."""
+    session = api_check(request)
+
+    serv = request.app['Creds'][session]['ST_conn']
+    sess = request.app['Creds'][session]['OS_sess']
+
+    # Get a list of containers
+    containers = []
+    list(map(lambda i: containers.extend(i['listing']),
+             request.app['Creds'][session]['ST_conn'].list()))
+
+    host = sess.get_endpoint(service_type="object-store")
+
+    # Get a list of ACL information
+    acls = {}
+    for c in containers:
+        acl = {}
+
+        c_meta = dict(serv.stat(container=c["name"])["items"])
+        # Create dictionaries keyed with projects that have access
+        if c_meta["Read ACL"]:
+            acl = {k: {"read": v} for k, v in [
+                i.split(":") for i in c_meta["Read ACL"].split(",")
+            ]}
+        if c_meta["Write ACL"]:
+            write_acl = {k: {"write": v} for k, v in [
+                i.split(":") for i in c_meta["Write ACL"].split(",")
+            ]}
+
+            for k, v in write_acl.items():
+                try:
+                    acl[k].update(v)
+                except KeyError:
+                    acl[k] = v
+
+        if acl:
+            acls[c["name"]] = acl
+
+    return aiohttp.web.json_response({
+        "address": host,
+        "access": acls,
+    })
