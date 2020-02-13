@@ -3,7 +3,7 @@
     <b-button
       v-if="!isLoading"
       is-primary
-      is-inverted
+      outlined
       @click="syncShares"
     >
       {{ $t('message.discover.sync_shares') }}
@@ -11,8 +11,8 @@
     <b-button
       v-else
       is-primary
-      is-inverted
       loading
+      outlined
     >
       {{ $t('message.discover.sync_shares') }}
     </b-button>
