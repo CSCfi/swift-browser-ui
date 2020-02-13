@@ -18,6 +18,7 @@ export default {
   methods: {
     syncShares: function () {
       getAccessControlMeta().then(async (acl) => {
+        let amount = 0;
         let aclmeta = acl.access;
         let currentsharing = await this.$store.state.client.getShare(
           this.$store.state.active.id
@@ -53,7 +54,22 @@ export default {
               accesslist,
               acl.address,
             );
+            amount++;
           }
+        }
+        if (amount > 1) {
+          this.$buefy.toast.open({
+            message: "Successfully synchronized ".concat(
+              amount,
+              " shares"
+            ),
+            type: "is-success",
+          });
+        } else {
+          this.$buefy.toast.open({
+            message: "No new sharing information to synchronize.",
+            type: "is-success",
+          });
         }
       });
     },
