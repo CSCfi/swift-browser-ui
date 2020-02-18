@@ -21,11 +21,6 @@
           >
             {{ $t('message.share.write_perm') }}
           </b-switch>
-          <b-switch
-            v-model="listings"
-          >
-            {{ $t('message.share.list_perm') }}
-          </b-switch>
         </b-field>
         <b-field
           :label="$t('message.share.field_label')"
