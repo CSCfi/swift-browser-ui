@@ -32,10 +32,6 @@ async def has_access_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle has-access endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         access_list = await request.app["db_conn"].get_access_list(
             request.match_info["user"]
@@ -55,10 +51,6 @@ async def access_details_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         access_details = \
             await request.app["db_conn"].get_access_container_details(
@@ -80,10 +72,6 @@ async def gave_access_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle gave-access endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared_list = await request.app["db_conn"].get_shared_list(
             request.match_info["owner"]
@@ -104,10 +92,6 @@ async def shared_details_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared_details = \
             await request.app["db_conn"].get_shared_container_details(
@@ -129,10 +113,6 @@ async def share_container_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle share-container endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared = await request.app["db_conn"].add_share(
             request.match_info["owner"],
@@ -156,10 +136,6 @@ async def edit_share_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle container shared rights editions."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         edited = await request.app["db_conn"].edit_share(
             request.match_info["owner"],
@@ -182,10 +158,6 @@ async def delete_share_handler(
         request: aiohttp.web.Response
 ) -> aiohttp.web.Request:
     """Handle unshare-container endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         deleted = await request.app["db_conn"].delete_share(
             request.match_info["owner"],
