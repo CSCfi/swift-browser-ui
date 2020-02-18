@@ -94,6 +94,7 @@ const translations = {
         fail_nocont: "Please specify the container!",
         new_share_button: "Share a container",
         container_label: "Container",
+        revoke: "Unshare container",
       },
       request: {
         project: "Project",
@@ -218,6 +219,7 @@ const translations = {
         fail_nocont: "Anna jaettava säiliö!",
         new_share_button: "Jaa säiliö",
         container_label: "Säiliö",
+        revoke: "Poista jakaminen",
       },
       request: {
         project: "Projekti",
