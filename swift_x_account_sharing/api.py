@@ -194,6 +194,35 @@ async def delete_share_handler(
         )
     except InterfaceError:
         handle_dropped_connection(request)
+    except KeyError:
+        # If can't find user from query, the client wants a bulk unshare
+        return await delete_container_shares_handler(
+            request.match_info["owner"],
+            request.match_info["container"]
+        )
+
+    MODULE_LOGGER.log(
+        logging.DEBUG,
+        "Deleted following shares: %s", str(deleted)
+    )
+
+    return aiohttp.web.Response(
+        status=204,
+        body="OK"
+    )
+
+
+async def delete_container_shares_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Delete all shares from a container."""
+    try:
+        deleted = await request.app["db_conn"].delete_container_shares(
+            request.match_info["owner"],
+            request.match_info["container"]
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,

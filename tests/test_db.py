@@ -184,6 +184,14 @@ class DBMethodTestCase(asynctest.TestCase):
         )
         self.db.conn.execute.assert_awaited()
 
+    async def test_delete_container_shares(self):
+        """Test delete_container_shares method."""
+        await self.db.delete_container_shares(
+            "test-owner",
+            "test-container"
+        )
+        self.db.conn.execute.assert_awaited()
+
     async def test_get_access_list(self):
         """Test get_access_list method."""
         await self.db.get_access_list(

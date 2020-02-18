@@ -154,6 +154,26 @@ class DBConn:
                 )
         return True
 
+    async def delete_container_shares(
+        self,
+        owner: str,
+        container: str
+    ) -> bool:
+        """Delete all shares for a container in the database."""
+        async with self.conn.transaction():
+            await self.conn.execute(
+                """
+                DELETE FROM Shares
+                WHERE
+                    container = $1 AND
+                    container_owner = $2
+                ;
+                """,
+                container,
+                owner
+            )
+        return True
+
     async def get_access_list(
             self,
             user: str
