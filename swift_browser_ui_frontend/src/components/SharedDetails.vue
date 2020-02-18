@@ -27,7 +27,7 @@
             icon-left="delete"
             @click="deleteSingleShare(details.sharedTo)"
           >
-            {{ $t('message.share.revoke') }}
+            {{ $t('message.share.revoke_project') }}
           </b-button>
         </div>
       </div>
@@ -63,12 +63,17 @@ export default {
       removeAccessControlMeta(
         this.container,
         recipient
-      ).then(() => {
-        this.$store.state.client.shareDeleteAccess(
+      ).then(async () => {
+        await this.$store.state.client.shareDeleteAccess(
           this.$route.params.project,
           this.container,
           [recipient]
-        ).then(() => {this.$router.go(0);});
+        );
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: this.$("message.share.success_delete"),
+          type: "is-success",
+        });
       });
     },
   },
