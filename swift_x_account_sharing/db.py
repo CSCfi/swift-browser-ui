@@ -5,6 +5,7 @@ import os
 import logging
 import asyncio
 import random
+import typing
 
 import asyncpg
 
@@ -65,7 +66,14 @@ class DBConn:
         if self.conn is not None:
             await self.conn.close()
 
-    async def add_share(self, owner, container, userlist, access, address):
+    async def add_share(
+            self,
+            owner: str,
+            container: str,
+            userlist: typing.List[str],
+            access: typing.List[str],
+            address: str
+    ) -> bool:
         """Add a share action to the database."""
         async with self.conn.transaction():
             for key in userlist:
@@ -92,7 +100,13 @@ class DBConn:
                 )
         return True
 
-    async def edit_share(self, owner, container, userlist, access):
+    async def edit_share(
+            self,
+            owner: str,
+            container: str,
+            userlist: typing.List[str],
+            access: typing.List[str]
+    ) -> bool:
         """Edit a share action in the database."""
         async with self.conn.transaction():
             for key in userlist:
@@ -116,7 +130,12 @@ class DBConn:
                 )
         return True
 
-    async def delete_share(self, owner, container, userlist):
+    async def delete_share(
+            self,
+            owner: str,
+            container: str,
+            userlist: typing.List[str]
+    ) -> bool:
         """Delete a share action from the database."""
         async with self.conn.transaction():
             for key in userlist:
@@ -135,7 +154,10 @@ class DBConn:
                 )
         return True
 
-    async def get_access_list(self, user):
+    async def get_access_list(
+            self,
+            user: str
+    ) -> typing.List[dict]:
         """Get the containers shared to the specified user."""
         query = await self.conn.fetch(
             """
@@ -155,7 +177,10 @@ class DBConn:
             for i in query
         ]
 
-    async def get_shared_list(self, user):
+    async def get_shared_list(
+            self,
+            user: str
+    ) -> typing.List[str]:
         """Get the containers that the user has shared."""
         query = await self.conn.fetch(
             """
@@ -169,7 +194,12 @@ class DBConn:
 
         return [i["container"] for i in query]
 
-    async def get_access_container_details(self, user, owner, container):
+    async def get_access_container_details(
+            self,
+            user: str,
+            owner: str,
+            container: str
+    ) -> dict:
         """Get shared container details for share receiver."""
         query = await self.conn.fetchrow(
             """
@@ -207,7 +237,11 @@ class DBConn:
             "access": access,
         }
 
-    async def get_shared_container_details(self, owner, container):
+    async def get_shared_container_details(
+            self,
+            owner: str,
+            container: str
+    ) -> typing.List[dict]:
         """Get shared container details for sharer."""
         query = await self.conn.fetch(
             """
