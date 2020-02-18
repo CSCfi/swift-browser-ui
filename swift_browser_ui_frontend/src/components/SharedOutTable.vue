@@ -29,6 +29,15 @@
           100 {{ $t('message.table.pageNb') }}
         </option>
       </b-select>
+      <b-button
+        is-primary
+        outlined
+        @click="$router.push({
+          name: 'Sharing'
+        })"
+      >
+        {{ $t('message.share.new_share_button') }}
+      </b-button>
       <ACLDiscoverButton />
     </b-field>
     <b-table

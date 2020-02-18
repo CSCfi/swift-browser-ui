@@ -91,6 +91,7 @@ const translations = {
         created: "Created",
         fail_noperm: "Please select permissions to grant!",
         fail_noid: "Please give at least one project ID",
+        new_share_button: "Share a container",
       },
       request: {
         project: "Project",
@@ -212,6 +213,7 @@ const translations = {
         shared_details_rights: "Annetut oikeudet: ",
         fail_noperm: "Valitse jaettavat oikeudet!",
         fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)",
+        new_share_button: "Jaa säiliö",
       },
       request: {
         project: "Projekti",
