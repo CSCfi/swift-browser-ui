@@ -1,9 +1,12 @@
 <template>
-  <section>
+  <div
+    id="sharingview"
+    class="contents"
+  >
     <form action="">
       <div>
-        <header class="modal-card-head">
-          <p class="modal-card-title">
+        <header>
+          <p>
             {{ $t('message.share.share_cont') }}
           </p>
         </header>
@@ -53,8 +56,17 @@
         </section>
       </div>
     </form>
-  </section>
+  </div>
 </template>
+
+<style scoped>
+  #sharingview {
+    width: auto;
+    margin-top: 2%;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+</style>
 
 <script>
 import {
