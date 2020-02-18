@@ -95,6 +95,8 @@ const translations = {
         new_share_button: "Share a container",
         container_label: "Container",
         revoke: "Unshare container",
+        revoke_project: "Unshare from project",
+        success_delete: "Successfully deleted sharing action",
       },
       request: {
         project: "Project",
@@ -220,6 +222,8 @@ const translations = {
         new_share_button: "Jaa säiliö",
         container_label: "Säiliö",
         revoke: "Poista jakaminen",
+        revoke_project: "Poista jakaminen projektilta",
+        success_delete: "Säiliön jaetun oikeuden poistaminen onnistui",
       },
       request: {
         project: "Projekti",

@@ -63,16 +63,17 @@ export default {
       removeAccessControlMeta(
         this.container,
         recipient
-      ).then(async () => {
-        await this.$store.state.client.shareDeleteAccess(
+      ).then(() => {
+        this.$store.state.client.shareDeleteAccess(
           this.$route.params.project,
           this.container,
           [recipient]
-        );
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$("message.share.success_delete"),
-          type: "is-success",
+        ).then(() => {
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: this.$t("message.share.success_delete"),
+            type: "is-success",
+          });
         });
       });
     },
