@@ -169,8 +169,7 @@ async def delete_share_handler(
     except KeyError:
         # If can't find user from query, the client wants a bulk unshare
         return await delete_container_shares_handler(
-            request.match_info["owner"],
-            request.match_info["container"]
+            request
         )
 
     MODULE_LOGGER.log(
