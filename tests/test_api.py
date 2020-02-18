@@ -25,9 +25,6 @@ from swift_x_account_sharing.api import (
 )
 
 
-from swift_x_account_sharing.dict_db import InMemDB
-
-
 class APITestClass(asynctest.TestCase):
     """Test the sharing backend public API."""
 
@@ -35,8 +32,15 @@ class APITestClass(asynctest.TestCase):
         """Set up necessary mocks."""
         self.mock_request = SimpleNamespace(**{
             "app": {
-                "db_conn":
-                    asynctest.MagicMock(InMemDB())
+                "db_conn": SimpleNamespace(**{
+                    "add_share": asynctest.CoroutineMock(),
+                    "edit_share": asynctest.CoroutineMock(),
+                    "delete_share": asynctest.CoroutineMock(),
+                    "get_access_list": asynctest.CoroutineMock(),
+                    "get_shared_list": asynctest.CoroutineMock(),
+                    "get_access_container_details": asynctest.CoroutineMock(),
+                    "get_shared_container_details": asynctest.CoroutineMock(),
+                }),
             },
             "query": {
                 "user": "AUTH_example",

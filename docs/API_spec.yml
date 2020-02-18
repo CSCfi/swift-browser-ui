@@ -249,7 +249,7 @@ components:
     ListedContainer:
       type: object
       properties:
-        name:
+        container:
           type: string
           description: The container name.
           example: test-container-1
@@ -261,7 +261,7 @@ components:
     DetailedContainer:
       type: object
       properties:
-        name:
+        container:
           type: string
           description: The container name.
           example: test-container-1
@@ -294,7 +294,7 @@ components:
     GaveAccess:
       type: array
       items:
-        $ref: "#/components/schemas/DetailedContainer"
+        type: string
 
     SharedDetails:
       type: array
