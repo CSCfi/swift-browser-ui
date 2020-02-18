@@ -11,7 +11,9 @@ from asyncpg import InterfaceError
 MODULE_LOGGER = logging.getLogger("api")
 
 
-def handle_dropped_connection(request):
+def handle_dropped_connection(
+        request: aiohttp.web.Request
+):
     """Handle dropped database connection."""
     MODULE_LOGGER.log(
         logging.ERROR,
@@ -26,7 +28,9 @@ def handle_dropped_connection(request):
     )
 
 
-async def has_access_handler(request):
+async def has_access_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle has-access endpoint query."""
     # Future authorization check here
 
@@ -47,7 +51,9 @@ async def has_access_handler(request):
     return aiohttp.web.json_response(access_list)
 
 
-async def access_details_handler(request):
+async def access_details_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
     # Future authorization check here
 
@@ -70,7 +76,9 @@ async def access_details_handler(request):
     return aiohttp.web.json_response(access_details)
 
 
-async def gave_access_handler(request):
+async def gave_access_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle gave-access endpoint query."""
     # Future authorization check here
 
@@ -92,7 +100,9 @@ async def gave_access_handler(request):
     return aiohttp.web.json_response(shared_list)
 
 
-async def shared_details_handler(request):
+async def shared_details_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
     # Future authorization check here
 
@@ -115,7 +125,9 @@ async def shared_details_handler(request):
     return aiohttp.web.json_response(shared_details)
 
 
-async def share_container_handler(request):
+async def share_container_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle share-container endpoint query."""
     # Future authorization check here
 
@@ -140,7 +152,9 @@ async def share_container_handler(request):
     return aiohttp.web.json_response(shared)
 
 
-async def edit_share_handler(request):
+async def edit_share_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle container shared rights editions."""
     # Future authorization check here
 
@@ -164,7 +178,9 @@ async def edit_share_handler(request):
     return aiohttp.web.json_response(edited)
 
 
-async def delete_share_handler(request):
+async def delete_share_handler(
+        request: aiohttp.web.Response
+) -> aiohttp.web.Request:
     """Handle unshare-container endpoint query."""
     # Future authorization check here
 
