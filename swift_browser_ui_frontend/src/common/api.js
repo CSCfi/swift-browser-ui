@@ -197,7 +197,7 @@ export async function addAccessControlMeta (
     rights_str += "w";
   }
 
-  aclURL.searchParams.append("projectcs", projects_csv);
+  aclURL.searchParams.append("projects", projects_csv);
   aclURL.searchParams.append("rights", rights_str);
 
   await fetch(

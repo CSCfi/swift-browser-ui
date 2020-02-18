@@ -118,7 +118,7 @@
             inverted
             @click="$router.push({
               name: 'Sharing',
-              params: {container: props.row}
+              query: {container: props.row.name}
             })"
           />
           <b-button
@@ -129,34 +129,11 @@
             size="is-small"
             @click="$router.push({
               name: 'Sharing',
-              params: {container: props.row}
+              query: {container: props.row.name}
             })"
           />
         </b-table-column>
       </template>
-      <!--
-      <template
-        slot="detail"
-        slot-scope="props"
-      >
-        <ul>
-          <li>
-            <a
-              @click="shareModalIsActive = true"
-            >
-              {{ $t('message.share.share_cont') }}
-            </a>
-          </li>
-        </ul>    
-        
-        <b-modal
-          :active.sync="shareModalIsActive"
-          has-modal-card
-        >
-          <Sharing :container="props.row.name" />
-        </b-modal>
-      </template>
--->
       <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%;"

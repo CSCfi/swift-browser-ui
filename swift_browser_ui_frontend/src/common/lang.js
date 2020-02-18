@@ -90,8 +90,10 @@ const translations = {
         shared_details_rights: "Rights given: ",
         created: "Created",
         fail_noperm: "Please select permissions to grant!",
-        fail_noid: "Please give at least one project ID",
+        fail_noid: "Please give at least one project ID!",
+        fail_nocont: "Please specify the container!",
         new_share_button: "Share a container",
+        container_label: "Container",
       },
       request: {
         project: "Project",
@@ -212,8 +214,10 @@ const translations = {
         shared_details_address: "Säiliön osoite: ",
         shared_details_rights: "Annetut oikeudet: ",
         fail_noperm: "Valitse jaettavat oikeudet!",
-        fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)",
+        fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)!",
+        fail_nocont: "Anna jaettava säiliö!",
         new_share_button: "Jaa säiliö",
+        container_label: "Säiliö",
       },
       request: {
         project: "Projekti",

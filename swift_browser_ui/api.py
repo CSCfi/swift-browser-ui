@@ -564,14 +564,14 @@ async def add_project_container_acl(
 
     meta_headers = dict(serv.stat(container=container)["items"])
 
+    read_acl = meta_headers["Read ACL"]
+    write_acl = meta_headers["Write ACL"]
     # Concatenate the new project to the ACL string
     if "r" in request.query["rights"]:
-        read_acl = meta_headers["Read ACL"]
         for project in projects:
             read_acl += f',{project}:*'
         read_acl = read_acl.replace(',,', ',').lstrip(',')
     if "w" in request.query["rights"]:
-        write_acl = meta_headers["Write ACL"]
         for project in projects:
             write_acl += f',{project}:*'
         read_acl = read_acl.replace(',,', ',').lstrip(',')

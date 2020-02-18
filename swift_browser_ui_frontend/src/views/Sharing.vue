@@ -76,16 +76,24 @@ import {
 
 export default {
   name: "Sharing",
-  props: ["container"],
   data () {
     return {
       tags: [],
+      container: "",
       read: false,
       write: false,
       loading: false,
     };
   },
+  beforeMount () {
+    this.checkContainer();
+  },
   methods: {
+    checkContainer: function () {
+      if (this.$route.query.container != undefined) {
+        this.container = this.$route.query.container;
+      }
+    },
     shareSubmit: function () {
       this.loading = true;
       this.shareContainer().then(
@@ -105,10 +113,10 @@ export default {
     shareContainer: async function () {
       let rights = [];
       if (this.read) {
-        rights = rights.push("r");
+        rights.push("r");
       }
       if (this.write) {
-        rights = rights.push("w");
+        rights.push("w");
       }
       if (rights.length < 1) {
         this.$buefy.toast.open({
@@ -125,6 +133,13 @@ export default {
           type: "is-danger",
         });
         return false;
+      }
+      if (this.container == "") {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: this.$t("message.share.fail_nocont"),
+          type: "is-danger",
+        });
       }
       await addAccessControlMeta(
         this.container,
