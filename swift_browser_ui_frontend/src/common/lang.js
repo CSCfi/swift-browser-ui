@@ -75,7 +75,6 @@ const translations = {
         share_cont: "Share the container",
         read_perm: "Grant read permissions",
         write_perm: "Grant write permissions",
-        list_perm: "Grant listing permissions",
         field_label: "UUIDs to share with",
         field_placeholder: "Add UUIDs here",
         cancel: "Cancel",
@@ -90,6 +89,8 @@ const translations = {
         shared_details_address: "Container address: ",
         shared_details_rights: "Rights given: ",
         created: "Created",
+        fail_noperm: "Please select permissions to grant!",
+        fail_noid: "Please give at least one project ID",
       },
       request: {
         project: "Project",
@@ -195,7 +196,6 @@ const translations = {
         share_cont: "Jaa säiliö",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
-        list_perm: "Salli säiliön listaus",
         field_label: "Jaa UUID:lle",
         field_placeholder: "Lisää UUID:t",
         cancel: "Peru",
@@ -210,6 +210,8 @@ const translations = {
         shared_details_to: "Jaettu projektille: ",
         shared_details_address: "Säiliön osoite: ",
         shared_details_rights: "Annetut oikeudet: ",
+        fail_noperm: "Valitse jaettavat oikeudet!",
+        fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)",
       },
       request: {
         project: "Projekti",

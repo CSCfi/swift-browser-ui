@@ -1,55 +1,67 @@
 <template>
-  <form action="">
-    <div
-      class="modal-card"
-      style="width: auto;"
-    >
-      <header class="modal-card-head">
-        <p class="modal-card-title">
-          {{ $t('message.share.share_cont') }}
-        </p>
-      </header>
-      <section class="modal-card-body">
-        <b-field grouped>
-          <b-switch
-            v-model="read"
+  <section>
+    <form action="">
+      <div>
+        <header class="modal-card-head">
+          <p class="modal-card-title">
+            {{ $t('message.share.share_cont') }}
+          </p>
+        </header>
+        <section>
+          <b-field grouped>
+            <b-switch
+              v-model="read"
+            >
+              {{ $t('message.share.read_perm') }}
+            </b-switch>
+            <b-switch
+              v-model="write"
+            >
+              {{ $t('message.share.write_perm') }}
+            </b-switch>
+          </b-field>
+          <b-field
+            :label="$t('message.share.field_label')"
+            label-position="on-border"
           >
-            {{ $t('message.share.read_perm') }}
-          </b-switch>
-          <b-switch
-            v-model="write"
+            <b-taginput
+              v-model="tags"
+              :placeholder="$t('message.share.field_placeholder')"
+            />
+          </b-field>
+          <b-field
+            :label="$t('message.share.container_label')"
+            label-position="on-border"
           >
-            {{ $t('message.share.write_perm') }}
-          </b-switch>
-        </b-field>
-        <b-field
-          :label="$t('message.share.field_label')"
-          label-position="on-border"
-        >
-          <b-taginput
-            v-model="tags"
-            :placeholder="$t('message.share.field_placeholder')"
-          />
-        </b-field>
-      </section>
-      <footer class="modal-card-foot">
-        <b-button
-          class="is-light"
-          @click="$parent.close()"
-        >
-          {{ $t('message.share.cancel') }}
-        </b-button>
-        <b-button
-          class="is-primary"
-        >
-          {{ $t('message.share.confirm') }}
-        </b-button>
-      </footer>
-    </div>
-  </form>
+            <b-input v-model="container" />
+          </b-field>
+        </section>
+        <section>
+          <b-button
+            class="is-light"
+            @click="$router.go(-1)"
+          >
+            {{ $t('message.share.cancel') }}
+          </b-button>
+          <b-button
+            class="is-primary"
+            :loading="loading"
+            @click="shareSubmit()"
+          >
+            {{ $t('message.share.confirm') }}
+          </b-button>
+        </section>
+      </div>
+    </form>
+  </section>
 </template>
 
 <script>
+import {
+  addAccessControlMeta,
+  getSharedContainerAddress,
+} from "@/common/api";
+
 export default {
   name: "Sharing",
   props: ["container"],
@@ -58,8 +70,64 @@ export default {
       tags: [],
       read: false,
       write: false,
-      listings: false,
+      loading: false,
     };
+  },
+  methods: {
+    shareSubmit: function () {
+      this.loading = true;
+      this.shareContainer().then(
+        (ret) => {
+          this.loading = false;
+          if (ret) {
+            this.$router.push({
+              name: "SharedFrom",
+              params: {
+                project: this.$store.state.active.id,
+              },
+            });
+          }
+        }
+      );
+    },
+    shareContainer: async function () {
+      let rights = [];
+      if (this.read) {
+        rights = rights.push("r");
+      }
+      if (this.write) {
+        rights = rights.push("w");
+      }
+      if (rights.length < 1) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: this.$t("message.share.fail_noperm"),
+          type: "is-danger",
+        });
+        return false;
+      }
+      if (this.tags.length < 1) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: this.$t("message.share.fail_noid"),
+          type: "is-danger",
+        });
+        return false;
+      }
+      await addAccessControlMeta(
+        this.container,
+        rights,
+        this.tags 
+      );
+      await this.$store.state.client.shareNewAccess(
+        this.$store.state.active.id,
+        this.container,
+        this.tags,
+        rights,
+        await getSharedContainerAddress()
+      );
+      return true;
+    },
   },
 };
 </script>
