@@ -425,6 +425,17 @@ async def get_os_active_project(
     )
 
 
+async def get_shared_container_address(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Get the project specific object storage address."""
+    session = api_check(request)
+    sess = request.app['Creds'][session]['OS_sess']
+
+    host = sess.get_endpoint(service_type="object-store")
+    return aiohttp.web.json_response(host)
+
+
 async def get_access_control_metadata(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
@@ -549,19 +560,21 @@ async def add_project_container_acl(
     serv = request.app['Creds'][session]['ST_conn']
 
     container = request.match_info["container"]
-    project = request.query["project"]
+    projects = request.query["projects"].split(",")
 
     meta_headers = dict(serv.stat(container=container)["items"])
 
     # Concatenate the new project to the ACL string
     if "r" in request.query["rights"]:
         read_acl = meta_headers["Read ACL"]
-        read_acl += f',{project}:*'
-        read_acl = read_acl.replace(',,', ',')
+        for project in projects:
+            read_acl += f',{project}:*'
+        read_acl = read_acl.replace(',,', ',').lstrip(',')
     if "w" in request.query["rights"]:
-        write_acl = meta_headers["Write_ACL"]
-        write_acl += f',{project}:*'
-        write_acl = write_acl.replace(',,', ',')
+        write_acl = meta_headers["Write ACL"]
+        for project in projects:
+            write_acl += f',{project}:*'
+        read_acl = read_acl.replace(',,', ',').lstrip(',')
 
     meta_options = {
         "read_acl": read_acl,

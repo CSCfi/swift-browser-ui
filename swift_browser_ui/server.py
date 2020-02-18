@@ -38,6 +38,7 @@ from .api import (
     get_access_control_metadata,
     remove_container_acl,
     add_project_container_acl,
+    get_shared_container_address,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -151,6 +152,7 @@ async def servinit() -> aiohttp.web.Application:
         aiohttp.web.post('/api/access/{container}',
                          add_project_container_acl),
         aiohttp.web.delete('/api/access/{container}', remove_container_acl),
+        aiohttp.web.get('/api/project/address', get_shared_container_address),
     ])
 
     # Add discovery routes
