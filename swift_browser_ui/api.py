@@ -436,8 +436,7 @@ async def get_access_control_metadata(
 
     # Get a list of containers
     containers = []
-    list(map(lambda i: containers.extend(i['listing']),
-             request.app['Creds'][session]['ST_conn'].list()))
+    list(map(lambda i: containers.extend(i['listing']), serv.list()))
 
     host = sess.get_endpoint(service_type="object-store")
 
@@ -470,3 +469,110 @@ async def get_access_control_metadata(
         "address": host,
         "access": acls,
     })
+
+
+async def remove_project_container_acl(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Remove access from a project in container acl."""
+    session = api_check(request)
+
+    serv = request.app['Creds'][session]['ST_conn']
+
+    container = request.match_info["container"]
+    project = request.query["project"]
+
+    meta_headers = dict(serv.stat(container=container)["items"])
+
+    read_acl = meta_headers["Read ACL"]
+    write_acl = meta_headers["Write ACL"]
+
+    # Remove specific project form both ACLs
+    read_acl = read_acl.replace(
+        f'{project}:*', ''
+    ).replace(',,', ',').rstrip(',')
+    read_acl = read_acl.replace(
+        f'{project}:*', ''
+    ).replace(',,', ',').rstrip(',')
+
+    meta_options = {
+        "read_acl": read_acl,
+        "write_acl": write_acl,
+    }
+
+    serv.post(
+        container=container,
+        options=meta_options
+    )
+
+    return aiohttp.web.Response(
+        status=200
+    )
+
+
+async def remove_container_acl(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Remove all allowed projects from container acl."""
+    # Since both removes are handled with the same endpoint, try the project
+    # specific one first
+    try:
+        return await remove_project_container_acl(request)
+    except KeyError:
+        session = api_check(request)
+
+        serv = request.app['Creds'][session]['ST_conn']
+
+        container = request.match_info["container"]
+
+        meta_options = {
+            "read_acl": "",
+            "write_acl": "",
+        }
+
+        serv.post(
+            container=container,
+            options=meta_options
+        )
+
+        return aiohttp.web.Response(
+            status=200
+        )
+
+
+async def add_project_container_acl(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Add access for a project in container acl."""
+    session = api_check(request)
+
+    serv = request.app['Creds'][session]['ST_conn']
+
+    container = request.match_info["container"]
+    project = request.query["project"]
+
+    meta_headers = dict(serv.stat(container=container)["items"])
+
+    # Concatenate the new project to the ACL string
+    if "r" in request.query["rights"]:
+        read_acl = meta_headers["Read ACL"]
+        read_acl += f',{project}:*'
+        read_acl = read_acl.replace(',,', ',')
+    if "w" in request.query["rights"]:
+        write_acl = meta_headers["Write_ACL"]
+        write_acl += f',{project}:*'
+        write_acl = write_acl.replace(',,', ',')
+
+    meta_options = {
+        "read_acl": read_acl,
+        "write_acl": write_acl,
+    }
+
+    serv.post(
+        container=container,
+        options=meta_options
+    )
+
+    return aiohttp.web.Response(
+        status=201
+    )
