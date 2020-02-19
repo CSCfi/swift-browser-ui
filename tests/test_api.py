@@ -21,11 +21,9 @@ from swift_x_account_sharing.api import (
     shared_details_handler,
     share_container_handler,
     edit_share_handler,
-    delete_share_handler
+    delete_share_handler,
+    delete_container_shares_handler,
 )
-
-
-from swift_x_account_sharing.dict_db import InMemDB
 
 
 class APITestClass(asynctest.TestCase):
@@ -35,8 +33,16 @@ class APITestClass(asynctest.TestCase):
         """Set up necessary mocks."""
         self.mock_request = SimpleNamespace(**{
             "app": {
-                "db_conn":
-                    asynctest.MagicMock(InMemDB())
+                "db_conn": SimpleNamespace(**{
+                    "add_share": asynctest.CoroutineMock(),
+                    "edit_share": asynctest.CoroutineMock(),
+                    "delete_share": asynctest.CoroutineMock(),
+                    "delete_container_shares": asynctest.CoroutineMock(),
+                    "get_access_list": asynctest.CoroutineMock(),
+                    "get_shared_list": asynctest.CoroutineMock(),
+                    "get_access_container_details": asynctest.CoroutineMock(),
+                    "get_shared_container_details": asynctest.CoroutineMock(),
+                }),
             },
             "query": {
                 "user": "AUTH_example",
@@ -123,6 +129,12 @@ class APITestClass(asynctest.TestCase):
             resp = await delete_share_handler(self.mock_request)
             self.assertEqual(resp.status, 204)
 
+    async def test_endpoint_delete_container_shares_correct(self):
+        """Test the delete_container_shares endpoint for conformity."""
+        with self.patch_json_dump:
+            resp = await delete_container_shares_handler(self.mock_request)
+            self.assertEqual(resp.status, 204)
+
 
 class APILostDatabaseConnectionClass(asynctest.TestCase):
     """Test the sharing backend API upon database failure."""
@@ -154,6 +166,9 @@ class APILostDatabaseConnectionClass(asynctest.TestCase):
                         "delete_share": asynctest.mock.Mock(
                             side_effect=InterfaceError('Lost connection')
                         ),
+                        "delete_container_shares": asynctest.mock.Mock(
+                            side_effect=InterfaceError('Lost connection')
+                        ),
                     })
             },
             "query": {
@@ -181,50 +196,57 @@ class APILostDatabaseConnectionClass(asynctest.TestCase):
         )
 
     async def test_endpoint_has_access_interface_error(self):
-        """Test the has-access endpoint for dropped connection."""
+        """Test the has_access endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await has_access_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_access_details_interface_error(self):
-        """Test the access-details endpoint for dropped connection."""
+        """Test the access_details endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await access_details_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_gave_access_interface_error(self):
-        """Test the gave-access endpoint for dropped connection."""
+        """Test the gave_access endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await gave_access_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_shared_details_interface_error(self):
-        """Test the shared-details endpoint for dropped connection."""
+        """Test the shared_details endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await shared_details_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_add_share_interface_error(self):
-        """Test the add-share endpoint for dropped connection."""
+        """Test the add_share endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await share_container_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_edit_share_interface_error(self):
-        """Test the add-share endpoint for dropped connection."""
+        """Test the edit_share endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await edit_share_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()
 
     async def test_endpoint_delete_share_interface_error(self):
-        """Test the add-share endpoint for dropped connection."""
+        """Test the delete_share endpoint for dropped connection."""
         with self.patch_handle_dropped_connection:
             with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
                 await delete_share_handler(self.mock_request)
+        self.handle_dropped_connection_mock.assert_called_once()
+
+    async def test_endpoint_delete_container_shares_interface_error(self):
+        """Test the delete_container_shares endpoint for dropped conn."""
+        with self.patch_handle_dropped_connection:
+            with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
+                await delete_container_shares_handler(self.mock_request)
         self.handle_dropped_connection_mock.assert_called_once()

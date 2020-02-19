@@ -11,7 +11,9 @@ from asyncpg import InterfaceError
 MODULE_LOGGER = logging.getLogger("api")
 
 
-def handle_dropped_connection(request):
+def handle_dropped_connection(
+        request: aiohttp.web.Request
+):
     """Handle dropped database connection."""
     MODULE_LOGGER.log(
         logging.ERROR,
@@ -26,12 +28,10 @@ def handle_dropped_connection(request):
     )
 
 
-async def has_access_handler(request):
+async def has_access_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle has-access endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         access_list = await request.app["db_conn"].get_access_list(
             request.match_info["user"]
@@ -47,12 +47,10 @@ async def has_access_handler(request):
     return aiohttp.web.json_response(access_list)
 
 
-async def access_details_handler(request):
+async def access_details_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         access_details = \
             await request.app["db_conn"].get_access_container_details(
@@ -70,12 +68,10 @@ async def access_details_handler(request):
     return aiohttp.web.json_response(access_details)
 
 
-async def gave_access_handler(request):
+async def gave_access_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle gave-access endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared_list = await request.app["db_conn"].get_shared_list(
             request.match_info["owner"]
@@ -92,12 +88,10 @@ async def gave_access_handler(request):
     return aiohttp.web.json_response(shared_list)
 
 
-async def shared_details_handler(request):
+async def shared_details_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared_details = \
             await request.app["db_conn"].get_shared_container_details(
@@ -115,12 +109,10 @@ async def shared_details_handler(request):
     return aiohttp.web.json_response(shared_details)
 
 
-async def share_container_handler(request):
+async def share_container_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle share-container endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         shared = await request.app["db_conn"].add_share(
             request.match_info["owner"],
@@ -140,12 +132,10 @@ async def share_container_handler(request):
     return aiohttp.web.json_response(shared)
 
 
-async def edit_share_handler(request):
+async def edit_share_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle container shared rights editions."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         edited = await request.app["db_conn"].edit_share(
             request.match_info["owner"],
@@ -164,17 +154,43 @@ async def edit_share_handler(request):
     return aiohttp.web.json_response(edited)
 
 
-async def delete_share_handler(request):
+async def delete_share_handler(
+        request: aiohttp.web.Response
+) -> aiohttp.web.Request:
     """Handle unshare-container endpoint query."""
-    # Future authorization check here
-
-    # Check for incorrect client query here
-
     try:
         deleted = await request.app["db_conn"].delete_share(
             request.match_info["owner"],
             request.match_info["container"],
             request.query["user"].split(",")
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
+    except KeyError:
+        # If can't find user from query, the client wants a bulk unshare
+        return await delete_container_shares_handler(
+            request
+        )
+
+    MODULE_LOGGER.log(
+        logging.DEBUG,
+        "Deleted following shares: %s", str(deleted)
+    )
+
+    return aiohttp.web.Response(
+        status=204,
+        body="OK"
+    )
+
+
+async def delete_container_shares_handler(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Delete all shares from a container."""
+    try:
+        deleted = await request.app["db_conn"].delete_container_shares(
+            request.match_info["owner"],
+            request.match_info["container"]
         )
     except InterfaceError:
         handle_dropped_connection(request)

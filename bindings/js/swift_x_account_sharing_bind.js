@@ -200,26 +200,52 @@ class SwiftXAccountSharing {
     let url = new URL(
       "/share/".concat(username, "/", container), this.address
     );
-    url.searchParams.append("user", this._parseListString(userlist));
-    url.searchParams.append("valid", signed.valid_until);
-    url.searchParams.append("signature", signed.signature);
 
     let signed = await this._getSignature(
       60,
       "/share/".concat(username, "/", container)
     );
 
+    url.searchParams.append("user", this._parseListString(userlist));
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
     let deleted = fetch(
       url, {method: "DELETE"}
     ).then(
       (resp) => {
-        if (resp.status == 204) {return true;}
-        if (resp.status == 404) {return false;}
+        return resp.status == 204 ? true : false;
       }
     );
     return deleted;
-  }    
+  }
+  
+  async shareContainerDeleteAccess(
+    username,
+    container
+  ) {
+    // Delete all shares on a container
+    let url = new URL(
+      "/share/".concat(username, "/", container), this.address
+    );
+
+    let signed = await this._getSignature(
+      60,
+      "/share/".concat(username, "/", container)
+    )
+
+    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("signature", signed.signature);
+
+    let deleted = fetch(
+      url, {method: "DELETE"}
+    ).then(
+      (resp) => {
+        return resp.status == 204 ? true : false;
+      }
+    );
+    return deleted;
+  }
 }
 
 export default SwiftXAccountSharing;
-  
