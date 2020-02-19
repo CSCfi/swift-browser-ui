@@ -6,9 +6,9 @@
     <form action="">
       <div>
         <header>
-          <p>
+          <h1 class="title sharinghead">
             {{ $t('message.share.share_cont') }}
-          </p>
+          </h1>
         </header>
         <section>
           <b-field grouped>
@@ -41,13 +41,13 @@
         </section>
         <section>
           <b-button
-            class="is-light"
+            class="is-light sharingbutton"
             @click="$router.go(-1)"
           >
             {{ $t('message.share.cancel') }}
           </b-button>
           <b-button
-            class="is-primary"
+            class="is-primary sharingbutton"
             :loading="loading"
             @click="shareSubmit()"
           >
@@ -65,6 +65,14 @@
     margin-top: 2%;
     margin-left: 5%;
     margin-right: 5%;
+  }
+
+  .sharingbutton {
+    margin: 1%;
+  }
+
+  .sharinghead {
+    margin: 1%;
   }
 </style>
 
