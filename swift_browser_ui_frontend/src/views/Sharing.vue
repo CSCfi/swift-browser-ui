@@ -150,17 +150,32 @@ export default {
         });
         return false;
       }
+      try {
+        await this.$store.state.client.shareNewAccess(
+          this.$store.state.active.id,
+          this.container,
+          this.tags,
+          rights,
+          await getSharedContainerAddress()
+        );
+      }
+      catch(error) {
+        if (error instanceof TypeError) {
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: this.$t("message.share.fail_duplicate"),
+            type: "is-danger",
+          });
+          return false;
+        }
+        else {
+          throw error;
+        }
+      }
       await addAccessControlMeta(
         this.container,
         rights,
         this.tags 
-      );
-      await this.$store.state.client.shareNewAccess(
-        this.$store.state.active.id,
-        this.container,
-        this.tags,
-        rights,
-        await getSharedContainerAddress()
       );
       return true;
     },
