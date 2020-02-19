@@ -182,20 +182,8 @@ export async function addAccessControlMeta (
     document.location.origin
   );
 
-  let projects_csv = "";
-  for (let project of projects) {
-    projects_csv.concat(project, ",");
-  }
-  // Strip trailing comma from csv
-  projects_csv = projects_csv.substr(0, projects_csv.length - 1);
-
-  let rights_str = "";
-  if ("r" in rights) {
-    rights_str += "r";
-  }
-  if ("w" in rights) {
-    rights_str += "w";
-  }
+  let projects_csv = projects.toString();
+  let rights_str = rights.toString().replace(",", "");
 
   aclURL.searchParams.append("projects", projects_csv);
   aclURL.searchParams.append("rights", rights_str);

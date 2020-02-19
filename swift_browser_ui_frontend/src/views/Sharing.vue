@@ -140,6 +140,7 @@ export default {
           message: this.$t("message.share.fail_nocont"),
           type: "is-danger",
         });
+        return false;
       }
       await addAccessControlMeta(
         this.container,
