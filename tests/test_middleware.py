@@ -58,7 +58,7 @@ class MiddlewareTestCase(asynctest.TestCase):
         unique_violating_handler = asynctest.CoroutineMock(
             side_effect=UniqueViolationError
         )
-        with self.assertRaises(aiohttp.web.HTTPClientError):
+        with self.assertRaises(aiohttp.web.HTTPConflict):
             await catch_uniqueness_error(
                 self.mock_request,
                 unique_violating_handler
