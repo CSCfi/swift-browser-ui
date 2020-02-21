@@ -95,8 +95,8 @@ const translations = {
         fail_duplicate: "The project already has access to the container!",
         new_share_button: "Share a container",
         container_label: "Container",
-        revoke: "Unshare container",
-        revoke_project: "Unshare from project",
+        revoke: "Revoke container access",
+        revoke_project: "Revoke access from project",
         success_delete: "Successfully deleted sharing action",
       },
       request: {
