@@ -3,43 +3,48 @@
     id="shared-out-table"
     class="column"
   >
-    <b-field
-      grouped
-      group-multiline
-    >
-      <b-select
-        v-model="perPage"
-      >
-        <option value="5">
-          5 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="10">
-          10 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="15">
-          15 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="25">
-          25 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="50">
-          50 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="100">
-          100 {{ $t('message.table.pageNb') }}
-        </option>
-      </b-select>
-      <b-button
-        is-primary
-        outlined
-        @click="$router.push({
-          name: 'Sharing'
-        })"
-      >
-        {{ $t('message.share.new_share_button') }}
-      </b-button>
-      <ACLDiscoverButton />
-    </b-field>
+    <div class="field is-grouped">
+      <p class="control">
+        <b-select
+          v-model="perPage"
+        >
+          <option value="5">
+            5 {{ $t('message.table.pageNb') }}
+          </option>
+          <option value="10">
+            10 {{ $t('message.table.pageNb') }}
+          </option>
+          <option value="15">
+            15 {{ $t('message.table.pageNb') }}
+          </option>
+          <option value="25">
+            25 {{ $t('message.table.pageNb') }}
+          </option>
+          <option value="50">
+            50 {{ $t('message.table.pageNb') }}
+          </option>
+          <option value="100">
+            100 {{ $t('message.table.pageNb') }}
+          </option>
+        </b-select>
+      </p>
+      <div class="field has-addons">
+        <p class="control">
+          <b-button
+            type="is-primary"
+            outlined
+            @click="$router.push({
+              name: 'Sharing'
+            })"
+          >
+            {{ $t('message.share.new_share_button') }}
+          </b-button>
+        </p>
+        <p class="control">
+          <ACLDiscoverButton />
+        </p>
+      </div>
+    </div>
     <b-table
       focusable
       hoverable

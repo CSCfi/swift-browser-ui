@@ -72,6 +72,7 @@ const translations = {
         my_csc: "https://my.csc.fi",
       },
       share: {
+        share: "Share",
         share_cont: "Share the container",
         read_perm: "Grant read permissions",
         write_perm: "Grant write permissions",
@@ -88,6 +89,8 @@ const translations = {
         shared_details_to: "Shared to: ",
         shared_details_address: "Container address: ",
         shared_details_rights: "Rights given: ",
+        shared_details_read: "Read access",
+        shared_details_write: "Write access",
         created: "Created",
         fail_noperm: "Please select permissions to grant!",
         fail_noid: "Please give at least one project ID!",
@@ -200,6 +203,7 @@ const translations = {
         my_csc: "https://my.csc.fi",
       },
       share: {
+        share: "Jaa",
         share_cont: "Jaa säiliö",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
@@ -217,6 +221,8 @@ const translations = {
         shared_details_to: "Jaettu projektille: ",
         shared_details_address: "Säiliön osoite: ",
         shared_details_rights: "Annetut oikeudet: ",
+        shared_details_read: "Lukuoikeus",
+        shared_details_write: "Kirjoitusoikeus",
         fail_noperm: "Valitse jaettavat oikeudet!",
         fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)!",
         fail_nocont: "Anna jaettava säiliö!",

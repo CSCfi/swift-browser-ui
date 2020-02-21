@@ -2,7 +2,7 @@
   <section>
     <b-button
       v-if="!isLoading"
-      is-primary
+      type="is-primary"
       outlined
       @click="syncShares"
     >
@@ -10,7 +10,7 @@
     </b-button>
     <b-button
       v-else
-      is-primary
+      type="is-primary"
       loading
       outlined
     >

@@ -112,7 +112,7 @@
           <b-button
             v-if="selected==props.row"
             type="is-primary"
-            icon-right="share"
+            icon-left="share"
             outlined
             size="is-small"
             inverted
@@ -120,18 +120,22 @@
               name: 'Sharing',
               query: {container: props.row.name}
             })"
-          />
+          >
+            {{ $t('message.share.share') }}
+          </b-button>
           <b-button
             v-else
             type="is-primary"
-            icon-right="share"
+            icon-left="share"
             outlined
             size="is-small"
             @click="$router.push({
               name: 'Sharing',
               query: {container: props.row.name}
             })"
-          />
+          >
+            {{ $t('message.share.share') }}
+          </b-button>
         </b-table-column>
       </template>
       <template slot="empty">
