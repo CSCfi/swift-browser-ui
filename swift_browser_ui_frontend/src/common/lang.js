@@ -101,6 +101,11 @@ const translations = {
         revoke: "Revoke container access",
         revoke_project: "Revoke access from project",
         success_delete: "Successfully deleted sharing action",
+        request_sync_nocont: "Can't synchronize access requests without a " +
+                             "container",
+        request_synced: "Succesfully synchronized access requests",
+        request_not_synced: "No access requests to sync",
+        sync_requests: "Synchronize container share requests",
       },
       request: {
         project: "Project",
@@ -232,6 +237,10 @@ const translations = {
         revoke: "Poista jakaminen",
         revoke_project: "Poista jakaminen projektilta",
         success_delete: "Säiliön jaetun oikeuden poistaminen onnistui",
+        request_sync_nocont: "Ei voida hakea jakopyyntöjä ilman säiliötä",
+        request_synced: "Säiliön jakopyyntöjen haku onnistui",
+        request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
+        sync_requests: "Synkronoi säiliön jakopyynnöt",
       },
       request: {
         project: "Projekti",

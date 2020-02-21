@@ -22,10 +22,18 @@
             >
               {{ $t('message.share.write_perm') }}
             </b-switch>
+            <b-button
+              class="syncbutton"
+              type="is-primary"
+              icon-left="refresh"
+              outlined
+              @click="syncShareRequests()"
+            >
+              {{ $t('message.share.sync_requests') }}
+            </b-button>
           </b-field>
           <b-field
             :label="$t('message.share.field_label')"
-            label-position="on-border"
           >
             <b-taginput
               v-model="tags"
@@ -34,7 +42,6 @@
           </b-field>
           <b-field
             :label="$t('message.share.container_label')"
-            label-position="on-border"
           >
             <b-input v-model="container" />
           </b-field>
@@ -71,6 +78,10 @@
     margin: 1%;
   }
 
+  .syncbutton {
+    margin-left: 1%;
+  }
+
   .sharinghead {
     margin: 1%;
   }
@@ -101,6 +112,40 @@ export default {
       if (this.$route.query.container != undefined) {
         this.container = this.$route.query.container;
       }
+    },
+    syncShareRequests: function () {
+      if (!this.container) {
+        this.$buefy.toast.open({
+          duration: 5000,
+          message: this.$t("message.share.request_sync_nocont"),
+          type: "is-danger",
+        });
+        return;
+      }
+      this.$store.state.requestClient.listOwnedRequests(
+        this.$store.state.active.id
+      ).then((ret) => {
+        let requests = ret.filter(req => req.container == this.container);
+        let request_amount = 0;
+        for (let request of requests) {
+          this.tags.push(request.user);
+          request_amount++;
+        }
+        if (request_amount > 0) {
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: this.$t("message.share.request_synced"),
+            type: "is-success",
+          });
+        }
+        else {
+          this.$buefy.toast.open({
+            duration: 5000,
+            message: this.$t("message.share.request_not_synced"),
+            type: "is-success",
+          });
+        }
+      });
     },
     shareSubmit: function () {
       this.loading = true;
