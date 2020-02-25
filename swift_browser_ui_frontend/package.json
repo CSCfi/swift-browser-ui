@@ -1,6 +1,6 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request",
