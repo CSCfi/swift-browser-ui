@@ -28,7 +28,7 @@ copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
 # The full version, including alpha/beta/rc tags
-version = release = '0.7.0'
+version = release = '0.7.1'
 
 
 # -- General configuration ---------------------------------------------------
