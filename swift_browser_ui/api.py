@@ -459,10 +459,21 @@ async def get_access_control_metadata(
         c_meta = dict(serv.stat(container=c["name"])["items"])
         # Create dictionaries keyed with projects that have access
         if c_meta["Read ACL"]:
-            acl = {k: {"read": v} for k, v in [
-                i.split(":") for i in c_meta["Read ACL"].split(",")
-            ]}
+            r_meta = c_meta["Read ACL"]
+            # Filter non-keystone ACL information out as unnecessary
+            r_meta = r_meta.replace(".r:*", "").replace(".rlistings", "")
+            # Handle residual double commas possibly left over
+            r_meta = r_meta.replace(",,", ",")
+            # Handle leading and trailing commas possibly left over
+            r_meta = r_meta.lstrip(",").rstrip(",").split(",")
+            try:
+                acl = {k: {"read": v} for k, v in [
+                    i.split(":") for i in r_meta
+                ]}
+            except ValueError:
+                acl = {}
         if c_meta["Write ACL"]:
+            # No need for Write ACL filtering as it's project scope only
             write_acl = {k: {"write": v} for k, v in [
                 i.split(":") for i in c_meta["Write ACL"].split(",")
             ]}
