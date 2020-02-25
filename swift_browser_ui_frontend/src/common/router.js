@@ -7,6 +7,7 @@ import SharedObjects from "@/views/SharedObjects";
 import ShareRequests from "@/views/ShareRequests";
 import SharedTo from "@/views/SharedTo";
 import SharedFrom from "@/views/SharedFrom";
+import Sharing from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 
 Vue.use(Router);
@@ -28,6 +29,11 @@ export default new Router({
       path: "/browse/sharing/requests/:project",
       name: "ShareRequests",
       component: ShareRequests,
+    },
+    {
+      path: "/browse/sharing/share",
+      name: "Sharing",
+      component: Sharing,
     },
     {
       path: "/browse/sharing/requestdirect",

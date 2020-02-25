@@ -139,3 +139,70 @@ export async function getProjectMeta () {
     });
   return ret;
 }
+
+
+export async function getAccessControlMeta () {
+  // Fetch the ACL metadata for all project containers.
+  let metaURL = new URL( "/api/project/acl", document.location.origin );
+  let ret = fetch(
+    metaURL, {method: "GET", credentials: "same-origin" }
+  ).then(function (ret) {return ret.json();});
+  return ret;
+}
+
+
+export async function removeAccessControlMeta (
+  container,
+  project = undefined,
+) {
+  // Remove access control metadata from the container specified
+  let aclURL = new URL(
+    "/api/access/".concat(container),
+    document.location.origin
+  );
+
+  if (project) {
+    aclURL.searchParams.append("project", project);
+  }
+
+  await fetch(
+    aclURL, {method: "DELETE", credentials: "same-origin"}
+  );
+}
+
+
+export async function addAccessControlMeta (
+  container,
+  rights,
+  projects
+) {
+  // Add access control metadata for the projects specified in a container
+  let aclURL = new URL(
+    "/api/access/".concat(container),
+    document.location.origin
+  );
+
+  let projects_csv = projects.toString();
+  let rights_str = rights.toString().replace(",", "");
+
+  aclURL.searchParams.append("projects", projects_csv);
+  aclURL.searchParams.append("rights", rights_str);
+
+  await fetch(
+    aclURL, {method: "POST", credentials: "same-origin"}
+  );
+}
+
+
+export async function getSharedContainerAddress () {
+  // Get the project specific address for container sharing
+  let addrURL = new URL(
+    "/api/project/address",
+    document.location.origin
+  );
+
+  let ret = await fetch(
+    addrURL, {method: "GET", credentials: "same-origin"}
+  );
+  return ret.json();
+}

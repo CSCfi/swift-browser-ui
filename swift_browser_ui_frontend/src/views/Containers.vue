@@ -112,52 +112,32 @@
           <b-button
             v-if="selected==props.row"
             type="is-primary"
-            icon-right="share"
+            icon-left="share"
             outlined
             size="is-small"
             inverted
-            @click="shareModalIsActive = true"
-          />
+            @click="$router.push({
+              name: 'Sharing',
+              query: {container: props.row.name}
+            })"
+          >
+            {{ $t('message.share.share') }}
+          </b-button>
           <b-button
             v-else
             type="is-primary"
-            icon-right="share"
+            icon-left="share"
             outlined
             size="is-small"
-            @click="shareModalIsActive = true"
-          />
+            @click="$router.push({
+              name: 'Sharing',
+              query: {container: props.row.name}
+            })"
+          >
+            {{ $t('message.share.share') }}
+          </b-button>
         </b-table-column>
-
-        <b-modal
-          :active.sync="shareModalIsActive"
-          has-modal-card
-        >
-          <Sharing :container="props.row.name" />
-        </b-modal>
       </template>
-      <!--
-      <template
-        slot="detail"
-        slot-scope="props"
-      >
-        <ul>
-          <li>
-            <a
-              @click="shareModalIsActive = true"
-            >
-              {{ $t('message.share.share_cont') }}
-            </a>
-          </li>
-        </ul>    
-        
-        <b-modal
-          :active.sync="shareModalIsActive"
-          has-modal-card
-        >
-          <Sharing :container="props.row.name" />
-        </b-modal>
-      </template>
--->
       <template slot="empty">
         <p
           style="text-align:center;margin-top:5%;margin-bottom:5%;"
@@ -173,11 +153,9 @@
 import { getBuckets } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
-import Sharing from "@/components/Sharing";
 
 export default {
   name: "Containers",
-  components: {Sharing},
   data: function () {
     return {
       bList: [],
