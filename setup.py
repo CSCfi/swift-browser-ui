@@ -19,7 +19,7 @@ setuptools.setup(
         'gunicorn',
         'uvloop',
         "swift-browser-ui"
-        "@ git+https://github.com/cscfi/swift-browser-ui.git@0.7.1"
+        "@ git+https://github.com/cscfi/swift-browser-ui.git@v0.7.1"
     ],
     extras_require={
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage',
@@ -31,7 +31,7 @@ setuptools.setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            'swift-upload-runner=swift_browser_ui.server:run_server',
+            'swift-upload-runner=swift_upload_runner.server:main',
         ]
     },
     classifiers=[

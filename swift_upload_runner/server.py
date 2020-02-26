@@ -54,6 +54,11 @@ def run_server(
     )
 
 
+def main():
+    """."""
+    run_server(servinit())
+
+
 if __name__ == '__main__':
     if sys.version_info < (3, 6):
         logging.error("swift-upload-runner requires >= python3.6")
