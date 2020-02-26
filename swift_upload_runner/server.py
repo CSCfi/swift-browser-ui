@@ -4,13 +4,18 @@
 import os
 import sys
 import logging
+import asyncio
 
 import aiohttp.web
 
+import uvloop
 
 from .middleware import add_cors
 from .auth import handle_login, read_in_keys, handle_validate_authentication
 from .api import handle_get_object
+
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 async def servinit() -> aiohttp.web.Application:
