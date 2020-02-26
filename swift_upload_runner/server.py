@@ -8,13 +8,19 @@ import logging
 import aiohttp.web
 
 
-from .auth import handle_login
+from .middleware import add_cors
+from .auth import handle_login, read_in_keys, handle_validate_authentication
 from .api import handle_get_object
 
 
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server for handling the upload runner API."""
-    app = aiohttp.web.Application()
+    app = aiohttp.web.Application(middlewares=[
+        add_cors,
+        handle_validate_authentication
+    ])
+
+    app.on_startup.append(read_in_keys)
 
     # Add auth related routes
     # Can use direct project post for creating a session, as it's intuitive
