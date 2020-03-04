@@ -5,7 +5,7 @@ THE_PORT=${PORT:="9092"}
 
 echo "Start swift-upload-runner backend"
 
-gunicorn swift_x_account_sharing.server:init_server \
+gunicorn swift_upload_runner.server:servinit \
     --bind $THE_HOST:$THE_PORT \
     --worker-class aiohttp.GunicornUVLoopWebWorker \
     --workers 1 \
