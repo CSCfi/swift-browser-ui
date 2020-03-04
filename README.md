@@ -18,6 +18,8 @@ The service requires following environment variables:
 The following environment variables are optional:
 
 * SWIFT_UPLOAD_RUNNER_PORT for the port on which the server runs
+* SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE for buffered chunk amount
+* SWIFT_UPLOAD_RUNNER_MAX_SESSION_CONNECTIONS for max connections per session
 
 #### Python
 By default the service runs on port `9092` and can be invoked with the command
