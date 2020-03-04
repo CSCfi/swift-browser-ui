@@ -95,7 +95,7 @@ async def handle_validate_authentication(
         validity = request.query["valid"]
         path = request.url.path
     except KeyError:
-        raise aiohttp.web.HTTPClientError(
+        raise aiohttp.web.HTTPUnauthorized(
             reason="Query string missing validity or signature."
         )
 
