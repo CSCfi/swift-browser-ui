@@ -1,6 +1,9 @@
 """Common resources for swift-upload-runner."""
 
 
+import typing
+
+
 import aiohttp.web
 
 import keystoneauth1.session
@@ -33,6 +36,19 @@ def get_auth_instance(
             raise aiohttp.web.HTTPUnauthorized(
                 reason="Runner session ID missing"
             )
+
+
+def get_path_from_list(
+        to_parse: typing.List[str],
+        path_prefix: str
+) -> str:
+    """Parse a path from a list of path parts."""
+    ret = path_prefix
+
+    for i in to_parse:
+        ret += f"/{i}"
+
+    return ret.lstrip("/").rstrip("/")
 
 
 async def handle_delete_preflight(_) -> aiohttp.web.Response:
