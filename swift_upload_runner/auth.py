@@ -13,12 +13,19 @@ from swift_browser_ui._convenience import (
 )
 
 
-AiohttpHandler = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
+AiohttpHandler = typing.Callable[
+    [aiohttp.web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        aiohttp.web.Response
+    ]
+]
 
 
 async def handle_login(
         request: aiohttp.web.Request
-) -> aiohttp.web.Request:
+) -> aiohttp.web.StreamResponse:
     """Begin a new session for the upload process."""
     session_key = hashlib.sha1(os.urandom(128)).hexdigest()  # nosec
 
@@ -71,7 +78,7 @@ async def test_signature(
             digestmod="sha256"
         ).hexdigest()
         if digest == signature:
-            return
+            return True
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"
     )
