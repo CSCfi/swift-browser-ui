@@ -106,6 +106,16 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
         <b-table-column
+          field="download"
+          label=""
+          width="40"
+        >
+          <ContainerDownloadLink
+            class="is-small"
+            :container="props.row.name"
+          />
+        </b-table-column>
+        <b-table-column
           field="share"
           label=""
           width="40"
@@ -157,10 +167,14 @@ import {
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import FolderUploadForm from "@/components/FolderUpload";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 
 export default {
   name: "Containers",
-  components: {FolderUploadForm},
+  components: {
+    FolderUploadForm,
+    ContainerDownloadLink,
+  },
   data: function () {
     return {
       bList: [],

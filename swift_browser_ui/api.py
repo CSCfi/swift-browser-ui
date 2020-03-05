@@ -284,7 +284,7 @@ async def swift_download_container(
     try:
         runner_id = request.app['Creds'][session]['runner']
     except KeyError:
-        runner_id = open_upload_runner_session(
+        runner_id = await open_upload_runner_session(
             project,
             request.app['Creds'][session]['Token']
         )
@@ -299,7 +299,7 @@ async def swift_download_container(
 
     resp = aiohttp.web.Response(status=303)
     resp.headers['Location'] = (
-        f"{setd['runner_endpoint']}{path}"
+        f"{setd['upload_endpoint']}{path}"
     )
 
     return resp

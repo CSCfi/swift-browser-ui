@@ -1,7 +1,7 @@
 <template>
   <a
     class="button is-primary is-outlined"
-    :href="download_link"
+    :href.sync="download_link"
   >
     Download
   </a>

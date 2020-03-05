@@ -46,7 +46,7 @@ async def handle_signature_request(
     session_check(request)
 
     try:
-        valid_for = request.match_info["valid"]
+        valid_for = int(request.match_info["valid"])
         path_to_sign = request.query["path"]
     except KeyError:
         raise aiohttp.web.HTTPClientError(
