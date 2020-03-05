@@ -13,6 +13,7 @@ import logging
 import urllib.request
 import typing
 
+import aiohttp
 import aiohttp.web
 
 from keystoneauth1.identity import v3
@@ -358,3 +359,16 @@ async def get_container_tempurl_key(
             if not retval['success']:
                 raise aiohttp.web.HTTPServerError()
     return temp_cont_key
+
+
+async def open_upload_runner_session(
+        project: str,
+        token: str
+) -> str:
+    """Open an upload session to the token."""
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+                f"{setd['upload_endpoint']}/{project}",
+                data={"token": token}
+        ) as resp:
+            return str(resp.cookies["RUNNER_SESSION_ID"])

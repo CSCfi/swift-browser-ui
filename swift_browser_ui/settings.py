@@ -67,6 +67,9 @@ setd = {
     "request_endpoint": environ.get(
         "BROWSER_START_REQUEST_ENDPOINT_URL", None
     ),
+    "upload_endpoint": environ.get(
+        "BROWSER_START_RUNNER_ENDPOINT", None
+    ),
     "sharing_request_token": environ.get(
         "SWIFT_UI_SHARING_REQUEST_TOKEN", None
     ),

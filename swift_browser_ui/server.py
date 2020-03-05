@@ -28,6 +28,8 @@ from .api import (
     swift_list_buckets,
     swift_list_objects,
     swift_download_object,
+    swift_download_shared_object,
+    swift_download_container,
     os_list_projects,
     get_os_user,
     get_os_active_project,
@@ -159,6 +161,14 @@ async def servinit() -> aiohttp.web.Application:
                          add_project_container_acl),
         aiohttp.web.delete('/api/access/{container}', remove_container_acl),
         aiohttp.web.get('/api/project/address', get_shared_container_address),
+    ])
+
+    # Add download routes
+    app.add_routes([
+        aiohttp.web.get('/download/{project}/{container}',
+                        swift_download_container),
+        aiohttp.web.get('/download/{project}/{container}/{object}',
+                        swift_download_shared_object),
     ])
 
     # Add discovery routes
