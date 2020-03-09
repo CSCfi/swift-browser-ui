@@ -266,7 +266,7 @@ async def token_rescope(
     response.set_cookie(
         "LAST_ACTIVE",
         request.app['Creds'][session]['active_project']['id'],
-        expires=2592000
+        expires=2592000  # type: ignore
     )
 
     return response

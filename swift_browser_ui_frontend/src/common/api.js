@@ -98,6 +98,7 @@ export async function getObjects (container) {
 }
 
 export async function getSharedObjects (
+  project,
   container,
   url
 ) {
@@ -116,8 +117,9 @@ export async function getSharedObjects (
     function( ret ) {
       for ( let i = 0; i < ret.length; i++ ) {
         ret[i]["url"] = (
-          "/api/dload?bucket=" + container +
-          "&objkey=" + ret[i]["name"]
+          "/download/" + project +
+          "/" + container +
+          "/" + ret[i]["name"]
         );
       }
       return ret;

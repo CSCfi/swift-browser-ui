@@ -192,6 +192,7 @@ export default {
       ).then(
         (ret) => {
           return getSharedObjects(
+            this.$route.params.owner,
             this.$route.params.container,
             ret.address
           );
