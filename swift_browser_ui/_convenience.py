@@ -12,6 +12,8 @@ import json
 import logging
 import urllib.request
 import typing
+import time
+import hmac
 
 import aiohttp
 import aiohttp.web
@@ -25,6 +27,35 @@ import swiftclient.client
 
 
 from .settings import setd
+
+
+async def sign(
+        valid_for: int,
+        path,
+) -> dict:
+    """Perform a general signature."""
+    valid_until = str(int(time.time() + valid_for))
+    to_sign = (valid_until + path).encode("utf-8")
+
+    try:
+        digest = hmac.new(
+            key=str(setd["sharing_request_token"]).encode("utf-8"),
+            msg=to_sign,
+            digestmod="sha256"
+        ).hexdigest()
+    except KeyError:
+        raise aiohttp.web.HTTPNotImplemented(
+            reason="Server doesn't have signing permissions"
+        )
+    except AttributeError:
+        raise aiohttp.web.HTTPNotImplemented(
+            reason="Server doesn't have signing permissions"
+        )
+
+    return {
+        "signature": digest,
+        "valid_until": valid_until
+    }
 
 
 def setup_logging():
@@ -367,8 +398,14 @@ async def open_upload_runner_session(
 ) -> str:
     """Open an upload session to the token."""
     async with aiohttp.ClientSession() as session:
+        path = f"{setd['upload_endpoint']}/{project}"
+        signature = await sign(3600, path)
         async with session.post(
-                f"{setd['upload_endpoint']}/{project}",
-                data={"token": token}
+                path,
+                data={"token": token},
+                params={
+                    "signature": signature["signature"],
+                    "valid": signature["valid_until"]
+                }
         ) as resp:
             return str(resp.cookies["RUNNER_SESSION_ID"])

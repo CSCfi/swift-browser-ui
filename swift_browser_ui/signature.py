@@ -6,37 +6,7 @@ import time
 
 import aiohttp.web
 
-from .settings import setd
-from ._convenience import session_check, api_check, get_tempurl_key
-
-
-async def sign(
-        valid_for: int,
-        path,
-) -> dict:
-    """Perform a general signature."""
-    valid_until = str(int(time.time() + valid_for))
-    to_sign = (valid_until + path).encode("utf-8")
-
-    try:
-        digest = hmac.new(
-            key=str(setd["sharing_request_token"]).encode("utf-8"),
-            msg=to_sign,
-            digestmod="sha256"
-        ).hexdigest()
-    except KeyError:
-        raise aiohttp.web.HTTPNotImplemented(
-            reason="Server doesn't have signing permissions"
-        )
-    except AttributeError:
-        raise aiohttp.web.HTTPNotImplemented(
-            reason="Server doesn't have signing permissions"
-        )
-
-    return {
-        "signature": digest,
-        "valid_until": valid_until
-    }
+from ._convenience import session_check, api_check, get_tempurl_key, sign
 
 
 async def handle_signature_request(
