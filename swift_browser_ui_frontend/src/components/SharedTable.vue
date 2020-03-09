@@ -67,6 +67,16 @@
         >
           {{ props.row.owner }}
         </b-table-column>
+        <b-table-column
+          field="download"
+          label=""
+          width="40"
+        >
+          <ContainerDownloadLink 
+            class="is-small"
+            :container="props.row.name"
+          />
+        </b-table-column>
       </template>
       <template slot="empty">
         <p
@@ -87,9 +97,11 @@
 
 <script>
 import delay from "lodash/delay";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 
 export default {
   name: "SharedTable",
+  components: { ContainerDownloadLink },
   data: function () {
     return {
       sharedList: [],
