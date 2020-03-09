@@ -1,7 +1,7 @@
 <template>
   <a
     class="button is-primary is-outlined"
-    :href.sync="download_link"
+    :href="download_link"
   >
     Download
   </a>
@@ -16,6 +16,14 @@ export default {
       download_link: "",
     };
   },
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
+  },
+  beforeMount () {
+    this.createDownloadLink();
+  },
   methods: {
     createDownloadLink: function () {
       if (this.$route.params.container != undefined) {
@@ -28,7 +36,7 @@ export default {
         }
         else {
           this.download_link = "/download/".concat(
-            this.$store.state.active.id,
+            this.active.id,
             "/",
             this.$route.params.container
           );
@@ -44,7 +52,7 @@ export default {
         }
         else {
           this.download_link = "/download/".concat(
-            this.$store.state.active.id,
+            this.active.id,
             "/",
             this.container
           );
