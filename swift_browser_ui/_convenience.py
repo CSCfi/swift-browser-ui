@@ -399,8 +399,8 @@ async def open_upload_runner_session(
 ) -> str:
     """Open an upload session to the token."""
     session = request.app['dload_session']
-    path = f"{setd['upload_endpoint']}/{project}"
-    signature = await sign(3600, path)
+    path = f"{setd['upload_internal_endpoint']}/{project}"
+    signature = await sign(3600, f"/{project}")
     async with session.post(
             path,
             data={"token": token},
@@ -409,4 +409,4 @@ async def open_upload_runner_session(
                 "valid": signature["valid_until"]
             }
     ) as resp:
-        return str(resp.cookies["RUNNER_SESSION_ID"])
+        return str(resp.cookies["RUNNER_SESSION_ID"].value)

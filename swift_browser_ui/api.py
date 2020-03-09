@@ -267,7 +267,7 @@ async def swift_download_shared_object(
 
     resp = aiohttp.web.Response(status=303)
     resp.headers['Location'] = (
-        f"{setd['runner_endpoint']}{path}"
+        f"{setd['runner_external_endpoint']}{path}"
     )
 
     return resp
@@ -301,7 +301,7 @@ async def swift_download_container(
 
     resp = aiohttp.web.Response(status=303)
     resp.headers['Location'] = (
-        f"{setd['upload_endpoint']}{path}"
+        f"{setd['upload_external_endpoint']}{path}"
     )
 
     return resp
