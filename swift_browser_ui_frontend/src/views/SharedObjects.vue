@@ -31,6 +31,7 @@
           100 {{ $t('message.table.pageNb') }}
         </option>
       </b-select>
+      <ContainerDownloadLink />
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -145,9 +146,11 @@
 import { getSharedObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 
 export default {
   name: "Objects",
+  components: { ContainerDownloadLink },
   data: function () {
     return {
       oList: [],
