@@ -56,13 +56,37 @@ class FileDownloadProxy:
         """Return the incoming file size."""
         return self.size
 
-    def get_mtime(self) -> int:
-        """Return the time of last modification."""
-        return self.mtime
-
     def get_chksum(self) -> str:
         """Return the checksum."""
         return self.chksum
+
+    async def a_get_type(self) -> str:
+        """Return the eventual incoming file type."""
+        try:
+            return self.get_type()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_type()
+
+    async def a_get_size(self) -> int:
+        """Return the eventual incoming file size."""
+        try:
+            return self.get_size()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_size()
+
+    async def a_get_checksum(self) -> str:
+        """Return the eventual checksum."""
+        try:
+            return self.get_chksum()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_checksum()
+
+    def get_mtime(self) -> int:
+        """Return the time of last modification."""
+        return self.mtime
 
     def download_into_queue(
             self,

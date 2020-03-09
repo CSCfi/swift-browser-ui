@@ -25,8 +25,8 @@ async def handle_get_object(
     resp = aiohttp.web.StreamResponse()
 
     # Create headers
-    resp.headers["Content-Type"] = download.get_type()
-    resp.headers["Content-Length"] = str(download.get_size())
+    resp.headers["Content-Type"] = await download.a_get_type()
+    resp.headers["Content-Length"] = str(await download.a_get_size())
 
     await resp.prepare(request)
 
