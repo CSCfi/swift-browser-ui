@@ -84,6 +84,20 @@ async def kill_sess_on_shutdown(
                       key, time.ctime())
 
 
+async def open_client_to_app(
+        app: aiohttp.web.Application
+):
+    """Open a client session for download proxies."""
+    app['dload_session'] = aiohttp.ClientSession()
+
+
+async def kill_dload_client(
+        app: aiohttp.web.Application
+):
+    """Kill download proxy client session."""
+    app['dload_session'].close()
+
+
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(
@@ -182,8 +196,11 @@ async def servinit() -> aiohttp.web.Application:
                         handle_bounce_direct_access_request)
     ])
 
+    app.on_startup.append(open_client_to_app)
+
     # Add graceful shutdown handler
     app.on_shutdown.append(kill_sess_on_shutdown)
+    app.on_shutdown.append(kill_dload_client)
 
     return app
 

@@ -252,6 +252,7 @@ async def swift_download_shared_object(
         runner_id = request.app['Creds'][session]['runner']
     except KeyError:
         runner_id = open_upload_runner_session(
+            request,
             project,
             request.app['Creds'][session]['Token']
         )
@@ -285,6 +286,7 @@ async def swift_download_container(
         runner_id = request.app['Creds'][session]['runner']
     except KeyError:
         runner_id = await open_upload_runner_session(
+            request,
             project,
             request.app['Creds'][session]['Token']
         )

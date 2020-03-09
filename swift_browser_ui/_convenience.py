@@ -393,19 +393,20 @@ async def get_container_tempurl_key(
 
 
 async def open_upload_runner_session(
+        request: aiohttp.web.Request,
         project: str,
         token: str
 ) -> str:
     """Open an upload session to the token."""
-    async with aiohttp.ClientSession() as session:
-        path = f"{setd['upload_endpoint']}/{project}"
-        signature = await sign(3600, path)
-        async with session.post(
-                path,
-                data={"token": token},
-                params={
-                    "signature": signature["signature"],
-                    "valid": signature["valid_until"]
-                }
-        ) as resp:
-            return str(resp.cookies["RUNNER_SESSION_ID"])
+    session = request.app['dload_session']
+    path = f"{setd['upload_endpoint']}/{project}"
+    signature = await sign(3600, path)
+    async with session.post(
+            path,
+            data={"token": token},
+            params={
+                "signature": signature["signature"],
+                "valid": signature["valid_until"]
+            }
+    ) as resp:
+        return str(resp.cookies["RUNNER_SESSION_ID"])
