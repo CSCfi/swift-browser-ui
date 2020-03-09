@@ -74,7 +74,8 @@
         >
           <ContainerDownloadLink 
             class="is-small"
-            :container="props.row.name"
+            :project="props.row.owner"
+            :container="props.row.container"
           />
         </b-table-column>
       </template>
