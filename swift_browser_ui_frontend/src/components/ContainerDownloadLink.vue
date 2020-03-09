@@ -1,6 +1,7 @@
 <template>
   <a
     class="button is-primary is-outlined"
+    target="_blank"
     :href="download_link"
   >
     Download
