@@ -248,15 +248,13 @@ async def swift_download_shared_object(
     container: str = request.match_info['container']
     object_name: str = request.match_info['object']
 
-    try:
-        runner_id = request.app['Creds'][session]['runner']
-    except KeyError:
-        runner_id = await open_upload_runner_session(
-            request,
-            request.app['Creds'][session]['active_project']['id'],
-            request.app['Creds'][session]['Token']
-        )
-        request.app['Creds'][session]['runner'] = runner_id
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+    request.app['Creds'][session]['runner'] = runner_id
 
     path = f"/{project}/{container}/{object_name}"
     signature = await sign(3600, path)
@@ -282,15 +280,13 @@ async def swift_download_container(
     project: str = request.match_info['project']
     container: str = request.match_info['container']
 
-    try:
-        runner_id = request.app['Creds'][session]['runner']
-    except KeyError:
-        runner_id = await open_upload_runner_session(
-            request,
-            request.app['Creds'][session]['active_project']['id'],
-            request.app['Creds'][session]['Token']
-        )
-        request.app['Creds'][session]['runner'] = runner_id
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+    request.app['Creds'][session]['runner'] = runner_id
 
     path = f"/{project}/{container}"
     signature = await sign(3600, path)
