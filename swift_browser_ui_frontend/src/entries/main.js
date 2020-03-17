@@ -147,14 +147,21 @@ new Vue({
         type: "is-danger",
       });
     },
-    getUploadUrl: function () {
+    getUploadUrl: function (params) {
       let alt_container = "upload-".concat(Date.now().toString());
-      return "/upload/".concat(
-        this.$route.params.owner ? this.$route.params.owner : this.active.id,
-        "/",
-        this.$route.params.container ? this.$route.params.container
-          : alt_container
+      let retUrl = new URL(
+        "/upload/".concat(
+          this.$route.params.owner ? this.$route.params.owner : this.active.id,
+          "/",
+          this.$route.params.container ? this.$route.params.container
+            : alt_container
+        ),
+        document.location.origin,
       );
+      for (const param of params) {
+        retUrl.searchParams.append(param[0], param[1]);
+      }
+      return retUrl.toString();
     },
     startUpload: function () {
       this.$store.commit("setUploading");
