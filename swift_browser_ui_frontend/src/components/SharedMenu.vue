@@ -44,6 +44,6 @@
 
 <script>
 export default {
-  name: "SharedMenu"
+  name: "SharedMenu",
 };
 </script>
