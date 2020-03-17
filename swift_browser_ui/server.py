@@ -42,11 +42,12 @@ from .api import (
     add_project_container_acl,
     get_shared_container_address,
     swift_create_container,
+    swift_upload_object,
 )
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
-from .signature import handle_signature_request, handle_form_post_signature
+from .signature import handle_signature_request
 from .misc_handlers import handle_bounce_direct_access_request
 
 
@@ -152,10 +153,6 @@ async def servinit() -> aiohttp.web.Application:
     app.add_routes([
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
     ])
-    app.add_routes([
-        aiohttp.web.get('/upload/{container}',
-                        handle_form_post_signature)
-    ])
 
     # Add api routes
     app.add_routes([
@@ -183,6 +180,12 @@ async def servinit() -> aiohttp.web.Application:
                         swift_download_container),
         aiohttp.web.get('/download/{project}/{container}/{object}',
                         swift_download_shared_object),
+    ])
+
+    # Add upload routes
+    app.add_routes([
+        aiohttp.web.post('/upload/{project}/{container}',
+                         swift_upload_object),
     ])
 
     # Add discovery routes

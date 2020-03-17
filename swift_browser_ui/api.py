@@ -303,6 +303,37 @@ async def swift_download_container(
     return resp
 
 
+async def swift_upload_object(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point a user to the object upload runner."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+
+    path = f"/{project}/{container}"
+    signature = await sign(3600, path)
+
+    path += f"?session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    resp = aiohttp.web.Response(status=307)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
+
+
 async def get_object_metadata(
         conn: SwiftService,
         meta_cont: str,
