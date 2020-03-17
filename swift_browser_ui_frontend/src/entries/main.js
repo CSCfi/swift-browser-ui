@@ -148,7 +148,7 @@ new Vue({
       });
     },
     getUploadUrl: function () {
-      let alt_container = "uplaod-".concat(Date.now().toString());
+      let alt_container = "upload-".concat(Date.now().toString());
       return "/upload/".concat(
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
         "/",
@@ -200,7 +200,7 @@ new Vue({
 
       // Set handlers
       res.on("uploadStart", this.startUpload);
-      res.on("compete", this.onComplete);
+      res.on("complete", this.onComplete);
       res.on("cancel", this.onCancel);
       res.on("fileAdded", this.addFileToast);
       res.on("fileSuccess", this.fileSuccessToast);
