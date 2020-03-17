@@ -184,7 +184,8 @@ new Vue({
     },
     createUploadInsatnce: function () {
       let res = new Resumable({
-        target: this.get_upload_url,
+        target: this.getUploadUrl,
+        testTarget: this.getUploadUrl,
         chunkSize: 268435456,
         forceChunkSize: true,
         simultaneousUploads: 1,
