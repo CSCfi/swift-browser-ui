@@ -22,6 +22,10 @@ const store = new Vuex.Store({
     ],
     client: undefined,
     requestClient: undefined,
+    resumableClient: undefined,
+    isUploading: false,
+    isChunking: false,
+    uploadProgress: undefined,
   },
   mutations: {
     updateContainers (state, newList) {
@@ -64,6 +68,27 @@ const store = new Vuex.Store({
     },
     setRequestClient (state, newClient) {
       state.requestClient = newClient;
+    },
+    setResumable (state, newClient) {
+      state.resumableClient = newClient;
+    },
+    setUploading (state) {
+      state.isUploading = true;
+    },
+    stopUploading (state) {
+      state.isUploading = false;
+    },
+    setChunking (state) {
+      state.isChunking = true;
+    },
+    stopChunking (state) {
+      state.isChunking = false;
+    },
+    updateProgress (state, progress) {
+      state.uploadProgress = progress;
+    },
+    eraseProgress (state) {
+      state.uploadProgress = undefined;
     },
   },
 });

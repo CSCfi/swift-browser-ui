@@ -21,6 +21,7 @@
         />
       </ul>
     </div>
+    <ProgressBar />
     <router-view />
     <b-loading
       :is-full-page="isFullPage"

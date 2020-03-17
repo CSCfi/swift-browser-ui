@@ -27,6 +27,12 @@ import store from "@/common/store";
 // Import project css
 import "buefy/dist/buefy.css";
 
+// Import resumable
+import Resumable from "resumablejs";
+
+// Upload progress button
+import ProgressBar from "@/components/UploadProgressBar";
+
 Vue.config.productionTip = false;
 
 Vue.use(Buefy);
@@ -44,6 +50,7 @@ new Vue({
   components: {
     BrowserNavbar,
     BreadcrumbListElement,
+    ProgressBar,
   },
   computed: {
     projects () {
@@ -64,8 +71,12 @@ new Vue({
     isLoading () {
       return this.$store.state.isLoading;
     },
+    resumableClient () {
+      return this.$store.state.resumableClient;
+    },
   },
   beforeMount() {
+    this.createUploadInsatnce();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
     });
@@ -116,6 +127,87 @@ new Vue({
       });
   },
   methods: {
+    // Following are the methods used for resumablejs, as the methods
+    // need to have access to the vue instance.
+    addFileToast: function () {
+      this.$buefy.toast.open({
+        message: "File / files scheduled for upload.",
+        type: "is-success",
+      });
+    },
+    fileSuccessToast: function (file) {
+      this.$buefy.toast.open({
+        message: "Finished uploading ".concat(file.fileName),
+        type: "is-success",  
+      });
+    },
+    fileFailureToast: function (file) {
+      this.$buefy.toast.open({
+        message: "Upload for file ".concat(file.fileName, " failed"),
+        type: "is-danger",
+      });
+    },
+    getUploadUrl: function () {
+      let alt_container = "uplaod-".concat(Date.now().toString());
+      return "/upload/".concat(
+        this.$route.params.owner ? this.$route.params.owner : this.active.id,
+        "/",
+        this.$route.params.container ? this.$route.params.container
+          : alt_container
+      );
+    },
+    startUpload: function () {
+      this.$store.state.commit("setUploading");
+    },
+    endUpload: function () {
+      this.$store.state.commit("stopUploading");
+    },
+    startChunking: function () {
+      this.$store.state.commit("setChunking");
+    },
+    stopChunking: function () {
+      this.$store.state.commit("stopChunking");
+    },
+    onComplete: function () {
+      this.endUpload();
+      this.stopChunking();
+      this.$store.state.commit("eraseProgress");
+    },
+    onCancel: function () {
+      this.onComplete();
+    },
+    updateProgress () {
+      this.$store.state.commit(
+        "updateProgress",
+        this.resumableClient.progress()
+      );
+    },
+    createUploadInsatnce: function () {
+      let res = new Resumable({
+        target: this.get_upload_url,
+        chunkSize: 268435456,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
+      });
+
+      if (!res.support) {
+        this.$buefy.toast.open({
+          message: "Uploading is not supported on your browser.",
+          type: "is-danger",
+        });
+        return;
+      }
+
+      // Set handlers
+      res.on("uploadStart", this.startUpload);
+      res.on("compete", this.onComplete);
+      res.on("cancel", this.onCancel);
+      res.on("fileAdded", this.addFileToast);
+      res.on("fileSuccess", this.fileSuccessToast);
+      res.on("fileError", this.fileFailureToast);
+
+      this.$store.commit("setResumable", res);
+    },
     getRouteAsList: function () {
       // Create a list representation of the current application route
       // to be used in the initialization of the breadcrumb component
