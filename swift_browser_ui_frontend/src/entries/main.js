@@ -157,27 +157,27 @@ new Vue({
       );
     },
     startUpload: function () {
-      this.$store.state.commit("setUploading");
+      this.$store.commit("setUploading");
     },
     endUpload: function () {
-      this.$store.state.commit("stopUploading");
+      this.$store.commit("stopUploading");
     },
     startChunking: function () {
-      this.$store.state.commit("setChunking");
+      this.$store.commit("setChunking");
     },
     stopChunking: function () {
-      this.$store.state.commit("stopChunking");
+      this.$store.commit("stopChunking");
     },
     onComplete: function () {
       this.endUpload();
       this.stopChunking();
-      this.$store.state.commit("eraseProgress");
+      this.$store.commit("eraseProgress");
     },
     onCancel: function () {
       this.onComplete();
     },
     updateProgress () {
-      this.$store.state.commit(
+      this.$store.commit(
         "updateProgress",
         this.resumableClient.progress()
       );
