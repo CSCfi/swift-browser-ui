@@ -43,7 +43,8 @@ from .api import (
     add_project_container_acl,
     get_shared_container_address,
     swift_create_container,
-    swift_upload_object,
+    swift_upload_object_chunk,
+    swift_check_object_chunk,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -186,7 +187,9 @@ async def servinit() -> aiohttp.web.Application:
     # Add upload routes
     app.add_routes([
         aiohttp.web.post('/upload/{project}/{container}',
-                         swift_upload_object),
+                         swift_upload_object_chunk),
+        aiohttp.web.get('/upload/{project}/{container}',
+                        swift_check_object_chunk),
     ])
 
     # Add discovery routes
