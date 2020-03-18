@@ -189,14 +189,12 @@
 <script>
 import { getObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
-import FileUploadForm from "@/components/FileUpload";
 import debounce from "lodash/debounce";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 
 export default {
   name: "Objects",
   components: {
-    FileUploadForm,
     ContainerDownloadLink,
   },
   data: function () {
