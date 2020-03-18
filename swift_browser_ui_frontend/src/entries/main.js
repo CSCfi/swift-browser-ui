@@ -159,7 +159,8 @@ new Vue({
         document.location.origin,
       );
       for (const param of params) {
-        retUrl.searchParams.append(param[0], param[1]);
+        let newParam = param.split("=");
+        retUrl.searchParams.append(newParam[0], newParam[1]);
       }
       return retUrl.toString();
     },
