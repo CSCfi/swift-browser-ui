@@ -49,7 +49,8 @@ async def handle_post_object_chunk(
     upload_session = await get_upload_instance(
         request,
         project,
-        container
+        container,
+        p_query=query
     )
 
     return await upload_session.a_add_chunk(

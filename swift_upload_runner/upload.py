@@ -26,7 +26,7 @@ class ResumableFileUploadProxy:
         """."""
         self.q: asyncio.PriorityQueue = asyncio.PriorityQueue(
             maxsize=int(
-                os.environ.get("SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE", 1)
+                os.environ.get("SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE", 3)
             )
         )
         # Set of chunks that are already uploaded

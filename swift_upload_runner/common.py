@@ -76,20 +76,26 @@ async def parse_multipart_in(
         if field.name == "resumableChunkNumber":  # type: ignore
             # Remember that resumable.js counts chunks from 1, not 0
             ret_d["resumableChunkNumber"] = \
-                int(await field.read(decode=True)) - 1  # type: ignore
+                int(await field.text()) - 1  # type: ignore
         else:
             ret_d[
                 str(field.name)  # type: ignore
-            ] = await field.read(decode=True)  # type: ignore
+            ] = await field.text()  # type: ignore
 
 
 async def get_upload_instance(
         request: aiohttp.web.Request,
         pro: str,
         cont: str,
+        p_query: typing.Optional[dict] = None,
 ) -> upload.ResumableFileUploadProxy:
     """Return the specific upload proxy for the resumable upload."""
     session = get_session_id(request)
+
+    if p_query:
+        query: dict = p_query
+    else:
+        query = request.query
 
     # Check the existence of the dictionary structure
     try:
@@ -103,7 +109,7 @@ async def get_upload_instance(
         request.app[session]["uploads"][pro][cont] = {}
 
     try:
-        ident = request.query["resumableIdentifier"]
+        ident = query["resumableIdentifier"]
     except KeyError:
         raise aiohttp.web.HTTPBadRequest(reason="Malformed query string.")
     try:
@@ -112,7 +118,7 @@ async def get_upload_instance(
         auth = get_auth_instance(request)
         upload_session = upload.ResumableFileUploadProxy(
             auth,
-            request.query,
+            query,
             request.match_info,
             request.app["client"]
         )
