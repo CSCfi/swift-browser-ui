@@ -5,8 +5,10 @@ import typing
 
 
 import aiohttp.web
-
 import keystoneauth1.session
+
+
+import upload
 
 
 def generate_download_url(
@@ -23,19 +25,100 @@ def generate_download_url(
     return f'{host}/{container}/{object_name}'
 
 
-def get_auth_instance(
+def get_download_host(
+        auth: keystoneauth1.session.Session,
+        project: str
+) -> str:
+    """Get the actual download host with shared container support."""
+    ret = auth.get_endpoint(service_type="object-store")
+
+    if project not in ret:
+        ret = ret.replace(ret.split("/")[-1], project)
+
+    return ret
+
+
+def get_session_id(
         request: aiohttp.web.Request
-) -> keystoneauth1.session.Session:
-    """Return the session specific keystone auth instance"""
+) -> str:
+    """Return the session id from request."""
     try:
-        return request.app[request.cookies["RUNNER_SESSION_ID"]]
+        return request.cookies["RUNNER_SESSION_ID"]
     except KeyError:
         try:
-            return request.app[request.query["session"]]
+            return request.query["session"]
         except KeyError:
             raise aiohttp.web.HTTPUnauthorized(
                 reason="Runner session ID missing"
             )
+
+
+def get_auth_instance(
+        request: aiohttp.web.Request
+) -> keystoneauth1.session.Session:
+    """Return the session specific keystone auth instance"""
+    return request.app[get_session_id(request)]["auth"]
+
+
+async def parse_multipart_in(
+        request: aiohttp.web.Request,
+) -> typing.Tuple[typing.Dict[str, typing.Any], aiohttp.MultipartReader]:
+    """Parse the form headers into a dictionary and chunk data as reader."""
+    reader = await request.multipart()
+
+    ret_d = {}
+
+    while True:
+        field = await reader.next()
+        if field.name == "file":  # type: ignore
+            ret_d["filename"] = field.filename  # type: ignore
+            return ret_d, field  # type: ignore
+        if field.name == "resumableChunkNumber":  # type: ignore
+            # Remember that resumable.js counts chunks from 1, not 0
+            ret_d["resumableChunkNumber"] = \
+                int(field.read(decode=True)) - 1  # type: ignore
+        else:
+            ret_d[str(field.name)] = field.read(decode=True)  # type: ignore
+
+
+async def get_upload_instance(
+        request: aiohttp.web.Request,
+        pro: str,
+        cont: str,
+) -> upload.ResumableFileUploadProxy:
+    """Return the specific upload proxy for the resumable upload."""
+    session = get_session_id(request)
+
+    # Check the existence of the dictionary structure
+    try:
+        request.app[session]["uploads"][pro]
+    except KeyError:
+        request.app[session]["uploads"][pro] = {}
+
+    try:
+        request.app[session]["uploads"][pro][cont]
+    except KeyError:
+        request.app[session]["uploads"][pro][cont] = {}
+
+    try:
+        ident = request.query["resumableIdentifier"]
+    except KeyError:
+        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string.")
+    try:
+        upload_session = request.app[session]["uploads"][pro][cont][ident]
+    except KeyError:
+        auth = get_auth_instance(request)
+        upload_session = upload.ResumableFileUploadProxy(
+            auth,
+            request.query,
+            request.match_info,
+            request.app["client"]
+        )
+        if upload_session.get_segmented():
+            await upload_session.a_check_segment()
+        request.app[session]["uploads"][pro][cont][ident] = upload_session
+
+    return upload_session
 
 
 def get_path_from_list(
