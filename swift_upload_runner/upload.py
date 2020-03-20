@@ -10,8 +10,7 @@ import aiohttp.client
 
 import keystoneauth1.session
 
-from .common import generate_download_url
-from .common import get_download_host
+import swift_upload_runner.common as common
 
 
 class ResumableFileUploadProxy:
@@ -59,8 +58,8 @@ class ResumableFileUploadProxy:
         self.coro_upload: typing.Coroutine[typing.Any, typing.Any, typing.Any]
 
         # Get object storage host
-        self.host: str = get_download_host(self.auth, self.project)
-        self.url: str = generate_download_url(
+        self.host: str = common.get_download_host(self.auth, self.project)
+        self.url: str = common.generate_download_url(
             self.host,
             container=self.container,
             object_name=self.path
@@ -76,8 +75,8 @@ class ResumableFileUploadProxy:
     ):
         """Synchronize segments from storage."""
         async with self.client.get(
-            generate_download_url(
-                get_download_host(self.auth, self.project),
+            common.generate_download_url(
+                common.get_download_host(self.auth, self.project),
                 self.container + "_segments"
             ),
             headers={
@@ -118,7 +117,7 @@ class ResumableFileUploadProxy:
         """Add manifest file after segmented upload finish."""
         manifest = f"{self.container}_segments/{self.path}/"
         async with self.client.put(
-            generate_download_url(
+            common.generate_download_url(
                 self.host,
                 container=self.container,
                 object_name=self.path
@@ -145,7 +144,7 @@ class ResumableFileUploadProxy:
 
         if self.segmented:
             async with self.client.put(
-                generate_download_url(
+                common.generate_download_url(
                     self.host,
                     container=self.container + "_segments",
                     object_name=f"""{self.path}/{

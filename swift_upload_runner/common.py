@@ -8,7 +8,7 @@ import aiohttp.web
 import keystoneauth1.session
 
 
-import upload
+import swift_upload_runner.upload as upload
 
 
 def generate_download_url(
