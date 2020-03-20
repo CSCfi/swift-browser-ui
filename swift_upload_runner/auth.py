@@ -33,7 +33,9 @@ async def handle_login(
         project = request.match_info["project"]
         login_form = await request.post()
         token = login_form["token"]
-        request.app[session_key] = initiate_os_session(
+        request.app[session_key] = {}
+        request.app[session_key]["uploads"] = {}
+        request.app[session_key]["auth"] = initiate_os_session(
             token,
             project
         )
