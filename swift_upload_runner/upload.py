@@ -222,7 +222,7 @@ class ResumableFileUploadProxy:
             ) as resp:
                 if resp.status == 408:
                     raise aiohttp.web.HTTPRequestTimeout()
-                self.total_uploaded += query["resumableCurrentChunkSize"]
+                self.total_uploaded += int(query["resumableCurrentChunkSize"])
                 if self.total_uploaded == self.total_size:
                     await self.a_add_manifest()
                 self.done_chunks.add(query["resumableChunkNumber"])
