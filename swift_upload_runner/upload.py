@@ -55,7 +55,7 @@ class ResumableFileUploadProxy:
         self.client: aiohttp.client.ClientSession = client
 
         # declare concatenated upload coroutine
-        self.coro_upload: typing.Coroutine[typing.Any, typing.Any, typing.Any]
+        self.coro_upload: asyncio.Task
 
         # Get object storage host
         self.host: str = common.get_download_host(self.auth, self.project)
@@ -138,7 +138,7 @@ class ResumableFileUploadProxy:
         if self.segmented:
             async with self.client.head(
                 common.generate_download_url(
-                    common.get_download_host(self.auht, self.project),
+                    common.get_download_host(self.auth, self.project),
                     f"{self.container}_segments"
                 ),
                 headers={
