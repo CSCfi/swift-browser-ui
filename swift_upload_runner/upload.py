@@ -211,9 +211,7 @@ class ResumableFileUploadProxy:
                 common.generate_download_url(
                     self.host,
                     container=self.container + "_segments",
-                    object_name=f"""{self.path}/{
-                        query['resumableChunkNumber']:08d
-                    }"""
+                    object_name=f"""{self.path}/{chunk_number:08d}"""
                 ),
                 data=chunk_reader,
                 headers={
