@@ -114,6 +114,7 @@ async def get_upload_instance(
             request.match_info,
             request.app["client"]
         )
+        await upload_session.a_check_container()
         if upload_session.get_segmented():
             await upload_session.a_check_segment()
         request.app[session]["uploads"][pro][cont][ident] = upload_session

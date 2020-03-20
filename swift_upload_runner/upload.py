@@ -82,12 +82,75 @@ class ResumableFileUploadProxy:
             headers={
                 "X-Auth-Token": self.auth.get_token()
             }
-        ) as request:
-            segments = await request.text
-            segments = segments.rstrip().lstrip().split("\n")
-            segments = filter(lambda i, path=self.path: path in i, segments)
-            for segment in segments:
-                self.done_chunks.add(int(segment.split("/")[-1]))
+        ) as resp:
+            if resp.status in {200}:
+                segments = await resp.text
+                segments = segments.rstrip().lstrip().split("\n")
+                segments = filter(
+                    lambda i,
+                    path=self.path: path in i, segments
+                )
+                if segments:
+                    for segment in segments:
+                        self.done_chunks.add(int(segment.split("/")[-1]))
+
+    async def a_create_container(
+            self,
+            segmented=False
+    ):
+        """Create the container required by the upload."""
+        container = \
+            f"{self.container}_segments" if segmented else self.container
+        with self.client.put(
+                common.generate_download_url(
+                    common.get_download_host(self.auth, self.project),
+                    container
+                ),
+                headers={
+                    "Content-Length": 0,
+                    "X-Auth-Token": self.auth.get_token()
+                }
+        ) as resp:
+            if resp.status not in {201, 202}:
+                raise aiohttp.web.HTTPForbidden(
+                    reason="Can't create the upload container."
+                )
+
+    async def a_check_container(
+            self,
+    ):
+        """Check if the container is allowed."""
+        with self.client.head(
+                common.generate_download_url(
+                    common.get_download_host(self.auth, self.project),
+                    self.container
+                ),
+                headers={
+                    "X-Auth-Token": self.auth.get_token()
+                }
+        ) as resp:
+            if resp.state != 204:
+                if self.project != self.auth.get_project_id:
+                    raise aiohttp.web.HTTPBadRequest(
+                        reason="No access to shared container"
+                    )
+                await self.a_create_container()
+        if self.segmented:
+            with self.client.head(
+                common.generate_download_url(
+                    common.get_download_host(self.auht, self.project),
+                    f"{self.container}_segments"
+                ),
+                headers={
+                    "X-Auth-Token": self.auth.get_token()
+                }
+            ) as resp:
+                if resp.state != 204:
+                    if self.project != self.auth.get_project_id:
+                        raise aiohttp.web.HTTPBadRequest(
+                            reason="No access to shared segments"
+                        )
+                    await self.a_create_container(segmented=True)
 
     async def a_check_segment(
             self,
@@ -183,7 +246,7 @@ class ResumableFileUploadProxy:
                     }
                 )
 
-            await self.wait_for_chunk(chunk_number)
+            await self.a_wait_for_chunk(chunk_number)
             return aiohttp.web.Response(status=201)
 
     async def generate_from_queue(self):
@@ -208,7 +271,7 @@ class ResumableFileUploadProxy:
                 await self.coro_upload
                 break
 
-    async def wait_for_chunk(
+    async def a_wait_for_chunk(
             self,
             chunk_number: int
     ):
