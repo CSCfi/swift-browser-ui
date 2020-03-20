@@ -76,9 +76,11 @@ async def parse_multipart_in(
         if field.name == "resumableChunkNumber":  # type: ignore
             # Remember that resumable.js counts chunks from 1, not 0
             ret_d["resumableChunkNumber"] = \
-                int(field.read(decode=True)) - 1  # type: ignore
+                int(await field.read(decode=True)) - 1  # type: ignore
         else:
-            ret_d[str(field.name)] = field.read(decode=True)  # type: ignore
+            ret_d[
+                str(field.name)  # type: ignore
+            ] = await field.read(decode=True)  # type: ignore
 
 
 async def get_upload_instance(
