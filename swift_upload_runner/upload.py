@@ -130,7 +130,7 @@ class ResumableFileUploadProxy:
                 }
         ) as resp:
             if resp.status != 204:
-                if self.project != self.auth.get_project_id:
+                if self.project != self.auth.get_project_id():
                     raise aiohttp.web.HTTPBadRequest(
                         reason="No access to shared container"
                     )
@@ -146,7 +146,7 @@ class ResumableFileUploadProxy:
                 }
             ) as resp:
                 if resp.status != 204:
-                    if self.project != self.auth.get_project_id:
+                    if self.project != self.auth.get_project_id():
                         raise aiohttp.web.HTTPBadRequest(
                             reason="No access to shared segments"
                         )
