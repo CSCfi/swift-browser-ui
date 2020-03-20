@@ -200,7 +200,7 @@ class ResumableFileUploadProxy:
             chunk_reader: aiohttp.MultipartReader
     ) -> aiohttp.web.Response:
         """Add a chunk to the upload."""
-        chunk_number = (query["resumableChunkNUmber"])
+        chunk_number = (query["resumableChunkNumber"])
 
         if chunk_number in self.done_chunks:
             return aiohttp.web.Response(status=200)
