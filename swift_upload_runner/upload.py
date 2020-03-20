@@ -107,7 +107,7 @@ class ResumableFileUploadProxy:
                     container
                 ),
                 headers={
-                    "Content-Length": 0,
+                    "Content-Length": str(0),
                     "X-Auth-Token": self.auth.get_token()
                 }
         ) as resp:
