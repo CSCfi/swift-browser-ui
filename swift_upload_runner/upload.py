@@ -239,7 +239,7 @@ class ResumableFileUploadProxy:
             if not self.done_chunks:
                 self.coro_upload = self.client.put(
                     self.url,
-                    data=self.generate_from_queue,
+                    data=self.generate_from_queue(),
                     headers={
                         "X-Auth-Token": self.auth.get_token(),
                         "Content-Length": query["resumableTotalSize"]
