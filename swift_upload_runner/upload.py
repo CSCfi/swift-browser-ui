@@ -200,7 +200,8 @@ class ResumableFileUploadProxy:
             chunk_reader: aiohttp.MultipartReader
     ) -> aiohttp.web.Response:
         """Add a chunk to the upload."""
-        chunk_number = (query["resumableChunkNumber"])
+        # Resumablejs begins counting from 1
+        chunk_number = (query["resumableChunkNumber"]) - 1
 
         if chunk_number in self.done_chunks:
             return aiohttp.web.Response(status=200)
@@ -237,14 +238,14 @@ class ResumableFileUploadProxy:
             ))
 
             if not self.done_chunks:
-                self.coro_upload = self.client.put(
+                self.coro_upload = asyncio.create_task(self.client.put(
                     self.url,
                     data=self.generate_from_queue(),
                     headers={
                         "X-Auth-Token": self.auth.get_token(),
                         "Content-Length": query["resumableTotalSize"]
                     }
-                )
+                ))
 
             await self.a_wait_for_chunk(chunk_number)
             return aiohttp.web.Response(status=201)
