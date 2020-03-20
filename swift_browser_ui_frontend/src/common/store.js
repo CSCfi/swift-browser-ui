@@ -26,6 +26,7 @@ const store = new Vuex.Store({
     isUploading: false,
     isChunking: false,
     uploadProgress: undefined,
+    altContainer: undefined,
   },
   mutations: {
     updateContainers (state, newList) {
@@ -89,6 +90,12 @@ const store = new Vuex.Store({
     },
     eraseProgress (state) {
       state.uploadProgress = undefined;
+    },
+    setAltContainer (state, altContainer) {
+      state.altContainer = altContainer;
+    },
+    eraseAltContainer (state) {
+      state.altContainer = undefined;
     },
   },
 });

@@ -74,6 +74,9 @@ new Vue({
     resumableClient () {
       return this.$store.state.resumableClient;
     },
+    altContainer () {
+      return this.$store.state.altContainer;
+    },
   },
   beforeMount() {
     this.createUploadInsatnce();
@@ -148,13 +151,12 @@ new Vue({
       });
     },
     getUploadUrl: function (params) {
-      let alt_container = "upload-".concat(Date.now().toString());
       let retUrl = new URL(
         "/upload/".concat(
           this.$route.params.owner ? this.$route.params.owner : this.active.id,
           "/",
           this.$route.params.container ? this.$route.params.container
-            : alt_container
+            : this.altContainer
         ),
         document.location.origin,
       );
@@ -165,9 +167,12 @@ new Vue({
       return retUrl.toString();
     },
     startUpload: function () {
+      let altContainer = "upload-".concat(Date.now().toString());
+      this.$store.commit("setAltContainer", altContainer);
       this.$store.commit("setUploading");
     },
     endUpload: function () {
+      this.$store.commit("eraseAltContainer");
       this.$store.commit("stopUploading");
     },
     startChunking: function () {
