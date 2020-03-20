@@ -101,7 +101,7 @@ class ResumableFileUploadProxy:
         """Create the container required by the upload."""
         container = \
             f"{self.container}_segments" if segmented else self.container
-        with self.client.put(
+        async with self.client.put(
                 common.generate_download_url(
                     common.get_download_host(self.auth, self.project),
                     container
@@ -120,7 +120,7 @@ class ResumableFileUploadProxy:
             self,
     ):
         """Check if the container is allowed."""
-        with self.client.head(
+        async with self.client.head(
                 common.generate_download_url(
                     common.get_download_host(self.auth, self.project),
                     self.container
@@ -136,7 +136,7 @@ class ResumableFileUploadProxy:
                     )
                 await self.a_create_container()
         if self.segmented:
-            with self.client.head(
+            async with self.client.head(
                 common.generate_download_url(
                     common.get_download_host(self.auht, self.project),
                     f"{self.container}_segments"
