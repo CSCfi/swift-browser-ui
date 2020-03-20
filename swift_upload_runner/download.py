@@ -16,6 +16,7 @@ import keystoneauth1.session
 import requests
 
 from .common import generate_download_url, get_path_from_list
+from .common import get_download_host
 
 
 class FileDownloadProxy:
@@ -56,7 +57,7 @@ class FileDownloadProxy:
         """Return the incoming file size."""
         return self.size
 
-    def get_chksum(self) -> str:
+    def get_chksum(self) -> typing.Optional[str]:
         """Return the checksum."""
         return self.chksum
 
@@ -76,7 +77,7 @@ class FileDownloadProxy:
             await asyncio.sleep(0.01)
             return await self.a_get_size()
 
-    async def a_get_checksum(self) -> str:
+    async def a_get_checksum(self) -> typing.Optional[str]:
         """Return the eventual checksum."""
         try:
             return self.get_chksum()
@@ -102,7 +103,7 @@ class FileDownloadProxy:
         """)
         with requests.get(
             generate_download_url(
-                self.auth.get_endpoint(service_type="object-store"),
+                get_download_host(self.auth, project),
                 container=container,
                 object_name=object_name
             ),
@@ -400,7 +401,7 @@ class ContainerArchiveDownloadProxy:
         """Synchronize the list of objects to download."""
         with requests.get(
                 generate_download_url(
-                    self.auth.get_endpoint(service_type="object-store"),
+                    get_download_host(self.auth, self.project),
                     container=self.container
                 ),
                 headers={
@@ -473,7 +474,9 @@ class ContainerArchiveDownloadProxy:
 
             tar_info = next_file["tar_info"]
             tar_info.size = next_file["fileobj"].get_dload().get_size()
-            tar_info.chksum = next_file["fileobj"].get_dload().get_chksum()
+            if next_file["fileobj"].get_dload().get_chksum():
+                tar_info.chksum = \
+                    next_file["fileobj"].get_dload().get_chksum()
             tar_info.mtime = next_file["fileobj"].get_dload().get_mtime()
 
             self.archive.addfile(
