@@ -21,6 +21,11 @@ from .api import handle_post_object_chunk, handle_post_object_options
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
+logging.basicConfig(
+    level=int(os.environ.get("UPLOAD_RUNNER_LOG_LEVEL"), 20)  # type: ignore
+)
+
+
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server for handling the upload runner API."""
     middlewares: typing.List[typing.Coroutine] = [add_cors]  # type: ignore

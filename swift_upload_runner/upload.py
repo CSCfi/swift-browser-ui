@@ -4,6 +4,7 @@
 import os
 import typing
 import asyncio
+import logging
 
 import aiohttp.web
 import aiohttp.client
@@ -11,6 +12,9 @@ import aiohttp.client
 import keystoneauth1.session
 
 import swift_upload_runner.common as common
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class ResumableFileUploadProxy:
@@ -207,6 +211,7 @@ class ResumableFileUploadProxy:
             return aiohttp.web.Response(status=200)
 
         if self.segmented:
+            LOGGER.debug(f"Uploading chunk {chunk_number}")
             async with self.client.put(
                 common.generate_download_url(
                     self.host,
@@ -226,8 +231,10 @@ class ResumableFileUploadProxy:
                 if self.total_uploaded == self.total_size:
                     await self.a_add_manifest()
                 self.done_chunks.add(chunk_number)
+                LOGGER.debug(f"Success in uploding chunk {chunk_number}")
                 return aiohttp.web.Response(status=201)
         else:
+            LOGGER.debug(f"Concatenatig chunk {chunk_number}")
             await self.q.put((
                 # Using chunk number as priority, to handle chunks in any
                 # order
@@ -250,14 +257,19 @@ class ResumableFileUploadProxy:
 
     async def generate_from_queue(self):
         """Generate the response data form the internal queue."""
+        LOGGER.debug("Generating upload data from a queue.")
         while True:
             chunk_number, segment = await self.q.get()
+
+            LOGGER.debug(f"Got chunk from chunk {chunk_number}")
 
             chunk_reader = segment["data"]
             chunk = await chunk_reader.read_chunk()
             while chunk:
                 yield chunk
                 chunk = await chunk_reader.read_chunk()
+
+            LOGGER.debug(f"Chunk {chunk_number} exhausted.")
 
             self.total_uploaded += \
                 segment["query"]["resumableCurrentChunkSize"]
@@ -267,6 +279,7 @@ class ResumableFileUploadProxy:
                     len(self.done_chunks) ==
                     segment["query"]["resumableTotalChunks"]
             ):
+                LOGGER.debug("Terminating queue chunk generator.")
                 await self.coro_upload
                 break
 
@@ -275,6 +288,7 @@ class ResumableFileUploadProxy:
             chunk_number: int
     ):
         """Wait asynchronously for a chunk to be written to the upload."""
+        LOGGER.debug(f"Waiting for chunk {chunk_number}")
         while True:
             if chunk_number in self.done_chunks:
                 break
