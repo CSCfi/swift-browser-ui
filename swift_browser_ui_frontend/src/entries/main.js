@@ -79,7 +79,7 @@ new Vue({
     },
   },
   beforeMount() {
-    this.createUploadInsatnce();
+    this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
     });
@@ -195,7 +195,7 @@ new Vue({
         this.resumableClient.progress()
       );
     },
-    createUploadInsatnce: function () {
+    createUploadInstance: function () {
       let res = new Resumable({
         target: this.getUploadUrl,
         testTarget: this.getUploadUrl,
