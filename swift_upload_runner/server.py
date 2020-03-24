@@ -22,7 +22,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 logging.basicConfig(
-    level=int(os.environ.get("UPLOAD_RUNNER_LOG_LEVEL"), 20)  # type: ignore
+    level=int(os.environ.get("UPLOAD_RUNNER_LOG_LEVEL", 20))
 )
 
 
