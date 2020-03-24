@@ -1,5 +1,10 @@
 <template>
-  <span :id="id" />
+  <a
+    :id="id"
+    class="button is-outlined is-primary"
+  >
+    {{ $t('message.upload') }}
+  </a>
 </template>
 
 <script>
