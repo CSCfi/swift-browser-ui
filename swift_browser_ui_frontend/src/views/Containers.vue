@@ -39,7 +39,7 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <FolderUploadForm />
+      <FolderUploadForm dropelement="container-table" />
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
