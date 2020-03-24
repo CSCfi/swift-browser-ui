@@ -243,14 +243,17 @@ class ResumableFileUploadProxy:
             ))
 
             if not self.done_chunks:
-                self.coro_upload = asyncio.create_task(self.client.put(
-                    self.url,
-                    data=self.generate_from_queue(),
-                    headers={
-                        "X-Auth-Token": self.auth.get_token(),
-                        "Content-Length": query["resumableTotalSize"]
-                    }
-                ))
+                LOGGER.debug("Scheduling upload coroutine")
+                self.coro_upload = asyncio.ensure_future(  # type: ignore
+                    self.client.put(
+                        self.url,
+                        data=self.generate_from_queue(),
+                        headers={
+                            "X-Auth-Token": self.auth.get_token(),
+                            "Content-Length": query["resumableTotalSize"]
+                        }
+                    )
+                )
 
             await self.a_wait_for_chunk(chunk_number)
             return aiohttp.web.Response(status=201)
