@@ -71,6 +71,9 @@ new Vue({
     isLoading () {
       return this.$store.state.isLoading;
     },
+    isUploading () {
+      return this.$store.state.isUploading;
+    },
     resumableClient () {
       return this.$store.state.resumableClient;
     },
@@ -137,6 +140,9 @@ new Vue({
         message: "File / files scheduled for upload.",
         type: "is-success",
       });
+      if(!this.isUploading) {
+        this.resumableClient.upload();
+      }
     },
     fileSuccessToast: function (file) {
       this.$buefy.toast.open({
