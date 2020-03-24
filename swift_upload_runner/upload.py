@@ -15,6 +15,7 @@ import swift_upload_runner.common as common
 
 
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 
 class ResumableFileUploadProxy:
@@ -278,10 +279,7 @@ class ResumableFileUploadProxy:
                 segment["query"]["resumableCurrentChunkSize"]
             self.done_chunks.add(chunk_number)
 
-            if (
-                    len(self.done_chunks) ==
-                    segment["query"]["resumableTotalChunks"]
-            ):
+            if len(self.done_chunks) == self.total_chunks:
                 LOGGER.debug("Terminating queue chunk generator.")
                 await self.coro_upload
                 break
@@ -294,7 +292,8 @@ class ResumableFileUploadProxy:
         LOGGER.debug(f"Waiting for chunk {chunk_number}")
         while True:
             if chunk_number in self.done_chunks:
-                break
+                LOGGER.debug(f"Waited for chunk {chunk_number}")
+                return
             # Unfortunate busywaiting for now
             await asyncio.sleep(0.25)
 
