@@ -137,6 +137,7 @@ const translations = {
       containers: "Containers - ",
       upload: " Upload",
       uploadfolder: " Upload Folder",
+      cancelupload: " Cancel uploading",
     },
   },
   fi: {
@@ -274,6 +275,7 @@ const translations = {
       containers: "Säiliöt - ",
       upload: " Lähetä",
       uploadfolder: " Lähetä kansio",
+      cancelupload: " Peru lähetys",
     },
   },
 };

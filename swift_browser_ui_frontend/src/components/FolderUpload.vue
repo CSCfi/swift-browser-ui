@@ -1,10 +1,18 @@
 <template>
-  <a
-    :id="id"
-    class="button is-outlined is-primary"
-  >
-    {{ $t('message.upload') }}
-  </a>
+  <div>
+    <a
+      :id="id"
+      class="button is-outlined is-primary"
+    >
+      {{ $t('message.upload') }}
+    </a>
+    <b-button
+      v-if="isUploading"
+      @click="res.cancel()"
+    >
+      {{ t('cancelupload') }}
+    </b-button>
+  </div>
 </template>
 
 <script>
@@ -30,6 +38,9 @@ export default {
     },
     res () {
       return this.$store.state.resumableClient;
+    },
+    isUploading () {
+      return this.$store.state.isUploading;
     },
   },
   mounted () {
