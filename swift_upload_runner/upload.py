@@ -247,7 +247,7 @@ class ResumableFileUploadProxy:
                 LOGGER.debug("Scheduling upload coroutine")
                 self.coro_upload = asyncio.ensure_future(self.upload_file())
 
-            if chunk_number == self.total_chunks:
+            if chunk_number + 1 == self.total_chunks:
                 LOGGER.debug("Waiting for upload to finish")
                 await self.coro_upload
             else:
