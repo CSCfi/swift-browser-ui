@@ -60,7 +60,7 @@ class ResumableFileUploadProxy:
         self.client: aiohttp.client.ClientSession = client
 
         # declare concatenated upload coroutine
-        self.coro_upload: asyncio.Task
+        self.coro_upload: typing.Awaitable[typing.Any]
 
         # Get object storage host
         self.host: str = common.get_download_host(self.auth, self.project)
@@ -245,19 +245,34 @@ class ResumableFileUploadProxy:
 
             if not self.done_chunks:
                 LOGGER.debug("Scheduling upload coroutine")
-                self.coro_upload = asyncio.ensure_future(  # type: ignore
-                    self.client.put(
-                        self.url,
-                        data=self.generate_from_queue(),
-                        headers={
-                            "X-Auth-Token": self.auth.get_token(),
-                            "Content-Length": query["resumableTotalSize"]
-                        }
-                    )
-                )
+                self.coro_upload = asyncio.ensure_future(self.upload_file())
 
-            await self.a_wait_for_chunk(chunk_number)
+            if chunk_number == self.total_chunks:
+                LOGGER.debug("Waiting for upload to finish")
+                await self.coro_upload
+            else:
+                await self.a_wait_for_chunk(chunk_number)
+
             return aiohttp.web.Response(status=201)
+
+    async def upload_file(self):
+        """Upload the file with concatenated segments."""
+        async with self.client.put(
+                self.url,
+                data=self.generate_from_queue(),
+                headers={
+                    "X-Auth-Token": self.auth.get_token(),
+                    "Content-Length": self.total_size,
+                }
+        ) as resp:
+            if resp.status == 408:
+                raise aiohttp.web.HTTPRequestTimeout()
+            if resp.status == 411:
+                raise aiohttp.web.HTTPLengthRequired()
+            if resp.status == 422:
+                raise aiohttp.web.HTTPUnprocessableEntity()
+            else:
+                return
 
     async def generate_from_queue(self):
         """Generate the response data form the internal queue."""
@@ -280,8 +295,6 @@ class ResumableFileUploadProxy:
             self.done_chunks.add(chunk_number)
 
             if len(self.done_chunks) == self.total_chunks:
-                LOGGER.debug("Terminating queue chunk generator.")
-                await self.coro_upload
                 break
 
     async def a_wait_for_chunk(
