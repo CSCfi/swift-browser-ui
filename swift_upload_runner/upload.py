@@ -262,7 +262,7 @@ class ResumableFileUploadProxy:
                 data=self.generate_from_queue(),
                 headers={
                     "X-Auth-Token": self.auth.get_token(),
-                    "Content-Length": self.total_size,
+                    "Content-Length": str(self.total_size),
                 }
         ) as resp:
             if resp.status == 408:
@@ -277,7 +277,7 @@ class ResumableFileUploadProxy:
     async def generate_from_queue(self):
         """Generate the response data form the internal queue."""
         LOGGER.debug("Generating upload data from a queue.")
-        while True:
+        while len(self.done_chunks) < self.total_chunks:
             chunk_number, segment = await self.q.get()
 
             LOGGER.debug(f"Got chunk from chunk {chunk_number}")
@@ -291,11 +291,8 @@ class ResumableFileUploadProxy:
             LOGGER.debug(f"Chunk {chunk_number} exhausted.")
 
             self.total_uploaded += \
-                segment["query"]["resumableCurrentChunkSize"]
+                int(segment["query"]["resumableCurrentChunkSize"])
             self.done_chunks.add(chunk_number)
-
-            if len(self.done_chunks) == self.total_chunks:
-                break
 
     async def a_wait_for_chunk(
             self,
