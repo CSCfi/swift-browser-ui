@@ -95,10 +95,10 @@ async def handle_post_object_chunk(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle a request for posting an object chunk."""
-    if "from_container" in request.query:
-        return await handle_replicate_container(request)
     if "from_object" in request.query:
         return await handle_replicate_object(request)
+    if "from_container" in request.query:
+        return await handle_replicate_container(request)
 
     project = request.match_info["project"]
     container = request.match_info["container"]
