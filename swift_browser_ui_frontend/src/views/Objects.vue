@@ -39,7 +39,7 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <FileUploadForm />
+      <FolderUploadForm dropelement="object-table" />
       <ContainerDownloadLink />
       <b-field class="control searchBox">
         <b-input
@@ -191,11 +191,13 @@ import { getObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import FolderUploadForm from "@/components/FolderUpload";
 
 export default {
   name: "Objects",
   components: {
     ContainerDownloadLink,
+    FolderUploadForm,
   },
   data: function () {
     return {
