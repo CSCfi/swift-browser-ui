@@ -161,8 +161,7 @@ new Vue({
         "/upload/".concat(
           this.$route.params.owner ? this.$route.params.owner : this.active.id,
           "/",
-          this.$route.params.container ? this.$route.params.container
-            : this.altContainer
+          this.altContainer
         ),
         document.location.origin,
       );
@@ -174,6 +173,9 @@ new Vue({
     },
     startUpload: function () {
       let altContainer = "upload-".concat(Date.now().toString());
+      if (this.$route.params.container) {
+        altContainer = this.$route.params.container;
+      }
       this.$store.commit("setAltContainer", altContainer);
       this.$store.commit("setUploading");
     },
