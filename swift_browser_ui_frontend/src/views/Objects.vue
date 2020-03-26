@@ -39,8 +39,14 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <FolderUploadForm dropelement="object-table" />
-      <ContainerDownloadLink />
+      <div class="field has-addons">
+        <p class="control">
+          <FolderUploadForm dropelement="object-table" />
+        </p>
+        <p class="control">
+          <ContainerDownloadLink />
+        </p>
+      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
