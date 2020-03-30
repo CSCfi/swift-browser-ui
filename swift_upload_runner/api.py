@@ -95,9 +95,9 @@ async def handle_post_object_chunk(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle a request for posting an object chunk."""
-    if "from_object" in request.query:
+    if "from_object" in request.query.keys():
         return await handle_replicate_object(request)
-    if "from_container" in request.query:
+    if "from_container" in request.query.keys():
         return await handle_replicate_container(request)
 
     project = request.match_info["project"]
@@ -163,7 +163,7 @@ async def handle_get_container(
         request: aiohttp.web.Request
 ) -> aiohttp.web.StreamResponse:
     """Handle a request for getting container contents as an archive."""
-    if "resumableChunkNumber" in request.query:
+    if "resumableChunkNumber" in request.query.keys():
         return await handle_get_object_chunk(request)
 
     auth = get_auth_instance(request)
