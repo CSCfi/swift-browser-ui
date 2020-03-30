@@ -6,7 +6,7 @@
       size="is-small"
       @click="$router.push({
         name: 'ReplicateContainer',
-        query: {
+        props: {
           container: getContainer(),
           project: getProject(),
         }
@@ -19,7 +19,7 @@
       class="is-primary is-outlined"
       @click="$router.push({
         name: 'ReplicateContainer',
-        query: {
+        props: {
           container: getContainer(),
           project: getProject(),
         }
