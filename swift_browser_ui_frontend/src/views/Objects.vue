@@ -268,7 +268,7 @@ export default {
     confirmDownload: function () {
       // Snackbar for enabling large downloads for the duration of the
       // session
-      this.$snackbar.open({
+      this.$buefy.snackbar.open({
         duration: 5000,
         message: this.$t("message.largeDownMessage"),
         type: "is-success",
