@@ -154,6 +154,7 @@
           width="40"
         >
           <ReplicateContainerButton
+            :project="active.id"
             :container="props.row.name"
             :smallSize="true"
           />
