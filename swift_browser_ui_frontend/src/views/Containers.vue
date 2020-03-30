@@ -203,6 +203,11 @@ export default {
       shareModalIsActive: false,
     };
   },
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
+  },
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
