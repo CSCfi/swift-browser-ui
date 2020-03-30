@@ -36,6 +36,7 @@ async def servinit() -> aiohttp.web.Application:
     app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
     app.on_startup.append(read_in_keys)
+    app.on_shutdown.append(kill_client)
 
     # Add client session for aiohttp requests
     app["client"] = aiohttp.client.ClientSession()
@@ -60,6 +61,13 @@ async def servinit() -> aiohttp.web.Application:
     ])
 
     return app
+
+
+async def kill_client(
+        app: aiohttp.web.Application
+):
+    """Kill the app client session."""
+    await app["client"].close()
 
 
 def run_server(
