@@ -7,8 +7,8 @@
       @click="$router.push({
         name: 'ReplicateContainer',
         query: {
-          container: getContainer,
-          project: getProject,
+          container: getContainer(),
+          project: getProject(),
         }
       })"
     >
@@ -20,8 +20,8 @@
       @click="$router.push({
         name: 'ReplicateContainer',
         query: {
-          container: getContainer,
-          project: getProject,
+          container: getContainer(),
+          project: getProject(),
         }
       })"
     >
