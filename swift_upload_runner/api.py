@@ -2,7 +2,7 @@
 
 
 import aiohttp.web
-# import asyncio
+import asyncio
 
 from .common import get_auth_instance, get_upload_instance
 from .common import parse_multipart_in
@@ -59,9 +59,9 @@ async def handle_replicate_container(
         source_container
     )
 
-    await replicator.a_copy_from_container()
+    asyncio.ensure_future(replicator.a_copy_from_container())
 
-    return aiohttp.web.Response(status=201)
+    return aiohttp.web.Response(status=202)
 
 
 async def handle_replicate_object(
@@ -86,9 +86,9 @@ async def handle_replicate_object(
         source_container
     )
 
-    await replicator.a_copy_object(source_object)
+    asyncio.ensure_future(replicator.a_copy_object(source_object))
 
-    return aiohttp.web.Response(status=201)
+    return aiohttp.web.Response(status=202)
 
 
 async def handle_post_object_chunk(
