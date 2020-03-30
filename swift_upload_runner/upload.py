@@ -18,6 +18,12 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 
 
+# The upload process needs a generous timeout, due to aiohttp having a
+# default limit of 5 minutes. This is too low for the purposes of the upload.
+# The new value is approx 9 hours.
+UPL_TIMEOUT = 32768
+
+
 class ResumableFileUploadProxy:
     """A class for a single proxied upload."""
 
@@ -86,15 +92,15 @@ class ResumableFileUploadProxy:
             ),
             headers={
                 "X-Auth-Token": self.auth.get_token()
-            }
+            },
         ) as resp:
             if resp.status in {200}:
                 segments = await resp.text
                 segments = segments.rstrip().lstrip().split("\n")
-                segments = filter(
+                segments = list(filter(
                     lambda i,
                     path=self.path: path in i, segments
-                )
+                ))
                 if segments:
                     for segment in segments:
                         self.done_chunks.add(int(segment.split("/")[-1]))
@@ -224,7 +230,8 @@ class ResumableFileUploadProxy:
                     "X-Auth-Token": self.auth.get_token(),
                     "Content-Length": query["resumableCurrentChunkSize"],
                     "Content-Type": "application/swiftclient-segment",
-                }
+                },
+                timeout=UPL_TIMEOUT
             ) as resp:
                 if resp.status == 408:
                     raise aiohttp.web.HTTPRequestTimeout()
@@ -263,7 +270,8 @@ class ResumableFileUploadProxy:
                 headers={
                     "X-Auth-Token": self.auth.get_token(),
                     "Content-Length": str(self.total_size),
-                }
+                },
+                timeout=UPL_TIMEOUT
         ) as resp:
             if resp.status == 408:
                 raise aiohttp.web.HTTPRequestTimeout()

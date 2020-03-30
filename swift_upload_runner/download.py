@@ -19,6 +19,10 @@ from .common import generate_download_url, get_path_from_list
 from .common import get_download_host
 
 
+# Unlike other classes, download uses python-requests for fetching objects
+# to simplify threading. Thus, timing out is not the default behavior.
+
+
 class FileDownloadProxy:
     """A class for a single proxied download."""
 
