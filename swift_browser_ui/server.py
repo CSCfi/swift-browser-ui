@@ -45,6 +45,7 @@ from .api import (
     swift_create_container,
     swift_upload_object_chunk,
     swift_check_object_chunk,
+    swift_replicate_container,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -190,6 +191,12 @@ async def servinit() -> aiohttp.web.Application:
                          swift_upload_object_chunk),
         aiohttp.web.get('/upload/{project}/{container}',
                         swift_check_object_chunk),
+    ])
+
+    # Add replication routes
+    app.add_routes([
+        aiohttp.web.post('/replicate/{project}/{container}',
+                         swift_replicate_container),
     ])
 
     # Add discovery routes
