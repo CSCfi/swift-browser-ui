@@ -148,6 +148,16 @@
             {{ $t('message.share.share') }}
           </b-button>
         </b-table-column>
+        <b-table-column
+          field="copy"
+          label=""
+          width="40"
+        >
+          <ReplicateContainerButton
+            :container="props.row.name"
+            :smallSize="true"
+          />
+        </b-table-column>
       </template>
       <template slot="empty">
         <p
@@ -168,12 +178,14 @@ import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "Containers",
   components: {
     FolderUploadForm,
     ContainerDownloadLink,
+    ReplicateContainerButton,
   },
   data: function () {
     return {
