@@ -228,3 +228,31 @@ export async function swiftCreateContainer (
     throw new Error("Container creation not successful.");
   }
 }
+
+
+export async function swiftCopyContainer (
+  project,
+  container,
+  source_project,
+  source_container
+) {
+  // Replicate the container from a specified source to the location
+
+  let fetchURL = new URL( "/replicate/".concat(
+    project, "/",
+    container
+  ), document.location.origin);
+
+  fetchURL.searchParams.append("from_project", source_project);
+  fetchURL.searchParams.append("from_container", source_container);
+
+  let ret = await fetch(
+    fetchURL, { method: "POST", credentials: "same-origin" }
+  );
+
+  if (ret.status != 202) {
+    throw new Error("Container replication not successful.");
+  }
+
+  return ret;
+}
