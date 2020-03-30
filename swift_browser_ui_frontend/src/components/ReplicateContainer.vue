@@ -2,7 +2,7 @@
   <div>
     <a
       v-if="smallSize"
-      class="is-primary is-outlined"
+      class="button is-primary is-outlined"
       size="is-small"
       @click="$router.push({
         name: 'ReplicateContainer',
@@ -16,7 +16,7 @@
     </a>
     <a
       v-else
-      class="is-primary is-outlined"
+      class="button is-primary is-outlined"
       @click="$router.push({
         name: 'ReplicateContainer',
         props: {
