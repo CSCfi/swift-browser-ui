@@ -229,6 +229,9 @@ new Vue({
       res.on("fileAdded", this.addFileToast);
       res.on("fileSuccess", this.fileSuccessToast);
       res.on("fileError", this.fileFailureToast);
+      res.on("chunkingStart", this.startChunking);
+      res.on("chunkingComplete", this.stopChunking);
+      res.on("progress", this.updateProgress);
 
       this.$store.commit("setResumable", res);
     },
