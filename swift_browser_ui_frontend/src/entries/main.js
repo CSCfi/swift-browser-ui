@@ -180,10 +180,12 @@ new Vue({
       }
       this.$store.commit("setAltContainer", altContainer);
       this.$store.commit("setUploading");
+      window.onbeforeunload = function () {return "";};
     },
     endUpload: function () {
       this.$store.commit("eraseAltContainer");
       this.$store.commit("stopUploading");
+      window.onbeforeunload = undefined;
     },
     startChunking: function () {
       this.$store.commit("setChunking");
