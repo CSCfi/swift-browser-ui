@@ -88,14 +88,16 @@ new Vue({
     });
     getProjects().then((value) => {
       this.$store.commit("setProjects", value);
-
+      
       getActiveProject().then((value) => {
         this.$store.commit("setActive", value);
-        if (
-          value.name != this.$route.params.project &&
-          this.$route.params.project != undefined
-        ) {
-          this.changeProject(this.$route.params.project);
+        if (this.$route.params.user != undefined) {
+          if (
+            value.name != this.$route.params.project &&
+            this.$route.params.project != undefined
+          ) {
+            this.changeProject(this.$route.params.project);
+          }
         }
         if (document.location.pathname == "/browse") {
           this.$router.push(
