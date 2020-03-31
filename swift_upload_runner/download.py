@@ -113,7 +113,7 @@ class FileDownloadProxy:
             ),
             headers={
                 "X-Auth-Token": self.auth.get_token(),
-                "Accept-Encoding": None
+                "Accept-Encoding": "identity"
             },
             stream=True
         ) as req:
