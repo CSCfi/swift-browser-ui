@@ -71,6 +71,9 @@ new Vue({
     isLoading () {
       return this.$store.state.isLoading;
     },
+    isChunking () {
+      return this.$store.state.isChunking;
+    },
     isUploading () {
       return this.$store.state.isUploading;
     },

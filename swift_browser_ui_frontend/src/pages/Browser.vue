@@ -21,7 +21,7 @@
         />
       </ul>
     </div>
-    <ProgressBar />
+    <ProgressBar v-if="isUploading || isChunking" />
     <router-view />
     <b-loading
       :is-full-page="isFullPage"
