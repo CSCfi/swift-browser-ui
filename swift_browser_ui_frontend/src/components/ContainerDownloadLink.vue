@@ -1,5 +1,6 @@
 <template>
   <b-button
+    tag="a"
     type="is-primary"
     outlined
     target="_blank"
@@ -52,16 +53,16 @@ export default {
       else {
         if (this.$route.name == "SharedTo") {
           this.download_link = "/download/".concat(
-            this.project,
+            this.$props.project,
             "/",
-            this.container
+            this.$props.container
           );
         }
         else {
           this.download_link = "/download/".concat(
             this.active.id,
             "/",
-            this.container
+            this.$props.container
           );
         }
       }
