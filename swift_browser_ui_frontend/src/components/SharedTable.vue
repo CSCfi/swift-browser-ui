@@ -68,40 +68,40 @@
           {{ props.row.owner }}
         </b-table-column>
         <b-table-column
-          field="download"
+          field="functions"
           label=""
-          width="40"
+          width="150"
         >
-          <ContainerDownloadLink
-            v-if="selected==props.row"
-            class="is-small"
-            :project="props.row.owner"
-            :inverted="true"
-            :container="props.row.container"
-          />
-          <ContainerDownloadLink
-            v-else
-            class="is-small"
-            :project="props.row.owner"
-            :container="props.row.container"
-          />
-        </b-table-column>
-        <b-table-column
-          field="copy"
-          label=""
-          width="40"
-        >
-          <ReplicateContainerButton
-            v-if="selected==props.row"
-            :inverted="true"
-            :container="props.row.container"
-            :smallsize="true"
-          />
-          <ReplicateContainerButton
-            v-else
-            :container="props.row.container"
-            :smallsize="true"
-          />
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected==props.row"
+                class="is-small"
+                :project="props.row.owner"
+                :inverted="true"
+                :container="props.row.container"
+              />
+              <ContainerDownloadLink
+                v-else
+                class="is-small"
+                :project="props.row.owner"
+                :container="props.row.container"
+              />
+            </p>
+            <p class="control">
+              <ReplicateContainerButton
+                v-if="selected==props.row"
+                :inverted="true"
+                :container="props.row.container"
+                :smallsize="true"
+              />
+              <ReplicateContainerButton
+                v-else
+                :container="props.row.container"
+                :smallsize="true"
+              />
+            </p>
+          </div>
         </b-table-column>
       </template>
       <template slot="empty">

@@ -106,73 +106,69 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
         <b-table-column
-          field="download"
+          field="functions"
           label=""
-          width="40"
+          width="150"
         >
-          <ContainerDownloadLink
-            v-if="selected==props.row"
-            class="is-small"
-            :inverted="true"
-            :container="props.row.name"
-          />
-          <ContainerDownloadLink
-            v-else
-            class="is-small"
-            :container="props.row.name"
-          />
-        </b-table-column>
-        <b-table-column
-          field="share"
-          label=""
-          width="80"
-        >
-          <b-button
-            v-if="selected==props.row"
-            type="is-primary"
-            icon-left="share"
-            outlined
-            size="is-small"
-            inverted
-            @click="$router.push({
-              name: 'Sharing',
-              query: {container: props.row.name}
-            })"
-          >
-            {{ $t('message.share.share') }}
-          </b-button>
-          <b-button
-            v-else
-            type="is-primary"
-            icon-left="share"
-            outlined
-            size="is-small"
-            @click="$router.push({
-              name: 'Sharing',
-              query: {container: props.row.name}
-            })"
-          >
-            {{ $t('message.share.share') }}
-          </b-button>
-        </b-table-column>
-        <b-table-column
-          field="copy"
-          label=""
-          width="80"
-        >
-          <ReplicateContainerButton
-            v-if="selected==props.row"
-            :project="active.id"
-            :container="props.row.name"
-            :smallsize="true"
-            :inverted="true"
-          />
-          <ReplicateContainerButton
-            v-else
-            :project="active.id"
-            :container="props.row.name"
-            :smallsize="true"
-          />
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected==props.row"
+                class="is-small"
+                :inverted="true"
+                :container="props.row.name"
+              />
+              <ContainerDownloadLink
+                v-else
+                class="is-small"
+                :container="props.row.name"
+              />
+            </p>
+            <p class="control">
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
+                icon-left="share"
+                outlined
+                size="is-small"
+                inverted
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                icon-left="share"
+                outlined
+                size="is-small"
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p class="control">
+              <ReplicateContainerButton
+                v-if="selected==props.row"
+                :project="active.id"
+                :container="props.row.name"
+                :smallsize="true"
+                :inverted="true"
+              />
+              <ReplicateContainerButton
+                v-else
+                :project="active.id"
+                :container="props.row.name"
+                :smallsize="true"
+              />
+            </p>
+          </div>
         </b-table-column>
       </template>
       <template slot="empty">
