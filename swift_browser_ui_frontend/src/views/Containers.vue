@@ -156,7 +156,7 @@
           <ReplicateContainerButton
             :project="active.id"
             :container="props.row.name"
-            :smallSize="true"
+            :smallsize="true"
           />
         </b-table-column>
       </template>
