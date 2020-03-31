@@ -78,6 +78,13 @@
             :container="props.row.container"
           />
         </b-table-column>
+        <b-table-column
+          field="copy"
+          label=""
+          width="40"
+        >
+          <ReplicateContainerButton :smallsize="true" />
+        </b-table-column>
       </template>
       <template slot="empty">
         <p
@@ -99,10 +106,14 @@
 <script>
 import delay from "lodash/delay";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "SharedTable",
-  components: { ContainerDownloadLink },
+  components: {
+    ContainerDownloadLink,
+    ReplicateContainerButton,
+  },
   data: function () {
     return {
       sharedList: [],
