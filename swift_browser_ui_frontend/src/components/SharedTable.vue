@@ -83,7 +83,10 @@
           label=""
           width="40"
         >
-          <ReplicateContainerButton :smallsize="true" />
+          <ReplicateContainerButton
+            :container="props.row.container"
+            :smallsize="true"
+          />
         </b-table-column>
       </template>
       <template slot="empty">

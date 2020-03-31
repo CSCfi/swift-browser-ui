@@ -46,6 +46,9 @@
         <p class="control">
           <ContainerDownloadLink />
         </p>
+        <p class="control">
+          <ReplicateContainerButton />
+        </p>
       </div>
       <b-field class="control searchBox">
         <b-input
@@ -198,12 +201,14 @@ import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import FolderUploadForm from "@/components/FolderUpload";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "Objects",
   components: {
     ContainerDownloadLink,
     FolderUploadForm,
+    ReplicateContainerButton,
   },
   data: function () {
     return {

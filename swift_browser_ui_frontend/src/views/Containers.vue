@@ -118,7 +118,7 @@
         <b-table-column
           field="share"
           label=""
-          width="40"
+          width="80"
         >
           <b-button
             v-if="selected==props.row"
@@ -151,7 +151,7 @@
         <b-table-column
           field="copy"
           label=""
-          width="40"
+          width="80"
         >
           <ReplicateContainerButton
             :project="active.id"
