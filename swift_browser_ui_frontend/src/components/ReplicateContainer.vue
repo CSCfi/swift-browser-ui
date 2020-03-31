@@ -42,9 +42,6 @@ export default {
       return this.$store.state.active;
     },
   },
-  beforeMount () {
-    this.checkSize();
-  },
   methods: {
     getProject: function () {
       if(this.$route.params.user == undefined) {
