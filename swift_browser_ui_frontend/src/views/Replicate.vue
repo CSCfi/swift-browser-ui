@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="contents"
+    style="width: 90%;"
+  >
     <b-field grouped>
       <b-field
         horizontal
