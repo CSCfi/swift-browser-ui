@@ -72,7 +72,15 @@
           label=""
           width="40"
         >
-          <ContainerDownloadLink 
+          <ContainerDownloadLink
+            v-if="selected==props.row"
+            class="is-small"
+            :project="props.row.owner"
+            :inverted="true"
+            :container="props.row.container"
+          />
+          <ContainerDownloadLink
+            v-else
             class="is-small"
             :project="props.row.owner"
             :container="props.row.container"
@@ -84,6 +92,13 @@
           width="40"
         >
           <ReplicateContainerButton
+            v-if="selected==props.row"
+            :inverted="true"
+            :container="props.row.container"
+            :smallsize="true"
+          />
+          <ReplicateContainerButton
+            v-else
             :container="props.row.container"
             :smallsize="true"
           />

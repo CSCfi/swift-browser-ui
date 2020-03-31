@@ -1,17 +1,23 @@
 <template>
-  <a
-    class="button is-primary is-outlined"
+  <b-button
+    type="is-primary"
+    outlined
     target="_blank"
+    :inverted="inverted"
     :href="download_link"
   >
     Download
-  </a>
+  </b-button>
 </template>
 
 <script>
 export default {
   name: "ContainerDownloadLink",
-  props: ["container", "project"],
+  props: [
+    "container",
+    "project",
+    "inverted",
+  ],
   data: function () {
     return {
       download_link: "",

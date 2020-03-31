@@ -1,8 +1,11 @@
 <template>
   <div>
-    <a
+    <b-button
       v-if="smallsize"
-      class="button is-primary is-outlined is-small"
+      type="is-primary"
+      size="is-small"
+      outlined
+      :inverted="inverted"
       @click="$router.push({
         name: 'ReplicateContainer',
         params: {
@@ -12,10 +15,13 @@
       })"
     >
       Copy
-    </a>
-    <a
+    </b-button>
+    <b-button
       v-else
-      class="button is-primary is-outlined"
+      type="is-primary"
+      size="is-small"
+      outlined
+      :inverted="inverted"
       @click="$router.push({
         name: 'ReplicateContainer',
         params: {
@@ -25,7 +31,7 @@
       })"
     >
       Copy
-    </a>
+    </b-button>
   </div>
 </template>
 
@@ -36,6 +42,7 @@ export default {
     "project",
     "container",
     "smallsize",
+    "inverted",
   ],
   computed: {
     active () {
