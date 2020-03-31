@@ -99,7 +99,7 @@ async def kill_dload_client(
         app: aiohttp.web.Application
 ):
     """Kill download proxy client session."""
-    app['dload_session'].close()
+    await app['dload_session'].close()
 
 
 async def servinit() -> aiohttp.web.Application:
