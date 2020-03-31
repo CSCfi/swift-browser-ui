@@ -181,7 +181,7 @@ async def servinit() -> aiohttp.web.Application:
     app.add_routes([
         aiohttp.web.get('/download/{project}/{container}',
                         swift_download_container),
-        aiohttp.web.get('/download/{project}/{container}/{object}',
+        aiohttp.web.get('/download/{project}/{container}/{object:.*}',
                         swift_download_shared_object),
     ])
 
