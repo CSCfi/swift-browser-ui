@@ -5,7 +5,7 @@
       class="button is-primary is-outlined is-small"
       @click="$router.push({
         name: 'ReplicateContainer',
-        props: {
+        params: {
           container: getContainer(),
           project: getProject(),
         }
@@ -45,12 +45,14 @@ export default {
   methods: {
     getProject: function () {
       if(this.$route.params.user == undefined) {
-        return this.project ? this.project : this.$route.params.project;
+        return this.$props.project ? this.$props.project :
+          this.$route.params.project;
       }
       return this.active.id;
     },
     getContainer: function () {
-      return this.container ? this.container : this.$route.params.container;
+      return this.$props.container ? this.$props.container :
+        this.$route.params.container;
     },
   },
 };
