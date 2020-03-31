@@ -81,7 +81,7 @@ new Vue({
       return this.$store.state.altContainer;
     },
   },
-  beforeMount() {
+  created() {
     this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
