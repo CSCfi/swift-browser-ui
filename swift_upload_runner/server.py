@@ -50,7 +50,7 @@ async def servinit() -> aiohttp.web.Application:
 
     # Add api routes
     app.add_routes([
-        aiohttp.web.get("/{project}/{container}/{object_name}",
+        aiohttp.web.get("/{project}/{container}/{object_name:.*}",
                         handle_get_object),
         aiohttp.web.get("/{project}/{container}",
                         handle_get_container),
