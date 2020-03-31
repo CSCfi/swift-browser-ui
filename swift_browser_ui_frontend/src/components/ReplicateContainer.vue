@@ -1,7 +1,7 @@
 <template>
   <div>
     <a
-      v-if="smallSize"
+      v-if="smallsize"
       class="button is-primary is-outlined"
       size="is-small"
       @click="$router.push({
