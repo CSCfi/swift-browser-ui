@@ -8,6 +8,7 @@ import typing
 import tarfile
 import time
 import asyncio
+import logging
 
 import aiohttp.web
 
@@ -17,6 +18,10 @@ import requests
 
 from .common import generate_download_url, get_path_from_list
 from .common import get_download_host
+
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 
 # Unlike other classes, download uses python-requests for fetching objects
@@ -341,8 +346,10 @@ class ContainerArchiveDownloadProxy:
             # Create TarInfo for the directory
             if len(path) > 1:
                 if path[0] in ret_fs.keys():
+                    LOGGER.debug(f"Skipping path {path} as added.")
                     continue
 
+                LOGGER.debug(f"Adding directory for {path[0]} {path_prefix}")
                 new_info = tarfile.TarInfo(
                     name=get_path_from_list(
                         [path[0] + "/"],
@@ -363,6 +370,8 @@ class ContainerArchiveDownloadProxy:
                     ):
                         dir_contents.append(i)
 
+                LOGGER.debug(f"Dir {path[0]} contents: {dir_contents}")
+
                 ret_fs[path[0]] = {
                     "name": get_path_from_list(
                         [path[0]],
@@ -382,6 +391,7 @@ class ContainerArchiveDownloadProxy:
             # Path of == 1 implies a file
             else:
                 # Create file TarInfo class
+                LOGGER.debug(f"Adding file {path} to {path_prefix}")
                 new_info = tarfile.TarInfo(name=get_path_from_list(
                     path,
                     path_prefix
@@ -412,9 +422,9 @@ class ContainerArchiveDownloadProxy:
                     "X-Auth-Token": self.auth.get_token()
                 }
         ) as req:
-            self.fs = self._parse_archive_fs(
-                i.split("/") for i in req.text.rstrip().lstrip().split("\n")
-            )
+            self.fs = self._parse_archive_fs([
+                i.split("/") for i in req.text.lstrip().rstrip().split("\n")
+            ])
 
     def sync_folders(
             self,
