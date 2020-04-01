@@ -35,8 +35,8 @@ COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 
-RUN addgroup -g 1001 swiftui && \
-    adduser -D -u 1001 --disabled-password --no-create-home -G swiftui swiftui
+RUN addgroup -g 1001 swiftsharing && \
+    adduser -D -u 1001 --disabled-password --no-create-home -G swiftsharing swiftsharing
 
 USER swiftsharing
 
