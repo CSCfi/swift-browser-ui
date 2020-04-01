@@ -7,7 +7,7 @@
     :inverted="inverted"
     :href="download_link"
   >
-    {{ $t('message.download') }}
+    {{ $t('message.downloadContainer') }}
   </b-button>
 </template>
 

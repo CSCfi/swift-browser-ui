@@ -122,6 +122,7 @@ const translations = {
       largeFileMessage: "",
       download: "Download",
       downloadLink: "Download Link",
+      downloadContainer: "Download Container",
       downloadAlt: "Download link for",
       downloadAltLarge: "Confirm download large file",
       largeDownMessage: "No large (> 1GiB) downloads enabled. Click to " +
@@ -268,6 +269,7 @@ const translations = {
       },
       largeFileMessage: "",
       download: "Lataa",
+      downloadContainer: "Lataa säiliö",
       downloadLink: "Latauslinkki",
       downloadAlt: "Latauslinkki tiedostolle",
       downloadAltLarge: "Hyväksy suuren tiedoston lataus",
