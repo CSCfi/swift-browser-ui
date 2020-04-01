@@ -285,7 +285,7 @@ export default {
     filter: function() {
       var name_cmp = new RegExp(this.searchQuery, "i");
       this.bList = this.containers.filter(
-        element => element.name.match(name_cmp)
+        element => element.name.match(name_cmp),
       );
     },
   },

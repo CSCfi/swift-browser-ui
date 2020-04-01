@@ -107,8 +107,8 @@ new Vue({
             "/browse/".concat(
               this.$store.state.uname,
               "/",
-              value.name
-            )
+              value.name,
+            ),
           );
         }
       });
@@ -122,8 +122,8 @@ new Vue({
             "setSharingClient",
             new SwiftXAccountSharing(
               ret.sharing_endpoint,
-              document.location.origin
-            )
+              document.location.origin,
+            ),
           );
         }
         if (ret.request_endpoint) {
@@ -131,8 +131,8 @@ new Vue({
             "setRequestClient",
             new SwiftSharingRequest(
               ret.request_endpoint,
-              document.location.origin
-            )
+              document.location.origin,
+            ),
           );
         }
       });
@@ -166,7 +166,7 @@ new Vue({
         "/upload/".concat(
           this.$route.params.owner ? this.$route.params.owner : this.active.id,
           "/",
-          this.altContainer
+          this.altContainer,
         ),
         document.location.origin,
       );
@@ -207,7 +207,7 @@ new Vue({
     updateProgress () {
       this.$store.commit(
         "updateProgress",
-        this.resumableClient.progress()
+        this.resumableClient.progress(),
       );
     },
     createUploadInstance: function () {
@@ -286,7 +286,7 @@ new Vue({
             this.$router.push(
               "/browse/" +
               this.$store.state.uname + "/" +
-              this.$store.state.active["name"]
+              this.$store.state.active["name"],
             );
             this.$router.go(0);
           });

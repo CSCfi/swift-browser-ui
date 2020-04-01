@@ -55,7 +55,7 @@ export default {
       this.$store.state.requestClient.addAccessRequest(
         this.$route.params.project,
         this.container,
-        this.owner
+        this.owner,
       ).then(() => {
         this.$router.go();
       });

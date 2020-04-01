@@ -39,14 +39,14 @@ export default {
           this.download_link = "/download/".concat(
             this.$route.params.owner,
             "/",
-            this.$route.params.container
+            this.$route.params.container,
           );
         }
         else {
           this.download_link = "/download/".concat(
             this.active.id,
             "/",
-            this.$route.params.container
+            this.$route.params.container,
           );
         }
       }
@@ -55,14 +55,14 @@ export default {
           this.download_link = "/download/".concat(
             this.$props.project,
             "/",
-            this.$props.container
+            this.$props.container,
           );
         }
         else {
           this.download_link = "/download/".concat(
             this.active.id,
             "/",
-            this.$props.container
+            this.$props.container,
           );
         }
       }

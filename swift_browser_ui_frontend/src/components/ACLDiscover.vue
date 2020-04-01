@@ -36,7 +36,7 @@ export default {
         let amount = 0;
         let aclmeta = acl.access;
         let currentsharing = await this.$store.state.client.getShare(
-          this.$store.state.active.id
+          this.$store.state.active.id,
         );
 
         for (let container of Object.keys(aclmeta)) {
@@ -44,14 +44,14 @@ export default {
           if (currentsharing.includes(container)) {
             currentdetails = await this.$store.state.client.getShareDetails(
               this.$store.state.active.id,
-              container
+              container,
             );
           }
           for (let share of Object.keys(aclmeta[container])) {
             if (await this.checkDuplicate(
               container,
               share,
-              currentdetails
+              currentdetails,
             )) {
               continue;
             }
@@ -76,7 +76,7 @@ export default {
           this.$buefy.toast.open({
             message: this.$t("message.discover.sync_success_template").concat(
               amount,
-              this.$t("message.discover.sync_success_concat")
+              this.$t("message.discover.sync_success_concat"),
             ),
             type: "is-success",
           });
@@ -92,7 +92,7 @@ export default {
     checkDuplicate: async function (
       container,
       share,
-      currentdetails
+      currentdetails,
     ) {
       for (let detail of currentdetails) {
         if(

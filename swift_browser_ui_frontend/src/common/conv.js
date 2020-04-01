@@ -1,6 +1,6 @@
 export default function getLangCookie () {
   let matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)"
+    "(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)",
   ));
   return matches ? decodeURIComponent(matches[1]) : "en";
 }

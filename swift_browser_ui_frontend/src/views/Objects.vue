@@ -330,7 +330,7 @@ export default {
     filter: function () {
       var name_re = new RegExp(this.searchQuery, "i");
       this.oList = this.objects.filter(
-        element => element.name.match(name_re)
+        element => element.name.match(name_re),
       );
     },
   },

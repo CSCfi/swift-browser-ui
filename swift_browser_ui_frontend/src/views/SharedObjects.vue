@@ -199,19 +199,19 @@ export default {
       this.$store.state.client.getAccessDetails(
         this.$route.params.project,
         this.$route.params.container,
-        this.$route.params.owner
+        this.$route.params.owner,
       ).then(
         (ret) => {
           return getSharedObjects(
             this.$route.params.owner,
             this.$route.params.container,
-            ret.address
+            ret.address,
           );
-        }
+        },
       ).then(
         (ret) => {
           this.objects = ret;
-        }
+        },
       );
     },
     checkLargeDownloads: function () {
@@ -282,7 +282,7 @@ export default {
     filter: function () {
       var name_re = new RegExp(this.searchQuery, "i");
       this.oList = this.objects.filter(
-        element => element.name.match(name_re)
+        element => element.name.match(name_re),
       );
     },
   },

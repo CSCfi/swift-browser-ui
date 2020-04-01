@@ -157,9 +157,9 @@ export default {
     getSharedContainers: function () {
       if (this.$store.state.client) {
         this.$store.state.client.getShare(
-          this.$route.params.project
+          this.$route.params.project,
         ).then(
-          (ret) => {this.sharedOutList = ret;}
+          (ret) => {this.sharedOutList = ret;},
         );
       }
       else {
@@ -171,7 +171,7 @@ export default {
         () => {
           this.$store.state.client.shareContainerDeleteAccess(
             this.$route.params.project,
-            container
+            container,
           ).then(() => {
             this.$buefy.toast.open({
               duration: 5000,
@@ -179,7 +179,7 @@ export default {
               type: "is-success",
             });
           });
-        }
+        },
       );
     },
   },
