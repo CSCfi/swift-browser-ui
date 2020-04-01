@@ -4,6 +4,7 @@ import json
 import hashlib
 import os
 import unittest
+import types
 
 from aiohttp.web import HTTPNotFound
 import asynctest
@@ -17,6 +18,11 @@ from swift_browser_ui.api import get_metadata_object
 from swift_browser_ui.api import get_metadata_bucket
 from swift_browser_ui.api import get_project_metadata
 from swift_browser_ui.api import get_os_active_project
+from swift_browser_ui.api import swift_download_shared_object
+from swift_browser_ui.api import swift_download_container
+from swift_browser_ui.api import swift_upload_object_chunk
+from swift_browser_ui.api import swift_replicate_container
+from swift_browser_ui.api import swift_check_object_chunk
 from swift_browser_ui.settings import setd
 
 from .creation import get_request_with_mock_openstack
@@ -377,3 +383,135 @@ class APITestClass(asynctest.TestCase):
         """Test teardown."""
         self.cookie = None
         self.request = None
+
+
+class TestProxyFunctions(asynctest.TestCase):
+    """Test the handlers proxying information to the upload runner."""
+
+    def setUp(self):
+        """."""
+        self.mock_request = types.SimpleNamespace(**{
+            "match_info": {
+                "project": "test-project",
+                "container": "test-container",
+                "object": "test-object"
+            },
+            "query": {
+                "from_container": "test-container-2",
+                "from_project": "test-project-2"
+            },
+            "query_string": "&test-query=test-value",
+            "app": {
+                "Creds": {
+                    "session_key": {
+                        "active_project": {
+                            "id": "test-id"
+                        },
+                        "Token": "test-token"
+                    }
+                }
+            }
+        })
+
+        self.api_check_mock = unittest.mock.MagicMock(
+            return_value="session_key"
+        )
+        self.patch_api_check = unittest.mock.patch(
+            "swift_browser_ui.api.api_check",
+            self.api_check_mock
+        )
+
+        self.session_open_mock = asynctest.CoroutineMock(
+            return_value="test_runner_id"
+        )
+        self.patch_runner_session = unittest.mock.patch(
+            "swift_browser_ui.api.open_upload_runner_session",
+            self.session_open_mock
+        )
+
+        self.sign_mock = asynctest.CoroutineMock(return_value={
+            "signature": "test-signature",
+            "valid_until": "test-valid",
+        })
+        self.patch_sign = unittest.mock.patch(
+            "swift_browser_ui.api.sign",
+            self.sign_mock
+        )
+
+        self.setd_mock = {
+            "upload_external_endpoint": "http://test-endpoint:9092/"
+        }
+        self.patch_setd = unittest.mock.patch(
+            "swift_browser_ui.api.setd",
+            self.setd_mock
+        )
+
+    async def test_swift_download_share_object(self):
+        """Test share object download handler."""
+        with self.patch_api_check, \
+                self.patch_runner_session, \
+                self.patch_setd, \
+                self.patch_sign:
+            resp = await swift_download_shared_object(self.mock_request)
+
+            self.assertIn("test-signature", resp.headers["Location"])
+            self.assertIn("test-valid", resp.headers["Location"])
+            self.assertIn("test-endpoint", resp.headers["Location"])
+            self.assertEqual(303, resp.status)
+
+    async def test_swift_download_container(self):
+        """Test container download handler."""
+        with self.patch_api_check, \
+                self.patch_runner_session, \
+                self.patch_setd, \
+                self.patch_sign:
+            resp = await swift_download_container(self.mock_request)
+
+            self.assertIn("test-signature", resp.headers["Location"])
+            self.assertIn("test-valid", resp.headers["Location"])
+            self.assertIn("test-endpoint", resp.headers["Location"])
+            self.assertEqual(303, resp.status)
+
+    async def test_swift_upload_object_chunk(self):
+        """Test upload object chunk handler."""
+        with self.patch_api_check, \
+                self.patch_runner_session, \
+                self.patch_setd, \
+                self.patch_sign:
+            resp = await swift_upload_object_chunk(self.mock_request)
+
+            self.assertIn("test-signature", resp.headers["Location"])
+            self.assertIn("test-valid", resp.headers["Location"])
+            self.assertIn("test-endpoint", resp.headers["Location"])
+            self.assertEqual(307, resp.status)
+
+    async def test_swift_replicate_container(self):
+        """Test replicate container handler."""
+        with self.patch_api_check, \
+                self.patch_runner_session, \
+                self.patch_setd, \
+                self.patch_sign:
+            resp = await swift_replicate_container(self.mock_request)
+
+            self.assertIn("test-signature", resp.headers["Location"])
+            self.assertIn("test-valid", resp.headers["Location"])
+            self.assertIn("test-endpoint", resp.headers["Location"])
+            self.assertEqual(307, resp.status)
+            self.assertIn("from_container", resp.headers["Location"])
+            self.assertIn("test-container-2", resp.headers["Location"])
+            self.assertIn("from_project", resp.headers["Location"])
+            self.assertIn("test-project-2", resp.headers["Location"])
+
+    async def test_swift_check_object_chunk(self):
+        """Test upload object chunk handler."""
+        with self.patch_api_check, \
+                self.patch_runner_session, \
+                self.patch_setd, \
+                self.patch_sign:
+            resp = await swift_check_object_chunk(self.mock_request)
+
+            self.assertIn("test-signature", resp.headers["Location"])
+            self.assertIn("test-valid", resp.headers["Location"])
+            self.assertIn("test-endpoint", resp.headers["Location"])
+            self.assertEqual(307, resp.status)
+            self.assertIn("&test-query=test-value", resp.headers["Location"])
