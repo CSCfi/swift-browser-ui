@@ -5,7 +5,7 @@
       type="is-primary"
       size="is-large"
     >
-      Chunking
+      {{ $t('message.chunking') }}
     </b-progress>
     <b-progress
       v-else-if="isUploading && progress != undefined"
@@ -14,14 +14,14 @@
       size="is-large"
       show-value
     >
-      Uploading {{ (progress * 100).toFixed(1) }}%
+      {{ $t('message.uploading') }} {{ (progress * 100).toFixed(1) }}%
     </b-progress>
     <b-progress
       v-else-if="isUploading"
       type="is-primary"
       size="is-large"
     >
-      Uploading
+      {{ $t('message.uploading') }}
     </b-progress>
   </div>
 </template>

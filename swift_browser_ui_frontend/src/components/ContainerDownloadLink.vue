@@ -7,7 +7,7 @@
     :inverted="inverted"
     :href="download_link"
   >
-    Download
+    {{ $t('message.download') }}
   </b-button>
 </template>
 

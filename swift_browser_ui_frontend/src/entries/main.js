@@ -151,13 +151,13 @@ new Vue({
     },
     fileSuccessToast: function (file) {
       this.$buefy.toast.open({
-        message: "Finished uploading ".concat(file.fileName),
+        message: this.$t("message.upfinish").concat(file.fileName),
         type: "is-success",  
       });
     },
     fileFailureToast: function (file) {
       this.$buefy.toast.open({
-        message: "Upload for file ".concat(file.fileName, " failed"),
+        message: this.$t("message.upfail").concat(file.fileName),
         type: "is-danger",
       });
     },
@@ -221,7 +221,7 @@ new Vue({
 
       if (!res.support) {
         this.$buefy.toast.open({
-          message: "Uploading is not supported on your browser.",
+          message: this.$("message.upnotsupported"),
           type: "is-danger",
         });
         return;
@@ -231,7 +231,7 @@ new Vue({
       res.on("uploadStart", this.startUpload);
       res.on("complete", this.onComplete);
       res.on("cancel", this.onCancel);
-      res.on("fileAdded", this.addFileToast);
+      res.on("filesAdded", this.addFileToast);
       res.on("fileSuccess", this.fileSuccessToast);
       res.on("fileError", this.fileFailureToast);
       res.on("chunkingStart", this.startChunking);

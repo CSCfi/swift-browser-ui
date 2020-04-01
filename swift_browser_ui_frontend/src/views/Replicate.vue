@@ -22,7 +22,7 @@
             class="button is-primary"
             @click="replicateContainer ()"
           >
-            Replicate
+            {{ $t('message.copy') }}
           </button>
         </p>
       </b-field>
@@ -56,13 +56,13 @@ export default {
         this.$route.params.container,
       ).then(() => {
         this.$buefy.toast.open({
-          message: "Initiated container replication in the background.",
+          message: this.$t("message.copysuccess"),
           type: "is-success",
         });
         this.$router.go(-1);
       }).catch(() => {
         this.$buefy.toast.open({
-          message: "Container replication failed",
+          message: this.$t("message.copyfail"),
           type: "is-danger",
         });
       });

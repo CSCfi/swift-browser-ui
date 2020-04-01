@@ -14,7 +14,7 @@
         }
       })"
     >
-      Copy
+      {{ $t('message.copy') }}
     </b-button>
     <b-button
       v-else
@@ -29,7 +29,7 @@
         }
       })"
     >
-      Copy
+      {{ $t('message.copy') }}
     </b-button>
   </div>
 </template>
