@@ -19,7 +19,6 @@
     <b-button
       v-else
       type="is-primary"
-      size="is-small"
       outlined
       :inverted="inverted"
       @click="$router.push({
