@@ -35,7 +35,9 @@ COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 
-RUN adduser --disabled-password --no-create-home swiftrequest
+RUN addgroup -g 1001 swiftui && \
+    adduser -D -u 1001 --disabled-password --no-create-home -G swiftui swiftui
+
 USER swiftrequest
 
 ENTRYPOINT ["/bin/sh", "-c", "/app/app.sh"]
