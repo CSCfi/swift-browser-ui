@@ -3,7 +3,6 @@
     <b-progress
       v-if="isChunking && !isUploading"
       type="is-primary"
-      size="is-large"
     >
       {{ $t('message.chunking') }}
     </b-progress>
@@ -11,7 +10,6 @@
       v-else-if="isUploading && progress != undefined"
       type="is-primary"
       :value="progress * 100"
-      size="is-large"
       show-value
     >
       {{ $t('message.uploading') }} {{ (progress * 100).toFixed(1) }}%
@@ -19,7 +17,6 @@
     <b-progress
       v-else-if="isUploading"
       type="is-primary"
-      size="is-large"
     >
       {{ $t('message.uploading') }}
     </b-progress>
@@ -30,8 +27,8 @@
 #up-progress {
   margin-left: 5%;
   margin-right: 5%;
-  margin-top: 1%;
-  margin-bottom: 2%;
+  margin-top: 2%;
+  margin-bottom: 3%;
 }
 </style>
 
