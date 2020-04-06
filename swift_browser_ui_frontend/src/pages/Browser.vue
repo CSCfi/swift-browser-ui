@@ -5,6 +5,7 @@
       :multiple-projects="multipleProjects"
       :projects="projects"
     />
+    <ProgressBar v-if="isUploading || isChunking" />
     <div
       class="breadcrumb"
       aria-label="breadcrumbs"
@@ -21,7 +22,6 @@
         />
       </ul>
     </div>
-    <ProgressBar v-if="isUploading || isChunking" />
     <router-view />
     <b-loading
       :is-full-page="isFullPage"
