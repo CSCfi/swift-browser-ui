@@ -14,7 +14,10 @@
         }
       })"
     >
-      {{ $t('message.copy') }}
+      <b-icon
+        icon="content-copy"
+        size="is-small"
+      />{{ $t('message.copy') }}
     </b-button>
     <b-button
       v-else
@@ -29,7 +32,10 @@
         }
       })"
     >
-      {{ $t('message.copy') }}
+      <b-icon
+        icon="content-copy"
+        size="is-small"
+      />{{ $t('message.copy') }}
     </b-button>
   </div>
 </template>

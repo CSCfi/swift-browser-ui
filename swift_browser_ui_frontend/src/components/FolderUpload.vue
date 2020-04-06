@@ -4,13 +4,19 @@
       :id="id"
       class="button is-outlined is-primary"
     >
-      {{ $t('message.upload') }}
+      <b-icon
+        icon="upload"
+        size="is-small"
+      />{{ $t('message.upload') }}
     </a>
     <b-button
       v-if="isUploading"
       @click="res.cancel()"
     >
-      {{ t('cancelupload') }}
+      <b-icon
+        icon="cancel"
+        size="is-small"
+      />{{ t('cancelupload') }}
     </b-button>
   </div>
 </template>

@@ -108,7 +108,7 @@
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -119,7 +119,7 @@
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -129,7 +129,7 @@
             @click="confirmDownload ()"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -156,7 +156,7 @@
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
@@ -167,7 +167,7 @@
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
@@ -177,7 +177,7 @@
               @click="confirmDownload ()"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
