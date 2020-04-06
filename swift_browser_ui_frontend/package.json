@@ -10,12 +10,12 @@
     "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request"
   },
   "dependencies": {
-    "@vue/cli-service-global": "^3.12.1",
+    "@vue/cli-service-global": "^4.3.0",
     "buefy": "^0.8.8",
     "core-js": "^3.6.4",
     "lodash": "^4.17.15",
     "material-design-icons": "^3.0.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.13.1",
     "resumablejs": "^1.1.0",
     "sass-loader": "^7.3.1",
     "serve": "^11.2.0",
