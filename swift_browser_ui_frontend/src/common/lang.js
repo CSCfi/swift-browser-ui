@@ -148,6 +148,11 @@ const translations = {
       copy: " Copy",
       copysuccess: "Started copying the container in the background",
       copyfail: "Failed to copy the container",
+      replicate: {
+        destinationLabel: "Destination container",
+        destinationMessage: "Insert copy destination container here",
+        destinationExists: " Destination already exists",
+      },
     },
   },
   fi: {
@@ -296,6 +301,11 @@ const translations = {
       copy: " Kopioi",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
+      replicate: {
+        destinationLabel: "Kohdesäiliö",
+        destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
+        destinationExists: " Kohdesäililö on jo olemassa",
+      },
     },
   },
 };

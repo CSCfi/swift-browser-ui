@@ -6,8 +6,8 @@
     <b-field grouped>
       <b-field
         horizontal
-        label="Destination container"
-        message="Insert replication destination container here"
+        :label="$t('message.replicate.destinationLabel')"
+        :message="$t('message.replicate.destinationMessage')"
         expanded
       >
         <b-input
@@ -17,8 +17,25 @@
         />
       </b-field>
       <b-field>
-        <p class="control">
+        <p 
+          id="destinationButton"
+          class="control"
+        >
           <button
+            v-if="destinationExists"
+            class="button is-primary"
+            disabled
+          >
+            {{ $t('message.copy') }}
+          </button>
+          <span
+            v-if="destinationExists"
+            style="margin-top: auto;margin-bottom: auto;"
+          >
+            {{ $t('message.replicate.destinationExists') }}
+          </span>
+          <button
+            v-else
             class="button is-primary"
             @click="replicateContainer ()"
           >
@@ -30,6 +47,14 @@
   </div>
 </template>
 
+<style scoped>
+#destinationButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+
 <script>
 import {swiftCopyContainer} from "@/common/api";
 
@@ -39,12 +64,24 @@ export default {
     return {
       destination: this.$route.params.container,
       project: this.$route.params.project,
+      destinationExists: false,
     };
   },
   computed: {
     active () {
       return this.$store.state.active;
     },
+    containerCache () {
+      return this.$store.state.containerCache;
+    },
+  },
+  watch: {
+    destination: function () {
+      this.checkDestination();
+    },
+  },
+  mounted () {
+    this.checkDestination();
   },
   methods: {
     replicateContainer: function () {
@@ -66,6 +103,16 @@ export default {
           type: "is-danger",
         });
       });
+    },
+    checkDestination: function () {
+      let re = new RegExp("^".concat(this.destination, "$"));
+      for (let cont of this.containerCache) {
+        if (cont.name.match(re)) {
+          this.destinationExists = true;
+          return;
+        }
+      }
+      this.destinationExists = false;
     },
   },
 };
