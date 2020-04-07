@@ -1,6 +1,18 @@
 <template>
   <div>
+    <b-button
+      type="is-primary"
+      outlined
+      v-if="isUploading"
+      @click="res.cancel()"
+    >
+      <b-icon
+        icon="cancel"
+        size="is-small"
+      />{{ $t('message.cancelupload') }}
+    </b-button>
     <a
+      v-else
       :id="id"
       class="button is-outlined is-primary"
     >
@@ -9,15 +21,6 @@
         size="is-small"
       />{{ $t('message.upload') }}
     </a>
-    <b-button
-      v-if="isUploading"
-      @click="res.cancel()"
-    >
-      <b-icon
-        icon="cancel"
-        size="is-small"
-      />{{ t('cancelupload') }}
-    </b-button>
   </div>
 </template>
 
