@@ -3,6 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import { recursivePruneCache } from "@/common/conv";
+import { getBuckets } from "@/common/api";
 
 Vue.use(Vuex);
 
@@ -29,9 +30,18 @@ const store = new Vuex.Store({
     altContainer: undefined,
   },
   mutations: {
-    updateContainers (state, newList) {
+    updateContainers (state) {
       // Update container cache with the new container listing.
-      state.containerCache = newList;
+      state.isLoading = true;
+      getBuckets().then((ret) => {
+        if (ret.status != 200) {
+          state.isLoading = false;
+        }
+        state.containerCache = ret;
+        state.isLoading = false;
+      }).catch(() => {
+        state.isLoading = false;
+      });
     },
     updateObjects (state, updateTuple) {
       // Update object cache as the object listing required wasn't

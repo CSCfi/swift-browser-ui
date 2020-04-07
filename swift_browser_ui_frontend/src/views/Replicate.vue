@@ -96,6 +96,7 @@ export default {
           message: this.$t("message.copysuccess"),
           type: "is-success",
         });
+        this.$store.commit("updateContainers");
         this.$router.go(-1);
       }).catch(() => {
         this.$buefy.toast.open({

@@ -183,9 +183,6 @@
 </template>
 
 <script>
-import {
-  getBuckets,
-} from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import FolderUploadForm from "@/components/FolderUpload";
@@ -201,7 +198,6 @@ export default {
   },
   data: function () {
     return {
-      bList: [],
       files: [],
       folders: [],
       containers: [],
@@ -217,6 +213,9 @@ export default {
   computed: {
     active () {
       return this.$store.state.active;
+    },
+    bList () {
+      return this.$store.state.containerCache;
     },
   },
   watch: {
@@ -234,27 +233,17 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
-    this.fetchContainers();
     this.getDirectCurrentPage();
+  },
+  mounted() {
+    this.fetchContainers();
   },
   methods: {
     fetchContainers: function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
-      if(this.$store.state.containerCache.length < 1) {
-        this.$store.commit("setLoading", true);
-        getBuckets().then((ret) => {
-          if (ret.status != 200) {
-            this.$store.commit("setLoading", false);
-          }
-          this.$store.commit("updateContainers", ret);
-          this.containers = ret;
-          this.$store.commit("setLoading", false);
-        }).catch(() => {
-          this.$store.commit("setLoading", false);
-        });
-      } else {
-        this.containers = this.$store.state.containerCache;
+      if(this.bList.length < 1) {
+        this.$store.commit("updateContainers");
       }
     },
     checkPageFromRoute: function () {
