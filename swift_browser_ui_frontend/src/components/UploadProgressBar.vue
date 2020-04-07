@@ -27,8 +27,8 @@
 #up-progress {
   margin-left: 5%;
   margin-right: 5%;
-  margin-top: 2%;
-  margin-bottom: 3%;
+  margin-top: 1%;
+  margin-bottom: 1%;
 }
 </style>
 
