@@ -6,13 +6,16 @@ API, cache manipulation, cookies etc.
 """
 
 
-from hashlib import sha256
+from hashlib import sha256, md5
 from os import urandom
 import json
 import logging
 import urllib.request
 import typing
+import time
+import hmac
 
+import aiohttp
 import aiohttp.web
 
 from keystoneauth1.identity import v3
@@ -24,6 +27,35 @@ import swiftclient.client
 
 
 from .settings import setd
+
+
+async def sign(
+        valid_for: int,
+        path,
+) -> dict:
+    """Perform a general signature."""
+    valid_until = str(int(time.time() + valid_for))
+    to_sign = (valid_until + path).encode("utf-8")
+
+    try:
+        digest = hmac.new(
+            key=str(setd["sharing_request_token"]).encode("utf-8"),
+            msg=to_sign,
+            digestmod="sha256"
+        ).hexdigest()
+    except KeyError:
+        raise aiohttp.web.HTTPNotImplemented(
+            reason="Server doesn't have signing permissions"
+        )
+    except AttributeError:
+        raise aiohttp.web.HTTPNotImplemented(
+            reason="Server doesn't have signing permissions"
+        )
+
+    return {
+        "signature": digest,
+        "valid_until": valid_until
+    }
 
 
 def setup_logging():
@@ -308,3 +340,79 @@ def initiate_os_service(
     )
 
     return os_sc
+
+
+async def get_tempurl_key(
+        connection
+) -> str:
+    """Get the correct temp URL key from Openstack."""
+    stats = connection.stat()
+
+    # Check for the existence of the key headers
+    try:
+        acc_meta_hdr = stats['headers']
+        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
+    except KeyError:
+        try:
+            temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
+        # If key headers don't exist, generate a new temporary URL key
+        except KeyError:
+            temp_url_key = md5(urandom(128)).hexdigest()  # nosec
+            meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
+            retval = connection.post(options=meta_options)
+            if not retval['success']:
+                raise aiohttp.web.HTTPServerError()
+    return temp_url_key
+
+
+async def get_container_tempurl_key(
+        connection,
+        container,
+) -> str:
+    """Get the correct temp URL key for container operations."""
+    stats = connection.stat(container=container)
+
+    # Check for the existence of the key headers
+    try:
+        cont_meta_hdr = stats['headers']
+        temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key']
+    except KeyError:
+        try:
+            temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key-2']
+        # If key headers don't exist generate a new temporary URL key
+        except KeyError:
+            temp_cont_key = md5(urandom(128)).hexdigest()  # nosec
+            meta_options = {"meta": [f'Temp-URL-Key-2:{temp_cont_key}']}
+            retval = connection.post(
+                container=container,
+                options=meta_options
+            )
+            if not retval['success']:
+                raise aiohttp.web.HTTPServerError()
+    return temp_cont_key
+
+
+async def open_upload_runner_session(
+        session_key: str,
+        request: aiohttp.web.Request,
+        project: str,
+        token: str
+) -> str:
+    """Open an upload session to the token."""
+    try:
+        return request.app['Creds'][session_key]['runner']
+    except KeyError:
+        session = request.app['dload_session']
+        path = f"{setd['upload_internal_endpoint']}/{project}"
+        signature = await sign(3600, f"/{project}")
+        async with session.post(
+                path,
+                data={"token": token},
+                params={
+                    "signature": signature["signature"],
+                    "valid": signature["valid_until"]
+                }
+        ) as resp:
+            ret = str(resp.cookies["RUNNER_SESSION_ID"].value)
+            request.app['Creds'][session_key]['runner'] = ret
+            return ret

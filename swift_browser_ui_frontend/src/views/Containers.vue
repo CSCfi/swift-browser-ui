@@ -39,6 +39,7 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
+      <FolderUploadForm dropelement="container-table" />
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -105,37 +106,69 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </b-table-column>
         <b-table-column
-          field="share"
+          field="functions"
           label=""
-          width="40"
+          width="150"
         >
-          <b-button
-            v-if="selected==props.row"
-            type="is-primary"
-            icon-left="share"
-            outlined
-            size="is-small"
-            inverted
-            @click="$router.push({
-              name: 'Sharing',
-              query: {container: props.row.name}
-            })"
-          >
-            {{ $t('message.share.share') }}
-          </b-button>
-          <b-button
-            v-else
-            type="is-primary"
-            icon-left="share"
-            outlined
-            size="is-small"
-            @click="$router.push({
-              name: 'Sharing',
-              query: {container: props.row.name}
-            })"
-          >
-            {{ $t('message.share.share') }}
-          </b-button>
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected==props.row"
+                class="is-small"
+                :inverted="true"
+                :container="props.row.name"
+              />
+              <ContainerDownloadLink
+                v-else
+                class="is-small"
+                :container="props.row.name"
+              />
+            </p>
+            <p class="control">
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
+                icon-left="share"
+                outlined
+                size="is-small"
+                inverted
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                icon-left="share"
+                outlined
+                size="is-small"
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p class="control">
+              <ReplicateContainerButton
+                v-if="selected==props.row"
+                :project="active.id"
+                :container="props.row.name"
+                :smallsize="true"
+                :inverted="true"
+              />
+              <ReplicateContainerButton
+                v-else
+                :project="active.id"
+                :container="props.row.name"
+                :smallsize="true"
+              />
+            </p>
+          </div>
         </b-table-column>
       </template>
       <template slot="empty">
@@ -150,16 +183,24 @@
 </template>
 
 <script>
-import { getBuckets } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import FolderUploadForm from "@/components/FolderUpload";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "Containers",
+  components: {
+    FolderUploadForm,
+    ContainerDownloadLink,
+    ReplicateContainerButton,
+  },
   data: function () {
     return {
+      files: [],
+      folders: [],
       bList: [],
-      containers: [],
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -168,6 +209,14 @@ export default {
       currentPage: 1,
       shareModalIsActive: false,
     };
+  },
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
+    containers () {
+      return this.$store.state.containerCache;
+    },
   },
   watch: {
     searchQuery: function () {
@@ -184,27 +233,17 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
-    this.fetchContainers();
     this.getDirectCurrentPage();
+  },
+  mounted() {
+    this.fetchContainers();
   },
   methods: {
     fetchContainers: function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
-      if(this.$store.state.containerCache.length < 1) {
-        this.$store.commit("setLoading", true);
-        getBuckets().then((ret) => {
-          if (ret.status != 200) {
-            this.$store.commit("setLoading", false);
-          }
-          this.$store.commit("updateContainers", ret);
-          this.containers = ret;
-          this.$store.commit("setLoading", false);
-        }).catch(() => {
-          this.$store.commit("setLoading", false);
-        });
-      } else {
-        this.containers = this.$store.state.containerCache;
+      if(this.bList.length < 1) {
+        this.$store.commit("updateContainers");
       }
     },
     checkPageFromRoute: function () {
@@ -235,7 +274,7 @@ export default {
     filter: function() {
       var name_cmp = new RegExp(this.searchQuery, "i");
       this.bList = this.containers.filter(
-        element => element.name.match(name_cmp)
+        element => element.name.match(name_cmp),
       );
     },
   },

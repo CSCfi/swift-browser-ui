@@ -39,6 +39,17 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
+      <div class="field has-addons">
+        <p class="control">
+          <FolderUploadForm dropelement="object-table" />
+        </p>
+        <p class="control">
+          <ContainerDownloadLink />
+        </p>
+        <p class="control">
+          <ReplicateContainerButton />
+        </p>
+      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -97,7 +108,7 @@
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -108,7 +119,7 @@
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -118,7 +129,7 @@
             @click="confirmDownload ()"
           >
             <b-icon
-              icon="cloud-download"
+              icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
           </a>
@@ -145,7 +156,7 @@
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
@@ -156,7 +167,7 @@
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
@@ -166,7 +177,7 @@
               @click="confirmDownload ()"
             >
               <b-icon
-                icon="cloud-download"
+                icon="download"
                 size="is-small"
               /> {{ $t('message.downloadLink') }}
             </a>
@@ -188,9 +199,17 @@
 import { getObjects } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import FolderUploadForm from "@/components/FolderUpload";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "Objects",
+  components: {
+    ContainerDownloadLink,
+    FolderUploadForm,
+    ReplicateContainerButton,
+  },
   data: function () {
     return {
       oList: [],
@@ -254,7 +273,7 @@ export default {
     confirmDownload: function () {
       // Snackbar for enabling large downloads for the duration of the
       // session
-      this.$snackbar.open({
+      this.$buefy.snackbar.open({
         duration: 5000,
         message: this.$t("message.largeDownMessage"),
         type: "is-success",
@@ -311,7 +330,7 @@ export default {
     filter: function () {
       var name_re = new RegExp(this.searchQuery, "i");
       this.oList = this.objects.filter(
-        element => element.name.match(name_re)
+        element => element.name.match(name_re),
       );
     },
   },

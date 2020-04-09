@@ -9,6 +9,7 @@ import SharedTo from "@/views/SharedTo";
 import SharedFrom from "@/views/SharedFrom";
 import Sharing from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
+import ReplicationView from "@/views/Replicate";
 
 Vue.use(Router);
 
@@ -44,6 +45,11 @@ export default new Router({
       path: "/browse/shared/:project/:owner/:container",
       name: "SharedObjects",
       component: SharedObjects,
+    },
+    {
+      path: "/browse/replicate/:project/:container",
+      name: "ReplicateContainer",
+      component: ReplicationView,
     },
     {
       path: "/browse/:user",

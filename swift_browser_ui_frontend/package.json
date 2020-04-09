@@ -1,21 +1,22 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "0.7.1",
+  "version": "1.0.0rc1",
   "private": true,
   "scripts": {
-    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-devel": "vue-cli-service build --mode development"
+    "build-devel": "vue-cli-service build --mode development",
+    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request"
   },
   "dependencies": {
-    "@vue/cli-service-global": "^3.12.1",
+    "@vue/cli-service-global": "^4.3.0",
     "buefy": "^0.8.8",
-    "core-js": "^2.6.11",
+    "core-js": "^3.6.4",
     "lodash": "^4.17.15",
     "material-design-icons": "^3.0.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.13.1",
+    "resumablejs": "^1.1.0",
     "sass-loader": "^7.3.1",
     "serve": "^11.2.0",
     "vue": "^2.6.10",
@@ -25,12 +26,12 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.12.1",
-    "@vue/cli-plugin-eslint": "^3.12.1",
-    "@vue/cli-service": "^3.12.1",
-    "babel-eslint": "^10.0.3",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.2.3",
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
     "eslint-utils": "^1.4.3",
     "vue-template-compiler": "^2.6.10"
   },

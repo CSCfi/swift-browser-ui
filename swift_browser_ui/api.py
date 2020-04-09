@@ -1,16 +1,19 @@
 """Project functions for handling API requests from front-end."""
 
 import time
-import os
-import hashlib
 import typing
 
 import aiohttp.web
 from swiftclient.service import SwiftError
-from swiftclient.service import SwiftService  # for type hints
+from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
-from ._convenience import api_check, initiate_os_service
+from ._convenience import api_check, initiate_os_service, get_tempurl_key
+from ._convenience import open_upload_runner_session
+
+from .signature import sign
+
+from .settings import setd
 
 
 async def get_os_user(
@@ -56,8 +59,8 @@ async def swift_list_buckets(
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        cont = []
-        list(map(lambda i: cont.extend(i['listing']),
+        cont: typing.List[dict] = []
+        list(map(lambda i: cont.extend(i['listing']),  # type: ignore
                  request.app['Creds'][session]['ST_conn'].list()))
         # for a bucket with no objects
         if not cont:
@@ -67,6 +70,35 @@ async def swift_list_buckets(
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
+
+
+async def swift_create_container(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Create a new container according to the name specified."""
+    try:
+        session = api_check(request)
+        request.app['Log'].info(
+            'API call for bucket creation from %s, sess %s',
+            request.remote,
+            session
+        )
+        # Shamelessly use private methods from SwiftService to avoid writing
+        # own implementation
+        res = request.app['Creds'][session]['ST_conn']._create_container_job(
+            get_conn(request.app['Creds'][session]['ST_conn']._options),
+            request.match_info["container"]
+        )
+    except SwiftError:
+        raise aiohttp.web.HTTPServerError(
+            reason="Container creation failure"
+        )
+    # Return HTTPCreated upon a successful creation
+    if res["success"]:
+        return aiohttp.web.Response(status=201)
+    raise aiohttp.web.HTTPClientError(
+        reason=res["error"]
+    )
 
 
 async def swift_list_objects(
@@ -89,8 +121,8 @@ async def swift_list_objects(
             )
         )
 
-        obj = []
-        list(map(lambda i: obj.extend(i['listing']),
+        obj: typing.List[dict] = []
+        list(map(lambda i: obj.extend(i['listing']),  # type: ignore
                  request.app['Creds'][session]['ST_conn'].list(
                      container=request.query['bucket'])))
 
@@ -137,8 +169,8 @@ async def swift_list_shared_objects(
             url=request.query["storageurl"]
         )
 
-        obj = []
-        list(map(lambda i: obj.extend(i["listing"]),
+        obj: typing.List[dict] = []
+        list(map(lambda i: obj.extend(i["listing"]),  # type: ignore
                  tmp_serv.list(
                      container=request.query["container"])))
         if not obj:
@@ -175,41 +207,10 @@ async def swift_download_object(
 
     serv = request.app['Creds'][session]['ST_conn']
     sess = request.app['Creds'][session]['OS_sess']
-    stats = serv.stat()
 
-    # Check for the existence of the key headers
-    acc_meta_hdr = stats['headers']
-    if 'x-account-meta-temp-url-key' in acc_meta_hdr.keys():
-        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key']
-    elif 'x-acccount-meta-temp-url-key-2' in acc_meta_hdr.keys():
-        temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
-    # If the key headers don't exist, assume that the key has to be created by
-    # the service
-    else:
-        # The hash only provides random data for the key, it doesn't have to
-        # be cryptographically secure.
-        temp_url_key = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
-        # This service will use the X-Account-Meta-Temp-URL-Key-2 header for
-        # its own key storage, if no existing keys are provided.
-        meta_options = {
-            "meta": ["Temp-URL-Key-2:{0}".format(
-                temp_url_key
-            )]
-        }
-        retval = serv.post(
-            options=meta_options
-        )
-        if not retval['success']:
-            raise aiohttp.web.HTTPServerError()
-        request.app['Log'].info(
-            "Created a temp url key for account {0} Key:{1} :: {2}".format(
-                stats['items'][0][1], temp_url_key, time.ctime()
-            )
-        )
+    temp_url_key = await get_tempurl_key(serv)
     request.app['Log'].debug(
-        "Using {0} as temporary URL key :: {1}".format(
-            temp_url_key, time.ctime()
-        )
+        "Using %s as temporary URL key", temp_url_key
     )
     # Generate temporary URL
     host = sess.get_endpoint(service_type="object-store").split('/v1')[0]
@@ -225,7 +226,7 @@ async def swift_download_object(
     # In the path creation, the stats['items'][0][1] is the tenant id from
     # server statistics, the order should be significant, so this shouldn't
     # be a problem
-    path = '%s/%s/%s' % (path_begin, container, object_key)
+    path = f'{path_begin}/{container}/{object_key}'
 
     dloadurl = (host +
                 generate_temp_url(path, lifetime, temp_url_key, 'GET'))
@@ -235,6 +236,168 @@ async def swift_download_object(
     )
     response.headers['Location'] = dloadurl
     return response
+
+
+async def swift_download_shared_object(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point a user to the shared download runner."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+    object_name: str = request.match_info['object']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+    request.app['Creds'][session]['runner'] = runner_id
+
+    path = f"/{project}/{container}/{object_name}"
+    signature = await sign(3600, path)
+
+    path += f"?session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    resp = aiohttp.web.Response(status=303)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
+
+
+async def swift_download_container(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point a user to the container download runner."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+    request.app['Creds'][session]['runner'] = runner_id
+
+    path = f"/{project}/{container}"
+    signature = await sign(3600, path)
+
+    path += f"?session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    resp = aiohttp.web.Response(status=303)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
+
+
+async def swift_upload_object_chunk(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point a user to the object upload runner."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+
+    path = f"/{project}/{container}"
+    signature = await sign(3600, path)
+
+    path += f"?session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    resp = aiohttp.web.Response(status=307)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
+
+
+async def swift_replicate_container(
+    request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point the user to container replication endpoint."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+
+    path = f"/{project}/{container}"
+    signature = await sign(3600, path)
+
+    path += f"?session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    for i in request.query.keys():
+        path += f"&{i}={request.query[i]}"
+
+    resp = aiohttp.web.Response(status=307)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
+
+
+async def swift_check_object_chunk(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Point check for object existence to the upload runner."""
+    session = api_check(request)
+
+    project: str = request.match_info['project']
+    container: str = request.match_info['container']
+
+    runner_id = await open_upload_runner_session(
+        session,
+        request,
+        request.app['Creds'][session]['active_project']['id'],
+        request.app['Creds'][session]['Token']
+    )
+
+    path = f"/{project}/{container}"
+    signature = await sign(3600, path)
+
+    path += f"?{request.query_string}"
+    path += f"&session={runner_id}"
+    path += f"&signature={signature['signature']}"
+    path += f"&valid={signature['valid_until']}"
+
+    resp = aiohttp.web.Response(status=307)
+    resp.headers['Location'] = (
+        f"{setd['upload_external_endpoint']}{path}"
+    )
+
+    return resp
 
 
 async def get_object_metadata(
@@ -446,8 +609,9 @@ async def get_access_control_metadata(
     sess = request.app['Creds'][session]['OS_sess']
 
     # Get a list of containers
-    containers = []
-    list(map(lambda i: containers.extend(i['listing']), serv.list()))
+    containers: typing.List[dict] = []
+    list(map(lambda i: containers.extend(i['listing']),  # type: ignore
+             serv.list()))
 
     host = sess.get_endpoint(service_type="object-store")
 

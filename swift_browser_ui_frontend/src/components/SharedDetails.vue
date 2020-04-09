@@ -74,22 +74,22 @@ export default {
     getSharedDetails: function () {
       this.$store.state.client.getShareDetails(
         this.$route.params.project,
-        this.container
+        this.container,
       ).then((ret) => {
         this.allDetails = ret;
       });
     },
     deleteSingleShare: function (
-      recipient
+      recipient,
     ) {
       removeAccessControlMeta(
         this.container,
-        recipient
+        recipient,
       ).then(() => {
         this.$store.state.client.shareDeleteAccess(
           this.$route.params.project,
           this.container,
-          [recipient]
+          [recipient],
         ).then(() => {
           this.$buefy.toast.open({
             duration: 5000,

@@ -148,7 +148,7 @@ export default {
     getProjectChangeURL ( newProject ) {
       let rescopeURL = new URL(
         "/login/rescope",
-        document.location.origin
+        document.location.origin,
       );
       rescopeURL.searchParams.append( "project", newProject );
       return rescopeURL.toString();        

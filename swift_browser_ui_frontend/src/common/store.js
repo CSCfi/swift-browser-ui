@@ -3,6 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import { recursivePruneCache } from "@/common/conv";
+import { getBuckets } from "@/common/api";
 
 Vue.use(Vuex);
 
@@ -22,11 +23,25 @@ const store = new Vuex.Store({
     ],
     client: undefined,
     requestClient: undefined,
+    resumableClient: undefined,
+    isUploading: false,
+    isChunking: false,
+    uploadProgress: undefined,
+    altContainer: undefined,
   },
   mutations: {
-    updateContainers (state, newList) {
+    updateContainers (state) {
       // Update container cache with the new container listing.
-      state.containerCache = newList;
+      state.isLoading = true;
+      getBuckets().then((ret) => {
+        if (ret.status != 200) {
+          state.isLoading = false;
+        }
+        state.containerCache = ret;
+        state.isLoading = false;
+      }).catch(() => {
+        state.isLoading = false;
+      });
     },
     updateObjects (state, updateTuple) {
       // Update object cache as the object listing required wasn't
@@ -64,6 +79,33 @@ const store = new Vuex.Store({
     },
     setRequestClient (state, newClient) {
       state.requestClient = newClient;
+    },
+    setResumable (state, newClient) {
+      state.resumableClient = newClient;
+    },
+    setUploading (state) {
+      state.isUploading = true;
+    },
+    stopUploading (state) {
+      state.isUploading = false;
+    },
+    setChunking (state) {
+      state.isChunking = true;
+    },
+    stopChunking (state) {
+      state.isChunking = false;
+    },
+    updateProgress (state, progress) {
+      state.uploadProgress = progress;
+    },
+    eraseProgress (state) {
+      state.uploadProgress = undefined;
+    },
+    setAltContainer (state, altContainer) {
+      state.altContainer = altContainer;
+    },
+    eraseAltContainer (state) {
+      state.altContainer = undefined;
     },
   },
 });

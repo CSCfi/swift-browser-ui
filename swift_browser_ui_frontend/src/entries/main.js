@@ -27,6 +27,12 @@ import store from "@/common/store";
 // Import project css
 import "buefy/dist/buefy.css";
 
+// Import resumable
+import Resumable from "resumablejs";
+
+// Upload progress button
+import ProgressBar from "@/components/UploadProgressBar";
+
 Vue.config.productionTip = false;
 
 Vue.use(Buefy);
@@ -44,6 +50,7 @@ new Vue({
   components: {
     BrowserNavbar,
     BreadcrumbListElement,
+    ProgressBar,
   },
   computed: {
     projects () {
@@ -64,29 +71,44 @@ new Vue({
     isLoading () {
       return this.$store.state.isLoading;
     },
+    isChunking () {
+      return this.$store.state.isChunking;
+    },
+    isUploading () {
+      return this.$store.state.isUploading;
+    },
+    resumableClient () {
+      return this.$store.state.resumableClient;
+    },
+    altContainer () {
+      return this.$store.state.altContainer;
+    },
   },
-  beforeMount() {
+  created() {
+    this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
     });
     getProjects().then((value) => {
       this.$store.commit("setProjects", value);
-
+      
       getActiveProject().then((value) => {
         this.$store.commit("setActive", value);
-        if (
-          value.name != this.$route.params.project &&
-          this.$route.params.project != undefined
-        ) {
-          this.changeProject(this.$route.params.project);
+        if (this.$route.params.user != undefined) {
+          if (
+            value.name != this.$route.params.project &&
+            this.$route.params.project != undefined
+          ) {
+            this.changeProject(this.$route.params.project);
+          }
         }
         if (document.location.pathname == "/browse") {
           this.$router.push(
             "/browse/".concat(
               this.$store.state.uname,
               "/",
-              value.name
-            )
+              value.name,
+            ),
           );
         }
       });
@@ -100,8 +122,8 @@ new Vue({
             "setSharingClient",
             new SwiftXAccountSharing(
               ret.sharing_endpoint,
-              document.location.origin
-            )
+              document.location.origin,
+            ),
           );
         }
         if (ret.request_endpoint) {
@@ -109,13 +131,116 @@ new Vue({
             "setRequestClient",
             new SwiftSharingRequest(
               ret.request_endpoint,
-              document.location.origin
-            )
+              document.location.origin,
+            ),
           );
         }
       });
   },
   methods: {
+    // Following are the methods used for resumablejs, as the methods
+    // need to have access to the vue instance.
+    addFileToast: function () {
+      this.$buefy.toast.open({
+        message: "File / files scheduled for upload.",
+        type: "is-success",
+      });
+      if(!this.isUploading) {
+        this.resumableClient.upload();
+      }
+    },
+    fileSuccessToast: function (file) {
+      this.$buefy.toast.open({
+        message: this.$t("message.upfinish").concat(file.fileName),
+        type: "is-success",  
+      });
+    },
+    fileFailureToast: function (file) {
+      this.$buefy.toast.open({
+        message: this.$t("message.upfail").concat(file.fileName),
+        type: "is-danger",
+      });
+    },
+    getUploadUrl: function (params) {
+      let retUrl = new URL(
+        "/upload/".concat(
+          this.$route.params.owner ? this.$route.params.owner : this.active.id,
+          "/",
+          this.altContainer,
+        ),
+        document.location.origin,
+      );
+      for (const param of params) {
+        let newParam = param.split("=");
+        retUrl.searchParams.append(newParam[0], newParam[1]);
+      }
+      return retUrl.toString();
+    },
+    startUpload: function () {
+      let altContainer = "upload-".concat(Date.now().toString());
+      if (this.$route.params.container) {
+        altContainer = this.$route.params.container;
+      }
+      this.$store.commit("setAltContainer", altContainer);
+      this.$store.commit("setUploading");
+      window.onbeforeunload = function () {return "";};
+    },
+    endUpload: function () {
+      this.$store.commit("eraseAltContainer");
+      this.$store.commit("stopUploading");
+      this.$store.commit("updateContainers");
+      window.onbeforeunload = undefined;
+    },
+    startChunking: function () {
+      this.$store.commit("setChunking");
+    },
+    stopChunking: function () {
+      this.$store.commit("stopChunking");
+    },
+    onComplete: function () {
+      this.endUpload();
+      this.stopChunking();
+      this.$store.commit("eraseProgress");
+    },
+    onCancel: function () {
+      this.onComplete();
+    },
+    updateProgress () {
+      this.$store.commit(
+        "updateProgress",
+        this.resumableClient.progress(),
+      );
+    },
+    createUploadInstance: function () {
+      let res = new Resumable({
+        target: this.getUploadUrl,
+        testTarget: this.getUploadUrl,
+        chunkSize: 268435456,
+        forceChunkSize: true,
+        simultaneousUploads: 1,
+      });
+
+      if (!res.support) {
+        this.$buefy.toast.open({
+          message: this.$("message.upnotsupported"),
+          type: "is-danger",
+        });
+        return;
+      }
+
+      // Set handlers
+      res.on("uploadStart", this.startUpload);
+      res.on("complete", this.onComplete);
+      res.on("cancel", this.onCancel);
+      res.on("filesAdded", this.addFileToast);
+      res.on("fileSuccess", this.fileSuccessToast);
+      res.on("fileError", this.fileFailureToast);
+      res.on("chunkingStart", this.startChunking);
+      res.on("chunkingComplete", this.stopChunking);
+      res.on("progress", this.updateProgress);
+
+      this.$store.commit("setResumable", res);
+    },
     getRouteAsList: function () {
       // Create a list representation of the current application route
       // to be used in the initialization of the breadcrumb component
@@ -162,7 +287,7 @@ new Vue({
             this.$router.push(
               "/browse/" +
               this.$store.state.uname + "/" +
-              this.$store.state.active["name"]
+              this.$store.state.active["name"],
             );
             this.$router.go(0);
           });
