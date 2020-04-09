@@ -1,7 +1,7 @@
 ### swift-upload-runner – better browser file upload and download for swift-browser-ui
 
 `swift-upload-runner` makes it possible to properly batch upload from browser
-into object storage backends using Openstack Swift API. It also will make possible
+into object storage backends using Openstack Swift API. It will also make possible
 proper container uploads without plaintext passwords or tokens, to prevent
 token expiration.
 
