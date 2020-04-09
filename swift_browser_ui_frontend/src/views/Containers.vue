@@ -200,7 +200,7 @@ export default {
     return {
       files: [],
       folders: [],
-      containers: [],
+      bList: [],
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -214,7 +214,7 @@ export default {
     active () {
       return this.$store.state.active;
     },
-    bList () {
+    containers () {
       return this.$store.state.containerCache;
     },
   },
