@@ -67,6 +67,42 @@
         >
           {{ props.row.owner }}
         </b-table-column>
+        <b-table-column
+          field="functions"
+          label=""
+          width="150"
+        >
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected==props.row"
+                class="is-small"
+                :project="props.row.owner"
+                :inverted="true"
+                :container="props.row.container"
+              />
+              <ContainerDownloadLink
+                v-else
+                class="is-small"
+                :project="props.row.owner"
+                :container="props.row.container"
+              />
+            </p>
+            <p class="control">
+              <ReplicateContainerButton
+                v-if="selected==props.row"
+                :inverted="true"
+                :container="props.row.container"
+                :smallsize="true"
+              />
+              <ReplicateContainerButton
+                v-else
+                :container="props.row.container"
+                :smallsize="true"
+              />
+            </p>
+          </div>
+        </b-table-column>
       </template>
       <template slot="empty">
         <p
@@ -87,9 +123,15 @@
 
 <script>
 import delay from "lodash/delay";
+import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+import ReplicateContainerButton from "@/components/ReplicateContainer";
 
 export default {
   name: "SharedTable",
+  components: {
+    ContainerDownloadLink,
+    ReplicateContainerButton,
+  },
   data: function () {
     return {
       sharedList: [],
@@ -106,9 +148,9 @@ export default {
     getSharedContainers: function () {
       if (this.$store.state.client) {
         this.$store.state.client.getAccess(
-          this.$route.params.project
+          this.$route.params.project,
         ).then(
-          (ret) => {this.sharedList = ret;}
+          (ret) => {this.sharedList = ret;},
         );
       }
       else {
@@ -119,7 +161,7 @@ export default {
       return "/browse/shared/".concat(
         this.$route.params.project,
         "/", row.owner,
-        "/", row.container
+        "/", row.container,
       );
     },
   },

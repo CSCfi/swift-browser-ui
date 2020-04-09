@@ -123,7 +123,7 @@ export default {
         return;
       }
       this.$store.state.requestClient.listOwnedRequests(
-        this.$store.state.active.id
+        this.$store.state.active.id,
       ).then((ret) => {
         let requests = ret.filter(req => req.container == this.container);
         let request_amount = 0;
@@ -160,7 +160,7 @@ export default {
               },
             });
           }
-        }
+        },
       );
     },
     shareContainer: async function () {
@@ -201,7 +201,7 @@ export default {
           this.container,
           this.tags,
           rights,
-          await getSharedContainerAddress()
+          await getSharedContainerAddress(),
         );
       }
       catch(error) {
@@ -220,7 +220,7 @@ export default {
       await addAccessControlMeta(
         this.container,
         rights,
-        this.tags 
+        this.tags, 
       );
       return true;
     },

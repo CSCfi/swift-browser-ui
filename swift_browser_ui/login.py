@@ -241,6 +241,10 @@ async def token_rescope(
         request.app['Creds'][session]['OS_sess'],
     )
 
+    # Ditch the session download proxy if that exists
+    if 'runner' in request.app['Creds'][session].keys():
+        request.app['Creds'][session].pop('runner')
+
     # Save the new project as the active project in session
     new_project_name = [
         i['name'] for i in request.app['Creds'][session]['Avail']['projects']
@@ -262,7 +266,7 @@ async def token_rescope(
     response.set_cookie(
         "LAST_ACTIVE",
         request.app['Creds'][session]['active_project']['id'],
-        expires=2592000
+        expires=2592000  # type: ignore
     )
 
     return response

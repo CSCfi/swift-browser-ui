@@ -58,7 +58,7 @@ class TestFirefoxFrontend(FirefoxTestClass):
         # Again firefox needs a bit more waiting around to prevent web driver
         # from crashing (implicit wait would work otherwise, but the problem
         # is that the element is present, it's just obstructed)
-        time.sleep(0.1)
+        time.sleep(0.25)
         switch_to_finnish(self.drv)
         time.sleep(0.25)
         self.drv = navigate_to_container_with_objects(self.drv)
@@ -90,7 +90,7 @@ class TestFirefoxFrontend(FirefoxTestClass):
     def test_long_user_session(self):
         """Test the UI for a longer session."""
         # Perform a container search
-        time.sleep(0.1)
+        time.sleep(0.25)
         self.drv.find_element_by_class_name("input").send_keys(
             "test-container-4"
         )
@@ -98,29 +98,29 @@ class TestFirefoxFrontend(FirefoxTestClass):
         navigate_to_next_container_from_search(self.drv)
         self.assertIn("test-container-4", self.drv.current_url)
         # Go back and check the next container with some objects inside.
-        time.sleep(0.1)
+        time.sleep(0.25)
         self.drv.back()
-        time.sleep(0.1)
+        time.sleep(0.25)
         navigate_to_next_full_after_back(self.drv)
         # Test downloading the first object from the newly open container.
         time.sleep(0.25)
         self.assertTrue(check_download(self.drv))
-        time.sleep(0.1)
+        time.sleep(0.25)
         self.drv.back()
-        time.sleep(0.1)
+        time.sleep(0.25)
         # Switch to finnish and test navigating to the user page.
         switch_to_finnish(self.drv)
         time.sleep(0.25)
         wait_for_clickable(
             self.drv.find_element_by_link_text("test_user_id")
         )
-        time.sleep(0.1)
+        time.sleep(0.25)
         self.assertIn("Käyttäjä", self.drv.page_source)
         self.assertIn("Kontteja", self.drv.page_source)
         self.assertIn("Objekteja", self.drv.page_source)
         self.assertIn("Tilankäyttö", self.drv.page_source)
         self.drv.back()
-        time.sleep(0.1)
+        time.sleep(0.25)
         # Perform one hash check still, in Finnish.
         navigate_to_next_full_after_back(self.drv)
         time.sleep(0.25)

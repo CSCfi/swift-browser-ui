@@ -8,6 +8,7 @@ import asyncio
 import hashlib
 import os
 import ssl
+import typing
 
 import uvloop
 import cryptography.fernet
@@ -28,6 +29,8 @@ from .api import (
     swift_list_buckets,
     swift_list_objects,
     swift_download_object,
+    swift_download_shared_object,
+    swift_download_container,
     os_list_projects,
     get_os_user,
     get_os_active_project,
@@ -39,6 +42,10 @@ from .api import (
     remove_container_acl,
     add_project_container_acl,
     get_shared_container_address,
+    swift_create_container,
+    swift_upload_object_chunk,
+    swift_check_object_chunk,
+    swift_replicate_container,
 )
 from .settings import setd
 from .middlewares import error_middleware
@@ -81,10 +88,24 @@ async def kill_sess_on_shutdown(
                       key, time.ctime())
 
 
+async def open_client_to_app(
+        app: aiohttp.web.Application
+):
+    """Open a client session for download proxies."""
+    app['dload_session'] = aiohttp.ClientSession()
+
+
+async def kill_dload_client(
+        app: aiohttp.web.Application
+):
+    """Kill download proxy client session."""
+    await app['dload_session'].close()
+
+
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(
-        middlewares=[error_middleware]
+        middlewares=[error_middleware]  # type: ignore
     )
 
     # Mutable_map handles cookie storage, also stores the object that provides
@@ -108,7 +129,7 @@ async def servinit() -> aiohttp.web.Application:
     if setd['static_directory'] is not None:
         app.router.add_static(
             '/static/',
-            path=setd['static_directory'],
+            path=setd['static_directory'],  # type: ignore
             name='static',
             show_index=True,
         )
@@ -139,6 +160,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add api routes
     app.add_routes([
         aiohttp.web.get('/api/buckets', swift_list_buckets),
+        aiohttp.web.put('/api/containers/{container}', swift_create_container),
         aiohttp.web.get('/api/bucket/objects', swift_list_objects),
         aiohttp.web.get('/api/object/dload', swift_download_object),
         aiohttp.web.get('/api/shared/objects', swift_list_shared_objects),
@@ -155,6 +177,28 @@ async def servinit() -> aiohttp.web.Application:
         aiohttp.web.get('/api/project/address', get_shared_container_address),
     ])
 
+    # Add download routes
+    app.add_routes([
+        aiohttp.web.get('/download/{project}/{container}',
+                        swift_download_container),
+        aiohttp.web.get('/download/{project}/{container}/{object:.*}',
+                        swift_download_shared_object),
+    ])
+
+    # Add upload routes
+    app.add_routes([
+        aiohttp.web.post('/upload/{project}/{container}',
+                         swift_upload_object_chunk),
+        aiohttp.web.get('/upload/{project}/{container}',
+                        swift_check_object_chunk),
+    ])
+
+    # Add replication routes
+    app.add_routes([
+        aiohttp.web.post('/replicate/{project}/{container}',
+                         swift_replicate_container),
+    ])
+
     # Add discovery routes
     app.add_routes([
         aiohttp.web.get('/discover', handle_discover)
@@ -166,14 +210,17 @@ async def servinit() -> aiohttp.web.Application:
                         handle_bounce_direct_access_request)
     ])
 
+    app.on_startup.append(open_client_to_app)
+
     # Add graceful shutdown handler
     app.on_shutdown.append(kill_sess_on_shutdown)
+    app.on_shutdown.append(kill_dload_client)
 
     return app
 
 
 def run_server_secure(
-        app: aiohttp.web.Application,
+        app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application],
         cert_file: str,
         cert_key: str
 ):
@@ -208,19 +255,19 @@ def run_server_secure(
     aiohttp.web.run_app(
         app,
         access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
-        port=setd['port'],
+        port=setd['port'],  # type: ignore
         ssl_context=sslcontext,
     )
 
 
 def run_server_insecure(
-        app: aiohttp.web.Application
+        app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
 ):
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
         access_log=aiohttp.web.logging.getLogger('aiohttp.access'),
-        port=setd['port']
+        port=(setd['port'])  # type: ignore
     )
 
 

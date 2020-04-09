@@ -5,6 +5,7 @@
       :multiple-projects="multipleProjects"
       :projects="projects"
     />
+    <ProgressBar v-if="isUploading || isChunking" />
     <div
       class="breadcrumb"
       aria-label="breadcrumbs"
