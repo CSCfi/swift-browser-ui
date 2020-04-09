@@ -341,7 +341,7 @@ class ContainerArchiveDownloadProxy:
             print(path)
             # Path of zero means an incorrect input
             if len(path) == 0:
-                raise ValueError("Can't archive files without name.")
+                raise ValueError("Tried to archive a file wihtout a name")
             # Path of > 1 implies a directory in between
             # Create TarInfo for the directory
             if len(path) > 1:

@@ -132,7 +132,7 @@ async def handle_get_object_chunk(
         # thus, reducing said 1 from the resulting chunk number
         chunk_number = int(request.query["resumableChunkNumber"]) - 1
     except KeyError:
-        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string.")
+        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string")
 
     upload_session = await get_upload_instance(
         request,

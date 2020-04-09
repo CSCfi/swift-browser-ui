@@ -49,7 +49,7 @@ def get_session_id(
             return request.query["session"]
         except KeyError:
             raise aiohttp.web.HTTPUnauthorized(
-                reason="Runner session ID missing"
+                reason="Missing runner session ID"
             )
 
 
@@ -110,7 +110,7 @@ async def get_upload_instance(
     try:
         ident = query["resumableIdentifier"]
     except KeyError:
-        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string.")
+        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string")
     try:
         upload_session = request.app[session]["uploads"][pro][cont][ident]
     except KeyError:

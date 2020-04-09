@@ -124,7 +124,7 @@ class ResumableFileUploadProxy:
         ) as resp:
             if resp.status not in {201, 202}:
                 raise aiohttp.web.HTTPForbidden(
-                    reason="Can't create the upload container."
+                    reason="Upload container creation failed"
                 )
 
     async def a_check_container(

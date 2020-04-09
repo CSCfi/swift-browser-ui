@@ -85,7 +85,7 @@ class ObjectReplicationProxy():
         ) as resp:
             if resp.status not in {201, 202}:
                 raise aiohttp.web.HTTPForbidden(
-                    reason="Can't create the upload container."
+                    reason="Upload container creation failed"
                 )
         LOGGER.debug(f"Created container {container}")
 
@@ -107,11 +107,11 @@ class ObjectReplicationProxy():
         ) as resp:
             if resp.status == 404:
                 raise aiohttp.web.HTTPNotFound(
-                    reason="Couldn't find segment container."
+                    reason="Segment container not found"
                 )
             if resp.status == 403:
                 raise aiohttp.web.HTTPForbidden(
-                    reason="Not allowed to access segment container."
+                    reason="Segment container access not allowed"
                 )
             prefix = manifest.replace(manifest.split('/')[0], "").lstrip('/')
             LOGGER.debug(f"Segment prefix: {prefix}")
@@ -149,7 +149,7 @@ class ObjectReplicationProxy():
 
                 if resp_g.status not in {200, 201, 202}:
                     raise aiohttp.web.HTTPNotFound(
-                        reason="Couldn't find segment"
+                        reason="Segment not found"
                     )
                 LOGGER.debug(f"Copying segment {segment}")
                 headers["Content-Length"] = str(length)
@@ -173,7 +173,7 @@ class ObjectReplicationProxy():
                         raise aiohttp.web.HTTPRequestTimeout()
                     if resp_p.status not in {201, 202}:
                         raise aiohttp.web.HTTPBadRequest(
-                            reason="Couldn't upload object segment"
+                            reason="Segment upload failed"
                         )
                 LOGGER.debug(f"Success in copying segment {segment}")
 
@@ -202,7 +202,7 @@ class ObjectReplicationProxy():
             # If the source object doesn't exist, abort
             if resp_g.status != 200:
                 raise aiohttp.web.HTTPBadRequest(
-                    reason="Couldn't fetch the source object."
+                    reason="Source object fetch failed"
                 )
             LOGGER.debug(f"Got stream handle for {object_name}")
 
@@ -242,7 +242,7 @@ class ObjectReplicationProxy():
                         raise aiohttp.web.HTTPRequestTimeout()
                     if resp_p.status not in {201, 202}:
                         raise aiohttp.web.HTTPBadRequest(
-                            reason="Couldn't upload object segment"
+                            reason="Object segment upload failed"
                         )
                 LOGGER.debug(f"Success in copying object {object_name}")
             else:
@@ -271,7 +271,7 @@ class ObjectReplicationProxy():
                 ) as resp:
                     if resp.status != 201:
                         raise aiohttp.web.HTTPInternalServerError(
-                            reason="Manifest creation failure."
+                            reason="Object manifest creation failed"
                         )
                 LOGGER.debug(f"Uploaded manifest for {object_name}")
 
@@ -300,7 +300,7 @@ class ObjectReplicationProxy():
                     f"Container fetch failed with status {resp.status}"
                 )
                 raise aiohttp.web.HTTPBadRequest(
-                    reason="Couldn't fetch the source container"
+                    reason="Source container fetch failed"
                 )
             LOGGER.debug("Got container object listing")
             objects = await resp.text()
