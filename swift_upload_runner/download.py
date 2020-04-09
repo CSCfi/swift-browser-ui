@@ -8,6 +8,7 @@ import typing
 import tarfile
 import time
 import asyncio
+import logging
 
 import aiohttp.web
 
@@ -16,6 +17,15 @@ import keystoneauth1.session
 import requests
 
 from .common import generate_download_url, get_path_from_list
+from .common import get_download_host
+
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+
+
+# Unlike other classes, download uses python-requests for fetching objects
+# to simplify threading. Thus, timing out is not the default behavior.
 
 
 class FileDownloadProxy:
@@ -56,13 +66,37 @@ class FileDownloadProxy:
         """Return the incoming file size."""
         return self.size
 
+    def get_chksum(self) -> typing.Optional[str]:
+        """Return the checksum."""
+        return self.chksum
+
+    async def a_get_type(self) -> str:
+        """Return the eventual incoming file type."""
+        try:
+            return self.get_type()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_type()
+
+    async def a_get_size(self) -> int:
+        """Return the eventual incoming file size."""
+        try:
+            return self.get_size()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_size()
+
+    async def a_get_checksum(self) -> typing.Optional[str]:
+        """Return the eventual checksum."""
+        try:
+            return self.get_chksum()
+        except AttributeError:
+            await asyncio.sleep(0.01)
+            return await self.a_get_checksum()
+
     def get_mtime(self) -> int:
         """Return the time of last modification."""
         return self.mtime
-
-    def get_chksum(self) -> str:
-        """Return the checksum."""
-        return self.chksum
 
     def download_into_queue(
             self,
@@ -78,13 +112,13 @@ class FileDownloadProxy:
         """)
         with requests.get(
             generate_download_url(
-                self.auth.get_endpoint(service_type="object-store"),
+                get_download_host(self.auth, project),
                 container=container,
                 object_name=object_name
             ),
             headers={
                 "X-Auth-Token": self.auth.get_token(),
-                "Accept-Encoding": None
+                "Accept-Encoding": "identity"
             },
             stream=True
         ) as req:
@@ -307,13 +341,15 @@ class ContainerArchiveDownloadProxy:
             print(path)
             # Path of zero means an incorrect input
             if len(path) == 0:
-                raise ValueError("Can't archive files without name.")
+                raise ValueError("Tried to archive a file wihtout a name")
             # Path of > 1 implies a directory in between
             # Create TarInfo for the directory
             if len(path) > 1:
                 if path[0] in ret_fs.keys():
+                    LOGGER.debug(f"Skipping path {path} as added.")
                     continue
 
+                LOGGER.debug(f"Adding directory for {path[0]} {path_prefix}")
                 new_info = tarfile.TarInfo(
                     name=get_path_from_list(
                         [path[0] + "/"],
@@ -334,6 +370,8 @@ class ContainerArchiveDownloadProxy:
                     ):
                         dir_contents.append(i)
 
+                LOGGER.debug(f"Dir {path[0]} contents: {dir_contents}")
+
                 ret_fs[path[0]] = {
                     "name": get_path_from_list(
                         [path[0]],
@@ -353,6 +391,7 @@ class ContainerArchiveDownloadProxy:
             # Path of == 1 implies a file
             else:
                 # Create file TarInfo class
+                LOGGER.debug(f"Adding file {path} to {path_prefix}")
                 new_info = tarfile.TarInfo(name=get_path_from_list(
                     path,
                     path_prefix
@@ -376,16 +415,16 @@ class ContainerArchiveDownloadProxy:
         """Synchronize the list of objects to download."""
         with requests.get(
                 generate_download_url(
-                    self.auth.get_endpoint(service_type="object-store"),
+                    get_download_host(self.auth, self.project),
                     container=self.container
                 ),
                 headers={
                     "X-Auth-Token": self.auth.get_token()
                 }
         ) as req:
-            self.fs = self._parse_archive_fs(
-                i.split("/") for i in req.text.rstrip().lstrip().split("\n")
-            )
+            self.fs = self._parse_archive_fs([
+                i.split("/") for i in req.text.lstrip().rstrip().split("\n")
+            ])
 
     def sync_folders(
             self,
@@ -449,7 +488,9 @@ class ContainerArchiveDownloadProxy:
 
             tar_info = next_file["tar_info"]
             tar_info.size = next_file["fileobj"].get_dload().get_size()
-            tar_info.chksum = next_file["fileobj"].get_dload().get_chksum()
+            if next_file["fileobj"].get_dload().get_chksum():
+                tar_info.chksum = \
+                    next_file["fileobj"].get_dload().get_chksum()
             tar_info.mtime = next_file["fileobj"].get_dload().get_mtime()
 
             self.archive.addfile(

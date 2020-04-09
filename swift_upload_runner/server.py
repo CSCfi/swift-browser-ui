@@ -8,15 +8,22 @@ import asyncio
 import typing
 
 import aiohttp.web
+import aiohttp.client
 
 import uvloop
 
 from .middleware import add_cors
 from .auth import handle_login, read_in_keys, handle_validate_authentication
 from .api import handle_get_object, handle_get_container
+from .api import handle_post_object_chunk, handle_post_object_options
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+
+logging.basicConfig(
+    level=int(os.environ.get("UPLOAD_RUNNER_LOG_LEVEL", 20))
+)
 
 
 async def servinit() -> aiohttp.web.Application:
@@ -29,6 +36,10 @@ async def servinit() -> aiohttp.web.Application:
     app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
     app.on_startup.append(read_in_keys)
+    app.on_shutdown.append(kill_client)
+
+    # Add client session for aiohttp requests
+    app["client"] = aiohttp.client.ClientSession()
 
     # Add auth related routes
     # Can use direct project post for creating a session, as it's intuitive
@@ -39,13 +50,24 @@ async def servinit() -> aiohttp.web.Application:
 
     # Add api routes
     app.add_routes([
-        aiohttp.web.get("/{project}/{container}/{object_name}",
+        aiohttp.web.get("/{project}/{container}/{object_name:.*}",
                         handle_get_object),
         aiohttp.web.get("/{project}/{container}",
-                        handle_get_container)
+                        handle_get_container),
+        aiohttp.web.post("/{project}/{container}",
+                         handle_post_object_chunk),
+        aiohttp.web.options("/{project}/{container}",
+                            handle_post_object_options),
     ])
 
     return app
+
+
+async def kill_client(
+        app: aiohttp.web.Application
+):
+    """Kill the app client session."""
+    await app["client"].close()
 
 
 def run_server(

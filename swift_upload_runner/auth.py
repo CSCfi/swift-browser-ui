@@ -33,7 +33,9 @@ async def handle_login(
         project = request.match_info["project"]
         login_form = await request.post()
         token = login_form["token"]
-        request.app[session_key] = initiate_os_session(
+        request.app[session_key] = {}
+        request.app[session_key]["uploads"] = {}
+        request.app[session_key]["auth"] = initiate_os_session(
             token,
             project
         )
@@ -96,7 +98,7 @@ async def handle_validate_authentication(
         path = request.url.path
     except KeyError:
         raise aiohttp.web.HTTPUnauthorized(
-            reason="Query string missing validity or signature."
+            reason="Query string missing validity or signature"
         )
 
     await test_signature(
