@@ -26,7 +26,8 @@ Using vanilla docker in order to build the image - the tag can be customised:
 Kubernetes Integration
 ----------------------
 
-For use with Kubernetes we provide ``YAML`` configuration.
+For use with Kubernetes we provide ``YAML`` configuration. Further
+configuration files are provided in `deployment example repository <https://github.com/CSCfi/swift-ui-deployment/>`_
 
 .. code-block:: yaml
 
