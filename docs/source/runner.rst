@@ -2,7 +2,8 @@ Upload runnner
 ==============
 The UI provides an improved upload proxy / runner, that provides a possibility
 for more complicated operations not normally present on the object storage Web
-interface.
+interface – these operations include e.g. uploading files into an object
+storage container, and downloading a whole container with API call.
 
 
 File Upload

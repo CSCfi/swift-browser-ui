@@ -30,9 +30,9 @@ Out of the box the ``swift-browser-ui`` offers:
     Deployment                 <deploy>
     Architecture               <tech>
     User Interface             <ui>
-    Sharing backend            <sharing>
-    Access request backend     <request>
-    Upload, download and copy  <runner>
+    Sharing Backend            <sharing>
+    Access Request Backend     <request>
+    Upload, Download and Copy  <runner>
     Python Modules             <code>
     Testing                    <testing>
     Tools / Miscellaneous      <tools>

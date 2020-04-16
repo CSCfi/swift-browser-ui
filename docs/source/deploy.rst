@@ -24,8 +24,8 @@ Using vanilla docker in order to build the image - the tag can be customised:
 Database for sharing functionality
 ----------------------------------
 Both ``swift-x-account-sharing`` and ``swift-sharing-request`` services need
-access to a Postgres database in order to work. In the usual deployment this
-is done with a container deployment. Necessary files to build a database
+access to a PostgreSQL database in order to work. In a usual deployment this
+is done within a containerized stack. Necessary files to build a database
 container for testing can be found in the `deployment example repository. <https://github.com/CSCfi/swift-ui-deployment/>`_
 The file ``init-project-db.sh`` contains the necessary input to build the DB
 schema, and the same commands can be used to build the schema into an existing

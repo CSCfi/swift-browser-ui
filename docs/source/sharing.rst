@@ -40,9 +40,9 @@ Viewing containers shared to the project
 ----------------------------------------
 Containers that are shared to a particular project can be viewed by navigating
 to the "Shared" page in the application navbar. From this view the granted
-access can be viewd, and any container can be opened just like when using
-the normal container browsing view. All features present in the ordinary
-container view are present, like downloading, uploading (if write access is
+access can be viewed, and any container can be opened just like when using
+the normal container browsing view. All features available in the ordinary
+container view work, such as downloading, uploading (if write access is
 granted to the container) and copying the container.
 
 .. figure:: ./_static/images/shared-to-view.png

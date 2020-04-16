@@ -14,14 +14,15 @@ The program can be installed with pip from the git repository:
     cd swift_browser_ui_frontend && npm run build && cd ..
     pip install .
 
-Note that the program uses external services that need to be present in order
-to enable all functionality, like sharing. These additional services can be
-found from the git repositories. The instructions to getting the services up
-and running can be found in their respective repositories.
-
-    * https://github.com/cscfi/swift-x-account-sharing
-    * https://github.com/cscfi/swift-sharing-request
-    * https://github.com/cscfi/swiftui-upload-runner
+.. note:: The program uses external services that need to be present in order
+          to enable all functionality, like sharing. These additional services
+          can be found from the git repositories. The instructions for getting
+          the services up and running can be found in their respective
+          repositories, and partly under the *Deployment* section.
+          
+          * https://github.com/cscfi/swift-x-account-sharing
+          * https://github.com/cscfi/swift-sharing-request
+          * https://github.com/cscfi/swiftui-upload-runner
 
 
 Environment Setup
