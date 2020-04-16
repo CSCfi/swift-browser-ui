@@ -44,9 +44,11 @@ Container Download
 Full containers can be downloaded from the UI using the download button either
 on the table row in the container listing, or a download button on the top of
 the table when viewing an open container. Downloading whole containers works
-the same in both owned and shared containers. The runner seamlessly creates
-a tar archive of the container currently downloaded, without additional wait
-time used for archiving or compressing – the archival is done on the fly.
+the same in both owned and shared containers. The runner archives the
+container while the download is taking place, in order to prevent aditional
+waiting for an archiving operation to finish. This has the added benefit of
+not requiring any intermediary storage for the archiving operation on the
+server side.
 
 .. hint:: Due to the fact that the archive size can't be precisely calculated
           when archiving on the fly, the server is unable to provide a progress
