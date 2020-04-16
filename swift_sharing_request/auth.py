@@ -11,11 +11,19 @@
 import os
 import typing
 import hmac
+import time
 
 import aiohttp.web
 
 
-AiohttpHandler = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
+AiohttpHandler = typing.Callable[
+    [aiohttp.web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        aiohttp.web.Response
+    ]
+]
 
 
 async def read_in_keys(
@@ -34,8 +42,14 @@ async def test_signature(
         tokens: typing.List[bytes],
         signature: str,
         message: str,
-) -> bool:
+        validity: str,
+):
     """Validate signature against the given tokens."""
+    # Check signature expiration
+    if int(validity) < time.time():
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Signature expired"
+        )
     byte_message = message.encode("utf-8")
     for token in tokens:
         digest = hmac.new(
@@ -68,7 +82,8 @@ async def handle_validate_authentication(
     await test_signature(
         request.app["tokens"],
         signature,
-        validity + path
+        validity + path,
+        validity
     )
 
     return await handler(request)
