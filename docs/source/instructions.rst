@@ -10,7 +10,19 @@ The program can be installed with pip from the git repository:
 
     # Requires python >= 3.6
     git clone git@github.com:CSCfi/swift-browser-ui.git
+    # Frontend files need to be separately built
+    cd swift_browser_ui_frontend && npm run build && cd ..
     pip install .
+
+.. note:: The program uses external services that need to be present in order
+          to enable all functionality, like sharing. These additional services
+          can be found from the git repositories. The instructions for getting
+          the services up and running can be found in their respective
+          repositories, and partly under the *Deployment* section.
+          
+          * https://github.com/cscfi/swift-x-account-sharing
+          * https://github.com/cscfi/swift-sharing-request
+          * https://github.com/cscfi/swiftui-upload-runner
 
 
 Environment Setup
@@ -26,15 +38,23 @@ Environment Setup
 
 Variables are depicted in the table below:
 
-+--------------------------------------+----------+-------------------------------------------------------------------------+
-| ENV                                  | Default  | Description                                                             |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
-| ``BROWSER_START_AUTH_ENDPOINT_URL``  |          | Authentication endpoint. Address for OpenStack keystone API ``v3``.     |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
-| ``BROWSER_START_PORT``               | ``8080`` |                                                                         |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
-| ``BROWSER_START_SET_ORIGIN_ADDRESS`` |          | Authentication return address, to which the ``WebSSO`` redirects.       |
-+--------------------------------------+----------+-------------------------------------------------------------------------+
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| Environment variable                   | Default | Description                                                   |  |  |
++========================================+=========+===============================================================+==+==+
+| ``BROWSER_START_AUTH_ENDPOINT_URL``    |         | URL to use as the authentication backend                      |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_PORT``                 | 8080    | Port that the service will listen                             |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_SET_ORIGIN_ADDRESS``   |         | Authentication return address to which WebSSO should redirect |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_SHARING_ENDPOINT_URL`` |         | URL for the container sharing backend                         |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_REQUEST_ENDPOINT_URL`` |         | URL for the shared access request backend                     |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_RUNNER_ENDPOINT``      |         | URL for the upload, copy, download runner                     |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``SWIFT_UI_SHARING_REQUEST_TOKEN``     |         | Token for signing the internal API requests                   |  |  |
++----------------------------------------+---------+---------------------------------------------------------------+--+--+
 
 .. hint:: Authentication endpoint can also be specified with any openrc file,
           which can be usually downloaded from Openstack. The setup script
