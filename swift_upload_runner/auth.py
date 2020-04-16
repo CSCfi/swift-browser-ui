@@ -5,13 +5,13 @@ import os
 import hashlib
 import typing
 import hmac
+import time
 
 import aiohttp.web
 
 from swift_browser_ui._convenience import (
     initiate_os_session
 )
-
 
 AiohttpHandler = typing.Callable[
     [aiohttp.web.Request],
@@ -70,8 +70,14 @@ async def test_signature(
         tokens: typing.List[bytes],
         signature: str,
         message: str,
+        validity: str,
 ) -> bool:
     """Validate signature against the given tokens."""
+    # Check signature expiration
+    if int(validity) < time.time():
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Signature expired"
+        )
     byte_message = message.encode("utf-8")
     for token in tokens:
         digest = hmac.new(
@@ -104,7 +110,8 @@ async def handle_validate_authentication(
     await test_signature(
         request.app["tokens"],
         signature,
-        validity + path
+        validity + path,
+        validity
     )
 
     return await handler(request)
