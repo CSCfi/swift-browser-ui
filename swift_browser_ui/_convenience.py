@@ -402,7 +402,7 @@ async def open_upload_runner_session(
     try:
         return request.app['Creds'][session_key]['runner']
     except KeyError:
-        session = request.app['dload_session']
+        session = request.app['api_client']
         path = f"{setd['upload_internal_endpoint']}/{project}"
         signature = await sign(3600, f"/{project}")
         async with session.post(

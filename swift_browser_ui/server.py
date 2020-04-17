@@ -92,14 +92,14 @@ async def open_client_to_app(
         app: aiohttp.web.Application
 ):
     """Open a client session for download proxies."""
-    app['dload_session'] = aiohttp.ClientSession()
+    app['api_client'] = aiohttp.ClientSession()
 
 
 async def kill_dload_client(
         app: aiohttp.web.Application
 ):
     """Kill download proxy client session."""
-    await app['dload_session'].close()
+    await app['api_client'].close()
 
 
 async def servinit() -> aiohttp.web.Application:
