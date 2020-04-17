@@ -146,7 +146,7 @@ class SwiftSharingRequest {
       },
     );
     return deleted;
-  }    
+  }
 }
 
 export default SwiftSharingRequest;
