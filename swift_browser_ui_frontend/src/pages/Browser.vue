@@ -76,7 +76,12 @@ html, body {
 
 .searchBox {
     width: 30%;
+    margin-right: auto;
     margin-left: auto;
+}
+
+.uploadGroup {
+  margin-left: auto;
 }
 
 .groupControls {

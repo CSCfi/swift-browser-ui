@@ -39,7 +39,13 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <div class="field has-addons">
+      <b-field class="control searchBox">
+        <b-input
+          v-model="searchQuery"
+          :placeholder="$t('message.searchBy')"
+        />
+      </b-field>
+      <div class="field has-addons uploadGroup">
         <p class="control">
           <FolderUploadForm dropelement="object-table" />
         </p>
@@ -55,7 +61,7 @@
           v-model="searchQuery"
           :placeholder="$t('message.searchBy')"
         />
-      </b-field>
+    </b-field>
     </b-field>
     <b-table
       focusable

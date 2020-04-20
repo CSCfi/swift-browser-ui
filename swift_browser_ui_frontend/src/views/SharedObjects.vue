@@ -31,7 +31,7 @@
           100 {{ $t('message.table.pageNb') }}
         </option>
       </b-select>
-      <div class="field has-addons">
+      <div class="field has-addons uploadGroup">
         <p class="control">
           <ContainerDownloadLink />
         </p>
