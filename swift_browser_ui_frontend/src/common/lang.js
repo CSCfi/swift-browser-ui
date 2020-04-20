@@ -153,7 +153,7 @@ const translations = {
         destinationMessage: "Insert copy destination container here",
         destinationExists: " Destination already exists",
       },
-      token: {
+      tokens: {
         empty: "No API tokens created for the project",
         identifier: "Identifier",
         revoke: "Revoke",
@@ -314,7 +314,7 @@ const translations = {
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
         destinationExists: " Kohdesäililö on jo olemassa",
       },
-      token: {
+      tokens: {
         empty: "Projektille ei ole luotu API-avaimia",
         identifier: "Tunniste",
         revoke: "Mitätöi",
