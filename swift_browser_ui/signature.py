@@ -46,8 +46,8 @@ async def handle_ext_token_create(
 
     client: aiohttp.ClientSession = request.app["api_client"]
 
-    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
-    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+    sharing_api_address = setd["sharing_endpoint"]
+    request_api_address = setd["request_endpoint"]
 
     if not sharing_api_address or not request_api_address:
         raise aiohttp.web.HTTPNotFound(
@@ -87,8 +87,8 @@ async def handle_ext_token_remove(
 
     client: aiohttp.ClientSession = request.app["api_client"]
 
-    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
-    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+    sharing_api_address = setd["sharing_endpoint"]
+    request_api_address = setd["request_endpoint"]
 
     if not sharing_api_address or not request_api_address:
         raise aiohttp.web.HTTPNotFound(
@@ -113,8 +113,8 @@ async def handle_ext_token_list(
 
     client: aiohttp.ClientSession = request.app["api_client"]
 
-    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
-    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+    sharing_api_address = setd["sharing_endpoint"]
+    request_api_address = setd["request_endpoint"]
 
     if not sharing_api_address or not request_api_address:
         raise aiohttp.web.HTTPNotFound(
