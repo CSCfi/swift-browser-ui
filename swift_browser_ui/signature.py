@@ -54,26 +54,20 @@ async def handle_ext_token_create(
             reason=("External APIs not configured on server")
         )
 
-    async with client.post(
-            f"{sharing_api_address}/token/{project}/{ident}",
-            data={
-                "token": token,
-            }
-    ) as resp_sharing:
-        if resp_sharing.status != 200:
-            raise aiohttp.web.HTTPInternalServerError(
-                reason="Token creation failed"
-            )
-    async with client.post(
-            f"{request_api_address}/token/{project}/{ident}",
-            data={
-                "token": token,
-            }
-    ) as resp_request:
-        if resp_request.status != 200:
-            raise aiohttp.web.HTTPInternalServerError(
-                reason="Token creation failed"
-            )
+    resp_sharing = await client.post(
+        f"{sharing_api_address}/token/{project}/{ident}",
+        data={"token": token}
+    )
+    resp_request = await client.post(
+        f"{request_api_address}/token/{project}/{ident}",
+    )
+
+    if resp_sharing.status != 200 or resp_request.status != 200:
+        raise aiohttp.web.HTTPInternalServerError(
+            reason=f"""Token creation failed, statuses
+            sharing: {resp_sharing.status}
+            request: {resp_request.status}"""
+        )
 
     resp = aiohttp.web.json_response(
         token,
