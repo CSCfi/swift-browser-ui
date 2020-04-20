@@ -282,7 +282,7 @@ export async function createExtToken (
     throw new Error("Token creation failed");
   }
 
-  return ret;
+  return ret.json();
 }
 
 

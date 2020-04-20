@@ -127,7 +127,7 @@ async def handle_ext_token_list(
     if not sharing_tokens == request_tokens:
         raise aiohttp.web.HTTPConflict(reason="API tokens don't match")
 
-    resp = aiohttp.web.json_response()
+    resp = aiohttp.web.json_response(sharing_tokens)
 
     return resp
 
