@@ -113,7 +113,7 @@ export default {
       defaultSortDirection: "asc",
       newIdentifier: "",
       latest: undefined,
-    }
+    };
   },
   beforeMount () {
     this.getTokens();
@@ -126,7 +126,7 @@ export default {
       removeToken(identifier).then(() => {this.getTokens();});
     },
     addToken: function (identifier) {
-      addToken(identifier).then((ret) => {
+      createExtToken(identifier).then((ret) => {
         this.latest = ret;
         this.$buefy.toast.open({
           message: "Copy the token displayed below identifier field",
@@ -139,5 +139,5 @@ export default {
       return this.tokens.includes(identifier) ? true : false;
     },
   },
-}
+};
 </script>

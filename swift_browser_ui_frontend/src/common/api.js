@@ -309,7 +309,7 @@ export async function removeToken (
   // Tell backend to delete API tokens matching the ID
 
   let fetchURL = new URL ("/token/".concat(
-    id
+    id,
   ), document.location.origin);
 
   let ret = await fetch(
