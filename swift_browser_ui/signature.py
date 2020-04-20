@@ -3,10 +3,14 @@
 
 import hmac
 import time
+import hashlib
+import os
 
 import aiohttp.web
 
 from ._convenience import session_check, api_check, get_tempurl_key, sign
+
+from .settings import setd
 
 
 async def handle_signature_request(
@@ -27,6 +31,105 @@ async def handle_signature_request(
         valid_for,
         path_to_sign
     ))
+
+
+async def handle_ext_token_create(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle call for an API token create."""
+    session = api_check(request)
+
+    project = request.app["Creds"][session]["active_project"]["id"]
+
+    ident = request.match_info["id"]
+    token = hashlib.sha256(os.urandom(256)).hexdigest()  # nosec
+
+    client: aiohttp.ClientSession = request.app["api_client"]
+
+    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
+    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+
+    if not sharing_api_address or not request_api_address:
+        raise aiohttp.web.HTTPNotFound(
+            reason=("External APIs not configured on server")
+        )
+
+    client.post(
+        f"{sharing_api_address}/token/{project}/{ident}",
+        data={
+            "token": token,
+        }
+    )
+    client.post(
+        f"{request_api_address}/token/{project}/{ident}",
+        data={
+            "token": token,
+        }
+    )
+
+    resp = aiohttp.web.json_response(
+        token,
+        status=201
+    )
+
+    return resp
+
+
+async def handle_ext_token_remove(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle call for an API token delete."""
+    session = api_check(request)
+
+    project = request.app["Creds"][session]["active_project"]["id"]
+
+    ident = request.match_info["id"]
+
+    client: aiohttp.ClientSession = request.app["api_client"]
+
+    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
+    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+
+    if not sharing_api_address or not request_api_address:
+        raise aiohttp.web.HTTPNotFound(
+            reason=("External APIs not configured on server")
+        )
+
+    client.delete(f"{sharing_api_address}/token/{project}/{ident}")
+    client.delete(f"{request_api_address}/token/{project}/{ident}")
+
+    resp = aiohttp.web.Response(status=204)
+
+    return resp
+
+
+async def handle_ext_token_list(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle call for listing API tokens."""
+    session = api_check(request)
+
+    project = request.app["Creds"][session]["active_project"]["id"]
+
+    client: aiohttp.ClientSession = request.app["api_client"]
+
+    sharing_api_address = setd["BROWSER_START_SHARING_ENDPOINT_URL"]
+    request_api_address = setd["BROWSER_START_REQUEST_ENDPOINT_URL"]
+
+    if not sharing_api_address or not request_api_address:
+        raise aiohttp.web.HTTPNotFound(
+            reason=("External APIs not configured on server")
+        )
+
+    sharing_tokens = client.get(f"{sharing_api_address}/token/{project}")
+    request_tokens = client.get(f"{request_api_address}/token/{project}")
+
+    if not sharing_tokens == request_tokens:
+        raise aiohttp.web.HTTPConflict(reason="API tokens don't match")
+
+    resp = aiohttp.web.json_response()
+
+    return resp
 
 
 async def handle_form_post_signature(

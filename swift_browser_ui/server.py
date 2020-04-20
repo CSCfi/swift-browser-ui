@@ -50,7 +50,12 @@ from .api import (
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
-from .signature import handle_signature_request
+from .signature import (
+    handle_signature_request,
+    handle_ext_token_create,
+    handle_ext_token_list,
+    handle_ext_token_remove,
+)
 from .misc_handlers import handle_bounce_direct_access_request
 
 
@@ -155,6 +160,13 @@ async def servinit() -> aiohttp.web.Application:
     # Add signature endpoint
     app.add_routes([
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
+    ])
+
+    # Add token functionality
+    app.add_routes([
+        aiohttp.web.get('/token/{id}', handle_ext_token_create),
+        aiohttp.web.delete('/token/{id}', handle_ext_token_remove),
+        aiohttp.web.get('/token', handle_ext_token_list),
     ])
 
     # Add api routes
