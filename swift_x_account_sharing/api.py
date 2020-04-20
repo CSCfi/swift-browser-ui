@@ -213,7 +213,16 @@ async def handle_user_add_token(
     project = request.match_info["project"]
     identifier = request.match_info["id"]
 
-    token = request.query["token"]
+    try:
+        token = request.query["token"]
+    except KeyError:
+        try:
+            formdata = await request.post()
+            token = formdata["token"]
+        except KeyError:
+            raise aiohttp.web.HTTPBadRequest(
+                reason="No token present"
+            )
 
     try:
         await request.app["db_conn"].add_token(
