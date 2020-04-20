@@ -298,3 +298,82 @@ class DBConn:
                 "access": access,
             })
         return ret
+
+    async def get_tokens(
+            self,
+            token_owner: str
+    ) -> typing.List[dict]:
+        """Get tokens created for a project."""
+        query = await self.conn.fetch(
+            """
+            SELECT *
+            FROM Tokens
+            WHERE token_owner = $1
+            ;
+            """,
+            token_owner
+        )
+        return list(query)
+
+    async def check_token(
+            self,
+            token_owner: str,
+            token: str
+    ) -> bool:
+        """Check a token against tokens created by the project."""
+        query = await self.conn.execute(
+            """
+            SELECT *
+            FROM Tokens
+            WHERE
+                token_owner = $1 AND
+                token = $2
+            ;
+            """,
+            token_owner,
+            token
+        )
+        return len(list(query)) > 0
+
+    async def revoke_token(
+            self,
+            token_owner: str,
+            token_identifier: str
+    ):
+        """Remove a token from the database."""
+        async with self.conn.transaction():
+            await self.conn.execute(
+                """
+                DELETE FROM Tokens
+                WHERE
+                    token_owner = $1 AND
+                    identifier = $2
+                ;
+                """,
+                token_owner,
+                token_identifier
+            )
+
+    async def add_token(
+            self,
+            token_owner: str,
+            token: str,
+            identifier: str
+    ):
+        """Add a token to the database."""
+        async with self.conn.transaction():
+            await self.conn.execute(
+                """
+                INSERT INTO Tokens(
+                    token_owner,
+                    token,
+                    identifier
+                ) VALUES (
+                    $1, $2, $3
+                )
+                ;
+                """,
+                token_owner,
+                token,
+                identifier
+            )
