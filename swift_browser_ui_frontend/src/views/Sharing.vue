@@ -4,9 +4,9 @@
     class="contents"
   >
     <form action="">
-      <div>
+      <div class="contents">
         <header>
-          <h1 class="title sharinghead">
+          <h1 class="title is-3 sharinghead">
             {{ $t('message.share.share_cont') }}
           </h1>
         </header>
@@ -69,7 +69,6 @@
 <style scoped>
   #sharingview {
     width: auto;
-    margin-top: 2%;
     margin-left: 5%;
     margin-right: 5%;
   }
@@ -83,7 +82,7 @@
   }
 
   .sharinghead {
-    margin: 1%;
+    margin: 1% 1% 1% 0;
   }
 </style>
 

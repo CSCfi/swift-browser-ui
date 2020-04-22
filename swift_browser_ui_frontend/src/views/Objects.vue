@@ -39,7 +39,13 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
-      <div class="field has-addons">
+      <b-field class="control searchBox">
+        <b-input
+          v-model="searchQuery"
+          :placeholder="$t('message.searchBy')"
+        />
+      </b-field>
+      <div class="field has-addons uploadGroup">
         <p class="control">
           <FolderUploadForm dropelement="object-table" />
         </p>
@@ -50,12 +56,6 @@
           <ReplicateContainerButton />
         </p>
       </div>
-      <b-field class="control searchBox">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.searchBy')"
-        />
-      </b-field>
     </b-field>
     <b-table
       focusable
@@ -101,38 +101,50 @@
           label=""
           width="110"
         >
-          <a
+          <b-button
             v-if="props.row.bytes < 1073741824"
             :href="props.row.url"
             target="_blank"
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+            type="is-primary"
+            outlined
+            size="is-small"
+            tag="a"
           >
             <b-icon
               icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
-          </a>
-          <a
+          </b-button>
+          <b-button
             v-else-if="allowLargeDownloads"
             :href="props.row.url"
             target="_blank"
             :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+            type="is-primary"
+            outlined
+            size="is-small"
+            tag="a"
           >
             <b-icon
               icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
-          </a>
-          <a
+          </b-button>
+          <b-button
             v-else
             :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
             @click="confirmDownload ()"
+            type="is-primary"
+            outlined
+            size="is-small"
+            tag="a"
           >
             <b-icon
               icon="download"
               size="is-small"
             /> {{ $t('message.download') }}
-          </a>
+          </b-button>
         </b-table-column>
       </template>
       <template
