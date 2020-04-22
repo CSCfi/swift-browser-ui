@@ -5,12 +5,16 @@ import hmac
 import time
 import hashlib
 import os
+import logging
 
 import aiohttp.web
 
 from ._convenience import session_check, api_check, get_tempurl_key, sign
 
 from .settings import setd
+
+
+LOGGER = logging.getLogger("signature")
 
 
 async def handle_signature_request(
@@ -41,6 +45,8 @@ async def handle_ext_token_create(
 
     project = request.app["Creds"][session]["active_project"]["id"]
 
+    LOGGER.debug(f"Creating a scoped API token for {project}")
+
     ident = request.match_info["id"]
     token = hashlib.sha256(os.urandom(256)).hexdigest()  # nosec
 
@@ -54,19 +60,35 @@ async def handle_ext_token_create(
             reason=("External APIs not configured on server")
         )
 
+    path = f"/token/{project}/{ident}"
+    signature = await sign(3600, path)
+
     resp_sharing = await client.post(
-        f"{sharing_api_address}/token/{project}/{ident}",
-        data={"token": token}
+        f"{sharing_api_address}{path}",
+        data={"token": token},
+        params={
+            "valid": signature["valid_until"],
+            "signature": signature["signature"],
+        }
     )
     resp_request = await client.post(
-        f"{request_api_address}/token/{project}/{ident}",
+        f"{request_api_address}{path}",
+        data={"token": token},
+        params={
+            "valid": signature["valid_until"],
+            "signature": signature["signature"],
+        }
     )
 
     if resp_sharing.status != 200 or resp_request.status != 200:
+        LOGGER.debug(f"""\
+        Sharing failed with status {resp_sharing.status}
+        {await resp_sharing.text()}{resp_sharing.url}
+        Request failed with status {resp_request.status}
+        {await resp_request.text()}{resp_request.url}\
+        """)
         raise aiohttp.web.HTTPInternalServerError(
-            reason=f"""Token creation failed, statuses
-            sharing: {resp_sharing.status}
-            request: {resp_request.status}"""
+            reason=f"""Token creation failed"""
         )
 
     resp = aiohttp.web.json_response(
@@ -97,8 +119,23 @@ async def handle_ext_token_remove(
             reason=("External APIs not configured on server")
         )
 
-    client.delete(f"{sharing_api_address}/token/{project}/{ident}")
-    client.delete(f"{request_api_address}/token/{project}/{ident}")
+    path = f"/token/{project}/{ident}"
+    signature = await sign(3600, path)
+
+    await client.delete(
+        f"{sharing_api_address}{path}",
+        params={
+            "signature": signature["signature"],
+            "valid": signature["valid_until"],
+        }
+    )
+    await client.delete(
+        f"{request_api_address}{path}",
+        params={
+            "signature": signature["signature"],
+            "valid": signature["valid_until"],
+        }
+    )
 
     resp = aiohttp.web.Response(status=204)
 
@@ -123,13 +160,33 @@ async def handle_ext_token_list(
             reason=("External APIs not configured on server")
         )
 
-    sharing_tokens = client.get(f"{sharing_api_address}/token/{project}")
-    request_tokens = client.get(f"{request_api_address}/token/{project}")
+    path = f"/token/{project}"
+    signature = await sign(3600, path)
 
-    if not sharing_tokens == request_tokens:
+    sharing_tokens = await client.get(
+        f"{sharing_api_address}{path}",
+        params={
+            "signature": signature["signature"],
+            "valid": signature["valid_until"],
+        }
+    )
+    request_tokens = await client.get(
+        f"{request_api_address}{path}",
+        params={
+            "signature": signature["signature"],
+            "valid": signature["valid_until"],
+        }
+    )
+    sharing_tokens_text = await sharing_tokens.text()
+    request_tokens_text = await request_tokens.text()
+
+    LOGGER.debug(f"Sharing tokens: {sharing_tokens_text}")
+    LOGGER.debug(f"Request tokens: {request_tokens_text}")
+
+    if sharing_tokens_text != request_tokens_text:
         raise aiohttp.web.HTTPConflict(reason="API tokens don't match")
 
-    resp = aiohttp.web.json_response(sharing_tokens)
+    resp = aiohttp.web.Response(text=sharing_tokens_text)
 
     return resp
 
