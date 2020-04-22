@@ -1,9 +1,9 @@
 <template>
   <div>
     <b-button
+      v-if="isUploading"
       type="is-primary"
       outlined
-      v-if="isUploading"
       @click="res.cancel()"
     >
       <b-icon
