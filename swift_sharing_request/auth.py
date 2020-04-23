@@ -86,7 +86,10 @@ async def handle_validate_authentication(
         try:
             project = request.match_info["user"]
         except KeyError:
-            pass
+            try:
+                project = request.query["project"]
+            except KeyError:
+                pass
     else:
         project_tokens = [
             rec["token"]
