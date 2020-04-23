@@ -79,8 +79,22 @@ async def handle_validate_authentication(
             reason="Query string missing validity or signature."
         )
 
+    project_tokens = []
+    try:
+        project = request.match_info["project"]
+    except KeyError:
+        try:
+            project = request.match_info["owner"]
+        except KeyError:
+            project = request.match_info["user"]
+    else:
+        project_tokens = [
+            rec["token"]
+            for rec in await request.app["db_conn"].get_tokens(project)
+        ]
+
     await test_signature(
-        request.app["tokens"],
+        request.app["tokens"] + project_tokens,
         signature,
         validity + path,
         validity
