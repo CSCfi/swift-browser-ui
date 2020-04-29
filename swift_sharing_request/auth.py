@@ -97,7 +97,7 @@ async def handle_validate_authentication(
     finally:
         if project:
             project_tokens = [
-                rec["token"]
+                rec["token"].encode("utf-8")
                 for rec in await request.app["db_conn"].get_tokens(project)
             ]
         else:
