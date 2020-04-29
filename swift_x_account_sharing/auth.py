@@ -12,6 +12,7 @@ import os
 import typing
 import hmac
 import time
+import logging
 
 import aiohttp.web
 
@@ -24,6 +25,9 @@ AiohttpHandler = typing.Callable[
         aiohttp.web.Response
     ]
 ]
+
+
+LOGGER = logging.getLogger("swift_x_account_sharing.auth")
 
 
 async def read_in_keys(
@@ -86,12 +90,21 @@ async def handle_validate_authentication(
         try:
             project = request.match_info["owner"]
         except KeyError:
-            project = request.match_info["user"]
-    else:
-        project_tokens = [
-            rec["token"]
-            for rec in await request.app["db_conn"].get_tokens(project)
-        ]
+            try:
+                project = request.match_info["user"]
+            except KeyError:
+                pass
+    finally:
+        if project:
+            project_tokens = [
+                rec["token"]
+                for rec in await request.app["db_conn"].get_tokens(project)
+            ]
+        else:
+            LOGGER.debug(f"No project ID found in request {request}")
+            raise aiohttp.web.HTTPUnauthorized(
+                reason="No project ID in request"
+            )
 
     await test_signature(
         request.app["tokens"] + project_tokens,
