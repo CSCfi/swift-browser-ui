@@ -1,6 +1,7 @@
 """Async Python bindings for the swift-x-account-sharing backend."""
 
 
+import os
 import json
 import typing
 
@@ -93,12 +94,17 @@ class SwiftSharingRequest:
         path = f"/request/container/{container}"
         url = self.url + path
 
+        project = os.environ.get("OS_PROJECT_ID", None)
+
         signature = sign_api_request(path)
 
         params = {
             "valid": signature["valid"],
             "signature": signature["signature"],
         }
+
+        if project:
+            params["project"] = project
 
         async with self.session.get(url, params=params) as resp:
             return json.loads(await resp.text())
