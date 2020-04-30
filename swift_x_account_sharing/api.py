@@ -155,8 +155,8 @@ async def edit_share_handler(
 
 
 async def delete_share_handler(
-        request: aiohttp.web.Response
-) -> aiohttp.web.Request:
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle unshare-container endpoint query."""
     try:
         deleted = await request.app["db_conn"].delete_share(
@@ -204,3 +204,69 @@ async def delete_container_shares_handler(
         status=204,
         body="OK"
     )
+
+
+async def handle_user_add_token(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Add a token to the user."""
+    project = request.match_info["project"]
+    identifier = request.match_info["id"]
+
+    try:
+        token = request.query["token"]
+    except KeyError:
+        try:
+            formdata = await request.post()
+            token = formdata["token"]
+        except KeyError:
+            raise aiohttp.web.HTTPBadRequest(
+                reason="No token present"
+            )
+
+    try:
+        await request.app["db_conn"].add_token(
+            project,
+            token,
+            identifier
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
+
+    return aiohttp.web.Response(status=200)
+
+
+async def handle_user_delete_token(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Delete a token from the user."""
+    project = request.match_info["project"]
+    identifier = request.match_info["id"]
+
+    try:
+        await request.app["db_conn"].revoke_token(
+            project,
+            identifier
+        )
+    except InterfaceError:
+        handle_dropped_connection(request)
+
+    return aiohttp.web.Response(status=200)
+
+
+async def handle_user_list_tokens(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Get project token listing."""
+    project = request.match_info["project"]
+
+    try:
+        tokens = await request.app["db_conn"].get_tokens(project)
+    except InterfaceError:
+        handle_dropped_connection(request)
+
+    # Return only the identifiers
+    return aiohttp.web.json_response([
+        rec["identifier"]
+        for rec in tokens
+    ])
