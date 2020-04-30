@@ -173,26 +173,6 @@ class DBConn:
         )
         return list(query)
 
-    async def check_token(
-            self,
-            token_owner: str,
-            token: str
-    ) -> bool:
-        """Check a token against tokens created by the project."""
-        query = await self.conn.execute(
-            """
-            SELECT *
-            FROM Tokens
-            WHERE
-                token_owner = $1 AND
-                token = $2
-            ;
-            """,
-            token_owner,
-            token
-        )
-        return len(list(query)) > 0
-
     async def revoke_token(
             self,
             token_owner: str,
