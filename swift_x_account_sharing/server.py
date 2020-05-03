@@ -18,6 +18,9 @@ from .api import (
     share_container_handler,
     delete_share_handler,
     edit_share_handler,
+    handle_user_add_token,
+    handle_user_delete_token,
+    handle_user_list_tokens,
 )
 from .db import DBConn
 from .middleware import (
@@ -74,9 +77,18 @@ async def init_server() -> aiohttp.web.Application:
         aiohttp.web.post("/share/{owner}/{container}",
                          share_container_handler),
         aiohttp.web.patch("/share/{owner}/{contanier}", edit_share_handler),
-        aiohttp.web.delete("/share/{owner}/{container}", delete_share_handler),
+        aiohttp.web.delete("/share/{owner}/{container}",
+                           delete_share_handler),
         aiohttp.web.options("/share/{owner}/{container}",
                             handle_delete_preflight),
+    ])
+
+    app.add_routes([
+        aiohttp.web.options("/token/{project}/{id}",
+                            handle_delete_preflight),
+        aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
+        aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
+        aiohttp.web.get("/token/{project}", handle_user_list_tokens),
     ])
 
     app.on_startup.append(resume_on_start)
