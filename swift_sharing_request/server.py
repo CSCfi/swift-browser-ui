@@ -19,6 +19,9 @@ from .api import (
     handle_user_made_request_listing,
     handle_container_request_listing,
     handle_user_share_request_delete,
+    handle_user_add_token,
+    handle_user_delete_token,
+    handle_user_list_tokens
 )
 from .db import DBConn
 from .preflight import handle_delete_preflight
@@ -74,6 +77,14 @@ async def init_server() -> aiohttp.web.Application:
                         handle_user_owned_request_listing),
         aiohttp.web.get("/request/container/{container}",
                         handle_container_request_listing),
+    ])
+
+    app.add_routes([
+        aiohttp.web.options("/token/{project}/{id}",
+                            handle_delete_preflight),
+        aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
+        aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
+        aiohttp.web.get("/token/{project}", handle_user_list_tokens),
     ])
 
     app.on_startup.append(resume_on_start)

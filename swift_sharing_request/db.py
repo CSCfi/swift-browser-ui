@@ -5,6 +5,7 @@ import logging
 import random
 import asyncio
 import os
+import typing
 
 import asyncpg
 
@@ -155,3 +156,62 @@ class DBConn:
                 recipient
             )
         return True
+
+    async def get_tokens(
+            self,
+            token_owner: str
+    ) -> typing.List[dict]:
+        """Get tokens created for a project."""
+        query = await self.conn.fetch(
+            """
+            SELECT *
+            FROM Tokens
+            WHERE token_owner = $1
+            ;
+            """,
+            token_owner
+        )
+        return list(query)
+
+    async def revoke_token(
+            self,
+            token_owner: str,
+            token_identifier: str
+    ):
+        """Remove a token from the database."""
+        async with self.conn.transaction():
+            await self.conn.execute(
+                """
+                DELETE FROM Tokens
+                WHERE
+                    token_owner = $1 AND
+                    identifier = $2
+                ;
+                """,
+                token_owner,
+                token_identifier
+            )
+
+    async def add_token(
+            self,
+            token_owner: str,
+            token: str,
+            identifier: str
+    ):
+        """Add a token to the database."""
+        async with self.conn.transaction():
+            await self.conn.execute(
+                """
+                INSERT INTO Tokens(
+                    token_owner,
+                    token,
+                    identifier
+                ) VALUES (
+                    $1, $2, $3
+                )
+                ;
+                """,
+                token_owner,
+                token,
+                identifier
+            )

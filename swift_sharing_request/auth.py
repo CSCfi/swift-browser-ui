@@ -11,11 +11,23 @@
 import os
 import typing
 import hmac
+import time
+import logging
 
 import aiohttp.web
 
 
-AiohttpHandler = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
+AiohttpHandler = typing.Callable[
+    [aiohttp.web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        aiohttp.web.Response
+    ]
+]
+
+
+LOGGER = logging.getLogger("swift_sharing_request.auth")
 
 
 async def read_in_keys(
@@ -34,8 +46,14 @@ async def test_signature(
         tokens: typing.List[bytes],
         signature: str,
         message: str,
-) -> bool:
+        validity: str,
+):
     """Validate signature against the given tokens."""
+    # Check signature expiration
+    if int(validity) < time.time():
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Signature expired"
+        )
     byte_message = message.encode("utf-8")
     for token in tokens:
         digest = hmac.new(
@@ -65,10 +83,35 @@ async def handle_validate_authentication(
             reason="Query string missing validity or signature."
         )
 
+    project_tokens = []
+    project = None
+    try:
+        project = request.match_info["project"]
+    except KeyError:
+        try:
+            project = request.match_info["user"]
+        except KeyError:
+            try:
+                project = request.query["project"]
+            except KeyError:
+                pass
+    finally:
+        if project:
+            project_tokens = [
+                rec["token"].encode("utf-8")
+                for rec in await request.app["db_conn"].get_tokens(project)
+            ]
+        else:
+            LOGGER.debug(f"No project ID found in request {request}")
+            raise aiohttp.web.HTTPUnauthorized(
+                reason="No project ID in request"
+            )
+
     await test_signature(
-        request.app["tokens"],
+        request.app["tokens"] + project_tokens,
         signature,
-        validity + path
+        validity + path,
+        validity
     )
 
     return await handler(request)
