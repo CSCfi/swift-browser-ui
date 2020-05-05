@@ -41,7 +41,7 @@
           </b-button>
         </p>
         <p class="control">
-          <ACLDiscoverButton />
+          <ACLDiscoverButton @synced="getSharedContainers()" />
         </p>
       </div>
     </div>
