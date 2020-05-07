@@ -39,6 +39,11 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
+      <div class="control is-flex">
+        <b-switch v-model="renderFolders">
+          Render Folders
+        </b-switch>
+      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -228,6 +233,7 @@ export default {
       objects: [],
       selected: undefined,
       isPaginated: true,
+      renderFolders: false,
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
