@@ -107,114 +107,130 @@
           field="last_modified"
           :label="$t('message.table.modified')"
         >
-          {{ getHumanReadableDate(props.row.last_modified) }}
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <span v-else>
+            {{ getHumanReadableDate(props.row.last_modified) }}
+          </span>
         </b-table-column>
         <b-table-column
           sortable
           field="bytes"
           :label="$t('message.table.size')"
         >
-          {{ localHumanReadableSize(props.row.bytes) }}
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <span v-else>
+            {{ localHumanReadableSize(props.row.bytes) }}
+          </span>
         </b-table-column>
         <b-table-column
           field="url"
           label=""
           width="110"
         >
-          <b-button
-            v-if="props.row.bytes < 1073741824"
-            :href="props.row.url"
-            target="_blank"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
-            size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <span v-else>
+            <b-button
+              v-if="props.row.bytes < 1073741824"
+              :href="props.row.url"
+              target="_blank"
+              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+              type="is-primary"
+              outlined
               size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else-if="allowLargeDownloads"
-            :href="props.row.url"
-            target="_blank"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
-            size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
+              tag="a"
+            >
+              <b-icon
+                icon="download"
+                size="is-small"
+              /> {{ $t('message.download') }}
+            </b-button>
+            <b-button
+              v-else-if="allowLargeDownloads"
+              :href="props.row.url"
+              target="_blank"
+              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+              type="is-primary"
+              outlined
               size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else
-            :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
-            size="is-small"
-            tag="a"
-            @click="confirmDownload ()"
-          >
-            <b-icon
-              icon="download"
+              tag="a"
+            >
+              <b-icon
+                icon="download"
+                size="is-small"
+              /> {{ $t('message.download') }}
+            </b-button>
+            <b-button
+              v-else
+              :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
+              type="is-primary"
+              outlined
               size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
+              tag="a"
+              @click="confirmDownload ()"
+            >
+              <b-icon
+                icon="download"
+                size="is-small"
+              /> {{ $t('message.download') }}
+            </b-button>
+          </span>
         </b-table-column>
       </template>
       <template
         slot="detail"
         slot-scope="props"
       >
-        <ul>
-          <li>
-            <b>{{ $t('message.table.fileHash') }}: </b>{{ props.row.hash }}
-          </li>
-          <li>
-            <b>{{ $t('message.table.fileType') }}: </b>
+        <span v-if="renderFolders && !isFile(props.row.name)">
+          No details for folders
+        </span>
+        <span v-else>
+          <ul>
+            <li>
+              <b>{{ $t('message.table.fileHash') }}: </b>{{ props.row.hash }}
+            </li>
+            <li>
+              <b>{{ $t('message.table.fileType') }}: </b>
+              {{ props.row.content_type }} 
             {{ props.row.content_type }} 
-          </li>
-          <li>
-            <b>{{ $t('message.table.fileDown') }}: </b>
-            <a
-              v-if="props.row.bytes < 1073741824"
-              :href="props.row.url"
-              target="_blank"
-              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            >
-              <b-icon
-                icon="download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-            <a
-              v-else-if="allowLargeDownloads"
-              :href="props.row.url"
-              target="_blank"
-              :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            >
-              <b-icon
-                icon="download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-            <a
-              v-else
-              :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-              @click="confirmDownload ()"
-            >
-              <b-icon
-                icon="download"
-                size="is-small"
-              /> {{ $t('message.downloadLink') }}
-            </a>
-          </li>
-        </ul>
+              {{ props.row.content_type }} 
+            </li>
+            <li>
+              <b>{{ $t('message.table.fileDown') }}: </b>
+              <a
+                v-if="props.row.bytes < 1073741824"
+                :href="props.row.url"
+                target="_blank"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.downloadLink') }}
+              </a>
+              <a
+                v-else-if="allowLargeDownloads"
+                :href="props.row.url"
+                target="_blank"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.downloadLink') }}
+              </a>
+              <a
+                v-else
+                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
+                @click="confirmDownload ()"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.downloadLink') }}
+              </a>
+            </li>
+          </ul>
+        </span>
       </template>
       <template slot="empty">
         <p
