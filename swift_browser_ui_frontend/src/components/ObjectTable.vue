@@ -191,8 +191,6 @@
             <li>
               <b>{{ $t('message.table.fileType') }}: </b>
               {{ props.row.content_type }} 
-            {{ props.row.content_type }} 
-              {{ props.row.content_type }} 
             </li>
             <li>
               <b>{{ $t('message.table.fileDown') }}: </b>
@@ -438,11 +436,22 @@ export default {
       return dateVal.toLocaleDateString(langLocale, options, zone);
     },
     getFolderContents: function () {
-      // Get folderized view of the objects
+      // Get folderized list of the objects
       let pre_re = new RegExp(this.getPrefix());
-      this.oList = this.objects.filter(
+      let tmpList = this.objects.filter(
         element => element.name.match(pre_re),
       );
+      let retList = [];
+      for (let obj of tmpList) {
+        for (let i of retList) {
+          if (!(
+            this.getFolderName(i.name).match(this.getFolderName(obj.name))
+          )) {
+            retList.push(obj);
+          }
+        }
+      }
+      this.oList = retList;
     },
     getPrefix: function () {
       // Get current pseudofolder prefix
