@@ -83,13 +83,16 @@
         <!-- Alt name column for case pseudo folders enabled  -->
         <b-table-column
           v-if="renderFolders && !isFile(props.row.name)"
+          sortable
+          field="name"
+          :label="$t('message.table.name')"
         >
           <b>{{ getFolderName(props.row.name) }}</b>
         </b-table-column>
         <b-table-column
           v-else-if="renderFolders"
         >
-          {{ props.row.name.replcae(getPrefix(), '') }}
+          {{ props.row.name.replace(getPrefix(), '') }}
         </b-table-column>
         <b-table-column
           v-else
