@@ -75,6 +75,9 @@
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
       @page-change="( page ) => addPageToURL( page )"
+      @dblclick="(row) => {if (renderFolders) {changeFolder(
+        getFolderName(row.name)
+      )}}"
     >
       <template slot-scope="props">
         <!-- Alt name column for case pseudo folders enabled  -->
