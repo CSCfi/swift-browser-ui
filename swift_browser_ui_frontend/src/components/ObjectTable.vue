@@ -463,7 +463,7 @@ export default {
     changeFolder: function (folder) {
       // Change currently displayed pseudofolder
       if (this.$route.name == "SharedObjects") {
-        this.$route.push({
+        this.$router.push({
           name: "SharedObjects",
           params: {
             project: this.$route.params.project,
@@ -476,7 +476,7 @@ export default {
           },
         });
       } else {
-        this.$route.push({
+        this.$router.push({
           name: "Objects",
           params: {
             project: this.$route.params.project,
