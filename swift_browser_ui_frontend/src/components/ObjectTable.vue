@@ -503,9 +503,15 @@ export default {
     },
     filter: function () {
       let name_re = new RegExp(this.searchQuery, "i");
-      this.oList = this.objects.filter(
-        element => element.name.match(name_re),
-      );
+      if (this.renderFolders) {
+        this.oList = this.getObjects().filter(
+          element => element.name.match(name_re)
+        );
+      } else {
+        this.oList = this.objects.filter(
+          element => element.name.match(name_re),
+        );
+      }
     },
   },
 };
