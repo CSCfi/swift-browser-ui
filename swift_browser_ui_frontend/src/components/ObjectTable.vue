@@ -91,6 +91,9 @@
         </b-table-column>
         <b-table-column
           v-else-if="renderFolders"
+          sortable
+          field="name"
+          :label="$t('message.table.name')"
         >
           {{ props.row.name.replace(getPrefix(), '') }}
         </b-table-column>
