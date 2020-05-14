@@ -278,10 +278,10 @@ export default {
       this.debounceFilter();
     },
     objects: function () {
-      if (!this.renderFolders) {
-        this.oList = this.objects;
-      } else {
+      if (this.renderFolders) {
         this.oList = this.getFolderContents();
+      } else {
+        this.oList = this.objects;
       }
     },
     renderFolders: function () {
@@ -438,20 +438,25 @@ export default {
     getFolderContents: function () {
       // Get folderized list of the objects
       let pre_re = new RegExp(this.getPrefix());
+
       let tmpList = this.objects.filter(
-        element => element.name.match(pre_re),
+        el => el.name.match(pre_re),
       );
+
       let retList = [];
-      for (let obj of tmpList) {
+
+      tmpList.forEach(element => {
         for (let i of retList) {
-          if (!(
-            this.getFolderName(i.name).match(this.getFolderName(obj.name))
+          if (this.getFolderName(i.name).match(
+            this.getFolderName(element.name),
           )) {
-            retList.push(obj);
+            return;
           }
         }
-      }
-      this.oList = retList;
+        retList.push(element);
+      });
+
+      return retList;
     },
     getPrefix: function () {
       // Get current pseudofolder prefix
@@ -490,7 +495,7 @@ export default {
         });
       }
 
-      this.getFolderContents();
+      this.oList = this.getFolderContents();
     },
     getFolderName: function (path) {
       // Get the name of the currently displayed pseudofolder
@@ -504,7 +509,7 @@ export default {
     filter: function () {
       let name_re = new RegExp(this.searchQuery, "i");
       if (this.renderFolders) {
-        this.oList = this.getObjects().filter(
+        this.oList = this.getFolderContents().filter(
           element => element.name.match(name_re),
         );
       } else {
