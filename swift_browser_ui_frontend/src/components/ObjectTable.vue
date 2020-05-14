@@ -279,6 +279,9 @@ export default {
     prefix () {
       return this.$route.query.prefix || "";
     },
+    queryPage () {
+      return this.$route.query.page || 1;
+    },
   },
   watch: {
     searchQuery: function () {
@@ -303,6 +306,9 @@ export default {
       if (this.renderFolders) {
         this.oList = this.getFolderContents();
       }
+    },
+    queryPage: function () {
+      this.currentPage = this.queryPage;
     },
   },
   created: function () {
