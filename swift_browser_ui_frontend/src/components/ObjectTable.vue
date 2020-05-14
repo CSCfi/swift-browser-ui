@@ -275,6 +275,11 @@ export default {
       currentPage: 1,
     };
   },
+  computed: {
+    prefix () {
+      return this.$route.query.prefix || "";
+    },
+  },
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -292,6 +297,11 @@ export default {
         this.oList = this.getFolderContents();
       } else {
         this.oList = this.objects;
+      }
+    },
+    prefix: function () {
+      if (this.renderFolders) {
+        this.oList = this.getFolderContents();
       }
     },
   },
