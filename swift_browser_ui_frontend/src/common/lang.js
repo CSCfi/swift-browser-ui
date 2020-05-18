@@ -38,6 +38,7 @@ const translations = {
         fileDown: "File Download",
         owner: "Container owner",
         created: "Created",
+        folderDetails: "No details for folders",
       },
       discover: {
         sync_shares: "Synchronize shared containers",
@@ -148,6 +149,7 @@ const translations = {
       copy: " Copy",
       copysuccess: "Started copying the container in the background",
       copyfail: "Failed to copy the container",
+      renderFolders: "Render as Folders",
       replicate: {
         destinationLabel: "Destination container",
         destinationMessage: "Insert copy destination container here",
@@ -199,6 +201,7 @@ const translations = {
         fileDown: "Tiedoston lataus",
         owner: "Säiliön omistaja",
         created: "Luotu",
+        folderDetails: "Ei yksityiskohtia kansioille",
       },
       discover: {
         sync_shares: "Synkronoi jaetut säiliöt",
@@ -309,6 +312,7 @@ const translations = {
       copy: " Kopioi",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
+      renderFolders: "Näytä kansioina",
       replicate: {
         destinationLabel: "Kohdesäiliö",
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",

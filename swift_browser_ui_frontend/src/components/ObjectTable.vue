@@ -38,7 +38,7 @@
       </div>
       <div class="control is-flex">
         <b-switch v-model="renderFolders">
-          Render Folders
+          {{ $t('message.renderFolders') }}
         </b-switch>
       </div>
       <b-field class="control searchBox">
@@ -87,7 +87,10 @@
           field="name"
           :label="$t('message.table.name')"
         >
-          <b>{{ getFolderName(props.row.name) }}</b>
+          <b-icon
+            icon="folder"
+            size="is-small"
+          /> <b>{{ getFolderName(props.row.name) }}</b>
         </b-table-column>
         <b-table-column
           v-else-if="renderFolders"
@@ -184,7 +187,7 @@
         slot-scope="props"
       >
         <span v-if="renderFolders && !isFile(props.row.name)">
-          No details for folders
+          {{ $t('message.table.folderDetails') }}
         </span>
         <span v-else>
           <ul>
