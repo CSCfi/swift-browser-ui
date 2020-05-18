@@ -75,7 +75,22 @@
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
       @page-change="( page ) => addPageToURL( page )"
-      @dblclick="(row) => {if (renderFolders) {changeFolder(
+      @dblclick="(row) => {if (
+        renderFolders &&
+        !isFile(row.name)
+      ) {changeFolder(
+        getFolderName(row.name)
+      )}}"
+      @keyup.native.enter="(row) => {if (
+        renderFolders &&
+        !isFile(row.name)
+      ) {changeFolder(
+        getFolderName(row.name)
+      )}}"
+      @keyup.native.space="(row) => {if (
+        renderFolders &&
+        !isFile(row.name)
+      ) {changeFolder(
         getFolderName(row.name)
       )}}"
     >
