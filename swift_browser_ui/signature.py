@@ -81,11 +81,13 @@ async def handle_ext_token_create(
     )
 
     if resp_sharing.status != 200 or resp_request.status != 200:
+        resp_sharing_text = await resp_sharing.text()
+        resp_request_text = await resp_request.text()
         LOGGER.debug(f"""\
         Sharing failed with status {resp_sharing.status}
-        {await resp_sharing.text()}{resp_sharing.url}
+        {resp_sharing_text}{resp_sharing.url}
         Request failed with status {resp_request.status}
-        {await resp_request.text()}{resp_request.url}\
+        {resp_request_text}{resp_request.url}\
         """)
         raise aiohttp.web.HTTPInternalServerError(
             reason="Token creation failed"
