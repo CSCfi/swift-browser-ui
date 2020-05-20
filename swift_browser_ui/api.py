@@ -9,9 +9,7 @@ from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
 from ._convenience import api_check, initiate_os_service, get_tempurl_key
-from ._convenience import open_upload_runner_session
-
-from .signature import sign
+from ._convenience import open_upload_runner_session, sign
 
 from .settings import setd
 
