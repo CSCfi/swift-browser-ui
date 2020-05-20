@@ -196,7 +196,7 @@ async def handle_form_post_signature(
 ) -> aiohttp.web.Response:
     """Handle call for a form signature."""
     session = api_check(request)
-    request.app['Log'].info(
+    LOGGER.info(
         'API call for download object from %s, sess. %s',
         request.remote,
         session
@@ -210,7 +210,7 @@ async def handle_form_post_signature(
         serv,
         # container
     )
-    request.app['Log'].debug(
+    LOGGER.debug(
         "Using %s as temporary URL key.", temp_url_key
     )
 
