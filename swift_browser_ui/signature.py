@@ -88,7 +88,7 @@ async def handle_ext_token_create(
         {await resp_request.text()}{resp_request.url}\
         """)
         raise aiohttp.web.HTTPInternalServerError(
-            reason=f"""Token creation failed"""
+            reason="Token creation failed"
         )
 
     resp = aiohttp.web.json_response(
