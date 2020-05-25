@@ -1,6 +1,6 @@
 <template>
   <div class="contents">
-    <div style="width: 90%;margin-left: 5%; margin-right: 5%;">
+    <div class="tokenContents">
       <b-field grouped>
         <b-field
           horizontal
@@ -39,13 +39,13 @@
     </div>
     <div
       v-if="latest"
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
+      class="tokenContents"
     >
       <b>Latest token: </b> {{ latest }}
     </div>
     <b-table
+      class="tokenContents"
       narrowed
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="identifier"
       :data="tokens"
       :selected.sync="selected"
@@ -91,11 +91,27 @@
         </b-table-column>
       </template>
       <template slot="empty">
-        {{ $t('message.tokens.empty') }}
+        <span class="emptyContents">
+          {{ $t('message.tokens.empty') }}
+        </span>
       </template>
     </b-table>
   </div>
 </template>
+
+<style scoped>
+.tokenContents {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.emptyContents {
+  width: 100%;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>
 
 <script>
 import {

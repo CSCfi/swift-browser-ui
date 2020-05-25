@@ -50,10 +50,10 @@
       </div>
     </b-field>
     <b-table
+      class="containerTable"
       focusable
       hoverable
       narrowed
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="name"
       :data="bList"
       :selected.sync="selected"
@@ -174,15 +174,26 @@
         </b-table-column>
       </template>
       <template slot="empty">
-        <p
-          style="text-align:center;margin-top:5%;margin-bottom:5%;"
-        >
+        <p class="emptyTable">
           {{ $t('message.emptyProject') }}
         </p>
       </template>
     </b-table>
   </div>
 </template>
+
+<style scoped>
+.containerTable {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>
 
 <script>
 import { getHumanReadableSize } from "@/common/conv";
