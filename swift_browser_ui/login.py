@@ -28,7 +28,11 @@ async def handle_login(
 
     # Add a cookie for navigating
     if "navto" in request.query.keys():
-        response.set_cookie("NAV_TO", request.query["navto"], expires=3600)
+        response.set_cookie(
+            "NAV_TO",
+            request.query["navto"],
+            expires=str(3600)
+        )
 
     response.headers['Location'] = "/login/front"
 
@@ -40,7 +44,7 @@ async def sso_query_begin(_) -> aiohttp.web.Response:
     # Return the form based login page if the service isn't trusted
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
-            setd['static_directory'] + '/login.html'
+            str(setd['static_directory']) + '/login.html'
         )
         return disable_cache(response)
 
@@ -142,7 +146,7 @@ async def sso_query_end(
         value=cookie_crypted,
         max_age=3600,
     )
-    request.app['Sessions'].append(session)
+    request.app['Sessions'].add(session)
     # Initiate the credential dictionary
     request.app['Creds'][session] = {}
 

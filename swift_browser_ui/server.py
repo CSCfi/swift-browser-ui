@@ -5,10 +5,9 @@ import logging
 import time
 import sys
 import asyncio
-import hashlib
-import os
 import ssl
 import typing
+import secrets
 
 import uvloop
 import cryptography.fernet
@@ -121,12 +120,12 @@ async def servinit() -> aiohttp.web.Application:
     # Create a signature salt to prevent editing the signature on the client
     # side. Hash function doesn't need to be cryptographically secure, it's
     # just a convenient way of getting ascii output from byte values.
-    app['Salt'] = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
+    app['Salt'] = secrets.token_hex(64)
     # Set application specific logging
     app['Log'] = logging.getLogger('swift-browser-ui')
     app['Log'].info('Set up logging for the swift-browser-ui application')
-    # Session list to quickly validate sessions
-    app['Sessions'] = []
+    # Session set to quickly validate sessions
+    app['Sessions'] = set({})
     # Cookie keyed dictionary to store session data
     app['Creds'] = {}
 
