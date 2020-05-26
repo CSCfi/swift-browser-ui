@@ -6,8 +6,8 @@ API, cache manipulation, cookies etc.
 """
 
 
-from hashlib import sha256, md5
-from os import urandom
+import secrets
+from hashlib import sha256
 import json
 import logging
 import urllib.request
@@ -129,11 +129,14 @@ def check_csrf(
     # Throw if the cookie signature doesn't match (meaning the referer might
     # have been changed without setting the signature)
     if (
-            sha256((cookie["id"] +
-                    cookie["referer"] +
-                    request.app["Salt"])
-                   .encode('utf-8'))
-            .hexdigest() != cookie["signature"]
+            not secrets.compare_digest(
+                sha256((cookie["id"] +
+                        cookie["referer"] +
+                        request.app["Salt"])
+                       .encode('utf-8'))
+                .hexdigest(),
+                cookie["signature"]
+            )
     ):
         request.app["Log"].info(
             "Throw due to invalid referer: {0}".format(
@@ -226,7 +229,7 @@ def generate_cookie(
     Returns a tuple containing both the unencrypted and encrypted cookie.
     """
     cookie = {
-        "id": sha256(urandom(512)).hexdigest(),
+        "id": secrets.token_hex(64),
         "referer": None,
         "signature": None,
     }
@@ -357,7 +360,7 @@ async def get_tempurl_key(
             temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
         # If key headers don't exist, generate a new temporary URL key
         except KeyError:
-            temp_url_key = md5(urandom(128)).hexdigest()  # nosec
+            temp_url_key = secrets.token_hex(64)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
             retval = connection.post(options=meta_options)
             if not retval['success']:
@@ -381,7 +384,7 @@ async def get_container_tempurl_key(
             temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key-2']
         # If key headers don't exist generate a new temporary URL key
         except KeyError:
-            temp_cont_key = md5(urandom(128)).hexdigest()  # nosec
+            temp_cont_key = secrets.token_hex(64)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_cont_key}']}
             retval = connection.post(
                 container=container,
