@@ -64,8 +64,14 @@ setd = {
     "sharing_endpoint": environ.get(
         "BROWSER_START_SHARING_ENDPOINT_URL", None
     ),
+    "sharing_internal_endpoint": environ.get(
+        "BROWSER_START_SHARING_INT_ENDPOINT_URL", None
+    ),
     "request_endpoint": environ.get(
         "BROWSER_START_REQUEST_ENDPOINT_URL", None
+    ),
+    "request_internal_endpoint": environ.get(
+        "BROWSER_START_REQUEST_INT_ENDPOINT_URL", None
     ),
     "upload_internal_endpoint": environ.get(
         "BROWSER_START_RUNNER_ENDPOINT", None

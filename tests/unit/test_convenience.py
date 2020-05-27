@@ -87,7 +87,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         """
         req = get_request_with_fernet()
         _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-        req.app['Sessions'] = []
+        req.app['Sessions'] = set({})
         with self.assertRaises(HTTPUnauthorized):
             session_check(req)
 
@@ -103,7 +103,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         req.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, req.app)
 
-        req.app['Sessions'].append(cookie["id"])
+        req.app['Sessions'].add(cookie["id"])
         self.assertTrue(session_check(req) is None)
 
     # The api_check session check function testing – Might seem unnecessary,
@@ -114,7 +114,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         """Test raise if there's no session cookie."""
         testreq = get_request_with_fernet()
         _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-        testreq.app['Sessions'] = []
+        testreq.app['Sessions'] = set({})
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -122,7 +122,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         """Test raise if there's an invalid session cookie."""
         testreq = get_request_with_fernet()
         _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-        testreq.app['Sessions'] = []
+        testreq.app['Sessions'] = set({})
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -143,7 +143,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = [session]
+        testreq.app['Sessions'] = {session}
         testreq.app['Creds'][session] = {}
         testreq.app['Creds'][session]['Avail'] = "placeholder"
         testreq.app['Creds'][session]['OS_sess'] = "placeholder"
@@ -157,7 +157,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = [session]
+        testreq.app['Sessions'] = {session}
         testreq.app['Creds'][session] = {}
         testreq.app['Creds'][session]['ST_conn'] = "placeholder"
         testreq.app['Creds'][session]['Avail'] = "placeholder"
@@ -172,7 +172,7 @@ class TestConvenienceFunctions(unittest.TestCase):
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
         testreq.app['Creds'][session] = {}
-        testreq.app['Sessions'] = [session]
+        testreq.app['Sessions'] = {session}
         testreq.app['Creds'][session]['ST_conn'] = "placeholder"
         testreq.app['Creds'][session]['OS_sess'] = "placeholder"
         with self.assertRaises(HTTPUnauthorized):
@@ -185,7 +185,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = [session]
+        testreq.app['Sessions'] = {session}
         testreq.app['Creds'][session] = {}
         testreq.app['Creds'][session]['Avail'] = "placeholder"
         testreq.app['Creds'][session]['OS_sess'] = "placeholder"

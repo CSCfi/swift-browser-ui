@@ -116,6 +116,32 @@
         </div>
       </div>
     </div>
+    <div class="tile is-ancestor">
+      <div class="tile is-parent is-horizontal is-12">
+        <div class="tile is-child is-12 box">
+          <p class="title is-size-5">
+            {{ $t('message.dashboard.resources') }}
+          </p>
+          <div class="field has-addons">
+            <p class="control">
+              <b-button
+                class="control"
+                type="is-primary"
+                outlined
+                @click="$router.push({
+                  name: 'Tokens',
+                  params: {
+                    project: $store.state.active.id
+                  }
+                })"
+              >
+                {{ $t('message.dashboard.tokens') }}
+              </b-button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

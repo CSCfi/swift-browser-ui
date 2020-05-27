@@ -2,9 +2,9 @@
   <div id="shared-tabs">
     <b-tabs
       v-model="activeTab"
+      class="sharedTab"
       type="is-toggle"
       expanded
-      style="width:90%;margin-left:5%;margin-right:5%;"
     >
       <b-tab-item
         :label="$t('message.share.to_me')"
@@ -26,6 +26,14 @@
     </b-tabs>
   </div>
 </template>
+
+<style scoped>
+.sharedTab {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+</style>
 
 <script>
 // Import table for the containers shared to the querying user

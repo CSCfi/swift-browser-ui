@@ -138,8 +138,15 @@ export async function getProjectMeta () {
     .then( function ( json_ret ) {
       let newRet = json_ret;
       newRet["Size"] = getHumanReadableSize(newRet["Bytes"]);
-      newRet["Billed"] = parseFloat(newRet["Bytes"] / 1099511627776 * 3.5)
-        .toPrecision(4);
+      // we check if it is greather than 0.4Mib if not we display with 10
+      // decimal points
+      if (newRet["Bytes"] > 400000) {
+        newRet["Billed"] = parseFloat(newRet["Bytes"] / 1099511627776 * 3.5)
+          .toPrecision(4);
+      } else {
+        newRet["Billed"] = parseFloat(newRet["Bytes"] / 1099511627776 * 3.5)
+          .toFixed(10);
+      }
       return newRet;
     });
   return ret;
@@ -255,4 +262,61 @@ export async function swiftCopyContainer (
   }
 
   return ret;
+}
+
+
+export async function createExtToken (
+  id,
+) {
+  // Tell backend to create a new project scoped API token
+
+  let fetchURL = new URL ( "/token/".concat(
+    id,
+  ), document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "GET", credentials: "same-origin" },
+  );
+
+  if (ret.status != 201) {
+    throw new Error("Token creation failed");
+  }
+
+  return ret.json();
+}
+
+
+export async function listTokens () {
+  // Get all tokens created for the project by id
+
+  let fetchURL = new URL ( "/token", document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "GET", credentials: "same-origin" },
+  );
+
+  if (ret.status != 200) {
+    throw new Error("Token listing fetch failed");
+  }
+
+  return ret.json();
+}
+
+
+export async function removeToken (
+  id,
+) {
+  // Tell backend to delete API tokens matching the ID
+
+  let fetchURL = new URL ("/token/".concat(
+    id,
+  ), document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "DELETE", credentials: "same-origin" },
+  );
+
+  if (ret.status != 204) {
+    throw new Error("Token deletion failed");
+  }
 }

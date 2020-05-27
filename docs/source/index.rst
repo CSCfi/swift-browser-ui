@@ -14,6 +14,7 @@ endpoints provided by `OpenStack Keystone <https://docs.openstack.org/keystone/l
 Out of the box the ``swift-browser-ui`` offers:
 
 * UI for browsing `SWIFT objects <https://docs.openstack.org/swift/latest/>`_;
+* support for additional features like uploading files >5GiB in size;
 * support for federated authentication of an user with their HAKA credentials
   using OpenStack Keystone;
 * UI based on `Vue.js <https://vuejs.org/>`_ with `Buefy framework <https://buefy.org/documentation>`_;
@@ -24,14 +25,17 @@ Out of the box the ``swift-browser-ui`` offers:
    :maxdepth: 2
    :caption: Contents:
 
-    Setup Instructions       <instructions>
-    Usage & Examples         <usage>
-    Deployment               <deploy>
-    Architecture             <tech>
-    User Interface           <ui>
-    Python Modules           <code>
-    Testing                  <testing>
-    Tools / Miscellaneous    <tools>
+    Setup Instructions         <instructions>
+    Usage & Examples           <usage>
+    Deployment                 <deploy>
+    Architecture               <tech>
+    User Interface             <ui>
+    Sharing Backend            <sharing>
+    Access Request Backend     <request>
+    Upload, Download and Copy  <runner>
+    Python Modules             <code>
+    Testing                    <testing>
+    Tools / Miscellaneous      <tools>
 
 
 .. note:: ``swift-browser-ui`` and all it sources are released under *MIT License*.

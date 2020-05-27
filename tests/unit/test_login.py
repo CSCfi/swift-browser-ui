@@ -100,7 +100,7 @@ class LoginTestClass(asynctest.TestCase):
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
-            session = req.app['Sessions'][0]
+            session = list(req.app['Sessions'])[0]
             self.assertTrue(req.app['Creds'][session]['Token'] is not None)
             self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
             self.assertEqual(req.app['Creds'][session]['active_project'], {
@@ -148,7 +148,7 @@ class LoginTestClass(asynctest.TestCase):
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
-            session = req.app['Sessions'][0]
+            session = list(req.app['Sessions'])[0]
             self.assertTrue(req.app['Creds'][session]['Token'] is not None)
             self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
             self.assertEqual(req.app['Creds'][session]['active_project'], {
@@ -196,7 +196,7 @@ class LoginTestClass(asynctest.TestCase):
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
-            session = req.app['Sessions'][0]
+            session = list(req.app['Sessions'])[0]
             self.assertTrue(req.app['Creds'][session]['Token'] is not None)
             self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
             self.assertEqual(req.app['Creds'][session]['active_project'], {

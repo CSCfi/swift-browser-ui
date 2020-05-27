@@ -38,6 +38,7 @@ const translations = {
         fileDown: "File Download",
         owner: "Container owner",
         created: "Created",
+        folderDetails: "No details for folders",
       },
       discover: {
         sync_shares: "Synchronize shared containers",
@@ -70,6 +71,8 @@ const translations = {
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",
+        resources: "Resources",
+        tokens: "Tokens",
       },
       share: {
         share: "Share",
@@ -148,10 +151,26 @@ const translations = {
       copy: " Copy",
       copysuccess: "Started copying the container in the background",
       copyfail: "Failed to copy the container",
+      renderFolders: "Render as Folders",
       replicate: {
         destinationLabel: "Destination container",
         destinationMessage: "Insert copy destination container here",
         destinationExists: " Destination already exists",
+      },
+      tokens: {
+        empty: "No API tokens created for the project",
+        identifier: "Identifier",
+        revoke: "Revoke",
+        identLabel: "New token identifier",
+        identMessage: "Insert new token identifier here",
+        createToken: "Create token",
+        latestToken: "Latest token: ",
+        copyToken: "The token will be displayed just this once after its " +
+                   "creation, and recovering it will not be possible " +
+                   "afterwards. Please make sure that you have stored " +
+                   "the token somewhere before navigating away from the " +
+                   "token page.",
+        tokenCopied: "Token copied.",
       },
     },
   },
@@ -191,6 +210,7 @@ const translations = {
         fileDown: "Tiedoston lataus",
         owner: "Säiliön omistaja",
         created: "Luotu",
+        folderDetails: "Ei yksityiskohtia kansioille",
       },
       discover: {
         sync_shares: "Synkronoi jaetut säiliöt",
@@ -224,6 +244,8 @@ const translations = {
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",
+        resources: "Resurssit",
+        tokens: "Avaimet",
       },
       share: {
         share: "Jaa",
@@ -301,10 +323,25 @@ const translations = {
       copy: " Kopioi",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
+      renderFolders: "Näytä kansioina",
       replicate: {
         destinationLabel: "Kohdesäiliö",
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
         destinationExists: " Kohdesäililö on jo olemassa",
+      },
+      tokens: {
+        empty: "Projektille ei ole luotu API-avaimia",
+        identifier: "Tunniste",
+        revoke: "Mitätöi",
+        identLabel: "Uuden avaimen tunniste",
+        identMessage: "Syötä tunniste uudelle API-avaimelle",
+        createToken: "Luo avain",
+        latestToken: "Viimeisin avain: ",
+        copyToken: "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
+                   "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
+                   "Varmistathan ottaneesi avaimen talteen ennen " +
+                   "navigointia pois sivulta.",
+        tokenCopied: "Avain kopioitu.",
       },
     },
   },

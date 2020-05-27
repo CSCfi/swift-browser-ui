@@ -28,7 +28,7 @@ copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
 # The full version, including alpha/beta/rc tags
-version = release = '1.0.0rc1'
+version = release = '1.0.0rc2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -46,6 +46,8 @@ extensions = ['sphinx.ext.autodoc',
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+linkcheck_ignore = [r'https://editor.swagger.io/']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

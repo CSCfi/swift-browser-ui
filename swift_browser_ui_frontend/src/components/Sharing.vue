@@ -1,8 +1,8 @@
 <template>
   <form action="">
     <div
+      id="sharingMenu"
       class="modal-card"
-      style="width: auto;"
     >
       <header class="modal-card-head">
         <p class="modal-card-title">
@@ -48,6 +48,12 @@
     </div>
   </form>
 </template>
+
+<style scoped>
+#sharingMenu {
+  width: auto;
+}
+</style>
 
 <script>
 export default {

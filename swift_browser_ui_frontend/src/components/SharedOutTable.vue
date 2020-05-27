@@ -41,7 +41,7 @@
           </b-button>
         </p>
         <p class="control">
-          <ACLDiscoverButton />
+          <ACLDiscoverButton @synced="getSharedContainers()" />
         </p>
       </div>
     </div>
@@ -113,9 +113,7 @@
         />
       </template>
       <template slot="empty">
-        <p
-          style="text-align:center;margin-top:5%;margin-bottom:5%"
-        >
+        <p class="emptyTable">
           {{ $t('message.emptyShared') }}
         </p>
       </template>
@@ -126,6 +124,11 @@
 <style scoped>
 #shared-out-table {
   width: 100%;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
 }
 </style>
 
