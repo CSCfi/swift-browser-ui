@@ -71,6 +71,8 @@ const translations = {
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",
+        resources: "Resources",
+        tokens: "Tokens",
       },
       share: {
         share: "Share",
@@ -242,6 +244,8 @@ const translations = {
         pouta_accounting: "https://research.csc.fi/pouta-accounting",
         pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
         my_csc: "https://my.csc.fi",
+        resources: "Resurssit",
+        tokens: "Avaimet",
       },
       share: {
         share: "Jaa",

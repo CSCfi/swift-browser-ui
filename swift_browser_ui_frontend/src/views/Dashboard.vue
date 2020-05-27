@@ -120,7 +120,7 @@
       <div class="tile is-parent is-horizontal is-12">
         <div class="tile is-child is-12 box">
           <p class="title is-size-5">
-            Resources
+            {{ $t('message.dashboard.resources') }}
           </p>
           <div class="field has-addons">
             <p class="control">
@@ -135,7 +135,7 @@
                   }
                 })"
               >
-                Tokens
+                {{ $t('message.dashboard.tokens') }}
               </b-button>
             </p>
           </div>
