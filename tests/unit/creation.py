@@ -43,7 +43,7 @@ def encrypt_cookie(cookie, req):
 def get_request_with_fernet():
     """Create a request with a working fernet object."""
     ret = Mock_Request()
-    ret.app['Sessions'] = []
+    ret.app['Sessions'] = set({})
     ret.app['Creds'] = {}
     ret.app['Log'] = logging.getLogger(name="test_logger")
     ret.app['Crypt'] = cryptography.fernet.Fernet(
@@ -66,7 +66,7 @@ def get_request_with_mock_openstack():
     ret.cookies["S3BROW_SESSION"] = ret.app["Crypt"].encrypt(
         json.dumps(cookie).encode('utf-8')
     ).decode('utf-8')
-    ret.app['Sessions'].append(session)
+    ret.app['Sessions'].add(session)
     ret.app['Creds'][session] = {}
     ret.app['Creds'][session]['OS_sess'] = Mock_Session()
     ret.app['Creds'][session]['ST_conn'] = Mock_Service()

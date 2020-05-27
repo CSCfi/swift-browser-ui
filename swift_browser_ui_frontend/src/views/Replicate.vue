@@ -1,7 +1,7 @@
 <template>
   <div
+    id="replicateView"
     class="contents"
-    style="width: 90%;"
   >
     <b-field grouped>
       <b-field
@@ -30,7 +30,7 @@
           </button>
           <span
             v-if="destinationExists"
-            style="margin-top: auto;margin-bottom: auto;"
+            class="forbiddenDestination"
           >
             {{ $t('message.replicate.destinationExists') }}
           </span>
@@ -48,6 +48,13 @@
 </template>
 
 <style scoped>
+.forbiddenDestination {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+#replicateView {
+  width: 90%;
+}
 #destinationButton {
   display: flex;
   justify-content: center;

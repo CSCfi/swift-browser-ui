@@ -60,12 +60,12 @@
       </div>
     </b-field>
     <b-table
+      class="objectTable"
       focusable
       detailed
       hoverable
       narrowed
       header-checkable
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="name"
       :data="oList"
       :selected.sync="selected"
@@ -252,15 +252,28 @@
         </span>
       </template>
       <template slot="empty">
-        <p
-          style="width:100%;text-align:center;margin-top:5%;margin-bottom:5%"
-        >
+        <p class="emptyTable">
           {{ $t('message.emptyContainer') }}
         </p>
       </template>
     </b-table>
   </div>
 </template>
+
+<style scoped>
+.objectTable {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.emptyTable {
+  width: 100%;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>
 
 <script>
 import {

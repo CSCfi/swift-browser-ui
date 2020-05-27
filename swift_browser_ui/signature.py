@@ -3,9 +3,8 @@
 
 import hmac
 import time
-import hashlib
-import os
 import logging
+import secrets
 
 import aiohttp.web
 
@@ -48,7 +47,7 @@ async def handle_ext_token_create(
     LOGGER.debug(f"Creating a scoped API token for {project}")
 
     ident = request.match_info["id"]
-    token = hashlib.sha256(os.urandom(256)).hexdigest()  # nosec
+    token = secrets.token_hex(64)
 
     client: aiohttp.ClientSession = request.app["api_client"]
 

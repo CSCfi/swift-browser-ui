@@ -162,6 +162,13 @@ const translations = {
         identLabel: "New token identifier",
         identMessage: "Insert new token identifier here",
         createToken: "Create token",
+        latestToken: "Latest token: ",
+        copyToken: "The token will be displayed just this once after its " +
+                   "creation, and recovering it will not be possible " +
+                   "afterwards. Please make sure that you have stored " +
+                   "the token somewhere before navigating away from the " +
+                   "token page.",
+        tokenCopied: "Token copied.",
       },
     },
   },
@@ -325,6 +332,12 @@ const translations = {
         identLabel: "Uuden avaimen tunniste",
         identMessage: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
+        latestToken: "Viimeisin avain: ",
+        copyToken: "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
+                   "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
+                   "Varmistathan ottaneesi avaimen talteen ennen " +
+                   "navigointia pois sivulta.",
+        tokenCopied: "Avain kopioitu.",
       },
     },
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="contents">
-    <div style="width: 90%;margin-left: 5%; margin-right: 5%;">
+    <div class="tokenContents">
       <b-field grouped>
         <b-field
           horizontal
@@ -39,13 +39,25 @@
     </div>
     <div
       v-if="latest"
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
+      class="tokenContents"
     >
-      <b>Latest token: </b> {{ latest }}
+      <div class="latestTokenRow">
+        <span>
+          <b>{{ $t('message.tokens.latestToken') }}</b>&nbsp;{{ latest }}&nbsp;
+        </span>
+        <b-button
+          class="copyButton"
+          outlined
+          icon-left="content-copy"
+          @click="copyTokenHex()"
+        >
+          {{ $t('message.copy') }}
+        </b-button>
+      </div>
     </div>
     <b-table
+      class="tokenContents"
       narrowed
-      style="width: 90%;margin-left: 5%; margin-right: 5%;"
       default-sort="identifier"
       :data="tokens"
       :selected.sync="selected"
@@ -91,11 +103,35 @@
         </b-table-column>
       </template>
       <template slot="empty">
-        {{ $t('message.tokens.empty') }}
+        <span class="emptyContents">
+          {{ $t('message.tokens.empty') }}
+        </span>
       </template>
     </b-table>
   </div>
 </template>
+
+<style scoped>
+.tokenContents {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.emptyContents {
+  width: 100%;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+.latestTokenRow {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+.copyButton {
+  margin-left: 1%;
+}
+</style>
 
 <script>
 import {
@@ -128,15 +164,28 @@ export default {
     addToken: function (identifier) {
       createExtToken(identifier).then((ret) => {
         this.latest = ret;
-        this.$buefy.toast.open({
-          message: "Copy the token displayed below identifier field",
+        this.$buefy.notification.open({
+          message: this.$t("message.tokens.copyToken"),
+          duration: 3600000,
           type: "is-success",
+          queue: false,
         });
         this.getTokens();
       });
     },
     tokenExists: function (identifier) {
       return this.tokens.includes(identifier) ? true : false;
+    },
+    copyTokenHex: function () {
+      navigator.clipboard.writeText(
+        this.latest,
+      ).then(() => {
+        this.$buefy.toast.open({
+          message: this.$t("message.tokens.tokenCopied"),
+          type: "is-success",
+          queue: false,
+        });
+      });
     },
   },
 };
