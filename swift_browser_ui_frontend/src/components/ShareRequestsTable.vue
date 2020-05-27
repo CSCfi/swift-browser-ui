@@ -79,9 +79,7 @@
         </b-table-column>
       </template>
       <template slot="empty">
-        <p
-          style="text-align:center;margin-top:5%;margin-bottom:5%"
-        >
+        <p class="empptyTable">
           {{ $t('message.emptyRequested') }}
         </p>
       </template>
@@ -92,6 +90,11 @@
 <style scoped>
 #requested-shares-table {
   margin-top: 20px;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
 }
 </style>
 

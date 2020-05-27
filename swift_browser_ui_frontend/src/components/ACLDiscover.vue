@@ -87,6 +87,7 @@ export default {
           });
         }
         this.isLoading = false;
+        this.$emit("synced");
       });
     },
     checkDuplicate: async function (

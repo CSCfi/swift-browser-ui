@@ -263,3 +263,60 @@ export async function swiftCopyContainer (
 
   return ret;
 }
+
+
+export async function createExtToken (
+  id,
+) {
+  // Tell backend to create a new project scoped API token
+
+  let fetchURL = new URL ( "/token/".concat(
+    id,
+  ), document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "GET", credentials: "same-origin" },
+  );
+
+  if (ret.status != 201) {
+    throw new Error("Token creation failed");
+  }
+
+  return ret.json();
+}
+
+
+export async function listTokens () {
+  // Get all tokens created for the project by id
+
+  let fetchURL = new URL ( "/token", document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "GET", credentials: "same-origin" },
+  );
+
+  if (ret.status != 200) {
+    throw new Error("Token listing fetch failed");
+  }
+
+  return ret.json();
+}
+
+
+export async function removeToken (
+  id,
+) {
+  // Tell backend to delete API tokens matching the ID
+
+  let fetchURL = new URL ("/token/".concat(
+    id,
+  ), document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "DELETE", credentials: "same-origin" },
+  );
+
+  if (ret.status != 204) {
+    throw new Error("Token deletion failed");
+  }
+}

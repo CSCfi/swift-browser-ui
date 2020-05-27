@@ -5,10 +5,9 @@ import logging
 import time
 import sys
 import asyncio
-import hashlib
-import os
 import ssl
 import typing
+import secrets
 
 import uvloop
 import cryptography.fernet
@@ -50,7 +49,12 @@ from .api import (
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
-from .signature import handle_signature_request
+from .signature import (
+    handle_signature_request,
+    handle_ext_token_create,
+    handle_ext_token_list,
+    handle_ext_token_remove,
+)
 from .misc_handlers import handle_bounce_direct_access_request
 
 
@@ -92,14 +96,14 @@ async def open_client_to_app(
         app: aiohttp.web.Application
 ):
     """Open a client session for download proxies."""
-    app['dload_session'] = aiohttp.ClientSession()
+    app['api_client'] = aiohttp.ClientSession()
 
 
 async def kill_dload_client(
         app: aiohttp.web.Application
 ):
     """Kill download proxy client session."""
-    await app['dload_session'].close()
+    await app['api_client'].close()
 
 
 async def servinit() -> aiohttp.web.Application:
@@ -116,12 +120,12 @@ async def servinit() -> aiohttp.web.Application:
     # Create a signature salt to prevent editing the signature on the client
     # side. Hash function doesn't need to be cryptographically secure, it's
     # just a convenient way of getting ascii output from byte values.
-    app['Salt'] = hashlib.md5(os.urandom(128)).hexdigest()  # nosec
+    app['Salt'] = secrets.token_hex(64)
     # Set application specific logging
     app['Log'] = logging.getLogger('swift-browser-ui')
     app['Log'].info('Set up logging for the swift-browser-ui application')
-    # Session list to quickly validate sessions
-    app['Sessions'] = []
+    # Session set to quickly validate sessions
+    app['Sessions'] = set({})
     # Cookie keyed dictionary to store session data
     app['Creds'] = {}
 
@@ -155,6 +159,13 @@ async def servinit() -> aiohttp.web.Application:
     # Add signature endpoint
     app.add_routes([
         aiohttp.web.get('/sign/{valid}', handle_signature_request)
+    ])
+
+    # Add token functionality
+    app.add_routes([
+        aiohttp.web.get('/token/{id}', handle_ext_token_create),
+        aiohttp.web.delete('/token/{id}', handle_ext_token_remove),
+        aiohttp.web.get('/token', handle_ext_token_list),
     ])
 
     # Add api routes

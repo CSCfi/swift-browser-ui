@@ -10,6 +10,7 @@ import SharedFrom from "@/views/SharedFrom";
 import Sharing from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
+import Tokens from "@/views/Tokens";
 
 Vue.use(Router);
 
@@ -50,6 +51,11 @@ export default new Router({
       path: "/browse/replicate/:project/:container",
       name: "ReplicateContainer",
       component: ReplicationView,
+    },
+    {
+      path: "/browse/tokens/:project",
+      name: "Tokens",
+      component: Tokens,
     },
     {
       path: "/browse/:user",
