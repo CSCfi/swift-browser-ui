@@ -38,6 +38,7 @@ async def handle_health_check(
                 str(setd["sharing_internal_endpoint"]) + "/health",
                 params=api_params
         ) as resp:
+            request.app["Log"].debug(resp)
             if resp.status != 200:
                 services["swift-x-account-sharing"] = {
                     "status": "Down",
@@ -60,6 +61,7 @@ async def handle_health_check(
                 str(setd["request_internal_endpoint"]) + "/health",
                 params=api_params
         ) as resp:
+            request.app["Log"].debug(resp)
             if resp.status != 200:
                 services["swift-sharing-request"] = {
                     "status": "Down",
@@ -82,6 +84,7 @@ async def handle_health_check(
                 str(setd["upload_internal_endpoint"]) + "/health",
                 params=api_params
         ) as resp:
+            request.app["Log"].debug(resp)
             if resp.status != 200:
                 services["swiftui-upload-runner"] = {
                     "status": "Down",
