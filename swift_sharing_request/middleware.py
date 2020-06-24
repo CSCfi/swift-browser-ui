@@ -49,6 +49,6 @@ async def catch_uniqueness_error(
     try:
         return await handler(request)
     except UniqueViolationError:
-        raise aiohttp.web.HTTPClientError(
+        raise aiohttp.web.HTTPConflict(
             reason="Duplicate entries are not allowed."
         )
