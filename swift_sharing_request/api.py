@@ -7,6 +7,8 @@ import asyncio
 import aiohttp.web
 from asyncpg import InterfaceError
 
+from .db import DBConn
+
 
 MODULE_LOGGER = logging.getLogger("api")
 
@@ -166,3 +168,25 @@ async def handle_user_list_tokens(
         rec["identifier"]
         for rec in tokens
     ])
+
+
+async def handle_health_check(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Answer a service health check."""
+    # Case degraded
+    if (
+            isinstance(request.app["db_conn"], DBConn)
+            and request.app["db_conn"] is None
+    ):
+        return aiohttp.web.json_response({
+            "status": "Degraded",
+            "degraded": [
+                "database"
+            ]
+        })
+
+    # Case nominal
+    return aiohttp.web.json_response({
+        "status": "Ok",
+    })
