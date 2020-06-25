@@ -2,30 +2,14 @@
 
 
 import logging
-import asyncio
 
 import aiohttp.web
 from asyncpg import InterfaceError
 
+from .db import handle_dropped_connection
+
 
 MODULE_LOGGER = logging.getLogger("api")
-
-
-def handle_dropped_connection(
-        request: aiohttp.web.Request
-):
-    """Handle dropped database connection."""
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Lost database connection, reconnecting..."
-    )
-    request.app["db_conn"].erase()
-    asyncio.ensure_future(
-        request.app["db_conn"].open()
-    )
-    raise aiohttp.web.HTTPServiceUnavailable(
-        reason="No database connection."
-    )
 
 
 async def has_access_handler(
