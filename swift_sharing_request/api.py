@@ -7,8 +7,6 @@ import asyncio
 import aiohttp.web
 from asyncpg import InterfaceError
 
-from .db import DBConn
-
 
 MODULE_LOGGER = logging.getLogger("api")
 
@@ -175,10 +173,15 @@ async def handle_health_check(
 ) -> aiohttp.web.Response:
     """Answer a service health check."""
     # Case degraded
-    if (
-            isinstance(request.app["db_conn"], DBConn)
-            and request.app["db_conn"] is None
-    ):
+    try:
+        if request.app["db_conn"].conn.is_closed():
+            return aiohttp.web.json_response({
+                "status": "Degraded",
+                "degraded": [
+                    "database"
+                ]
+            })
+    except AttributeError:
         return aiohttp.web.json_response({
             "status": "Degraded",
             "degraded": [
