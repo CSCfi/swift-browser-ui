@@ -94,7 +94,7 @@ async def handle_validate_authentication(
             try:
                 project = request.query["project"]
             except KeyError:
-                pass
+                project = None
     finally:
         if project:
             project_tokens = [
@@ -103,9 +103,10 @@ async def handle_validate_authentication(
             ]
         else:
             LOGGER.debug(f"No project ID found in request {request}")
-            raise aiohttp.web.HTTPUnauthorized(
-                reason="No project ID in request"
-            )
+            if request.path != "/health":
+                raise aiohttp.web.HTTPUnauthorized(
+                    reason="No project ID in request"
+                )
 
     await test_signature(
         request.app["tokens"] + project_tokens,

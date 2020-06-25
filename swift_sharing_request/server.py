@@ -66,6 +66,10 @@ async def init_server() -> aiohttp.web.Application:
     app["tokens"] = []
 
     app.add_routes([
+        aiohttp.web.get("/health", handle_health_check),
+    ])
+
+    app.add_routes([
         aiohttp.web.options("/request/user/{user}/{container}",
                             handle_delete_preflight),
         aiohttp.web.post("/request/user/{user}/{container}",
@@ -86,10 +90,6 @@ async def init_server() -> aiohttp.web.Application:
         aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
         aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
         aiohttp.web.get("/token/{project}", handle_user_list_tokens),
-    ])
-
-    app.add_routes([
-        aiohttp.web.get("/health", handle_health_check),
     ])
 
     app.on_startup.append(resume_on_start)
