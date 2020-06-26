@@ -202,7 +202,7 @@ class DBConn:
         """Get the containers shared to the specified user."""
         query = await self.conn.fetch(
             """
-            SELECT container, container_owner
+            SELECT container, container_owner, sharingdate
             FROM Shares
             WHERE recipient = $1
             ;
@@ -213,7 +213,8 @@ class DBConn:
         return [
             {
                 "container": i["container"],
-                "owner": i["container_owner"]
+                "owner": i["container_owner"],
+                "sharingdate": i["sharingdate"]
             }
             for i in query
         ]
