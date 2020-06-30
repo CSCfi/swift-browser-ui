@@ -4,13 +4,48 @@
 import datetime
 import unittest
 from types import SimpleNamespace
+import asyncio
 
 
 import asynctest
 import asyncpg
+import aiohttp.web
 
 
 from swift_sharing_request.db import DBConn
+from swift_sharing_request.db import handle_dropped_connection
+
+
+class APITestClass(asynctest.TestCase):
+    """Test class for testing API functions."""
+
+    def setUp(self):
+        """Set up necessary mocks."""
+        self.mock_request = SimpleNamespace(**{
+            "app": {
+                "db_conn":
+                    SimpleNamespace(**{
+                        "erase": unittest.mock.Mock(),
+                        "open": asynctest.mock.Mock(),
+                    })
+            },
+        })
+
+        self.ensure_future_mock = unittest.mock.MagicMock(
+            asyncio.ensure_future
+        )
+        self.patch_asyncio_ensure_future = unittest.mock.patch(
+            "swift_sharing_request.db.asyncio.ensure_future",
+            new=self.ensure_future_mock
+        )
+
+    async def test_handle_dropped_connection(self):
+        """Test handling dropped connection."""
+        with self.patch_asyncio_ensure_future:
+            with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
+                await handle_dropped_connection(self.mock_request)
+            self.mock_request.app["db_conn"].erase.assert_called_once()
+            self.mock_request.app["db_conn"].open.assert_called_once()
 
 
 class DBConnTestClass(asynctest.TestCase):
