@@ -21,6 +21,7 @@ from .api import (
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
+    handle_health_check,
 )
 from .db import DBConn
 from .middleware import (
@@ -68,6 +69,10 @@ async def init_server() -> aiohttp.web.Application:
     )
 
     app["db_conn"] = DBConn()
+
+    app.add_routes([
+        aiohttp.web.get("/health", handle_health_check),
+    ])
 
     app.add_routes([
         aiohttp.web.get("/access/{user}", has_access_handler),
