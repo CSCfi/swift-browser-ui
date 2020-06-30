@@ -1,7 +1,6 @@
 """Test sharing backend API functions."""
 
 
-import asyncio
 from types import SimpleNamespace
 
 
@@ -14,7 +13,6 @@ from asyncpg import InterfaceError
 
 
 from swift_x_account_sharing.api import (
-    handle_dropped_connection,
     has_access_handler,
     access_details_handler,
     gave_access_handler,
@@ -65,26 +63,6 @@ class APITestClass(asynctest.TestCase):
             "swift_x_account_sharing.api.aiohttp.web.json_response",
             new=self.json_mock
         )
-
-        self.ensure_future_mock = unittest.mock.MagicMock(
-            asyncio.ensure_future
-        )
-        self.patch_asyncio_ensure_future = unittest.mock.patch(
-            "swift_x_account_sharing.api.asyncio.ensure_future",
-            new=self.ensure_future_mock
-        )
-
-    async def test_handle_dropped_connection(self):
-        """Test handling dropped connection."""
-        self.mock_request.app["db_conn"] = SimpleNamespace(**{
-            "erase": unittest.mock.Mock(),
-            "open": asynctest.mock.Mock(),
-        })
-        with self.patch_asyncio_ensure_future:
-            with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
-                await handle_dropped_connection(self.mock_request)
-            self.mock_request.app["db_conn"].erase.assert_called_once()
-            self.mock_request.app["db_conn"].open.assert_called_once()
 
     async def test_endpoint_has_access_correct(self):
         """Test the has-access endpoint for conformity."""

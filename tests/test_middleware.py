@@ -28,7 +28,8 @@ class MiddlewareTestCase(asynctest.TestCase):
             },
             "app": {
                 "db_conn": DBConn()
-            }
+            },
+            "path": "/test"
         })
         self.mock_handler = asynctest.CoroutineMock(
             return_value=aiohttp.web.Response()
