@@ -8,6 +8,27 @@ import os
 import typing
 
 import asyncpg
+import aiohttp.web
+
+
+MODULE_LOGGER = logging.getLogger("db")
+
+
+def handle_dropped_connection(
+        request: aiohttp.web.Request
+):
+    """Handle dropped database connection."""
+    MODULE_LOGGER.log(
+        logging.ERROR,
+        "Lost database connection, reconnecting..."
+    )
+    request.app["db_conn"].erase()
+    asyncio.ensure_future(
+        request.app["db_conn"].open()
+    )
+    raise aiohttp.web.HTTPServiceUnavailable(
+        reason="No database connection."
+    )
 
 
 class DBConn:
@@ -15,7 +36,7 @@ class DBConn:
 
     def __init__(self):
         """."""
-        self.log = logging.getLogger("db")
+        self.log = MODULE_LOGGER
         self.conn = None
 
     async def open(self):

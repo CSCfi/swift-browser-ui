@@ -2,28 +2,15 @@
 
 
 import logging
-import asyncio
 
 import aiohttp.web
 from asyncpg import InterfaceError
 
 
+from .db import handle_dropped_connection
+
+
 MODULE_LOGGER = logging.getLogger("api")
-
-
-def handle_dropped_connection(request):
-    """Handle dropped database connection."""
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Lost database connection, reconnecting..."
-    )
-    request.app["db_conn"].erase()
-    asyncio.ensure_future(
-        request.app["db_conn"].open()
-    )
-    raise aiohttp.web.HTTPServiceUnavailable(
-        reason="No database connection."
-    )
 
 
 async def handle_share_request_post(request):
@@ -166,3 +153,30 @@ async def handle_user_list_tokens(
         rec["identifier"]
         for rec in tokens
     ])
+
+
+async def handle_health_check(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Answer a service health check."""
+    # Case degraded
+    try:
+        if request.app["db_conn"].conn.is_closed():
+            return aiohttp.web.json_response({
+                "status": "Degraded",
+                "degraded": [
+                    "database"
+                ]
+            })
+    except AttributeError:
+        return aiohttp.web.json_response({
+            "status": "Degraded",
+            "degraded": [
+                "database"
+            ]
+        })
+
+    # Case nominal
+    return aiohttp.web.json_response({
+        "status": "Ok",
+    })

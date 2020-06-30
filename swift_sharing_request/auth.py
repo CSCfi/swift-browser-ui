@@ -15,6 +15,9 @@ import time
 import logging
 
 import aiohttp.web
+from asyncpg import InterfaceError
+
+from .db import handle_dropped_connection
 
 
 AiohttpHandler = typing.Callable[
@@ -84,7 +87,6 @@ async def handle_validate_authentication(
         )
 
     project_tokens = []
-    project = None
     try:
         project = request.match_info["project"]
     except KeyError:
@@ -94,18 +96,22 @@ async def handle_validate_authentication(
             try:
                 project = request.query["project"]
             except KeyError:
-                pass
+                project = None
     finally:
         if project:
-            project_tokens = [
-                rec["token"].encode("utf-8")
-                for rec in await request.app["db_conn"].get_tokens(project)
-            ]
+            try:
+                project_tokens = [
+                    rec["token"].encode("utf-8")
+                    for rec in await request.app["db_conn"].get_tokens(project)
+                ]
+            except InterfaceError:
+                handle_dropped_connection(request)
         else:
             LOGGER.debug(f"No project ID found in request {request}")
-            raise aiohttp.web.HTTPUnauthorized(
-                reason="No project ID in request"
-            )
+            if request.path != "/health":
+                raise aiohttp.web.HTTPUnauthorized(
+                    reason="No project ID in request"
+                )
 
     await test_signature(
         request.app["tokens"] + project_tokens,
