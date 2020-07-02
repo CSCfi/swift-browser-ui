@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.7]
-        node: [ '12']
+        node: ['12']
       
     runs-on: ${{ matrix.os }}
 
@@ -31,7 +31,6 @@ jobs:
         pushd swift_browser_ui_frontend
         npm install
         npm run build
-        pushd ..
     - name: Install chrome driver
       run: |
         curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
