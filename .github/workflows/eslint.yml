@@ -1,0 +1,25 @@
+name: Javascript ESLint check
+
+on: [push]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '12', '14' ]
+    name: Node ${{ matrix.node }} eslint check
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: |
+          pushd swift_browser_ui_frontend
+          npm install
+      - name: Run eslint
+        run: npm run lint
+      
