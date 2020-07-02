@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.7]
-        node: [ '12']
+        node: ['12']
       
     runs-on: ${{ matrix.os }}
 
@@ -31,7 +31,6 @@ jobs:
         pushd swift_browser_ui_frontend
         npm install
         npm run build
-        pushd ..
     - name: Install firefox driver
       run: |
         wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
@@ -43,4 +42,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install firefox -y
     - name: Test documentation
-      run: tox -e docs
+      run: |
+        ls -al docs/source/_static
+        tox -e docs

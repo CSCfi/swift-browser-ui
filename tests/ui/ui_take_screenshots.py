@@ -5,6 +5,7 @@ import subprocess  # nosec
 import time
 import os
 import sys
+from pathlib import Path
 
 
 from selenium import webdriver
@@ -25,10 +26,10 @@ class ObjBrowserScreenshot():
         """."""
         self.server_process = None
         self.options = None
-        self.img_dir = (__file__.split('swift-browser-ui')[0] +
-                        'swift-browser-ui/docs/source/_static/images/')
-        if not os.path.exists(self.img_dir):
-            os.mkdir(self.img_dir)
+        folder_path = 'swift-browser-ui/docs/source/_static/images/'
+        self.img_dir = Path(__file__).parent / folder_path
+        if not self.img_dir.exists():
+            self.img_dir.mkdir(parents=True, exist_ok=True)
         self.drv = None
 
     def raise_server(self):
@@ -60,14 +61,14 @@ class TakeScreenshots(ObjBrowserScreenshot):
         """Take screenshot of the development login page."""
         self.drv.get(TEST_ADDRESS)
         time.sleep(0.25)
-        with open(self.img_dir + 'screenshot-login-page', 'wb') as img_f:
+        with open(str(self.img_dir) + 'screenshot-login-page', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_front_page(self):
         """Take screenshot of the front page."""
         get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         time.sleep(0.25)
-        with open(self.img_dir + 'screenshot-front-page', 'wb') as img_f:
+        with open(str(self.img_dir) + 'screenshot-front-page', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_dashboard(self):
@@ -77,7 +78,7 @@ class TakeScreenshots(ObjBrowserScreenshot):
             self.drv.find_element_by_link_text("User information")
         )
         time.sleep(5.0)
-        with open(self.img_dir + 'screenshot-dashboard', 'wb') as img_f:
+        with open(str(self.img_dir) + 'screenshot-dashboard', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_object_page(self):
@@ -85,7 +86,7 @@ class TakeScreenshots(ObjBrowserScreenshot):
         get_nav_to_ui(self.drv, address=TEST_ADDRESS)
         navigate_to_container_with_objects(self.drv)
         time.sleep(0.25)
-        with open(self.img_dir + 'screenshot-object-page', 'wb') as img_f:
+        with open(str(self.img_dir) + 'screenshot-object-page', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
     def screenshot_object_details(self):
@@ -97,7 +98,8 @@ class TakeScreenshots(ObjBrowserScreenshot):
             self.drv.find_element_by_class_name("chevron-cell")
         )
         time.sleep(0.1)
-        with open(self.img_dir + 'screenshot-object-details', 'wb') as img_f:
+        with open(str(self.img_dir) +
+                  'screenshot-object-details', 'wb') as img_f:
             img_f.write(self.drv.get_screenshot_as_png())
 
 
