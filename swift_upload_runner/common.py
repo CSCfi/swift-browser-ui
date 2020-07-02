@@ -56,7 +56,7 @@ def get_session_id(
 def get_auth_instance(
         request: aiohttp.web.Request
 ) -> keystoneauth1.session.Session:
-    """Return the session specific keystone auth instance"""
+    """Return the session specific keystone auth instance."""
     return request.app[get_session_id(request)]["auth"]
 
 

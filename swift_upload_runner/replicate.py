@@ -63,7 +63,7 @@ class ObjectReplicationProxy():
                 break
             yield chunk
             number += 1
-        LOGGER.debug(f"Response stream complete.")
+        LOGGER.debug("Response stream complete.")
 
     async def a_create_container(
             self,

@@ -305,6 +305,7 @@ class ContainerArchiveDownloadProxy:
             container: str,
             chunk_size=128 * 1024
     ):
+        """."""
         self.auth = auth
         self.download_queue: queue.Queue = queue.Queue(
             maxsize=3
@@ -384,9 +385,7 @@ class ContainerArchiveDownloadProxy:
                             [i[1:] for i in dir_contents],
                             get_path_from_list(
                                 [path[0]],
-                                path_prefix
-                            )
-                        )
+                                path_prefix))
                 }
             # Path of == 1 implies a file
             else:
@@ -440,6 +439,7 @@ class ContainerArchiveDownloadProxy:
     def download_init(
             self,
     ):
+        """Create download init."""
         self.download_init_loop(self.fs)
         self.download_queue.put(None)
 
