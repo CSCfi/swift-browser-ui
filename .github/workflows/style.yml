@@ -25,4 +25,4 @@ jobs:
     - name: Test flake8 syntax with tox
       run: tox -e flake8
     - name: bandit static check
-      run: tox -e bandint
+      run: tox -e bandit
