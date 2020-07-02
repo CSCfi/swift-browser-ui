@@ -21,5 +21,7 @@ jobs:
           pushd swift_browser_ui_frontend
           npm install
       - name: Run eslint
-        run: npm run lint
+        run: |
+          pushd swift_browser_ui_frontend
+          npm run lint
       
