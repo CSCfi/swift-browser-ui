@@ -32,15 +32,17 @@ jobs:
         npm install
         npm run build
         pushd ..
-    - name: Install firefox driver
+    - name: Install chrome driver
       run: |
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
-        tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
-        rm geckodriver-v0.24.0-linux64.tar.gz
-        chmod +x geckodriver
-        sudo cp geckodriver /usr/local/bin/
-        geckodriver --version
-        sudo apt-get update
-        sudo apt-get install firefox -y
-    - name: Test UI in Firefox
-      run: tox -e firefox
+        curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
+        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get -y update
+        sudo apt-get -y install google-chrome-stable
+        wget $(echo $(curl https://chromedriver.chromium.org/downloads |grep -o href=\"[^\"]*index\.html\?path.$(google-chrome --version | sed 's/^Google Chrome //g' |grep -o ^[0-9][0-9]\..\.)[^\"]*\" | head -n 1 |sed s/href=\"//g |sed s/\"//g |sed s/index\.html\?path=//g)chromedriver_linux64.zip)
+        unzip chromedriver_linux64.zip
+        rm chromedriver_linux64.zip
+        chmod +x chromedriver
+        sudo cp chromedriver /usr/local/bin/
+        sudo chromedriver --version
+    - name: Test UI in Chrome
+      run: tox -e chrome
