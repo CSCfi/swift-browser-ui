@@ -19,19 +19,19 @@ jobs:
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
       - name: Build the tagged Docker image
         if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-upload-runner:${{steps.vars.outputs.tag}}
+        run: docker build . --file Dockerfile --tag cscfi/swiftui-upload-runner:${{steps.vars.outputs.tag}}
       - name: Push the tagged Docker image
         if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
-        run: docker push cscfi/swift-upload-runner:${{steps.vars.outputs.tag}}
+        run: docker push cscfi/swiftui-upload-runner:${{steps.vars.outputs.tag}}
       - name: Build the latest Docker image
         if:  ${{ steps.vars.outputs.tag == '/master' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-upload-runner:latest
+        run: docker build . --file Dockerfile --tag cscfi/swiftui-upload-runner:latest
       - name: Push the latest Docker image
         if:  ${{ steps.vars.outputs.tag == '/master' }}
-        run: docker push cscfi/swift-upload-runner:latest
+        run: docker push cscfi/swiftui-upload-runner:latest
       - name: Build the stage Docker image
         if:  ${{ steps.vars.outputs.tag == '/devel' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-upload-runner:stage
+        run: docker build . --file Dockerfile --tag cscfi/swiftui-upload-runner:stage
       - name: Push the stage Docker image
         if:  ${{ steps.vars.outputs.tag == '/devel' }}
-        run: docker push cscfi/swift-upload-runner:stage
+        run: docker push cscfi/swiftui-upload-runner:stage
