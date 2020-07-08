@@ -1,0 +1,25 @@
+name: Javascript ESLint check
+
+on: [push]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '12', '14' ]
+    name: Node ${{ matrix.node }} eslint check
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install dependencies
+        run: npm i -g eslint
+      - name: Run eslint
+        run: |
+          pushd bindings/js
+          eslint --no-eslintrc --ext js --env es6,node --parser-options=ecmaVersion:8 --parser-options=sourceType:module swift_sharing_request_bind.js
+      
