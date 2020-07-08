@@ -18,10 +18,10 @@ jobs:
         id: vars
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
       - name: Build the tagged Docker image
-        if:  ${{ steps.vars.outputs.tag != '/master' }}
+        if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
         run: docker build . --file Dockerfile --tag cscfi/swift-upload-runner:${{steps.vars.outputs.tag}}
       - name: Push the tagged Docker image
-        if:  ${{ steps.vars.outputs.tag != '/master' }}
+        if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
         run: docker push cscfi/swift-upload-runner:${{steps.vars.outputs.tag}}
       - name: Build the latest Docker image
         if:  ${{ steps.vars.outputs.tag == '/master' }}
