@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.com/CSCfi/swift-x-account-sharing.svg?branch=master)](https://travis-ci.com/CSCfi/swift-x-account-sharing)
+![Javascript ESLint check](https://github.com/CSCfi/swift-x-account-sharing/workflows/Javascript%20ESLint%20check/badge.svg)
+![Python style check](https://github.com/CSCfi/swift-x-account-sharing/workflows/Python%20style%20check/badge.svg)
+![Python Unit Tests](https://github.com/CSCfi/swift-x-account-sharing/workflows/Python%20Unit%20Tests/badge.svg)
 
 ### swift-x-account-sharing – OS swift container sharing backend
 Openstack Swift Access Control Lists don't natively implement querying
