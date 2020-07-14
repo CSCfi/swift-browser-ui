@@ -38,23 +38,31 @@ Environment Setup
 
 Variables are depicted in the table below:
 
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| Environment variable                   | Default | Description                                                   |  |  |
-+========================================+=========+===============================================================+==+==+
-| ``BROWSER_START_AUTH_ENDPOINT_URL``    |         | URL to use as the authentication backend                      |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``BROWSER_START_PORT``                 | 8080    | Port that the service will listen                             |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``BROWSER_START_SET_ORIGIN_ADDRESS``   |         | Authentication return address to which WebSSO should redirect |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``BROWSER_START_SHARING_ENDPOINT_URL`` |         | URL for the container sharing backend                         |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``BROWSER_START_REQUEST_ENDPOINT_URL`` |         | URL for the shared access request backend                     |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``BROWSER_START_RUNNER_ENDPOINT``      |         | URL for the upload, copy, download runner                     |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
-| ``SWIFT_UI_SHARING_REQUEST_TOKEN``     |         | Token for signing the internal API requests                   |  |  |
-+----------------------------------------+---------+---------------------------------------------------------------+--+--+
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| Environment variable                        | Default | Description                                                   |  |  |
++=============================================+=========+===============================================================+==+==+
+| ``BROWSER_START_AUTH_ENDPOINT_URL``         |         | URL to use as the Openstack authentication backend            |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_PORT``                      | 8080    | Port that the service will listen                             |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_SET_ORIGIN_ADDRESS``        |         | Authentication return address to which WebSSO should redirect |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_HAS_TRUST``                 |         | Flag if the program is listed on the trusted_dashboards       |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_SHARING_ENDPOINT_URL``      |         | external URL for the container sharing backend                |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_REQUEST_ENDPOINT_URL``      |         | external URL for the shared access request backend            |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_RUNNER_ENDPOINT``           |         | internal URL for the upload, copy, download runner            |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``SWIFT_UI_SHARING_REQUEST_TOKEN``          |         | Token for signing the internal sharing & request API requests |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_RUNNER_EXT_ENDPOINT``       |         | external URL for the upload runner service                    |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_SHARING_INT_ENDPOINT_URL``  |         | internal URL / hostname of the sharing API                    |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``BROWSER_START_REQUEST_INT_ENDPOINT_URL``  |         | internal URL / hostname of the request API                    |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
 
 .. hint:: Authentication endpoint can also be specified with any openrc file,
           which can be usually downloaded from Openstack. The setup script
@@ -72,6 +80,7 @@ For the Pouta test environment with NGINX TLS termination proxy in use::
 For the Pouta production environment for testing unsecurely without trust::
 
     export BROWSER_START_AUTH_ENDPOINT_URL="https://pouta.csc.fi:5001/v3"
+    
 
 Setting up TLS termination proxy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
