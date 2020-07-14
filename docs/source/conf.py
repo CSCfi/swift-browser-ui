@@ -78,7 +78,7 @@ html_static_path = ['_static']
 
 def setup(app):
     """Add custom stylesheet."""
-    app.add_stylesheet('style.css')
+    app.add_css_file('style.css')
 
 
 htmlhelp_basename = 'swift-browser-ui'
