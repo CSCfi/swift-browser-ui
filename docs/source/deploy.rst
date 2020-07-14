@@ -40,19 +40,19 @@ way to do this is to use the docker-compose fields provided in the
 The sharing functionality requires the following environment variables to be
 present in order to work:
 
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| Environment variable     | Default      | Required | Description                                                                         |
-+==========================+==============+==========+=====================================================================================+
-| SWIFT_UI_API_AUTH_TOKENS |              | True     | Comma separated list of master tokens that can be used for signing the API requests |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| SHARING_DB_NAME          | swiftsharing |          | Name for the sharing functionality database                                         |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| SHARING_DB_USER          | sharing      |          | User used in connecting to the sharing functionality database                       |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| SHARING_DB_HOST          |              | True     | Sharing functionality database address/hostname                                     |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| SHARING_DB_PASSWORD      |              | True     | Sharing functionality database password                                             |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| Environment variable         | Default      | Required | Description                                                                         |
++==============================+==============+==========+=====================================================================================+
+| ``SWIFT_UI_API_AUTH_TOKENS`` |              | True     | Comma separated list of master tokens that can be used for signing the API requests |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``SHARING_DB_NAME``          | swiftsharing |          | Name for the sharing functionality database                                         |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``SHARING_DB_USER``          | sharing      |          | User used in connecting to the sharing functionality database                       |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``SHARING_DB_HOST``          |              | True     | Sharing functionality database address/hostname                                     |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``SHARING_DB_PASSWORD``      |              | True     | Sharing functionality database password                                             |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
 
 Shared access request back-end
 ------------------------------
@@ -62,19 +62,19 @@ in the `deployment example repository. <https://github.com/CSCfi/swift-ui-deploy
 The shared access request functionality requires the following environment variables
 to be present in order to work:
 
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| Environment variable     | Default      | Required | Description                                                                         |
-+==========================+==============+==========+=====================================================================================+
-| SWIFT_UI_API_AUTH_TOKENS |              | True     | Comma separated list of master tokens that can be used for signing the API requests |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| REQUEST_DB_NAME          | swiftrequest |          | Name for the shared access request functionality database                           |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| REQUEST_DB_USER          | request      |          | User used in connecting to the shared access request functionality database         |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| REQUEST_DB_HOST          |              | True     | Shared access request functionality database address/hostname                       |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
-| REQUEST_DB_PASSWORD      |              | True     | Shared access request functionality database password                               |
-+--------------------------+--------------+----------+-------------------------------------------------------------------------------------+
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| Environment variable         | Default      | Required | Description                                                                         |
++==============================+==============+==========+=====================================================================================+
+| ``SWIFT_UI_API_AUTH_TOKENS`` |              | True     | Comma separated list of master tokens that can be used for signing the API requests |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``REQUEST_DB_NAME``          | swiftrequest |          | Name for the shared access request functionality database                           |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``REQUEST_DB_USER``          | request      |          | User used in connecting to the shared access request functionality database         |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``REQUEST_DB_HOST``          |              | True     | Shared access request functionality database address/hostname                       |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
+| ``REQUEST_DB_PASSWORD``      |              | True     | Shared access request functionality database password                               |
++------------------------------+--------------+----------+-------------------------------------------------------------------------------------+
 
 Upload runner back-end
 ----------------------
@@ -84,15 +84,15 @@ to do this is to use the docker-compose files provided in the
 The upload runner requires the following environment variables to be present
 in order to work:
 
-+---------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
-| Environment variable            | Default | Required | Description                                                                                                 |
-+=================================+=========+==========+=============================================================================================================+
-| SWIFT_UI_API_AUTH_TOKENS        |         | True     | Comma separated list of master tokens that can be used for signing the API requests                         |
-+---------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
-| BROWSER_START_AUTH_ENDPOINT_URL |         |          | Openstack keystone endpoint for authentication – can also be specified with OS_AUTH_URL                     |
-+---------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
-| OS_AUTH_URL                     |         |          | Openstack keystone endpoint for authentication – can also be specified with BROWSER_START_AUTH_ENDPOINT_URL |
-+---------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
++-------------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
+| Environment variable                | Default | Required | Description                                                                                                 |
++=====================================+=========+==========+=============================================================================================================+
+| ``SWIFT_UI_API_AUTH_TOKENS``        |         | True     | Comma separated list of master tokens that can be used for signing the API requests                         |
++-------------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
+| ``BROWSER_START_AUTH_ENDPOINT_URL`` |         |          | Openstack keystone endpoint for authentication – can also be specified with OS_AUTH_URL                     |
++-------------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
+| ``OS_AUTH_URL``                     |         |          | Openstack keystone endpoint for authentication – can also be specified with BROWSER_START_AUTH_ENDPOINT_URL |
++-------------------------------------+---------+----------+-------------------------------------------------------------------------------------------------------------+
 
 The authentication information can also be gotten through sourcing any
 Openstack credential v3 file, the password is not necessary as only the
