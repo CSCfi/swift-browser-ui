@@ -16,6 +16,7 @@ from .middleware import add_cors
 from .auth import handle_login, read_in_keys, handle_validate_authentication
 from .api import handle_get_object, handle_get_container
 from .api import handle_post_object_chunk, handle_post_object_options
+from .api import handle_health_check
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -46,6 +47,10 @@ async def servinit() -> aiohttp.web.Application:
     # and POST upload against an account doesn't exist
     app.add_routes([
         aiohttp.web.post("/{project}", handle_login)
+    ])
+
+    app.add_routes([
+        aiohttp.web.get("/health", handle_health_check)
     ])
 
     # Add api routes
