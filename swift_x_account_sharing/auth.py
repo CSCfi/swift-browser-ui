@@ -13,8 +13,12 @@ import typing
 import hmac
 import time
 import logging
+import secrets
 
 import aiohttp.web
+from asyncpg import InterfaceError
+
+from .db import handle_dropped_connection
 
 
 AiohttpHandler = typing.Callable[
@@ -61,7 +65,7 @@ async def test_signature(
             byte_message,
             digestmod="sha256"
         ).hexdigest()
-        if digest == signature:
+        if secrets.compare_digest(digest, signature):
             return
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"
@@ -93,18 +97,22 @@ async def handle_validate_authentication(
             try:
                 project = request.match_info["user"]
             except KeyError:
-                pass
+                project = None
     finally:
         if project:
-            project_tokens = [
-                rec["token"].encode("utf-8")
-                for rec in await request.app["db_conn"].get_tokens(project)
-            ]
+            try:
+                project_tokens = [
+                    rec["token"].encode("utf-8")
+                    for rec in await request.app["db_conn"].get_tokens(project)
+                ]
+            except InterfaceError:
+                handle_dropped_connection(request)
         else:
             LOGGER.debug(f"No project ID found in request {request}")
-            raise aiohttp.web.HTTPUnauthorized(
-                reason="No project ID in request"
-            )
+            if request.path != "/health":
+                raise aiohttp.web.HTTPUnauthorized(
+                    reason="No project ID in request"
+                )
 
     await test_signature(
         request.app["tokens"] + project_tokens,

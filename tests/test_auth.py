@@ -4,6 +4,7 @@
 import unittest.mock
 import hmac
 from types import SimpleNamespace
+import time
 
 
 import aiohttp.web
@@ -46,7 +47,8 @@ class AuthModuleTestCase(asynctest.TestCase):
             await t_signature(
                 tokens_mock,
                 "",
-                message_mock
+                message_mock,
+                time.time() + 3600,
             )
 
     async def test_test_signature_success(self):
@@ -61,7 +63,8 @@ class AuthModuleTestCase(asynctest.TestCase):
         await t_signature(
             tokens_mock,
             signature,
-            message_mock
+            message_mock,
+            time.time() + 3600,
         )
 
     async def test_handle_validate_authentication_success(self):
@@ -81,9 +84,11 @@ class AuthModuleTestCase(asynctest.TestCase):
                 "signature": "a",
                 "valid": "b"
             },
+            "match_info": {},
             "url": SimpleNamespace(**{
                 "path": "c"
-            })
+            }),
+            "path": "/health",
         })
 
         with t_signature_patch:
@@ -100,9 +105,11 @@ class AuthModuleTestCase(asynctest.TestCase):
                 "signature": "a",
                 "vali": "b"
             },
+            "match_info": {},
             "url": SimpleNamespace(**{
                 "path": "c"
-            })
+            }),
+            "path": "/health",
         })
         with self.assertRaises(aiohttp.web.HTTPClientError):
             await handle_validate_authentication(
