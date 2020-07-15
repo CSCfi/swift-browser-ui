@@ -68,8 +68,8 @@ const translations = {
                         "values. If there's a separate pricing contract " +
                         "with CSC for the project used, the values " +
                         "specific the project may vary.",
-        pouta_accounting: "https://research.csc.fi/pouta-accounting",
-        pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
+        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
+        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
         my_csc: "https://my.csc.fi",
         resources: "Resources",
         tokens: "Tokens",
@@ -241,8 +241,8 @@ const translations = {
                         "mukaan. Jos käytetylle projektille on erillinen " +
                         "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
                         "voivat poiketa näytetyistä.",
-        pouta_accounting: "https://research.csc.fi/pouta-accounting",
-        pouta_obj_store_quota_info: "https://research.csc.fi/pouta-object-storage-quotas-and-billing",
+        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
+        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
         my_csc: "https://my.csc.fi",
         resources: "Resurssit",
         tokens: "Avaimet",
