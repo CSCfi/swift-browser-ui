@@ -46,6 +46,7 @@ from .api import (
     swift_check_object_chunk,
     swift_replicate_container,
 )
+from .health import handle_health_check
 from .settings import setd
 from .middlewares import error_middleware
 from .discover import handle_discover
@@ -219,6 +220,11 @@ async def servinit() -> aiohttp.web.Application:
     app.add_routes([
         aiohttp.web.get('/direct/request',
                         handle_bounce_direct_access_request)
+    ])
+
+    # Add health check endpoint
+    app.add_routes([
+        aiohttp.web.get('/health', handle_health_check),
     ])
 
     app.on_startup.append(open_client_to_app)

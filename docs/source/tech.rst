@@ -15,7 +15,7 @@ Openstack WebSSO implementation:
 
 * `Federated authentication API in Openstack <https://docs.openstack.org/keystone/pike/advanced-topics/federation/federated_identity.html>`_
 * `WebSSO details conveniently explained (or how it works in the OS Horizon dashboard) <http://www.gazlene.net/demystifying-keystone-federation.html>`_
-* `Openstack Horizon dahsboard WebSSO guide <https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html>`_
+* `Openstack Horizon dashboard WebSSO guide <https://docs.openstack.org/keystone/pike/advanced-topics/federation/websso.html>`_
 
 The login process follows an *almost ordinary* process of federated
 authentication with SAML, but that is something we don't need to concern

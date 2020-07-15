@@ -1,0 +1,47 @@
+name: Chrome UI check
+
+on: [pull_request]
+
+jobs:
+  style_check:
+    strategy:
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.7]
+        node: ['12']
+      
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+        pushd swift_browser_ui_frontend
+        npm install
+        npm run build
+    - name: Install chrome driver
+      run: |
+        curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add
+        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get -y update
+        sudo apt-get -y install google-chrome-stable
+        wget $(echo $(curl https://chromedriver.chromium.org/downloads |grep -o href=\"[^\"]*index\.html\?path.$(google-chrome --version | sed 's/^Google Chrome //g' |grep -o ^[0-9][0-9]\..\.)[^\"]*\" | head -n 1 |sed s/href=\"//g |sed s/\"//g |sed s/index\.html\?path=//g)chromedriver_linux64.zip)
+        unzip chromedriver_linux64.zip
+        rm chromedriver_linux64.zip
+        chmod +x chromedriver
+        sudo cp chromedriver /usr/local/bin/
+        sudo chromedriver --version
+    - name: Test UI in Chrome
+      run: tox -e chrome

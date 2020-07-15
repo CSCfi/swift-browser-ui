@@ -1,9 +1,13 @@
 ## swift-browser-ui
 
-[![Build Status](https://travis-ci.com/CSCfi/swift-browser-ui.svg?branch=master)](https://travis-ci.com/CSCfi/swift-browser-ui)
-[![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=master)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=master)
+![Python Unit Tests](https://github.com/CSCfi/swift-browser-ui/workflows/Python%20Unit%20Tests/badge.svg)
+![Javascript ESLint check](https://github.com/CSCfi/swift-browser-ui/workflows/Javascript%20ESLint%20check/badge.svg)
+![Python style check](https://github.com/CSCfi/swift-browser-ui/workflows/Python%20style%20check/badge.svg)
+![Chrome UI check](https://github.com/CSCfi/swift-browser-ui/workflows/Chrome%20UI%20check/badge.svg)
+![Firefox UI check](https://github.com/CSCfi/swift-browser-ui/workflows/Firefox%20UI%20check/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/CSCfi/swift-browser-ui/badge.svg?branch=HEAD)](https://coveralls.io/github/CSCfi/swift-browser-ui?branch=HEAD)
 [![Documentation Status](https://readthedocs.org/projects/swift-browser-ui/badge/?version=latest)](https://swift-browser-ui.readthedocs.io/en/latest/?badge=latest)
-[![](https://images.microbadger.com/badges/version/cscfi/swift-ui.svg)](https://microbadger.com/images/cscfi/swift-ui "Get your own version badge on microbadger.com")
+
 
 
 ### Description
