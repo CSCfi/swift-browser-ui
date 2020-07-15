@@ -9,7 +9,14 @@ from asyncpg.exceptions import UniqueViolationError
 from .db import DBConn
 
 
-AiohttpHandler = typing.Callable[[aiohttp.web.Request], aiohttp.web.Response]
+AiohttpHandler = typing.Callable[
+    [aiohttp.web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        aiohttp.web.Response
+    ]
+]
 
 
 @aiohttp.web.middleware
@@ -30,6 +37,9 @@ async def check_db_conn(
         handler: AiohttpHandler
 ) -> aiohttp.web.Response:
     """Check if an established database connection exists."""
+    if request.path == "/health":
+        return await handler(request)
+
     if (
             isinstance(request.app["db_conn"], DBConn)
             and request.app["db_conn"].conn is None
@@ -49,6 +59,6 @@ async def catch_uniqueness_error(
     try:
         return await handler(request)
     except UniqueViolationError:
-        raise aiohttp.web.HTTPClientError(
+        raise aiohttp.web.HTTPConflict(
             reason="Duplicate entries are not allowed."
         )
