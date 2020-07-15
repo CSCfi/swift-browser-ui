@@ -195,3 +195,15 @@ async def handle_get_container(
     await download.a_write_to_response(resp)
 
     return resp
+
+
+async def handle_health_check(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Answer a service health check."""
+    # Case degraded
+
+    # Case nominal
+    return aiohttp.web.json_response({
+        "status": "Ok",
+    })
