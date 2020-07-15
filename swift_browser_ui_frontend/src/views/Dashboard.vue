@@ -9,7 +9,7 @@
           <p>
             <ul>
               <li>
-                <b>{{ $t('message.dashboard.account') }}:</b>{{ Account }}
+                <b>{{ $t('message.dashboard.account') }}:</b> {{ Account }}
               </li>
               <li>
                 <b>
