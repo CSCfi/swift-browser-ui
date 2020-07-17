@@ -11,6 +11,7 @@ import aiohttp.web
 
 from swift_x_account_sharing.db import DBConn
 from swift_x_account_sharing.db import handle_dropped_connection
+import datetime
 
 
 class HandleDroppedTestClass(asynctest.TestCase):
@@ -157,14 +158,14 @@ class DBMethodTestCase(asynctest.TestCase):
         self.connection_transaction_mock = asynctest.MagicMock(
             asyncpg.Connection.transaction
         )
-
+        mock_date = datetime.datetime(2020, 7, 15, 12, 25, 26, 791901)
         self.asyncpg_connection_mock = SimpleNamespace(**{
             "fetch": asynctest.CoroutineMock(
                 return_value=[{
                     "container": "test-container",
                     "container_owner": "test-owner",
                     "recipient": "test-receiver",
-                    "sharingdate": "testdate",
+                    "sharingdate": mock_date,
                     "address": "test-address",
                     "r_read": True,
                     "r_write": True,
@@ -175,7 +176,7 @@ class DBMethodTestCase(asynctest.TestCase):
                     "r_read": True,
                     "r_write": True,
                     "container": "test-container",
-                    "sharingdate": "testdate",
+                    "sharingdate": "15 July 2020",
                     "container_owner": "test-owner",
                     "recipient": "test-recipient",
                     "address": "test-address",

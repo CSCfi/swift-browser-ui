@@ -214,7 +214,7 @@ class DBConn:
             {
                 "container": i["container"],
                 "owner": i["container_owner"],
-                "sharingdate": i["sharingdate"]
+                "sharingdate": i["sharingdate"].strftime("%d %b %Y")
             }
             for i in query
         ]
