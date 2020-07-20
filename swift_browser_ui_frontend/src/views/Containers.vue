@@ -118,11 +118,13 @@
                 v-if="selected==props.row"
                 class="is-small"
                 :inverted="true"
+                :disabled="!props.row.bytes ? true : false"
                 :container="props.row.name"
               />
               <ContainerDownloadLink
                 v-else
                 class="is-small"
+                :disabled="!props.row.bytes ? true : false"
                 :container="props.row.name"
               />
             </p>
@@ -198,12 +200,14 @@
                 :project="active.id"
                 :container="props.row.name"
                 :smallsize="true"
+                :disabled="!props.row.bytes ? true : false"
                 :inverted="true"
               />
               <ReplicateContainerButton
                 v-else
                 :project="active.id"
                 :container="props.row.name"
+                :disabled="!props.row.bytes ? true : false"
                 :smallsize="true"
               />
             </p>
