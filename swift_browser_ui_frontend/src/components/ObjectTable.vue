@@ -154,6 +154,7 @@
               v-if="props.row.bytes < 1073741824"
               :href="props.row.url"
               target="_blank"
+              :inverted="props.row == selected ? true : false"
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
               type="is-primary"
               outlined
@@ -169,6 +170,7 @@
               v-else-if="allowLargeDownloads"
               :href="props.row.url"
               target="_blank"
+              :inverted="props.row == selected ? true : false"
               :alt="$t('message.downloadAlt') + ' ' + props.row.name"
               type="is-primary"
               outlined
@@ -185,6 +187,7 @@
               :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
               type="is-primary"
               outlined
+              :inverted="props.row === selected ? true : false"
               size="is-small"
               tag="a"
               @click="confirmDownload ()"
