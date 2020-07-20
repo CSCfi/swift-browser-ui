@@ -126,11 +126,43 @@
                 :container="props.row.name"
               />
             </p>
-            <p class="control">
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
               <b-button
                 v-if="selected==props.row"
                 type="is-primary"
-                icon-left="share"
+                outlined
+                size="is-small"
+                disabled
+                inverted
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p
+              v-else
+              class="control"
+            >
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
                 outlined
                 size="is-small"
                 inverted
@@ -139,12 +171,14 @@
                   query: {container: props.row.name}
                 })"
               >
-                {{ $t('message.share.share') }}
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
                 type="is-primary"
-                icon-left="share"
                 outlined
                 size="is-small"
                 @click="$router.push({
@@ -152,7 +186,10 @@
                   query: {container: props.row.name}
                 })"
               >
-                {{ $t('message.share.share') }}
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p class="control">
