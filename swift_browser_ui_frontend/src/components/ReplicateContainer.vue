@@ -1,5 +1,32 @@
 <template>
-  <div>
+  <div v-if="disabled">
+    <b-button
+      v-if="smallsize"
+      type="is-primary"
+      size="is-small"
+      outlined
+      disabled
+      :inverted="inverted"
+    >
+      <b-icon
+        icon="content-copy"
+        size="is-small"
+      /> {{ $t('message.copy') }}
+    </b-button>
+    <b-button
+      v-else
+      type="is-primary"
+      outlined
+      :inverted="inverted"
+      disabled
+    >
+      <b-icon
+        icon="content-copy"
+        size="is-small"
+      /> {{ $t('message.copy') }}
+    </b-button>
+  </div>
+  <div v-else>
     <b-button
       v-if="smallsize"
       type="is-primary"
@@ -17,7 +44,7 @@
       <b-icon
         icon="content-copy"
         size="is-small"
-      />{{ $t('message.copy') }}
+      /> {{ $t('message.copy') }}
     </b-button>
     <b-button
       v-else
@@ -35,7 +62,7 @@
       <b-icon
         icon="content-copy"
         size="is-small"
-      />{{ $t('message.copy') }}
+      /> {{ $t('message.copy') }}
     </b-button>
   </div>
 </template>
@@ -48,6 +75,7 @@ export default {
     "container",
     "smallsize",
     "inverted",
+    "disabled",
   ],
   computed: {
     active () {
