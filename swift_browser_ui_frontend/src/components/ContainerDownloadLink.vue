@@ -1,5 +1,20 @@
 <template>
   <b-button
+    v-if="disabled"
+    tag="a"
+    type="is-primary"
+    outlined
+    target="_blank"
+    :inverted="inverted"
+    disabled
+  >
+    <b-icon
+      icon="download"
+      size="is-small"
+    /> {{ $t('message.downloadContainer') }}
+  </b-button>
+  <b-button
+    v-else
     tag="a"
     type="is-primary"
     outlined
@@ -10,7 +25,7 @@
     <b-icon
       icon="download"
       size="is-small"
-    />{{ $t('message.downloadContainer') }}
+    /> {{ $t('message.downloadContainer') }}
   </b-button>
 </template>
 
@@ -21,6 +36,7 @@ export default {
     "container",
     "project",
     "inverted",
+    "disabled",
   ],
   data: function () {
     return {

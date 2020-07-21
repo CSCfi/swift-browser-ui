@@ -118,19 +118,53 @@
                 v-if="selected==props.row"
                 class="is-small"
                 :inverted="true"
+                :disabled="!props.row.bytes ? true : false"
                 :container="props.row.name"
               />
               <ContainerDownloadLink
                 v-else
                 class="is-small"
+                :disabled="!props.row.bytes ? true : false"
                 :container="props.row.name"
               />
             </p>
-            <p class="control">
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
               <b-button
                 v-if="selected==props.row"
                 type="is-primary"
-                icon-left="share"
+                outlined
+                size="is-small"
+                disabled
+                inverted
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p
+              v-else
+              class="control"
+            >
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
                 outlined
                 size="is-small"
                 inverted
@@ -139,12 +173,14 @@
                   query: {container: props.row.name}
                 })"
               >
-                {{ $t('message.share.share') }}
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
                 type="is-primary"
-                icon-left="share"
                 outlined
                 size="is-small"
                 @click="$router.push({
@@ -152,7 +188,10 @@
                   query: {container: props.row.name}
                 })"
               >
-                {{ $t('message.share.share') }}
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p class="control">
@@ -161,12 +200,14 @@
                 :project="active.id"
                 :container="props.row.name"
                 :smallsize="true"
+                :disabled="!props.row.bytes ? true : false"
                 :inverted="true"
               />
               <ReplicateContainerButton
                 v-else
                 :project="active.id"
                 :container="props.row.name"
+                :disabled="!props.row.bytes ? true : false"
                 :smallsize="true"
               />
             </p>
