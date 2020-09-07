@@ -33,9 +33,9 @@ jobs:
         npm run build
     - name: Install firefox driver
       run: |
-        wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
-        tar -xvzf geckodriver-v0.24.0-linux64.tar.gz
-        rm geckodriver-v0.24.0-linux64.tar.gz
+        wget https://github.com/mozilla/geckodriver/releases/download/v0.27.0/geckodriver-v0.27.0-linux64.tar.gz
+        tar -xvzf geckodriver-v0.27.0-linux64.tar.gz
+        rm geckodriver-v0.27.0-linux64.tar.gz
         chmod +x geckodriver
         sudo cp geckodriver /usr/local/bin/
         geckodriver --version
