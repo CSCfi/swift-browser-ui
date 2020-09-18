@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath('../../swift_browser_ui'))
 # -- Project information -----------------------------------------------------
 current_year = str(datetime.date.today().year)
 
-project = 'swit-browser-ui'
+project = 'swift-browser-ui'
 copyright = f'{current_year}, CSC Developers'
 author = 'CSC Developers'
 
