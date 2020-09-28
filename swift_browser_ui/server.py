@@ -130,7 +130,7 @@ async def servinit() -> aiohttp.web.Application:
     # Cookie keyed dictionary to store session data
     app['Creds'] = {}
 
-    # Setup static folder during developement, if it has been specified
+    # Setup static folder during development, if it has been specified
     if setd['static_directory'] is not None:
         app.router.add_static(
             '/static/',
