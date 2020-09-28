@@ -108,8 +108,8 @@ async def handle_validate_authentication(
             except InterfaceError:
                 handle_dropped_connection(request)
         else:
-            LOGGER.debug(f"No project ID found in request {request}")
             if request.path != "/health":
+                LOGGER.debug(f"No project ID found in request {request}")
                 raise aiohttp.web.HTTPUnauthorized(
                     reason="No project ID in request"
                 )
