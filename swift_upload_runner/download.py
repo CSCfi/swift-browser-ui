@@ -120,7 +120,8 @@ class FileDownloadProxy:
                 "X-Auth-Token": self.auth.get_token(),
                 "Accept-Encoding": "identity"
             },
-            stream=True
+            stream=True,
+            verify=True
         ) as req:
             print(f"""
             Request headers:
@@ -419,7 +420,8 @@ class ContainerArchiveDownloadProxy:
                 ),
                 headers={
                     "X-Auth-Token": self.auth.get_token()
-                }
+                },
+                verify=True
         ) as req:
             self.fs = self._parse_archive_fs([
                 i.split("/") for i in req.text.lstrip().rstrip().split("\n")
