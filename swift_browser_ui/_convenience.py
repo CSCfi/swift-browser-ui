@@ -323,7 +323,7 @@ def initiate_os_session(
 
     return keystoneauth1.session.Session(
         auth=os_auth,
-        verify=False,
+        verify=True,
     )
 
 
