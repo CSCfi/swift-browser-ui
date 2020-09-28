@@ -3,3 +3,4 @@ requests
 python-swiftclient
 keystoneauth1
 git+https://github.com/cscfi/swift-browser-ui.git
+certifi
