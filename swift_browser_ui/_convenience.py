@@ -89,6 +89,12 @@ def decrypt_cookie(
         request: aiohttp.web.Request
 ) -> dict:
     """Decrypt a cookie using the server instance specific fernet key."""
+    if "S3BROW_SESSION" not in request.cookies:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
     cookie_json = request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
     ).decode('utf-8')
