@@ -1,4 +1,4 @@
-// Vuex store for the variables that need to be globally avaliable.
+// Vuex store for the variables that need to be globally available.
 import Vue from "vue";
 import Vuex from "vuex";
 

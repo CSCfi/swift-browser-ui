@@ -9,12 +9,12 @@ const translations = {
       error: {
         frontPage: "To the Front Page",
         Unauthorized: "401 – Not logged in",
-        Unauthorized_text: "The action requested requires logging" +
+        Unauthorized_text: "The action requested requires logging " +
                            "in. Use the button below to Log in.",
         Notfound: "404 – Could not find the page that was requested.",
         Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
-        Forbidden: "403 – Wait, thats forbidden!",
+        Forbidden: "403 – Wait, that is forbidden!",
         Forbidden_text: "The previous request could not be fulfilled. " +
                         "If said operation should be allowed to be " +
                         "performed, contact the service administrator. " +
@@ -104,9 +104,9 @@ const translations = {
         revoke: "Revoke container access",
         revoke_project: "Revoke access from project",
         success_delete: "Successfully deleted sharing action",
-        request_sync_nocont: "Can't synchronize access requests without a " +
+        request_sync_nocont: "Cannot synchronize access requests without a " +
                              "container",
-        request_synced: "Succesfully synchronized access requests",
+        request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize container share requests",
       },
@@ -132,7 +132,7 @@ const translations = {
                         "enable them for the duration of the session.",
       largeDownAction: "Enable",
       emptyContainer: "This container is empty.",
-      emptyProject: "The project doesn't contain any containers.",
+      emptyProject: "The project does not contain any containers.",
       emptyShared: "No containers have been shared to the project.",
       emptyRequested: "No shared containers have been requested for the " +
                       "project.",

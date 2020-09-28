@@ -1,7 +1,7 @@
 """
 Miscallaneous convenience functions used during the project.
 
-Module contains funcions for e.g. authenticating agains openstack v3 identity
+Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
 """
 
