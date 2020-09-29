@@ -6,6 +6,7 @@ import hashlib
 import typing
 import hmac
 import time
+import secrets
 
 import aiohttp.web
 
@@ -85,7 +86,7 @@ async def test_signature(
             byte_message,
             digestmod="sha256"
         ).hexdigest()
-        if digest == signature:
+        if secrets.compare_digest(digest, signature):
             return True
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"

@@ -17,9 +17,10 @@ setuptools.setup(
         'python-swiftclient',
         'keystoneauth1',
         'gunicorn',
+        'certifi',
         'uvloop',
         "swift-browser-ui"
-        "@ git+https://github.com/cscfi/swift-browser-ui.git@v0.7.1"
+        "@ git+https://github.com/cscfi/swift-browser-ui.git"
     ],
     extras_require={
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage',
