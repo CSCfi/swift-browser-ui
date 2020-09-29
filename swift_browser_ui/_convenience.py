@@ -332,23 +332,32 @@ def initiate_os_service(
         url: str = None
 ) -> swiftclient.service.SwiftService:
     """Create a SwiftService connection to object storage."""
-    # Set up new options for the swift service, since the defaults won't do
-    sc_new_options = {
-        'os_auth_token': os_session.get_token(),
-        'os_storage_url': os_session.get_endpoint(service_type='object-store'),
-        'os_auth_url': setd['auth_endpoint_url'],
-        'debug': True,
-        'info': True,
-    }
+    try:
+        # Set up new options for the swift service, since the defaults won't do
+        sc_new_options = {
+            'os_auth_token': os_session.get_token(),
+            'os_storage_url': os_session.get_endpoint(
+                service_type='object-store'),
+            'os_auth_url': setd['auth_endpoint_url'],
+            'debug': True,
+            'info': True,
+        }
 
-    if url:
-        sc_new_options["os_storage_url"] = url
+        if url:
+            sc_new_options["os_storage_url"] = url
 
-    os_sc = swiftclient.service.SwiftService(
-        options=sc_new_options
-    )
+        os_sc = swiftclient.service.SwiftService(
+            options=sc_new_options
+        )
 
-    return os_sc
+        return os_sc
+    except Exception as e:
+        logging.info(f"Throw due to keystoneAPI issue {e}.")
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
 
 
 async def get_tempurl_key(
