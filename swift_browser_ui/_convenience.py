@@ -1,7 +1,7 @@
 """
 Miscallaneous convenience functions used during the project.
 
-Module contains funcions for e.g. authenticating agains openstack v3 identity
+Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
 """
 
@@ -89,6 +89,12 @@ def decrypt_cookie(
         request: aiohttp.web.Request
 ) -> dict:
     """Decrypt a cookie using the server instance specific fernet key."""
+    if "S3BROW_SESSION" not in request.cookies:
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
     cookie_json = request.app['Crypt'].decrypt(
         request.cookies['S3BROW_SESSION'].encode('utf-8')
     ).decode('utf-8')
@@ -317,7 +323,7 @@ def initiate_os_session(
 
     return keystoneauth1.session.Session(
         auth=os_auth,
-        verify=False,
+        verify=True,
     )
 
 
