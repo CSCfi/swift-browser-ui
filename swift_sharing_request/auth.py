@@ -13,6 +13,7 @@ import typing
 import hmac
 import time
 import logging
+import secrets
 
 import aiohttp.web
 from asyncpg import InterfaceError
@@ -64,7 +65,7 @@ async def test_signature(
             byte_message,
             digestmod="sha256"
         ).hexdigest()
-        if digest == signature:
+        if secrets.compare_digest(digest, signature):
             return
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"
@@ -107,8 +108,8 @@ async def handle_validate_authentication(
             except InterfaceError:
                 handle_dropped_connection(request)
         else:
-            LOGGER.debug(f"No project ID found in request {request}")
             if request.path != "/health":
+                LOGGER.debug(f"No project ID found in request {request}")
                 raise aiohttp.web.HTTPUnauthorized(
                     reason="No project ID in request"
                 )
