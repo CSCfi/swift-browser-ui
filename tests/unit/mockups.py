@@ -16,7 +16,20 @@ from swiftclient.service import SwiftError
 
 mock_token_project_avail = json.dumps({
     "projects": [
+        # there is a special use case when this is first
+        # as the list of projects might give 401
         {
+            "is_domain": False,
+            "description": "Not enabled project",
+            "links": {
+                "self": "https://place-holder-url:5001/v3/projects/no"
+            },
+            "enabled": False,
+            "id": "no",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "no",
+        }, {
             "is_domain": False,
             "description": "",
             "links": {
