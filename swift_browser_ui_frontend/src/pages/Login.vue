@@ -15,9 +15,9 @@
           Open the <b>Network</b> tab on the console
         </li>
         <li>
-          Open <a href="https://pouta.csc.fi:5001/v3/OS-FEDERATION/identity_providers/haka/protocols/saml2/auth">
+          Open <b><a href="https://pouta.csc.fi:5001/v3/OS-FEDERATION/identity_providers/haka/protocols/saml2/auth">
             this link
-          </a>
+          </a></b>
           in the new tab to begin authentication to Openstack and fetch an
           unscoped token.
         </li>
@@ -53,49 +53,50 @@
 
 <style>
 #loginwindow {
-    width: 70ch;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 7%;
+  width: 70ch;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%;
 }
 
 h2 {
-    font-family: sans-serif;
-    text-align: center;
+  font-family: sans-serif;
+  text-align: center;
 }
 
 .maintext {
-    font-family: sans-serif;
-    text-align: justify;
-    line-height: 1.5;
+  font-family: sans-serif;
+  text-align: justify;
+  line-height: 1.5;
 }
 
 #manlist {
-    text-align: justify;
-    font-family: monospace;
-    line-height: 1.4;
+  text-align: justify;
+  font-family: monospace;
+  line-height: 1.4;
 }
 
 li {
-    text-align: left;
+  text-align: left;
 }
 
 a {
-    color: black;
+  background: blueviolet;
+  color: white;
 }
 
 a:hover {
-    background: pink;
-    color: black;
+  background: blue;
+  color: white;
 }
 
 form {
-    text-align: center;
-    line-height: 2.5;
-    font-family: sans-serif;
+  text-align: center;
+  line-height: 2.5;
+  font-family: sans-serif;
 }
 
 #inputbox {
-    width: 40ch;
+  width: 40ch;
 }
 </style>
