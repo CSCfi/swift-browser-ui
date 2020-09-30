@@ -287,10 +287,21 @@ def get_availability_from_token(
                  str(output_projects),
                  str(output_domains))
 
+    # we need to take the projects that have been enabled for the
+    # user, otherwise if the first project is disabled we will
+    # get a 401 response when we do initiate_os_service
+    filtered = list(filter(lambda d: d.get("enabled") is not False,
+                           output_projects['projects']))
+
+    if len(filtered) == 0:
+        raise aiohttp.web.HTTPForbidden(
+            reason="Thre is no project available for this user."
+        )
+
     # Return all project names and domain names inside a dictionary
     return {
         "projects": [
-            p for p in output_projects['projects']
+            p for p in filtered
         ],
         "domains": [
             d for d in output_domains['domains']
