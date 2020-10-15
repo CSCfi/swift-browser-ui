@@ -3,7 +3,7 @@ name: Firefox UI check
 on: [pull_request]
 
 jobs:
-  style_check:
+  ui_test:
     strategy:
       max-parallel: 4
       matrix:
