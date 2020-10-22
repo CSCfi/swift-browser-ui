@@ -165,6 +165,10 @@ async def sso_query_end(
         raise aiohttp.web.HTTPUnauthorized(
             reason="Token no longer valid"
         )
+    except urllib.error.URLError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Cannot fetch project and domains from existing endpoint."
+        )
 
     if "LAST_ACTIVE" in request.cookies:
         if (request.cookies["LAST_ACTIVE"] not in [
