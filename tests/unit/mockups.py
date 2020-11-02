@@ -127,7 +127,7 @@ def return_project_avail(_):
 
 
 @contextmanager
-def urlopen(prq):
+def urlopen(prq, timeout=10):
     """Mockup class for opening keystone."""
     yield MockKeystone(prq)
 

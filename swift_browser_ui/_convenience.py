@@ -272,7 +272,7 @@ def get_availability_from_token(
         setd['auth_endpoint_url'] + "/OS-FEDERATION/projects",
         headers=hdr,
     )
-    with urllib.request.urlopen(prq) as projects:  # nosec
+    with urllib.request.urlopen(prq, timeout=20) as projects:  # nosec
         output_projects = json.loads(projects.read().decode('utf-8'))
 
     # Check domains from the API
@@ -280,7 +280,7 @@ def get_availability_from_token(
         setd['auth_endpoint_url'] + "/OS-FEDERATION/domains",
         headers=hdr,
     )
-    with urllib.request.urlopen(drq) as domains:  # nosec
+    with urllib.request.urlopen(drq, timeout=20) as domains:  # nosec
         output_domains = json.loads(domains.read().decode('utf-8'))
 
     logging.info("%s\n%s",

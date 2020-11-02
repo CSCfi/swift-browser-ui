@@ -141,10 +141,14 @@ async def sso_query_end(
 
     response = disable_cache(response)
 
+    trust = bool(setd['has_trust']) if 'has_trust' in setd else False
+
     response.set_cookie(
         name='S3BROW_SESSION',
         value=cookie_crypted,
         max_age=3600,
+        secure=trust,  # type: ignore
+        httponly=trust,  # type: ignore
     )
     request.app['Sessions'].add(session)
     # Initiate the credential dictionary
@@ -160,6 +164,10 @@ async def sso_query_end(
     except urllib.error.HTTPError:
         raise aiohttp.web.HTTPUnauthorized(
             reason="Token no longer valid"
+        )
+    except urllib.error.URLError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Cannot fetch project and domains from existing endpoint."
         )
 
     if "LAST_ACTIVE" in request.cookies:
@@ -196,8 +204,12 @@ async def sso_query_end(
         "id": project_id
     }
 
+    trust = bool(setd['has_trust']) if 'has_trust' in setd else False
+
     # Set the active project to be the last active project
-    response.set_cookie("LAST_ACTIVE", project_id, expires=2592000)
+    response.set_cookie("LAST_ACTIVE", project_id,
+                        expires=2592000,  # type: ignore
+                        secure=trust, httponly=trust)  # type: ignore
 
     # Redirect to the browse page
     if "NAV_TO" in request.cookies.keys():
