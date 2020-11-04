@@ -51,7 +51,7 @@ jobs:
           file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
-          cache-from: type=registry,ref=cscfi/swift-ui:latest
+          cache-from: type=registry,ref=cscfi/swift-x-account-sharing:latest
           cache-to: type=inline
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.clone_url }}
