@@ -10,28 +10,14 @@ from .settings import setd
 from .signature import sign
 
 
-async def handle_health_check(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
-    """Handle a service health check."""
-    # Pull all health endpoint information
-    web_client = request.app["api_client"]
-
-    status: typing.Dict[str, typing.Union[
-        str, typing.Dict
-    ]] = {
-        "status": "Ok",
-    }
-
-    services = {}
-    performance = {}
-
-    signature = await sign(60, "/health")
-    api_params = {
-        "signature": signature["signature"],
-        "valid": signature["valid_until"]
-    }
-    # Poll swift-x-account-sharing API
+async def get_x_account_sharing(
+        services: typing.Dict[str, typing.Any],
+        request: aiohttp.web.Request,
+        web_client: aiohttp.ClientSession,
+        api_params: dict,
+        performance: typing.Dict[str, typing.Any]
+) -> None:
+    """Poll swift-x-account-sharing API."""
     if setd["sharing_internal_endpoint"]:
         start = time.time()
         async with web_client.get(
@@ -54,7 +40,15 @@ async def handle_health_check(
             "status": "Nonexistent"
         }
 
-    # Poll swift-sharing-request API
+
+async def get_swift_sharing(
+        services: typing.Dict[str, typing.Any],
+        request: aiohttp.web.Request,
+        web_client: aiohttp.ClientSession,
+        api_params: dict,
+        performance: typing.Dict[str, typing.Any]
+) -> None:
+    """Poll swift-sharing-request API."""
     if setd["request_internal_endpoint"]:
         start = time.time()
         async with web_client.get(
@@ -77,7 +71,15 @@ async def handle_health_check(
             "status": "Nonexistent"
         }
 
-    # Poll swiftui-upload-runner API
+
+async def get_upload_runner(
+        services: typing.Dict[str, typing.Any],
+        request: aiohttp.web.Request,
+        web_client: aiohttp.ClientSession,
+        api_params: dict,
+        performance: typing.Dict[str, typing.Any]
+) -> None:
+    """Poll swiftui-upload-runner API."""
     if setd["upload_internal_endpoint"]:
         start = time.time()
         async with web_client.get(
@@ -99,6 +101,47 @@ async def handle_health_check(
         services["swiftui-upload-runner"] = {
             "status": "Nonexistent"
         }
+
+
+async def handle_health_check(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle a service health check."""
+    # Pull all health endpoint information
+    web_client = request.app["api_client"]
+
+    status: typing.Dict[str, typing.Union[
+        str, typing.Dict
+    ]] = {
+        "status": "Ok",
+    }
+
+    services: typing.Dict[str, typing.Any] = dict()
+    performance: typing.Dict[str, typing.Any] = dict()
+
+    signature = await sign(60, "/health")
+    api_params = {
+        "signature": signature["signature"],
+        "valid": signature["valid_until"]
+    }
+
+    await get_x_account_sharing(services,
+                                request,
+                                web_client,
+                                api_params,
+                                performance)
+
+    await get_swift_sharing(services,
+                            request,
+                            web_client,
+                            api_params,
+                            performance)
+
+    await get_upload_runner(services,
+                            request,
+                            web_client,
+                            api_params,
+                            performance)
 
     status["services"] = services
     status["performance"] = performance

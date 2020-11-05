@@ -8,6 +8,7 @@ import re
 
 # aiohttp
 import aiohttp.web
+from multidict import MultiDictProxy
 
 import typing
 import urllib.error
@@ -73,18 +74,14 @@ async def sso_query_begin(
     return response
 
 
-async def sso_query_end(
-        request: aiohttp.web.Request
-) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
-    """Handle the login procedure return from SSO or user from POST."""
+def test_token(
+        formdata: MultiDictProxy[
+            typing.Union[str, bytes, aiohttp.web.FileField]],
+        request: aiohttp.web.Request,
+        unscoped: typing.Union[str, None]
+) -> None:
+    """."""
     log = request.app['Log']
-    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
-    # Declare the unscoped token
-    unscoped = None
-    formdata = await request.post()
-    log.info(
-        "Got %s in form.", formdata
-    )
     if 'token' in formdata:
         unscoped = str(formdata['token'])
         log.info(
@@ -126,6 +123,21 @@ async def sso_query_end(
             reason="Token is malformed"
         )
 
+
+async def sso_query_end(
+        request: aiohttp.web.Request
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Handle the login procedure return from SSO or user from POST."""
+    log = request.app['Log']
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+    # Declare the unscoped token
+    unscoped: typing.Union[str, None] = None
+    formdata = await request.post()
+    log.info(
+        "Got %s in form.", formdata
+    )
+    test_token(formdata, request, unscoped)
+
     # Establish connection and begin session
     response = aiohttp.web.Response(
         status=303
@@ -165,7 +177,7 @@ async def sso_query_end(
     # Check token availability
     try:
         request.app['Creds'][session]['Avail'] =\
-            get_availability_from_token(unscoped)
+            get_availability_from_token(str(unscoped))
     except urllib.error.HTTPError:
         raise aiohttp.web.HTTPUnauthorized(
             reason="Token no longer valid"
@@ -190,7 +202,7 @@ async def sso_query_end(
 
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
-        unscoped,
+        str(unscoped),
         project_id
     )
 
