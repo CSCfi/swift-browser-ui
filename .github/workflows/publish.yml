@@ -11,27 +11,49 @@ jobs:
     name: Push swift-x-account-sharing Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Login to DockerHub Registry
-        run: echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin
-      - name: Get the version
-        id: vars
-        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
-      - name: Build the tagged Docker image
-        if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-x-account-sharing:${{steps.vars.outputs.tag}}
-      - name: Push the tagged Docker image
-        if:  ${{ steps.vars.outputs.tag != '/master' && steps.vars.outputs.tag != '/devel' }}
-        run: docker push cscfi/swift-x-account-sharing:${{steps.vars.outputs.tag}}
-      - name: Build the latest Docker image
-        if:  ${{ steps.vars.outputs.tag == '/master' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-x-account-sharing:latest
-      - name: Push the latest Docker image
-        if:  ${{ steps.vars.outputs.tag == '/master' }}
-        run: docker push cscfi/swift-x-account-sharing:latest
-      - name: Build the stage Docker image
-        if:  ${{ steps.vars.outputs.tag == '/devel' }}
-        run: docker build . --file Dockerfile --tag cscfi/swift-x-account-sharing:stage
-      - name: Push the stage Docker image
-        if:  ${{ steps.vars.outputs.tag == '/devel' }}
-        run: docker push cscfi/swift-x-account-sharing:stage
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Prepare
+        id: prep
+        run: |
+          DOCKER_IMAGE=cscfi/swift-x-account-sharing
+          VERSION=edge
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+            BRANCH=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+            if [[ $BRANCH == master ]]; then
+              VERSION=latest
+            elif [[ $BRANCH == devel ]]; then
+              VERSION=stage
+            fi
+          fi
+          TAGS="${DOCKER_IMAGE}:${VERSION}"
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=registry,ref=cscfi/swift-x-account-sharing:latest
+          cache-to: type=inline
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
