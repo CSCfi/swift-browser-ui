@@ -401,7 +401,7 @@ async def swift_check_object_chunk(
 async def get_object_metadata(
         conn: SwiftService,
         meta_cont: str,
-        meta_obj: str
+        meta_obj: typing.Union[typing.List[str], None]
 ) -> typing.List[dict]:
     """Get object metadata."""
     try:

@@ -9,6 +9,7 @@ import re
 # aiohttp
 import aiohttp.web
 
+import typing
 import urllib.error
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
@@ -39,9 +40,12 @@ async def handle_login(
     return response
 
 
-async def sso_query_begin(_) -> aiohttp.web.Response:
+async def sso_query_begin(
+        _: None
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
             str(setd['static_directory']) + '/login.html'
@@ -53,7 +57,7 @@ async def sso_query_begin(_) -> aiohttp.web.Response:
     )
 
     response.headers['Location'] = (
-        setd['auth_endpoint_url'] +
+        str(setd['auth_endpoint_url']) +
         "/auth"
         "/OS-FEDERATION" +
         "/identity_providers" +
@@ -71,9 +75,10 @@ async def sso_query_begin(_) -> aiohttp.web.Response:
 
 async def sso_query_end(
         request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Handle the login procedure return from SSO or user from POST."""
     log = request.app['Log']
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     # Declare the unscoped token
     unscoped = None
     formdata = await request.post()
@@ -81,10 +86,10 @@ async def sso_query_end(
         "Got %s in form.", formdata
     )
     if 'token' in formdata:
-        unscoped = formdata['token']
+        unscoped = str(formdata['token'])
         log.info(
             'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
-                unscoped,
+                str(unscoped),
                 request.remote,
                 time.ctime()
             )

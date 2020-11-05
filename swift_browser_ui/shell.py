@@ -3,7 +3,7 @@
 
 import logging
 import sys
-
+import typing
 
 import click
 
@@ -30,7 +30,7 @@ from ._convenience import setup_logging as conv_setup_logging
     '--logfile', default=None, type=str,
     help='Write program logs to a file.'
 )
-def cli(verbose, debug, logfile):
+def cli(verbose: bool, debug: bool, logfile: str) -> None:
     """Command line interface for managing swift-browser-ui."""
     # set version
     setd['version'] = __version__
@@ -105,16 +105,16 @@ def cli(verbose, debug, logfile):
     help="Specify the certificate key to use with SSL."
 )
 def start(
-        port,
-        auth_endpoint_url,
-        has_trust,
-        dry_run,
-        set_origin_address,
-        set_session_devmode,
-        secure,
-        ssl_cert_file,
-        ssl_cert_key,
-):
+        port: int,
+        auth_endpoint_url: typing.Union[str, None],
+        has_trust: bool,
+        dry_run: bool,
+        set_origin_address: typing.Union[str, None],
+        set_session_devmode: bool,
+        secure: bool,
+        ssl_cert_file: str,
+        ssl_cert_key: str,
+) -> None:
     """Start the browser backend and server."""
     logging.debug(
         "Current settings dictionary:%s", str(setd)
@@ -150,7 +150,7 @@ def start(
         run_server_secure(servinit(), ssl_cert_file, ssl_cert_key)
 
 
-def main():
+def main() -> None:
     """Run the CLI."""
     cli(  # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
         auto_envvar_prefix='BROWSER'
