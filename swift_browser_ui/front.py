@@ -1,5 +1,6 @@
 """Web frontend functions for stand-alone running."""
 
+from typing import Union
 import aiohttp.web
 
 from .settings import setd
@@ -22,7 +23,9 @@ async def browse(
     return response
 
 
-async def index(_: None) -> aiohttp.web.FileResponse:
+async def index(
+        _: Union[aiohttp.web.Request, None]
+) -> aiohttp.web.FileResponse:
     """Serve the index page when running without a proxy."""
     return aiohttp.web.FileResponse(
         str(setd['static_directory']) + '/index.html'
