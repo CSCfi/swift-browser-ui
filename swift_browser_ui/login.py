@@ -77,10 +77,10 @@ async def sso_query_begin(
 def test_token(
         formdata: MultiDictProxy[
             typing.Union[str, bytes, aiohttp.web.FileField]],
-        request: aiohttp.web.Request,
-        unscoped: typing.Union[str, None]
-) -> None:
-    """."""
+        request: aiohttp.web.Request
+) -> str:
+    """Validate unscoped token."""
+    unscoped: typing.Union[str, None] = None
     log = request.app['Log']
     if 'token' in formdata:
         unscoped = str(formdata['token'])
@@ -123,6 +123,8 @@ def test_token(
             reason="Token is malformed"
         )
 
+    return unscoped
+
 
 async def sso_query_end(
         request: aiohttp.web.Request
@@ -130,13 +132,12 @@ async def sso_query_end(
     """Handle the login procedure return from SSO or user from POST."""
     log = request.app['Log']
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
-    # Declare the unscoped token
-    unscoped: typing.Union[str, None] = None
     formdata = await request.post()
     log.info(
         "Got %s in form.", formdata
     )
-    test_token(formdata, request, unscoped)
+    # Declare the unscoped token
+    unscoped = test_token(formdata, request)
 
     # Establish connection and begin session
     response = aiohttp.web.Response(
@@ -177,7 +178,7 @@ async def sso_query_end(
     # Check token availability
     try:
         request.app['Creds'][session]['Avail'] =\
-            get_availability_from_token(str(unscoped))
+            get_availability_from_token(unscoped)
     except urllib.error.HTTPError:
         raise aiohttp.web.HTTPUnauthorized(
             reason="Token no longer valid"
@@ -202,7 +203,7 @@ async def sso_query_end(
 
     # Open an OS session for the first project that's found for the user.
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
-        str(unscoped),
+        unscoped,
         project_id
     )
 
@@ -309,9 +310,10 @@ async def handle_logout(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Properly kill the session for the user."""
+    cookie = ""
+    log = request.app['Log']
     if not setd['set_session_devmode']:
         try:
-            log = request.app['Log']
             cookie = decrypt_cookie(request)["id"]
             log.info("Killing session for %s :: %s",
                      cookie, time.ctime())
