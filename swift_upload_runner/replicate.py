@@ -34,7 +34,7 @@ class ObjectReplicationProxy():
             container: str,
             source_project: str,
             source_container: str,
-    ):
+    ) -> None:
         """."""
         self.project = project
         self.container = container
@@ -54,7 +54,7 @@ class ObjectReplicationProxy():
     async def a_generate_object_from_reader(
             self,
             resp: aiohttp.client.ClientResponse
-    ):
+    ) -> typing.AsyncGenerator:
         """Generate uploaded object chunks from a response."""
         number = 0
         while True:
@@ -67,8 +67,8 @@ class ObjectReplicationProxy():
 
     async def a_create_container(
             self,
-            segmented=False
-    ):
+            segmented: bool = False
+    ) -> None:
         """Create the container required by the upload."""
         container = \
             f"{self.container}_segments" if segmented else self.container
@@ -91,8 +91,8 @@ class ObjectReplicationProxy():
 
     async def a_sync_object_segments(
             self,
-            manifest
-    ) -> typing.List[str]:
+            manifest: str
+    ) -> str:
         """Get object segments."""
         async with self.client.get(
                 common.generate_download_url(
@@ -183,8 +183,8 @@ class ObjectReplicationProxy():
 
     async def a_copy_object(
             self,
-            object_name
-    ):
+            object_name: str
+    ) -> None:
         """Copy an object from a location."""
         # Get the object stream handle
         async with self.client.get(
@@ -275,7 +275,7 @@ class ObjectReplicationProxy():
                         )
                 LOGGER.debug(f"Uploaded manifest for {object_name}")
 
-    async def a_copy_from_container(self):
+    async def a_copy_from_container(self) -> None:
         """Copy objects from a source container."""
         LOGGER.debug(
             f"Fetching objects from container {self.source_container}"
@@ -285,6 +285,7 @@ class ObjectReplicationProxy():
             container=self.source_container
         )
         LOGGER.debug(f"Container url: {container_url}")
+        objects: typing.Union[typing.List, str]
         async with self.client.get(
                 common.generate_download_url(
                     self.source_host,

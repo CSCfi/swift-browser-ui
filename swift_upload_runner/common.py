@@ -12,9 +12,9 @@ import swift_upload_runner.upload as upload
 
 
 def generate_download_url(
-        host,
-        container=None,
-        object_name=None,
+        host: str,
+        container: typing.Union[str, None] = None,
+        object_name: typing.Union[str, None] = None,
 ) -> str:
     """Generate the download URL to use."""
     if not container and not object_name:
@@ -94,7 +94,7 @@ async def get_upload_instance(
     if p_query:
         query: dict = p_query
     else:
-        query = request.query
+        query = request.query  # type: ignore
 
     # Check the existence of the dictionary structure
     try:
@@ -142,7 +142,9 @@ def get_path_from_list(
     return ret.lstrip("/").rstrip("/")
 
 
-async def handle_delete_preflight(_) -> aiohttp.web.Response:
+async def handle_delete_preflight(
+        _: typing.Union[aiohttp.web.Request, None]
+) -> aiohttp.web.Response:
     """Serve correct response headers to allowed DELETE preflight query."""
     resp = aiohttp.web.Response(
         headers={
