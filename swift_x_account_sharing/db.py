@@ -16,7 +16,7 @@ MODULE_LOGGER = logging.getLogger("db")
 
 def handle_dropped_connection(
         request: aiohttp.web.Request
-):
+) -> None:
     """Handle dropped database connection."""
     MODULE_LOGGER.log(
         logging.ERROR,
@@ -34,16 +34,16 @@ def handle_dropped_connection(
 class DBConn:
     """Class for the account sharing database functionality."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize connection variable."""
-        self.conn = None
+        self.conn: asyncpg.connection.Connection = None
         self.log = MODULE_LOGGER
 
-    def erase(self):
+    def erase(self) -> None:
         """Erase the connection."""
         self.conn = None
 
-    async def open(self):
+    async def open(self) -> None:
         """Initialize the database connection."""
         while self.conn is None:
             try:
@@ -82,7 +82,7 @@ class DBConn:
                 slp = random.randint(5, 15)  # nosec
                 await asyncio.sleep(slp)
 
-    async def close(self):
+    async def close(self) -> None:
         """Safely close the database connection."""
         if self.conn is not None:
             await self.conn.close()
@@ -341,7 +341,7 @@ class DBConn:
             self,
             token_owner: str,
             token_identifier: str
-    ):
+    ) -> None:
         """Remove a token from the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -361,7 +361,7 @@ class DBConn:
             token_owner: str,
             token: str,
             identifier: str
-    ):
+    ) -> None:
         """Add a token to the database."""
         async with self.conn.transaction():
             await self.conn.execute(
