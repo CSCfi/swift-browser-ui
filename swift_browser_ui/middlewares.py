@@ -7,6 +7,15 @@ from aiohttp import web
 
 from .settings import setd
 
+AiohttpHandler = typing.Callable[
+    [web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        web.Response
+    ]
+]
+
 
 def return_error_response(
         error_code: int
@@ -30,7 +39,7 @@ def return_error_response(
 @web.middleware
 async def error_middleware(
         request: web.Request,
-        handler: typing.Callable
+        handler: AiohttpHandler
 ) -> web.Response:
     """Return the correct HTTP Error page."""
     try:
