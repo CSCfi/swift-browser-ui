@@ -222,8 +222,6 @@ async def sso_query_end(
         "id": project_id
     }
 
-    trust = bool(setd['has_trust']) if 'has_trust' in setd else False
-
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id,
                         expires=2592000,  # type: ignore
