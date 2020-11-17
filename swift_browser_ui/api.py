@@ -58,7 +58,7 @@ async def swift_list_buckets(
         # so it's not necessary to think twice about iterating over the whole
         # response at once
         cont: typing.List[dict] = []
-        list(map(lambda i: cont.extend(i['listing']),  # type: ignore
+        list(map(lambda i: cont.extend(i["listing"]),  # type: ignore
                  request.app['Creds'][session]['ST_conn'].list()))
         # for a bucket with no objects
         if not cont:
@@ -68,6 +68,9 @@ async def swift_list_buckets(
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
+    except KeyError:
+        # listing is missing; possible broken swift auth
+        return aiohttp.web.json_response([])
 
 
 async def swift_create_container(
@@ -140,6 +143,9 @@ async def swift_list_objects(
         return aiohttp.web.json_response(obj)
     except SwiftError:
         return aiohttp.web.json_response([])
+    except KeyError:
+        # listing is missing; possible broken swift auth
+        return aiohttp.web.json_response([])
 
 
 async def swift_list_shared_objects(
@@ -187,6 +193,9 @@ async def swift_list_shared_objects(
         return aiohttp.web.json_response(obj)
 
     except SwiftError:
+        return aiohttp.web.json_response([])
+    except KeyError:
+        # listing is missing; possible broken swift auth
         return aiohttp.web.json_response([])
 
 
