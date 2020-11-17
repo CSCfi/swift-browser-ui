@@ -95,14 +95,22 @@ def decrypt_cookie(
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
-    cookie_json = request.app['Crypt'].decrypt(
-        request.cookies['S3BROW_SESSION'].encode('utf-8')
-    ).decode('utf-8')
-    cookie = json.loads(cookie_json)
-    request.app["Log"].debug(
-        "Decrypted cookie: {0}".format(cookie)
-    )
-    return cookie
+    try:
+        cookie_json = request.app['Crypt'].decrypt(
+            request.cookies['S3BROW_SESSION'].encode('utf-8')
+        ).decode('utf-8')
+        cookie = json.loads(cookie_json)
+        request.app["Log"].debug(
+            "Decrypted cookie: {0}".format(cookie)
+        )
+        return cookie
+    except InvalidToken:
+        request.app["Log"].info("Throw due to invalid token.")
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
 
 
 def check_csrf(
@@ -219,6 +227,7 @@ def api_check(
             )
         return ret
     except InvalidToken:
+        request.app["Log"].info("Throw due to invalid token.")
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
