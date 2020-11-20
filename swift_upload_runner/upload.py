@@ -33,7 +33,7 @@ class ResumableFileUploadProxy:
             query: dict,
             match: dict,
             client: aiohttp.client.ClientSession
-    ):
+    ) -> None:
         """."""
         self.q: asyncio.PriorityQueue = asyncio.PriorityQueue(
             maxsize=int(
@@ -83,8 +83,9 @@ class ResumableFileUploadProxy:
 
     async def a_sync_segments(
             self
-    ):
+    ) -> None:
         """Synchronize segments from storage."""
+        segments: typing.Union[typing.List, str]
         async with self.client.get(
             common.generate_download_url(
                 common.get_download_host(self.auth, self.project),
@@ -95,10 +96,10 @@ class ResumableFileUploadProxy:
             },
         ) as resp:
             if resp.status in {200}:
-                segments = await resp.text
+                segments = await resp.text()
                 segments = segments.rstrip().lstrip().split("\n")
                 segments = list(filter(
-                    lambda i,
+                    lambda i,  # type: ignore
                     path=self.path: path in i, segments
                 ))
                 if segments:
@@ -107,8 +108,8 @@ class ResumableFileUploadProxy:
 
     async def a_create_container(
             self,
-            segmented=False
-    ):
+            segmented: bool = False
+    ) -> None:
         """Create the container required by the upload."""
         container = \
             f"{self.container}_segments" if segmented else self.container
@@ -129,7 +130,7 @@ class ResumableFileUploadProxy:
 
     async def a_check_container(
             self,
-    ):
+    ) -> None:
         """Check if the container is allowed."""
         async with self.client.head(
                 common.generate_download_url(
@@ -187,7 +188,7 @@ class ResumableFileUploadProxy:
 
     async def a_add_manifest(
             self,
-    ):
+    ) -> None:
         """Add manifest file after segmented upload finish."""
         manifest = f"{self.container}_segments/{self.path}/"
         async with self.client.put(
@@ -262,7 +263,7 @@ class ResumableFileUploadProxy:
 
             return aiohttp.web.Response(status=201)
 
-    async def upload_file(self):
+    async def upload_file(self) -> None:
         """Upload the file with concatenated segments."""
         async with self.client.put(
                 self.url,
@@ -282,7 +283,7 @@ class ResumableFileUploadProxy:
             else:
                 return
 
-    async def generate_from_queue(self):
+    async def generate_from_queue(self) -> typing.AsyncGenerator:
         """Generate the response data form the internal queue."""
         LOGGER.debug("Generating upload data from a queue.")
         while len(self.done_chunks) < self.total_chunks:
@@ -305,7 +306,7 @@ class ResumableFileUploadProxy:
     async def a_wait_for_chunk(
             self,
             chunk_number: int
-    ):
+    ) -> None:
         """Wait asynchronously for a chunk to be written to the upload."""
         LOGGER.debug(f"Waiting for chunk {chunk_number}")
         while True:
@@ -323,5 +324,5 @@ class ResumableFileUploadProxy:
         """Check if the upload is segmented."""
         return self.segmented
 
-    def write(self):
+    def write(self) -> None:
         """Write one chunk of binary data to the upload."""
