@@ -4,7 +4,7 @@
 import sys
 import logging
 import asyncio
-
+import typing
 
 import aiohttp.web
 import uvloop
@@ -44,14 +44,14 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 async def resume_on_start(
         app: aiohttp.web.Application
-):
+) -> None:
     """Resume old instance from start."""
     await app["db_conn"].open()
 
 
 async def save_on_shutdown(
         app: aiohttp.web.Application
-):
+) -> None:
     """Flush the database on shutdown."""
     if app["db_conn"] is not None:
         await app["db_conn"].close()
@@ -61,10 +61,10 @@ async def init_server() -> aiohttp.web.Application:
     """Initialize the server."""
     app = aiohttp.web.Application(
         middlewares=[
-            add_cors,
-            check_db_conn,
-            handle_validate_authentication,
-            catch_uniqueness_error,
+            add_cors,  # type:ignore
+            check_db_conn,  # type:ignore
+            handle_validate_authentication,  # type:ignore
+            catch_uniqueness_error,  # type:ignore
         ]
     )
 
@@ -104,8 +104,8 @@ async def init_server() -> aiohttp.web.Application:
 
 
 def run_server_devel(
-        app: aiohttp.web.Application
-):
+        app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
+) -> None:
     """Run the server in development mode (without HTTPS)."""
     aiohttp.web.run_app(
         app,
@@ -114,7 +114,7 @@ def run_server_devel(
     )
 
 
-def main():
+def main() -> None:
     """Run the server with the default run function."""
     if sys.version_info < (3, 6):
         logging.error("swift-x-account-sharing requires >= python3.6")
