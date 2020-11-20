@@ -13,7 +13,9 @@ from .db import handle_dropped_connection
 MODULE_LOGGER = logging.getLogger("api")
 
 
-async def handle_share_request_post(request):
+async def handle_share_request_post(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle query for posting a new share request."""
     container = request.match_info["container"]
     user = request.match_info["user"]
@@ -36,7 +38,9 @@ async def handle_share_request_post(request):
     })
 
 
-async def handle_user_owned_request_listing(request):
+async def handle_user_owned_request_listing(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle query for listing the requests owned by the user."""
     user = request.match_info["user"]
 
@@ -48,7 +52,9 @@ async def handle_user_owned_request_listing(request):
     return aiohttp.web.json_response(ret)
 
 
-async def handle_user_made_request_listing(request):
+async def handle_user_made_request_listing(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle query listing for the requests created by the user."""
     user = request.match_info["user"]
 
@@ -60,7 +66,9 @@ async def handle_user_made_request_listing(request):
     return aiohttp.web.json_response(ret)
 
 
-async def handle_container_request_listing(request):
+async def handle_container_request_listing(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Handle query for listing the container share requests."""
     container = request.match_info["container"]
 
@@ -72,7 +80,9 @@ async def handle_container_request_listing(request):
     return aiohttp.web.json_response(ret)
 
 
-async def handle_user_share_request_delete(request):
+async def handle_user_share_request_delete(
+        request: aiohttp.web.Request
+) -> aiohttp.web.Response:
     """Delete container share request or requests."""
     container = request.match_info["container"]
     user = request.match_info["user"]
@@ -101,7 +111,7 @@ async def handle_user_add_token(
     except KeyError:
         try:
             formdata = await request.post()
-            token = formdata["token"]
+            token = str(formdata["token"])
         except KeyError:
             raise aiohttp.web.HTTPBadRequest(
                 reason="No token present"
