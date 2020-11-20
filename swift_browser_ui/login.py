@@ -8,7 +8,9 @@ import re
 
 # aiohttp
 import aiohttp.web
+from multidict import MultiDictProxy
 
+import typing
 import urllib.error
 
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
@@ -39,9 +41,12 @@ async def handle_login(
     return response
 
 
-async def sso_query_begin(_) -> aiohttp.web.Response:
+async def sso_query_begin(
+        _: typing.Union[aiohttp.web.Request, None]
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     if not setd['has_trust']:
         response = aiohttp.web.FileResponse(
             str(setd['static_directory']) + '/login.html'
@@ -53,7 +58,7 @@ async def sso_query_begin(_) -> aiohttp.web.Response:
     )
 
     response.headers['Location'] = (
-        setd['auth_endpoint_url'] +
+        str(setd['auth_endpoint_url']) +
         "/auth"
         "/OS-FEDERATION" +
         "/identity_providers" +
@@ -69,22 +74,19 @@ async def sso_query_begin(_) -> aiohttp.web.Response:
     return response
 
 
-async def sso_query_end(
+def test_token(
+        formdata: MultiDictProxy[
+            typing.Union[str, bytes, aiohttp.web.FileField]],
         request: aiohttp.web.Request
-) -> aiohttp.web.Response:
-    """Handle the login procedure return from SSO or user from POST."""
+) -> str:
+    """Validate unscoped token."""
+    unscoped: typing.Union[str, None] = None
     log = request.app['Log']
-    # Declare the unscoped token
-    unscoped = None
-    formdata = await request.post()
-    log.info(
-        "Got %s in form.", formdata
-    )
     if 'token' in formdata:
-        unscoped = formdata['token']
+        unscoped = str(formdata['token'])
         log.info(
             'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
-                unscoped,
+                str(unscoped),
                 request.remote,
                 time.ctime()
             )
@@ -120,6 +122,22 @@ async def sso_query_end(
         raise aiohttp.web.HTTPClientError(
             reason="Token is malformed"
         )
+
+    return unscoped
+
+
+async def sso_query_end(
+        request: aiohttp.web.Request
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Handle the login procedure return from SSO or user from POST."""
+    log = request.app['Log']
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+    formdata = await request.post()
+    log.info(
+        "Got %s in form.", formdata
+    )
+    # Declare the unscoped token
+    unscoped = test_token(formdata, request)
 
     # Establish connection and begin session
     response = aiohttp.web.Response(
@@ -203,8 +221,6 @@ async def sso_query_end(
         "name": project_name,
         "id": project_id
     }
-
-    trust = bool(setd['has_trust']) if 'has_trust' in setd else False
 
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id,
@@ -292,9 +308,10 @@ async def handle_logout(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Properly kill the session for the user."""
+    cookie = ""
+    log = request.app['Log']
     if not setd['set_session_devmode']:
         try:
-            log = request.app['Log']
             cookie = decrypt_cookie(request)["id"]
             log.info("Killing session for %s :: %s",
                      cookie, time.ctime())

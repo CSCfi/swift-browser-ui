@@ -7,13 +7,22 @@ from aiohttp import web
 
 from .settings import setd
 
+AiohttpHandler = typing.Callable[
+    [web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        web.Response
+    ]
+]
+
 
 def return_error_response(
         error_code: int
 ) -> web.Response:
     """Return the correct error page with correct status code."""
     with open(
-            setd["static_directory"] + "/" + str(error_code) + ".html"
+            str(setd["static_directory"]) + "/" + str(error_code) + ".html"
     ) as resp:
         return web.Response(
             body="".join(resp.readlines()),
@@ -30,7 +39,7 @@ def return_error_response(
 @web.middleware
 async def error_middleware(
         request: web.Request,
-        handler: typing.Callable[[web.Request], web.Response]
+        handler: AiohttpHandler
 ) -> web.Response:
     """Return the correct HTTP Error page."""
     try:

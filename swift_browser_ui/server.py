@@ -64,7 +64,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 async def kill_sess_on_shutdown(
         app: aiohttp.web.Application
-):
+) -> None:
     """Kill all open sessions and purge their data when killed."""
     logging.info("Gracefully shutting down the program at %s",
                  time.ctime())
@@ -95,14 +95,14 @@ async def kill_sess_on_shutdown(
 
 async def open_client_to_app(
         app: aiohttp.web.Application
-):
+) -> None:
     """Open a client session for download proxies."""
     app['api_client'] = aiohttp.ClientSession()
 
 
 async def kill_dload_client(
         app: aiohttp.web.Application
-):
+) -> None:
     """Kill download proxy client session."""
     await app['api_client'].close()
 
@@ -134,7 +134,7 @@ async def servinit() -> aiohttp.web.Application:
     if setd['static_directory'] is not None:
         app.router.add_static(
             '/static/',
-            path=setd['static_directory'],  # type: ignore
+            path=str(setd['static_directory']),
             name='static',
             show_index=True,
         )
@@ -240,7 +240,7 @@ def run_server_secure(
         app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application],
         cert_file: str,
         cert_key: str
-):
+) -> None:
     """
     Run the server securely with a given ssl context.
 
@@ -279,7 +279,7 @@ def run_server_secure(
 
 def run_server_insecure(
         app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
-):
+) -> None:
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
