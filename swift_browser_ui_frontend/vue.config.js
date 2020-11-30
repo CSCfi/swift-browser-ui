@@ -29,6 +29,13 @@ module.exports = {  // eslint-disable-line
       title: "Not Found",
       chunks: ["chunk-vendors", "chunk-common", "notfound"],
     },
+    uidown: {
+      entry: "src/entries/uidown.js",
+      template: "public/index.html",
+      filename: "503.html",
+      title: "Not Found",
+      chunks: ["chunk-vendors", "chunk-common", "uidown"],
+    },
     browse: {
       entry: "src/entries/main.js",
       template: "public/index.html",

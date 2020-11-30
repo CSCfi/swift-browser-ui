@@ -27,6 +27,7 @@ new Vue({
     unauth: false,
     forbid: true,
     notfound: false,
+    uidown: false,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
   },
   methods: {
