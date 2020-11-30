@@ -5,4 +5,4 @@ THE_PORT=${PORT:="8080"}
 
 echo 'Start object-browser application'
 
-gunicorn swift_browser_ui.server:servinit --bind $THE_HOST:$THE_PORT --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120
+gunicorn swift_browser_ui.server:servinit --bind $THE_HOST:$THE_PORT --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --graceful-timeout 60 --timeout 120
