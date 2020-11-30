@@ -11,6 +11,7 @@ from hashlib import sha256
 import json
 import logging
 import urllib.request
+import requests
 import typing
 import time
 import hmac
@@ -27,6 +28,20 @@ import swiftclient.client
 
 
 from .settings import setd
+
+
+def test_swift_endpoint(endpoint: str) -> None:
+    """Test swift endpoint connectivity."""
+    try:
+        requests.head(endpoint)
+    except requests.exceptions.ConnectionError as e:
+        logging.debug(f"The {endpoint} couldn't fulfill the request.")
+        logging.debug(f"Error code: {e}")
+        raise aiohttp.web.HTTPServiceUnavailable(
+            reason="Cannot get Swift endpoint connection."
+        )
+    else:
+        logging.info('Swift endpoint accessible ')
 
 
 async def sign(

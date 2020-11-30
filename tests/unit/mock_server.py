@@ -10,7 +10,7 @@ import swift_browser_ui.server
 
 
 # Import some mock-ups that are already made before
-from .mockups import return_project_avail
+from .mockups import return_project_avail, return_test_swift_endpoint
 from .mockups import Mock_Service, Mock_Session
 
 
@@ -70,6 +70,10 @@ async def mock_graceful_shutdown(_):
 @unittest.mock.patch(
     "swift_browser_ui.login.get_availability_from_token",
     return_project_avail
+)
+@unittest.mock.patch(
+    "swift_browser_ui.login.test_swift_endpoint",
+    return_test_swift_endpoint
 )
 @unittest.mock.patch.dict(
     swift_browser_ui.server.setd,

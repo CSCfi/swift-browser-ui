@@ -16,6 +16,7 @@ import urllib.error
 from ._convenience import disable_cache, decrypt_cookie, generate_cookie
 from ._convenience import get_availability_from_token, session_check
 from ._convenience import initiate_os_session, initiate_os_service
+from ._convenience import test_swift_endpoint
 from .settings import setd
 
 
@@ -205,6 +206,11 @@ async def sso_query_end(
     request.app['Creds'][session]['OS_sess'] = initiate_os_session(
         unscoped,
         project_id
+    )
+
+    test_swift_endpoint(
+        request.app['Creds'][session]['OS_sess'].get_endpoint(
+            service_type='object-store')
     )
 
     # Create the swiftclient connection
