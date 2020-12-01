@@ -20,14 +20,14 @@ const i18n = new VueI18n({
 });
 
 new Vue({
-  name: "Unauthorized",
+  name: "ServiceUnavailable",
   i18n,
   data: {
     notindex: true,
-    unauth: true,
+    unauth: false,
     forbid: false,
     notfound: false,
-    uidown: false,
+    uidown: true,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
   },
   methods: {

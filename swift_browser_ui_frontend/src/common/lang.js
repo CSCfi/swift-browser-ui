@@ -8,6 +8,8 @@ const translations = {
       },
       error: {
         frontPage: "To the Front Page",
+        UIdown: "503 - Service Unavailable",
+        UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
                            "in. Use the button below to Log in.",
@@ -181,6 +183,8 @@ const translations = {
       },
       error: {
         frontPage: "Etusivulle",
+        UIdown: "503 - Palvelu ei ole käytettävissä",
+        UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
                            "jonka voi toteuttaa oheisesta painikkeesta.",

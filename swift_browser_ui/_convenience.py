@@ -11,6 +11,7 @@ from hashlib import sha256
 import json
 import logging
 import urllib.request
+import requests
 import typing
 import time
 import hmac
@@ -29,9 +30,23 @@ import swiftclient.client
 from .settings import setd
 
 
+def test_swift_endpoint(endpoint: str) -> None:
+    """Test swift endpoint connectivity."""
+    try:
+        requests.head(endpoint)
+    except requests.exceptions.ConnectionError as e:
+        logging.debug(f"The {endpoint} couldn't fulfill the request.")
+        logging.debug(f"Error code: {e}")
+        raise aiohttp.web.HTTPServiceUnavailable(
+            reason="Cannot get Swift endpoint connection."
+        )
+    else:
+        logging.info('Swift endpoint accessible ')
+
+
 async def sign(
         valid_for: int,
-        path,
+        path: str,
 ) -> dict:
     """Perform a general signature."""
     valid_until = str(int(time.time() + valid_for))
@@ -58,7 +73,7 @@ async def sign(
     }
 
 
-def setup_logging():
+def setup_logging() -> None:
     """
     Set up logging for the keystoneauth module.
 
@@ -76,8 +91,8 @@ def setup_logging():
 
 
 def disable_cache(
-        response: aiohttp.web.Response
-) -> aiohttp.web.Response:
+        response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Add cache disabling headers to an aiohttp response."""
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response.headers['Pragma'] = 'no-Cache'
@@ -95,14 +110,22 @@ def decrypt_cookie(
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
-    cookie_json = request.app['Crypt'].decrypt(
-        request.cookies['S3BROW_SESSION'].encode('utf-8')
-    ).decode('utf-8')
-    cookie = json.loads(cookie_json)
-    request.app["Log"].debug(
-        "Decrypted cookie: {0}".format(cookie)
-    )
-    return cookie
+    try:
+        cookie_json = request.app['Crypt'].decrypt(
+            request.cookies['S3BROW_SESSION'].encode('utf-8')
+        ).decode('utf-8')
+        cookie = json.loads(cookie_json)
+        request.app["Log"].debug(
+            "Decrypted cookie: {0}".format(cookie)
+        )
+        return cookie
+    except InvalidToken:
+        request.app["Log"].info("Throw due to invalid token.")
+        raise aiohttp.web.HTTPUnauthorized(
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
+        )
 
 
 def check_csrf(
@@ -114,7 +137,7 @@ def check_csrf(
     # site's wrong)
     if "Referer" in request.headers.keys():
         # Pass referer check if we're returning from the login.
-        if request.headers["Referer"] in setd["auth_endpoint_url"]:
+        if request.headers["Referer"] in str(setd["auth_endpoint_url"]):
             request.app["Log"].info(
                 "Skipping Referer check due to request coming from OS."
             )
@@ -156,7 +179,7 @@ def check_csrf(
 
 def session_check(
         request: aiohttp.web.Request
-):
+) -> None:
     """Check session validity from a request."""
     try:
         cookie = decrypt_cookie(request)
@@ -219,6 +242,7 @@ def api_check(
             )
         return ret
     except InvalidToken:
+        request.app["Log"].info("Throw due to invalid token.")
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
@@ -269,7 +293,7 @@ def get_availability_from_token(
 
     # Check projects from the API
     prq = urllib.request.Request(
-        setd['auth_endpoint_url'] + "/OS-FEDERATION/projects",
+        str(setd['auth_endpoint_url']) + "/OS-FEDERATION/projects",
         headers=hdr,
     )
     with urllib.request.urlopen(prq, timeout=20) as projects:  # nosec
@@ -277,7 +301,7 @@ def get_availability_from_token(
 
     # Check domains from the API
     drq = urllib.request.Request(
-        setd['auth_endpoint_url'] + "/OS-FEDERATION/domains",
+        str(setd['auth_endpoint_url']) + "/OS-FEDERATION/domains",
         headers=hdr,
     )
     with urllib.request.urlopen(drq, timeout=20) as domains:  # nosec
@@ -339,7 +363,7 @@ def initiate_os_session(
 
 
 def initiate_os_service(
-        os_session,
+        os_session: keystoneauth1.session.Session,
         url: str = None
 ) -> swiftclient.service.SwiftService:
     """Create a SwiftService connection to object storage."""
@@ -372,11 +396,11 @@ def initiate_os_service(
 
 
 async def get_tempurl_key(
-        connection
+        connection: swiftclient.service.SwiftService
 ) -> str:
     """Get the correct temp URL key from Openstack."""
     stats = connection.stat()
-
+    acc_meta_hdr = dict()
     # Check for the existence of the key headers
     try:
         acc_meta_hdr = stats['headers']
@@ -395,12 +419,12 @@ async def get_tempurl_key(
 
 
 async def get_container_tempurl_key(
-        connection,
-        container,
+        connection: swiftclient.service.SwiftService,
+        container: str,
 ) -> str:
     """Get the correct temp URL key for container operations."""
     stats = connection.stat(container=container)
-
+    cont_meta_hdr = dict()
     # Check for the existence of the key headers
     try:
         cont_meta_hdr = stats['headers']

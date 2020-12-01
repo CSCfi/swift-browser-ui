@@ -44,6 +44,14 @@
               >
                 {{ $t('message.error.Notfound_text') }}
               </b-message>
+              <b-message
+                v-if="uidown"
+                :title="$t('message.error.UIdown')"
+                type="is-warning"
+                has-icon
+              >
+                {{ $t('message.error.UIdown_text') }}
+              </b-message>
             </div>
             <div
               v-if="!forbid"

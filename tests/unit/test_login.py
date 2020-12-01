@@ -13,7 +13,7 @@ import swift_browser_ui.login
 import swift_browser_ui.settings
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
-from .mockups import return_project_avail
+from .mockups import return_project_avail, return_test_swift_endpoint
 from .mockups import return_invalid
 from .mockups import mock_token_project_avail
 
@@ -89,7 +89,12 @@ class LoginTestClass(asynctest.TestCase):
             "swiftclient.service.SwiftService"
         )
 
-        with patch1, patch2, patch3, patch4, patch5:
+        patch6 = unittest.mock.patch(
+            "swift_browser_ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint
+        )
+
+        with patch1, patch2, patch3, patch4, patch5, patch6:
             req = get_request_with_fernet()
             token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
             req.set_post({
@@ -138,7 +143,12 @@ class LoginTestClass(asynctest.TestCase):
             "swiftclient.service.SwiftService"
         )
 
-        with patch1, patch2, patch3, patch4, patch5:
+        patch6 = unittest.mock.patch(
+            "swift_browser_ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint
+        )
+
+        with patch1, patch2, patch3, patch4, patch5, patch6:
             req = get_request_with_fernet()
             token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 
@@ -179,14 +189,21 @@ class LoginTestClass(asynctest.TestCase):
         patch3 = unittest.mock.patch(
             "keystoneauth1.identity.v3.Token"
         )
+
         patch4 = unittest.mock.patch(
             "keystoneauth1.session.Session"
         )
+
         patch5 = unittest.mock.patch(
             "swiftclient.service.SwiftService"
         )
 
-        with patch1, patch2, patch3, patch4, patch5:
+        patch6 = unittest.mock.patch(
+            "swift_browser_ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint
+        )
+
+        with patch1, patch2, patch3, patch4, patch5, patch6:
             req = get_request_with_fernet()
             token = hashlib.md5(os.urandom(64)).hexdigest()  # nosec
 

@@ -37,6 +37,7 @@ The different configurations are also listed here:
 
 import logging
 from os import environ
+from typing import Union, Dict
 
 
 FORMAT = """\
@@ -55,11 +56,11 @@ if environ.get('BROWSER_DEBUG', None):
 
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
-setd = {
+setd: Dict[str, Union[str, int, None]] = {
     "auth_endpoint_url": environ.get(
         "BROWSER_START_AUTH_ENDPOINT_URL",
         environ.get(
-            "OS_AUTH_URL", None
+            "OS_AUTH_URL", ""
         )),
     "sharing_endpoint": environ.get(
         "BROWSER_START_SHARING_ENDPOINT_URL", None
@@ -98,7 +99,7 @@ setd = {
 }
 
 
-def set_key(key, value, log_message):
+def set_key(key: str, value: Union[str, int, None], log_message: str) -> None:
     """Set a key value if it's specified."""
     if value:
         logging.info(log_message, str(value))

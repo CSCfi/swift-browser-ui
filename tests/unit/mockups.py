@@ -126,6 +126,11 @@ def return_project_avail(_):
     return mock_token_output
 
 
+def return_test_swift_endpoint(_):
+    """Return mocked test available swift."""
+    return None
+
+
 @contextmanager
 def urlopen(prq, timeout=10):
     """Mockup class for opening keystone."""

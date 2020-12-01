@@ -7,13 +7,22 @@ from aiohttp import web
 
 from .settings import setd
 
+AiohttpHandler = typing.Callable[
+    [web.Request],
+    typing.Coroutine[
+        typing.Awaitable,
+        typing.Any,
+        web.Response
+    ]
+]
+
 
 def return_error_response(
         error_code: int
 ) -> web.Response:
     """Return the correct error page with correct status code."""
     with open(
-            setd["static_directory"] + "/" + str(error_code) + ".html"
+            str(setd["static_directory"]) + "/" + str(error_code) + ".html"
     ) as resp:
         return web.Response(
             body="".join(resp.readlines()),
@@ -30,7 +39,7 @@ def return_error_response(
 @web.middleware
 async def error_middleware(
         request: web.Request,
-        handler: typing.Callable[[web.Request], web.Response]
+        handler: AiohttpHandler
 ) -> web.Response:
     """Return the correct HTTP Error page."""
     try:
@@ -49,7 +58,9 @@ async def error_middleware(
             return return_error_response(403)
         if ex.status == 404:
             return return_error_response(404)
-        if ex.status > 404:
-            # we forbid all dubios and unauthorized requests
+        if ex.status > 404 and ex.status < 500:
             return return_error_response(403)
+        if ex.status > 500:
+            # we forbid all dubios and unauthorized requests
+            return return_error_response(503)
         raise
