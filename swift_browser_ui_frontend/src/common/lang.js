@@ -9,7 +9,7 @@ const translations = {
       error: {
         frontPage: "To the Front Page",
         UIdown: "503 - Service Unavailable",
-        UIdown_text: "Allas User interface is currently Unavailable",
+        UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
                            "in. Use the button below to Log in.",
