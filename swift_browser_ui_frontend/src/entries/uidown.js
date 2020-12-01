@@ -20,7 +20,7 @@ const i18n = new VueI18n({
 });
 
 new Vue({
-  name: "Service Unavailable",
+  name: "ServiceUnavailable",
   i18n,
   data: {
     notindex: true,
