@@ -16,16 +16,16 @@ class SwiftSharingRequest:
     def __init__(
             self,
             url: str
-    ):
+    ) -> None:
         """."""
         self.url = url
         self.session = aiohttp.ClientSession()
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> 'SwiftSharingRequest':
         """."""
         return self
 
-    async def __aexit__(self, *excinfo):
+    async def __aexit__(self, *excinfo: BaseException) -> None:
         """."""
         await self.session.close()
 
