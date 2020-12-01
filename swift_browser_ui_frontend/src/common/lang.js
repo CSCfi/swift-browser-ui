@@ -183,8 +183,8 @@ const translations = {
       },
       error: {
         frontPage: "Etusivulle",
-        UIdown: "503 - Service Unavailable",
-        UIdown_text: "Allas User interface is currently Unavailable",
+        UIdown: "503 - Palvelu ei ole käytettävissä",
+        UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
                            "jonka voi toteuttaa oheisesta painikkeesta.",
