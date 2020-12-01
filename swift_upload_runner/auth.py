@@ -57,7 +57,7 @@ async def handle_login(
 
 async def read_in_keys(
         app: aiohttp.web.Application
-):
+) -> None:
     """Read in keys to the application."""
     keys = os.environ.get("SWIFT_UI_API_AUTH_TOKENS", None)
     app["tokens"] = keys.split(",") if keys is not None else []

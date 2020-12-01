@@ -8,7 +8,7 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.7]
+        python-version: [3.7, 3.8]
       
     runs-on: ${{ matrix.os }}
 
@@ -24,5 +24,7 @@ jobs:
         pip install tox tox-gh-actions
     - name: Test flake8 syntax with tox
       run: tox -e flake8
+    - name: Test mypy typing with tox
+      run: tox -e mypy
     - name: bandit static check
       run: tox -e bandit

@@ -34,8 +34,8 @@ class FileDownloadProxy:
     def __init__(
             self,
             auth: keystoneauth1.session.Session,
-            chunk_size=128 * 1024
-    ):
+            chunk_size: int = 128 * 1024
+    ) -> None:
         """."""
         # Establish a queue for the proxied file parts
         # Total queue size 128 * 256 * 1024 = 32MiB for now
@@ -103,7 +103,7 @@ class FileDownloadProxy:
             project: str,
             container: str,
             object_name: str
-    ):
+    ) -> None:
         """Download object chunks from stream into the queue."""
         print(f"""
         Downloading from project {project},
@@ -159,7 +159,7 @@ class FileDownloadProxy:
             project: str,
             container: str,
             object_name: str
-    ):
+    ) -> None:
         """Begin the download process."""
         self.begin_download(
             project,
@@ -172,7 +172,7 @@ class FileDownloadProxy:
         project: str,
         container: str,
         object_name: str
-    ):
+    ) -> None:
         """Begin the download process."""
         self.t_dload = threading.Thread(
             target=self.download_into_queue,
@@ -188,7 +188,7 @@ class FileDownloadProxy:
     async def a_write_to_response(
             self,
             resp: aiohttp.web.StreamResponse
-    ):
+    ) -> None:
         """Get the response serving the file."""
         while True:
             chunk = await self.a_read()
@@ -207,7 +207,7 @@ class TarInputWrapper:
             project: str,
             container: str,
             object_name: str
-    ):
+    ) -> None:
         """."""
         # Initialize the download class
         self.dload = FileDownloadProxy(auth)
@@ -222,7 +222,7 @@ class TarInputWrapper:
         """Return the specific download instance."""
         return self.dload
 
-    def begin_download(self):
+    def begin_download(self) -> None:
         """Begin download and block until received headers."""
         self.dload.begin_download(
             self.project,
@@ -258,7 +258,7 @@ class TarQueueWrapper:
 
     def __init__(
             self
-    ):
+    ) -> None:
         """."""
         self.q: queue.Queue = queue.Queue(
             maxsize=int(
@@ -269,13 +269,13 @@ class TarQueueWrapper:
     def write(
             self,
             payload: bytes = None
-    ):
+    ) -> None:
         """Emulate BytesIO write function to be used with tarfile."""
         self.q.put(payload)
 
     def read(
             self
-    ):
+    ) -> bytes:
         """Read next chunk."""
         return self.q.get()
 
@@ -287,7 +287,7 @@ class TarQueueWrapper:
 
     async def a_read(
             self
-    ):
+    ) -> bytes:
         """Asynchronously read next chunk."""
         while True:
             try:
@@ -304,8 +304,8 @@ class ContainerArchiveDownloadProxy:
             auth: keystoneauth1.session.Session,
             project: str,
             container: str,
-            chunk_size=128 * 1024
-    ):
+            chunk_size: int = 128 * 1024
+    ) -> None:
         """."""
         self.auth = auth
         self.download_queue: queue.Queue = queue.Queue(
@@ -411,7 +411,7 @@ class ContainerArchiveDownloadProxy:
 
     def get_object_listing(
             self,
-    ):
+    ) -> None:
         """Synchronize the list of objects to download."""
         with requests.get(
                 generate_download_url(
@@ -429,8 +429,8 @@ class ContainerArchiveDownloadProxy:
 
     def sync_folders(
             self,
-            fs
-    ):
+            fs: dict
+    ) -> None:
         """Sycnhronize the folders into the tar archive."""
         if self.archive:
             for i in fs:
@@ -440,15 +440,15 @@ class ContainerArchiveDownloadProxy:
 
     def download_init(
             self,
-    ):
+    ) -> None:
         """Create download init."""
         self.download_init_loop(self.fs)
         self.download_queue.put(None)
 
     def download_init_loop(
             self,
-            fs
-    ):
+            fs: dict
+    ) -> None:
         """Loop to run for initializing downloads."""
         if self.archive:
             for i in fs:
@@ -472,7 +472,7 @@ class ContainerArchiveDownloadProxy:
 
     def tar_archiving_loop(
             self,
-    ):
+    ) -> None:
         """Loop to run for initializing tarballing."""
         while True:
             next_file = self.download_queue.get()
@@ -502,20 +502,20 @@ class ContainerArchiveDownloadProxy:
 
     async def a_begin_container_download(
             self,
-    ):
+    ) -> None:
         """Begin the operation for downloading a whole container."""
         self.begin_container_download()
 
     def begin_container_download(
             self,
-    ):
+    ) -> None:
         """Begin the operation for downloading a whole container."""
         self.get_object_listing()
 
         self.archive = tarfile.open(
             name=self.container + ".tar",
             mode="w|",
-            fileobj=self.output_queue
+            fileobj=self.output_queue  # type:ignore
         )
 
         self.sync_folders(self.fs)
@@ -535,7 +535,7 @@ class ContainerArchiveDownloadProxy:
     async def a_write_to_response(
             self,
             response: aiohttp.web.StreamResponse
-    ):
+    ) -> None:
         """Write the tarball into the response."""
         while True:
             chunk = await self.output_queue.a_read()
