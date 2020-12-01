@@ -4,6 +4,7 @@ import time
 import typing
 
 import aiohttp.web
+from swiftclient.exceptions import ClientException
 from swiftclient.service import SwiftError
 from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
@@ -68,6 +69,8 @@ async def swift_list_buckets(
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
+    except ClientException as e:
+        request.app['Log'].error(e.msg)
     except KeyError:
         # listing is missing; possible broken swift auth
         return aiohttp.web.json_response([])
@@ -90,7 +93,7 @@ async def swift_create_container(
             get_conn(request.app['Creds'][session]['ST_conn']._options),
             request.match_info["container"]
         )
-    except SwiftError:
+    except (SwiftError, ClientException):
         raise aiohttp.web.HTTPServerError(
             reason="Container creation failure"
         )
@@ -143,6 +146,9 @@ async def swift_list_objects(
         return aiohttp.web.json_response(obj)
     except SwiftError:
         return aiohttp.web.json_response([])
+    except ClientException as e:
+        request.app['Log'].error(e.msg)
+        return aiohttp.web.json_response([])
     except KeyError:
         # listing is missing; possible broken swift auth
         return aiohttp.web.json_response([])
@@ -193,6 +199,9 @@ async def swift_list_shared_objects(
         return aiohttp.web.json_response(obj)
 
     except SwiftError:
+        return aiohttp.web.json_response([])
+    except ClientException as e:
+        request.app['Log'].error(e.msg)
         return aiohttp.web.json_response([])
     except KeyError:
         # listing is missing; possible broken swift auth
