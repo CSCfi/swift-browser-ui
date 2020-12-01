@@ -16,6 +16,7 @@ async def has_access_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle has-access endpoint query."""
+    access_list = []
     try:
         access_list = await request.app["db_conn"].get_access_list(
             request.match_info["user"]
@@ -35,6 +36,7 @@ async def access_details_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
+    access_details = dict()
     try:
         access_details = \
             await request.app["db_conn"].get_access_container_details(
@@ -56,6 +58,7 @@ async def gave_access_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle gave-access endpoint query."""
+    shared_list = []
     try:
         shared_list = await request.app["db_conn"].get_shared_list(
             request.match_info["owner"]
@@ -76,6 +79,7 @@ async def shared_details_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
+    shared_details = dict()
     try:
         shared_details = \
             await request.app["db_conn"].get_shared_container_details(
@@ -97,6 +101,7 @@ async def share_container_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle share-container endpoint query."""
+    shared: bool = False
     try:
         shared = await request.app["db_conn"].add_share(
             request.match_info["owner"],
@@ -110,7 +115,8 @@ async def share_container_handler(
 
     MODULE_LOGGER.log(
         logging.DEBUG,
-        "Added following new shares: %s", str(shared)
+        "Added following new shared containers: %s",
+        str(request.match_info["container"])
     )
 
     return aiohttp.web.json_response(shared)
@@ -120,6 +126,7 @@ async def edit_share_handler(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Handle container shared rights editions."""
+    edited: bool = False
     try:
         edited = await request.app["db_conn"].edit_share(
             request.match_info["owner"],
@@ -132,7 +139,8 @@ async def edit_share_handler(
 
     MODULE_LOGGER.log(
         logging.DEBUG,
-        "Edited following shares: %s", str(edited)
+        "Edited following shared containers: %s",
+        str(request.match_info["container"])
     )
 
     return aiohttp.web.json_response(edited)
@@ -143,7 +151,7 @@ async def delete_share_handler(
 ) -> aiohttp.web.Response:
     """Handle unshare-container endpoint query."""
     try:
-        deleted = await request.app["db_conn"].delete_share(
+        await request.app["db_conn"].delete_share(
             request.match_info["owner"],
             request.match_info["container"],
             request.query["user"].split(",")
@@ -158,7 +166,8 @@ async def delete_share_handler(
 
     MODULE_LOGGER.log(
         logging.DEBUG,
-        "Deleted following shares: %s", str(deleted)
+        "Deleted following shared containers: %s",
+        str(request.match_info["container"])
     )
 
     return aiohttp.web.Response(
@@ -172,7 +181,7 @@ async def delete_container_shares_handler(
 ) -> aiohttp.web.Response:
     """Delete all shares from a container."""
     try:
-        deleted = await request.app["db_conn"].delete_container_shares(
+        await request.app["db_conn"].delete_container_shares(
             request.match_info["owner"],
             request.match_info["container"]
         )
@@ -181,7 +190,8 @@ async def delete_container_shares_handler(
 
     MODULE_LOGGER.log(
         logging.DEBUG,
-        "Deleted following shares: %s", str(deleted)
+        "Deleted following shared container: %s",
+        str(request.match_info["container"])
     )
 
     return aiohttp.web.Response(
@@ -202,7 +212,7 @@ async def handle_user_add_token(
     except KeyError:
         try:
             formdata = await request.post()
-            token = formdata["token"]
+            token = str(formdata["token"])
         except KeyError:
             raise aiohttp.web.HTTPBadRequest(
                 reason="No token present"
@@ -243,7 +253,7 @@ async def handle_user_list_tokens(
 ) -> aiohttp.web.Response:
     """Get project token listing."""
     project = request.match_info["project"]
-
+    tokens = []
     try:
         tokens = await request.app["db_conn"].get_tokens(project)
     except InterfaceError:

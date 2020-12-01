@@ -36,7 +36,7 @@ LOGGER = logging.getLogger("swift_x_account_sharing.auth")
 
 async def read_in_keys(
         app: aiohttp.web.Application
-):
+) -> None:
     """Read in keys to the application."""
     keys = os.environ.get("SWIFT_UI_API_AUTH_TOKENS", None)
     app["tokens"] = keys.split(",") if keys is not None else []
@@ -51,7 +51,7 @@ async def test_signature(
         signature: str,
         message: str,
         validity: str,
-):
+) -> None:
     """Validate signature against the given tokens."""
     # Check signature expiration
     if int(validity) < time.time():
@@ -87,6 +87,7 @@ async def handle_validate_authentication(
             reason="Query string missing validity or signature."
         )
 
+    project: typing.Union[None, str]
     project_tokens = []
     try:
         project = request.match_info["project"]
