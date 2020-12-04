@@ -45,6 +45,7 @@ async def swift_list_buckets(
     not necessary in this case and returns a JSON response containing all the
     necessary data.
     """
+    cont: typing.List[dict] = []
     try:
         session = api_check(request)
         request.app['Log'].info(
@@ -58,14 +59,12 @@ async def swift_list_buckets(
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        cont: typing.List[dict] = []
         list(map(lambda i: cont.extend(i["listing"]),  # type: ignore
                  request.app['Creds'][session]['ST_conn'].list()))
         # for a bucket with no objects
         if not cont:
             # return empty object
             raise aiohttp.web.HTTPNotFound()
-        return aiohttp.web.json_response(cont)
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
@@ -73,7 +72,9 @@ async def swift_list_buckets(
         request.app['Log'].error(e.msg)
     except KeyError:
         # listing is missing; possible broken swift auth
-        return aiohttp.web.json_response([])
+        return aiohttp.web.json_response(cont)
+
+    return aiohttp.web.json_response(cont)
 
 
 async def swift_create_container(
