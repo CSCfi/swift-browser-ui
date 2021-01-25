@@ -21,7 +21,7 @@ LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCFI/swift-x-account-sharing"
 
-COPY --from=BACKEND /usr/local/lib/python3.7 /usr/local/lib/python3.7/
+COPY --from=BACKEND /usr/local/lib/python3.8 /usr/local/lib/python3.8/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 

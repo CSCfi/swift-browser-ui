@@ -16,7 +16,6 @@ ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
 
 
-
 class SwiftXAccountSharing:
     """Swift X Account Sharing backend client."""
 
@@ -56,20 +55,23 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
                 raise Exception(f"response status: {resp.status}.")
-                
 
     async def get_access_details(
             self,
@@ -84,15 +86,19 @@ class SwiftXAccountSharing:
         params = sign_api_request(path)
         params.update({"owner": owner})
 
-        async with self.session.get(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
@@ -108,15 +114,19 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
@@ -133,15 +143,19 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
@@ -167,15 +181,19 @@ class SwiftXAccountSharing:
             "address": address
         })
 
-        async with self.session.post(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.post(url,
+                                     params=params,
+                                     ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
@@ -198,15 +216,19 @@ class SwiftXAccountSharing:
             "access": self.parse_list_to_string(accesslist),
         })
 
-        async with self.session.patch(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.patch(url,
+                                      params=params,
+                                      ssl=ssl_context) as resp:
             if resp.status == 200:
                 try:
                     return json.loads(await resp.text())
                 except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error response was not possible.")
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
                     raise
                 except Exception as e:
-                    logging.error(f"Unknown exception occured with content: {e}.")
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
                     raise
             else:
                 logging.error(f"response status: {resp.status}.")
@@ -227,5 +249,7 @@ class SwiftXAccountSharing:
             "user": self.parse_list_to_string(userlist),
         })
 
-        async with self.session.delete(url, params=params, ssl=ssl_context) as resp:
+        async with self.session.delete(url,
+                                       params=params,
+                                       ssl=ssl_context) as resp:
             return bool(resp.status == 204)
