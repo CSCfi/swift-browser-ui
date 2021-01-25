@@ -4,10 +4,17 @@
 import os
 import json
 import typing
-
+import logging
 import aiohttp
 
 from .signature import sign_api_request
+
+import ssl
+import certifi
+
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
 
 
 class SwiftSharingRequest:
@@ -47,8 +54,23 @@ class SwiftSharingRequest:
             "signature": signature["signature"],
         }
 
-        async with self.session.post(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.post(url,
+                                     params=params,
+                                     ssl=ssl_context) as resp:
+            if resp.status == 200:
+                try:
+                    return json.loads(await resp.text())
+                except json.decoder.JSONDecodeError:
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
+                    raise
+                except Exception as e:
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
+                    raise
+            else:
+                logging.error(f"response status: {resp.status}.")
+                raise Exception(f"response status: {resp.status}.")
 
     async def list_made_requests(
             self,
@@ -65,8 +87,23 @@ class SwiftSharingRequest:
             "signature": signature["signature"],
         }
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+            if resp.status == 200:
+                try:
+                    return json.loads(await resp.text())
+                except json.decoder.JSONDecodeError:
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
+                    raise
+                except Exception as e:
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
+                    raise
+            else:
+                logging.error(f"response status: {resp.status}.")
+                raise Exception(f"response status: {resp.status}.")
 
     async def list_owned_requests(
             self,
@@ -83,8 +120,23 @@ class SwiftSharingRequest:
             "signature": signature["signature"],
         }
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+            if resp.status == 200:
+                try:
+                    return json.loads(await resp.text())
+                except json.decoder.JSONDecodeError:
+                    logging.error("Decoding JSON error \
+                        response was not possible.")
+                    raise
+                except Exception as e:
+                    logging.error(f"Unknown exception \
+                        occured with content: {e}.")
+                    raise
+            else:
+                logging.error(f"response status: {resp.status}.")
+                raise Exception(f"response status: {resp.status}.")
 
     async def list_container_requests(
             self,
@@ -106,7 +158,9 @@ class SwiftSharingRequest:
         if project:
             params["project"] = project
 
-        async with self.session.get(url, params=params) as resp:
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
             return json.loads(await resp.text())
 
     async def share_delete_access(
@@ -127,5 +181,7 @@ class SwiftSharingRequest:
             "signature": signature["signature"],
         }
 
-        async with self.session.delete(url, params=params) as resp:
+        async with self.session.delete(url,
+                                       params=params,
+                                       ssl=ssl_context) as resp:
             return bool(resp.status == 200)
