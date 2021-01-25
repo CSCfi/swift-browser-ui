@@ -202,43 +202,36 @@ async def sso_query_end(
         project_id = \
             request.app['Creds'][session]['Avail']['projects'][0]['id']
 
-    try:
-        # Open an OS session for the first project that's found for the user.
-        request.app['Creds'][session]['OS_sess'] = initiate_os_session(
-            unscoped,
-            project_id
-        )
+    # Open an OS session for the first project that's found for the user.
+    request.app['Creds'][session]['OS_sess'] = initiate_os_session(
+        unscoped,
+        project_id
+    )
 
-        test_swift_endpoint(
-            request.app['Creds'][session]['OS_sess'].get_endpoint(
-                service_type='object-store')
-        )
+    test_swift_endpoint(
+        request.app['Creds'][session]['OS_sess'].get_endpoint(
+            service_type='object-store')
+    )
 
-        # Create the swiftclient connection
-        request.app['Creds'][session]['ST_conn'] = initiate_os_service(
-            request.app['Creds'][session]['OS_sess'],
-        )
+    # Create the swiftclient connection
+    request.app['Creds'][session]['ST_conn'] = initiate_os_service(
+        request.app['Creds'][session]['OS_sess'],
+    )
 
-        project_name = None
-        for i in request.app['Creds'][session]['Avail']['projects']:
-            if i['id'] == project_id:
-                project_name = i['name']
-        # Save the current active project
-        request.app['Creds'][session]['active_project'] = {
-            "name": project_name,
-            "id": project_id
-        }
+    project_name = None
+    for i in request.app['Creds'][session]['Avail']['projects']:
+        if i['id'] == project_id:
+            project_name = i['name']
+    # Save the current active project
+    request.app['Creds'][session]['active_project'] = {
+        "name": project_name,
+        "id": project_id
+    }
 
-        # Set the active project to be the last active project
-        response.set_cookie("LAST_ACTIVE", project_id,
-                            expires=2592000,  # type: ignore
-                            secure=trust, httponly=trust)  # type: ignore
-
-    except Exception as e:
-        request.app['Log'].debug(
-            f'Something went wrong at login Login: {e}',
-        )
-        raise aiohttp.web.HTTPServiceUnavailable()
+    # Set the active project to be the last active project
+    response.set_cookie("LAST_ACTIVE", project_id,
+                        expires=2592000,  # type: ignore
+                        secure=trust, httponly=trust)  # type: ignore
 
     # Redirect to the browse page
     if "NAV_TO" in request.cookies.keys():
