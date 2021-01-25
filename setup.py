@@ -20,8 +20,7 @@ setuptools.setup(
         'certifi',
         'uvloop',
         "swift-browser-ui"
-        "@ git+https://github.com/cscfi/swift-browser-ui.git",
-        "certifi"
+        "@ git+https://github.com/cscfi/swift-browser-ui.git"
     ],
     extras_require={
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage',
