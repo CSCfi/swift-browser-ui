@@ -16,6 +16,7 @@ setuptools.setup(
         "aiohttp",
         "uvloop",
         "asyncpg",
+        "certifi"
     ],
     extras_require={
         "test": ["tox", "pytest", "pytest-cov", "coverage", "flake8",
@@ -36,8 +37,8 @@ setuptools.setup(
         "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
 
         "License :: OSI Approved :: MIT License",
-
-        "Programming Language :: Python :: 3.6",
+        
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
 )
