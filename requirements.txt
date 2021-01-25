@@ -7,3 +7,4 @@ sphinx
 sphinx_rtd_theme
 uvloop
 gunicorn>=20.0.1
+certifi

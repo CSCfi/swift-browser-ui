@@ -29,6 +29,13 @@ import swiftclient.client
 
 from .settings import setd
 
+import ssl
+import certifi
+
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
+
 
 def test_swift_endpoint(endpoint: str) -> None:
     """Test swift endpoint connectivity."""
@@ -464,7 +471,8 @@ async def open_upload_runner_session(
                 params={
                     "signature": signature["signature"],
                     "valid": signature["valid_until"]
-                }
+                },
+                ssl=ssl_context
         ) as resp:
             ret = str(resp.cookies["RUNNER_SESSION_ID"].value)
             request.app['Creds'][session_key]['runner'] = ret
