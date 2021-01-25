@@ -257,7 +257,7 @@ class ResumableFileUploadProxy:
                 LOGGER.debug(f"Success in uploding chunk {chunk_number}")
                 return aiohttp.web.Response(status=201)
         else:
-            LOGGER.debug(f"Concatenatig chunk {chunk_number}")
+            LOGGER.debug(f"Concatenating chunk {chunk_number}")
             await self.q.put((
                 # Using chunk number as priority, to handle chunks in any
                 # order
