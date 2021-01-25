@@ -13,6 +13,13 @@ import keystoneauth1.session
 
 import swift_upload_runner.common as common
 
+import ssl
+import certifi
+
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
+
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -94,6 +101,7 @@ class ResumableFileUploadProxy:
             headers={
                 "X-Auth-Token": self.auth.get_token()
             },
+            ssl=ssl_context
         ) as resp:
             if resp.status in {200}:
                 segments = await resp.text()
@@ -121,7 +129,8 @@ class ResumableFileUploadProxy:
                 headers={
                     "Content-Length": str(0),
                     "X-Auth-Token": self.auth.get_token()
-                }
+                },
+                ssl=ssl_context
         ) as resp:
             if resp.status not in {201, 202}:
                 raise aiohttp.web.HTTPForbidden(
@@ -139,7 +148,8 @@ class ResumableFileUploadProxy:
                 ),
                 headers={
                     "X-Auth-Token": self.auth.get_token()
-                }
+                },
+                ssl=ssl_context
         ) as resp:
             if resp.status != 204:
                 if self.project != self.auth.get_project_id():
@@ -155,7 +165,8 @@ class ResumableFileUploadProxy:
                 ),
                 headers={
                     "X-Auth-Token": self.auth.get_token()
-                }
+                },
+                ssl=ssl_context
             ) as resp:
                 if resp.status != 204:
                     if self.project != self.auth.get_project_id():
@@ -176,7 +187,8 @@ class ResumableFileUploadProxy:
             self.url,
             headers={
                 "X-Auth-Token": self.auth.get_token()
-            }
+            },
+            ssl=ssl_context
         ) as request:
             if request.status == 200:
                 return aiohttp.web.Response(status=200)
@@ -201,7 +213,8 @@ class ResumableFileUploadProxy:
             headers={
                 "X-Auth-Token": self.auth.get_token(),
                 "X-Object-Manifest": manifest
-            }
+            },
+            ssl=ssl_context
         ) as resp:
             if resp.status != 201:
                 raise aiohttp.web.HTTPBadRequest()
@@ -232,7 +245,8 @@ class ResumableFileUploadProxy:
                     "Content-Length": query["resumableCurrentChunkSize"],
                     "Content-Type": "application/swiftclient-segment",
                 },
-                timeout=UPL_TIMEOUT
+                timeout=UPL_TIMEOUT,
+                ssl=ssl_context
             ) as resp:
                 if resp.status == 408:
                     raise aiohttp.web.HTTPRequestTimeout()
@@ -272,7 +286,8 @@ class ResumableFileUploadProxy:
                     "X-Auth-Token": self.auth.get_token(),
                     "Content-Length": str(self.total_size),
                 },
-                timeout=UPL_TIMEOUT
+                timeout=UPL_TIMEOUT,
+                ssl=ssl_context
         ) as resp:
             if resp.status == 408:
                 raise aiohttp.web.HTTPRequestTimeout()

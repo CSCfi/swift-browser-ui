@@ -10,10 +10,14 @@ import aiohttp.client
 import keystoneauth1.session
 
 import swift_upload_runner.common as common
-
+import ssl
+import certifi
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
 
 
 # The replication process needs a generous timeout, due to aiohttp having
@@ -81,7 +85,8 @@ class ObjectReplicationProxy():
                 headers={
                     "Content-Length": str(0),
                     "X-Auth-Token": self.auth.get_token()
-                }
+                },
+                ssl=ssl_context
         ) as resp:
             if resp.status not in {201, 202}:
                 raise aiohttp.web.HTTPForbidden(
@@ -103,7 +108,8 @@ class ObjectReplicationProxy():
                     "X-Auth-Token": self.auth.get_token(),
                     "Accept-Encoding": "identity"
                 },
-                timeout=REPL_TIMEOUT
+                timeout=REPL_TIMEOUT,
+                ssl=ssl_context
         ) as resp:
             if resp.status == 404:
                 raise aiohttp.web.HTTPNotFound(
@@ -140,7 +146,8 @@ class ObjectReplicationProxy():
                         "X-Auth-Token": self.auth.get_token(),
                         "Accept-Encoding": "identity"
                     },
-                    timeout=REPL_TIMEOUT
+                    timeout=REPL_TIMEOUT,
+                    ssl=ssl_context
             ) as resp_g:
                 length = int(resp_g.headers["Content-Length"])
                 headers = {
@@ -166,7 +173,8 @@ class ObjectReplicationProxy():
                         to_url,
                         data=self.a_generate_object_from_reader(resp_g),
                         headers=headers,
-                        timeout=REPL_TIMEOUT
+                        timeout=REPL_TIMEOUT,
+                        ssl=ssl_context
                 ) as resp_p:
                     LOGGER.debug(f"Segment {segment} status {resp_p.status}")
                     if resp_p.status == 408:
@@ -197,7 +205,8 @@ class ObjectReplicationProxy():
                     "X-Auth-Token": self.auth.get_token(),
                     "Accept-Encoding": "identity"
                 },
-                timeout=REPL_TIMEOUT
+                timeout=REPL_TIMEOUT,
+                ssl=ssl_context
         ) as resp_g:
             # If the source object doesn't exist, abort
             if resp_g.status != 200:
@@ -236,7 +245,8 @@ class ObjectReplicationProxy():
                         ),
                         data=self.a_generate_object_from_reader(resp_g),
                         headers=headers,
-                        timeout=REPL_TIMEOUT
+                        timeout=REPL_TIMEOUT,
+                        ssl=ssl_context
                 ) as resp_p:
                     if resp_p.status == 408:
                         raise aiohttp.web.HTTPRequestTimeout()
@@ -267,7 +277,8 @@ class ObjectReplicationProxy():
                         ),
                         data=b"",
                         headers=headers,
-                        timeout=REPL_TIMEOUT
+                        timeout=REPL_TIMEOUT,
+                        ssl=ssl_context
                 ) as resp:
                     if resp.status != 201:
                         raise aiohttp.web.HTTPInternalServerError(
@@ -294,7 +305,8 @@ class ObjectReplicationProxy():
                 headers={
                     "X-Auth-Token": self.auth.get_token()
                 },
-                timeout=REPL_TIMEOUT
+                timeout=REPL_TIMEOUT,
+                ssl=ssl_context
         ) as resp:
             if resp.status != 200:
                 LOGGER.debug(

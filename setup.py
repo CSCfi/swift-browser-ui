@@ -20,7 +20,8 @@ setuptools.setup(
         'certifi',
         'uvloop',
         "swift-browser-ui"
-        "@ git+https://github.com/cscfi/swift-browser-ui.git"
+        "@ git+https://github.com/cscfi/swift-browser-ui.git",
+        "certifi"
     ],
     extras_require={
         'test': ['tox', 'pytest', 'pytest-cov', 'coverage',
@@ -46,7 +47,7 @@ setuptools.setup(
         # Pick your license as you wish
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 )
