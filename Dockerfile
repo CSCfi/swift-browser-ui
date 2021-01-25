@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.12 as BACKEND
+FROM python:3.8-alpine3.12 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
@@ -13,7 +13,7 @@ RUN pip install --upgrade pip\
     && pip install -r /root/swift_request/requirements.txt \
     && pip install /root/swift_request
 
-FROM python:3.7-alpine3.12
+FROM python:3.8-alpine3.12
 
 RUN apk add --no-cache --update bash
 
@@ -21,7 +21,7 @@ LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCFI/swift-sharing-request"
 
-COPY --from=BACKEND /usr/local/lib/python3.7 /usr/local/lib/python3.7/
+COPY --from=BACKEND /usr/local/lib/python3.8 /usr/local/lib/python3.8/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 
