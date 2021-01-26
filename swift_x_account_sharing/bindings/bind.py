@@ -3,10 +3,17 @@
 
 import json
 import typing
-
+import logging
 import aiohttp
 
 from .signature import sign_api_request
+
+import ssl
+import certifi
+
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
 
 
 class SwiftXAccountSharing:
@@ -28,6 +35,26 @@ class SwiftXAccountSharing:
         """."""
         await self.session.close()
 
+    async def _handler_response(
+            self,
+            resp: aiohttp.ClientResponse
+    ) -> typing.Any:
+        """Handle API response."""
+        if resp.status == 200:
+            try:
+                return json.loads(await resp.text())
+            except json.decoder.JSONDecodeError:
+                logging.error("Decoding JSON error \
+                    response was not possible.")
+                raise
+            except Exception as e:
+                logging.error(f"Unknown exception \
+                    occured with content: {e}.")
+                raise
+        else:
+            logging.error(f"response status: {resp.status}.")
+            raise Exception(f"response status: {resp.status}.")
+
     @staticmethod
     def parse_list_to_string(
             to_parse: typing.List[str]
@@ -48,8 +75,11 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+
+            return await self._handler_response(resp)
 
     async def get_access_details(
             self,
@@ -64,8 +94,10 @@ class SwiftXAccountSharing:
         params = sign_api_request(path)
         params.update({"owner": owner})
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+            return await self._handler_response(resp)
 
     async def get_share(
             self,
@@ -77,8 +109,10 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+            return await self._handler_response(resp)
 
     async def get_share_details(
             self,
@@ -91,8 +125,10 @@ class SwiftXAccountSharing:
 
         params = sign_api_request(path)
 
-        async with self.session.get(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.get(url,
+                                    params=params,
+                                    ssl=ssl_context) as resp:
+            return await self._handler_response(resp)
 
     async def share_new_access(
             self,
@@ -114,8 +150,10 @@ class SwiftXAccountSharing:
             "address": address
         })
 
-        async with self.session.post(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.post(url,
+                                     params=params,
+                                     ssl=ssl_context) as resp:
+            return await self._handler_response(resp)
 
     async def share_edit_access(
             self,
@@ -134,8 +172,10 @@ class SwiftXAccountSharing:
             "access": self.parse_list_to_string(accesslist),
         })
 
-        async with self.session.patch(url, params=params) as resp:
-            return json.loads(await resp.text())
+        async with self.session.patch(url,
+                                      params=params,
+                                      ssl=ssl_context) as resp:
+            return await self._handler_response(resp)
 
     async def share_delete_access(
             self,
@@ -152,5 +192,7 @@ class SwiftXAccountSharing:
             "user": self.parse_list_to_string(userlist),
         })
 
-        async with self.session.delete(url, params=params) as resp:
+        async with self.session.delete(url,
+                                       params=params,
+                                       ssl=ssl_context) as resp:
             return bool(resp.status == 204)
