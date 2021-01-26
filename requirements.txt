@@ -2,3 +2,4 @@ asyncpg
 aiohttp
 uvloop
 gunicorn>=20.0.1
+certifi

@@ -20,7 +20,7 @@ class MockRequestContextManager(asynctest.TestCase):
             "text": asynctest.CoroutineMock(
                 return_value="[]"
             ),
-            "status": 204
+            "status": 200
         })
 
     async def __aenter__(self, *args, **kwargs):
