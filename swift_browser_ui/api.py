@@ -35,6 +35,17 @@ async def get_os_user(
     )
 
 
+def _unpack(item: dict,
+            cont: typing.List[dict],
+            request: aiohttp.web.Request) -> typing.Any:
+    """Unpack container list if the request was successful."""
+    if item["success"]:
+        request.app['Log'].info("container list unpacked successfully")
+        return cont.extend(item["listing"])
+    else:
+        request.app['Log'].error(item["error"])
+
+
 async def swift_list_buckets(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
@@ -59,8 +70,8 @@ async def swift_list_buckets(
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        list(map(lambda i: cont.extend(i["listing"]),  # type: ignore
-                 request.app['Creds'][session]['ST_conn'].list()))
+        sess = request.app['Creds'][session]['ST_conn'].list()
+        [_unpack(i, cont, request) for i in sess]
         # for a bucket with no objects
         if not cont:
             # return empty object
@@ -124,10 +135,9 @@ async def swift_list_objects(
         )
 
         obj: typing.List[dict] = []
-        list(map(lambda i: obj.extend(i['listing']),  # type: ignore
-                 request.app['Creds'][session]['ST_conn'].list(
-                     container=request.query['bucket'])))
-
+        sess = request.app['Creds'][session]['ST_conn'].list(
+            container=request.query['bucket'])
+        [_unpack(i, obj, request) for i in sess]
         if not obj:
             raise aiohttp.web.HTTPNotFound()
 
