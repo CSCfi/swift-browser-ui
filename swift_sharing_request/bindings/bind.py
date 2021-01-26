@@ -36,6 +36,26 @@ class SwiftSharingRequest:
         """."""
         await self.session.close()
 
+    async def _handler_response(
+            self,
+            resp: aiohttp.ClientResponse
+    ) -> typing.Any:
+        """Handle API response."""
+        if resp.status == 200:
+            try:
+                return json.loads(await resp.text())
+            except json.decoder.JSONDecodeError:
+                logging.error("Decoding JSON error \
+                    response was not possible.")
+                raise
+            except Exception as e:
+                logging.error(f"Unknown exception \
+                    occured with content: {e}.")
+                raise
+        else:
+            logging.error(f"response status: {resp.status}.")
+            raise Exception(f"response status: {resp.status}.")
+
     async def add_access_request(
             self,
             user: str,
@@ -57,20 +77,8 @@ class SwiftSharingRequest:
         async with self.session.post(url,
                                      params=params,
                                      ssl=ssl_context) as resp:
-            if resp.status == 200:
-                try:
-                    return json.loads(await resp.text())
-                except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error \
-                        response was not possible.")
-                    raise
-                except Exception as e:
-                    logging.error(f"Unknown exception \
-                        occured with content: {e}.")
-                    raise
-            else:
-                logging.error(f"response status: {resp.status}.")
-                raise Exception(f"response status: {resp.status}.")
+
+            return await self._handler_response(resp)
 
     async def list_made_requests(
             self,
@@ -90,20 +98,8 @@ class SwiftSharingRequest:
         async with self.session.get(url,
                                     params=params,
                                     ssl=ssl_context) as resp:
-            if resp.status == 200:
-                try:
-                    return json.loads(await resp.text())
-                except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error \
-                        response was not possible.")
-                    raise
-                except Exception as e:
-                    logging.error(f"Unknown exception \
-                        occured with content: {e}.")
-                    raise
-            else:
-                logging.error(f"response status: {resp.status}.")
-                raise Exception(f"response status: {resp.status}.")
+
+            return await self._handler_response(resp)
 
     async def list_owned_requests(
             self,
@@ -123,20 +119,8 @@ class SwiftSharingRequest:
         async with self.session.get(url,
                                     params=params,
                                     ssl=ssl_context) as resp:
-            if resp.status == 200:
-                try:
-                    return json.loads(await resp.text())
-                except json.decoder.JSONDecodeError:
-                    logging.error("Decoding JSON error \
-                        response was not possible.")
-                    raise
-                except Exception as e:
-                    logging.error(f"Unknown exception \
-                        occured with content: {e}.")
-                    raise
-            else:
-                logging.error(f"response status: {resp.status}.")
-                raise Exception(f"response status: {resp.status}.")
+
+            return await self._handler_response(resp)
 
     async def list_container_requests(
             self,
