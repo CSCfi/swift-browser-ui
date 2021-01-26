@@ -68,12 +68,9 @@ async def swift_list_buckets(
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
-    except ClientException as e:
-        request.app['Log'].error(e.msg)
     except KeyError:
         # listing is missing; possible broken swift auth
         return aiohttp.web.json_response(cont)
-
     return aiohttp.web.json_response(cont)
 
 
@@ -146,9 +143,6 @@ async def swift_list_objects(
 
         return aiohttp.web.json_response(obj)
     except SwiftError:
-        return aiohttp.web.json_response([])
-    except ClientException as e:
-        request.app['Log'].error(e.msg)
         return aiohttp.web.json_response([])
     except KeyError:
         # listing is missing; possible broken swift auth
