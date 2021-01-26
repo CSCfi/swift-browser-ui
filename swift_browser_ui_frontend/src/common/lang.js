@@ -135,7 +135,7 @@ const translations = {
       largeDownAction: "Enable",
       emptyContainer: "This container is empty.",
       emptyProject: "The project does not contain any containers " +
-                    "or not enabled for using containers.",
+                    "or their use is not permitted.",
       emptyShared: "No containers have been shared to the project.",
       emptyRequested: "No shared containers have been requested for the " +
                       "project.",
@@ -311,7 +311,7 @@ const translations = {
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
       emptyProject: "Projektilla ei ole säiliöitä " +
-                    "tai niitä ei ole sallittu tankkien käyttämiseen.",
+                    "tai niiden käyttöä ei ole sallittu.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       searchBy: "Etsi nimellä",
