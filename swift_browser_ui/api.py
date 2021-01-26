@@ -4,6 +4,7 @@ import time
 import typing
 
 import aiohttp.web
+from swiftclient.exceptions import ClientException
 from swiftclient.service import SwiftError
 from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
@@ -34,6 +35,17 @@ async def get_os_user(
     )
 
 
+def _unpack(item: dict,
+            cont: typing.List[dict],
+            request: aiohttp.web.Request) -> typing.Any:
+    """Unpack container list if the request was successful."""
+    if item["success"]:
+        request.app['Log'].info("container list unpacked successfully")
+        return cont.extend(item["listing"])
+    else:
+        request.app['Log'].error(item["error"])
+
+
 async def swift_list_buckets(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
@@ -44,6 +56,7 @@ async def swift_list_buckets(
     not necessary in this case and returns a JSON response containing all the
     necessary data.
     """
+    cont: typing.List[dict] = []
     try:
         session = api_check(request)
         request.app['Log'].info(
@@ -57,20 +70,19 @@ async def swift_list_buckets(
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        cont: typing.List[dict] = []
-        list(map(lambda i: cont.extend(i["listing"]),  # type: ignore
-                 request.app['Creds'][session]['ST_conn'].list()))
+        sess = request.app['Creds'][session]['ST_conn'].list()
+        [_unpack(i, cont, request) for i in sess]
         # for a bucket with no objects
         if not cont:
             # return empty object
             raise aiohttp.web.HTTPNotFound()
-        return aiohttp.web.json_response(cont)
 
     except SwiftError:
         raise aiohttp.web.HTTPNotFound()
     except KeyError:
         # listing is missing; possible broken swift auth
-        return aiohttp.web.json_response([])
+        return aiohttp.web.json_response(cont)
+    return aiohttp.web.json_response(cont)
 
 
 async def swift_create_container(
@@ -90,7 +102,7 @@ async def swift_create_container(
             get_conn(request.app['Creds'][session]['ST_conn']._options),
             request.match_info["container"]
         )
-    except SwiftError:
+    except (SwiftError, ClientException):
         raise aiohttp.web.HTTPServerError(
             reason="Container creation failure"
         )
@@ -123,10 +135,9 @@ async def swift_list_objects(
         )
 
         obj: typing.List[dict] = []
-        list(map(lambda i: obj.extend(i['listing']),  # type: ignore
-                 request.app['Creds'][session]['ST_conn'].list(
-                     container=request.query['bucket'])))
-
+        sess = request.app['Creds'][session]['ST_conn'].list(
+            container=request.query['bucket'])
+        [_unpack(i, obj, request) for i in sess]
         if not obj:
             raise aiohttp.web.HTTPNotFound()
 
@@ -193,6 +204,9 @@ async def swift_list_shared_objects(
         return aiohttp.web.json_response(obj)
 
     except SwiftError:
+        return aiohttp.web.json_response([])
+    except ClientException as e:
+        request.app['Log'].error(e.msg)
         return aiohttp.web.json_response([])
     except KeyError:
         # listing is missing; possible broken swift auth

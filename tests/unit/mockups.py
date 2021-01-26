@@ -285,6 +285,7 @@ class Mock_Service:
                     "bytes": sum([j['bytes'] for j in self.containers[i]]),
                 })
             return [{
+                "success": True,
                 "listing": ret
             }]
         if container is not None:
@@ -301,6 +302,7 @@ class Mock_Service:
                         to_append["content_type"] = i["content_type"]
                     ret.append(to_append)
                 return [{
+                    "success": True,
                     "listing": ret
                 }]
             except KeyError:

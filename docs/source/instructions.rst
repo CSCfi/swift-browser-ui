@@ -8,7 +8,7 @@ The program can be installed with pip from the git repository:
 
 .. code-block:: console
 
-    # Requires python >= 3.6
+    # Requires python >= 3.6 (recommended >= 3.7)
     git clone git@github.com:CSCfi/swift-browser-ui.git
     # Frontend files need to be separately built
     cd swift_browser_ui_frontend && npm run build && cd ..

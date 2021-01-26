@@ -59,8 +59,8 @@ async def error_middleware(
         if ex.status == 404:
             return return_error_response(404)
         if ex.status > 404 and ex.status < 500:
+            # we forbid all dubios and unauthorized requests
             return return_error_response(403)
         if ex.status > 500:
-            # we forbid all dubios and unauthorized requests
             return return_error_response(503)
         raise

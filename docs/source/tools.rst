@@ -4,7 +4,7 @@ Tools used in project
 Backend
 -------
 The backend is written in Python, requiring at minimum Python version `3.6.8`,
-but is tested with 3.7 as well. Additionally the following libraries are used
+but is tested with 3.7 and 3.8 as well. Additionally the following libraries are used
 in the program development:
 
 * `aiohttp for the API server <https://aiohttp.readthedocs.io/en/stable/>`_

@@ -176,8 +176,8 @@ async def sso_query_end(
     # Save the unscoped token to the session, as it's needed for re-scoping
     request.app['Creds'][session]['Token'] = unscoped
 
-    # Check token availability
     try:
+        # Check token availability
         request.app['Creds'][session]['Avail'] =\
             get_availability_from_token(unscoped)
     except urllib.error.HTTPError:
