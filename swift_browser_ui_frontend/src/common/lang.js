@@ -134,7 +134,8 @@ const translations = {
                         "enable them for the duration of the session.",
       largeDownAction: "Enable",
       emptyContainer: "This container is empty.",
-      emptyProject: "The project does not contain any containers.",
+      emptyProject: "The project does not contain any containers " +
+                    "or not enabled for using containers.",
       emptyShared: "No containers have been shared to the project.",
       emptyRequested: "No shared containers have been requested for the " +
                       "project.",
@@ -309,7 +310,8 @@ const translations = {
                         "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
-      emptyProject: "Projektilla ei ole säiliöitä.",
+      emptyProject: "Projektilla ei ole säiliöitä " +
+                    "tai niitä ei ole sallittu tankkien käyttämiseen.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       searchBy: "Etsi nimellä",
