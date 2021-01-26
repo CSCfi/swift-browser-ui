@@ -19,7 +19,7 @@ Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
 
 ### Requirements
 
-Python 3.6+ required
+Python 3.6+ required (recommended 3.7+)
 
 The dependencies mentioned in `requirements.txt` and an account that has access
 rights to [CSC Pouta](https://docs.csc.fi/cloud/pouta/) platform, 
