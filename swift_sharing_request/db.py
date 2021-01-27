@@ -12,6 +12,7 @@ import aiohttp.web
 
 
 MODULE_LOGGER = logging.getLogger("db")
+MODULE_LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 def handle_dropped_connection(

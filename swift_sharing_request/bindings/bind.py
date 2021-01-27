@@ -45,16 +45,17 @@ class SwiftSharingRequest:
             try:
                 return json.loads(await resp.text())
             except json.decoder.JSONDecodeError:
-                logging.error("Decoding JSON error \
-                    response was not possible.")
+                logging.error("Decoding JSON error, "
+                              "response was not possible.")
                 raise
             except Exception as e:
-                logging.error(f"Unknown exception \
-                    occured with content: {e}.")
+                logging.error("Unknown exception "
+                              f"occured with content: {e}.")
                 raise
         else:
-            logging.error(f"response status: {resp.status}.")
-            raise Exception(f"response status: {resp.status}.")
+            logging.error(f"API call {resp.url} responded with "
+                          f"status {resp.status} and reason {resp.reason}.")
+            raise Exception
 
     async def add_access_request(
             self,
