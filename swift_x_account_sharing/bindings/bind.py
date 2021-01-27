@@ -44,16 +44,17 @@ class SwiftXAccountSharing:
             try:
                 return json.loads(await resp.text())
             except json.decoder.JSONDecodeError:
-                logging.error("Decoding JSON error \
-                    response was not possible.")
+                logging.error("Decoding JSON error, "
+                              "response was not possible.")
                 raise
             except Exception as e:
-                logging.error(f"Unknown exception \
-                    occured with content: {e}.")
+                logging.error("Unknown exception "
+                              f"occured with content: {e}.")
                 raise
         else:
-            logging.error(f"response status: {resp.status}.")
-            raise Exception(f"response status: {resp.status}.")
+            logging.error(f"API call {resp.url} responded with "
+                          f"status {resp.status} and reason {resp.reason}.")
+            raise Exception
 
     @staticmethod
     def parse_list_to_string(
@@ -195,4 +196,9 @@ class SwiftXAccountSharing:
         async with self.session.delete(url,
                                        params=params,
                                        ssl=ssl_context) as resp:
-            return bool(resp.status == 204)
+            if resp.status == 204:
+                return True
+            else:
+                logging.error(f"API call {resp.url} responded with status "
+                              f"{resp.status} and reason {resp.reason}.")
+                raise Exception

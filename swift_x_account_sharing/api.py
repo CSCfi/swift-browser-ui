@@ -2,7 +2,7 @@
 
 
 import logging
-
+import os
 import aiohttp.web
 from asyncpg import InterfaceError
 
@@ -10,6 +10,7 @@ from .db import handle_dropped_connection
 
 
 MODULE_LOGGER = logging.getLogger("api")
+MODULE_LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 async def has_access_handler(
@@ -214,6 +215,9 @@ async def handle_user_add_token(
             formdata = await request.post()
             token = str(formdata["token"])
         except KeyError:
+            MODULE_LOGGER.log(
+                logging.ERROR, "No token present"
+            )
             raise aiohttp.web.HTTPBadRequest(
                 reason="No token present"
             )
@@ -280,6 +284,9 @@ async def handle_health_check(
                 ]
             })
     except AttributeError:
+        MODULE_LOGGER.log(
+            logging.INFO, "Degraded Database"
+        )
         return aiohttp.web.json_response({
             "status": "Degraded",
             "degraded": [
