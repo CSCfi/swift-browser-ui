@@ -5,6 +5,7 @@ import hashlib
 import os
 import unittest
 import types
+import logging
 
 from aiohttp.web import HTTPNotFound
 import asynctest
@@ -409,8 +410,10 @@ class TestProxyFunctions(asynctest.TestCase):
                         },
                         "Token": "test-token"
                     }
-                }
-            }
+                },
+                "Log": logging.getLogger(name="test_logger")
+            },
+            "remote": "remote"
         })
 
         self.api_check_mock = unittest.mock.MagicMock(

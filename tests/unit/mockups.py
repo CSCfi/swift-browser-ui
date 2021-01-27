@@ -286,6 +286,7 @@ class Mock_Service:
                 })
             return [{
                 "success": True,
+                "container": "mock-container",
                 "listing": ret
             }]
         if container is not None:
@@ -303,6 +304,7 @@ class Mock_Service:
                     ret.append(to_append)
                 return [{
                     "success": True,
+                    "container": container,
                     "listing": ret
                 }]
             except KeyError:
