@@ -2,6 +2,6 @@
 
 
 __name__ = "swift_sharing_request"
-__version__ = "0.4.7"
+__version__ = "0.4.8"
 __author__ = "CSC Developers"
 __license__ = "MIT License"
