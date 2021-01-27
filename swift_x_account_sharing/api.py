@@ -277,6 +277,9 @@ async def handle_health_check(
     # Case degraded
     try:
         if request.app["db_conn"].conn.is_closed():
+            MODULE_LOGGER.log(
+                logging.DEBUG, "Database closed"
+            )
             return aiohttp.web.json_response({
                 "status": "Degraded",
                 "degraded": [
@@ -285,7 +288,7 @@ async def handle_health_check(
             })
     except AttributeError:
         MODULE_LOGGER.log(
-            logging.INFO, "Degraded Database"
+            logging.ERROR, "Degraded Database"
         )
         return aiohttp.web.json_response({
             "status": "Degraded",
