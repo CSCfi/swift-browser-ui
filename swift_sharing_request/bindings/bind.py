@@ -145,7 +145,7 @@ class SwiftSharingRequest:
         async with self.session.get(url,
                                     params=params,
                                     ssl=ssl_context) as resp:
-            return json.loads(await resp.text())
+            return await self._handler_response(resp)
 
     async def share_delete_access(
             self,
