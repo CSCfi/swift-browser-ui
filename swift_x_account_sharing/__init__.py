@@ -2,6 +2,6 @@
 
 
 __name__ = "swift_x_account_sharing"
-__version__ = "0.5.9"
+__version__ = "0.5.10"
 __author__ = "CSC Developers"
 __license__ = "MIT License"
