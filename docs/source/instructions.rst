@@ -63,6 +63,8 @@ Variables are depicted in the table below:
 +---------------------------------------------+---------+---------------------------------------------------------------+--+--+
 | ``BROWSER_START_REQUEST_INT_ENDPOINT_URL``  |         | internal URL / hostname of the request API                    |  |  |
 +---------------------------------------------+---------+---------------------------------------------------------------+--+--+
+| ``LOG_LEVEL``                               |         | set logging level e.g. INFO, DEBUG                            |  |  |
++---------------------------------------------+---------+---------------------------------------------------------------+--+--+
 
 .. hint:: Authentication endpoint can also be specified with any openrc file,
           which can be usually downloaded from Openstack. The setup script
