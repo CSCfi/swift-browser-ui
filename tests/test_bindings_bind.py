@@ -20,7 +20,8 @@ class MockRequestContextManager(asynctest.TestCase):
             "text": asynctest.CoroutineMock(
                 return_value="[]"
             ),
-            "status": 200
+            "status": 200,
+            "url": "http://example",
         })
 
     async def __aenter__(self, *args, **kwargs):
@@ -47,16 +48,20 @@ class MockGenericContextManager(MockRequestContextManager):
 # Delete method mock context manager won't have any assertions in the
 # __aexit__ method, since there's no real assertable functionality.
 # Functionality will be tested in integration testing.
-class MockDeleteContextManager(MockRequestContextManager):
+class MockDeleteContextManager(asynctest.TestCase):
     """Mock class for aiohttp delete context manager."""
 
     def __init__(self, *args, **kwargs):
         """."""
-        super(MockDeleteContextManager, self).__init__(
-            self,
-            *args,
-            **kwargs
-        )
+        self.resp = SimpleNamespace(**{
+            "status": 204,
+            "url": "http://example",
+            "reason": "reason"
+        })
+
+    async def __aenter__(self, *args, **kwargs):
+        """."""
+        return self.resp
 
     async def __aexit__(self, *excinfo):
         """."""

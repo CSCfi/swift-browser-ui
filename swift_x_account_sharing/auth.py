@@ -32,6 +32,7 @@ AiohttpHandler = typing.Callable[
 
 
 LOGGER = logging.getLogger("swift_x_account_sharing.auth")
+LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 async def read_in_keys(
@@ -55,8 +56,9 @@ async def test_signature(
     """Validate signature against the given tokens."""
     # Check signature expiration
     if int(validity) < time.time():
+        LOGGER.debug(f"Signature validity expired: {validity}")
         raise aiohttp.web.HTTPUnauthorized(
-            reason="Signature expired"
+            reason="Signature validity expired"
         )
     byte_message = message.encode("utf-8")
     for token in tokens:
@@ -67,6 +69,7 @@ async def test_signature(
         ).hexdigest()
         if secrets.compare_digest(digest, signature):
             return
+    LOGGER.debug(f"Missing valid query signature for signature {signature}")
     raise aiohttp.web.HTTPUnauthorized(
         reason="Missing valid query signature"
     )
@@ -83,8 +86,9 @@ async def handle_validate_authentication(
         validity = request.query["valid"]
         path = request.url.path
     except KeyError:
+        LOGGER.debug("Query string missing validity or signature")
         raise aiohttp.web.HTTPClientError(
-            reason="Query string missing validity or signature."
+            reason="Query string missing validity or signature"
         )
 
     project: typing.Union[None, str]

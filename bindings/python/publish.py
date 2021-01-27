@@ -14,10 +14,12 @@ import swift_x_account_sharing_bind
 import fire
 
 
-logging.basicConfig()
+logging.basicConfig(format='%(levelname)-8s %(asctime)s | %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p',
+                    level=logging.INFO)
 
 
-class Publish():
+class Publish:
     """Share and publish Openstack Swift containers."""
 
     @staticmethod
@@ -51,8 +53,8 @@ class Publish():
 
     def share(self, container, recipient, *args):
         """Share an existing container."""
-        print("share called")
-        print(args)
+        logging.log(logging.INFO, "share called")
+        logging.log(logging.INFO, args)
         tenant = os.environ.get("OS_PROJECT_ID", None)
         if not tenant:
             logging.log(
@@ -79,7 +81,8 @@ class Publish():
             command.append("--write-acl")
             command.append(recipient + ":*")
             rights.append("w")
-        print("Running POST: %s" % command)
+
+        logging.log(logging.INFO, f"Running POST: {command}")
         subprocess.call(command)  # nosec
 
         asyncio.run(self._push_share(
@@ -121,4 +124,7 @@ class Publish():
 
 
 if __name__ == "__main__":
-    fire.Fire(Publish)
+    try:
+        fire.Fire(Publish)
+    except Exception as e:
+        logging.log(logging.ERROR, f"An error ocurred{': ' if e else ''}{e}.")
