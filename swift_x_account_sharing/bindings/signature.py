@@ -10,7 +10,7 @@ def sign_api_request(
     path: str
 ) -> dict:
     """Handle authentication with a signature."""
-    valid_until = str(int(time.time() + 10))
+    valid_until = str(int(time.time() + (60 * 61)))
     to_sign = (valid_until + path).encode("utf-8")
 
     digest = hmac.new(
