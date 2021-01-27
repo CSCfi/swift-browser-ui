@@ -109,7 +109,7 @@ export default {
       perPage: 10,
       requestedSharesList: [],
       selected: undefined,
-      currentPage: 0,
+      currentPage: 1,
       defaultSortDirection: "asc",
     };
   },
