@@ -42,7 +42,9 @@ def _unpack(
 ) -> typing.Any:
     """Unpack container list if the request was successful."""
     if item["success"]:
-        request.app['Log'].info(f"Container: {item['container']} "
+        tenant = f"Container: {item['container']}" \
+            if item['container'] else "No tenant specified, container"
+        request.app['Log'].info(f"{tenant} "
                                 "list unpacked successfully.")
         return cont.extend(item["listing"])
     else:
