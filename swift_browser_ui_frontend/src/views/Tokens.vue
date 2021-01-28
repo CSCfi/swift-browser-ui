@@ -63,46 +63,50 @@
       :selected.sync="selected"
       :default-sort-direction="defaultSortDirection"
     >
-      <template slot-scope="props">
+      <template>
         <b-table-column
           field="identifier"
           :label="$t('message.tokens.identifier')"
           sortable
         >
-          {{ props.row }}
+          <template v-slot="props">
+            {{ props.row }}
+          </template>
         </b-table-column>
         <b-table-column
           field="controls"
           label=""
         >
-          <div class="field has-addons">
-            <p class="control">
-              <b-button
-                v-if="selected==props.row"
-                type="is-danger"
-                icon-left="delete"
-                outlined
-                size="is-small"
-                inverted
-                @click="removeToken(props.row)"
-              >
-                {{ $t('message.tokens.revoke') }}
-              </b-button>
-              <b-button
-                v-else
-                type="is-danger"
-                icon-left="delete"
-                outlined
-                size="is-small"
-                @click="removeToken(props.row)"
-              >
-                {{ $t('message.tokens.revoke') }}
-              </b-button>
-            </p>
-          </div>
+          <template v-slot="props">
+            <div class="field has-addons">
+              <p class="control">
+                <b-button
+                  v-if="selected==props.row"
+                  type="is-danger"
+                  icon-left="delete"
+                  outlined
+                  size="is-small"
+                  inverted
+                  @click="removeToken(props.row)"
+                >
+                  {{ $t('message.tokens.revoke') }}
+                </b-button>
+                <b-button
+                  v-else
+                  type="is-danger"
+                  icon-left="delete"
+                  outlined
+                  size="is-small"
+                  @click="removeToken(props.row)"
+                >
+                  {{ $t('message.tokens.revoke') }}
+                </b-button>
+              </p>
+            </div>
+          </template>
         </b-table-column>
       </template>
-      <template slot="empty">
+      <template v-slot:empty>
         <span class="emptyContents">
           {{ $t('message.tokens.empty') }}
         </span>

@@ -41,44 +41,52 @@
       :pagination-simple="true"
       :default-sort-direction="defaultSortDirection"
     >
-      <template slot-scope="props">
+      <template>
         <b-table-column
           sortable
           field="container"
           :label="$t('message.share.container')"
         >
-          {{ props.row.container }}
+          <template v-slot="props">
+            {{ props.row.container }}
+          </template>
         </b-table-column>
         <b-table-column
           sortable
           field="owner"
           :label="$t('message.share.owner')"
         >
-          {{ props.row.owner }}
+          <template v-slot="props">
+            {{ props.row.owner }}
+          </template>
         </b-table-column>
         <b-table-column
           sortable
           field="created"
           :label="$t('message.share.created')"
         >
-          {{ getHumanReadableDate( props.row.date ) }}
+          <template v-slot="props">
+            {{ getHumanReadableDate( props.row.date ) }}
+          </template>
         </b-table-column>
         <b-table-column
           field="delete"
           label=""
           width="40"
-        >
-          <b-button
-            type="is-danger"
-            outlined
-            size="is-small"
-            @click="deleteShareRequest(props.row.container, props.row.owner)"
-          >
-            {{ $t('message.share.cancel') }}
-          </b-button>
+        > 
+          <template v-slot="props">
+            <b-button
+              type="is-danger"
+              outlined
+              size="is-small"
+              @click="deleteShareRequest(props.row.container, props.row.owner)"
+            >
+              {{ $t('message.share.cancel') }}
+            </b-button>
+          </template>
         </b-table-column>
       </template>
-      <template slot="empty">
+      <template v-slot:empty>
         <p class="empptyTable">
           {{ $t('message.emptyRequested') }}
         </p>
