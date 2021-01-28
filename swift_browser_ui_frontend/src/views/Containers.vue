@@ -67,29 +67,31 @@
       @keyup.native.enter="$router.push( getConAddr ( selected['name'] ))"
       @keyup.native.space="$router.push( getConAddr ( selected['name'] ))"
     >
-      <template slot-scope="props">
+      <template>
         <b-table-column
           sortable
           field="name"
           :label="$t('message.table.name')"
         >
-          <span v-if="!props.row.bytes">
-            <b-icon
-              icon="folder-outline"
-              size="is-small"
-            /> 
-            {{ props.row.name }}
-          </span>
-          <span
-            v-else
-            class="has-text-weight-bold"
-          >
-            <b-icon
-              icon="folder"
-              size="is-small"
-            /> 
-            {{ props.row.name }}
-          </span>
+          <template v-slot="props">
+            <span v-if="!props.row.bytes">
+              <b-icon
+                icon="folder-outline"
+                size="is-small"
+              /> 
+              {{ props.row.name }}
+            </span>
+            <span
+              v-else
+              class="has-text-weight-bold"
+            >
+              <b-icon
+                icon="folder"
+                size="is-small"
+              /> 
+              {{ props.row.name }}
+            </span>
+          </template>
         </b-table-column>
         <b-table-column
           field="count"
@@ -97,7 +99,9 @@
           width="120"
           sortable
         >
-          {{ props.row.count }}
+          <template v-slot="props">
+            {{ props.row.count }}
+          </template>
         </b-table-column>
         <b-table-column
           field="bytes"
@@ -105,116 +109,120 @@
           width="120"
           sortable
         >
-          {{ localHumanReadableSize(props.row.bytes) }}
+          <template v-slot="props">
+            {{ localHumanReadableSize(props.row.bytes) }}
+          </template>
         </b-table-column>
         <b-table-column
           field="functions"
           label=""
           width="150"
         >
-          <div class="field has-addons">
-            <p class="control">
-              <ContainerDownloadLink
-                v-if="selected==props.row"
-                class="is-small"
-                :inverted="true"
-                :disabled="!props.row.bytes ? true : false"
-                :container="props.row.name"
-              />
-              <ContainerDownloadLink
-                v-else
-                class="is-small"
-                :disabled="!props.row.bytes ? true : false"
-                :container="props.row.name"
-              />
-            </p>
-            <p
-              v-if="!props.row.bytes"
-              class="control"
-            >
-              <b-button
-                v-if="selected==props.row"
-                type="is-primary"
-                outlined
-                size="is-small"
-                disabled
-                inverted
+          <template v-slot="props">
+            <div class="field has-addons">
+              <p class="control">
+                <ContainerDownloadLink
+                  v-if="selected==props.row"
+                  class="is-small"
+                  :inverted="true"
+                  :disabled="!props.row.bytes ? true : false"
+                  :container="props.row.name"
+                />
+                <ContainerDownloadLink
+                  v-else
+                  class="is-small"
+                  :disabled="!props.row.bytes ? true : false"
+                  :container="props.row.name"
+                />
+              </p>
+              <p
+                v-if="!props.row.bytes"
+                class="control"
               >
-                <b-icon
-                  icon="share"
+                <b-button
+                  v-if="selected==props.row"
+                  type="is-primary"
+                  outlined
                   size="is-small"
-                /> {{ $t('message.share.share') }}
-              </b-button>
-              <b-button
+                  disabled
+                  inverted
+                >
+                  <b-icon
+                    icon="share"
+                    size="is-small"
+                  /> {{ $t('message.share.share') }}
+                </b-button>
+                <b-button
+                  v-else
+                  type="is-primary"
+                  outlined
+                  size="is-small"
+                  disabled
+                >
+                  <b-icon
+                    icon="share"
+                    size="is-small"
+                  /> {{ $t('message.share.share') }}
+                </b-button>
+              </p>
+              <p
                 v-else
-                type="is-primary"
-                outlined
-                size="is-small"
-                disabled
+                class="control"
               >
-                <b-icon
-                  icon="share"
+                <b-button
+                  v-if="selected==props.row"
+                  type="is-primary"
+                  outlined
                   size="is-small"
-                /> {{ $t('message.share.share') }}
-              </b-button>
-            </p>
-            <p
-              v-else
-              class="control"
-            >
-              <b-button
-                v-if="selected==props.row"
-                type="is-primary"
-                outlined
-                size="is-small"
-                inverted
-                @click="$router.push({
-                  name: 'Sharing',
-                  query: {container: props.row.name}
-                })"
-              >
-                <b-icon
-                  icon="share"
+                  inverted
+                  @click="$router.push({
+                    name: 'Sharing',
+                    query: {container: props.row.name}
+                  })"
+                >
+                  <b-icon
+                    icon="share"
+                    size="is-small"
+                  /> {{ $t('message.share.share') }}
+                </b-button>
+                <b-button
+                  v-else
+                  type="is-primary"
+                  outlined
                   size="is-small"
-                /> {{ $t('message.share.share') }}
-              </b-button>
-              <b-button
-                v-else
-                type="is-primary"
-                outlined
-                size="is-small"
-                @click="$router.push({
-                  name: 'Sharing',
-                  query: {container: props.row.name}
-                })"
-              >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
-              </b-button>
-            </p>
-            <p class="control">
-              <ReplicateContainerButton
-                v-if="selected==props.row"
-                :project="active.id"
-                :container="props.row.name"
-                :smallsize="true"
-                :disabled="!props.row.bytes ? true : false"
-                :inverted="true"
-              />
-              <ReplicateContainerButton
-                v-else
-                :project="active.id"
-                :container="props.row.name"
-                :disabled="!props.row.bytes ? true : false"
-                :smallsize="true"
-              />
-            </p>
-          </div>
+                  @click="$router.push({
+                    name: 'Sharing',
+                    query: {container: props.row.name}
+                  })"
+                >
+                  <b-icon
+                    icon="share"
+                    size="is-small"
+                  /> {{ $t('message.share.share') }}
+                </b-button>
+              </p>
+              <p class="control">
+                <ReplicateContainerButton
+                  v-if="selected==props.row"
+                  :project="active.id"
+                  :container="props.row.name"
+                  :smallsize="true"
+                  :disabled="!props.row.bytes ? true : false"
+                  :inverted="true"
+                />
+                <ReplicateContainerButton
+                  v-else
+                  :project="active.id"
+                  :container="props.row.name"
+                  :disabled="!props.row.bytes ? true : false"
+                  :smallsize="true"
+                />
+              </p>
+            </div>
+          </template>
         </b-table-column>
       </template>
-      <template slot="empty">
+      <template v-slot:empty>
         <p class="emptyTable">
           {{ $t('message.emptyProject') }}
         </p>

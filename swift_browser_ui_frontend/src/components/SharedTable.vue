@@ -46,65 +46,71 @@
       @keyup.native.enter="$router.push(getConAddr(selected))"
       @keyup.native.space="$router.push(getConAddr(selected))"
     >
-      <template slot-scope="props">
+      <template>
         <b-table-column
           sortable
           field="name"
           :label="$t('message.table.name')"
         >
-          <span clss="has-text-weight-bold">
-            <b-icon
-              icon="folder"
-              size="is-small"
-            />
-            {{ props.row.container }}
-          </span>
+          <template v-slot="props">
+            <span clss="has-text-weight-bold">
+              <b-icon
+                icon="folder"
+                size="is-small"
+              />
+              {{ props.row.container }}
+            </span>
+          </template>
         </b-table-column>
         <b-table-column
           field="owner"
           :label="$t('message.table.owner')"
           sortable
         >
-          {{ props.row.owner }}
+          <template v-slot="props">
+            {{ props.row.owner }}
+          </template>
         </b-table-column>
         <b-table-column
           field="functions"
           label=""
           width="150"
         >
-          <div class="field has-addons">
-            <p class="control">
-              <ContainerDownloadLink
-                v-if="selected==props.row"
-                class="is-small"
-                :project="props.row.owner"
-                :inverted="true"
-                :container="props.row.container"
-              />
-              <ContainerDownloadLink
-                v-else
-                class="is-small"
-                :project="props.row.owner"
-                :container="props.row.container"
-              />
-            </p>
-            <p class="control">
-              <ReplicateContainerButton
-                v-if="selected==props.row"
-                :inverted="true"
-                :container="props.row.container"
-                :smallsize="true"
-              />
-              <ReplicateContainerButton
-                v-else
-                :container="props.row.container"
-                :smallsize="true"
-              />
-            </p>
-          </div>
+          <template v-slot="props">
+            <div class="field has-addons">
+              <p class="control">
+                <ContainerDownloadLink
+                  v-if="selected==props.row"
+                  class="is-small"
+                  :project="props.row.owner"
+                  :inverted="true"
+                  :container="props.row.container"
+                />
+                <ContainerDownloadLink
+                  v-else
+                  class="is-small"
+                  :project="props.row.owner"
+                  :container="props.row.container"
+                />
+              </p>
+              <p class="control">
+                <ReplicateContainerButton
+                  v-if="selected==props.row"
+                  :inverted="true"
+                  :container="props.row.container"
+                  :smallsize="true"
+                />
+                <ReplicateContainerButton
+                  v-else
+                  :container="props.row.container"
+                  :smallsize="true"
+                />
+              </p>
+            </div>
+          </template>
         </b-table-column>
       </template>
-      <template slot="empty">
+      <template v-slot:empty>
         <p class="emptyTable">
           {{ $t('message.emptyShared') }}
         </p>

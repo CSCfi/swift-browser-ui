@@ -48,6 +48,11 @@ export default {
       return this.$store.state.active;
     },
   },
+  watch: {
+    container: function () {
+      this.createDownloadLink();
+    },
+  },
   beforeMount () {
     this.createDownloadLink();
   },

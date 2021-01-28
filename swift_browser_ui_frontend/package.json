@@ -1,6 +1,6 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "1.0.0rc13",
+  "version": "1.0.0rc14",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@vue/cli-service-global": "^4.5.11",
-    "buefy": "^0.8.20",
+    "buefy": "^0.9.4",
     "core-js": "^3.8.3",
     "lodash": "^4.17.20",
     "material-design-icons": "^3.0.1",
@@ -22,8 +22,8 @@
     "vue": "^2.6.12",
     "vue-i18n": "^8.22.4",
     "vue-material-design-icons": "^3.4.0",
-    "vue-router": "^3.4.9",
-    "vuex": "^3.6.0"
+    "vue-router": "^3.5.1",
+    "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.11",
