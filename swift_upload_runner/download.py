@@ -21,7 +21,7 @@ from .common import get_download_host
 
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 # Unlike other classes, download uses python-requests for fetching objects
@@ -105,11 +105,9 @@ class FileDownloadProxy:
             object_name: str
     ) -> None:
         """Download object chunks from stream into the queue."""
-        print(f"""
-        Downloading from project {project},
-        from container {container},
-        the file {object_name}
-        """)
+        LOGGER.info(f"Downloading from project {project}, "
+                    f"from container {container}, "
+                    f"the file {object_name}")
         with requests.get(
             generate_download_url(
                 get_download_host(self.auth, project),
@@ -123,10 +121,7 @@ class FileDownloadProxy:
             stream=True,
             verify=True
         ) as req:
-            print(f"""
-            Request headers:
-            {req.headers}
-            """)
+            LOGGER.info(f"Request headers: {req.headers}")
             try:
                 self.content_type = req.headers["Content-Type"]
             except KeyError:
@@ -340,10 +335,10 @@ class ContainerArchiveDownloadProxy:
         """Parse a list of paths into a dict representing a filesystem."""
         ret_fs: dict = {}
         for path in to_parse:
-            print(path)
+            LOGGER.info(f"working path: {path}")
             # Path of zero means an incorrect input
             if len(path) == 0:
-                raise ValueError("Tried to archive a file wihtout a name")
+                raise ValueError("Tried to archive a file without a name")
             # Path of > 1 implies a directory in between
             # Create TarInfo for the directory
             if len(path) > 1:
@@ -484,7 +479,7 @@ class ContainerArchiveDownloadProxy:
 
             next_file["fileobj"].begin_download()
 
-            print(f"""
+            LOGGER.info(f"""
             Writing file {next_file["tar_info"].name} into the archive.
             """)
 

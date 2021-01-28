@@ -3,7 +3,7 @@
 
 import logging
 import typing
-
+import os
 import aiohttp.web
 import aiohttp.client
 
@@ -14,7 +14,7 @@ import ssl
 import certifi
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())

@@ -22,7 +22,7 @@ ssl_context.load_verify_locations(certifi.where())
 
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 # The upload process needs a generous timeout, due to aiohttp having a
@@ -203,6 +203,7 @@ class ResumableFileUploadProxy:
     ) -> None:
         """Add manifest file after segmented upload finish."""
         manifest = f"{self.container}_segments/{self.path}/"
+        LOGGER.info(f"Add manifest to {self.container}_segments.")
         async with self.client.put(
             common.generate_download_url(
                 self.host,
