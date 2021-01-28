@@ -32,10 +32,10 @@
             {{ $t('message.dashboard.cur_billing') }}
           </p>
           <progress
-            v-if="Bytes < 1099511627776"
+            v-if="Bytes < (Bytes > 1099511627776 ? Bytes : 1099511627776)"
             class="progress is-success is-large"
             :value="Bytes"
-            :max="1099511627776"
+            :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
           >
             {{ parseInt(Bytes/1099511627776) }}
           </progress>
@@ -43,7 +43,7 @@
             v-else
             class="progress is-danger is-large"
             :value="Bytes"
-            :max="1099511627776"
+            :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
           >
             {{ parseInt(Bytes/1099511627776) }}
           </progress>
@@ -51,7 +51,7 @@
             <ul>
               <li>
                 <b>{{ $t('message.dashboard.prj_str_usag') }}: </b>
-                {{ Size }} / 1TiB
+                {{ Size }} / {{ ProjectSize }}
                 <b-tooltip
                   v-if="!DisableTooltip"
                   size="is-large"
@@ -164,6 +164,7 @@ export default {
       Billed: 0,
       Bytes: 0,
       DisableTooltip: false,
+      ProjectSize: "1TiB",
     };
   },
   beforeMount(){
@@ -182,6 +183,7 @@ export default {
         this.Size = ret["Size"];
         this.Billed = ret["Billed"];
         this.Bytes = ret["Bytes"];
+        this.ProjectSize = ret["ProjectSize"];
       });
     },
     disable: function() {
