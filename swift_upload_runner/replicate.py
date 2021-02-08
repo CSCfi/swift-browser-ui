@@ -161,7 +161,13 @@ class ObjectReplicationProxy():
                 LOGGER.debug(f"Copying segment {segment}")
                 headers["Content-Length"] = str(length)
                 headers["Content-Type"] = resp_g.headers["Content-Type"]
-                headers["ETag"] = resp_g.headers["ETag"]
+                if "ETag" in resp_g.headers:
+                    headers["ETag"] = resp_g.headers["ETag"]
+                else:
+                    LOGGER.error("ETag missing, maybe segments file empty")
+                    raise aiohttp.web.HTTPUnprocessableEntity(
+                        reason="ETag missing, maybe segments file empty"
+                    )
 
                 to_url = common.generate_download_url(
                     self.host,
@@ -236,7 +242,13 @@ class ObjectReplicationProxy():
                 LOGGER.debug(f"Copying object {object_name} in full.")
                 headers["Content-Length"] = str(length)
                 headers["Content-Type"] = resp_g.headers["Content-Type"]
-                headers["ETag"] = resp_g.headers["ETag"]
+                if "ETag" in resp_g.headers:
+                    headers["ETag"] = resp_g.headers["ETag"]
+                else:
+                    LOGGER.error("ETag missing, maybe segments file empty")
+                    raise aiohttp.web.HTTPUnprocessableEntity(
+                        reason="ETag missing, maybe segments file empty"
+                    )
                 async with self.client.put(
                         common.generate_download_url(
                             self.host,

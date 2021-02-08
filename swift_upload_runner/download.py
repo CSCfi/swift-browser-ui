@@ -126,7 +126,13 @@ class FileDownloadProxy:
                 self.content_type = req.headers["Content-Type"]
             except KeyError:
                 self.content_type = "binary/octet-stream"
-            self.chksum = req.headers["ETag"]
+            if "ETag" in req.headers:
+                self.chksum = req.headers["ETag"]
+            else:
+                LOGGER.error("ETag missing, maybe segments file empty")
+                raise aiohttp.web.HTTPUnprocessableEntity(
+                    reason="ETag missing, maybe segments file empty"
+                )
             self.mtime = int(float(req.headers["X-Timestamp"]))
             self.size = int(req.headers["Content-Length"])
             for chunk in req.iter_content(chunk_size=self.chunk_size):
