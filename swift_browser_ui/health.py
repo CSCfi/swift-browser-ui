@@ -46,6 +46,12 @@ async def get_x_account_sharing(
         services["swift-x-account-sharing"] = {
             "status": "Error"
         }
+    except Exception as e:
+        request.app["Log"].debug("Poll swift-x-account-sharing failed")
+        request.app["Log"].info(f"reason: {e}")
+        services["swift-sharing-request"] = {
+            "status": "Error"
+        }
 
 
 async def get_swift_sharing(
@@ -80,6 +86,12 @@ async def get_swift_sharing(
             }
     except ServerDisconnectedError:
         request.app["Log"].debug("Poll swift-x-account-sharing failed")
+        services["swift-sharing-request"] = {
+            "status": "Error"
+        }
+    except Exception as e:
+        request.app["Log"].debug("Poll swift-x-account-sharing failed")
+        request.app["Log"].info(f"reason: {e}")
         services["swift-sharing-request"] = {
             "status": "Error"
         }
@@ -118,6 +130,12 @@ async def get_upload_runner(
     except ServerDisconnectedError:
         request.app["Log"].debug("Poll swift-x-account-sharing failed")
         services["swiftui-upload-runner"] = {
+            "status": "Error"
+        }
+    except Exception as e:
+        request.app["Log"].debug("Poll swift-x-account-sharing failed")
+        request.app["Log"].info(f"reason: {e}")
+        services["swift-sharing-request"] = {
             "status": "Error"
         }
 
