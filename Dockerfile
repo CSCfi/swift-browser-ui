@@ -1,4 +1,4 @@
-FROM python:3.8-alpine3.12 as BACKEND
+FROM python:3.8-alpine3.13 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
@@ -9,11 +9,14 @@ COPY requirements.txt /root/swift_sharing/requirements.txt
 COPY setup.py /root/swift_sharing/setup.py
 COPY swift_x_account_sharing /root/swift_sharing/swift_x_account_sharing
 
+RUN apk add --no-cache rust cargo \
+    && rm -rf /var/cache/apk/*
+
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_sharing/requirements.txt \
     && pip install /root/swift_sharing
 
-FROM python:3.8-alpine3.12
+FROM python:3.8-alpine3.13
 
 RUN apk add --no-cache --update bash
 
