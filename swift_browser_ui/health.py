@@ -11,6 +11,17 @@ from .settings import setd
 from .signature import sign
 
 
+def _set_error_status(
+    request: aiohttp.web.Request,
+    services: typing.Dict[str, typing.Any],
+    service: str,
+) -> None:
+    request.app["Log"].debug(f"Poll {service} failed")
+    services[service] = {
+        "status": "Error"
+    }
+
+
 async def get_x_account_sharing(
         services: typing.Dict[str, typing.Any],
         request: aiohttp.web.Request,
@@ -42,16 +53,10 @@ async def get_x_account_sharing(
                 "status": "Nonexistent"
             }
     except ServerDisconnectedError:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        services["swift-x-account-sharing"] = {
-            "status": "Error"
-        }
+        _set_error_status(request, services, "swift-x-account-sharing")
     except Exception as e:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        request.app["Log"].info(f"reason: {e}")
-        services["swift-sharing-request"] = {
-            "status": "Error"
-        }
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "swift-x-account-sharing")
 
 
 async def get_swift_sharing(
@@ -85,16 +90,10 @@ async def get_swift_sharing(
                 "status": "Nonexistent"
             }
     except ServerDisconnectedError:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        services["swift-sharing-request"] = {
-            "status": "Error"
-        }
+        _set_error_status(request, services, "swift-sharing-request")
     except Exception as e:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        request.app["Log"].info(f"reason: {e}")
-        services["swift-sharing-request"] = {
-            "status": "Error"
-        }
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "swift-sharing-request")
 
 
 async def get_upload_runner(
@@ -128,16 +127,10 @@ async def get_upload_runner(
                 "status": "Nonexistent"
             }
     except ServerDisconnectedError:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        services["swiftui-upload-runner"] = {
-            "status": "Error"
-        }
+        _set_error_status(request, services, "swiftui-upload-runner")
     except Exception as e:
-        request.app["Log"].debug("Poll swift-x-account-sharing failed")
-        request.app["Log"].info(f"reason: {e}")
-        services["swift-sharing-request"] = {
-            "status": "Error"
-        }
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "sswiftui-upload-runner")
 
 
 async def handle_health_check(
