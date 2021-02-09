@@ -1,16 +1,13 @@
 FROM python:3.8-alpine3.13 as BACKEND
 
 RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git\
-    && apk add --no-cache libressl-dev libffi-dev\
+    && apk add --no-cache build-base curl-dev linux-headers bash git \
+    && apk add --no-cache libressl-dev libffi-dev rust cargo \
     && rm -rf /var/cache/apk/*
 
 COPY requirements.txt /root/swift_upload_runner/requirements.txt
 COPY setup.py /root/swift_upload_runner/setup.py
 COPY swift_upload_runner /root/swift_upload_runner/swift_upload_runner
-
-RUN apk add --no-cache rust cargo \
-    && rm -rf /var/cache/apk/*
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_upload_runner/requirements.txt \
