@@ -1,8 +1,8 @@
-FROM python:3.8-alpine3.12 as BACKEND
+FROM python:3.8-alpine3.13 as BACKEND
 
 RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git\
-    && apk add --no-cache libressl-dev libffi-dev\
+    && apk add --no-cache build-base curl-dev linux-headers bash git \
+    && apk add --no-cache libressl-dev libffi-dev rust cargo \
     && rm -rf /var/cache/apk/*
 
 COPY requirements.txt /root/swift_request/requirements.txt
@@ -13,7 +13,7 @@ RUN pip install --upgrade pip\
     && pip install -r /root/swift_request/requirements.txt \
     && pip install /root/swift_request
 
-FROM python:3.8-alpine3.12
+FROM python:3.8-alpine3.13
 
 RUN apk add --no-cache --update bash
 
