@@ -19,17 +19,14 @@ RUN cd /root/swift_ui/swift_browser_ui_frontend \
 FROM python:3.8-alpine3.13 as BACKEND
 
 RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git\
-    && apk add --no-cache libressl-dev libffi-dev\
+    && apk add --no-cache build-base curl-dev linux-headers bash git \
+    && apk add --no-cache libressl-dev libffi-dev rust cargo \
     && rm -rf /var/cache/apk/*
 
 COPY requirements.txt /root/swift_ui/requirements.txt
 COPY setup.py /root/swift_ui/setup.py
 COPY swift_browser_ui /root/swift_ui/swift_browser_ui
 COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist /root/swift_ui/swift_browser_ui_frontend/dist
-
-RUN apk add --no-cache rust cargo \
-    && rm -rf /var/cache/apk/*
 
 RUN pip install --upgrade pip && \
     pip install -r /root/swift_ui/requirements.txt && \
