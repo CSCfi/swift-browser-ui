@@ -43,7 +43,8 @@ def _unpack(
     """Unpack container list if the request was successful."""
     if item["success"]:
         tenant = f"Container: {item['container']}" \
-            if item['container'] else "No tenant specified, container"
+            if item['container'] \
+            else "No tenant specified, working with container"
         request.app['Log'].info(f"{tenant} "
                                 "list unpacked successfully.")
         return cont.extend(item["listing"])
@@ -199,7 +200,7 @@ async def swift_list_shared_objects(
             request.app["Creds"][session]["OS_sess"],
             url=request.query["storageurl"]
         )
-        serv = tmp_serv.list(container=request.query['bucket'])
+        serv = tmp_serv.list(container=request.query['container'])
         [_unpack(i, obj, request) for i in serv]
 
         if not obj:
