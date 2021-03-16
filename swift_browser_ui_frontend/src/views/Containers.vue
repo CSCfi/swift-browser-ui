@@ -67,162 +67,161 @@
       @keyup.native.enter="$router.push( getConAddr ( selected['name'] ))"
       @keyup.native.space="$router.push( getConAddr ( selected['name'] ))"
     >
-      <template>
-        <b-table-column
-          sortable
-          field="name"
-          :label="$t('message.table.name')"
-        >
-          <template v-slot="props">
-            <span v-if="!props.row.bytes">
-              <b-icon
-                icon="folder-outline"
-                size="is-small"
-              /> 
-              {{ props.row.name }}
-            </span>
-            <span
-              v-else
-              class="has-text-weight-bold"
-            >
-              <b-icon
-                icon="folder"
-                size="is-small"
-              /> 
-              {{ props.row.name }}
-            </span>
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="count"
-          :label="$t('message.table.objects')"
-          width="120"
-          sortable
-        >
-          <template v-slot="props">
-            {{ props.row.count }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="bytes"
-          :label="$t('message.table.size')"
-          width="120"
-          sortable
-        >
-          <template v-slot="props">
-            {{ localHumanReadableSize(props.row.bytes) }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="functions"
-          label=""
-          width="150"
-        >
-          <template v-slot="props">
-            <div class="field has-addons">
-              <p class="control">
-                <ContainerDownloadLink
-                  v-if="selected==props.row"
-                  class="is-small"
-                  :inverted="true"
-                  :disabled="!props.row.bytes ? true : false"
-                  :container="props.row.name"
-                />
-                <ContainerDownloadLink
-                  v-else
-                  class="is-small"
-                  :disabled="!props.row.bytes ? true : false"
-                  :container="props.row.name"
-                />
-              </p>
-              <p
-                v-if="!props.row.bytes"
-                class="control"
-              >
-                <b-button
-                  v-if="selected==props.row"
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  disabled
-                  inverted
-                >
-                  <b-icon
-                    icon="share"
-                    size="is-small"
-                  /> {{ $t('message.share.share') }}
-                </b-button>
-                <b-button
-                  v-else
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  disabled
-                >
-                  <b-icon
-                    icon="share"
-                    size="is-small"
-                  /> {{ $t('message.share.share') }}
-                </b-button>
-              </p>
-              <p
+      <b-table-column
+        sortable
+        field="name"
+        :label="$t('message.table.name')"
+      >
+        <template #default="props">
+          <span v-if="!props.row.bytes">
+            <b-icon
+              icon="folder-outline"
+              size="is-small"
+            /> 
+            {{ props.row.name }}
+          </span>
+          <span
+            v-else
+            class="has-text-weight-bold"
+          >
+            <b-icon
+              icon="folder"
+              size="is-small"
+            /> 
+            {{ props.row.name }}
+          </span>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="count"
+        :label="$t('message.table.objects')"
+        width="120"
+        sortable
+      >
+        <template #default="props">
+          {{ props.row.count }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="bytes"
+        :label="$t('message.table.size')"
+        width="120"
+        sortable
+      >
+        <template #default="props">
+          {{ localHumanReadableSize(props.row.bytes) }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="functions"
+        label=""
+        width="150"
+      >
+        <template #default="props">
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected==props.row"
+                class="is-small"
+                :inverted="true"
+                :disabled="!props.row.bytes ? true : false"
+                :container="props.row.name"
+              />
+              <ContainerDownloadLink
                 v-else
-                class="control"
+                class="is-small"
+                :disabled="!props.row.bytes ? true : false"
+                :container="props.row.name"
+              />
+            </p>
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+                inverted
               >
-                <b-button
-                  v-if="selected==props.row"
-                  type="is-primary"
-                  outlined
+                <b-icon
+                  icon="share"
                   size="is-small"
-                  inverted
-                  @click="$router.push({
-                    name: 'Sharing',
-                    query: {container: props.row.name}
-                  })"
-                >
-                  <b-icon
-                    icon="share"
-                    size="is-small"
-                  /> {{ $t('message.share.share') }}
-                </b-button>
-                <b-button
-                  v-else
-                  type="is-primary"
-                  outlined
+                /> {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+              >
+                <b-icon
+                  icon="share"
                   size="is-small"
-                  @click="$router.push({
-                    name: 'Sharing',
-                    query: {container: props.row.name}
-                  })"
-                >
-                  <b-icon
-                    icon="share"
-                    size="is-small"
-                  /> {{ $t('message.share.share') }}
-                </b-button>
-              </p>
-              <p class="control">
-                <ReplicateContainerButton
-                  v-if="selected==props.row"
-                  :project="active.id"
-                  :container="props.row.name"
-                  :smallsize="true"
-                  :disabled="!props.row.bytes ? true : false"
-                  :inverted="true"
-                />
-                <ReplicateContainerButton
-                  v-else
-                  :project="active.id"
-                  :container="props.row.name"
-                  :disabled="!props.row.bytes ? true : false"
-                  :smallsize="true"
-                />
-              </p>
-            </div>
-          </template>
-        </b-table-column>
-      </template>
-      <template v-slot:empty>
+                /> {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p
+              v-else
+              class="control"
+            >
+              <b-button
+                v-if="selected==props.row"
+                type="is-primary"
+                outlined
+                size="is-small"
+                inverted
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                outlined
+                size="is-small"
+                @click="$router.push({
+                  name: 'Sharing',
+                  query: {container: props.row.name}
+                })"
+              >
+                <b-icon
+                  icon="share"
+                  size="is-small"
+                /> {{ $t('message.share.share') }}
+              </b-button>
+            </p>
+            <p class="control">
+              <ReplicateContainerButton
+                v-if="selected==props.row"
+                :project="active.id"
+                :container="props.row.name"
+                :smallsize="true"
+                :disabled="!props.row.bytes ? true : false"
+                :inverted="true"
+              />
+              <ReplicateContainerButton
+                v-else
+                :project="active.id"
+                :container="props.row.name"
+                :disabled="!props.row.bytes ? true : false"
+                :smallsize="true"
+              />
+            </p>
+          </div>
+        </template>
+      </b-table-column>
+
+      <template #empty>
         <p class="emptyTable">
           {{ $t('message.emptyProject') }}
         </p>
@@ -230,19 +229,6 @@
     </b-table>
   </div>
 </template>
-
-<style scoped>
-.containerTable {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-.emptyTable {
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
-}
-</style>
 
 <script>
 import { getHumanReadableSize } from "@/common/conv";
@@ -342,3 +328,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.containerTable {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>

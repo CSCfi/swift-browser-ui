@@ -50,13 +50,6 @@
   </ul>
 </template>
 
-<style>
-  .container-share-revoke-button{
-    margin-top: auto;
-    margin-bottom: auto;
-  }
-</style>
-
 <script>
 import { removeAccessControlMeta } from "@/common/api";
 
@@ -102,3 +95,10 @@ export default {
   },
 };
 </script>
+
+<style>
+  .container-share-revoke-button{
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+</style>

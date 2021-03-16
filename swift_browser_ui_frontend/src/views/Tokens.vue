@@ -63,50 +63,48 @@
       :selected.sync="selected"
       :default-sort-direction="defaultSortDirection"
     >
-      <template>
-        <b-table-column
-          field="identifier"
-          :label="$t('message.tokens.identifier')"
-          sortable
-        >
-          <template v-slot="props">
-            {{ props.row }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="controls"
-          label=""
-        >
-          <template v-slot="props">
-            <div class="field has-addons">
-              <p class="control">
-                <b-button
-                  v-if="selected==props.row"
-                  type="is-danger"
-                  icon-left="delete"
-                  outlined
-                  size="is-small"
-                  inverted
-                  @click="removeToken(props.row)"
-                >
-                  {{ $t('message.tokens.revoke') }}
-                </b-button>
-                <b-button
-                  v-else
-                  type="is-danger"
-                  icon-left="delete"
-                  outlined
-                  size="is-small"
-                  @click="removeToken(props.row)"
-                >
-                  {{ $t('message.tokens.revoke') }}
-                </b-button>
-              </p>
-            </div>
-          </template>
-        </b-table-column>
-      </template>
-      <template v-slot:empty>
+      <b-table-column
+        field="identifier"
+        :label="$t('message.tokens.identifier')"
+        sortable
+      >
+        <template #default="props">
+          {{ props.row }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="controls"
+        label=""
+      >
+        <template #default="props">
+          <div class="field has-addons">
+            <p class="control">
+              <b-button
+                v-if="selected==props.row"
+                type="is-danger"
+                icon-left="delete"
+                outlined
+                size="is-small"
+                inverted
+                @click="removeToken(props.row)"
+              >
+                {{ $t('message.tokens.revoke') }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-danger"
+                icon-left="delete"
+                outlined
+                size="is-small"
+                @click="removeToken(props.row)"
+              >
+                {{ $t('message.tokens.revoke') }}
+              </b-button>
+            </p>
+          </div>
+        </template>
+      </b-table-column>
+      <template #empty>
         <span class="emptyContents">
           {{ $t('message.tokens.empty') }}
         </span>
@@ -114,28 +112,6 @@
     </b-table>
   </div>
 </template>
-
-<style scoped>
-.tokenContents {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-.emptyContents {
-  width: 100%;
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
-}
-.latestTokenRow {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-}
-.copyButton {
-  margin-left: 1%;
-}
-</style>
 
 <script>
 import {
@@ -194,3 +170,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.tokenContents {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.emptyContents {
+  width: 100%;
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+.latestTokenRow {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+.copyButton {
+  margin-left: 1%;
+}
+</style>

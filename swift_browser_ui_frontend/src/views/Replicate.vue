@@ -47,21 +47,6 @@
   </div>
 </template>
 
-<style scoped>
-.forbiddenDestination {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-#replicateView {
-  width: 90%;
-}
-#destinationButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>
-
 <script>
 import {swiftCopyContainer} from "@/common/api";
 
@@ -125,3 +110,18 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.forbiddenDestination {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+#replicateView {
+  width: 90%;
+}
+#destinationButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>

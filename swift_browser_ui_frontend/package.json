@@ -13,14 +13,14 @@
     "@vue/cli-service-global": "^4.5.11",
     "buefy": "^0.9.4",
     "core-js": "^3.9.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^5.0.0",
     "resumablejs": "^1.1.0",
     "sass-loader": "^7.3.1",
     "serve": "^11.3.2",
     "vue": "^2.6.12",
-    "vue-i18n": "^8.22.4",
+    "vue-i18n": "^8.24.1",
     "vue-material-design-icons": "^4.11.0",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2"
@@ -32,8 +32,8 @@
     "babel-eslint": "^10.1.0",
     "cli-highlight": "^2.1.10",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "eslint-utils": "^1.4.3",
+    "eslint-plugin-vue": "^7.7.0",
+    "eslint-utils": "^2.1.0",
     "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {

@@ -62,52 +62,50 @@
       @keyup.native.enter="$router.push(getConAddr(selected))"
       @keyup.native.space="$router.push(getConAddr(selected))"
     >
-      <template>
-        <b-table-column
-          sortable
-          field="name"
-          :label="$t('message.table.name')"
-        >
-          <template v-slot="props">
-            <span class="has-text-weight-bold">
-              <b-icon
-                icon="folder"
-                size="is-small"
-              />
-              {{ props.row }}
-            </span>
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="delete"
-          label=""
-          width="100"
-        >
-          <template v-slot="props">
-            <b-button
-              v-if="selected == props.row"
-              type="is-danger"
+      <b-table-column
+        sortable
+        field="name"
+        :label="$t('message.table.name')"
+      >
+        <template #default="props">
+          <span class="has-text-weight-bold">
+            <b-icon
+              icon="folder"
               size="is-small"
-              icon-left="delete"
-              outlined
-              inverted
-              @click="deleteContainerShare(props.row)"
-            >
-              {{ $t('message.share.revoke') }}
-            </b-button>
-            <b-button
-              v-else
-              type="is-danger"
-              size="is-small"
-              icon-left="delete"
-              outlined
-              @click="deleteContainerShare(props.row)"
-            >
-              {{ $t('message.share.revoke') }}
-            </b-button>
-          </template>
-        </b-table-column>
-      </template>
+            />
+            {{ props.row }}
+          </span>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="delete"
+        label=""
+        width="100"
+      >
+        <template #default="props">
+          <b-button
+            v-if="selected == props.row"
+            type="is-danger"
+            size="is-small"
+            icon-left="delete"
+            outlined
+            inverted
+            @click="deleteContainerShare(props.row)"
+          >
+            {{ $t('message.share.revoke') }}
+          </b-button>
+          <b-button
+            v-else
+            type="is-danger"
+            size="is-small"
+            icon-left="delete"
+            outlined
+            @click="deleteContainerShare(props.row)"
+          >
+            {{ $t('message.share.revoke') }}
+          </b-button>
+        </template>
+      </b-table-column>
       <template 
         #detail="props"
       >
@@ -115,7 +113,7 @@
           :container="props.row"
         />
       </template>
-      <template v-slot:empty>
+      <template #empty>
         <p class="emptyTable">
           {{ $t('message.emptyShared') }}
         </p>
@@ -123,17 +121,6 @@
     </b-table>
   </div>
 </template>
-
-<style scoped>
-#shared-out-table {
-  width: 100%;
-}
-.emptyTable {
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
-}
-</style>
 
 <script>
 import SharedDetails from "@/components/SharedDetails";
@@ -191,3 +178,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#shared-out-table {
+  width: 100%;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>
