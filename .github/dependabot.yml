@@ -8,3 +8,11 @@ updates:
     labels:
       - "pip dependencies"
     open-pull-requests-limit: 10
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "docker dependencies"
+    open-pull-requests-limit: 10
