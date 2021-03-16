@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "pip dependencies"
+    open-pull-requests-limit: 10
+  - package-ecosystem: "npm"
+    directory: "/swift_browser_ui_frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "npm dependencies"
+    open-pull-requests-limit: 10
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "github actions"
+    open-pull-requests-limit: 10
