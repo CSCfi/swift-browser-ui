@@ -1,5 +1,5 @@
-aiohttp
-uvloop
-asyncpg
+aiohttp==3.7.4
+uvloop==0.15.2
+asyncpg==0.22.0
 gunicorn>=20.0.1
-certifi
+certifi==2020.12.05 
