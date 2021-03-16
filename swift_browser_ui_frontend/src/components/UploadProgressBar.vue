@@ -23,15 +23,6 @@
   </div>
 </template>
 
-<style scoped>
-#up-progress {
-  margin-left: 5%;
-  margin-right: 5%;
-  margin-top: 1%;
-  margin-bottom: 1%;
-}
-</style>
-
 <script>
 export default {
   name: "ProgressBar",
@@ -48,3 +39,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#up-progress {
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+</style>

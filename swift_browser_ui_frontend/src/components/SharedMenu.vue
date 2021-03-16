@@ -26,6 +26,13 @@
   </b-menu>
 </template>
 
+<script>
+export default {
+  name: "SharedMenu",
+};
+</script>
+
+
 <style>
 .menu-list {
   border: solid 1px #dbdbdb;
@@ -41,9 +48,3 @@
   border-bottom: none;
 }
 </style>
-
-<script>
-export default {
-  name: "SharedMenu",
-};
-</script>

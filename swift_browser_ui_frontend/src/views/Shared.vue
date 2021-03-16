@@ -27,14 +27,6 @@
   </div>
 </template>
 
-<style scoped>
-.sharedTab {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-</style>
-
 <script>
 // Import table for the containers shared to the querying user
 import SharedTable from "@/components/SharedTable";
@@ -54,3 +46,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.sharedTab {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+</style>

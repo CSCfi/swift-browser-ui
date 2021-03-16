@@ -49,12 +49,6 @@
   </form>
 </template>
 
-<style scoped>
-#sharingMenu {
-  width: auto;
-}
-</style>
-
 <script>
 export default {
   name: "Sharing",
@@ -69,3 +63,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#sharingMenu {
+  width: auto;
+}
+</style>

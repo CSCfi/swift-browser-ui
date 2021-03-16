@@ -9,22 +9,6 @@
   </section>
 </template>
 
-<style scoped>
-.sharing-view {
-  display: flex;
-  padding-left: 5%;
-  padding-right: 5%;
-  width: auto;
-}
-#SharedMenu {
-  flex: 1 1 auto;
-  padding-right: 1%
-}
-#SharedOutTable {
-  flex: 4 1 auto;
-}
-</style>
-
 <script>
 import SharedMenu from "@/components/SharedMenu";
 import SharedOutTable from "@/components/SharedOutTable";
@@ -40,3 +24,19 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.sharing-view {
+  display: flex;
+  padding-left: 5%;
+  padding-right: 5%;
+  width: auto;
+}
+#SharedMenu {
+  flex: 1 1 auto;
+  padding-right: 1%
+}
+#SharedOutTable {
+  flex: 4 1 auto;
+}
+</style>

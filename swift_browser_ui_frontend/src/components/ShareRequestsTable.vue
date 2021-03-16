@@ -41,52 +41,50 @@
       :pagination-simple="true"
       :default-sort-direction="defaultSortDirection"
     >
-      <template>
-        <b-table-column
-          sortable
-          field="container"
-          :label="$t('message.share.container')"
-        >
-          <template v-slot="props">
-            {{ props.row.container }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          sortable
-          field="owner"
-          :label="$t('message.share.owner')"
-        >
-          <template v-slot="props">
-            {{ props.row.owner }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          sortable
-          field="created"
-          :label="$t('message.share.created')"
-        >
-          <template v-slot="props">
-            {{ getHumanReadableDate( props.row.date ) }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="delete"
-          label=""
-          width="40"
-        > 
-          <template v-slot="props">
-            <b-button
-              type="is-danger"
-              outlined
-              size="is-small"
-              @click="deleteShareRequest(props.row.container, props.row.owner)"
-            >
-              {{ $t('message.share.cancel') }}
-            </b-button>
-          </template>
-        </b-table-column>
-      </template>
-      <template v-slot:empty>
+      <b-table-column
+        sortable
+        field="container"
+        :label="$t('message.share.container')"
+      >
+        <template #default="props">
+          {{ props.row.container }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        sortable
+        field="owner"
+        :label="$t('message.share.owner')"
+      >
+        <template #default="props">
+          {{ props.row.owner }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        sortable
+        field="created"
+        :label="$t('message.share.created')"
+      >
+        <template #default="props">
+          {{ getHumanReadableDate( props.row.date ) }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="delete"
+        label=""
+        width="40"
+      > 
+        <template #default="props">
+          <b-button
+            type="is-danger"
+            outlined
+            size="is-small"
+            @click="deleteShareRequest(props.row.container, props.row.owner)"
+          >
+            {{ $t('message.share.cancel') }}
+          </b-button>
+        </template>
+      </b-table-column>
+      <template #empty>
         <p class="empptyTable">
           {{ $t('message.emptyRequested') }}
         </p>
@@ -94,18 +92,6 @@
     </b-table>
   </div>
 </template>
-
-<style scoped>
-#requested-shares-table {
-  margin-top: 20px;
-}
-.emptyTable {
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
-}
-</style>
-
 
 <script>
 import delay from "lodash/delay";
@@ -177,3 +163,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#requested-shares-table {
+  margin-top: 20px;
+}
+.emptyTable {
+  text-align: center;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+</style>

@@ -66,26 +66,6 @@
   </div>
 </template>
 
-<style scoped>
-  #sharingview {
-    width: auto;
-    margin-left: 5%;
-    margin-right: 5%;
-  }
-
-  .sharingbutton {
-    margin: 1%;
-  }
-
-  .syncbutton {
-    margin-left: 1%;
-  }
-
-  .sharinghead {
-    margin: 1% 1% 1% 0;
-  }
-</style>
-
 <script>
 import {
   addAccessControlMeta,
@@ -226,3 +206,23 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  #sharingview {
+    width: auto;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+
+  .sharingbutton {
+    margin: 1%;
+  }
+
+  .syncbutton {
+    margin-left: 1%;
+  }
+
+  .sharinghead {
+    margin: 1% 1% 1% 0;
+  }
+</style>
