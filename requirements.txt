@@ -1,6 +1,6 @@
-aiohttp
-requests
-python-swiftclient
-keystoneauth1
+aiohttp==3.7.4
+requests==2.25.1
+python-swiftclient==3.11.1
+keystoneauth1==4.3.1
 git+https://github.com/cscfi/swift-browser-ui.git
-certifi
+certifi==2020.12.05 
