@@ -13,7 +13,7 @@
     "@vue/cli-service-global": "^4.5.11",
     "buefy": "^0.9.4",
     "core-js": "^3.9.1",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node-sass": "^4.14.1",
     "resumablejs": "^1.1.0",
