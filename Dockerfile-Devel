@@ -1,4 +1,4 @@
-FROM node:14.15-alpine3.12 as FRONTEND
+FROM node:15.11.0-alpine3.12 as FRONTEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
