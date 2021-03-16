@@ -1,4 +1,4 @@
-aiohttp==3.7.4
+aiohttp==3.7.4.post0
 requests==2.25.1
 python-swiftclient==3.11.1
 keystoneauth1==4.3.1
