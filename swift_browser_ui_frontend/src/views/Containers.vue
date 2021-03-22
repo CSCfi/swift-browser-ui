@@ -233,6 +233,7 @@
 <script>
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import escapeRegExp from "lodash/escapeRegExp";
 import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
@@ -320,7 +321,9 @@ export default {
       return getHumanReadableSize(size);
     },
     filter: function() {
-      var name_cmp = new RegExp(this.searchQuery, "i");
+      // request parameter should be sanitized first
+      var safeKey = escapeRegExp(this.searchQuery);
+      var name_cmp = new RegExp(safeKey, "i");
       this.bList = this.containers.filter(
         element => element.name.match(name_cmp),
       );
