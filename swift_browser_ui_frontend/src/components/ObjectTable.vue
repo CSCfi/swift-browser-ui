@@ -262,6 +262,7 @@ import {
 } from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
+import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
@@ -467,7 +468,9 @@ export default {
     },
     getFolderContents: function () {
       // Get folderized list of the objects
-      let pre_re = new RegExp(this.getPrefix());
+      // request parameter should be sanitized first
+      var safeKey = escapeRegExp(this.getPrefix());
+      let pre_re = new RegExp(safeKey);
 
       let tmpList = this.objects.filter(
         el => el.name.match(pre_re),
@@ -537,7 +540,9 @@ export default {
       return path.replace(this.getPrefix(), "").match("/") ? false : true;
     },
     filter: function () {
-      let name_re = new RegExp(this.searchQuery, "i");
+      // request parameter should be sanitized first
+      var safeKey = escapeRegExp(this.searchQuery);
+      var name_re = new RegExp(safeKey, "i");
       if (this.renderFolders) {
         this.oList = this.getFolderContents().filter(
           element => element.name.match(name_re),

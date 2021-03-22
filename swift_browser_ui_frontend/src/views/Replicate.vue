@@ -49,6 +49,7 @@
 
 <script>
 import {swiftCopyContainer} from "@/common/api";
+import escapeRegExp from "lodash/escapeRegExp";
 
 export default {
   name: "ReplicationView",
@@ -98,7 +99,9 @@ export default {
       });
     },
     checkDestination: function () {
-      let re = new RegExp("^".concat(this.destination, "$"));
+      // request parameter should be sanitized first
+      var safeKey = escapeRegExp(this.destination);
+      let re = new RegExp("^".concat(safeKey, "$"));
       for (let cont of this.containerCache) {
         if (cont.name.match(re)) {
           this.destinationExists = true;
