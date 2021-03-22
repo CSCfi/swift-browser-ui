@@ -7,6 +7,7 @@ updates:
       day: "monday"
     labels:
       - "pip dependencies"
+    target-branch: "devel"
     open-pull-requests-limit: 10
   - package-ecosystem: "npm"
     directory: "/swift_browser_ui_frontend"
@@ -15,6 +16,7 @@ updates:
       day: "monday"
     labels:
       - "npm dependencies"
+    target-branch: "devel"
     open-pull-requests-limit: 10
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -23,6 +25,7 @@ updates:
       day: "monday"
     labels:
       - "github actions"
+    target-branch: "devel"
     open-pull-requests-limit: 10
   - package-ecosystem: docker
     directory: "/"
@@ -31,4 +34,5 @@ updates:
       day: "monday"
     labels:
       - "docker dependencies"
+    target-branch: "devel"
     open-pull-requests-limit: 10
