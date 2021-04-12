@@ -3,7 +3,7 @@ python-swiftclient==3.11.1
 cryptography==3.4.7
 keystoneauth1==4.3.1
 click==7.1.2
-sphinx==3.5.3
+sphinx==3.5.4
 sphinx_rtd_theme==0.5.2
 uvloop==0.15.2
 gunicorn>=20.0.1
