@@ -256,10 +256,6 @@
 </template>
 
 <script>
-import {
-  getObjects,
-  getSharedObjects,
-} from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
@@ -277,7 +273,6 @@ export default {
   data: function () {
     return {
       oList: [],
-      objects: [],
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
@@ -294,18 +289,20 @@ export default {
     queryPage () {
       return this.$route.query.page || 1;
     },
+    objects () {
+      return (
+        this.$route.name == "SharedObjects" ?
+          this.$store.state.sharedObjects :
+          this.$store.getters.getObjectcsByContainer(
+            this.$route.params.container,
+          )
+      );
+    },
   },
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
-    },
-    objects: function () {
-      if (this.renderFolders) {
-        this.oList = this.getFolderContents();
-      } else {
-        this.oList = this.objects;
-      }
     },
     renderFolders: function () {
       if (this.renderFolders) {
@@ -335,44 +332,12 @@ export default {
   },
   methods: {
     fetchObjects: function () {
-      // Get the object listing from the API if the listing hasn't yet 
-      // been cached
-      if (this.$route.name == "SharedObjects") {
-        this.$store.state.client.getAccessDetails(
-          this.$route.params.project,
-          this.$route.params.container,
-          this.$route.params.owner,
-        ).then(
-          (ret) => {
-            return getSharedObjects(
-              this.$route.params.owner,
-              this.$route.params.container,
-              ret.address,
-            );
-          },
-        ).then(
-          (ret) => {
-            this.objects = ret;
-          },
-        );
-      }
-      else {
-        let container = this.$route.params.container;
-        if(this.$store.state.objectCache[container] == undefined) {
-          this.$store.commit("setLoading", true);
-          getObjects(container).then((ret) => {
-            if (ret.status != 200) {
-              this.$store.commit("setLoading", false);
-            }
-            this.$store.commit("updateObjects", [container, ret]);
-            this.objects = ret;
-            this.$store.commit("setLoading", false);
-          }).catch(() => {
-            this.$store.commit("setLoading", false);
-          });
-        } else {
-          this.objects = this.$store.state.objectCache[container];
-        }
+      // Update current object listing in Vuex if length is too little
+      if (this.objects.length < 1) {
+        this.$store.commit({
+          type: "updateObjects",
+          route: this.route,
+        });
       }
     },
     checkLargeDownloads: function () {
