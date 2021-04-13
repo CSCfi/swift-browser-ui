@@ -4,6 +4,10 @@ import Vuex from "vuex";
 
 import { recursivePruneCache } from "@/common/conv";
 import { getBuckets } from "@/common/api";
+import { 
+  getObjects,
+  getSharedObjects,
+} from "./api";
 
 Vue.use(Vuex);
 
@@ -16,6 +20,7 @@ const store = new Vuex.Store({
     isLoading: false,
     isFullPage: true,
     objectCache: {},
+    sharedObjects: undefined,
     containerCache: [],
     langs: [
       {ph: "In English", value: "en"},
@@ -28,6 +33,11 @@ const store = new Vuex.Store({
     isChunking: false,
     uploadProgress: undefined,
     altContainer: undefined,
+  },
+  getters: {
+    getObjectsByContainer: (state) => (container) => {
+      return state.objectCache[container];
+    },
   },
   mutations: {
     updateContainers (state) {
@@ -43,13 +53,47 @@ const store = new Vuex.Store({
         state.isLoading = false;
       });
     },
-    updateObjects (state, updateTuple) {
-      // Update object cache as the object listing required wasn't
-      // available in the cache.
-      state.objectCache = recursivePruneCache(
-        state.objectCache,
-      );
-      state.objectCache[updateTuple[0]] = updateTuple[1];
+    updateObjects (
+      state,
+      payload,
+    ) {
+      // Update object cache with the new object listing.
+      let container = payload.route.params.container;
+      state.isLoading = true;
+      if (payload.route.name == "SharedObjects") {
+        state.client.getAccessDetails(
+          payload.route.params.project,
+          container,
+          payload.route.params.owner,
+        ).then(
+          (ret) => {
+            return getSharedObjects(
+              payload.route.params.owner,
+              container,
+              ret.address,
+            );
+          },
+        ).then(
+          (ret) => {
+            state.isLoading = false;
+            state.sharedObjects = ret;
+          },
+        ).catch(() => {
+          state.isLoading = false;
+        });
+      }
+      else {
+        getObjects(container).then((ret) => {
+          if (ret.status != 200) {
+            state.isLoading = false;
+          }
+          state.objectCache = recursivePruneCache(state.objectCache);
+          state.objectCache[container] = ret;
+          state.isLoading = false;
+        }).catch(() => {
+          state.isLoading = false;
+        });
+      }
     },
     eraseObjects (state) {
       state.objectCache = {};
