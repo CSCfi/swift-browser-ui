@@ -293,7 +293,7 @@ export default {
       return (
         this.$route.name == "SharedObjects" ?
           this.$store.state.sharedObjects :
-          this.$store.getters.getObjectcsByContainer(
+          this.$store.getters.getObjectsByContainer(
             this.$route.params.container,
           )
       );
@@ -336,7 +336,7 @@ export default {
       if (this.objects.length < 1) {
         this.$store.commit({
           type: "updateObjects",
-          route: this.route,
+          route: this.$route,
         });
       }
     },

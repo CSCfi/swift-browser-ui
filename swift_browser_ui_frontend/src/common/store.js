@@ -36,7 +36,11 @@ const store = new Vuex.Store({
   },
   getters: {
     getObjectsByContainer: (state) => (container) => {
-      return state.objectCache[container];
+      return (
+        state.objectCache[container] != undefined ?
+          state.objectCache[container] :
+          []
+      );
     },
   },
   mutations: {
