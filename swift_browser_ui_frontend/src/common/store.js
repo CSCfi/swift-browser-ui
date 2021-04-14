@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { recursivePruneCache } from "@/common/conv";
+// import { recursivePruneCache } from "@/common/conv";
 import { getBuckets } from "@/common/api";
 import { 
   getObjects,
@@ -19,8 +19,7 @@ const store = new Vuex.Store({
     multipleProjects: false,
     isLoading: false,
     isFullPage: true,
-    objectCache: {},
-    sharedObjects: undefined,
+    objectCache: [],
     containerCache: [],
     langs: [
       {ph: "In English", value: "en"},
@@ -33,15 +32,6 @@ const store = new Vuex.Store({
     isChunking: false,
     uploadProgress: undefined,
     altContainer: undefined,
-  },
-  getters: {
-    getObjectsByContainer: (state) => (container) => {
-      return (
-        state.objectCache[container] != undefined ?
-          state.objectCache[container] :
-          []
-      );
-    },
   },
   mutations: {
     updateContainers (state) {
@@ -65,9 +55,9 @@ const store = new Vuex.Store({
       let container = payload.route.params.container;
       state.isLoading = true;
       if (payload.route.name == "SharedObjects") {
+        payload.route.params.project,
+        container,
         state.client.getAccessDetails(
-          payload.route.params.project,
-          container,
           payload.route.params.owner,
         ).then(
           (ret) => {
@@ -80,7 +70,7 @@ const store = new Vuex.Store({
         ).then(
           (ret) => {
             state.isLoading = false;
-            state.sharedObjects = ret;
+            state.objectCache = ret;
           },
         ).catch(() => {
           state.isLoading = false;
@@ -91,8 +81,8 @@ const store = new Vuex.Store({
           if (ret.status != 200) {
             state.isLoading = false;
           }
-          state.objectCache = recursivePruneCache(state.objectCache);
-          state.objectCache[container] = ret;
+          // state.objectCache = recursivePruneCache(state.objectCache);
+          state.objectCache = ret;
           state.isLoading = false;
         }).catch(() => {
           state.isLoading = false;
@@ -100,7 +90,7 @@ const store = new Vuex.Store({
       }
     },
     eraseObjects (state) {
-      state.objectCache = {};
+      state.objectCache = [];
     },
     setProjects (state, newProjects) {
       // Update the project listing in store

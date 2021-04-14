@@ -290,13 +290,7 @@ export default {
       return this.$route.query.page || 1;
     },
     objects () {
-      return (
-        this.$route.name == "SharedObjects" ?
-          this.$store.state.sharedObjects :
-          this.$store.getters.getObjectsByContainer(
-            this.$route.params.container,
-          )
-      );
+      return this.$store.state.objectCache;
     },
   },
   watch: {
@@ -305,6 +299,13 @@ export default {
       this.debounceFilter();
     },
     renderFolders: function () {
+      if (this.renderFolders) {
+        this.oList = this.getFolderContents();
+      } else {
+        this.oList = this.objects;
+      }
+    },
+    objects: function () {
       if (this.renderFolders) {
         this.oList = this.getFolderContents();
       } else {
@@ -326,19 +327,17 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
-    this.fetchObjects();
+    this.updateObjects();
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
   methods: {
-    fetchObjects: function () {
+    updateObjects: function () {
       // Update current object listing in Vuex if length is too little
-      if (this.objects.length < 1) {
-        this.$store.commit({
-          type: "updateObjects",
-          route: this.$route,
-        });
-      }
+      this.$store.commit({
+        type: "updateObjects",
+        route: this.$route,
+      });
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {
