@@ -35,15 +35,9 @@ export default {
   data: function () {
     return {
       id: "upload-".concat(Date.now().toString()),
-      containerName: undefined,
-      address: "",
-      resum: undefined,
     };
   },
   computed: {
-    active () {
-      return this.$store.state.active;
-    },
     res () {
       return this.$store.state.resumableClient;
     },
