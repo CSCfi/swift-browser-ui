@@ -183,7 +183,6 @@ new Vue({
         if (
           newParam[0].match("resumableRelativePath")
           && this.$route.query.prefix != undefined
-          && !newParam[1].match("/")  // only pseudofolderize incomplete paths
         ) {
           retUrl.searchParams.append(
             newParam[0],
