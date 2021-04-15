@@ -152,8 +152,14 @@ new Vue({
     fileSuccessToast: function (file) {
       this.$buefy.toast.open({
         message: this.$t("message.upfinish").concat(file.fileName),
-        type: "is-success",  
+        type: "is-success",
       });
+      if (this.$route.params.container != undefined) {
+        this.$store.commit({
+          type: "updateObjects",
+          route: this.$route,
+        });
+      }
     },
     fileFailureToast: function (file) {
       this.$buefy.toast.open({
@@ -201,12 +207,6 @@ new Vue({
       this.endUpload();
       this.stopChunking();
       this.$store.commit("eraseProgress");
-      if (this.$route.params.container != undefined) {
-        this.$store.commit({
-          type: "updateObjects",
-          route: this.$route,
-        });
-      }
     },
     onCancel: function () {
       this.onComplete();
