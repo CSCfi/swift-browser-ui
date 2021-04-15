@@ -178,7 +178,20 @@ new Vue({
       );
       for (const param of params) {
         let newParam = param.split("=");
-        retUrl.searchParams.append(newParam[0], newParam[1]);
+        // check if we should move the file under a pseudofolder
+        // using the current prefix defined in route for the url
+        if (
+          newParam[0].match("resumableRelativePath")
+          && this.$route.query.prefix != undefined
+          && !newParam[1].match("/")  // only pseudofolderize incomplete paths
+        ) {
+          retUrl.searchParams.append(
+            newParam[0],
+            this.$route.query.prefix + newParam[1],
+          );
+        } else {
+          retUrl.searchParams.append(newParam[0], newParam[1]);
+        }
       }
       return retUrl.toString();
     },
