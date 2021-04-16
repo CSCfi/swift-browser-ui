@@ -2,7 +2,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-// import { recursivePruneCache } from "@/common/conv";
 import { getBuckets } from "@/common/api";
 import { 
   getObjects,
@@ -81,7 +80,6 @@ const store = new Vuex.Store({
           if (ret.status != 200) {
             state.isLoading = false;
           }
-          // state.objectCache = recursivePruneCache(state.objectCache);
           state.objectCache = ret;
           state.isLoading = false;
         }).catch(() => {
