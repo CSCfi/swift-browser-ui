@@ -11,22 +11,21 @@
         size="is-small"
       />{{ $t('message.cancelupload') }}
     </b-button>
-    <a
+    <UploadButton
       v-else
       :id="id"
-      class="button is-outlined is-primary"
-    >
-      <b-icon
-        icon="upload"
-        size="is-small"
-      />{{ $t('message.upload') }}
-    </a>
+    />
   </div>
 </template>
 
 <script>
+import UploadButton from "@/components/UploadButton";
+
 export default {
   name: "FolderUploadForm",
+  components: {
+    UploadButton,
+  },
   props: {
     dropelement: {
       default: "",
@@ -36,15 +35,9 @@ export default {
   data: function () {
     return {
       id: "upload-".concat(Date.now().toString()),
-      containerName: undefined,
-      address: "",
-      resum: undefined,
     };
   },
   computed: {
-    active () {
-      return this.$store.state.active;
-    },
     res () {
       return this.$store.state.resumableClient;
     },
@@ -58,7 +51,6 @@ export default {
   methods: {
     registerToResumable: function () {
       // Add elements to listen
-      this.res.assignBrowse(document.getElementById(this.id));
       if(this.dropelement != "") {
         this.res.assignDrop(document.getElementById(this.dropelement));
       }
