@@ -134,7 +134,8 @@ def switch_to_finnish(drv):
 def get_nav_to_ui(drv, address=ADDRESS):
     """Navigate to the browser UI."""
     drv.get(address)
-    login(drv)
+    if "/browse" not in drv.current_url:
+        login(drv)
     time.sleep(0.1)
     return drv
 
