@@ -266,7 +266,7 @@ def generate_cookie(
     Returns a tuple containing both the unencrypted and encrypted cookie.
     """
     cookie = {
-        "id": secrets.token_hex(64),
+        "id": secrets.token_urlsafe(32),
         "referer": None,
         "signature": None,
     }
@@ -417,7 +417,7 @@ async def get_tempurl_key(
             temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
         # If key headers don't exist, generate a new temporary URL key
         except KeyError:
-            temp_url_key = secrets.token_hex(64)
+            temp_url_key = secrets.token_urlsafe(32)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
             retval = connection.post(options=meta_options)
             if not retval['success']:
@@ -441,7 +441,7 @@ async def get_container_tempurl_key(
             temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key-2']
         # If key headers don't exist generate a new temporary URL key
         except KeyError:
-            temp_cont_key = secrets.token_hex(64)
+            temp_cont_key = secrets.token_urlsafe(32)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_cont_key}']}
             retval = connection.post(
                 container=container,
