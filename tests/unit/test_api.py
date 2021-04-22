@@ -45,7 +45,7 @@ class APITestClass(asynctest.TestCase):
     # Follows the testing of the different list functions
     async def test_list_containers_correct(self):
         """Test function swift_list_buckets with a correct query."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=100,
             object_range=(0, 10),
             size_range=(65535, 262144),
@@ -55,21 +55,21 @@ class APITestClass(asynctest.TestCase):
         buckets = [i['name'] for i in buckets]
         comp = [
             i for i in
-            self.request.app['Creds'][self.cookie]['ST_conn'].containers.keys()
+            self.request.app['Sessions'][self.cookie]['ST_conn'].containers.keys()
         ]
         # Test if return all the correct values from the mock service
         self.assertEqual(buckets, comp)
 
     async def test_list_containers_swift_error(self):
         """Test function swift_list_buckets when raising SwiftError."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].list = \
+        self.request.app['Sessions'][self.cookie]['ST_conn'].list = \
             unittest.mock.Mock(side_effect=SwiftError("..."))
         with self.assertRaises(HTTPNotFound):
             _ = await swift_list_buckets(self.request)
 
     async def test_list_objects_correct(self):
         """Test function swift_list_objetcs with a correct query."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=5,
             object_range=(10, 100),
             size_range=(65535, 262144),
@@ -81,14 +81,14 @@ class APITestClass(asynctest.TestCase):
             objects = [i['hash'] for i in objects]
             comp = [
                 i['hash'] for i in
-                self.request.app['Creds'][self.cookie]['ST_conn']
+                self.request.app['Sessions'][self.cookie]['ST_conn']
                 .containers[container]
             ]
             self.assertEqual(objects, comp)
 
     async def test_list_objects_with_unicode_nulls(self):
         """Test function swift_list_objects with unicode nulls in type."""
-        self.request.app["Creds"][self.cookie]["ST_conn"].init_with_data(
+        self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(
             containers=1,
             object_range=(1, 10),
             size_range=(65535, 262144),
@@ -104,7 +104,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_list_without_containers(self):
         """Test function list buckets on a project without object storage."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=0
         )
         with self.assertRaises(HTTPNotFound):
@@ -113,7 +113,7 @@ class APITestClass(asynctest.TestCase):
     async def test_list_with_invalid_container(self):
         """Test function list objects with an invalid container id."""
         # Let's create some test data anyway
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=3,
             object_range=(1, 5),
             size_range=(65535, 262144),
@@ -126,7 +126,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_list_without_objects(self):
         """Test function list objects without an object query in request."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(0, 0),
         )
@@ -142,19 +142,19 @@ class APITestClass(asynctest.TestCase):
         projects = json.loads(response.text)
         self.assertEqual(
             projects,
-            self.request.app['Creds'][self.cookie]['Avail']['projects']
+            self.request.app['Sessions'][self.cookie]['Avail']['projects']
         )
 
     async def test_swift_download_object(self):
         """Test object download function."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(1, 1),
             size_range=(4096, 4096),
         )
         # Get names for the download query
         container = "test-container-0"
-        o_name = self.request.app['Creds'][self.cookie]['ST_conn'].containers[
+        o_name = self.request.app['Sessions'][self.cookie]['ST_conn'].containers[
             container
         ][0]
 
@@ -165,31 +165,31 @@ class APITestClass(asynctest.TestCase):
         setd["swift_endpoint_url"] = "http://object.example-os.com:443/v1"
 
         # Case 1: Only Meta-Temp-URL-Key exists
-        self.request.app['Creds'][self.cookie]['ST_conn'].tempurl_key_1 = \
+        self.request.app['Sessions'][self.cookie]['ST_conn'].tempurl_key_1 = \
             hashlib.md5(os.urandom(128)).hexdigest()  # nosec
         resp = await swift_download_object(self.request)
         self.assertTrue(resp.headers['Location'] is not None)
 
         # Case 2: Only Meta-Temp-URL-Key-2
-        self.request.app['Creds'][self.cookie]['ST_conn'].tempurl_key_1 = None
-        self.request.app['Creds'][self.cookie]['ST_conn'].tempurl_key_2 = \
+        self.request.app['Sessions'][self.cookie]['ST_conn'].tempurl_key_1 = None
+        self.request.app['Sessions'][self.cookie]['ST_conn'].tempurl_key_2 = \
             hashlib.md5(os.urandom(128)).hexdigest()  # nosec
         resp = await swift_download_object(self.request)
         self.assertTrue(resp.headers['Location'] is not None)
 
         # Case 3: No pre-existing keys
-        self.request.app['Creds'][self.cookie]['ST_conn'].meta = {
+        self.request.app['Sessions'][self.cookie]['ST_conn'].meta = {
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
         resp = await swift_download_object(self.request)
         self.assertTrue(
-            self.request.app['Creds'][self.cookie]['ST_conn'].meta[
+            self.request.app['Sessions'][self.cookie]['ST_conn'].meta[
                 "tempurl_key_1"
             ] is None
         )
         self.assertTrue(
-            self.request.app['Creds'][self.cookie]['ST_conn'].meta[
+            self.request.app['Sessions'][self.cookie]['ST_conn'].meta[
                 "tempurl_key_2"
             ] is not None
         )
@@ -201,17 +201,17 @@ class APITestClass(asynctest.TestCase):
     # metadata contains sensitive information. (e.g. the tempurl keys)
     async def test_get_container_meta_swift(self):
         """Test metadata API endpoint with container metadata."""
-        req_creds = self.request.app['Creds']
-        req_creds[self.cookie]['ST_conn'].init_with_data(
+        req_sessions = self.request.app['Sessions']
+        req_sessions[self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(1, 1),
             size_range=(252144, 252144),
         )
-        req_creds[self.cookie]['ST_conn'].meta = {
+        req_sessions[self.cookie]['ST_conn'].meta = {
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
-        req_creds[self.cookie]['ST_conn'].set_swift_meta_container(
+        req_sessions[self.cookie]['ST_conn'].set_swift_meta_container(
             "test-container-0"
         )
 
@@ -228,26 +228,26 @@ class APITestClass(asynctest.TestCase):
 
     async def test_get_object_meta_swift(self):
         """Test metadata API endpoint when object has swift metadata."""
-        req_creds = self.request.app['Creds']
-        req_creds[self.cookie]['ST_conn'].init_with_data(
+        req_sessions = self.request.app['Sessions']
+        req_sessions[self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(1, 1),
             size_range=(252144, 252144),
         )
-        req_creds[self.cookie]['ST_conn'].meta = {
+        req_sessions[self.cookie]['ST_conn'].meta = {
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
         # Get the object key to test with
-        objs = req_creds[self.cookie]['ST_conn'].containers[
+        objs = req_sessions[self.cookie]['ST_conn'].containers[
             "test-container-0"]
         objkey = [i['name'] for i in objs][0]
 
-        req_creds[self.cookie]['ST_conn'].set_swift_meta_container(
+        req_sessions[self.cookie]['ST_conn'].set_swift_meta_container(
             "test-container-0"
         )
 
-        req_creds[self.cookie]['ST_conn'].set_swift_meta_object(
+        req_sessions[self.cookie]['ST_conn'].set_swift_meta_object(
             "test-container-0",
             objkey
         )
@@ -265,26 +265,26 @@ class APITestClass(asynctest.TestCase):
 
     async def test_get_object_meta_s3(self):
         """Test metadata API endpoint when object has s3 metadata."""
-        req_creds = self.request.app['Creds']
-        req_creds[self.cookie]['ST_conn'].init_with_data(
+        req_sessions = self.request.app['Sessions']
+        req_sessions[self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(1, 1),
             size_range=(252144, 252144),
         )
-        req_creds[self.cookie]['ST_conn'].meta = {
+        req_sessions[self.cookie]['ST_conn'].meta = {
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
         # Get the object key to test with
-        objs = req_creds[self.cookie]['ST_conn'].containers[
+        objs = req_sessions[self.cookie]['ST_conn'].containers[
             "test-container-0"]
         objkey = [i['name'] for i in objs][0]
 
-        req_creds[self.cookie]['ST_conn'].set_swift_meta_container(
+        req_sessions[self.cookie]['ST_conn'].set_swift_meta_container(
             "test-container-0"
         )
 
-        req_creds[self.cookie]['ST_conn'].set_s3_meta_object(
+        req_sessions[self.cookie]['ST_conn'].set_s3_meta_object(
             "test-container-0",
             objkey
         )
@@ -310,25 +310,25 @@ class APITestClass(asynctest.TestCase):
 
     async def test_get_object_meta_swift_whole(self):
         """Test metadata API endpoint with containers' objects."""
-        req_creds = self.request.app['Creds']
-        req_creds[self.cookie]['ST_conn'].init_with_data(
+        req_sessions = self.request.app['Sessions']
+        req_sessions[self.cookie]['ST_conn'].init_with_data(
             containers=1,
             object_range=(5, 5),
             size_range=(252144, 252144),
         )
-        req_creds[self.cookie]['ST_conn'].meta = {
+        req_sessions[self.cookie]['ST_conn'].meta = {
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
 
-        req_creds[self.cookie]['ST_conn'].set_swift_meta_container(
+        req_sessions[self.cookie]['ST_conn'].set_swift_meta_container(
             "test-container-0"
         )
 
-        objs = req_creds[self.cookie]['ST_conn'].containers[
+        objs = req_sessions[self.cookie]['ST_conn'].containers[
             "test-container-0"]
         for key in [i['name'] for i in objs]:
-            req_creds[self.cookie]['ST_conn'].set_swift_meta_object(
+            req_sessions[self.cookie]['ST_conn'].set_swift_meta_object(
                 "test-container-0",
                 key
             )
@@ -350,7 +350,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_get_project_metadata(self):
         """Test metadata API endpoint for account metadata."""
-        self.request.app['Creds'][self.cookie]['ST_conn'].init_with_data(
+        self.request.app['Sessions'][self.cookie]['ST_conn'].init_with_data(
             containers=5,
             object_range=(100, 100),
             size_range=(1073741824, 1073741824)
@@ -373,7 +373,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_get_os_active_project(self):
         """Test active project API endpoint."""
-        self.request.app["Creds"][self.cookie]["active_project"] = \
+        self.request.app["Sessions"][self.cookie]["active_project"] = \
             "placeholder"
         resp = await get_os_active_project(self.request)
         text = json.loads(resp.text)
@@ -403,7 +403,7 @@ class TestProxyFunctions(asynctest.TestCase):
             },
             "query_string": "&test-query=test-value",
             "app": {
-                "Creds": {
+                "Sessions": {
                     "session_key": {
                         "active_project": {
                             "id": "test-id"

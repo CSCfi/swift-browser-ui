@@ -218,43 +218,20 @@ def api_check(
         request: aiohttp.web.Request
 ) -> str:
     """Do a more thorough session check for the API."""
-    try:
-        if decrypt_cookie(request)["id"] in request.app['Sessions']:
-            session = decrypt_cookie(request)["id"]
-            check_csrf(request)
-            ret = session
-            if 'ST_conn' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-            if 'OS_sess' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-            if 'Avail' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-        else:
-            raise aiohttp.web.HTTPUnauthorized(
-                headers={
-                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                }
-            )
-        return ret
-    except InvalidToken:
-        request.app["Log"].info("Throw due to invalid token.")
+    session_check(request)
+    check_csrf(request)
+    session = decrypt_cookie(request)["id"]
+    if (
+            "ST_conn" not in request.app["Sessions"][session]
+            or "OS_sess" not in request.app["Sessions"][session]
+            or "Avail" not in request.app["Sessions"][session]
+    ):
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
+    return session
 
 
 def generate_cookie(
@@ -460,7 +437,7 @@ async def open_upload_runner_session(
 ) -> str:
     """Open an upload session to the token."""
     try:
-        return request.app['Creds'][session_key]['runner']
+        return request.app['Sessions'][session_key]['runner']
     except KeyError:
         session = request.app['api_client']
         path = f"{setd['upload_internal_endpoint']}/{project}"
@@ -475,5 +452,5 @@ async def open_upload_runner_session(
                 ssl=ssl_context
         ) as resp:
             ret = str(resp.cookies["RUNNER_SESSION_ID"].value)
-            request.app['Creds'][session_key]['runner'] = ret
+            request.app['Sessions'][session_key]['runner'] = ret
             return ret

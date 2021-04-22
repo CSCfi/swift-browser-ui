@@ -54,7 +54,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
                 "container": "test-container",
             },
             "app": {
-                "Creds": {
+                "Sessions": {
                     "test-session": {
                         "ST_conn": None,
                         "OS_sess": types.SimpleNamespace(**{
@@ -119,7 +119,7 @@ class SignatureTokenTestClass(asynctest.TestCase):
                 "id": "test-token"
             },
             "app": {
-                "Creds": {
+                "Sessions": {
                     "test-session": {
                         "active_project": {
                             "id": "test-project",
@@ -149,7 +149,7 @@ class SignatureTokenTestClass(asynctest.TestCase):
                 "id": "test-token"
             },
             "app": {
-                "Creds": {
+                "Sessions": {
                     "test-session": {
                         "active_project": {
                             "id": "test-project"

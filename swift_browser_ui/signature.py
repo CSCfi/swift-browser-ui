@@ -42,7 +42,7 @@ async def handle_ext_token_create(
     """Handle call for an API token create."""
     session = api_check(request)
 
-    project = request.app["Creds"][session]["active_project"]["id"]
+    project = request.app["Sessions"][session]["active_project"]["id"]
 
     LOGGER.debug(f"Creating a scoped API token for {project}")
 
@@ -106,7 +106,7 @@ async def handle_ext_token_remove(
     """Handle call for an API token delete."""
     session = api_check(request)
 
-    project = request.app["Creds"][session]["active_project"]["id"]
+    project = request.app["Sessions"][session]["active_project"]["id"]
 
     ident = request.match_info["id"]
 
@@ -149,7 +149,7 @@ async def handle_ext_token_list(
     """Handle call for listing API tokens."""
     session = api_check(request)
 
-    project = request.app["Creds"][session]["active_project"]["id"]
+    project = request.app["Sessions"][session]["active_project"]["id"]
 
     client: aiohttp.ClientSession = request.app["api_client"]
 
@@ -203,8 +203,8 @@ async def handle_form_post_signature(
         session
     )
 
-    serv = request.app['Creds'][session]['ST_conn']
-    sess = request.app['Creds'][session]['OS_sess']
+    serv = request.app['Sessions'][session]['ST_conn']
+    sess = request.app['Sessions'][session]['OS_sess']
     container = request.match_info["container"]
 
     temp_url_key = await get_tempurl_key(

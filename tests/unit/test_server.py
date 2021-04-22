@@ -44,7 +44,7 @@ class TestServerShutdownHandler(asynctest.TestCase):
 
         await kill_sess_on_shutdown(req.app)
 
-        self.assertNotIn(session, req.app["Creds"].keys())
+        self.assertNotIn(session, req.app["Sessions"])
 
 
 class TestRunServerFunctions(unittest.TestCase):
