@@ -4,6 +4,7 @@
 import hashlib
 import os
 import unittest
+import time
 
 from aiohttp.web import HTTPUnauthorized, Response
 from aiohttp.web import HTTPForbidden
@@ -91,6 +92,20 @@ class TestConvenienceFunctions(unittest.TestCase):
         with self.assertRaises(HTTPUnauthorized):
             session_check(req)
 
+    def test_session_check_expired_last_used(self):
+        """Test session check function raise on expired last use."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Sessions"][session]["last_used"] = time.time() - 7200
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
+
+    def test_session_check_expired_max_lifetime(self):
+        """Test session check function raise on expired lifetime."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Sessions"][session]["max_lifetime"] = time.time() - 86400
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
+
     def test_session_check_correct(self):
         """
         Test that the ordinary session check function result is True.
@@ -103,8 +118,12 @@ class TestConvenienceFunctions(unittest.TestCase):
         req.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, req.app)
 
-        req.app['Sessions'][cookie["id"]] = {}
-        self.assertTrue(session_check(req) is None)
+        session = cookie["id"]
+
+        req.app['Sessions'][session] = {}
+        req.app['Sessions'][session]['last_used'] = time.time() - 360
+        req.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
+        self.assertIsNone(session_check(req))
 
     # The api_check session check function testing – Might seem unnecessary,
     # but are required since e.g. token rescoping can fail the sessions
@@ -146,6 +165,8 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.app['Sessions'][session] = {}
         testreq.app['Sessions'][session]['Avail'] = "placeholder"
         testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -159,6 +180,8 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.app['Sessions'][session] = {}
         testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
         testreq.app['Sessions'][session]['Avail'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -172,6 +195,8 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.app['Sessions'][session] = {}
         testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
         testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -186,6 +211,8 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.app['Sessions'][session]['Avail'] = "placeholder"
         testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
         testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         ret = api_check(testreq)
         self.assertEqual(ret, cookie["id"])
 

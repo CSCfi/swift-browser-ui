@@ -9,6 +9,7 @@ import logging
 import hashlib
 import os
 import json
+import time
 
 import cryptography.fernet
 from swift_browser_ui._convenience import generate_cookie
@@ -72,6 +73,9 @@ def get_request_with_mock_openstack():
         "projects": ['test-project-1', 'test-project-2'],
         "domains": ['default']
     }
+    cur_time = time.time()
+    ret.app["Sessions"][session]["last_used"] = cur_time
+    ret.app["Sessions"][session]["max_lifetime"] = cur_time + 28800
     return session, ret
 
 

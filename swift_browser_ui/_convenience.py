@@ -210,15 +210,33 @@ def session_check(
 ) -> None:
     """Check session validity from a request."""
     try:
-        cookie = decrypt_cookie(request)
-        if cookie["id"] not in request.app['Sessions']:
+        session = decrypt_cookie(request)["id"]
+        # Keyerror takes care of checking session id's existence
+        try:
+            last_used = request.app["Sessions"][session]["last_used"]
+            max_lifetime = request.app["Sessions"][session]["max_lifetime"]
+        except KeyError:
+            request.app["Log"].info("Throw due to nonexistent session")
             raise aiohttp.web.HTTPUnauthorized(
                 headers={
                     "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
                 }
             )
         check_csrf(request)
-
+        # Check token expiration
+        current_time = time.time()
+        if (
+                last_used + 3600 < current_time or
+                max_lifetime < current_time
+        ):
+            request.app["Log"].info("Throw due to expired token")
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+        # Update token last usage
+        request.app["Sessions"][session]["last_used"] = current_time
     except InvalidToken:
         request.app["Log"].info("Throw due to invalid token.")
         raise aiohttp.web.HTTPUnauthorized(

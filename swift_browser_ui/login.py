@@ -173,7 +173,7 @@ async def sso_query_end(
     response.set_cookie(
         name='S3BROW_SESSION',
         value=cookie_crypted,
-        max_age=3600,
+        max_age=28800,
         secure=trust,  # type: ignore
         httponly=trust,  # type: ignore
     )
@@ -240,6 +240,11 @@ async def sso_query_end(
         "name": project_name,
         "id": project_id
     }
+
+    # Save time of login to the backend
+    created = time.time()
+    request.app["Sessions"][session]["last_used"] = created
+    request.app["Sessions"][session]["max_lifetime"] = created + 28800
 
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id,
