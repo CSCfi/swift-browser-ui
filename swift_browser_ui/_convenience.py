@@ -107,6 +107,27 @@ def disable_cache(
     return response
 
 
+def clear_session_info(
+        session: typing.Dict[str, typing.Any]
+):
+    """Properly clear session information."""
+    if "OS_sess" in session:
+        # invalidate used tokens
+        session["OS_sess"].invalidate(
+            session["OS_sess"].auth
+        )
+        session["OS_sess"] = None
+        # ensure deletion of references to connection info
+    if "ST_conn" in session:
+        session["ST_conn"] = None
+    if "Avail" in session:
+        session["Avail"] = None
+    if "Token" in session:
+        session["Token"] = None
+    if "active_project" in session:
+        session["active_project"] = None
+
+
 def decrypt_cookie(
         request: aiohttp.web.Request
 ) -> dict:
@@ -222,9 +243,9 @@ def api_check(
     check_csrf(request)
     session = decrypt_cookie(request)["id"]
     if (
-            "ST_conn" not in request.app["Sessions"][session]
-            or "OS_sess" not in request.app["Sessions"][session]
-            or "Avail" not in request.app["Sessions"][session]
+            "ST_conn" not in request.app["Sessions"][session] or
+            "OS_sess" not in request.app["Sessions"][session] or
+            "Avail" not in request.app["Sessions"][session]
     ):
         raise aiohttp.web.HTTPUnauthorized(
             headers={

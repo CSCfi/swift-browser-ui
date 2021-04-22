@@ -13,10 +13,17 @@ from multidict import MultiDictProxy
 import typing
 import urllib.error
 
-from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import get_availability_from_token, session_check
-from ._convenience import initiate_os_session, initiate_os_service
-from ._convenience import test_swift_endpoint
+from ._convenience import (
+    disable_cache,
+    decrypt_cookie,
+    generate_cookie,
+    get_availability_from_token,
+    session_check,
+    initiate_os_session,
+    initiate_os_service,
+    test_swift_endpoint,
+    clear_session_info,
+)
 from .settings import setd
 
 
@@ -326,18 +333,7 @@ async def handle_logout(
             session = decrypt_cookie(request)["id"]
             log.info("Killing session for %s :: %s",
                      session, time.ctime())
-            # Invalidate the tokens that are in use
-            request.app['Sessions'][session]['OS_sess'].invalidate(
-                request.app['Sessions'][session]['OS_sess'].auth
-            )
-            log.debug("Invalidated token for session %s :: %s",
-                      session, time.ctime())
-            # Purge everything related to the former openstack connection
-            request.app['Sessions'][session]['OS_sess'] = None
-            request.app['Sessions'][session]['ST_conn'] = None
-            request.app['Sessions'][session]['Avail'] = None
-            request.app['Sessions'][session]['Token'] = None
-            request.app['Sessions'][session]['active_project'] = None
+            clear_session_info(request.app["Sessions"])
             # Purge the openstack connection from the server
             request.app['Sessions'].pop(session)
             log.debug("Removed session %s from session list :: %s",

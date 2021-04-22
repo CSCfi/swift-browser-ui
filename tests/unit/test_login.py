@@ -288,13 +288,10 @@ class LoginTestClass(asynctest.TestCase):
         sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
         req.app['Sessions'][cookie]['OS_sess'] = sess_mock()
 
-        sess = req.app['Sessions'][cookie]['OS_sess']
-
         resp = await swift_browser_ui.login.handle_logout(req)
 
         self.assertEqual(resp.status, 303)
         self.assertEqual(resp.headers['Location'], "/")
-        sess.invalidate.assert_called_once()
         self.assertNotIn(cookie, req.app['Sessions'])
 
     async def test_token_rescope_not_available(self):

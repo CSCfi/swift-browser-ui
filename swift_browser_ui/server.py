@@ -57,6 +57,7 @@ from .signature import (
     handle_ext_token_remove,
 )
 from .misc_handlers import handle_bounce_direct_access_request
+from ._convenience import clear_session_info
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -71,19 +72,7 @@ async def kill_sess_on_shutdown(
     while app['Sessions'].keys():
         key = list(app['Sessions'].keys())[0]
         logging.info("Purging session for %s", key)
-        # Invalidate the tokens that are in use
-        app['Sessions'][key]['OS_sess'].invalidate(
-            app['Sessions'][key]['OS_sess'].auth
-        )
-        logging.debug("Invalidated token for session %s :: %s",
-                      key, time.ctime())
-        # Purge everything related to the former openstack connection
-        app['Sessions'][key]['OS_sess'] = None
-        app['Sessions'][key]['ST_conn'] = None
-        app['Sessions'][key]['Avail'] = None
-        app['Sessions'][key]['Token'] = None
-        app['Sessions'][key]['active_project'] = None
-        # Purge the session from the session dict
+        clear_session_info(app["Sessions"][key])
         app['Sessions'].pop(key)
         logging.debug("Purged session information for %s :: %s",
                       key, time.ctime())

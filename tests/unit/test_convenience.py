@@ -17,10 +17,10 @@ from swift_browser_ui._convenience import session_check, setup_logging
 from swift_browser_ui._convenience import get_availability_from_token
 from swift_browser_ui._convenience import initiate_os_service
 from swift_browser_ui._convenience import initiate_os_session
-from swift_browser_ui._convenience import check_csrf
+from swift_browser_ui._convenience import check_csrf, clear_session_info
 from swift_browser_ui.settings import setd
 
-from .creation import get_request_with_fernet
+from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .creation import get_full_crypted_session_cookie
 from .creation import add_csrf_to_cookie, encrypt_cookie
 from .mockups import mock_token_output, urlopen
@@ -290,3 +290,19 @@ class TestConvenienceFunctions(unittest.TestCase):
             encrypt_cookie(cookie, testreq)
             testreq.headers["Referer"] = "http://localhost:8080"
             self.assertTrue(check_csrf(testreq))
+
+    def test_clear_session_info(self):
+        """Test if session information clear works."""
+        session, req = get_request_with_mock_openstack()
+        sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
+        sess = sess_mock()
+        req.app["Sessions"][session]["OS_sess"] = sess
+        req.app["Sessions"][session]["Token"] = "not_real_token"
+
+        clear_session_info(req.app["Sessions"][session])
+
+        sess.invalidate.assert_called_once()
+        self.assertIsNone(req.app["Sessions"][session]["ST_conn"])
+        self.assertIsNone(req.app["Sessions"][session]["OS_sess"])
+        self.assertIsNone(req.app["Sessions"][session]["Avail"])
+        self.assertIsNone(req.app["Sessions"][session]["Token"])
