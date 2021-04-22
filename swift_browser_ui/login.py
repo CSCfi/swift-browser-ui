@@ -90,9 +90,10 @@ def test_token(
     """Validate unscoped token."""
     unscoped: typing.Union[str, None] = None
     log = request.app['Log']
+    log.info("Got OS token in login return")
     if 'token' in formdata:
         unscoped = str(formdata['token'])
-        log.info(
+        log.debug(
             'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
                 str(unscoped),
                 request.remote,
@@ -102,7 +103,7 @@ def test_token(
     # Try getting the token id from form
     if 'token' in request.query and unscoped is None:
         unscoped = request.query['token']
-        log.info(
+        log.debug(
             'Got OS token qstr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
@@ -112,7 +113,7 @@ def test_token(
     # Try getting the token id from headers
     if 'X-Auth-Token' in request.headers and unscoped is None:
         unscoped = request.headers['X-Auth-Token']
-        log.info(
+        log.debug(
             'Got OS token hdr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
@@ -141,7 +142,7 @@ async def sso_query_end(
     log = request.app['Log']
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     formdata = await request.post()
-    log.info(
+    log.debug(
         "Got %s in form.", formdata
     )
     # Declare the unscoped token
