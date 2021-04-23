@@ -33,6 +33,7 @@ async def index(
     try:
         if request is not None:
             session_check(request)
+            request.app["Log"].info("Redirecting an existing session to app")
             return aiohttp.web.Response(
                 status=303,
                 headers={
