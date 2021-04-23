@@ -230,6 +230,8 @@ def session_check(
                 max_lifetime < current_time
         ):
             request.app["Log"].info("Throw due to expired token")
+            clear_session_info(request.app["Sessions"][session])
+            request.app["Sessions"].pop(session)
             raise aiohttp.web.HTTPUnauthorized(
                 headers={
                     "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
