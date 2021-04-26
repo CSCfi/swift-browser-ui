@@ -91,7 +91,9 @@ setd: Dict[str, Union[str, int, None]] = {
     "debug": False,
     "version": None,
     "set_session_devmode": False,
-    "static_directory": __file__.replace("/settings.py", "") + "/static"
+    "static_directory": __file__.replace("/settings.py", "") + "/static",
+    "session_lifetime": 28800,
+    "history_lifetime": 2592000,
 }
 
 

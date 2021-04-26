@@ -173,7 +173,7 @@ async def sso_query_end(
     response.set_cookie(
         name='S3BROW_SESSION',
         value=cookie_crypted,
-        max_age=28800,
+        max_age=str(setd["session_lifetime"]),
         secure=trust,  # type: ignore
         httponly=trust,  # type: ignore
     )
@@ -244,11 +244,13 @@ async def sso_query_end(
     # Save time of login to the backend
     created = time.time()
     request.app["Sessions"][session]["last_used"] = created
-    request.app["Sessions"][session]["max_lifetime"] = created + 28800
+    request.app["Sessions"][session]["max_lifetime"] = (
+        created + int(setd["session_lifetime"])  # type: ignore
+    )
 
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id,
-                        expires=2592000,  # type: ignore
+                        expires=str(setd["history_lifetime"]),  # type: ignore
                         secure=trust, httponly=trust)  # type: ignore
 
     # Redirect to the browse page
@@ -322,7 +324,7 @@ async def token_rescope(
     response.set_cookie(
         "LAST_ACTIVE",
         request.app['Sessions'][session]['active_project']['id'],
-        expires=2592000  # type: ignore
+        expires=str(setd["history_lifetime"])  # type: ignore
     )
 
     return response

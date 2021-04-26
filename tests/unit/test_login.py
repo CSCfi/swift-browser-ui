@@ -71,6 +71,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         # Patch away the convenience function for checking project availability
@@ -126,6 +128,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         patch2 = unittest.mock.patch(
@@ -178,6 +182,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         # Patch away the convenience function for checking project availability
