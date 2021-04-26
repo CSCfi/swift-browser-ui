@@ -4,6 +4,7 @@
 import hashlib
 import os
 import unittest
+import time
 
 from aiohttp.web import HTTPUnauthorized, Response
 from aiohttp.web import HTTPForbidden
@@ -17,10 +18,10 @@ from swift_browser_ui._convenience import session_check, setup_logging
 from swift_browser_ui._convenience import get_availability_from_token
 from swift_browser_ui._convenience import initiate_os_service
 from swift_browser_ui._convenience import initiate_os_session
-from swift_browser_ui._convenience import check_csrf
+from swift_browser_ui._convenience import check_csrf, clear_session_info
 from swift_browser_ui.settings import setd
 
-from .creation import get_request_with_fernet
+from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .creation import get_full_crypted_session_cookie
 from .creation import add_csrf_to_cookie, encrypt_cookie
 from .mockups import mock_token_output, urlopen
@@ -87,7 +88,21 @@ class TestConvenienceFunctions(unittest.TestCase):
         """
         req = get_request_with_fernet()
         _, req.cookies['S3BROW_SESSION'] = generate_cookie(req)
-        req.app['Sessions'] = set({})
+        req.app['Sessions'] = {}
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
+
+    def test_session_check_expired_last_used(self):
+        """Test session check function raise on expired last use."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Sessions"][session]["last_used"] = time.time() - 7200
+        with self.assertRaises(HTTPUnauthorized):
+            session_check(req)
+
+    def test_session_check_expired_max_lifetime(self):
+        """Test session check function raise on expired lifetime."""
+        session, req = get_request_with_mock_openstack()
+        req.app["Sessions"][session]["max_lifetime"] = time.time() - 86400
         with self.assertRaises(HTTPUnauthorized):
             session_check(req)
 
@@ -103,8 +118,12 @@ class TestConvenienceFunctions(unittest.TestCase):
         req.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, req.app)
 
-        req.app['Sessions'].add(cookie["id"])
-        self.assertTrue(session_check(req) is None)
+        session = cookie["id"]
+
+        req.app['Sessions'][session] = {}
+        req.app['Sessions'][session]['last_used'] = time.time() - 360
+        req.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
+        self.assertIsNone(session_check(req))
 
     # The api_check session check function testing – Might seem unnecessary,
     # but are required since e.g. token rescoping can fail the sessions
@@ -114,7 +133,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         """Test raise if there's no session cookie."""
         testreq = get_request_with_fernet()
         _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-        testreq.app['Sessions'] = set({})
+        testreq.app['Sessions'] = {}
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -122,7 +141,7 @@ class TestConvenienceFunctions(unittest.TestCase):
         """Test raise if there's an invalid session cookie."""
         testreq = get_request_with_fernet()
         _, testreq.cookies['S3BROW_SESSION'] = generate_cookie(testreq)
-        testreq.app['Sessions'] = set({})
+        testreq.app['Sessions'] = {}
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -143,10 +162,11 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = {session}
-        testreq.app['Creds'][session] = {}
-        testreq.app['Creds'][session]['Avail'] = "placeholder"
-        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session] = {}
+        testreq.app['Sessions'][session]['Avail'] = "placeholder"
+        testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -157,10 +177,11 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = {session}
-        testreq.app['Creds'][session] = {}
-        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
-        testreq.app['Creds'][session]['Avail'] = "placeholder"
+        testreq.app['Sessions'][session] = {}
+        testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
+        testreq.app['Sessions'][session]['Avail'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -171,10 +192,11 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Creds'][session] = {}
-        testreq.app['Sessions'] = {session}
-        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
-        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session] = {}
+        testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
+        testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         with self.assertRaises(HTTPUnauthorized):
             api_check(testreq)
 
@@ -185,11 +207,12 @@ class TestConvenienceFunctions(unittest.TestCase):
         testreq.cookies['S3BROW_SESSION'] = \
             get_full_crypted_session_cookie(cookie, testreq.app)
         session = cookie["id"]
-        testreq.app['Sessions'] = {session}
-        testreq.app['Creds'][session] = {}
-        testreq.app['Creds'][session]['Avail'] = "placeholder"
-        testreq.app['Creds'][session]['OS_sess'] = "placeholder"
-        testreq.app['Creds'][session]['ST_conn'] = "placeholder"
+        testreq.app['Sessions'][session] = {}
+        testreq.app['Sessions'][session]['Avail'] = "placeholder"
+        testreq.app['Sessions'][session]['OS_sess'] = "placeholder"
+        testreq.app['Sessions'][session]['ST_conn'] = "placeholder"
+        testreq.app['Sessions'][session]['last_used'] = time.time() - 360
+        testreq.app['Sessions'][session]['max_lifetime'] = time.time() + 86400
         ret = api_check(testreq)
         self.assertEqual(ret, cookie["id"])
 
@@ -294,3 +317,19 @@ class TestConvenienceFunctions(unittest.TestCase):
             encrypt_cookie(cookie, testreq)
             testreq.headers["Referer"] = "http://localhost:8080"
             self.assertTrue(check_csrf(testreq))
+
+    def test_clear_session_info(self):
+        """Test if session information clear works."""
+        session, req = get_request_with_mock_openstack()
+        sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
+        sess = sess_mock()
+        req.app["Sessions"][session]["OS_sess"] = sess
+        req.app["Sessions"][session]["Token"] = "not_real_token"
+
+        clear_session_info(req.app["Sessions"][session])
+
+        sess.invalidate.assert_called_once()
+        self.assertIsNone(req.app["Sessions"][session]["ST_conn"])
+        self.assertIsNone(req.app["Sessions"][session]["OS_sess"])
+        self.assertIsNone(req.app["Sessions"][session]["Avail"])
+        self.assertIsNone(req.app["Sessions"][session]["Token"])

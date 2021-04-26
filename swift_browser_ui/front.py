@@ -1,7 +1,10 @@
 """Web frontend functions for stand-alone running."""
 
-from typing import Union
+import typing
+
 import aiohttp.web
+
+from cryptography.fernet import InvalidToken
 
 from .settings import setd
 from ._convenience import session_check
@@ -24,9 +27,27 @@ async def browse(
 
 
 async def index(
-        _: Union[aiohttp.web.Request, None]
-) -> aiohttp.web.FileResponse:
+        request: typing.Optional[aiohttp.web.Request]
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the index page when running without a proxy."""
-    return aiohttp.web.FileResponse(
-        str(setd['static_directory']) + '/index.html'
-    )
+    try:
+        if request is not None:
+            session_check(request)
+            request.app["Log"].info("Redirecting an existing session to app")
+            return aiohttp.web.Response(
+                status=303,
+                headers={
+                    "Location": "/browse",
+                },
+            )
+        else:
+            raise AttributeError
+    except (
+            AttributeError,
+            InvalidToken,
+            KeyError,
+            aiohttp.web.HTTPUnauthorized
+    ):
+        return aiohttp.web.FileResponse(
+            str(setd['static_directory']) + '/index.html'
+        )

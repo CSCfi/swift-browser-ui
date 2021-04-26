@@ -107,6 +107,27 @@ def disable_cache(
     return response
 
 
+def clear_session_info(
+        session: typing.Dict[str, typing.Any]
+):
+    """Properly clear session information."""
+    if "OS_sess" in session:
+        # invalidate used tokens
+        session["OS_sess"].invalidate(
+            session["OS_sess"].auth
+        )
+        session["OS_sess"] = None
+        # ensure deletion of references to connection info
+    if "ST_conn" in session:
+        session["ST_conn"] = None
+    if "Avail" in session:
+        session["Avail"] = None
+    if "Token" in session:
+        session["Token"] = None
+    if "active_project" in session:
+        session["active_project"] = None
+
+
 def decrypt_cookie(
         request: aiohttp.web.Request
 ) -> dict:
@@ -189,15 +210,35 @@ def session_check(
 ) -> None:
     """Check session validity from a request."""
     try:
-        cookie = decrypt_cookie(request)
-        if cookie["id"] not in request.app['Sessions']:
+        session = decrypt_cookie(request)["id"]
+        # Keyerror takes care of checking session id's existence
+        try:
+            last_used = request.app["Sessions"][session]["last_used"]
+            max_lifetime = request.app["Sessions"][session]["max_lifetime"]
+        except KeyError:
+            request.app["Log"].info("Throw due to nonexistent session")
             raise aiohttp.web.HTTPUnauthorized(
                 headers={
                     "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
                 }
             )
         check_csrf(request)
-
+        # Check token expiration
+        current_time = time.time()
+        if (
+                last_used + 3600 < current_time or
+                max_lifetime < current_time
+        ):
+            request.app["Log"].info("Throw due to expired token")
+            clear_session_info(request.app["Sessions"][session])
+            request.app["Sessions"].pop(session)
+            raise aiohttp.web.HTTPUnauthorized(
+                headers={
+                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+                }
+            )
+        # Update token last usage
+        request.app["Sessions"][session]["last_used"] = current_time
     except InvalidToken:
         request.app["Log"].info("Throw due to invalid token.")
         raise aiohttp.web.HTTPUnauthorized(
@@ -218,43 +259,20 @@ def api_check(
         request: aiohttp.web.Request
 ) -> str:
     """Do a more thorough session check for the API."""
-    try:
-        if decrypt_cookie(request)["id"] in request.app['Sessions']:
-            session = decrypt_cookie(request)["id"]
-            check_csrf(request)
-            ret = session
-            if 'ST_conn' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-            if 'OS_sess' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-            if 'Avail' not in request.app['Creds'][session].keys():
-                raise aiohttp.web.HTTPUnauthorized(
-                    headers={
-                        "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                    }
-                )
-        else:
-            raise aiohttp.web.HTTPUnauthorized(
-                headers={
-                    "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
-                }
-            )
-        return ret
-    except InvalidToken:
-        request.app["Log"].info("Throw due to invalid token.")
+    session_check(request)
+    check_csrf(request)
+    session = decrypt_cookie(request)["id"]
+    if (
+            "ST_conn" not in request.app["Sessions"][session] or
+            "OS_sess" not in request.app["Sessions"][session] or
+            "Avail" not in request.app["Sessions"][session]
+    ):
         raise aiohttp.web.HTTPUnauthorized(
             headers={
                 "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
             }
         )
+    return session
 
 
 def generate_cookie(
@@ -266,7 +284,7 @@ def generate_cookie(
     Returns a tuple containing both the unencrypted and encrypted cookie.
     """
     cookie = {
-        "id": secrets.token_hex(64),
+        "id": secrets.token_urlsafe(32),
         "referer": None,
         "signature": None,
     }
@@ -417,7 +435,7 @@ async def get_tempurl_key(
             temp_url_key = acc_meta_hdr['x-account-meta-temp-url-key-2']
         # If key headers don't exist, generate a new temporary URL key
         except KeyError:
-            temp_url_key = secrets.token_hex(64)
+            temp_url_key = secrets.token_urlsafe(32)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_url_key}']}
             retval = connection.post(options=meta_options)
             if not retval['success']:
@@ -441,7 +459,7 @@ async def get_container_tempurl_key(
             temp_cont_key = cont_meta_hdr['x-container-meta-temp-url-key-2']
         # If key headers don't exist generate a new temporary URL key
         except KeyError:
-            temp_cont_key = secrets.token_hex(64)
+            temp_cont_key = secrets.token_urlsafe(32)
             meta_options = {"meta": [f'Temp-URL-Key-2:{temp_cont_key}']}
             retval = connection.post(
                 container=container,
@@ -460,7 +478,7 @@ async def open_upload_runner_session(
 ) -> str:
     """Open an upload session to the token."""
     try:
-        return request.app['Creds'][session_key]['runner']
+        return request.app['Sessions'][session_key]['runner']
     except KeyError:
         session = request.app['api_client']
         path = f"{setd['upload_internal_endpoint']}/{project}"
@@ -475,5 +493,5 @@ async def open_upload_runner_session(
                 ssl=ssl_context
         ) as resp:
             ret = str(resp.cookies["RUNNER_SESSION_ID"].value)
-            request.app['Creds'][session_key]['runner'] = ret
+            request.app['Sessions'][session_key]['runner'] = ret
             return ret

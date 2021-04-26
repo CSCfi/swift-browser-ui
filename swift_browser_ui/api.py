@@ -28,7 +28,7 @@ async def get_os_user(
         )
     )
 
-    userid = request.app['Creds'][session]['OS_sess'].get_user_id()
+    userid = request.app['Sessions'][session]['OS_sess'].get_user_id()
 
     return aiohttp.web.json_response(
         userid
@@ -76,7 +76,7 @@ async def swift_list_buckets(
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
-        serv = request.app['Creds'][session]['ST_conn'].list()
+        serv = request.app['Sessions'][session]['ST_conn'].list()
         [_unpack(i, cont, request) for i in serv]
         # for a bucket with no objects
         if not cont:
@@ -108,8 +108,8 @@ async def swift_create_container(
         )
         # Shamelessly use private methods from SwiftService to avoid writing
         # own implementation
-        res = request.app['Creds'][session]['ST_conn']._create_container_job(
-            get_conn(request.app['Creds'][session]['ST_conn']._options),
+        res = request.app['Sessions'][session]['ST_conn']._create_container_job(
+            get_conn(request.app['Sessions'][session]['ST_conn']._options),
             request.match_info["container"]
         )
     except (SwiftError, ClientException):
@@ -146,7 +146,7 @@ async def swift_list_objects(
             )
         )
 
-        serv = request.app['Creds'][session]['ST_conn'].list(
+        serv = request.app['Sessions'][session]['ST_conn'].list(
             container=request.query['bucket'])
         [_unpack(i, obj, request) for i in serv]
         if not obj:
@@ -197,7 +197,7 @@ async def swift_list_shared_objects(
 
         # Establish a temporary Openstack SwiftService connection
         tmp_serv = initiate_os_service(
-            request.app["Creds"][session]["OS_sess"],
+            request.app["Sessions"][session]["OS_sess"],
             url=request.query["storageurl"]
         )
         serv = tmp_serv.list(container=request.query['container'])
@@ -246,8 +246,8 @@ async def swift_download_object(
         )
     )
 
-    serv = request.app['Creds'][session]['ST_conn']
-    sess = request.app['Creds'][session]['OS_sess']
+    serv = request.app['Sessions'][session]['ST_conn']
+    sess = request.app['Sessions'][session]['OS_sess']
 
     temp_url_key = await get_tempurl_key(serv)
     request.app['Log'].debug(
@@ -300,10 +300,10 @@ async def swift_download_shared_object(
     runner_id = await open_upload_runner_session(
         session,
         request,
-        request.app['Creds'][session]['active_project']['id'],
-        request.app['Creds'][session]['Token']
+        request.app['Sessions'][session]['active_project']['id'],
+        request.app['Sessions'][session]['Token']
     )
-    request.app['Creds'][session]['runner'] = runner_id
+    request.app['Sessions'][session]['runner'] = runner_id
 
     path = f"/{project}/{container}/{object_name}"
     signature = await sign(3600, path)
@@ -340,10 +340,10 @@ async def swift_download_container(
     runner_id = await open_upload_runner_session(
         session,
         request,
-        request.app['Creds'][session]['active_project']['id'],
-        request.app['Creds'][session]['Token']
+        request.app['Sessions'][session]['active_project']['id'],
+        request.app['Sessions'][session]['Token']
     )
-    request.app['Creds'][session]['runner'] = runner_id
+    request.app['Sessions'][session]['runner'] = runner_id
 
     path = f"/{project}/{container}"
     signature = await sign(3600, path)
@@ -379,8 +379,8 @@ async def swift_upload_object_chunk(
     runner_id = await open_upload_runner_session(
         session,
         request,
-        request.app['Creds'][session]['active_project']['id'],
-        request.app['Creds'][session]['Token']
+        request.app['Sessions'][session]['active_project']['id'],
+        request.app['Sessions'][session]['Token']
     )
 
     path = f"/{project}/{container}"
@@ -417,8 +417,8 @@ async def swift_replicate_container(
     runner_id = await open_upload_runner_session(
         session,
         request,
-        request.app['Creds'][session]['active_project']['id'],
-        request.app['Creds'][session]['Token']
+        request.app['Sessions'][session]['active_project']['id'],
+        request.app['Sessions'][session]['Token']
     )
 
     path = f"/{project}/{container}"
@@ -459,8 +459,8 @@ async def swift_check_object_chunk(
     runner_id = await open_upload_runner_session(
         session,
         request,
-        request.app['Creds'][session]['active_project']['id'],
-        request.app['Creds'][session]['Token']
+        request.app['Sessions'][session]['active_project']['id'],
+        request.app['Sessions'][session]['Token']
     )
 
     path = f"/{project}/{container}"
@@ -538,7 +538,7 @@ async def get_metadata_bucket(
         if 'container' in request.query.keys()
         else None
     )
-    conn = request.app['Creds'][session]['ST_conn']
+    conn = request.app['Sessions'][session]['ST_conn']
     # Get container listing if no object list was specified
     ret = conn.stat(meta_cont)
 
@@ -593,7 +593,7 @@ async def get_metadata_object(
         request.app['Log'].error("Container not specified.")
         raise aiohttp.web.HTTPClientError()
 
-    conn = request.app['Creds'][session]['ST_conn']
+    conn = request.app['Sessions'][session]['ST_conn']
 
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
@@ -620,7 +620,7 @@ async def get_project_metadata(
             )
         )
 
-        conn = request.app['Creds'][session]['ST_conn']
+        conn = request.app['Sessions'][session]['ST_conn']
 
         # Get the account metadata listing
         stat = dict(conn.stat()['items'])
@@ -658,7 +658,7 @@ async def os_list_projects(
 
     # Return the projects available for the session
     return aiohttp.web.json_response(
-        request.app['Creds'][session]['Avail']['projects']
+        request.app['Sessions'][session]['Avail']['projects']
     )
 
 
@@ -676,7 +676,7 @@ async def get_os_active_project(
     )
 
     return aiohttp.web.json_response(
-        request.app['Creds'][session]['active_project']
+        request.app['Sessions'][session]['active_project']
     )
 
 
@@ -693,7 +693,7 @@ async def get_shared_container_address(
             time.ctime(),
         )
     )
-    sess = request.app['Creds'][session]['OS_sess']
+    sess = request.app['Sessions'][session]['OS_sess']
 
     host = sess.get_endpoint(service_type="object-store")
     return aiohttp.web.json_response(host)
@@ -712,8 +712,8 @@ async def get_access_control_metadata(
         )
     )
 
-    serv = request.app['Creds'][session]['ST_conn']
-    sess = request.app['Creds'][session]['OS_sess']
+    serv = request.app['Sessions'][session]['ST_conn']
+    sess = request.app['Sessions'][session]['OS_sess']
 
     # Get a list of containers
     containers: typing.List[dict] = []
@@ -776,7 +776,7 @@ async def remove_project_container_acl(
         )
     )
 
-    serv = request.app['Creds'][session]['ST_conn']
+    serv = request.app['Sessions'][session]['ST_conn']
 
     container = request.match_info["container"]
     project = request.query["project"]
@@ -828,7 +828,7 @@ async def remove_container_acl(
             )
         )
 
-        serv = request.app['Creds'][session]['ST_conn']
+        serv = request.app['Sessions'][session]['ST_conn']
 
         container = request.match_info["container"]
 
@@ -860,7 +860,7 @@ async def add_project_container_acl(
             time.ctime(),
         )
     )
-    serv = request.app['Creds'][session]['ST_conn']
+    serv = request.app['Sessions'][session]['ST_conn']
 
     container = request.match_info["container"]
     projects = request.query["projects"].split(",")

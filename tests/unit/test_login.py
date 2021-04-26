@@ -71,6 +71,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         # Patch away the convenience function for checking project availability
@@ -106,9 +108,9 @@ class LoginTestClass(asynctest.TestCase):
             # Test for the correct values
             assert req.app['Sessions']  # nosec
             session = list(req.app['Sessions'])[0]
-            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
-            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
-            self.assertEqual(req.app['Creds'][session]['active_project'], {
+            self.assertTrue(req.app['Sessions'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Sessions'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Sessions'][session]['active_project'], {
                 "name": "placeholder",
                 "id": "placeholder",
             })
@@ -126,6 +128,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         patch2 = unittest.mock.patch(
@@ -158,10 +162,10 @@ class LoginTestClass(asynctest.TestCase):
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
-            session = list(req.app['Sessions'])[0]
-            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
-            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
-            self.assertEqual(req.app['Creds'][session]['active_project'], {
+            session = list(req.app['Sessions'].keys())[0]
+            self.assertTrue(req.app['Sessions'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Sessions'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Sessions'][session]['active_project'], {
                 "name": "placeholder",
                 "id": "placeholder",
             })
@@ -178,6 +182,8 @@ class LoginTestClass(asynctest.TestCase):
         patch1 = unittest.mock.patch("swift_browser_ui.login.setd", new={
             "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
             "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+            "session_lifetime": 28800,
+            "history_lifetime": 2592000,
         })
 
         # Patch away the convenience function for checking project availability
@@ -213,10 +219,10 @@ class LoginTestClass(asynctest.TestCase):
 
             # Test for the correct values
             assert req.app['Sessions']  # nosec
-            session = list(req.app['Sessions'])[0]
-            self.assertTrue(req.app['Creds'][session]['Token'] is not None)
-            self.assertNotEqual(req.app['Creds'][session]['Avail'], "INVALID")
-            self.assertEqual(req.app['Creds'][session]['active_project'], {
+            session = list(req.app['Sessions'].keys())[0]
+            self.assertTrue(req.app['Sessions'][session]['Token'] is not None)
+            self.assertNotEqual(req.app['Sessions'][session]['Avail'], "INVALID")
+            self.assertEqual(req.app['Sessions'][session]['active_project'], {
                 "name": "placeholder",
                 "id": "placeholder",
             })
@@ -286,21 +292,18 @@ class LoginTestClass(asynctest.TestCase):
         cookie, req = get_request_with_mock_openstack()
 
         sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
-        req.app['Creds'][cookie]['OS_sess'] = sess_mock()
-
-        sess = req.app['Creds'][cookie]['OS_sess']
+        req.app['Sessions'][cookie]['OS_sess'] = sess_mock()
 
         resp = await swift_browser_ui.login.handle_logout(req)
 
         self.assertEqual(resp.status, 303)
         self.assertEqual(resp.headers['Location'], "/")
-        sess.invalidate.assert_called_once()
         self.assertNotIn(cookie, req.app['Sessions'])
 
     async def test_token_rescope_not_available(self):
         """Test the token rescope function."""
         session, req = get_request_with_mock_openstack()
-        req.app["Creds"][session]["Avail"] = \
+        req.app["Sessions"][session]["Avail"] = \
             json.loads(mock_token_project_avail)
         req.query["project"] = "non-existent-project"
         with self.assertRaises(aiohttp.web.HTTPForbidden):
@@ -309,14 +312,14 @@ class LoginTestClass(asynctest.TestCase):
     async def test_token_rescope_correct(self):
         """Test the token rescope function with correct request."""
         session, req = get_request_with_mock_openstack()
-        req.app["Creds"][session]["Avail"] = \
+        req.app["Sessions"][session]["Avail"] = \
             json.loads(mock_token_project_avail)
         req.query["project"] = "wol"
-        req.app["Creds"][session]["Token"] = "not_actually_a_token"  # nosec
+        req.app["Sessions"][session]["Token"] = "not_actually_a_token"  # nosec
 
         # Set up mockups
         sess_mock = unittest.mock.MagicMock("keystoneauth.session.Session")
-        req.app["Creds"][session]["OS_sess"] = sess_mock()
+        req.app["Sessions"][session]["OS_sess"] = sess_mock()
         patch_os_auth = unittest.mock.patch(
             "swift_browser_ui.login.initiate_os_service",
             new=unittest.mock.MagicMock(

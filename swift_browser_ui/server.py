@@ -57,6 +57,7 @@ from .signature import (
     handle_ext_token_remove,
 )
 from .misc_handlers import handle_bounce_direct_access_request
+from ._convenience import clear_session_info
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -68,28 +69,12 @@ async def kill_sess_on_shutdown(
     """Kill all open sessions and purge their data when killed."""
     logging.info("Gracefully shutting down the program at %s",
                  time.ctime())
-    while app['Creds'].keys():
-        key = list(app['Creds'].keys())[0]
+    while app['Sessions'].keys():
+        key = list(app['Sessions'].keys())[0]
         logging.info("Purging session for %s", key)
-        # Invalidate the tokens that are in use
-        app['Creds'][key]['OS_sess'].invalidate(
-            app['Creds'][key]['OS_sess'].auth
-        )
-        logging.debug("Invalidated token for session %s :: %s",
-                      key, time.ctime())
-        # Purge everything related to the former openstack connection
-        app['Creds'][key]['OS_sess'] = None
-        app['Creds'][key]['ST_conn'] = None
-        app['Creds'][key]['Avail'] = None
-        app['Creds'][key]['Token'] = None
-        app['Creds'][key]['active_project'] = None
-        # Purge the openstack connection from the server
-        app['Creds'].pop(key)
-        logging.debug("Purged connection information for %s :: %s",
-                      key, time.ctime())
-        # Purge the session from the session list
-        app['Sessions'].remove(key)
-        logging.debug("Removed session %s from session list :: %s",
+        clear_session_info(app["Sessions"][key])
+        app['Sessions'].pop(key)
+        logging.debug("Purged session information for %s :: %s",
                       key, time.ctime())
 
 
@@ -125,10 +110,8 @@ async def servinit() -> aiohttp.web.Application:
     # Set application specific logging
     app['Log'] = logging.getLogger('swift-browser-ui')
     app['Log'].info('Set up logging for the swift-browser-ui application')
-    # Session set to quickly validate sessions
-    app['Sessions'] = set({})
-    # Cookie keyed dictionary to store session data
-    app['Creds'] = {}
+    # Cookie keyed dict for storing session data
+    app['Sessions'] = {}
 
     # Setup static folder during development, if it has been specified
     if setd['static_directory'] is not None:

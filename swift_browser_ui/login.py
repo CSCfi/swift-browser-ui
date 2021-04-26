@@ -13,10 +13,17 @@ from multidict import MultiDictProxy
 import typing
 import urllib.error
 
-from ._convenience import disable_cache, decrypt_cookie, generate_cookie
-from ._convenience import get_availability_from_token, session_check
-from ._convenience import initiate_os_session, initiate_os_service
-from ._convenience import test_swift_endpoint
+from ._convenience import (
+    disable_cache,
+    decrypt_cookie,
+    generate_cookie,
+    get_availability_from_token,
+    session_check,
+    initiate_os_session,
+    initiate_os_service,
+    test_swift_endpoint,
+    clear_session_info,
+)
 from .settings import setd
 
 
@@ -83,9 +90,10 @@ def test_token(
     """Validate unscoped token."""
     unscoped: typing.Union[str, None] = None
     log = request.app['Log']
+    log.info("Got OS token in login return")
     if 'token' in formdata:
         unscoped = str(formdata['token'])
-        log.info(
+        log.debug(
             'Got OS token finvis ::{0}:: from address {1} :: {2}'.format(
                 str(unscoped),
                 request.remote,
@@ -95,7 +103,7 @@ def test_token(
     # Try getting the token id from form
     if 'token' in request.query and unscoped is None:
         unscoped = request.query['token']
-        log.info(
+        log.debug(
             'Got OS token qstr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
@@ -105,7 +113,7 @@ def test_token(
     # Try getting the token id from headers
     if 'X-Auth-Token' in request.headers and unscoped is None:
         unscoped = request.headers['X-Auth-Token']
-        log.info(
+        log.debug(
             'Got OS token hdr ::{0}:: from address {1} :: {2}'.format(
                 unscoped,
                 request.remote,
@@ -134,7 +142,7 @@ async def sso_query_end(
     log = request.app['Log']
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     formdata = await request.post()
-    log.info(
+    log.debug(
         "Got %s in form.", formdata
     )
     # Declare the unscoped token
@@ -165,34 +173,39 @@ async def sso_query_end(
     response.set_cookie(
         name='S3BROW_SESSION',
         value=cookie_crypted,
-        max_age=3600,
+        max_age=str(setd["session_lifetime"]),
         secure=trust,  # type: ignore
         httponly=trust,  # type: ignore
     )
-    request.app['Sessions'].add(session)
-    # Initiate the credential dictionary
-    request.app['Creds'][session] = {}
+    # Initiate the session dictionary
+    request.app['Sessions'][session] = {}
 
     # Save the unscoped token to the session, as it's needed for re-scoping
-    request.app['Creds'][session]['Token'] = unscoped
+    request.app['Sessions'][session]['Token'] = unscoped
 
     try:
         # Check token availability
-        request.app['Creds'][session]['Avail'] =\
+        request.app['Sessions'][session]['Avail'] =\
             get_availability_from_token(unscoped)
     except urllib.error.HTTPError:
         raise aiohttp.web.HTTPUnauthorized(
-            reason="Token no longer valid"
+            reason="Token no longer valid",
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
         )
     except urllib.error.URLError:
         raise aiohttp.web.HTTPUnauthorized(
-            reason="Cannot fetch project and domains from existing endpoint."
+            reason="Cannot fetch project and domains from existing endpoint.",
+            headers={
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'
+            }
         )
 
     if "LAST_ACTIVE" in request.cookies:
         if (request.cookies["LAST_ACTIVE"] not in [
                 p['id']
-                for p in request.app['Creds'][session]['Avail']['projects']
+                for p in request.app['Sessions'][session]['Avail']['projects']
         ]):
             raise aiohttp.web.HTTPForbidden(
                 reason="The project is not available for this token."
@@ -200,37 +213,44 @@ async def sso_query_end(
         project_id = request.cookies["LAST_ACTIVE"]
     else:
         project_id = \
-            request.app['Creds'][session]['Avail']['projects'][0]['id']
+            request.app['Sessions'][session]['Avail']['projects'][0]['id']
 
     # Open an OS session for the first project that's found for the user.
-    request.app['Creds'][session]['OS_sess'] = initiate_os_session(
+    request.app['Sessions'][session]['OS_sess'] = initiate_os_session(
         unscoped,
         project_id
     )
 
     test_swift_endpoint(
-        request.app['Creds'][session]['OS_sess'].get_endpoint(
+        request.app['Sessions'][session]['OS_sess'].get_endpoint(
             service_type='object-store')
     )
 
     # Create the swiftclient connection
-    request.app['Creds'][session]['ST_conn'] = initiate_os_service(
-        request.app['Creds'][session]['OS_sess'],
+    request.app['Sessions'][session]['ST_conn'] = initiate_os_service(
+        request.app['Sessions'][session]['OS_sess'],
     )
 
     project_name = None
-    for i in request.app['Creds'][session]['Avail']['projects']:
+    for i in request.app['Sessions'][session]['Avail']['projects']:
         if i['id'] == project_id:
             project_name = i['name']
     # Save the current active project
-    request.app['Creds'][session]['active_project'] = {
+    request.app['Sessions'][session]['active_project'] = {
         "name": project_name,
         "id": project_id
     }
 
+    # Save time of login to the backend
+    created = time.time()
+    request.app["Sessions"][session]["last_used"] = created
+    request.app["Sessions"][session]["max_lifetime"] = (
+        created + int(setd["session_lifetime"])  # type: ignore
+    )
+
     # Set the active project to be the last active project
     response.set_cookie("LAST_ACTIVE", project_id,
-                        expires=2592000,  # type: ignore
+                        expires=str(setd["history_lifetime"]),  # type: ignore
                         secure=trust, httponly=trust)  # type: ignore
 
     # Redirect to the browse page
@@ -258,37 +278,37 @@ async def token_rescope(
     )
 
     if (request.query['project'] not in [
-            p['id'] for p in request.app['Creds'][session]['Avail']['projects']
+            p['id'] for p in request.app['Sessions'][session]['Avail']['projects']
     ]):
         raise aiohttp.web.HTTPForbidden(
             reason="The project is not available for this token."
         )
 
     # Invalidate the old scoped token
-    request.app['Creds'][session]['OS_sess'].invalidate(
-        request.app['Creds'][session]['OS_sess'].auth
+    request.app['Sessions'][session]['OS_sess'].invalidate(
+        request.app['Sessions'][session]['OS_sess'].auth
     )
     # Overwrite the old session with a new one, with the updated project id
-    request.app['Creds'][session]['OS_sess'] = initiate_os_session(
-        request.app['Creds'][session]['Token'],
+    request.app['Sessions'][session]['OS_sess'] = initiate_os_session(
+        request.app['Sessions'][session]['Token'],
         request.query['project'],
     )
     # Overwrite the old connection with a new one, with the updated keystone
     # session
-    request.app['Creds'][session]['ST_conn'] = initiate_os_service(
-        request.app['Creds'][session]['OS_sess'],
+    request.app['Sessions'][session]['ST_conn'] = initiate_os_service(
+        request.app['Sessions'][session]['OS_sess'],
     )
 
     # Ditch the session download proxy if that exists
-    if 'runner' in request.app['Creds'][session].keys():
-        request.app['Creds'][session].pop('runner')
+    if 'runner' in request.app['Sessions'][session].keys():
+        request.app['Sessions'][session].pop('runner')
 
     # Save the new project as the active project in session
     new_project_name = [
-        i['name'] for i in request.app['Creds'][session]['Avail']['projects']
+        i['name'] for i in request.app['Sessions'][session]['Avail']['projects']
         if i['id'] == request.query['project']
     ][0]
-    request.app['Creds'][session]['active_project'] = {
+    request.app['Sessions'][session]['active_project'] = {
         "name": new_project_name,
         "id": request.query['project'],
     }
@@ -303,8 +323,8 @@ async def token_rescope(
             response.headers["Location"] = request.headers["Referer"]
     response.set_cookie(
         "LAST_ACTIVE",
-        request.app['Creds'][session]['active_project']['id'],
-        expires=2592000  # type: ignore
+        request.app['Sessions'][session]['active_project']['id'],
+        expires=str(setd["history_lifetime"])  # type: ignore
     )
 
     return response
@@ -314,37 +334,22 @@ async def handle_logout(
         request: aiohttp.web.Request
 ) -> aiohttp.web.Response:
     """Properly kill the session for the user."""
-    cookie = ""
+    session = ""
     log = request.app['Log']
     if not setd['set_session_devmode']:
         try:
-            cookie = decrypt_cookie(request)["id"]
+            session = decrypt_cookie(request)["id"]
             log.info("Killing session for %s :: %s",
-                     cookie, time.ctime())
-            # Invalidate the tokens that are in use
-            request.app['Creds'][cookie]['OS_sess'].invalidate(
-                request.app['Creds'][cookie]['OS_sess'].auth
-            )
-            log.debug("Invalidated token for session %s :: %s",
-                      cookie, time.ctime())
-            # Purge everything related to the former openstack connection
-            request.app['Creds'][cookie]['OS_sess'] = None
-            request.app['Creds'][cookie]['ST_conn'] = None
-            request.app['Creds'][cookie]['Avail'] = None
-            request.app['Creds'][cookie]['Token'] = None
-            request.app['Creds'][cookie]['active_project'] = None
+                     session, time.ctime())
+            clear_session_info(request.app["Sessions"])
             # Purge the openstack connection from the server
-            request.app['Creds'].pop(cookie)
-            log.debug("Purged connection information for %s :: %s",
-                      cookie, time.ctime())
-            # Purge the sessino from the session list
-            request.app['Sessions'].remove(cookie)
+            request.app['Sessions'].pop(session)
             log.debug("Removed session %s from session list :: %s",
-                      cookie, time.ctime())
+                      session, time.ctime())
         except aiohttp.web.HTTPUnauthorized:
             log.info(
                 "Trying to log out an invalidated session: {0}".format(
-                    cookie
+                    session
                 )
             )
     response = aiohttp.web.Response(
