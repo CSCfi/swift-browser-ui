@@ -41,9 +41,7 @@ class TestChromeFrontend(ChromiumTestClass):
         time.sleep(0.25)
         # The following finds the first table row with a detail container, and
         # clicks said container open.
-        wait_for_clickable(
-            self.drv.find_element_by_class_name("chevron-cell")
-        )
+        wait_for_clickable(self.drv.find_element_by_class_name("chevron-cell"))
         element = (
             self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
@@ -63,9 +61,7 @@ class TestChromeFrontend(ChromiumTestClass):
         time.sleep(0.25)
         self.drv = navigate_to_container_with_objects(self.drv)
         time.sleep(0.2)
-        wait_for_clickable(
-            self.drv.find_element_by_class_name("chevron-cell")
-        )
+        wait_for_clickable(self.drv.find_element_by_class_name("chevron-cell"))
         element = (
             self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")
@@ -77,9 +73,7 @@ class TestChromeFrontend(ChromiumTestClass):
     def test_search_a_container(self):
         """Test searching a specific container and navigating to it."""
         # The search box is the only input type form on the page.
-        self.drv.find_element_by_class_name("input").send_keys(
-            "test-container-3"
-        )
+        self.drv.find_element_by_class_name("input").send_keys("test-container-3")
         time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         time.sleep(0.25)
@@ -91,9 +85,7 @@ class TestChromeFrontend(ChromiumTestClass):
         """Test the UI for a longer session."""
         # Perform a container search
         time.sleep(0.25)
-        self.drv.find_element_by_class_name("input").send_keys(
-            "test-container-4"
-        )
+        self.drv.find_element_by_class_name("input").send_keys("test-container-4")
         time.sleep(0.6)
         navigate_to_next_container_from_search(self.drv)
         self.assertIn("test-container-4", self.drv.current_url)
@@ -111,9 +103,7 @@ class TestChromeFrontend(ChromiumTestClass):
         # Switch to finnish and test navigating to the user page.
         switch_to_finnish(self.drv)
         time.sleep(0.25)
-        wait_for_clickable(
-            self.drv.find_element_by_link_text("test_user_id")
-        )
+        wait_for_clickable(self.drv.find_element_by_link_text("test_user_id"))
         time.sleep(0.25)
         self.assertIn("Käyttäjä", self.drv.page_source)
         self.assertIn("Kontteja", self.drv.page_source)
@@ -124,9 +114,7 @@ class TestChromeFrontend(ChromiumTestClass):
         # Perform one hash check still, in Finnish.
         navigate_to_next_full_after_back(self.drv)
         time.sleep(0.25)
-        wait_for_clickable(
-            self.drv.find_element_by_class_name("chevron-cell")
-        )
+        wait_for_clickable(self.drv.find_element_by_class_name("chevron-cell"))
         element = (
             self.drv.find_element_by_class_name("detail-container")
             .find_element_by_tag_name("ul")

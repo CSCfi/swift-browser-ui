@@ -17,7 +17,7 @@ LOGGER = logging.getLogger("signature")
 
 
 async def handle_signature_request(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle call for an API call signature."""
     session_check(request)
@@ -30,15 +30,10 @@ async def handle_signature_request(
             reason="Signable path missing from query string."
         )
 
-    return aiohttp.web.json_response(await sign(
-        valid_for,
-        path_to_sign
-    ))
+    return aiohttp.web.json_response(await sign(valid_for, path_to_sign))
 
 
-async def handle_ext_token_create(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token create."""
     session = api_check(request)
 
@@ -68,7 +63,7 @@ async def handle_ext_token_create(
         params={
             "valid": signature["valid_until"],
             "signature": signature["signature"],
-        }
+        },
     )
     resp_request = await client.post(
         f"{request_api_address}{path}",
@@ -76,33 +71,28 @@ async def handle_ext_token_create(
         params={
             "valid": signature["valid_until"],
             "signature": signature["signature"],
-        }
+        },
     )
 
     if resp_sharing.status != 200 or resp_request.status != 200:
         resp_sharing_text = await resp_sharing.text()
         resp_request_text = await resp_request.text()
-        LOGGER.debug(f"""\
+        LOGGER.debug(
+            f"""\
         Sharing failed with status {resp_sharing.status}
         {resp_sharing_text}{resp_sharing.url}
         Request failed with status {resp_request.status}
         {resp_request_text}{resp_request.url}\
-        """)
-        raise aiohttp.web.HTTPInternalServerError(
-            reason="Token creation failed"
+        """
         )
+        raise aiohttp.web.HTTPInternalServerError(reason="Token creation failed")
 
-    resp = aiohttp.web.json_response(
-        token,
-        status=201
-    )
+    resp = aiohttp.web.json_response(token, status=201)
 
     return resp
 
 
-async def handle_ext_token_remove(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token delete."""
     session = api_check(request)
 
@@ -128,14 +118,14 @@ async def handle_ext_token_remove(
         params={
             "signature": signature["signature"],
             "valid": signature["valid_until"],
-        }
+        },
     )
     await client.delete(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid_until"],
-        }
+        },
     )
 
     resp = aiohttp.web.Response(status=204)
@@ -143,9 +133,7 @@ async def handle_ext_token_remove(
     return resp
 
 
-async def handle_ext_token_list(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for listing API tokens."""
     session = api_check(request)
 
@@ -169,14 +157,14 @@ async def handle_ext_token_list(
         params={
             "signature": signature["signature"],
             "valid": signature["valid_until"],
-        }
+        },
     )
     request_tokens = await client.get(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid_until"],
-        }
+        },
     )
     sharing_tokens_text = await sharing_tokens.text()
     request_tokens_text = await request_tokens.text()
@@ -193,32 +181,26 @@ async def handle_ext_token_list(
 
 
 async def handle_form_post_signature(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle call for a form signature."""
     session = api_check(request)
     LOGGER.info(
-        'API call for download object from %s, sess. %s',
-        request.remote,
-        session
+        "API call for download object from %s, sess. %s", request.remote, session
     )
 
-    serv = request.app['Sessions'][session]['ST_conn']
-    sess = request.app['Sessions'][session]['OS_sess']
+    serv = request.app["Sessions"][session]["ST_conn"]
+    sess = request.app["Sessions"][session]["OS_sess"]
     container = request.match_info["container"]
 
     temp_url_key = await get_tempurl_key(
         serv,
         # container
     )
-    LOGGER.debug(
-        "Using %s as temporary URL key.", temp_url_key
-    )
+    LOGGER.debug("Using %s as temporary URL key.", temp_url_key)
 
     host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
-    path_begin = sess.get_endpoint(service_type="object-store").replace(
-        host, ""
-    )
+    path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
 
     try:
         object_prefix = request.query["prefix"]
@@ -232,31 +214,31 @@ async def handle_form_post_signature(
     max_file_size = 5368709119
 
     expires = int(time.time() + 84600)
-    path = f'{path_begin}/{container}/'
+    path = f"{path_begin}/{container}/"
     if object_prefix:
         path = path + object_prefix
 
-    hmac_body = '%s\n%s\n%s\n%s\n%s' % (
+    hmac_body = "%s\n%s\n%s\n%s\n%s" % (
         path,
         redirect,
         max_file_size,
         max_file_count,
-        expires
+        expires,
     )
 
     signature = hmac.new(
-        temp_url_key.encode('utf-8'),
-        hmac_body.encode('utf-8'),
-        digestmod="sha1"
+        temp_url_key.encode("utf-8"), hmac_body.encode("utf-8"), digestmod="sha1"
     ).hexdigest()
 
-    return aiohttp.web.json_response({
-        "signature": signature,
-        "max_file_size": max_file_size,
-        "max_file_count": max_file_count,
-        "expires": expires,
-        "host": host,
-        "path": path,
-        "container": container,
-        "prefix": object_prefix,
-    })
+    return aiohttp.web.json_response(
+        {
+            "signature": signature,
+            "max_file_size": max_file_size,
+            "max_file_count": max_file_count,
+            "expires": expires,
+            "host": host,
+            "path": path,
+            "container": container,
+            "prefix": object_prefix,
+        }
+    )

@@ -24,31 +24,29 @@ class FrontendTestCase(AioHTTPTestCase):
     @unittest_run_loop
     async def test_browse(self):
         """Test /browse handler."""
-        patch_setd = unittest.mock.patch("swift_browser_ui.front.setd", new={
-            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
-        })
+        patch_setd = unittest.mock.patch(
+            "swift_browser_ui.front.setd",
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
+        )
         patch_check = unittest.mock.patch(
-            "swift_browser_ui.front.session_check",
-            new=self.return_true
+            "swift_browser_ui.front.session_check", new=self.return_true
         )
         with patch_setd, patch_check:
             response = await self.client.request("GET", "/browse")
             self.assertEqual(response.status, 200)
-            self.assertEqual(response.headers["Content-type"],
-                             "text/html")
+            self.assertEqual(response.headers["Content-type"], "text/html")
 
     @unittest_run_loop
     async def test_index(self):
         """Test / handler."""
-        patch_setd = unittest.mock.patch("swift_browser_ui.front.setd", new={
-            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
-        })
+        patch_setd = unittest.mock.patch(
+            "swift_browser_ui.front.setd",
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
+        )
         patch_check = unittest.mock.patch(
-            "swift_browser_ui.front.session_check",
-            new=self.return_true
+            "swift_browser_ui.front.session_check", new=self.return_true
         )
         with patch_setd, patch_check:
             response = await self.client.request("GET", "/")
             self.assertEqual(response.status, 200)
-            self.assertEqual(response.headers["Content-type"],
-                             "text/html")
+            self.assertEqual(response.headers["Content-type"], "text/html")

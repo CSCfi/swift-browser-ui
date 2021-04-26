@@ -21,7 +21,7 @@ from .creation import get_request_with_mock_openstack
 
 
 # Set static folder in settings so it can be tested
-setd['static_directory'] = os.getcwd() + '/swift_browser_ui_frontend'
+setd["static_directory"] = os.getcwd() + "/swift_browser_ui_frontend"
 
 
 class TestServinitMethod(asynctest.TestCase):
@@ -63,7 +63,7 @@ class TestRunServerFunctions(unittest.TestCase):
         )
         patch_ssl_defcontext = unittest.mock.patch(
             "swift_browser_ui.server.ssl.create_default_context",
-            self.mock_ssl_context_creation
+            self.mock_ssl_context_creation,
         )
         with patch_run_app, patch_ssl_defcontext:
             run_server_secure(None, None, None)
@@ -73,7 +73,7 @@ class TestRunServerFunctions(unittest.TestCase):
         """Test run_server_insecure function."""
         run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
         with unittest.mock.patch(
-                "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
+            "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
         ):
             run_server_insecure(None)
             run_app_mock.assert_called_once()
@@ -109,9 +109,7 @@ class AppTestCase(AioHTTPTestCase):
         # broken routes can be fixed one at a time.
         # Having all the route checks in
         # a single compact function is better overall. – Sampsa Penna
-        new_setd = {
-            "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"
-        }
+        new_setd = {"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"}
         patch_setd_front = unittest.mock.patch(
             "swift_browser_ui.front.setd",
             new=new_setd,
@@ -125,32 +123,32 @@ class AppTestCase(AioHTTPTestCase):
             new=new_setd,
         )
         with patch_setd_front, patch_setd_middleware, patch_setd_login:
-            response = await self.client.request("GET", '/')
+            response = await self.client.request("GET", "/")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/browse')
+            response = await self.client.request("GET", "/browse")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/login')
+            response = await self.client.request("GET", "/login")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/login/kill')
+            response = await self.client.request("GET", "/login/kill")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/login/front')
+            response = await self.client.request("GET", "/login/front")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/login/rescope')
+            response = await self.client.request("GET", "/login/rescope")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/buckets')
+            response = await self.client.request("GET", "/api/buckets")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/bucket/objects')
+            response = await self.client.request("GET", "/api/bucket/objects")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/object/dload')
+            response = await self.client.request("GET", "/api/object/dload")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/username')
+            response = await self.client.request("GET", "/api/username")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/projects')
+            response = await self.client.request("GET", "/api/projects")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", '/api/bucket/meta')
+            response = await self.client.request("GET", "/api/bucket/meta")
             self.assertNotEqual(response.status, 404)
             response = await self.client.request(
                 "GET",
-                '/api/project/meta',
+                "/api/project/meta",
             )
             self.assertNotEqual(response.status, 404)

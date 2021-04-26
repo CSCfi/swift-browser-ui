@@ -8,22 +8,13 @@ from aiohttp import web
 from .settings import setd
 
 AiohttpHandler = typing.Callable[
-    [web.Request],
-    typing.Coroutine[
-        typing.Awaitable,
-        typing.Any,
-        web.Response
-    ]
+    [web.Request], typing.Coroutine[typing.Awaitable, typing.Any, web.Response]
 ]
 
 
-def return_error_response(
-        error_code: int
-) -> web.Response:
+def return_error_response(error_code: int) -> web.Response:
     """Return the correct error page with correct status code."""
-    with open(
-            str(setd["static_directory"]) + "/" + str(error_code) + ".html"
-    ) as resp:
+    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as resp:
         return web.Response(
             body="".join(resp.readlines()),
             status=error_code,
@@ -31,15 +22,14 @@ def return_error_response(
             headers={
                 "Cache-Control": "no-cache, no-store, must-revalidate",
                 "Pragma": "no-cache",
-                "Expires": "0"
-            }
+                "Expires": "0",
+            },
         )
 
 
 @web.middleware
 async def error_middleware(
-        request: web.Request,
-        handler: AiohttpHandler
+    request: web.Request, handler: AiohttpHandler
 ) -> web.Response:
     """Return the correct HTTP Error page."""
     try:

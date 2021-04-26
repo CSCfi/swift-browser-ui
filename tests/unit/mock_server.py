@@ -40,10 +40,7 @@ def mock_initiate_swift_service(_):
         ),
         # Default size range is [0, 1048576[, the max can be overridden
         # with envvar.
-        size_range=(
-            1,
-            int(environ.get("TEST_MAX_OBJECT_SIZE", 1048576))
-        )
+        size_range=(1, int(environ.get("TEST_MAX_OBJECT_SIZE", 1048576))),
     )
     # The downloads aren't mocked, so no contents to any file. This isn't
     # something we need to test, and also would consume too much resources.
@@ -56,24 +53,19 @@ async def mock_graceful_shutdown(_):
 
 
 @unittest.mock.patch(
-    "swift_browser_ui.server.kill_sess_on_shutdown",
-    mock_graceful_shutdown
+    "swift_browser_ui.server.kill_sess_on_shutdown", mock_graceful_shutdown
 )
 @unittest.mock.patch(
-    "swift_browser_ui.login.initiate_os_session",
-    mock_initiate_os_session
+    "swift_browser_ui.login.initiate_os_session", mock_initiate_os_session
 )
 @unittest.mock.patch(
-    "swift_browser_ui.login.initiate_os_service",
-    mock_initiate_swift_service
+    "swift_browser_ui.login.initiate_os_service", mock_initiate_swift_service
 )
 @unittest.mock.patch(
-    "swift_browser_ui.login.get_availability_from_token",
-    return_project_avail
+    "swift_browser_ui.login.get_availability_from_token", return_project_avail
 )
 @unittest.mock.patch(
-    "swift_browser_ui.login.test_swift_endpoint",
-    return_test_swift_endpoint
+    "swift_browser_ui.login.test_swift_endpoint", return_test_swift_endpoint
 )
 @unittest.mock.patch.dict(
     swift_browser_ui.server.setd,
@@ -85,10 +77,11 @@ async def mock_graceful_shutdown(_):
         "verbose": True,
         "debug": True,
         "set_session_devmode": SESSION_MODE,
-        "static_directory":
-        swift_browser_ui.settings.__file__.replace("/settings.py", "") +
-        "/static"
-    }
+        "static_directory": swift_browser_ui.settings.__file__.replace(
+            "/settings.py", ""
+        )
+        + "/static",
+    },
 )
 def run_mock_server():
     """Run test server with mock openstack."""
@@ -99,5 +92,5 @@ def run_mock_server():
     swift_browser_ui.server.run_server_insecure(app)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_mock_server()

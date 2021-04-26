@@ -16,36 +16,28 @@ async def return_401_handler(with_exception):
     """Return an HTTP401 error."""
     if with_exception:
         raise HTTPUnauthorized()
-    return Response(
-        status=401
-    )
+    return Response(status=401)
 
 
 async def return_403_handler(with_exception):
     """Return an HTTP403 error."""
     if with_exception:
         raise HTTPForbidden()
-    return Response(
-        status=403
-    )
+    return Response(status=403)
 
 
 async def return_404_handler(with_exception):
     """Return or raise an HTTP404 error."""
     if with_exception:
         raise HTTPNotFound()
-    return Response(
-        status=404
-    )
+    return Response(status=404)
 
 
 async def return_400_handler(with_exception):
     """Return or raise an HTTP400 error."""
     if with_exception:
         raise HTTPClientError()
-    return Response(
-        status=400
-    )
+    return Response(status=400)
 
 
 class MiddlewareTestClass(asynctest.TestCase):
@@ -55,10 +47,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 401 middleware when the 401 status is returned."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(None, return_401_handler)
@@ -69,10 +58,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 401 middleware when the 401 status is risen."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(True, return_401_handler)
@@ -83,10 +69,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 403 middleware when the 403 status is returned."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(None, return_403_handler)
@@ -97,10 +80,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 403 middleware when the 403 status is risen."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(True, return_403_handler)
@@ -111,10 +91,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 404 middleware when the 404 status is returned."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(None, return_404_handler)
@@ -125,10 +102,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test 404 middlewrae when the 404 status is risen."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(True, return_404_handler)
@@ -139,10 +113,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test the general error middleware with correct status."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
             resp = await error_middleware(None, index)
@@ -153,10 +124,7 @@ class MiddlewareTestClass(asynctest.TestCase):
         """Test the general error middleware with other status code."""
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.middlewares.setd",
-            new={
-                "static_directory":
-                    os.getcwd() + "/swift_browser_ui_frontend/dist"
-            }
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with self.assertRaises(HTTPClientError), patch_setd:
             await error_middleware(True, return_400_handler)

@@ -35,18 +35,16 @@ class TestFirefoxSession(BaseUITestClass):
     def test_firefox_session_end_button(self):
         """Test session logout with the logout button."""
         drv = webdriver.Firefox(
-            options=self.opts,
-            firefox_profile=get_cacheless_profile()
+            options=self.opts, firefox_profile=get_cacheless_profile()
         )
         drv.set_window_size(1920, 1080)
         get_nav_to_ui(drv)
         time.sleep(0.33)
-        wait_for_clickable(
-            drv.find_element_by_link_text("Log Out")
-        )
+        wait_for_clickable(drv.find_element_by_link_text("Log Out"))
         time.sleep(0.5)
-        self.assertTrue("Log In" in drv.page_source or
-                        "Kirjaudu sisään" in drv.page_source)
+        self.assertTrue(
+            "Log In" in drv.page_source or "Kirjaudu sisään" in drv.page_source
+        )
         drv.quit()
 
     @pytest.mark.timeout(60)
@@ -54,10 +52,12 @@ class TestFirefoxSession(BaseUITestClass):
         """Test that session logouts stay separate."""
         # Create three separate sessions (should be enough to test with),
         # this time leaving the caching on.
-        drv_list = [webdriver.Firefox(
-            options=self.opts,
-            firefox_profile=webdriver.FirefoxProfile()
-        ) for i in range(0, 3)]
+        drv_list = [
+            webdriver.Firefox(
+                options=self.opts, firefox_profile=webdriver.FirefoxProfile()
+            )
+            for i in range(0, 3)
+        ]
 
         # Navigate to the server and log every instance in
         for drv in drv_list:
@@ -67,9 +67,7 @@ class TestFirefoxSession(BaseUITestClass):
         time.sleep(0.25)
         # Test session logout separation by killing one of the sessions
         to_kill = random.choice(drv_list)
-        wait_for_clickable(
-            to_kill.find_element_by_link_text("Log Out")
-        )
+        wait_for_clickable(to_kill.find_element_by_link_text("Log Out"))
         time.sleep(0.25)
         to_kill.quit()
         drv_list.remove(to_kill)
@@ -81,8 +79,10 @@ class TestFirefoxSession(BaseUITestClass):
 
         # Check that none of the pages were logged out
         for drv in drv_list:
-            self.assertTrue("Log In" not in drv.page_source or
-                            "Kirjaudu sisään" not in drv.page_source)
+            self.assertTrue(
+                "Log In" not in drv.page_source
+                or "Kirjaudu sisään" not in drv.page_source
+            )
 
         # After this we can test that the session border doesn't break,
         # i.e. the two remaining sessions have different content.

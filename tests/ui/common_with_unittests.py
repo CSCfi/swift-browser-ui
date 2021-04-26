@@ -19,12 +19,7 @@ class BaseUITestClass(unittest.TestCase):
     def setUp(self):
         """Start webserver with mock API."""
         self.server_process = subprocess.Popen(  # nosec
-            [
-                "python",
-                "-m",
-                "tests.unit.mock_server"
-            ],
-            stdout=subprocess.PIPE
+            ["python", "-m", "tests.unit.mock_server"], stdout=subprocess.PIPE
         )
         time.sleep(3.0)
 
@@ -62,8 +57,8 @@ class ChromiumTestClass(BaseUITestClass):
         self.opts = webdriver.chrome.options.Options()
         if environ.get("TEST_ENABLE_HEADLESS", None):
             self.opts.headless = True
-            self.opts.add_argument('--no-sandbox')
-            self.opts.add_argument('--disable-dev-shm-usage')
+            self.opts.add_argument("--no-sandbox")
+            self.opts.add_argument("--disable-dev-shm-usage")
         self.drv = webdriver.Chrome(options=self.opts)
         self.drv.set_window_size(1920, 1080)
         get_nav_to_ui(self.drv)
