@@ -7,7 +7,6 @@ setuptools.setup(
     version=__version__,
     description="Object browser for OS_swift API",
     author=__author__,
-    author_email="sampsa.penna@csc.fi",
     project_urls={
         "Source": "https://github.com/CSCfi/swift-browser-ui",
     },
