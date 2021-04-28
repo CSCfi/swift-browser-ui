@@ -34,6 +34,7 @@ setuptools.setup(
             "pytest-aiohttp",
             "pytest-xdist",
             "asynctest",
+            "black",
         ],
         "docs": ["sphinx==3.5.4", "sphinx_rtd_theme==0.5.2", "selenium"],
         "ui_test": ["pytest", "selenium", "pytest-timeout"],

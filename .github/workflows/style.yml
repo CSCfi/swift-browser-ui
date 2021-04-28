@@ -33,3 +33,5 @@ jobs:
       run: tox -e mypy
     - name: bandit static check
       run: tox -e bandit
+    - name: black style check
+      run: tox -e black
