@@ -780,7 +780,7 @@ async def add_project_container_acl(
     container = request.match_info["container"]
     projects = request.query["projects"].split(",")
     request.app["Log"].debug(
-        f"Requested container {container} " f"and projects {projects}."
+        f"Requested container {container} and projects {projects}."
     )
     meta_headers = dict(serv.stat(container=container)["items"])
 
