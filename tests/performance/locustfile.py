@@ -5,9 +5,7 @@ from locust import HttpLocust, TaskSet
 
 def login(l_instance):
     """Handle locust user login."""
-    l_instance.client.post(
-        "/login/websso", {"token": "the_actual_token_doesn't_matter"}
-    )
+    l_instance.client.post("/login/websso", {"token": "the_actual_token_doesn't_matter"})
 
 
 def logout(l_instance):

@@ -19,11 +19,7 @@ async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Fetch the session owning OS user."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for username from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        f"API call for username from {request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     userid = request.app["Sessions"][session]["OS_sess"].get_user_id()
@@ -41,7 +37,7 @@ def _unpack(
             if item["container"]
             else "No tenant specified, working with container"
         )
-        request.app["Log"].info(f"{tenant} " "list unpacked successfully.")
+        request.app["Log"].info(f"{tenant} list unpacked successfully.")
         return cont.extend(item["listing"])
     else:
         request.app["Log"].error(item["error"])
@@ -59,13 +55,9 @@ async def swift_list_buckets(request: aiohttp.web.Request) -> aiohttp.web.Respon
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "API call for list buckets from {0}, sess: {1} :: {2}".format(
-                request.remote,
-                session,
-                time.ctime(),
-            )
+            "API call for list buckets from "
+            f"{request.remote}, sess: {session} :: {time.ctime()}"
         )
-
         # The maximum amount of buckets / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
@@ -78,11 +70,11 @@ async def swift_list_buckets(request: aiohttp.web.Request) -> aiohttp.web.Respon
             raise aiohttp.web.HTTPNotFound()
         return aiohttp.web.json_response(cont)
     except SwiftError:
-        request.app["Log"].error("SwiftError occured " "return empty container list.")
+        request.app["Log"].error("SwiftError occured return empty container list.")
         raise aiohttp.web.HTTPNotFound()
     except KeyError:
         # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; " "possible broken swift auth.")
+        request.app["Log"].error("listing is missing; possible broken swift auth.")
         return aiohttp.web.json_response(cont)
 
 
@@ -91,7 +83,7 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "API call for bucket creation from %s, sess %s", request.remote, session
+            f"API call for container creation from {request.remote}, sess {session}"
         )
         # Shamelessly use private methods from SwiftService to avoid writing
         # own implementation
@@ -120,11 +112,8 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Respon
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "API call for list objects from {0}, sess: {1} :: {2}".format(
-                request.remote,
-                session,
-                time.ctime(),
-            )
+            "API call for list objects from "
+            f"{request.remote}, sess: {session} :: {time.ctime()}"
         )
 
         serv = request.app["Sessions"][session]["ST_conn"].list(
@@ -147,11 +136,11 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Respon
 
         return aiohttp.web.json_response(obj)
     except SwiftError:
-        request.app["Log"].error("SwiftError occured " "return empty container list.")
+        request.app["Log"].error("SwiftError occured return empty container list.")
         return aiohttp.web.json_response(obj)
     except KeyError:
         # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; " "possible broken swift auth.")
+        request.app["Log"].error("listing is missing; possible broken swift auth.")
         return aiohttp.web.json_response(obj)
 
 
@@ -169,10 +158,8 @@ async def swift_list_shared_objects(
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "API call for list shared objects from %s, sess: %s :: %s",
-            request.remote,
-            session,
-            time.ctime(),
+            "API call for list shared objects from "
+            f"{request.remote}, sess: {session} :: {time.ctime()}"
         )
 
         # Establish a temporary Openstack SwiftService connection
@@ -199,14 +186,14 @@ async def swift_list_shared_objects(
         return aiohttp.web.json_response(obj)
 
     except SwiftError:
-        request.app["Log"].error("SwiftError occured " "return empty container list.")
+        request.app["Log"].error("SwiftError occured return empty container list.")
         return aiohttp.web.json_response(obj)
     except ClientException as e:
         request.app["Log"].error(e.msg)
         return aiohttp.web.json_response(obj)
     except KeyError:
         # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; " "possible broken swift auth.")
+        request.app["Log"].error("listing is missing; possible broken swift auth.")
         return aiohttp.web.json_response(obj)
 
 
@@ -214,22 +201,19 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
     """Point a user to a temporary pre-signed download URL."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for download object from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for download object from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     serv = request.app["Sessions"][session]["ST_conn"]
     sess = request.app["Sessions"][session]["OS_sess"]
 
     temp_url_key = await get_tempurl_key(serv)
-    request.app["Log"].debug("Using %s as temporary URL key", temp_url_key)
+    request.app["Log"].debug(f"Using {temp_url_key} as temporary URL key")
     # Generate temporary URL
     host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
     path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
-    request.app["Log"].debug("Using %s as host and %s as path start.", host, path_begin)
+    request.app["Log"].debug(f"Using {host} as host and {path_begin} as path start.")
     container = request.query["bucket"]
     object_key = request.query["objkey"]
     lifetime = 60 * 15
@@ -254,11 +238,7 @@ async def swift_download_shared_object(
     session = api_check(request)
     request.app["Log"].info(
         "API call for shared download runner "
-        "from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        f"from {request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     project: str = request.match_info["project"]
@@ -292,12 +272,8 @@ async def swift_download_container(
     """Point a user to the container download runner."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for container download runner "
-        "from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for container download runner from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     project: str = request.match_info["project"]
@@ -330,11 +306,8 @@ async def swift_upload_object_chunk(
     """Point a user to the object upload runner."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for object upload runner from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for object upload runner from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     project: str = request.match_info["project"]
@@ -366,11 +339,8 @@ async def swift_replicate_container(
     """Point the user to container replication endpoint."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for replication endpoint from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for replication endpoint from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     project: str = request.match_info["project"]
@@ -405,12 +375,8 @@ async def swift_check_object_chunk(
     """Point check for object existence to the upload runner."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call to check object existence in upload runner "
-        "from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call to check object existence in upload runner from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     project: str = request.match_info["project"]
@@ -476,11 +442,8 @@ async def get_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Respo
     """Get metadata for a container."""
     session = api_check(request)
     request.app["Log"].info(
-        "API cal for project listing from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API cal for project listing from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     # Get required variables from query string
@@ -509,11 +472,8 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     """Get metadata for a container or for an object."""
     session = api_check(request)
     request.app["Log"].info(
-        "API cal for project listing from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API cal for project listing from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     # Get required variables from query string
@@ -534,9 +494,7 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
 
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
-    return aiohttp.web.json_response(
-        await get_object_metadata(conn, meta_cont, meta_obj)
-    )
+    return aiohttp.web.json_response(await get_object_metadata(conn, meta_cont, meta_obj))
 
 
 async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -549,10 +507,7 @@ async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Resp
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "Api call for project metadata check from {0}, sess: {1}".format(
-                request.remote,
-                session,
-            )
+            f"Api call for project metadata check from {request.remote}, sess: {session}"
         )
 
         conn = request.app["Sessions"][session]["ST_conn"]
@@ -583,11 +538,8 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
     """Fetch the projects available for the open session."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for project listing from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for project listing from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     # Return the projects available for the session
@@ -600,11 +552,8 @@ async def get_os_active_project(request: aiohttp.web.Request) -> aiohttp.web.Res
     """Fetch the project currently displayed to the session."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for current project from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for current project from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     return aiohttp.web.json_response(request.app["Sessions"][session]["active_project"])
@@ -616,12 +565,8 @@ async def get_shared_container_address(
     """Get the project specific object storage address."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for project specific storage "
-        "from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for project specific storage from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     sess = request.app["Sessions"][session]["OS_sess"]
 
@@ -635,11 +580,8 @@ async def get_access_control_metadata(
     """Fetch a compilation of ACL information for sharing discovery."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for project ACL info from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call for project ACL info from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     serv = request.app["Sessions"][session]["ST_conn"]
@@ -700,11 +642,8 @@ async def remove_project_container_acl(
     """Remove access from a project in container acl."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call to remove container ACL from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call to remove container ACL from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     serv = request.app["Sessions"][session]["ST_conn"]
@@ -740,12 +679,8 @@ async def remove_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Resp
     except KeyError:
         session = api_check(request)
         request.app["Log"].info(
-            "API call to remove projects fom container "
-            "ACL from {0}, sess: {1} :: {2}".format(
-                request.remote,
-                session,
-                time.ctime(),
-            )
+            "API call to remove projects fom container ACL from "
+            f"{request.remote}, sess: {session} :: {time.ctime()}"
         )
 
         serv = request.app["Sessions"][session]["ST_conn"]
@@ -768,20 +703,14 @@ async def add_project_container_acl(
     """Add access for a project in container acl."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call to add access for project in container "
-        "from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        "API call to add access for project in container from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     serv = request.app["Sessions"][session]["ST_conn"]
 
     container = request.match_info["container"]
     projects = request.query["projects"].split(",")
-    request.app["Log"].debug(
-        f"Requested container {container} and projects {projects}."
-    )
+    request.app["Log"].debug(f"Requested container {container} and projects {projects}.")
     meta_headers = dict(serv.stat(container=container)["items"])
 
     read_acl = meta_headers["Read ACL"]

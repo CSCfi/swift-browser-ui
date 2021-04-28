@@ -238,9 +238,7 @@ class Mock_Service:
             to_add = []
 
             # Iterate over a random amount of objects
-            for _ in range(
-                0, random.randint(object_range[0], object_range[1])  # nosec
-            ):
+            for _ in range(0, random.randint(object_range[0], object_range[1])):  # nosec
                 ohash = hashlib.sha1(os.urandom(256)).hexdigest()  # nosec
                 if object_name_prefix is not None:
                     oname = object_name_prefix + ohash
@@ -319,9 +317,7 @@ class Mock_Service:
             # Add the tempurl headers to the return dictionary, if they have
             # been initialized
             if self.meta["tempurl_key_1"] is not None:
-                ret["headers"]["x-account-meta-temp-url-key"] = self.meta[
-                    "tempurl_key_1"
-                ]
+                ret["headers"]["x-account-meta-temp-url-key"] = self.meta["tempurl_key_1"]
             if self.meta["tempurl_key_2"] is not None:
                 ret["headers"]["x-account-meta-temp-url-key-2"] = self.meta[
                     "tempurl_key_2"

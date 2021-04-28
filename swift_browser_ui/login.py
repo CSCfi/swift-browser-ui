@@ -47,9 +47,7 @@ async def sso_query_begin(
     # Return the form based login page if the service isn't trusted
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     if not setd["has_trust"]:
-        response = aiohttp.web.FileResponse(
-            str(setd["static_directory"]) + "/login.html"
-        )
+        response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
         return disable_cache(response)
 
     response = aiohttp.web.Response(
@@ -71,34 +69,32 @@ def test_token(
     """Validate unscoped token."""
     unscoped: typing.Union[str, None] = None
     log = request.app["Log"]
-    log.info("Got OS token in login return")
     if "token" in formdata:
         unscoped = str(formdata["token"])
         log.debug(
-            "Got OS token finvis ::{0}:: from address {1} :: {2}".format(
-                str(unscoped), request.remote, time.ctime()
-            )
+            f"Got OS token in formdata ::{str(unscoped)}:: "
+            f"from address {request.remote} :: {time.ctime()}"
         )
     # Try getting the token id from form
     if "token" in request.query and unscoped is None:
         unscoped = request.query["token"]
         log.debug(
-            "Got OS token qstr ::{0}:: from address {1} :: {2}".format(
-                unscoped, request.remote, time.ctime()
-            )
+            f"Got OS token in query string ::{unscoped}:: "
+            f"from address {request.remote} :: {time.ctime()}"
         )
     # Try getting the token id from headers
     if "X-Auth-Token" in request.headers and unscoped is None:
         unscoped = request.headers["X-Auth-Token"]
         log.debug(
-            "Got OS token hdr ::{0}:: from address {1} :: {2}".format(
-                unscoped, request.remote, time.ctime()
-            )
+            f"Got OS token in http header ::{unscoped}:: "
+            f"from address {request.remote} :: {time.ctime()}"
         )
     if unscoped is None:
         raise aiohttp.web.HTTPClientError(reason="Token missing from query")
     if not (re.match("[a-f0-9]{32}", unscoped) and len(unscoped) == 32):
         raise aiohttp.web.HTTPClientError(reason="Token is malformed")
+
+    log.info("Got OS token in login return")
 
     return unscoped
 
@@ -110,7 +106,7 @@ async def sso_query_end(
     log = request.app["Log"]
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     formdata = await request.post()
-    log.debug("Got %s in form.", formdata)
+    log.debug(f"Got {formdata} in form.")
     # Declare the unscoped token
     unscoped = test_token(formdata, request)
 
@@ -149,9 +145,7 @@ async def sso_query_end(
 
     try:
         # Check token availability
-        request.app["Sessions"][session]["Avail"] = get_availability_from_token(
-            unscoped
-        )
+        request.app["Sessions"][session]["Avail"] = get_availability_from_token(unscoped)
     except urllib.error.HTTPError:
         raise aiohttp.web.HTTPUnauthorized(
             reason="Token no longer valid",
@@ -231,11 +225,7 @@ async def token_rescope(request: aiohttp.web.Request) -> aiohttp.web.Response:
     session_check(request)
     session = decrypt_cookie(request)["id"]
     request.app["Log"].info(
-        "Call to rescope token from {0}, sess: {1} :: {2}".format(
-            request.remote,
-            session,
-            time.ctime(),
-        )
+        f"Call to rescope token from {request.remote}, sess: {session} :: {time.ctime()}"
     )
 
     if request.query["project"] not in [
@@ -300,9 +290,7 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
             clear_session_info(request.app["Sessions"])
             # Purge the openstack connection from the server
             request.app["Sessions"].pop(session)
-            log.debug(
-                "Removed session %s from session list :: %s", session, time.ctime()
-            )
+            log.debug(f"Removed session {session} from session list :: {time.ctime()}")
         except aiohttp.web.HTTPUnauthorized:
             log.info("Trying to log out an invalidated session: {0}".format(session))
     response = aiohttp.web.Response(status=303)

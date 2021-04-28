@@ -31,12 +31,12 @@ def cli(verbose: bool, debug: bool, logfile: str) -> None:
     if verbose:
         setd["verbose"] = True
         logging.root.setLevel(logging.INFO)
-        logging.info("Set logging level to info. %s", 'Reason: got flag "--verbose"')
+        logging.info("Set logging level to info. Reason: got flag --verbose")
     # set debug
     if debug:
         setd["debug"] = True
         logging.root.setLevel(logging.DEBUG)
-        logging.info("Set logging level to debug. %s", 'Reason: got flag "--debug"')
+        logging.info("Set logging level to debug. Reason: got flag --debug")
     # set logfile
     if logfile:
         setd["logfile"] = logfile
@@ -44,9 +44,7 @@ def cli(verbose: bool, debug: bool, logfile: str) -> None:
         new_handler.setFormatter(logging.Formatter(FORMAT))
         logging.root.addHandler(new_handler)
         logging.info(
-            "Save log information to the file %s %s",
-            logfile,
-            ' – Reason: got option "--logfile"',
+            f"Save log information to the file {logfile} – Reason: got option --logfile"
         )
     conv_setup_logging()
 
@@ -116,7 +114,7 @@ def start(
     ssl_cert_key: str,
 ) -> None:
     """Start the browser backend and server."""
-    logging.debug("Current settings dictionary:%s", str(setd))
+    logging.debug(f"Current settings dictionary: {str(setd)}")
     set_key("port", port, "Set running port as %s")
     set_key("auth_endpoint_url", auth_endpoint_url, "Set auth endpoint url to %s")
     set_key(
@@ -133,7 +131,7 @@ def start(
         set_session_devmode,
         "Disabled logouts for development purposes. %s",
     )
-    logging.debug("Running settings directory:%s", str(setd))
+    logging.debug(f"Running settings directory: {str(setd)}")
     if not dry_run and not secure:
         run_server_insecure(servinit())
     if not dry_run and secure:

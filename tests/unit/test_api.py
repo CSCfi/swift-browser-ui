@@ -84,9 +84,9 @@ class APITestClass(asynctest.TestCase):
             objects = [i["hash"] for i in objects]
             comp = [
                 i["hash"]
-                for i in self.request.app["Sessions"][self.cookie][
-                    "ST_conn"
-                ].containers[container]
+                for i in self.request.app["Sessions"][self.cookie]["ST_conn"].containers[
+                    container
+                ]
             ]
             self.assertEqual(objects, comp)
 
@@ -108,9 +108,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_list_without_containers(self):
         """Test function list buckets on a project without object storage."""
-        self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(
-            containers=0
-        )
+        self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(containers=0)
         with self.assertRaises(HTTPNotFound):
             _ = await swift_list_buckets(self.request)
 
@@ -170,9 +168,7 @@ class APITestClass(asynctest.TestCase):
         setd["swift_endpoint_url"] = "http://object.example-os.com:443/v1"
 
         # Case 1: Only Meta-Temp-URL-Key exists
-        self.request.app["Sessions"][self.cookie][
-            "ST_conn"
-        ].tempurl_key_1 = hashlib.md5(
+        self.request.app["Sessions"][self.cookie]["ST_conn"].tempurl_key_1 = hashlib.md5(
             os.urandom(128)
         ).hexdigest()  # nosec
         resp = await swift_download_object(self.request)
@@ -180,9 +176,7 @@ class APITestClass(asynctest.TestCase):
 
         # Case 2: Only Meta-Temp-URL-Key-2
         self.request.app["Sessions"][self.cookie]["ST_conn"].tempurl_key_1 = None
-        self.request.app["Sessions"][self.cookie][
-            "ST_conn"
-        ].tempurl_key_2 = hashlib.md5(
+        self.request.app["Sessions"][self.cookie]["ST_conn"].tempurl_key_2 = hashlib.md5(
             os.urandom(128)
         ).hexdigest()  # nosec
         resp = await swift_download_object(self.request)
@@ -220,9 +214,7 @@ class APITestClass(asynctest.TestCase):
             "tempurl_key_1": None,
             "tempurl_key_2": None,
         }
-        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(
-            "test-container-0"
-        )
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
 
         # Set up the query string
         self.request.query["container"] = "test-container-0"
@@ -249,9 +241,7 @@ class APITestClass(asynctest.TestCase):
         objs = req_sessions[self.cookie]["ST_conn"].containers["test-container-0"]
         objkey = [i["name"] for i in objs][0]
 
-        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(
-            "test-container-0"
-        )
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
 
         req_sessions[self.cookie]["ST_conn"].set_swift_meta_object(
             "test-container-0", objkey
@@ -282,9 +272,7 @@ class APITestClass(asynctest.TestCase):
         objs = req_sessions[self.cookie]["ST_conn"].containers["test-container-0"]
         objkey = [i["name"] for i in objs][0]
 
-        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(
-            "test-container-0"
-        )
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
 
         req_sessions[self.cookie]["ST_conn"].set_s3_meta_object(
             "test-container-0", objkey
@@ -325,9 +313,7 @@ class APITestClass(asynctest.TestCase):
             "tempurl_key_2": None,
         }
 
-        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(
-            "test-container-0"
-        )
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
 
         objs = req_sessions[self.cookie]["ST_conn"].containers["test-container-0"]
         for key in [i["name"] for i in objs]:
@@ -336,9 +322,7 @@ class APITestClass(asynctest.TestCase):
             )
 
         self.request.query["container"] = "test-container-0"
-        self.request.query["object"] = "%s,%s,%s,%s,%s" % tuple(
-            [i["name"] for i in objs]
-        )
+        self.request.query["object"] = "%s,%s,%s,%s,%s" % tuple([i["name"] for i in objs])
 
         resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
@@ -428,14 +412,10 @@ class TestProxyFunctions(asynctest.TestCase):
                 "valid_until": "test-valid",
             }
         )
-        self.patch_sign = unittest.mock.patch(
-            "swift_browser_ui.api.sign", self.sign_mock
-        )
+        self.patch_sign = unittest.mock.patch("swift_browser_ui.api.sign", self.sign_mock)
 
         self.setd_mock = {"upload_external_endpoint": "http://test-endpoint:9092/"}
-        self.patch_setd = unittest.mock.patch(
-            "swift_browser_ui.api.setd", self.setd_mock
-        )
+        self.patch_setd = unittest.mock.patch("swift_browser_ui.api.setd", self.setd_mock)
 
     async def test_swift_download_share_object(self):
         """Test share object download handler."""

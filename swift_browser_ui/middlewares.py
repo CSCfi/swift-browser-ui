@@ -28,9 +28,7 @@ def return_error_response(error_code: int) -> web.Response:
 
 
 @web.middleware
-async def error_middleware(
-    request: web.Request, handler: AiohttpHandler
-) -> web.Response:
+async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web.Response:
     """Return the correct HTTP Error page."""
     try:
         response = await handler(request)

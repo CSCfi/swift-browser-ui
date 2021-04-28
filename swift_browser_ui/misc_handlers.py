@@ -16,9 +16,9 @@ async def handle_bounce_direct_access_request(
         container = request.query["container"]
         owner = request.query["owner"]
         resp = aiohttp.web.Response(status=307)
-        resp.headers["Location"] = (
-            f"/browse/sharing/requestdirect?container={container}&owner={owner}"
-        )
+        resp.headers[
+            "Location"
+        ] = f"/browse/sharing/requestdirect?container={container}&owner={owner}"
         return resp
     except KeyError:
         raise aiohttp.web.HTTPClientError(reason="Query string missing parameters")

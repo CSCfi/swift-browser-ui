@@ -134,7 +134,7 @@ def decrypt_cookie(request: aiohttp.web.Request) -> dict:
             .decode("utf-8")
         )
         cookie = json.loads(cookie_json)
-        request.app["Log"].debug("Decrypted cookie: {0}".format(cookie))
+        request.app["Log"].debug(f"Decrypted cookie: {cookie}")
         return cookie
     except InvalidToken:
         request.app["Log"].info("Throw due to invalid token.")
@@ -157,7 +157,7 @@ def check_csrf(request: aiohttp.web.Request) -> bool:
             return True
         if cookie["referer"] not in request.headers["Referer"]:
             request.app["Log"].info(
-                "Throw due to invalid referer: {0}".format(request.headers["Referer"])
+                f"Throw due to invalid referer: {request.headers['Referer']}"
             )
             raise aiohttp.web.HTTPForbidden()
     else:
@@ -173,7 +173,7 @@ def check_csrf(request: aiohttp.web.Request) -> bool:
         cookie["signature"],
     ):
         request.app["Log"].info(
-            "Throw due to invalid referer: {0}".format(request.headers["Referer"])
+            f"Throw due to invalid referer: {request.headers['Referer']}"
         )
         raise aiohttp.web.HTTPForbidden()
     # If all is well, return True.
@@ -248,9 +248,7 @@ def generate_cookie(request: aiohttp.web.Request) -> typing.Tuple[dict, str]:
     # cookie itself
     return (
         cookie,
-        request.app["Crypt"]
-        .encrypt(json.dumps(cookie).encode("utf-8"))
-        .decode("utf-8"),
+        request.app["Crypt"].encrypt(json.dumps(cookie).encode("utf-8")).decode("utf-8"),
     )
 
 

@@ -77,9 +77,7 @@ async def mock_graceful_shutdown(_):
         "verbose": True,
         "debug": True,
         "set_session_devmode": SESSION_MODE,
-        "static_directory": swift_browser_ui.settings.__file__.replace(
-            "/settings.py", ""
-        )
+        "static_directory": swift_browser_ui.settings.__file__.replace("/settings.py", "")
         + "/static",
     },
 )

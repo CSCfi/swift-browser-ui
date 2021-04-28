@@ -62,13 +62,13 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 async def kill_sess_on_shutdown(app: aiohttp.web.Application) -> None:
     """Kill all open sessions and purge their data when killed."""
-    logging.info("Gracefully shutting down the program at %s", time.ctime())
+    logging.info(f"Gracefully shutting down the program at {time.ctime()}")
     while app["Sessions"].keys():
         key = list(app["Sessions"].keys())[0]
-        logging.info("Purging session for %s", key)
+        logging.info(f"Purging session for {key}")
         clear_session_info(app["Sessions"][key])
         app["Sessions"].pop(key)
-        logging.debug("Purged session information for %s :: %s", key, time.ctime())
+        logging.debug(f"Purged session information for {key} :: {time.ctime()}")
 
 
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
@@ -165,9 +165,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add download routes
     app.add_routes(
         [
-            aiohttp.web.get(
-                "/download/{project}/{container}", swift_download_container
-            ),
+            aiohttp.web.get("/download/{project}/{container}", swift_download_container),
             aiohttp.web.get(
                 "/download/{project}/{container}/{object:.*}",
                 swift_download_shared_object,
@@ -178,9 +176,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add upload routes
     app.add_routes(
         [
-            aiohttp.web.post(
-                "/upload/{project}/{container}", swift_upload_object_chunk
-            ),
+            aiohttp.web.post("/upload/{project}/{container}", swift_upload_object_chunk),
             aiohttp.web.get("/upload/{project}/{container}", swift_check_object_chunk),
         ]
     )
@@ -242,7 +238,7 @@ def run_server_secure(
         + "-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM"
         + "-SHA256:DHE-RSA-AES256-GCM-SHA384"
     )
-    logger.debug("Setting following ciphers for SSL context: \n%s", cipher_str)
+    logger.debug(f"Setting following ciphers for SSL context: \n{cipher_str}")
     sslcontext.set_ciphers(cipher_str)
     sslcontext.options |= ssl.OP_NO_TLSv1
     sslcontext.options |= ssl.OP_NO_TLSv1_1

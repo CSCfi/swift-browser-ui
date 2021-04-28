@@ -50,9 +50,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
     request_api_address = setd["request_internal_endpoint"]
 
     if not sharing_api_address or not request_api_address:
-        raise aiohttp.web.HTTPNotFound(
-            reason=("External APIs not configured on server")
-        )
+        raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}/{ident}"
     signature = await sign(3600, path)
@@ -106,9 +104,7 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
     request_api_address = setd["request_internal_endpoint"]
 
     if not sharing_api_address or not request_api_address:
-        raise aiohttp.web.HTTPNotFound(
-            reason=("External APIs not configured on server")
-        )
+        raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}/{ident}"
     signature = await sign(3600, path)
@@ -145,9 +141,7 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
     request_api_address = setd["request_internal_endpoint"]
 
     if not sharing_api_address or not request_api_address:
-        raise aiohttp.web.HTTPNotFound(
-            reason=("External APIs not configured on server")
-        )
+        raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}"
     signature = await sign(3600, path)
@@ -185,9 +179,7 @@ async def handle_form_post_signature(
 ) -> aiohttp.web.Response:
     """Handle call for a form signature."""
     session = api_check(request)
-    LOGGER.info(
-        "API call for download object from %s, sess. %s", request.remote, session
-    )
+    LOGGER.info(f"API call for download object from {request.remote}, sess: {session}")
 
     serv = request.app["Sessions"][session]["ST_conn"]
     sess = request.app["Sessions"][session]["OS_sess"]
@@ -197,7 +189,7 @@ async def handle_form_post_signature(
         serv,
         # container
     )
-    LOGGER.debug("Using %s as temporary URL key.", temp_url_key)
+    LOGGER.debug(f"Using {temp_url_key} as tempiorary URL key.")
 
     host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
     path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
