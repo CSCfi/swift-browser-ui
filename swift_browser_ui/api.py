@@ -574,7 +574,7 @@ async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Resp
         return aiohttp.web.json_response(ret)
     except KeyError:
         request.app["Log"].error(
-            "items is missing; possible allas " "is not authorised for project."
+            "items is missing; possible swift storage is not authorised for project."
         )
         return aiohttp.web.json_response(ret)
 
