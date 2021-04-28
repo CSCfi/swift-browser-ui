@@ -48,7 +48,7 @@ def test_swift_endpoint(endpoint: str) -> None:
             reason="Cannot get Swift endpoint connection."
         )
     else:
-        logging.info("Swift endpoint accessible ")
+        logging.info("Swift endpoint accessible.")
 
 
 async def sign(
