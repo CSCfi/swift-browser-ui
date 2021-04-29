@@ -284,7 +284,7 @@ def get_availability_from_token(token: str) -> dict:
     with urllib.request.urlopen(drq, timeout=20) as domains:  # nosec
         output_domains = json.loads(domains.read().decode("utf-8"))
 
-    logging.info("%s\n%s", str(output_projects), str(output_domains))
+    logging.info(f"{str(output_projects)}\n{str(output_domains)}")
 
     # we need to take the projects that have been enabled for the
     # user, otherwise if the first project is disabled we will

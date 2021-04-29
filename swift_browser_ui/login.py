@@ -286,13 +286,13 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
     if not setd["set_session_devmode"]:
         try:
             session = decrypt_cookie(request)["id"]
-            log.info("Killing session for %s :: %s", session, time.ctime())
+            log.info(f"Killing session for {session} :: {time.ctime()}")
             clear_session_info(request.app["Sessions"])
             # Purge the openstack connection from the server
             request.app["Sessions"].pop(session)
             log.debug(f"Removed session {session} from session list :: {time.ctime()}")
         except aiohttp.web.HTTPUnauthorized:
-            log.info("Trying to log out an invalidated session: {0}".format(session))
+            log.info(f"Trying to log our an invalidated session: {session}")
     response = aiohttp.web.Response(status=303)
     response.headers["Location"] = "/"
     return response

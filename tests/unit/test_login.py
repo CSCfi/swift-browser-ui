@@ -45,11 +45,8 @@ class LoginTestClass(asynctest.TestCase):
             self.assertEqual(resp.status, 302)
             self.assertEqual(
                 resp.headers["Location"],
-                (
-                    "https://example.os.com:5001/v3"
-                    + _path
-                    + "?origin={origin}".format(origin="https://localhost/login/websso")
-                ),
+                f"https://example.os.com:5001/v3{_path}"
+                "?origin=https://localhost/login/websso",
             )
 
     async def test_sso_query_begin_without_trust(self):
