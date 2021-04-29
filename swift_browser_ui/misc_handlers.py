@@ -7,7 +7,7 @@ from ._convenience import session_check
 
 
 async def handle_bounce_direct_access_request(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Redirect user to a correct access request page."""
     session_check(request)
@@ -15,17 +15,10 @@ async def handle_bounce_direct_access_request(
     try:
         container = request.query["container"]
         owner = request.query["owner"]
-        resp = aiohttp.web.Response(
-            status=307
-        )
-        resp.headers["Location"] = (
-            "/browse/sharing/requestdirect?container=" +
-            container +
-            "&owner=" +
-            owner
-        )
+        resp = aiohttp.web.Response(status=307)
+        resp.headers[
+            "Location"
+        ] = f"/browse/sharing/requestdirect?container={container}&owner={owner}"
         return resp
     except KeyError:
-        raise aiohttp.web.HTTPClientError(
-            reason="Query string missing parameters"
-        )
+        raise aiohttp.web.HTTPClientError(reason="Query string missing parameters")
