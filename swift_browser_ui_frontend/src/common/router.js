@@ -11,6 +11,7 @@ import Sharing from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
 import Tokens from "@/views/Tokens";
+import CreateContainer from "@/views/AddContainer";
 
 Vue.use(Router);
 
@@ -36,6 +37,11 @@ export default new Router({
       path: "/browse/sharing/share",
       name: "Sharing",
       component: Sharing,
+    },
+    {
+      path: "/browse/container/add",
+      name: "AddContainer",
+      component: CreateContainer,
     },
     {
       path: "/browse/sharing/requestdirect",
