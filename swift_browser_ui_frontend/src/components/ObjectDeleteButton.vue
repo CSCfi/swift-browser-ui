@@ -38,7 +38,7 @@ export default {
     deleteObjects: function () {
       this.$buefy.toast.open("Objects deleted");
       let to_remove = new Array;
-      if (typeof(objects) == "string") {
+      if (typeof(this.$props.objects) == "string") {
         to_remove.push(this.$props.objects);
       } else {
         for (let object of this.$props.objects) {
