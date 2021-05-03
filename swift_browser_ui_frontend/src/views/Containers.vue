@@ -46,13 +46,17 @@
         />
       </b-field>
       <div class="field has-addons uploadGroup">
-        <router-link
-          :to="{name: 'AddContainer'}"
-          class="button is-primary is-outlined"
-        >
-          {{ $t('message.createContainerButton') }}
-        </router-link>
-        <FolderUploadForm dropelement="container-table" />
+        <p class="control">
+          <router-link
+            :to="{name: 'AddContainer'}"
+            class="button is-primary is-outlined"
+          >
+            {{ $t('message.createContainerButton') }}
+          </router-link>
+        </p>
+        <p class="control">
+          <FolderUploadForm dropelement="container-table" />
+        </p>
       </div>
     </b-field>
     <b-table
