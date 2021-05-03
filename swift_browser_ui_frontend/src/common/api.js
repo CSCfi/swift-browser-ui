@@ -242,6 +242,22 @@ export async function swiftCreateContainer (
 }
 
 
+export async function swiftDeleteContainer (
+  container,
+) {
+  let fetchURL = new URL ( "/api/containers/".concat(
+    container,
+  ), document.location.origin);
+
+  let ret = await fetch(
+    fetchURL, { method: "DELETE", credentials: "same-origin" },
+  );
+  if (ret.status != 204) {
+    throw new Error("Container deletion not successful.");
+  }
+}
+
+
 export async function swiftCopyContainer (
   project,
   container,
