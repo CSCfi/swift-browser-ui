@@ -144,6 +144,20 @@
                 :container="props.row.name"
               />
             </p>
+            <p class="control">
+              <DeleteContainerButton
+                v-if="selected==props.row"
+                :inverted="true"
+                :disabled="!props.row.count ? false : true"
+                :container="props.row.name"
+              />
+              <DeleteContainerButton
+                v-else
+                :inverted="false"
+                :disabled="!props.row.count ? false : true"
+                :container="props.row.name"
+              />
+            </p>
             <p
               v-if="!props.row.bytes"
               class="control"
@@ -247,6 +261,7 @@ import escapeRegExp from "lodash/escapeRegExp";
 import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
+import DeleteContainerButton from "@/components/ContainerDeleteButton";
 
 export default {
   name: "Containers",
@@ -254,6 +269,7 @@ export default {
     FolderUploadForm,
     ContainerDownloadLink,
     ReplicateContainerButton,
+    DeleteContainerButton,
   },
   data: function () {
     return {
