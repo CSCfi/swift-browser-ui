@@ -1,30 +1,15 @@
 <template>
   <div class="contents">
-    <b-field
-      horizontal
-      :label="$t('message.request.container')"
-      :message="$t('message.request.container_message')"
+    <b-button
+      type="is-primary"
+      outlined
+      :size="size"
+      :inverted="inverted"
+      :disabled="disabled"
+      @click="confirmDelete ()"
     >
-      <b-input 
-        v-model="container"
-        name="container"
-        expanded
-        aria-required="true"
-      />
-    </b-field>
-
-    <b-field
-      horizontal
-    >
-      <p class="control">
-        <button
-          class="button is-primary"
-          @click="createContainer ()"
-        >
-          {{ $t('message.copy') }}
-        </button>
-      </p>
-    </b-field>
+      {{ $t('message.delete') }}
+    </b-button>
   </div>
 </template>
 
@@ -32,16 +17,42 @@
 import {swiftDeleteObjects} from "@/common/api";
 
 export default {
-  name: "CreateContainer",
-  data () {
-    return {
-      container: "",
-    };
-  },
+  name: "DeleteObjectsButton",
+  props: [
+    "disabled",
+    "inverted",
+    "size",
+    "objects",
+  ],
   methods: {
-    createContainer: function () {
-      swiftCreateContainer(this.container).then(() => {
-        this.$router.go();
+    confirmDelete: function () {
+      this.$buefy.dialog.confirm({
+        title: "Delete Object / Objects",
+        message: "Are you sure you want do delete these objects?",
+        confirmText: "Delete Objects",
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => {this.deleteObjects();},
+      });
+    },
+    deleteObjects: function () {
+      this.$buefy.toast.open("Objects deleted");
+      let to_remove = new Array;
+      if (typeof(objects) == "string") {
+        to_remove.push(this.$props.objects);
+      } else {
+        for (let object of this.$props.objects) {
+          to_remove.push(object.name);
+        }
+      }
+      swiftDeleteObjects(
+        this.$route.params.container,
+        to_remove,
+      ).then(() => {
+        this.$store.commit({
+          type: "updateObjects",
+          route: this.$route,
+        });
       });
     },
   },
