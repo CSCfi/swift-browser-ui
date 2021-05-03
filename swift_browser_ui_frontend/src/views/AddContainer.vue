@@ -21,7 +21,7 @@
           class="button is-primary"
           @click="createContainer ()"
         >
-          {{ $t('message.copy') }}
+          {{ $t('message.create') }}
         </button>
       </p>
     </b-field>
