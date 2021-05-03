@@ -103,7 +103,7 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
 async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Delete an empty container."""
     if "objects" in request.query:
-        return await swift_delete_object(request)
+        return await swift_delete_objects(request)
     try:
         session = api_check(request)
         request.app["Log"].info(
@@ -121,7 +121,7 @@ async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     return aiohttp.web.Response(status=204)
 
 
-async def swift_delete_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def swift_delete_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Delete an object."""
     try:
         session = api_check(request)
@@ -136,7 +136,7 @@ async def swift_delete_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
             "versions": False,
             "header": [],
         }
-        res = request.app["Session"][session]["ST_conn"].delete(
+        res = request.app["Sessions"][session]["ST_conn"].delete(
             container=request.match_info["container"],
             objects=request.query["objects"].split(","),
             options=options,
@@ -144,9 +144,10 @@ async def swift_delete_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     except (SwiftError, ClientException):
         request.app["Log"].error("Object deletion failed.")
         raise aiohttp.web.HTTPServerError(reason="Object deletion failure")
-    if res["success"]:
-        return aiohttp.web.Response(status=204)
-    raise aiohttp.web.HTTPServerError(reason=res["error"])
+    for item in res:
+        if not item["success"]:
+            raise aiohttp.web.HTTPServerError(reason=item["error"])
+    return aiohttp.web.Response(status=204)
 
 
 async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
