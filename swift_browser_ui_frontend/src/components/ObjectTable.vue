@@ -352,6 +352,7 @@ export default {
       } else {
         this.oList = this.objects;
       }
+      this.checkedRows = [];
     },
     prefix: function () {
       if (this.renderFolders) {
