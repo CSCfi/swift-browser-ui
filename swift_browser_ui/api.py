@@ -100,6 +100,54 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     raise aiohttp.web.HTTPClientError(reason=res["error"])
 
 
+async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Delete an empty container."""
+    if "objects" in request.query:
+        return await swift_delete_object(request)
+    try:
+        session = api_check(request)
+        request.app["Log"].info(
+            f"API call for container deletion from {request.remote}, sess {session}"
+        )
+        res = request.app["Sessions"][session]["ST_conn"].delete(
+            container=request.match_info["container"]
+        )
+    except (SwiftError, ClientException):
+        request.app["Log"].error("Container deletion failed.")
+        raise aiohttp.web.HTTPServerError(reason="Container deletion failure")
+    if res["success"]:
+        return aiohttp.web.Response(status=204)
+    raise aiohttp.web.HTTPServerError(reason=res["error"])
+
+
+async def swift_delete_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Delete an object."""
+    try:
+        session = api_check(request)
+        request.app["Log"].info(
+            f"API call for object deletion from {request.remote}, sess {session}"
+        )
+        options: typing.Dict[str, typing.Any] = {
+            "yes_all": False,
+            "leave_segments": False,
+            "version_id": None,
+            "prefix": request.query["prefix"] if "prefix" in request.query else None,
+            "versions": False,
+            "header": [],
+        }
+        res = request.app["Session"][session]["ST_conn"].delete(
+            container=request.match_info["container"],
+            objects=request.query["objects"].split(","),
+            options=options,
+        )
+    except (SwiftError, ClientException):
+        request.app["Log"].error("Object deletion failed.")
+        raise aiohttp.web.HTTPServerError(reason="Object deletion failure")
+    if res["success"]:
+        return aiohttp.web.Response(status=204)
+    raise aiohttp.web.HTTPServerError(reason=res["error"])
+
+
 async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """
     List objects in a given bucket or container.

@@ -39,6 +39,7 @@ from .api import (
     add_project_container_acl,
     get_shared_container_address,
     swift_create_container,
+    swift_delete_container,
     swift_upload_object_chunk,
     swift_check_object_chunk,
     swift_replicate_container,
@@ -146,6 +147,7 @@ async def servinit() -> aiohttp.web.Application:
         [
             aiohttp.web.get("/api/buckets", swift_list_buckets),
             aiohttp.web.put("/api/containers/{container}", swift_create_container),
+            aiohttp.web.delete("/api/containers/{container}", swift_delete_container),
             aiohttp.web.get("/api/bucket/objects", swift_list_objects),
             aiohttp.web.get("/api/object/dload", swift_download_object),
             aiohttp.web.get("/api/shared/objects", swift_list_shared_objects),
