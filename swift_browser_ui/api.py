@@ -115,9 +115,10 @@ async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     except (SwiftError, ClientException):
         request.app["Log"].error("Container deletion failed.")
         raise aiohttp.web.HTTPServerError(reason="Container deletion failure")
-    if res["success"]:
-        return aiohttp.web.Response(status=204)
-    raise aiohttp.web.HTTPServerError(reason=res["error"])
+    for item in res:
+        if not item["success"]:
+            raise aiohttp.web.HTTPServerError(reason=item["error"])
+    return aiohttp.web.Response(status=204)
 
 
 async def swift_delete_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
