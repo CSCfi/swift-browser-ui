@@ -27,16 +27,16 @@ export default {
   methods: {
     confirmDelete: function () {
       this.$buefy.dialog.confirm({
-        title: "Delete Object / Objects",
-        message: "Are you sure you want do delete these objects?",
-        confirmText: "Delete Objects",
+        title: this.$t("message.objects.deleteObjects"),
+        message: this.$t("message.objects.deleteObjectsMessage"),
+        confirmText: this.$t("message.objects.deleteConfirm"),
         type: "is-danger",
         hasIcon: true,
         onConfirm: () => {this.deleteObjects();},
       });
     },
     deleteObjects: function () {
-      this.$buefy.toast.open("Objects deleted");
+      this.$buefy.toast.open(this.$t("message.objects.deleteSuccess"));
       let to_remove = new Array;
       if (typeof(this.$props.objects) == "string") {
         to_remove.push(this.$props.objects);

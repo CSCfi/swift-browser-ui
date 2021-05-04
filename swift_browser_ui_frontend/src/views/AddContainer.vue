@@ -4,12 +4,12 @@
     class="contents"
   >
     <h1 class="title is-3 addcontainerhead">
-      Add a new container
+      {{ $t('message.container_ops.addContainer') }}
     </h1>
     <b-field
       horizontal
-      :label="$t('message.request.container')"
-      :message="$t('message.request.container_message')"
+      :label="$t('message.container_ops.containerName')"
+      :message="$t('message.container_ops.containerMessage')"
     >
       <b-input 
         v-model="container"
