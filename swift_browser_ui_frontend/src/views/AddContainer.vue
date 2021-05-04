@@ -1,5 +1,11 @@
 <template>
-  <div class="contents">
+  <div 
+    id="addview"
+    class="contents"
+  >
+    <h1 class="title is-3 addcontainerhead">
+      Add a new container
+    </h1>
     <b-field
       horizontal
       :label="$t('message.request.container')"
@@ -17,12 +23,13 @@
       horizontal
     >
       <p class="control">
-        <button
-          class="button is-primary"
+        <b-button
+          type="is-primary"
+          class="addcontainerbutton"
           @click="createContainer ()"
         >
           {{ $t('message.create') }}
-        </button>
+        </b-button>
       </p>
     </b-field>
   </div>
@@ -47,3 +54,17 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  #addview {
+    width: auto;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+  .addcontainerhead {
+    margin: 1% 1% 1% 0;
+  }
+  .addcontainerbutton {
+    margin: 1%;
+  }
+</style>
