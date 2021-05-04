@@ -67,7 +67,7 @@
         </p>
         <p class="control">
           <b-button
-            label="Clear checked"
+            :label="$t('message.table.clearChecked')"
             type="is-primary"
             outlined
             @click="checkedRows = []"

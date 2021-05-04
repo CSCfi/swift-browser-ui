@@ -41,6 +41,7 @@ const translations = {
         owner: "Container owner",
         created: "Created",
         folderDetails: "No details for folders",
+        clearChecked: "Clear checked",
       },
       discover: {
         sync_shares: "Synchronize shared containers",
@@ -123,6 +124,7 @@ const translations = {
                        "Please verify that the correct project is set " +
                        "active in the menu, and submit the request with " +
                        "the Request button.",
+        requestHeading: "Request access to a container",
       },
       largeFileMessage: "",
       download: " Download",
@@ -158,6 +160,22 @@ const translations = {
       copysuccess: "Started copying the container in the background",
       copyfail: "Failed to copy the container",
       renderFolders: "Render as Folders",
+      container_ops: {
+        addContainer: "Add a new container",
+        deleteConfirm: "Delete Container",
+        deleteConfirmMessage: "Are you sure you want to delete this " +
+                              "container?",
+        deleteSuccess: "Container Deleted",
+        containerName: "Container",
+        containerMessage: "The name of the new container",
+      },
+      objects: {
+        deleteConfirm: "Delete Objects",
+        deleteObjects: "Delete Object / Objects",
+        deleteSuccess: "Objects deleted",
+        deleteObjectsMessage: "Are you sure you want to delete these " +
+                              "objects?",
+      },
       replicate: {
         destinationLabel: "Destination container",
         destinationMessage: "Insert copy destination container here",
@@ -219,6 +237,7 @@ const translations = {
         owner: "Säiliön omistaja",
         created: "Luotu",
         folderDetails: "Ei yksityiskohtia kansioille",
+        clearChecked: "Poista valinnat",
       },
       discover: {
         sync_shares: "Synkronoi jaetut säiliöt",
@@ -301,6 +320,7 @@ const translations = {
                        "Tarkistathan, että haluttu projekti on valittu " +
                        "valikossa, ja lisää pyyntö Pyydä jakoa " +
                        "-painikkeella.",
+        requestHeading: "Pyydä oikeuksia säiliöön",
       },
       largeFileMessage: "",
       download: " Lataa",
@@ -336,6 +356,20 @@ const translations = {
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
+      container_ops: {
+        addContainer: "Luo uusi säiliö",
+        deleteConfirm: "Poista säiliö",
+        deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
+        deleteSuccess: "Säiliö poistettu",
+        containerName: "Säiliö",
+        containerMessage: "Uuden säiliön nimi",
+      },
+      objects: {
+        deleteConfirm: "Poista objektit",
+        deleteObjects: "Poista objekti / objektit",
+        deleteSuccess: "Objektit poistettu",
+        deleteObjectsMessage: "Halutako varmasti poistaa nämä objektit?",
+      },
       replicate: {
         destinationLabel: "Kohdesäiliö",
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",

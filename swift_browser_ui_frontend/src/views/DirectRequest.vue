@@ -4,7 +4,7 @@
     class="contents"
   >
     <h1 class="title is-3 requesthead">
-      Requets access to a container
+      {{ $t('message.request.requestHeading') }}
     </h1>
     <b-field
       v-if="projects.length > 1"

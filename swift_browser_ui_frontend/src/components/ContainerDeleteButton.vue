@@ -26,16 +26,16 @@ export default {
   methods: {
     confirmDelete: function () {
       this.$buefy.dialog.confirm({
-        title: "Delete Container",
-        message: "Are you sure you want do delete this container?",
-        confirmText: "Delete Container",
+        title: this.$t("message.container_ops.deleteConfirm"),
+        message: this.$t("message.container_ops.deleteConfirmMessage"),
+        confirmText: this.$t("message.container_ops.deleteConfirm"),
         type: "is-danger",
         hasIcon: true,
         onConfirm: () => {this.deleteContainer();},
       });
     },
     deleteContainer: function () {
-      this.$buefy.toast.open( "Container deleted");
+      this.$buefy.toast.open(this.$t("message.container_ops.deleteSuccess"));
       swiftDeleteContainer(this.container).then(() => {
         this.$store.commit("updateContainers");
       });
