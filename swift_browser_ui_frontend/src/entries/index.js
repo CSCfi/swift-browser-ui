@@ -7,7 +7,7 @@ import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
 
 // Import project css
-import "buefy/dist/buefy.css";
+import "@/css/csc.scss";
 
 Vue.config.productiontip = true;
 
