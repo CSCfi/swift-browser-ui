@@ -86,7 +86,7 @@
         :label="$t('message.table.name')"
       >
         <template #default="props">
-          <span v-if="!props.row.bytes">
+          <span v-if="!props.row.count">
             <b-icon
               icon="folder-outline"
               size="is-small"
