@@ -94,6 +94,7 @@ def navigate_to_next_container_from_search(drv):
     (
         webdriver.common.action_chains.ActionChains(drv)
         .send_keys(Keys.TAB)
+        .send_keys(Keys.TAB)
         .send_keys(Keys.ARROW_DOWN)
         .send_keys(Keys.ENTER)
         .perform()
