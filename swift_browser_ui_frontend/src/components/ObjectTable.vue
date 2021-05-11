@@ -159,7 +159,7 @@
       <b-table-column
         field="functions"
         label=""
-        width="150"
+        width="90"
       >
         <template #default="props">
           <div class="field has-addons">
@@ -224,14 +224,16 @@
         label=""
         width="75"
       >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <DeleteObjectsButton
-          v-else
-          size="is-small"
-          :inverted="props.row === selected ? true : false"
-          :disabled="false"
-          :objects="props.row.name"
-        />
+        <template #default="props">
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <DeleteObjectsButton
+            v-else 
+            size="is-small"
+            :inverted="props.row === selected ? true : false"
+            :disabled="false"
+            :objects="props.row.name"
+          />
+        </template>
       </b-table-column>
       <template
         #detail="props"
