@@ -2,7 +2,7 @@
   <div class="contents">
     <b-button
       type="is-danger"
-      icon="delete"
+      icon-left="delete"
       outlined
       size="is-small"
       :inverted="inverted"
