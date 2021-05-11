@@ -48,7 +48,7 @@ export default {
   methods: {
     createContainer: function () {
       swiftCreateContainer(this.container).then(() => {
-        this.$router.go();
+        this.$router.go(-1);
       });
     },
   },

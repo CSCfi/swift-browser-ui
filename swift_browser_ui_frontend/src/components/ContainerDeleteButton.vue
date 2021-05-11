@@ -1,7 +1,8 @@
 <template>
   <div class="contents">
     <b-button
-      type="is-primary"
+      type="is-danger"
+      icon="delete"
       outlined
       size="is-small"
       :inverted="inverted"
@@ -35,7 +36,10 @@ export default {
       });
     },
     deleteContainer: function () {
-      this.$buefy.toast.open(this.$t("message.container_ops.deleteSuccess"));
+      this.$buefy.toast.open({
+        message: this.$t("message.container_ops.deleteSuccess"),
+        type: "is-success",
+      });
       swiftDeleteContainer(this.container).then(() => {
         this.$store.commit("updateContainers");
       });

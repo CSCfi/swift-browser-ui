@@ -144,20 +144,6 @@
                 :container="props.row.name"
               />
             </p>
-            <p class="control">
-              <DeleteContainerButton
-                v-if="selected==props.row"
-                :inverted="true"
-                :disabled="!props.row.count ? false : true"
-                :container="props.row.name"
-              />
-              <DeleteContainerButton
-                v-else
-                :inverted="false"
-                :disabled="!props.row.count ? false : true"
-                :container="props.row.name"
-              />
-            </p>
             <p
               v-if="!props.row.bytes"
               class="control"
@@ -242,6 +228,26 @@
               />
             </p>
           </div>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
+        <template #default="props">
+          <DeleteContainerButton
+            v-if="selected==props.row"
+            :inverted="true"
+            :disabled="!props.row.count ? false : true"
+            :container="props.row.name"
+          />
+          <DeleteContainerButton
+            v-else
+            :inverted="false"
+            :disabled="!props.row.count ? false : true"
+            :container="props.row.name"
+          />
         </template>
       </b-table-column>
 
