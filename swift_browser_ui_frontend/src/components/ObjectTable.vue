@@ -52,14 +52,6 @@
           <FolderUploadForm dropelement="object-table" />
         </p>
         <p class="control">
-          <DeleteObjectsButton
-            size="is-normal"
-            :inverted="false"
-            :disabled="checkedRows.length == 0 ? true : false"
-            :objects="checkedRows"
-          />
-        </p>
-        <p class="control">
           <ContainerDownloadLink />
         </p>
         <p class="control">
@@ -73,6 +65,14 @@
             @click="checkedRows = []"
           />
         </p>
+      </div>
+      <div>
+        <DeleteObjectsButton
+          size="is-normal"
+          :inverted="false"
+          :disabled="checkedRows.length == 0 ? true : false"
+          :objects="checkedRows"
+        />
       </div>
     </b-field>
     <b-table
@@ -216,20 +216,22 @@
                 /> {{ $t('message.download') }}
               </b-button>
             </p>
-            <span v-if="renderFolders && !isFile(props.row.name)" />
-            <p
-              v-else
-              class="control"
-            >
-              <DeleteObjectsButton
-                size="is-small"
-                :inverted="props.row === selected ? true : false"
-                :disabled="false"
-                :objects="props.row.name"
-              />
-            </p>
           </div>
         </template>
+      </b-table-column>
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
+        <span v-if="renderFolders && !isFile(props.row.name)" />
+        <DeleteObjectsButton
+          v-else
+          size="is-small"
+          :inverted="props.row === selected ? true : false"
+          :disabled="false"
+          :objects="props.row.name"
+        />
       </b-table-column>
       <template
         #detail="props"
