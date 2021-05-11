@@ -148,13 +148,13 @@
               <DeleteContainerButton
                 v-if="selected==props.row"
                 :inverted="true"
-                :disabled="!props.row.count ? false : true"
+                :disabled="false"
                 :container="props.row.name"
               />
               <DeleteContainerButton
                 v-else
                 :inverted="false"
-                :disabled="!props.row.count ? false : true"
+                :disabled="false"
                 :container="props.row.name"
               />
             </p>
