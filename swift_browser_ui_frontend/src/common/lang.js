@@ -168,6 +168,8 @@ const translations = {
         deleteSuccess: "Container Deleted",
         containerName: "Container",
         containerMessage: "The name of the new container",
+        fullDelete: "Deleting a container with contents requires deleting " +
+                    "all objects inside it first.",
       },
       objects: {
         deleteConfirm: "Delete Objects",
@@ -363,6 +365,7 @@ const translations = {
         deleteSuccess: "Säiliö poistettu",
         containerName: "Säiliö",
         containerMessage: "Uuden säiliön nimi",
+        fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
       },
       objects: {
         deleteConfirm: "Poista objektit",
