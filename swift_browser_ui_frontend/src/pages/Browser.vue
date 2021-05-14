@@ -75,7 +75,8 @@ html, body {
 }
 
 .searchBox {
-    width: 30%;
+    max-width: 30%;
+    width: auto;
     margin-right: auto;
     margin-left: auto;
 }
