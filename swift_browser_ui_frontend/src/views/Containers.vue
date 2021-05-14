@@ -47,13 +47,15 @@
       </b-field>
       <div class="field has-addons uploadGroup">
         <p class="control">
-          <router-link
+          <b-button
+            tag="router-link"
             :to="{name: 'AddContainer'}"
-            class="button is-primary is-outlined"
+            type="is-primary"
+            outlined
+            icon-left="folder-plus"
           >
-            <b-icon icon="folder-plus" />
-             {{ $t('message.createContainerButton') }}
-          </router-link>
+            {{ $t('message.createContainerButton') }}
+          </b-button>
         </p>
         <p class="control">
           <FolderUploadForm dropelement="container-table" />
