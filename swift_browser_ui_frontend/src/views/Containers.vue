@@ -51,7 +51,8 @@
             :to="{name: 'AddContainer'}"
             class="button is-primary is-outlined"
           >
-            {{ $t('message.createContainerButton') }}
+            <b-icon icon="folder-plus" />
+             {{ $t('message.createContainerButton') }}
           </router-link>
         </p>
         <p class="control">

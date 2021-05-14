@@ -30,6 +30,7 @@ export default {
           message: "Deleting a container requires deleting all objects first.",
           type: "is-danger",
           position: "is-top-right",
+          duration: 30000,
           hasIcon: true,
         });
         this.$router.push(
