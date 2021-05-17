@@ -16,7 +16,7 @@ setuptools.setup(
         "python-swiftclient==3.11.1",
         "cryptography==3.4.7",
         "keystoneauth1==4.3.1",
-        "click==7.1.2",
+        "click==8.0.0",
         "gunicorn>=20.0.1",
         "uvloop==0.15.2",
         "certifi==2020.12.05",
