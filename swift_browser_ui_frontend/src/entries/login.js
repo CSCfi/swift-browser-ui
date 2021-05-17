@@ -2,7 +2,7 @@ import Vue from "vue";
 import App from "@/pages/Login.vue";
 
 // Import project css
-import "@/css/csc.scss";
+import "@/css/prod.scss";
 
 new Vue ({
   data: {

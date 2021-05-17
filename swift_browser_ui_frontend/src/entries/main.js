@@ -25,7 +25,7 @@ import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 import store from "@/common/store";
 
 // Import project css
-import "@/css/csc.scss";
+import "@/css/prod.scss";
 
 // Import resumable
 import Resumable from "resumablejs";
