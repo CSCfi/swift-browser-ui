@@ -24,6 +24,8 @@ const translations = {
                         "button below.",
       },
       program_name: "Object Browser",
+      program_description: "Web UI for browsing contents in Swift object " +
+                           "storage systems.",
       currentProj: "Current project",
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
@@ -222,6 +224,8 @@ const translations = {
                         "painikkeesta",
       },
       program_name: "Object Browser",
+      program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
+                           "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Nykyinen projekti",
       logOut: "Kirjaudu ulos",
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
