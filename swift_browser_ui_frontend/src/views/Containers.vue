@@ -46,7 +46,20 @@
         />
       </b-field>
       <div class="field has-addons uploadGroup">
-        <FolderUploadForm dropelement="container-table" />
+        <p class="control">
+          <b-button
+            tag="router-link"
+            :to="{name: 'AddContainer'}"
+            type="is-primary"
+            outlined
+            icon-left="folder-plus"
+          >
+            {{ $t('message.createContainerButton') }}
+          </b-button>
+        </p>
+        <p class="control">
+          <FolderUploadForm dropelement="container-table" />
+        </p>
       </div>
     </b-field>
     <b-table
@@ -220,6 +233,26 @@
           </div>
         </template>
       </b-table-column>
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
+        <template #default="props">
+          <DeleteContainerButton
+            v-if="selected==props.row"
+            :inverted="true"
+            :objects="props.row.count"
+            :container="props.row.name"
+          />
+          <DeleteContainerButton
+            v-else
+            :inverted="false"
+            :objects="props.row.count"
+            :container="props.row.name"
+          />
+        </template>
+      </b-table-column>
 
       <template #empty>
         <p class="emptyTable">
@@ -237,6 +270,7 @@ import escapeRegExp from "lodash/escapeRegExp";
 import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
+import DeleteContainerButton from "@/components/ContainerDeleteButton";
 
 export default {
   name: "Containers",
@@ -244,6 +278,7 @@ export default {
     FolderUploadForm,
     ContainerDownloadLink,
     ReplicateContainerButton,
+    DeleteContainerButton,
   },
   data: function () {
     return {

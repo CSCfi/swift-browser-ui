@@ -57,6 +57,22 @@
         <p class="control">
           <ReplicateContainerButton />
         </p>
+        <p class="control">
+          <b-button
+            :label="$t('message.table.clearChecked')"
+            type="is-primary"
+            outlined
+            @click="checkedRows = []"
+          />
+        </p>
+      </div>
+      <div>
+        <DeleteObjectsButton
+          size="is-normal"
+          :inverted="false"
+          :disabled="checkedRows.length == 0 ? true : false"
+          :objects="checkedRows"
+        />
       </div>
     </b-field>
     <b-table
@@ -66,6 +82,10 @@
       hoverable
       narrowed
       header-checkable
+      checkable
+      checkbox-position="right"
+      :checked-rows.sync="checkedRows"
+      :is-row-checkable="isRowCheckable"
       default-sort="name"
       :data="oList"
       :selected.sync="selected"
@@ -137,61 +157,83 @@
         </span>
       </b-table-column>
       <b-table-column
-        v-slot="props"
-        field="url"
+        field="functions"
         label=""
-        width="110"
+        width="90"
       >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          <b-button
-            v-if="props.row.bytes < 1073741824"
-            :href="props.row.url"
-            target="_blank"
-            :inverted="props.row == selected ? true : false"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
+        <template #default="props">
+          <div class="field has-addons">
+            <span v-if="renderFolders && !isFile(props.row.name)" />
+            <p
+              v-else
+              class="control"
+            >
+              <b-button
+                v-if="props.row.bytes < 1073741824"
+                :href="props.row.url"
+                target="_blank"
+                :inverted="props.row == selected ? true : false"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                size="is-small"
+                tag="a"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+              <b-button
+                v-else-if="allowLargeDownloads"
+                :href="props.row.url"
+                target="_blank"
+                :inverted="props.row == selected ? true : false"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                size="is-small"
+                tag="a"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+              <b-button
+                v-else
+                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                :inverted="props.row === selected ? true : false"
+                size="is-small"
+                tag="a"
+                @click="confirmDownload ()"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+            </p>
+          </div>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
+        <template #default="props">
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <DeleteObjectsButton
+            v-else 
             size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else-if="allowLargeDownloads"
-            :href="props.row.url"
-            target="_blank"
-            :inverted="props.row == selected ? true : false"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
-            size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else
-            :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
             :inverted="props.row === selected ? true : false"
-            size="is-small"
-            tag="a"
-            @click="confirmDownload ()"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-        </span>
+            :disabled="false"
+            :objects="props.row.name"
+          />
+        </template>
       </b-table-column>
       <template
         #detail="props"
@@ -262,6 +304,7 @@ import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
+import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
 export default {
   name: "ObjectTable",
@@ -269,6 +312,7 @@ export default {
     ContainerDownloadLink,
     FolderUploadForm,
     ReplicateContainerButton,
+    DeleteObjectsButton,
   },
   data: function () {
     return {
@@ -280,6 +324,7 @@ export default {
       defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
+      checkedRows: [],
     };
   },
   computed: {
@@ -311,6 +356,7 @@ export default {
       } else {
         this.oList = this.objects;
       }
+      this.checkedRows = [];
     },
     prefix: function () {
       if (this.renderFolders) {
@@ -338,6 +384,9 @@ export default {
         type: "updateObjects",
         route: this.$route,
       });
+    },
+    isRowCheckable: function (row) {
+      return this.renderFolders ? this.isFile(row.name) : true;
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {

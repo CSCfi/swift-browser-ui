@@ -72,6 +72,7 @@ const store = new Vuex.Store({
             state.objectCache = ret;
           },
         ).catch(() => {
+          state.objectCache = [];
           state.isLoading = false;
         });
       }
@@ -83,6 +84,7 @@ const store = new Vuex.Store({
           state.objectCache = ret;
           state.isLoading = false;
         }).catch(() => {
+          state.objectCache = [];
           state.isLoading = false;
         });
       }
