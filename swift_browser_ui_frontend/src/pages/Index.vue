@@ -17,7 +17,9 @@
         </a>
       </div>
       <div>
-        <h2 class="is-csc-secondary">{{ $t("message.program_name") }}</h2>
+        <h2 class="is-csc-secondary">
+          {{ $t("message.program_name") }}
+        </h2>
         <p>{{ $t("message.program_description") }}</p>
       </div>
       <div>
