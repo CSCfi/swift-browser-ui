@@ -11,7 +11,7 @@
           class="center"
         >
           <img
-            src="@/assets/csc_logo.svg"
+            src="@/assets/logo.svg"
             :alt="$t('message.cscOrg')"
           >
         </a>
