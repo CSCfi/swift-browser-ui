@@ -85,6 +85,7 @@ new Vue({
     },
   },
   created() {
+    document.title = this.$t("message.program_name");
     this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);

@@ -8,6 +8,9 @@ new Vue ({
   data: {
     formname: "Token id:",
   },
+  created() {
+    document.title = this.$t("message.program_name");
+  },
   methods: {
     "displayInvalid": function () {
       if (
