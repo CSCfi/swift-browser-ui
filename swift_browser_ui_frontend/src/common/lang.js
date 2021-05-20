@@ -1,6 +1,8 @@
 // Ready translated locale messages
 
-const translations = {
+import lang_overrides from "@/assets/lang_overrides";
+
+let default_translations = {
   en: {
     message: {
       index: {
@@ -399,5 +401,24 @@ const translations = {
     },
   },
 };
+
+let translations = default_translations;
+
+function nestedJoin (dst, src) {
+  // Join two objects with nested content overriding with the latter
+  let to_assign = [];
+  for (let [key, value] of Object.entries(src)) {
+    if (typeof(value) == "object") {
+      to_assign.push([key, nestedJoin(dst[key], src[key])]);
+    } else {
+      to_assign.push([key, value]);
+    }
+  }
+  let ret = Object.assign(dst, Object.fromEntries(to_assign));
+  return ret;
+}
+
+// Override keys according to lang_overrides
+translations = nestedJoin(translations, lang_overrides);
 
 export default translations;
