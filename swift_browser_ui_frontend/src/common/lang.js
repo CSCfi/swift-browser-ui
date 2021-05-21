@@ -31,7 +31,7 @@ let default_translations = {
       currentProj: "Current project",
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
-      devel: "developed by",
+      devel: "Developed by",
       table: {
         name: "Name",
         objects: "Objects",

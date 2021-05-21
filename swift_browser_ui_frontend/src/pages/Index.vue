@@ -4,25 +4,26 @@
 <!-- make index page development more difficult. -->
 <template>
   <div class="indexpage">
-    <div class="contents">
-      <div>
+    <div>
+      <div class="block has-text-centered">
         <a 
           href="#"
           class="center"
         >
           <img
             src="@/assets/logo.svg"
+            class="csc-logo"
             :alt="$t('message.cscOrg')"
           >
         </a>
       </div>
-      <div>
-        <h2 class="is-csc-secondary">
+      <div class="content has-text-centered">
+        <h2 class="title is-4 is-csc-secondary">
           {{ $t("message.program_name") }}
         </h2>
         <p>{{ $t("message.program_description") }}</p>
       </div>
-      <div>
+      <div class="block">
         <b-message
           v-if="unauth"
           :title="$t('message.error.Unauthorized')"
@@ -91,7 +92,7 @@
           </option>
         </b-select>
       </b-field>
-      <div class="content has-text-centered">
+      <div class="block has-text-centered">
         <p>
           {{ $t("message.devel") }}
           <a
@@ -104,19 +105,24 @@
   </div>
 </template>
 
-<style scoped>
+<style>
+html, body {
+  height: 100%;
+}
 .indexpage {
   width: 40%;
   height: 100%;
   display: flex;
   flex-direction: column;
   margin: auto;
-}
-.contents {
-  flex: 1 0 auto;
+  align-content: center;
+  justify-content: center;
 }
 .center {
   width: 50%;
   margin: auto;
+}
+.csc-logo {
+  justify-content: center;
 }
 </style>
