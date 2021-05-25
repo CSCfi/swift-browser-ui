@@ -10,13 +10,16 @@
           :href="'/browse/'.concat(uname)"
         >
           <img
-            src="@/assets/csc_logo.svg"
+            src="@/assets/logo.svg"
             :alt="$t('message.cscOrg')"
           >
         </a>
       </div>
       <div class="navbar-menu">
         <div class="navbar-start">
+          <div class="navbar-item">
+            <b>{{ $t("message.program_name") }}</b>
+          </div>
           <div 
             v-if="multipleProjects"
             class="navbar-item is-hoverable"

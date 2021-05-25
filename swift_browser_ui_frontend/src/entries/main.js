@@ -25,7 +25,7 @@ import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 import store from "@/common/store";
 
 // Import project css
-import "buefy/dist/buefy.css";
+import "@/css/prod.scss";
 
 // Import resumable
 import Resumable from "resumablejs";
@@ -85,6 +85,7 @@ new Vue({
     },
   },
   created() {
+    document.title = this.$t("message.program_name");
     this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);

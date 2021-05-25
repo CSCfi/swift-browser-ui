@@ -2,11 +2,14 @@ import Vue from "vue";
 import App from "@/pages/Login.vue";
 
 // Import project css
-import "buefy/dist/buefy.css";
+import "@/css/prod.scss";
 
 new Vue ({
   data: {
     formname: "Token id:",
+  },
+  created() {
+    document.title = this.$t("message.program_name");
   },
   methods: {
     "displayInvalid": function () {

@@ -1,6 +1,8 @@
 // Ready translated locale messages
 
-const translations = {
+import lang_overrides from "@/assets/lang_overrides";
+
+let default_translations = {
   en: {
     message: {
       index: {
@@ -24,10 +26,12 @@ const translations = {
                         "button below.",
       },
       program_name: "Object Browser",
+      program_description: "Web UI for browsing contents in Swift object " +
+                           "storage systems.",
       currentProj: "Current project",
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
-      devel: "developed by",
+      devel: "Developed by",
       table: {
         name: "Name",
         objects: "Objects",
@@ -222,6 +226,8 @@ const translations = {
                         "painikkeesta",
       },
       program_name: "Object Browser",
+      program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
+                           "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Nykyinen projekti",
       logOut: "Kirjaudu ulos",
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
@@ -395,5 +401,24 @@ const translations = {
     },
   },
 };
+
+let translations = default_translations;
+
+function nestedJoin (dst, src) {
+  // Join two objects with nested content overriding with the latter
+  let to_assign = [];
+  for (let [key, value] of Object.entries(src)) {
+    if (typeof(value) == "object") {
+      to_assign.push([key, nestedJoin(dst[key], src[key])]);
+    } else {
+      to_assign.push([key, value]);
+    }
+  }
+  let ret = Object.assign(dst, Object.fromEntries(to_assign));
+  return ret;
+}
+
+// Override keys according to lang_overrides
+translations = nestedJoin(translations, lang_overrides);
 
 export default translations;

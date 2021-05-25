@@ -6,7 +6,10 @@ RUN apk add --update \
 
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
-RUN cd /root/swift_ui/swift_browser_ui_frontend \
+RUN cd /root/swift_ui/swift_browser_ui_frontend/src/assets \
+    && ln -f -s ../../config/sd_overrides.js lang_overrides.js \
+    && cd ../.. \
+    && ls -lh ./src/assets \
     && git clone --verbose https://github.com/CSCfi/swift-x-account-sharing.git \
     && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common/swift_x_account_sharing_bind.js \
     && rm -rf swift-x-account-sharing \

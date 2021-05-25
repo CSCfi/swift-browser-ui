@@ -7,7 +7,7 @@ import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
 
 // Import project css
-import "buefy/dist/buefy.css";
+import "@/css/prod.scss";
 
 Vue.config.productiontip = true;
 
@@ -29,6 +29,9 @@ new Vue({
     notfound: true,
     uidown: false,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
+  },
+  created() {
+    document.title = this.$t("message.program_name");
   },
   methods: {
     setCookieLang: function() {

@@ -138,18 +138,18 @@ export async function getProjectMeta () {
     .then( function ( json_ret ) {
       let newRet = json_ret;
       newRet["Size"] = getHumanReadableSize(newRet["Bytes"]);
-      if (newRet["Bytes"] > 1099511627776) {
+      if (newRet["Bytes"] > 10995116277760) {
         newRet["ProjectSize"] = newRet["Size"];
       } else {
-        newRet["ProjectSize"] = "1TiB";
+        newRet["ProjectSize"] = "10TiB";
       }
       // we check if it is greather than 0.4Mib if not we display with 10
       // decimal points
       if (newRet["Bytes"] > 900000) {
-        newRet["Billed"] = parseFloat(newRet["Bytes"] / 1099511627776)
+        newRet["Billed"] = parseFloat(newRet["Bytes"] / 10995116277760)
           .toPrecision(4);
       } else {
-        newRet["Billed"] = parseFloat(newRet["Bytes"] / 1099511627776)
+        newRet["Billed"] = parseFloat(newRet["Bytes"] / 10995116277760)
           .toFixed(10);
       }
       return newRet;
