@@ -48,6 +48,10 @@ $custom-colors: null !default;
 $custom-shades: null !default;
 
 
+// specific bulma variable overrides
+$menu-item-active-background-color: $csc-primary;
+
+
 $colors: mergeColorMaps(
   (
     "white": (

@@ -2,23 +2,23 @@
   <b-menu>
     <b-menu-list>
       <b-menu-item
-        :label="$t('message.share.to_me')"
         icon="folder-account"
         tag="router-link"
+        :label="$t('message.share.to_me')"
         :to="{name :'SharedTo' ,params: {project: $route.params.project}}"
         :active="$route.name == 'SharedTo' ? true : false"
       />
       <b-menu-item
-        :label="$t('message.share.from_me')"
         icon="share"
         tag="router-link"
+        :label="$t('message.share.from_me')"
         :to="{name: 'SharedFrom', params: {project: $route.params.project}}"
         :active="$route.name == 'SharedFrom' ? true : false"
       />
       <b-menu-item
-        :label="$t('message.share.request_sharing')"
         icon="folder-plus"
         tag="router-link"
+        :label="$t('message.share.request_sharing')"
         :to="{name: 'ShareRequests', params: {project: $route.params.project}}"
         :active="$route.name == 'ShareRequests' ? true : false"
       />
