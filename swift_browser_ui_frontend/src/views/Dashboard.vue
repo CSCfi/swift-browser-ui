@@ -164,7 +164,7 @@ export default {
       Billed: 0,
       Bytes: 0,
       DisableTooltip: false,
-      ProjectSize: "1TiB",
+      ProjectSize: "10TiB",
     };
   },
   beforeMount(){
