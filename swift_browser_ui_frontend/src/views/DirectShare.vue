@@ -8,7 +8,6 @@
     </h3>
     <b-field
       v-if="projects.length > 1"
-      horizontal
       :label="$t('message.share.from_me')"
     >
       <b-select
@@ -24,7 +23,9 @@
         </option>
       </b-select>
     </b-field>
-    <b-field grouped>
+    <b-field
+      grouped
+    >
       <b-switch
         v-model="read"
       >
@@ -37,7 +38,6 @@
       </b-switch>
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.share.container')"
     >
       <b-input 
@@ -47,7 +47,6 @@
         aria-required="true"
       />
     </b-field>
-
     <b-field
       :label="$t('message.share.field_label')"
     >
@@ -57,9 +56,7 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
+    <b-field>
       <p class="control">
         <button
           class="button is-primary"
@@ -107,8 +104,15 @@ export default {
   },
   methods: {
     createAndShare: function () {
-      this.asyncCreateAndShare().then(() => {
-        this.router.go("/");
+      this.asyncCreateAndShare().then((ret) => {
+        if (ret) {
+          this.router.go({
+            name: "SharedFrom",
+            params: {
+              project: this.active,
+            },
+          });
+        }
       });
     },
     asyncCreateAndShare: async function () {
@@ -144,6 +148,7 @@ export default {
         rights,
         await getSharedContainerAddress(),
       );
+      return true;
     },
     setActive: function (wait) {
       try {
