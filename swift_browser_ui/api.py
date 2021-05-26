@@ -639,7 +639,7 @@ async def get_access_control_metadata(
 
     # Get a list of containers
     containers: typing.List[dict] = []
-    [_unpack(i, containers, request) for i in serv]
+    [_unpack(i, containers, request) for i in serv.list()]
 
     host = sess.get_endpoint(service_type="object-store")
 
