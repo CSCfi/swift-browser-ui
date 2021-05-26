@@ -101,9 +101,9 @@ export default {
     },
   },
   beforeMount () {
-    this.setActive(50);
-    this.checkMultiProject(50);
-    this.setParams(50);
+    this.setActive(100);
+    this.setParams(100);
+    delay(this.checkMultiProject, 100, [200]);
   },
   methods: {
     createAndShare: function () {
@@ -113,10 +113,10 @@ export default {
     },
     asyncCreateAndShare: async function () {
       let rights = [];
-      if (this.$read) {
+      if (this.read) {
         rights.push("r");
       }
-      if (this.$write) {
+      if (this.write) {
         rights.push("w");
       }
       if (rights.length < 1) {
@@ -164,15 +164,14 @@ export default {
     },
     checkMultiProject: function (wait) {
       try {
-        if (this.projects.length > 1) {
+        if (this.projects.length == 1 && this.projects != undefined) {
+          this.createAndShare();
+        } else {
           this.$buefy.notification.open({
             indefinite: true,
             message: this.$t("message.request.multi_project"),
             type: "is-danger",
           });
-        }
-        else {
-          this.createAndShare();
         }
       } catch (ReferenceError) {
         delay(this.checkMultiProject, wait, [wait * 2]);

@@ -124,7 +124,6 @@ export default {
             type: "is-danger",
           });
         }
-
         else {
           this.requestShare();
         }
