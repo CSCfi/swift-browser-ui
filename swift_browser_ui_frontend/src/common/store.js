@@ -54,9 +54,9 @@ const store = new Vuex.Store({
       let container = payload.route.params.container;
       state.isLoading = true;
       if (payload.route.name == "SharedObjects") {
-        payload.route.params.project,
-        container,
         state.client.getAccessDetails(
+          payload.route.params.project,
+          container,
           payload.route.params.owner,
         ).then(
           (ret) => {

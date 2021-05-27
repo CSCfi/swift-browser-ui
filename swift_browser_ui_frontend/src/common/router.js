@@ -12,6 +12,7 @@ import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
 import Tokens from "@/views/Tokens";
 import CreateContainer from "@/views/AddContainer";
+import DirectShare from "@/views/DirectShare";
 
 Vue.use(Router);
 
@@ -47,6 +48,11 @@ export default new Router({
       path: "/browse/sharing/requestdirect",
       name: "DirectRequest",
       component: DirectRequest,
+    },
+    {
+      path: "/browse/sharing/sharedirect",
+      name: "DirectShare",
+      component: DirectShare,
     },
     {
       path: "/browse/shared/:project/:owner/:container",
