@@ -106,10 +106,10 @@ export default {
     createAndShare: function () {
       this.asyncCreateAndShare().then((ret) => {
         if (ret) {
-          this.$router.go({
+          this.$router.push({
             name: "SharedFrom",
             params: {
-              project: this.active,
+              project: this.active.id,
             },
           });
         }
