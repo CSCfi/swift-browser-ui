@@ -373,7 +373,6 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
-    // this.updateObjects();
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
