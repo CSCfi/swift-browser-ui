@@ -1,5 +1,11 @@
 <template>
-  <div class="contents">
+  <div
+    id="requestview"
+    class="contents"
+  >
+    <h1 class="title is-3 requesthead">
+      {{ $t('message.request.requestHeading') }}
+    </h1>
     <b-field
       v-if="projects.length > 1"
       horizontal
@@ -118,7 +124,6 @@ export default {
             type: "is-danger",
           });
         }
-
         else {
           this.requestShare();
         }
@@ -129,3 +134,14 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  #requestview {
+    width: auto;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+  .requesthead {
+    margin: 1% 1% 1% 0;
+  }
+</style>

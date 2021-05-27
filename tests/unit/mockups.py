@@ -14,57 +14,56 @@ from contextlib import contextmanager
 from swiftclient.service import SwiftError
 
 
-mock_token_project_avail = json.dumps({
-    "projects": [
-        # there is a special use case when this is first
-        # as the list of projects might give 401
-        {
-            "is_domain": False,
-            "description": "Not enabled project",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/no"
+mock_token_project_avail = json.dumps(
+    {
+        "projects": [
+            # there is a special use case when this is first
+            # as the list of projects might give 401
+            {
+                "is_domain": False,
+                "description": "Not enabled project",
+                "links": {"self": "https://place-holder-url:5001/v3/projects/no"},
+                "enabled": False,
+                "id": "no",
+                "parent_id": "default",
+                "domain_id": "default",
+                "name": "no",
             },
-            "enabled": False,
-            "id": "no",
-            "parent_id": "default",
-            "domain_id": "default",
-            "name": "no",
-        }, {
-            "is_domain": False,
-            "description": "",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            {
+                "is_domain": False,
+                "description": "",
+                "links": {
+                    "self": "https://place-holder-url:5001/v3/projects/placeholder"
+                },
+                "enabled": True,
+                "id": "placeholder",
+                "parent_id": "default",
+                "domain_id": "default",
+                "name": "placeholder",
             },
-            "enabled": True,
-            "id": "placeholder",
-            "parent_id": "default",
-            "domain_id": "default",
-            "name": "placeholder",
-        }, {
-            "is_domain": False,
-            "description": "Wololo yol aweii",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/wol"
+            {
+                "is_domain": False,
+                "description": "Wololo yol aweii",
+                "links": {"self": "https://place-holder-url:5001/v3/projects/wol"},
+                "enabled": True,
+                "id": "wol",
+                "parent_id": "default",
+                "domain_id": "default",
+                "name": "wol",
             },
-            "enabled": True,
-            "id": "wol",
-            "parent_id": "default",
-            "domain_id": "default",
-            "name": "wol",
-        }, {
-            "is_domain": False,
-            "description": "Hmmph, what is",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/what"
+            {
+                "is_domain": False,
+                "description": "Hmmph, what is",
+                "links": {"self": "https://place-holder-url:5001/v3/projects/what"},
+                "enabled": True,
+                "id": "what",
+                "parent_id": "default",
+                "domain_id": "default",
+                "name": "what",
             },
-            "enabled": True,
-            "id": "what",
-            "parent_id": "default",
-            "domain_id": "default",
-            "name": "what",
-        },
-    ],
-})
+        ],
+    }
+)
 
 
 mock_token_domain_avail = json.dumps({"domains": []})
@@ -75,31 +74,27 @@ mock_token_output = {
         {
             "is_domain": False,
             "description": "",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/placeholder"
-            },
+            "links": {"self": "https://place-holder-url:5001/v3/projects/placeholder"},
             "enabled": True,
             "id": "placeholder",
             "parent_id": "default",
             "domain_id": "default",
             "name": "placeholder",
-        }, {
+        },
+        {
             "is_domain": False,
             "description": "Wololo yol aweii",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/wol"
-            },
+            "links": {"self": "https://place-holder-url:5001/v3/projects/wol"},
             "enabled": True,
             "id": "wol",
             "parent_id": "default",
             "domain_id": "default",
             "name": "wol",
-        }, {
+        },
+        {
             "is_domain": False,
             "description": "Hmmph, what is",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/what"
-            },
+            "links": {"self": "https://place-holder-url:5001/v3/projects/what"},
             "enabled": True,
             "id": "what",
             "parent_id": "default",
@@ -148,23 +143,15 @@ class MockKeystone:
         """Read request."""
         if "X-auth-token" not in self.prq.headers:
             raise HTTPError(
-                url=None,
-                code=401,
-                msg="Unauthorized",
-                hdrs=self.prq.headers,
-                fp=None
+                url=None, code=401, msg="Unauthorized", hdrs=self.prq.headers, fp=None
             )
         if "projects" in self.prq.full_url:
-            return mock_token_project_avail.encode('utf-8')
+            return mock_token_project_avail.encode("utf-8")
         if "domains" in self.prq.full_url:
-            return mock_token_domain_avail.encode('utf-8')
+            return mock_token_domain_avail.encode("utf-8")
         else:
             raise HTTPError(
-                url=None,
-                code=401,
-                msg="Unauthorized",
-                hdrs=self.prq.headers,
-                fp=None
+                url=None, code=401, msg="Unauthorized", hdrs=self.prq.headers, fp=None
             )
 
 
@@ -238,23 +225,20 @@ class Mock_Service:
         self.obj_meta = {}
 
     def init_with_data(
-            self,
-            containers=0,
-            object_range=(0, 0),
-            size_range=(0, 0),
-            container_name_prefix="test-container-",
-            object_name_prefix=None,  # None for just the hash as name
-            has_content_type=None,
+        self,
+        containers=0,
+        object_range=(0, 0),
+        size_range=(0, 0),
+        container_name_prefix="test-container-",
+        object_name_prefix=None,  # None for just the hash as name
+        has_content_type=None,
     ):
         """Initialize the Mock_Service instance with some test data."""
         for i in range(0, containers):
             to_add = []
 
             # Iterate over a random amount of objects
-            for _ in range(
-                    0, random.randint(object_range[0],  # nosec
-                                      object_range[1])
-            ):
+            for _ in range(0, random.randint(object_range[0], object_range[1])):  # nosec
                 ohash = hashlib.sha1(os.urandom(256)).hexdigest()  # nosec
                 if object_name_prefix is not None:
                     oname = object_name_prefix + ohash
@@ -264,9 +248,7 @@ class Mock_Service:
                     "hash": ohash,
                     "name": oname,
                     "last_modified": datetime.datetime.now().isoformat(),
-                    "bytes": random.randint(  # nosec
-                        size_range[0], size_range[1]
-                    )
+                    "bytes": random.randint(size_range[0], size_range[1]),  # nosec
                 }
                 if has_content_type:
                     to_append["content_type"] = has_content_type
@@ -279,16 +261,14 @@ class Mock_Service:
         if container is None:
             ret = []
             for i in self.containers:
-                ret.append({
-                    "name": i,
-                    "count": len(self.containers[i]),
-                    "bytes": sum([j['bytes'] for j in self.containers[i]]),
-                })
-            return [{
-                "success": True,
-                "container": "mock-container",
-                "listing": ret
-            }]
+                ret.append(
+                    {
+                        "name": i,
+                        "count": len(self.containers[i]),
+                        "bytes": sum([j["bytes"] for j in self.containers[i]]),
+                    }
+                )
+            return [{"success": True, "container": "mock-container", "listing": ret}]
         if container is not None:
             ret = []
             try:
@@ -302,11 +282,7 @@ class Mock_Service:
                     if "content_type" in i.keys():
                         to_append["content_type"] = i["content_type"]
                     ret.append(to_append)
-                return [{
-                    "success": True,
-                    "container": container,
-                    "listing": ret
-                }]
+                return [{"success": True, "container": container, "listing": ret}]
             except KeyError:
                 raise SwiftError(None, container=container)
         else:
@@ -326,9 +302,12 @@ class Mock_Service:
                 object_amount = object_amount + len(self.containers[i])
                 # Iterate over all objects to get the total storage usage
                 for j in self.containers[i]:
-                    bytes_total = bytes_total + j['bytes']
+                    bytes_total = bytes_total + j["bytes"]
             ret["items"] = [
-                ("Account", "AUTH_test_account",),
+                (
+                    "Account",
+                    "AUTH_test_account",
+                ),
                 ("Containers", container_amount),
                 ("Objects", object_amount),
                 ("Bytes", bytes_total),
@@ -338,11 +317,11 @@ class Mock_Service:
             # Add the tempurl headers to the return dictionary, if they have
             # been initialized
             if self.meta["tempurl_key_1"] is not None:
-                ret['headers']['x-account-meta-temp-url-key'] = \
-                    self.meta["tempurl_key_1"]
+                ret["headers"]["x-account-meta-temp-url-key"] = self.meta["tempurl_key_1"]
             if self.meta["tempurl_key_2"] is not None:
-                ret['headers']['x-account-meta-temp-url-key-2'] =\
-                    self.meta["tempurl_key_2"]
+                ret["headers"]["x-account-meta-temp-url-key-2"] = self.meta[
+                    "tempurl_key_2"
+                ]
             return ret
 
         if len(args) == 1:
@@ -361,11 +340,11 @@ class Mock_Service:
             to_add = {}
             to_add["headers"] = {}
             if "Obj_example" in self.obj_meta[args[0]][i].keys():
-                to_add['headers']["x-object-meta-obj-example"] = "example"
-            if ("Obj_S3_example" in
-                    self.obj_meta[args[0]][i].keys()):
-                to_add['headers']["x-object-meta-s3cmd-attrs"] = \
-                    self.obj_meta[args[0]][i]["Obj_S3_example"]
+                to_add["headers"]["x-object-meta-obj-example"] = "example"
+            if "Obj_S3_example" in self.obj_meta[args[0]][i].keys():
+                to_add["headers"]["x-object-meta-s3cmd-attrs"] = self.obj_meta[args[0]][
+                    i
+                ]["Obj_S3_example"]
             to_add["success"] = True
             to_add["object"] = i
             ret.append(to_add)
@@ -374,17 +353,17 @@ class Mock_Service:
     def ret_cont_stat(self, args):
         """Return container stats from stat query."""
         ret = {}
-        ret['headers'] = {}
+        ret["headers"] = {}
         if "Acc_example" in self.cont_meta[args[0]].keys():
-            ret['container'] = args[0]
-            ret['headers']["x-container-meta-obj-example"] = "example"
-            ret['success'] = True
+            ret["container"] = args[0]
+            ret["headers"]["x-container-meta-obj-example"] = "example"
+            ret["success"] = True
         return ret
 
     def post(self, options=None):
         """Mock the post call of SwiftService."""
         # Get the URL key 2
-        key = options['meta'][0].split(':')[1]
+        key = options["meta"][0].split(":")[1]
         self.meta["tempurl_key_2"] = key
         return {"success": True}
 
@@ -402,8 +381,9 @@ class Mock_Service:
     def set_s3_meta_object(self, container, obj):
         """Generate test s3 metadata for an object."""
         self.obj_meta[container][obj] = {}
-        self.obj_meta[container][obj]["Obj_S3_example"] = \
-            "atime:1536648772/ctime:1536648921/gid:101/gname:example"
+        self.obj_meta[container][obj][
+            "Obj_S3_example"
+        ] = "atime:1536648772/ctime:1536648921/gid:101/gname:example"
 
 
 class Mock_Session:

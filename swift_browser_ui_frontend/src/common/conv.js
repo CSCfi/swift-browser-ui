@@ -51,22 +51,3 @@ export function getHumanReadableSize (val) {
   }
   return ret;
 }
-
-export function recursivePruneCache (object_cache) {
-  // Prune the object_cache until the cache is < 250000 objects in total
-  if (getNestedObjectTotal(object_cache) > 250000) {
-    delete object_cache[Object.keys(object_cache)[0]];
-    return recursivePruneCache(object_cache);
-  }
-  return object_cache;
-}
-
-function getNestedObjectTotal (nested) {
-  // Get the size of a object containing arrays, in the amount of total
-  // array elements
-  let ret = 0;
-  for (var key in nested) {
-    ret += nested[key].length;
-  }
-  return ret;
-}

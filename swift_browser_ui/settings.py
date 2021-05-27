@@ -44,54 +44,40 @@ FORMAT = """\
 [%(asctime)s][%(name)s][%(process)d %(processName)s][%(levelname)-8s] \
 (L:%(lineno)s) %(funcName)s: %(message)s\
 """
-logging.basicConfig(format=FORMAT, datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
 # Log from envvar as well, since the CLI shouldn't be the only option.
 # Semantics are identical with the frontend, so i.e.:
-logging.root.setLevel(environ.get('LOG_LEVEL', 'INFO'))
+logging.root.setLevel(environ.get("LOG_LEVEL", "INFO"))
 
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
 setd: Dict[str, Union[str, int, None]] = {
     "auth_endpoint_url": environ.get(
-        "BROWSER_START_AUTH_ENDPOINT_URL",
-        environ.get(
-            "OS_AUTH_URL", ""
-        )),
-    "sharing_endpoint": environ.get(
-        "BROWSER_START_SHARING_ENDPOINT_URL", None
+        "BROWSER_START_AUTH_ENDPOINT_URL", environ.get("OS_AUTH_URL", "")
     ),
+    "sharing_endpoint": environ.get("BROWSER_START_SHARING_ENDPOINT_URL", None),
     "sharing_internal_endpoint": environ.get(
         "BROWSER_START_SHARING_INT_ENDPOINT_URL", None
     ),
-    "request_endpoint": environ.get(
-        "BROWSER_START_REQUEST_ENDPOINT_URL", None
-    ),
+    "request_endpoint": environ.get("BROWSER_START_REQUEST_ENDPOINT_URL", None),
     "request_internal_endpoint": environ.get(
         "BROWSER_START_REQUEST_INT_ENDPOINT_URL", None
     ),
-    "upload_internal_endpoint": environ.get(
-        "BROWSER_START_RUNNER_ENDPOINT", None
-    ),
-    "upload_external_endpoint": environ.get(
-        "BROWSER_START_RUNNER_EXT_ENDPOINT", None
-    ),
-    "sharing_request_token": environ.get(
-        "SWIFT_UI_SHARING_REQUEST_TOKEN", None
-    ),
-    "has_trust": environ.get(
-        "BROWSER_START_HAS_TRUST", False
-    ),
-    "set_origin_address": environ.get(
-        "BROWSER_START_SET_ORIGIN_ADDRESS", None
-    ),
+    "upload_internal_endpoint": environ.get("BROWSER_START_RUNNER_ENDPOINT", None),
+    "upload_external_endpoint": environ.get("BROWSER_START_RUNNER_EXT_ENDPOINT", None),
+    "sharing_request_token": environ.get("SWIFT_UI_SHARING_REQUEST_TOKEN", None),
+    "has_trust": environ.get("BROWSER_START_HAS_TRUST", False),
+    "set_origin_address": environ.get("BROWSER_START_SET_ORIGIN_ADDRESS", None),
     "logfile": None,
     "port": 8080,
     "verbose": False,
     "debug": False,
     "version": None,
     "set_session_devmode": False,
-    "static_directory": __file__.replace("/settings.py", "") + "/static"
+    "static_directory": __file__.replace("/settings.py", "") + "/static",
+    "session_lifetime": 28800,
+    "history_lifetime": 2592000,
 }
 
 

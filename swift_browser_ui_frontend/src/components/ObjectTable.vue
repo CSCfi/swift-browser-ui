@@ -57,6 +57,22 @@
         <p class="control">
           <ReplicateContainerButton />
         </p>
+        <p class="control">
+          <b-button
+            :label="$t('message.table.clearChecked')"
+            type="is-primary"
+            outlined
+            @click="checkedRows = []"
+          />
+        </p>
+      </div>
+      <div>
+        <DeleteObjectsButton
+          size="is-normal"
+          :inverted="false"
+          :disabled="checkedRows.length == 0 ? true : false"
+          :objects="checkedRows"
+        />
       </div>
     </b-field>
     <b-table
@@ -66,6 +82,10 @@
       hoverable
       narrowed
       header-checkable
+      checkable
+      checkbox-position="right"
+      :checked-rows.sync="checkedRows"
+      :is-row-checkable="isRowCheckable"
       default-sort="name"
       :data="oList"
       :selected.sync="selected"
@@ -137,61 +157,83 @@
         </span>
       </b-table-column>
       <b-table-column
-        v-slot="props"
-        field="url"
+        field="functions"
         label=""
-        width="110"
+        width="90"
       >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          <b-button
-            v-if="props.row.bytes < 1073741824"
-            :href="props.row.url"
-            target="_blank"
-            :inverted="props.row == selected ? true : false"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
+        <template #default="props">
+          <div class="field has-addons">
+            <span v-if="renderFolders && !isFile(props.row.name)" />
+            <p
+              v-else
+              class="control"
+            >
+              <b-button
+                v-if="props.row.bytes < 1073741824"
+                :href="props.row.url"
+                target="_blank"
+                :inverted="props.row == selected ? true : false"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                size="is-small"
+                tag="a"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+              <b-button
+                v-else-if="allowLargeDownloads"
+                :href="props.row.url"
+                target="_blank"
+                :inverted="props.row == selected ? true : false"
+                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                size="is-small"
+                tag="a"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+              <b-button
+                v-else
+                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
+                type="is-primary"
+                outlined
+                :inverted="props.row === selected ? true : false"
+                size="is-small"
+                tag="a"
+                @click="confirmDownload ()"
+              >
+                <b-icon
+                  icon="download"
+                  size="is-small"
+                /> {{ $t('message.download') }}
+              </b-button>
+            </p>
+          </div>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
+        <template #default="props">
+          <span v-if="renderFolders && !isFile(props.row.name)" />
+          <DeleteObjectsButton
+            v-else 
             size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else-if="allowLargeDownloads"
-            :href="props.row.url"
-            target="_blank"
-            :inverted="props.row == selected ? true : false"
-            :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
-            size="is-small"
-            tag="a"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-          <b-button
-            v-else
-            :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-            type="is-primary"
-            outlined
             :inverted="props.row === selected ? true : false"
-            size="is-small"
-            tag="a"
-            @click="confirmDownload ()"
-          >
-            <b-icon
-              icon="download"
-              size="is-small"
-            /> {{ $t('message.download') }}
-          </b-button>
-        </span>
+            :disabled="false"
+            :objects="props.row.name"
+          />
+        </template>
       </b-table-column>
       <template
         #detail="props"
@@ -256,16 +298,13 @@
 </template>
 
 <script>
-import {
-  getObjects,
-  getSharedObjects,
-} from "@/common/api";
 import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
+import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
 export default {
   name: "ObjectTable",
@@ -273,11 +312,11 @@ export default {
     ContainerDownloadLink,
     FolderUploadForm,
     ReplicateContainerButton,
+    DeleteObjectsButton,
   },
   data: function () {
     return {
       oList: [],
-      objects: [],
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
@@ -285,6 +324,7 @@ export default {
       defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
+      checkedRows: [],
     };
   },
   computed: {
@@ -294,18 +334,14 @@ export default {
     queryPage () {
       return this.$route.query.page || 1;
     },
+    objects () {
+      return this.$store.state.objectCache;
+    },
   },
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
-    },
-    objects: function () {
-      if (this.renderFolders) {
-        this.oList = this.getFolderContents();
-      } else {
-        this.oList = this.objects;
-      }
     },
     renderFolders: function () {
       if (this.renderFolders) {
@@ -313,6 +349,14 @@ export default {
       } else {
         this.oList = this.objects;
       }
+    },
+    objects: function () {
+      if (this.renderFolders) {
+        this.oList = this.getFolderContents();
+      } else {
+        this.oList = this.objects;
+      }
+      this.checkedRows = [];
     },
     prefix: function () {
       if (this.renderFolders) {
@@ -329,51 +373,22 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
-    this.fetchObjects();
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
+  mounted () {
+    this.updateObjects();
+  },
   methods: {
-    fetchObjects: function () {
-      // Get the object listing from the API if the listing hasn't yet 
-      // been cached
-      if (this.$route.name == "SharedObjects") {
-        this.$store.state.client.getAccessDetails(
-          this.$route.params.project,
-          this.$route.params.container,
-          this.$route.params.owner,
-        ).then(
-          (ret) => {
-            return getSharedObjects(
-              this.$route.params.owner,
-              this.$route.params.container,
-              ret.address,
-            );
-          },
-        ).then(
-          (ret) => {
-            this.objects = ret;
-          },
-        );
-      }
-      else {
-        let container = this.$route.params.container;
-        if(this.$store.state.objectCache[container] == undefined) {
-          this.$store.commit("setLoading", true);
-          getObjects(container).then((ret) => {
-            if (ret.status != 200) {
-              this.$store.commit("setLoading", false);
-            }
-            this.$store.commit("updateObjects", [container, ret]);
-            this.objects = ret;
-            this.$store.commit("setLoading", false);
-          }).catch(() => {
-            this.$store.commit("setLoading", false);
-          });
-        } else {
-          this.objects = this.$store.state.objectCache[container];
-        }
-      }
+    updateObjects: function () {
+      // Update current object listing in Vuex if length is too little
+      this.$store.commit({
+        type: "updateObjects",
+        route: this.$route,
+      });
+    },
+    isRowCheckable: function (row) {
+      return this.renderFolders ? this.isFile(row.name) : true;
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {

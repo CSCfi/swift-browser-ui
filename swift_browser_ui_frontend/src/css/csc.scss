@@ -1,0 +1,120 @@
+@charset "utf-8";
+// CSS file for integrating CSC brand colors
+
+
+@import "~bulma/sass/utilities/_all";
+
+
+$csc-primary: #006778;
+$csc-secondary: #830051;
+$csc-tertiary: #5e6a71;
+$csc-dark-blue: #002f5f;
+$csc-blue: #025b96;
+$csc-red: #b90729;
+$csc-alt-green: #50978d;
+$csc-light-green: #c9e2ae;
+$csc-grey: #595959;
+$csc-light-grey: #d2d3d5;
+$csc-grey-blue: #8196b9;
+$csc-light-grey-blue: #f8f9fc;
+$csc-yellow: #ffd534;
+$csc-green: #51a808;
+$csc-orange: #ff5800;
+
+// Set bulma initial colors to be derived from
+// Not overriding black, black's fine as is
+$orange: $csc-orange;
+$yellow: $csc-yellow;
+$green: $csc-green;
+$turquoise: $csc-alt-green;
+$cyan: $csc-primary;
+$blue: $csc-blue;
+$purple: $csc-secondary;
+$red: $csc-red;
+
+
+// Set bulma shorthand color pallette
+$primary: $csc-primary;
+$link: $csc-dark-blue;
+$info: $blue;
+$success: $green;
+$warning: $yellow;
+$danger: $red;
+$dark: $csc-grey;
+$text: $black;
+
+
+$custom-colors: null !default;
+$custom-shades: null !default;
+
+
+// specific bulma variable overrides
+$menu-item-active-background-color: $csc-primary;
+
+
+$colors: mergeColorMaps(
+  (
+    "white": (
+        $white,
+        $black,
+    ),
+    "black": (
+        $black,
+        $white,
+    ),
+    "light": (
+        $light,
+        $light-invert,
+    ),
+    "dark": (
+        $dark,
+        $dark-invert,
+    ),
+    "primary": (
+        $primary,
+        $primary-invert,
+        $primary-light,
+        $primary-dark,
+    ),
+    "link": (
+        $link,
+        $link-invert,
+        $link-light,
+        $link-dark,
+    ),
+    "info": (
+        $info,
+        $info-invert,
+        $info-light,
+        $info-dark,
+    ),
+    "success": (
+        $success,
+        $success-invert,
+        $success-light,
+        $success-dark,
+    ),
+    "warning": (
+        $warning,
+        $warning-invert,
+        $warning-light,
+        $warning-dark,
+    ),
+    "danger": (
+        $danger,
+        $danger-invert,
+        $danger-light,
+        $danger-dark,
+    ),
+  ),
+  $custom-colors
+);
+
+
+// Links
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";

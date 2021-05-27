@@ -25,7 +25,7 @@ import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 import store from "@/common/store";
 
 // Import project css
-import "buefy/dist/buefy.css";
+import "@/css/prod.scss";
 
 // Import resumable
 import Resumable from "resumablejs";
@@ -85,6 +85,7 @@ new Vue({
     },
   },
   created() {
+    document.title = this.$t("message.program_name");
     this.createUploadInstance();
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
@@ -152,8 +153,14 @@ new Vue({
     fileSuccessToast: function (file) {
       this.$buefy.toast.open({
         message: this.$t("message.upfinish").concat(file.fileName),
-        type: "is-success",  
+        type: "is-success",
       });
+      if (this.$route.params.container != undefined) {
+        this.$store.commit({
+          type: "updateObjects",
+          route: this.$route,
+        });
+      }
     },
     fileFailureToast: function (file) {
       this.$buefy.toast.open({
@@ -172,7 +179,19 @@ new Vue({
       );
       for (const param of params) {
         let newParam = param.split("=");
-        retUrl.searchParams.append(newParam[0], newParam[1]);
+        // check if we should move the file under a pseudofolder
+        // using the current prefix defined in route for the url
+        if (
+          newParam[0].match("resumableRelativePath")
+          && this.$route.query.prefix != undefined
+        ) {
+          retUrl.searchParams.append(
+            newParam[0],
+            this.$route.query.prefix + newParam[1],
+          );
+        } else {
+          retUrl.searchParams.append(newParam[0], newParam[1]);
+        }
       }
       return retUrl.toString();
     },

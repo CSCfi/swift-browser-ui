@@ -5,59 +5,42 @@ from locust import HttpLocust, TaskSet
 
 def login(l_instance):
     """Handle locust user login."""
-    l_instance.client.post(
-        "/login/websso",
-        {"token": "the_actual_token_doesn't_matter"}
-    )
+    l_instance.client.post("/login/websso", {"token": "the_actual_token_doesn't_matter"})
 
 
 def logout(l_instance):
     """Handle locust user logout."""
-    l_instance.client.get(
-        "/login/kill"
-    )
+    l_instance.client.get("/login/kill")
 
 
 def api_containers(l_instance):
     """Get container listing."""
-    l_instance.client.get(
-        "/api/buckets"
-    )
+    l_instance.client.get("/api/buckets")
 
 
 def api_objects(l_instance):
     """Get object listing."""
-    l_instance.client.get(
-        "/api/bucket/objects?bucket=test-container-0"
-    )
+    l_instance.client.get("/api/bucket/objects?bucket=test-container-0")
 
 
 def api_active(l_instance):
     """Get active project."""
-    l_instance.client.get(
-        "/api/project/active"
-    )
+    l_instance.client.get("/api/project/active")
 
 
 def api_projects(l_instance):
     """Get available projects."""
-    l_instance.client.get(
-        "/api/projects"
-    )
+    l_instance.client.get("/api/projects")
 
 
 def api_username(l_instance):
     """Get the username."""
-    l_instance.client.get(
-        "/api/username"
-    )
+    l_instance.client.get("/api/username")
 
 
 def api_project_meta(l_instance):
     """Get the project metadata."""
-    l_instance.client.get(
-        "/api/project/meta"
-    )
+    l_instance.client.get("/api/project/meta")
 
 
 class UserBehaviour(TaskSet):

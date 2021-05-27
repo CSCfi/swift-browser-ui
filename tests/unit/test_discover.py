@@ -18,7 +18,7 @@ class DiscoverTestClass(asynctest.TestCase):
             new={
                 "sharing_endpoint": "http://example",
                 "request_endpoint": "http://example",
-            }
+            },
         )
         with patch_setd:
             resp = await handle_discover(None)
