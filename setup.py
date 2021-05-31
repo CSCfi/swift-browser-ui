@@ -19,7 +19,7 @@ setuptools.setup(
         "click==8.0.1",
         "gunicorn>=20.0.1",
         "uvloop==0.15.2",
-        "certifi==2020.12.05",
+        "certifi==2021.5.30",
     ],
     extras_require={
         "test": [
