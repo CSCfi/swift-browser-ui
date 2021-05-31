@@ -12,7 +12,7 @@
   "dependencies": {
     "@vue/cli-service-global": "^4.5.13",
     "buefy": "^0.9.7",
-    "core-js": "^3.12.1",
+    "core-js": "^3.13.1",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node-sass": "^6.0.0",
@@ -32,7 +32,7 @@
     "babel-eslint": "^10.1.0",
     "cli-highlight": "^2.1.11",
     "eslint": "^7.27.0",
-    "eslint-plugin-vue": "^7.9.0",
+    "eslint-plugin-vue": "^7.10.0",
     "eslint-utils": "^3.0.0",
     "vue-template-compiler": "^2.6.12"
   },
