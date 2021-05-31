@@ -19,15 +19,15 @@ setuptools.setup(
         "click==8.0.1",
         "gunicorn>=20.0.1",
         "uvloop==0.15.2",
-        "certifi==2020.12.05",
+        "certifi==2021.5.30",
     ],
     extras_require={
         "test": [
             "tox==3.23.1",
             "pytest==6.2.4",
-            "pytest-cov==2.12.0 ",
+            "pytest-cov==2.12.0",
             "coverage==5.5",
-            "coveralls==3.0.1",
+            "coveralls==3.1.0",
             "flake8==3.9.2",
             "flake8-docstrings==1.6.0",
             "pytest-xdist==2.2.1",
