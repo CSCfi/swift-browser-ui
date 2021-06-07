@@ -25,7 +25,7 @@ setuptools.setup(
         "test": [
             "tox==3.23.1",
             "pytest==6.2.4",
-            "pytest-cov==2.12.0",
+            "pytest-cov==2.12.1",
             "coverage==5.5",
             "coveralls==3.1.0",
             "flake8==3.9.2",
