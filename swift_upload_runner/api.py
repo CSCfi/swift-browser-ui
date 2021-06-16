@@ -10,9 +10,7 @@ from .download import FileDownloadProxy, ContainerArchiveDownloadProxy
 from .replicate import ObjectReplicationProxy
 
 
-async def handle_get_object(
-        request: aiohttp.web.Request
-) -> aiohttp.web.StreamResponse:
+async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
     """Handle a request for getting object content."""
     auth = get_auth_instance(request)
 
@@ -21,7 +19,7 @@ async def handle_get_object(
     await download.a_begin_download(
         request.match_info["project"],
         request.match_info["container"],
-        request.match_info["object_name"]
+        request.match_info["object_name"],
     )
 
     resp = aiohttp.web.StreamResponse()
@@ -39,7 +37,7 @@ async def handle_get_object(
 
 
 async def handle_replicate_container(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle request to replicating a container from a source."""
     auth = get_auth_instance(request)
@@ -51,12 +49,7 @@ async def handle_replicate_container(
     source_container = request.query["from_container"]
 
     replicator = ObjectReplicationProxy(
-        auth,
-        request.app["client"],
-        project,
-        container,
-        source_project,
-        source_container
+        auth, request.app["client"], project, container, source_project, source_container
     )
 
     asyncio.ensure_future(replicator.a_copy_from_container())
@@ -64,9 +57,7 @@ async def handle_replicate_container(
     return aiohttp.web.Response(status=202)
 
 
-async def handle_replicate_object(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request to replicating an object from a source."""
     auth = get_auth_instance(request)
 
@@ -78,12 +69,7 @@ async def handle_replicate_object(
     source_object = request.query["from_object"]
 
     replicator = ObjectReplicationProxy(
-        auth,
-        request.app["client"],
-        project,
-        container,
-        source_project,
-        source_container
+        auth, request.app["client"], project, container, source_project, source_container
     )
 
     asyncio.ensure_future(replicator.a_copy_object(source_object))
@@ -91,9 +77,7 @@ async def handle_replicate_object(
     return aiohttp.web.Response(status=202)
 
 
-async def handle_post_object_chunk(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_post_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request for posting an object chunk."""
     if "from_object" in request.query.keys():
         return await handle_replicate_object(request)
@@ -105,22 +89,12 @@ async def handle_post_object_chunk(
 
     query, data = await parse_multipart_in(request)
 
-    upload_session = await get_upload_instance(
-        request,
-        project,
-        container,
-        p_query=query
-    )
+    upload_session = await get_upload_instance(request, project, container, p_query=query)
 
-    return await upload_session.a_add_chunk(
-        query,
-        data
-    )
+    return await upload_session.a_add_chunk(query, data)
 
 
-async def handle_get_object_chunk(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_get_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request for checking if a chunk exists."""
     get_auth_instance(request)
 
@@ -134,19 +108,13 @@ async def handle_get_object_chunk(
     except KeyError:
         raise aiohttp.web.HTTPBadRequest(reason="Malformed query string")
 
-    upload_session = await get_upload_instance(
-        request,
-        project,
-        container
-    )
+    upload_session = await get_upload_instance(request, project, container)
 
-    return await upload_session.a_check_segment(
-        chunk_number
-    )
+    return await upload_session.a_check_segment(chunk_number)
 
 
 async def handle_post_object_options(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle options request for posting the object chunk."""
     resp = aiohttp.web.Response(
@@ -160,7 +128,7 @@ async def handle_post_object_options(
 
 
 async def handle_get_container(
-        request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.StreamResponse:
     """Handle a request for getting container contents as an archive."""
     if "resumableChunkNumber" in request.query.keys():
@@ -183,11 +151,7 @@ async def handle_get_container(
 
     await resp.prepare(request)
 
-    download = ContainerArchiveDownloadProxy(
-        auth,
-        project,
-        container
-    )
+    download = ContainerArchiveDownloadProxy(auth, project, container)
 
     await download.a_begin_container_download()
 
@@ -197,13 +161,13 @@ async def handle_get_container(
     return resp
 
 
-async def handle_health_check(
-        request: aiohttp.web.Request
-) -> aiohttp.web.Response:
+async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Answer a service health check."""
     # Case degraded
 
     # Case nominal
-    return aiohttp.web.json_response({
-        "status": "Ok",
-    })
+    return aiohttp.web.json_response(
+        {
+            "status": "Ok",
+        }
+    )
