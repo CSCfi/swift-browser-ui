@@ -88,32 +88,6 @@ class ResumableFileUploadProxy:
         if self.total_size >= 5368709120:
             self.segmented = True
 
-    async def a_sync_segments(
-            self
-    ) -> None:
-        """Synchronize segments from storage."""
-        # segments: typing.Union[typing.List, str]
-        # async with self.client.get(
-        #     common.generate_download_url(
-        #         common.get_download_host(self.auth, self.project),
-        #         self.container + "_segments"
-        #     ),
-        #     headers={
-        #         "X-Auth-Token": self.auth.get_token()
-        #     },
-        #     ssl=ssl_context
-        # ) as resp:
-        #     if resp.status in {200}:
-        #         segments = await resp.text()
-        #         segments = segments.rstrip().lstrip().split("\n")
-        #         segments = list(filter(
-        #             lambda i,  # type: ignore
-        #             path=self.path: path in i, segments
-        #         ))
-        #         if segments:
-        #             for segment in segments:
-        #                 self.done_chunks.add(int(segment.split("/")[-1]))
-
     async def a_create_container(
             self,
             segmented: bool = False
@@ -251,52 +225,6 @@ class ResumableFileUploadProxy:
         
         return aiohttp.web.Response(status=201)
 
-        # if self.segmented:
-        #     LOGGER.debug(f"Uploading chunk {chunk_number}")
-        #     async with self.client.put(
-        #         common.generate_download_url(
-        #             self.host,
-        #             container=self.container + "_segments",
-        #             object_name=f"""{self.path}/{chunk_number:08d}"""
-        #         ),
-        #         data=chunk_reader,
-        #         headers={
-        #             "X-Auth-Token": self.auth.get_token(),
-        #             "Content-Length": query["resumableCurrentChunkSize"],
-        #             "Content-Type": "application/swiftclient-segment",
-        #         },
-        #         timeout=UPL_TIMEOUT,
-        #         ssl=ssl_context
-        #     ) as resp:
-        #         if resp.status == 408:
-        #             raise aiohttp.web.HTTPRequestTimeout()
-        #         self.total_uploaded += int(query["resumableCurrentChunkSize"])
-        #         if self.total_uploaded == self.total_size:
-        #             await self.a_add_manifest()
-        #         self.done_chunks.add(chunk_number)
-        #         LOGGER.debug(f"Success in uploding chunk {chunk_number}")
-        #         return aiohttp.web.Response(status=201)
-        # else:
-        #     LOGGER.debug(f"Concatenating chunk {chunk_number}")
-        #     await self.q.put((
-        #         # Using chunk number as priority, to handle chunks in any
-        #         # order
-        #         chunk_number,
-        #         {"query": query, "data": chunk_reader}
-        #     ))
-
-        #     if not self.done_chunks:
-        #         LOGGER.debug("Scheduling upload coroutine")
-        #         self.coro_upload = asyncio.ensure_future(self.upload_file())
-
-        #     if chunk_number + 1 == self.total_chunks:
-        #         LOGGER.debug("Waiting for upload to finish")
-        #         await self.coro_upload
-        #     else:
-        #         await self.a_wait_for_chunk(chunk_number)
-
-        #     return aiohttp.web.Response(status=201)
-
     async def upload_file(self) -> None:
         """Upload the file with concatenated segments."""
         if not self.segmented:
@@ -328,7 +256,7 @@ class ResumableFileUploadProxy:
                     container=self.container + "_segments",
                     object_name=f"""{self.path}/{segment_number:08d}"""
                 ),
-                data=self.generate_segment_from_queue(),
+                data=self.generate_from_queue(),
                 headers={
                     "X-Auth-Token": self.auth.get_token(),
                     "Content-Type": "application/swiftclient-segment",
@@ -344,29 +272,12 @@ class ResumableFileUploadProxy:
             segment_number += 1
         return
 
-    async def generate_segment_from_queue(self) -> typing.AsyncGenerator:
-        """Generate segment data from the internal queue."""
-        LOGGER.debug("Generating next segment from the internal queue.""")
-        initial_uploaded = self.total_uploaded
-        while len(self.done_chunks) < self.total_chunks:
-            chunk_number, segment = await self.q.get()
-            LOGGER.debug(f"Geting chunk {chunk_number}")
-            chunk_reader = segment["data"]
-            chunk = await chunk_reader.read_chunk()
-            while chunk:
-                yield chunk
-                chunk = await chunk_reader.read_chunk()
-            LOGGER.debug(f"Chunk {chunk_number} exhausted.")
-            self.total_uploaded += \
-                int(segment["query"]["resumableCurrentChunkSize"])
-            self.done_chunks.add(chunk_number)
-
-            if self.total_uploaded - initial_uploaded >= 1073741824:
-                break
-
     async def generate_from_queue(self) -> typing.AsyncGenerator:
         """Generate the response data from the internal queue."""
         LOGGER.debug("Generating upload data from a queue.")
+
+        initial_uploaded = self.total_uploaded
+
         while len(self.done_chunks) < self.total_chunks:
             chunk_number, segment = await self.q.get()
 
@@ -383,6 +294,13 @@ class ResumableFileUploadProxy:
             self.total_uploaded += \
                 int(segment["query"]["resumableCurrentChunkSize"])
             self.done_chunks.add(chunk_number)
+
+            # In case of a segmented upload cut the chunk at 1GiB or over
+            if (
+                    self.segmented
+                    and self.total_uploaded - initial_uploaded >= 1073741824
+            ):
+                break
 
     async def a_wait_for_chunk(
             self,
