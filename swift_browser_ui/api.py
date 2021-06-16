@@ -380,9 +380,7 @@ async def swift_upload_object_chunk(
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
 
-    request.app["Log"].info(
-        f"redirecting {session} to {resp.headers['Location']}"
-    )
+    request.app["Log"].info(f"redirecting {session} to {resp.headers['Location']}")
 
     return resp
 
