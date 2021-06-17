@@ -1,5 +1,5 @@
 aiohttp==3.7.4.post0
-python-swiftclient==3.11.1
+python-swiftclient==3.12.0
 cryptography==3.4.7
 keystoneauth1==4.3.1
 click==8.0.1
@@ -7,4 +7,4 @@ sphinx==4.0.2
 sphinx_rtd_theme==0.5.2
 uvloop==0.15.2
 gunicorn>=20.0.1
-certifi==2020.12.05 
+certifi==2021.5.30

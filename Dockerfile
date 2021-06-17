@@ -1,4 +1,4 @@
-FROM node:14.16.1-alpine3.12 as FRONTEND
+FROM node:14.17.0-alpine3.12 as FRONTEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
@@ -13,7 +13,7 @@ RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && git clone --verbose https://github.com/CSCfi/swift-sharing-request.git \
     && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common/swift_sharing_request_bind.js \
     && rm -rf swift-sharing-request \
-    && npm install -g npm@7.14.0 \
+    && npm install -g npm@7.17.0 \
     && npm install \
     && npm run build
 

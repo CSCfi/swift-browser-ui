@@ -234,7 +234,7 @@ new Vue({
       let res = new Resumable({
         target: this.getUploadUrl,
         testTarget: this.getUploadUrl,
-        chunkSize: 268435456,
+        chunkSize: 5242880,
         forceChunkSize: true,
         simultaneousUploads: 1,
       });
