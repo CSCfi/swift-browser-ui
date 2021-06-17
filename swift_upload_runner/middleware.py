@@ -8,18 +8,13 @@ import aiohttp.web
 
 AiohttpHandler = typing.Callable[
     [aiohttp.web.Request],
-    typing.Coroutine[
-        typing.Awaitable,
-        typing.Any,
-        aiohttp.web.Response
-    ]
+    typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response],
 ]
 
 
 @aiohttp.web.middleware
 async def add_cors(
-        request: aiohttp.web.Request,
-        handler: AiohttpHandler
+    request: aiohttp.web.Request, handler: AiohttpHandler
 ) -> aiohttp.web.Response:
     """Add CORS header for API responses."""
     resp = await handler(request)
