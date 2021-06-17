@@ -256,6 +256,9 @@ class ResumableFileUploadProxy:
         while len(self.done_chunks) < self.total_chunks:
             chunk_number, segment = await self.q.get()
 
+            if chunk_number in self.done_chunks:
+                continue
+
             LOGGER.debug(f"Got chunk from chunk {chunk_number}")
 
             chunk_reader = segment["data"]
