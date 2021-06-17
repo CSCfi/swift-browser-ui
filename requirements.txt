@@ -4,3 +4,5 @@ python-swiftclient==3.11.1
 keystoneauth1==4.3.1
 git+https://github.com/cscfi/swift-browser-ui.git
 certifi==2020.12.05 
+gunicorn>=20.0.1
+uvloop==0.15.2
