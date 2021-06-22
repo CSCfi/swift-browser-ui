@@ -94,23 +94,14 @@
             {{ $t('message.dashboard.more_info') }}
           </p>
           <ul>
-            <li>
-              <a 
+            <li 
+              v-for="item in $t('message.dashboard.links')"
+              :key="item.msg"
+            >
+              <a
                 target="_blank"
-                :href="$t('message.dashboard.pouta_accounting')"
-              >{{ $t('message.dashboard.billing_info') }}</a>
-            </li>
-            <li>
-              <a 
-                target="_blank"
-                :href="$t('message.dashboard.pouta_obj_store_quota_info')"
-              >{{ $t('message.dashboard.quota_info') }}</a>
-            </li>
-            <li>
-              <a 
-                target="_blank" 
-                :href="$t('message.dashboard.my_csc')"
-              >{{ $t('message.dashboard.avail_info') }}</a>
+                :href="item.href"
+              >{{ item.msg }}</a>
             </li>
           </ul>
         </div>
@@ -179,7 +170,7 @@ export default {
       getProjectMeta().then((ret) => {
         this.Containers = ret["Containers"];
         this.Objects = ret["Objects"];
-        this.Account = ret["Account"];
+        this.Account = ret["Account"].replace("AUTH_", "");
         this.Size = ret["Size"];
         this.Billed = ret["Billed"];
         this.Bytes = ret["Bytes"];

@@ -63,9 +63,6 @@ let default_translations = {
         prj_str_usag: "Project storage usage",
         equals: "Equals",
         more_info: "More information",
-        billing_info: "Pouta billing information",
-        quota_info: "Pouta default quotas",
-        avail_info: "Information on project billing unit availability etc.",
         dashboard: "User information",
         browser: "Browser",
         tooltip_disable: "Hide tooltip",
@@ -75,11 +72,22 @@ let default_translations = {
                         "values. If there's a separate pricing contract " +
                         "with CSC for the project used, the values " +
                         "specific the project may vary.",
-        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
-        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-        my_csc: "https://my.csc.fi",
         resources: "Resources",
         tokens: "Sharing API tokens",
+        links: [
+          {
+            msg: "Pouta billing information",
+            href: "https://docs.csc.fi/cloud/pouta/accounting/",
+          },
+          {
+            msg: "Pouta default quotas",
+            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
+          },
+          {
+            msg: "Information on project billing unit availability etc.",
+            href: "https://my.csc.fi",
+          },
+        ],
       },
       share: {
         share: "Share",
@@ -263,10 +271,6 @@ let default_translations = {
         prj_str_usag: "Projektin tilankäyttö",
         equals: "Tarkoittaen",
         more_info: "Lisätietoja",
-        billing_info: "Tietoa Pouta-palvelun laskutuksesta (englanniksi)",
-        quota_info: "Tietoa Pouta-palvelun käyttörajoista (englanniksi)",
-        avail_info: "Tietoa projektin laskutusyksiköiden määrästä jne. " +
-                    "(englanniksi)",
         dashboard: "Käyttäjän tiedot",
         browser: "Selain",
         tooltip_disable: "Piilota ohje",
@@ -276,11 +280,23 @@ let default_translations = {
                         "mukaan. Jos käytetylle projektille on erillinen " +
                         "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
                         "voivat poiketa näytetyistä.",
-        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
-        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-        my_csc: "https://my.csc.fi",
         resources: "Resurssit",
         tokens: "Jaetun sisällön APIn avaimet",
+        links: [
+          {
+            msg: "Tietoa Pouta-palvelun laskutuksesta (englanniksi)",
+            href: "https://docs.csc.fi/cloud/pouta/accounting/",
+          },
+          {
+            msg: "Tietoa Pouta-palvelun käyttörajoista (englanniksi)",
+            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
+          },
+          {
+            msg: "Tietoa projektin laskutusyksiköiden määrästä jne." +
+                 " (englanniksi)",
+            href: "https://my.csc.fi",
+          },
+        ],
       },
       share: {
         share: "Jaa",
