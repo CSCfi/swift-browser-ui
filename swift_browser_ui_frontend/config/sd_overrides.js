@@ -9,6 +9,10 @@ let lang_overrides = {
         "by allowing data uploads through drag-n-drop, and simple data " +
         "sharing.",
       dashboard: {
+        default_notify: "The information on consumed billing units and " +
+                        "available quota is derived from the default CSC " +
+                        "values. Default quota can be increased, and the " +
+                        "increase will not reflect here.",
         links: [
           {
             msg: "Sensitive Data Services User Guide",
@@ -34,6 +38,10 @@ let lang_overrides = {
         "datan säilyttämiseen tutkimusprojektin ajaksi, mahdollistamalla " +
         "tiedostojen lähettämisen raahaamalla ja yksinkertaisen jakamisen.",
       dashboard: {
+        default_notify: "Tieto laskutusyksiköiden kulutuksesta ja " +
+                        "käyttörajasta on laskettu CSC:n Allas-palvelun " +
+                        "oletusarvojen mukaan. Mahdollinen korotettu " +
+                        "käyttöraja ei näy käyttöliittymässä.",
         links: [
           {
             msg: "Sensitive Data Services User Guide",
