@@ -8,6 +8,7 @@ let lang_overrides = {
         "encrypted sensitive data for the duration of your research project " +
         "by allowing data uploads through drag-n-drop, and simple data " +
         "sharing.",
+      helplink: "https://docs.csc.fi/data/sensitive-data/",
       dashboard: {
         default_notify: "The information on consumed billing units and " +
                         "available quota is derived from the default CSC " +
@@ -37,6 +38,7 @@ let lang_overrides = {
         "web-käyttöliittymän ja komentorivikäyttöliittymän sensitiivisen " +
         "datan säilyttämiseen tutkimusprojektin ajaksi, mahdollistamalla " +
         "tiedostojen lähettämisen raahaamalla ja yksinkertaisen jakamisen.",
+      helplink: "https://docs.csc.fi/data/sensitive-data/",
       dashboard: {
         default_notify: "Tieto laskutusyksiköiden kulutuksesta ja " +
                         "käyttörajasta on laskettu CSC:n Allas-palvelun " +
