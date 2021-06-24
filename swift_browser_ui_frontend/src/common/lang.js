@@ -42,7 +42,7 @@ let default_translations = {
         fileHash: "Hash",
         fileType: "Type",
         fileDown: "File Download",
-        owner: "Bucket owner",
+        owner: "Owner Project Identifier",
         created: "Created",
         folderDetails: "No details for folders",
         clearChecked: "Clear checked",
@@ -55,7 +55,7 @@ let default_translations = {
       },
       dashboard: {
         prj_usage: "Project usage",
-        account: "Account",
+        account: "Project Identifier",
         containers: "Buckets",
         objects: "Objects",
         usage: "Usage",
@@ -63,9 +63,6 @@ let default_translations = {
         prj_str_usag: "Project storage usage",
         equals: "Equals",
         more_info: "More information",
-        billing_info: "Pouta billing information",
-        quota_info: "Pouta default quotas",
-        avail_info: "Information on project billing unit availability etc.",
         dashboard: "User information",
         browser: "Browser",
         tooltip_disable: "Hide tooltip",
@@ -75,19 +72,30 @@ let default_translations = {
                         "values. If there's a separate pricing contract " +
                         "with CSC for the project used, the values " +
                         "specific the project may vary.",
-        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
-        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-        my_csc: "https://my.csc.fi",
         resources: "Resources",
-        tokens: "Tokens",
+        tokens: "Sharing API tokens",
+        links: [
+          {
+            msg: "Pouta billing information",
+            href: "https://docs.csc.fi/cloud/pouta/accounting/",
+          },
+          {
+            msg: "Pouta default quotas",
+            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
+          },
+          {
+            msg: "Information on project billing unit availability etc.",
+            href: "https://my.csc.fi",
+          },
+        ],
       },
       share: {
         share: "Share",
         share_cont: "Share the bucket",
         read_perm: "Grant read permissions",
         write_perm: "Grant write permissions",
-        field_label: "UUIDs to share with",
-        field_placeholder: "Add UUIDs here",
+        field_label: "Project Identifiers to share with",
+        field_placeholder: "Add Project Identifiers here",
         cancel: "Cancel",
         confirm: "Share",
         to_me: "Shared to the project",
@@ -95,7 +103,7 @@ let default_translations = {
         request_sharing: "Request sharing",
         shared: "Shared",
         container: "Bucket",
-        owner: "Bucket owner",
+        owner: "Owner project identifier",
         shared_details_to: "Shared to: ",
         shared_details_address: "Bucket address: ",
         shared_details_rights: "Rights given: ",
@@ -103,7 +111,7 @@ let default_translations = {
         shared_details_write: "Write access",
         created: "Created",
         fail_noperm: "Please select permissions to grant!",
-        fail_noid: "Please give at least one project ID!",
+        fail_noid: "Please give at least one Project Identifier!",
         fail_nocont: "Please specify the bucket!",
         fail_duplicate: "The project already has access to the bucket!",
         new_share_button: "Share a bucket",
@@ -121,10 +129,10 @@ let default_translations = {
         project: "Project",
         container: "Bucket / Identfier",
         container_message: "The requested bucket name",
-        owner: "Owner",
-        owner_message: "The requested bucket owner",
+        owner: "Owner Project Identifier",
+        owner_message: "Project Identifier of the bucket owner",
         request: "Request",
-        multi_project: "Account has access to multiple projects. " +
+        multi_project: "Your account has access to multiple projects. " +
                        "Please verify that the correct project is set " +
                        "active in the menu, and submit the request with " +
                        "the Request button.",
@@ -242,7 +250,7 @@ let default_translations = {
         fileHash: "Tarkistussumma",
         fileType: "Tyyppi",
         fileDown: "Tiedoston lataus",
-        owner: "Säiliön omistaja",
+        owner: "Omistavan projektin tunniste",
         created: "Luotu",
         folderDetails: "Ei yksityiskohtia kansioille",
         clearChecked: "Poista valinnat",
@@ -255,7 +263,7 @@ let default_translations = {
       },
       dashboard: {
         prj_usage: "Projektin resurssienkäyttö",
-        account: "Käyttäjä",
+        account: "Projektin tunniste",
         containers: "Kontteja",
         objects: "Objekteja",
         usage: "Tilankäyttö",
@@ -263,10 +271,6 @@ let default_translations = {
         prj_str_usag: "Projektin tilankäyttö",
         equals: "Tarkoittaen",
         more_info: "Lisätietoja",
-        billing_info: "Tietoa Pouta-palvelun laskutuksesta (englanniksi)",
-        quota_info: "Tietoa Pouta-palvelun käyttörajoista (englanniksi)",
-        avail_info: "Tietoa projektin laskutusyksiköiden määrästä jne. " +
-                    "(englanniksi)",
         dashboard: "Käyttäjän tiedot",
         browser: "Selain",
         tooltip_disable: "Piilota ohje",
@@ -276,19 +280,31 @@ let default_translations = {
                         "mukaan. Jos käytetylle projektille on erillinen " +
                         "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
                         "voivat poiketa näytetyistä.",
-        pouta_accounting: "https://docs.csc.fi/cloud/pouta/accounting/",
-        pouta_obj_store_quota_info: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-        my_csc: "https://my.csc.fi",
         resources: "Resurssit",
-        tokens: "Avaimet",
+        tokens: "Jaetun sisällön APIn avaimet",
+        links: [
+          {
+            msg: "Tietoa Pouta-palvelun laskutuksesta (englanniksi)",
+            href: "https://docs.csc.fi/cloud/pouta/accounting/",
+          },
+          {
+            msg: "Tietoa Pouta-palvelun käyttörajoista (englanniksi)",
+            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
+          },
+          {
+            msg: "Tietoa projektin laskutusyksiköiden määrästä jne." +
+                 " (englanniksi)",
+            href: "https://my.csc.fi",
+          },
+        ],
       },
       share: {
         share: "Jaa",
         share_cont: "Jaa säiliö",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
-        field_label: "Jaa UUID:lle",
-        field_placeholder: "Lisää UUID:t",
+        field_label: "Jaa projektitunnisteille",
+        field_placeholder: "Lisää projektitunnisteet",
         cancel: "Peru",
         confirm: "Jaa",
         to_me: "Jaettu projektille",
@@ -296,7 +312,7 @@ let default_translations = {
         request_sharing: "Pyydä jakamista",
         shared: "Jaettu",
         container: "Säiliö",
-        owner: "Säiliön omistaja",
+        owner: "Omistavan projektin tunniste",
         created: "Luotu",
         shared_details_to: "Jaettu projektille: ",
         shared_details_address: "Säiliön osoite: ",
@@ -304,7 +320,8 @@ let default_translations = {
         shared_details_read: "Lukuoikeus",
         shared_details_write: "Kirjoitusoikeus",
         fail_noperm: "Valitse jaettavat oikeudet!",
-        fail_noid: "Anna vähintään yhden projektin tunnus (Project ID)!",
+        fail_noid: "Anna vähintään yhden projektin tunniste (Project " +
+                   "Identifier)!",
         fail_nocont: "Anna jaettava säiliö!",
         fail_duplicate: "Säiliö on jo jaettu projektille!",
         new_share_button: "Jaa säiliö",
@@ -321,8 +338,8 @@ let default_translations = {
         project: "Projekti",
         container: "Säiliö / tunniste",
         container_message: "Jaettavaksi pyydetyn säiliön nimi",
-        owner: "Omistaja",
-        owner_message: "Jaettavaksi pyydetyn säiliön omistaja",
+        owner: "Omistavan projektin tunniste",
+        owner_message: "Halutun säiliön omistavan projektin tunniste",
         request: "Pyydä jakoa",
         multi_project: "Käyttäjällä on pääsy useisiin projekteihin. " +
                        "Tarkistathan, että haluttu projekti on valittu " +
