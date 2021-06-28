@@ -47,6 +47,18 @@
           </div>
         </div>
         <div class="navbar-end">
+          <div
+            v-if="$t('message.helplink')"
+            class="navbar-item"
+          >
+            <div class="buttons">
+              <a
+                :href="$t('message.helplink')"
+                target="_blank"
+                class="button is-primary is-outlined"
+              >{{ $t("message.help") }}</a>
+            </div>
+          </div>
           <div class="navbar-item">
             <div class="buttons">
               <router-link

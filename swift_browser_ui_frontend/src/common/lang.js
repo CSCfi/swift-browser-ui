@@ -25,6 +25,8 @@ let default_translations = {
                         "Otherwise head back to the front page from the " +
                         "button below.",
       },
+      help: "Help",
+      helplink: "",
       program_name: "Object Browser",
       program_description: "Web UI for browsing contents in Swift object " +
                            "storage systems.",
@@ -233,6 +235,8 @@ let default_translations = {
                         "paluu etusivulle on mahdollista oheisesta " +
                         "painikkeesta",
       },
+      help: "Apua",
+      helplink: "",
       program_name: "Object Browser",
       program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
                            "selaamiseen Swift-objektitietojärjestelmissä.",
