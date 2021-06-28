@@ -15,7 +15,7 @@
     "core-js": "^3.15.1",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
-    "node-sass": "^6.0.0",
+    "node-sass": "^6.0.1",
     "resumablejs": "^1.1.0",
     "sass-loader": "^12.1.0",
     "serve": "^12.0.0",
