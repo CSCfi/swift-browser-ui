@@ -5,6 +5,7 @@ import time
 import hashlib
 import json
 import re
+import typing_extensions
 
 # aiohttp
 import aiohttp.web
@@ -21,6 +22,7 @@ from ._convenience import (
     session_check,
     initiate_os_session,
     initiate_os_service,
+    os_get_token_from_credentials,
     test_swift_endpoint,
     clear_session_info,
 )
@@ -99,125 +101,45 @@ def test_token(
     return unscoped
 
 
+async def credentials_login_end(
+    request: aiohttp.web.Request,
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Handle the login procedure with classic POST."""
+    log = request.app["Log"]
+    log.info("Got login request with username, password")
+
+    form = await request.post()
+
+    try:
+        username = str(form["username"])
+        password = str(form["password"])
+    except KeyError:
+        raise aiohttp.web.HTTPClientError(reason="Username or password not provided")
+
+    log.debug(f"username: {username}, password: {password}")
+
+    # Get an unscoped token with credentials
+    unscoped: str = os_get_token_from_credentials(
+        username,
+        password,
+    )
+
+    log.debug(f"got token {unscoped}")
+
+    return await login_with_token(request, unscoped)
+
+
 async def sso_query_end(
     request: aiohttp.web.Request,
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Handle the login procedure return from SSO or user from POST."""
     log = request.app["Log"]
-    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     formdata = await request.post()
     log.debug(f"Got {formdata} in form.")
     # Declare the unscoped token
     unscoped = test_token(formdata, request)
 
-    # Establish connection and begin session
-    response = aiohttp.web.Response(status=303)
-    cookie, _ = generate_cookie(request)
-
-    cookie["referer"] = request.url.host
-    cookie["signature"] = (
-        hashlib.sha256(
-            (cookie["id"] + cookie["referer"] + request.app["Salt"]).encode("utf-8")
-        )
-    ).hexdigest()
-    session = cookie["id"]
-
-    cookie_crypted = (
-        request.app["Crypt"].encrypt(json.dumps(cookie).encode("utf-8")).decode("utf-8")
-    )
-
-    response = disable_cache(response)
-
-    trust = bool(setd["has_trust"]) if "has_trust" in setd else False
-
-    response.set_cookie(
-        name="S3BROW_SESSION",
-        value=cookie_crypted,
-        max_age=str(setd["session_lifetime"]),
-        secure=trust,  # type: ignore
-        httponly=trust,  # type: ignore
-    )
-    # Initiate the session dictionary
-    request.app["Sessions"][session] = {}
-
-    # Save the unscoped token to the session, as it's needed for re-scoping
-    request.app["Sessions"][session]["Token"] = unscoped
-
-    try:
-        # Check token availability
-        request.app["Sessions"][session]["Avail"] = get_availability_from_token(unscoped)
-    except urllib.error.HTTPError:
-        raise aiohttp.web.HTTPUnauthorized(
-            reason="Token no longer valid",
-            headers={"WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'},
-        )
-    except urllib.error.URLError:
-        raise aiohttp.web.HTTPUnauthorized(
-            reason="Cannot fetch project and domains from existing endpoint.",
-            headers={"WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'},
-        )
-
-    if "LAST_ACTIVE" in request.cookies:
-        if request.cookies["LAST_ACTIVE"] not in [
-            p["id"] for p in request.app["Sessions"][session]["Avail"]["projects"]
-        ]:
-            raise aiohttp.web.HTTPForbidden(
-                reason="The project is not available for this token."
-            )
-        project_id = request.cookies["LAST_ACTIVE"]
-    else:
-        project_id = request.app["Sessions"][session]["Avail"]["projects"][0]["id"]
-
-    # Open an OS session for the first project that's found for the user.
-    request.app["Sessions"][session]["OS_sess"] = initiate_os_session(
-        unscoped, project_id
-    )
-
-    test_swift_endpoint(
-        request.app["Sessions"][session]["OS_sess"].get_endpoint(
-            service_type="object-store"
-        )
-    )
-
-    # Create the swiftclient connection
-    request.app["Sessions"][session]["ST_conn"] = initiate_os_service(
-        request.app["Sessions"][session]["OS_sess"],
-    )
-
-    project_name = None
-    for i in request.app["Sessions"][session]["Avail"]["projects"]:
-        if i["id"] == project_id:
-            project_name = i["name"]
-    # Save the current active project
-    request.app["Sessions"][session]["active_project"] = {
-        "name": project_name,
-        "id": project_id,
-    }
-
-    # Save time of login to the backend
-    created = time.time()
-    request.app["Sessions"][session]["last_used"] = created
-    request.app["Sessions"][session]["max_lifetime"] = created + int(
-        setd["session_lifetime"]  # type: ignore
-    )
-
-    # Set the active project to be the last active project
-    response.set_cookie(
-        "LAST_ACTIVE",
-        project_id,
-        expires=str(setd["history_lifetime"]),  # type: ignore
-        secure=trust,
-        httponly=trust,
-    )  # type: ignore
-
-    # Redirect to the browse page
-    if "NAV_TO" in request.cookies.keys():
-        response.headers["Location"] = request.cookies["NAV_TO"]
-        response.del_cookie("NAV_TO")
-    else:
-        response.headers["Location"] = "/browse"
-
-    return response
+    return await login_with_token(request, unscoped)
 
 
 async def token_rescope(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -275,6 +197,120 @@ async def token_rescope(request: aiohttp.web.Request) -> aiohttp.web.Response:
         request.app["Sessions"][session]["active_project"]["id"],
         expires=str(setd["history_lifetime"]),  # type: ignore
     )
+
+    return response
+
+
+async def login_with_token(
+    request: aiohttp.web.Request,
+    token: str,
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Log in a session with token."""
+    # Establish connection and begin user session
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+    response = aiohttp.web.Response(status=303)
+    cookie, _ = generate_cookie(request)
+
+    cookie["referer"] = request.url.host
+    cookie["signature"] = (
+        hashlib.sha256(
+            (cookie["id"] + cookie["referer"] + request.app["Salt"]).encode("utf-8")
+        )
+    ).hexdigest()
+    session = cookie["id"]
+
+    cookie_crypted = (
+        request.app["Crypt"].encrypt(json.dumps(cookie).encode("utf-8")).decode("utf-8")
+    )
+
+    response = disable_cache(response)
+
+    trust = bool(setd["has_trust"]) if "has_trust" in setd else False
+
+    response.set_cookie(
+        name="S3BROW_SESSION",
+        value=cookie_crypted,
+        max_age=str(setd["session_lifetime"]),
+        secure=trust,  # type: ignore
+        httponly=trust,  # type: ignore
+    )
+    # Initiate the session dictionary
+    request.app["Sessions"][session] = {}
+
+    # Save the unscoped token to the session, as it's needed for re-scoping
+    request.app["Sessions"][session]["Token"] = token
+
+    try:
+        # Check token availability
+        request.app["Sessions"][session]["Avail"] = get_availability_from_token(token)
+    except urllib.error.HTTPError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Token no longer valid",
+            headers={"WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'},
+        )
+    except urllib.error.URLError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Cannot fetch project and domains from existing endpoint.",
+            headers={"WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'},
+        )
+
+    if "LAST_ACTIVE" in request.cookies:
+        if request.cookies["LAST_ACTIVE"] not in [
+            p["id"] for p in request.app["Sessions"][session]["Avail"]["projects"]
+        ]:
+            raise aiohttp.web.HTTPForbidden(
+                reason="The project is not available for this token."
+            )
+        project_id = request.cookies["LAST_ACTIVE"]
+    else:
+        project_id = request.app["Sessions"][session]["Avail"]["projects"][0]["id"]
+
+    # Open an OS session for the first project that's found for the user.
+    request.app["Sessions"][session]["OS_sess"] = initiate_os_session(token, project_id)
+
+    test_swift_endpoint(
+        request.app["Sessions"][session]["OS_sess"].get_endpoint(
+            service_type="object-store"
+        )
+    )
+
+    # Create the swiftclient connection
+    request.app["Sessions"][session]["ST_conn"] = initiate_os_service(
+        request.app["Sessions"][session]["OS_sess"],
+    )
+
+    project_name = None
+    for i in request.app["Sessions"][session]["Avail"]["projects"]:
+        if i["id"] == project_id:
+            project_name = i["name"]
+    # Save the current active project
+    request.app["Sessions"][session]["active_project"] = {
+        "name": project_name,
+        "id": project_id,
+    }
+
+    # Save time of login to the backend
+    created = time.time()
+    request.app["Sessions"][session]["last_used"] = created
+    request.app["Sessions"][session]["max_lifetime"] = created + int(
+        setd["session_lifetime"]  # type: ignore
+    )
+
+    # Set the active project to be the last active project
+    response.set_cookie(
+        "LAST_ACTIVE",
+        project_id,
+        expires=str(setd["history_lifetime"]),  # type: ignore
+        secure=trust,
+        httponly=trust,
+    )  # type: ignore
+
+    # Redirect to the browse page
+    if "NAV_TO" in request.cookies.keys():
+        response.headers["Location"] = request.cookies["NAV_TO"]
+        response.del_cookie("NAV_TO")
+    else:
+        response.headers["Location"] = "/browse"
 
     return response
 

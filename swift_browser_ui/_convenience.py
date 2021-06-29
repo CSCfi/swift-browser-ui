@@ -329,6 +329,20 @@ def initiate_os_session(unscoped: str, project: str) -> keystoneauth1.session.Se
     )
 
 
+def os_get_token_from_credentials(
+    username: str,
+    password: str,
+) -> str:
+    """Get an unscoped token with provided credentials."""
+    os_auth = v3.Password(
+        auth_url=setd["auth_endpoint_url"],
+        username=username,
+        password=password,
+    )
+
+    return os_auth.get_token()
+
+
 def initiate_os_service(
     os_session: keystoneauth1.session.Session, url: str = None
 ) -> swiftclient.service.SwiftService:

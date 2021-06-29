@@ -19,6 +19,7 @@ from .login import (
     handle_logout,
     sso_query_begin,
     sso_query_end,
+    credentials_login_end,
     token_rescope,
 )
 from .api import (
@@ -126,6 +127,7 @@ async def servinit() -> aiohttp.web.Application:
             aiohttp.web.get("/login/front", sso_query_begin),
             aiohttp.web.post("/login/return", sso_query_end),
             aiohttp.web.post("/login/websso", sso_query_end),
+            aiohttp.web.post("/login/credentials", credentials_login_end),
             aiohttp.web.get("/login/rescope", token_rescope),
         ]
     )
