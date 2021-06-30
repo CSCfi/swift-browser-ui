@@ -9,10 +9,13 @@ import typing_extensions
 
 # aiohttp
 import aiohttp.web
+import keystoneauth1.exceptions.http
 from multidict import MultiDictProxy
 
 import typing
 import urllib.error
+
+from six import assertRaisesRegex
 
 from ._convenience import (
     disable_cache,
@@ -119,10 +122,15 @@ async def credentials_login_end(
     log.debug(f"username: {username}, password: {password}")
 
     # Get an unscoped token with credentials
-    unscoped: str = os_get_token_from_credentials(
-        username,
-        password,
-    )
+    try:
+        unscoped: str = os_get_token_from_credentials(
+            username,
+            password,
+        )
+    except keystoneauth1.exceptions.http.Unauthorized:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="Wrong username or password, or no access to the service."
+        )
 
     log.debug(f"got token {unscoped}")
 
