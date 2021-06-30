@@ -14,7 +14,8 @@ let default_translations = {
         UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
-                           "in. Use the button below to Log in.",
+                           "in, or the log in credentials were incorrect. " +
+                           "Use the button below to Log in.",
         Notfound: "404 – Could not find the page that was requested.",
         Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
