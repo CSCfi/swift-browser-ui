@@ -59,7 +59,7 @@
         method="POST"
         action="/login/credentials"
       >
-        <b>{{ formname }}</b><br>
+        <b>{{ loginformname }}</b><br>
         <input
           class="inputbox"
           type="text"
