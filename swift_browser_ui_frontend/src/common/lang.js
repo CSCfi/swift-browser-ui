@@ -6,7 +6,6 @@ let default_translations = {
   en: {
     message: {
       index: {
-        placeholder: "",
         loginmethods: [
           {
             msg: "Log In with SSO",
@@ -224,7 +223,6 @@ let default_translations = {
   fi: {
     message: {
       index: {
-        placeholder: "",
         loginmethods: [
           {
             msg: "Kirjaudu SSO:ta käyttäen",

@@ -47,7 +47,7 @@ async def index(
 
 async def loginpassword(
     request: typing.Optional[aiohttp.web.Request],
-) -> aiohttp.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the username and password login page."""
     try:
         if request is not None:
