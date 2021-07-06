@@ -3,7 +3,6 @@ let lang_overrides = {
   en: {
     message: {
       index: {
-        placeholder: "",
         loginmethods: [
           {
             msg: "Log In using Haka",
@@ -46,7 +45,6 @@ let lang_overrides = {
   },
   fi: {
     message: {
-      placeholder: "",
       index: {
         loginmethods: [
           {

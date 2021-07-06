@@ -5,7 +5,6 @@ import time
 import hashlib
 import json
 import re
-import typing_extensions
 
 # aiohttp
 import aiohttp.web
@@ -14,8 +13,6 @@ from multidict import MultiDictProxy
 
 import typing
 import urllib.error
-
-from six import assertRaisesRegex
 
 from ._convenience import (
     disable_cache,

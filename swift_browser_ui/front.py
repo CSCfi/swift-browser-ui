@@ -3,7 +3,6 @@
 import typing
 
 import aiohttp.web
-from aiohttp.web_routedef import head
 
 from cryptography.fernet import InvalidToken
 

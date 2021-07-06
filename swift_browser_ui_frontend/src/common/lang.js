@@ -441,7 +441,12 @@ function nestedJoin (dst, src) {
   let to_assign = [];
   for (let [key, value] of Object.entries(src)) {
     if (typeof(value) == "object") {
-      to_assign.push([key, nestedJoin(dst[key], src[key])]);
+      if (key in dst) {
+        to_assign.push([key, nestedJoin(dst[key], src[key])]);
+      }
+      else {
+        to_assign.push([key, src[key]]);
+      }
     } else {
       to_assign.push([key, value]);
     }
