@@ -3,6 +3,7 @@
 import typing
 
 import aiohttp.web
+from aiohttp.web_routedef import head
 
 from cryptography.fernet import InvalidToken
 
@@ -42,3 +43,25 @@ async def index(
             raise AttributeError
     except (AttributeError, InvalidToken, KeyError, aiohttp.web.HTTPUnauthorized):
         return aiohttp.web.FileResponse(str(setd["static_directory"]) + "/index.html")
+
+
+async def loginpassword(
+    request: typing.Optional[aiohttp.web.Request],
+) -> aiohttp.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Serve the username and password login page."""
+    try:
+        if request is not None:
+            session_check(request)
+            request.app["Log"].info("Redirecting an existing session to app")
+            return aiohttp.web.Response(
+                status=303,
+                headers={
+                    "Location": "/browse",
+                },
+            )
+        else:
+            raise AttributeError
+    except (AttributeError, InvalidToken, KeyError, aiohttp.web.HTTPUnauthorized):
+        return aiohttp.web.FileResponse(
+            str(setd["static_directory"]) + "/loginpassword.html"
+        )

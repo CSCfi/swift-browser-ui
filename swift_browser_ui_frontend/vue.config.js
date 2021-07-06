@@ -50,5 +50,12 @@ module.exports = {  // eslint-disable-line
       title: "Swift browser UI – Login",
       chunks: ["chunk-vendors", "chunk-common", "login"],
     },
+    loginpassword: {
+      entry: "src/entries/loginpassword.js",
+      template: "public/index.html",
+      filename: "loginpassword.html",
+      title: "Swift browser UI – Login",
+      chunks: ["chunk-vendors", "chunk-common", "loginpassword"],
+    }
   },
 };

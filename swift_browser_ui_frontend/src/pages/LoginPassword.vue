@@ -23,68 +23,33 @@
         </h2>
         <p>{{ $t("message.program_description") }}</p>
       </div>
-      <div class="block">
-        <b-message
-          v-if="unauth"
-          :title="$t('message.error.Unauthorized')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.Unauthorized_text') }}
-        </b-message>
-        <b-message
-          v-if="forbid"
-          :title="$t('message.error.Forbidden')"
-          type="is-danger"
-          has-icon
-        >
-          {{ $t('message.error.Forbidden_text') }}
-        </b-message>
-        <b-message
-          v-if="notfound"
-          :title="$t('message.error.Notfound')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.Notfound_text') }}
-        </b-message>
-        <b-message
-          v-if="uidown"
-          :title="$t('message.error.UIdown')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.UIdown_text') }}
-        </b-message>
+      <div class="content has-text-centered">
+        <h2 class="title is-4 is-csc-secondary">
+          CSC Login
+        </h2>
       </div>
-      <div
-        v-if="!forbid"
-        class="buttons block has-text-centered"
+      <form
+        method="POST"
+        action="/login/credentials"
       >
-        <b-button
-          v-for="item in $t('message.index.loginmethods')"
-          :key="item.msg"
+        <b-field
           class="center"
-          tag="a"
-          type="is-primary"
-          :href="item.href"
+          label="Username"
         >
-          {{ item.msg }}
-        </b-button>
-      </div>
-      <div
-        v-if="notindex"
-        class="buttons block has-text-centered"
-      >
-        <b-button
+          <b-input />
+        </b-field>
+        <b-field
           class="center"
-          tag="a"
-          type="is-primary"
-          href="/"
+          label="Password"
         >
-          {{ $t("message.error.frontPage") }}
-        </b-button>
-      </div>
+          <b-input />
+        </b-field>
+        <b-field
+          class="center"
+        >
+          <b-input type="submit" />
+        </b-field>
+      </form>
       <b-field class="locale-changer center">
         <b-select
           v-model="$i18n.locale"
@@ -102,6 +67,7 @@
           </option>
         </b-select>
       </b-field>
+      <div id="loginform" />
       <div class="block has-text-centered">
         <p>
           {{ $t("message.devel") }}
