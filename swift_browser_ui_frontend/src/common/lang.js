@@ -6,7 +6,12 @@ let default_translations = {
   en: {
     message: {
       index: {
-        logIn: "Log In",
+        loginmethods: [
+          {
+            msg: "Log In with SSO",
+            href: "/login",
+          },
+        ],
       },
       error: {
         frontPage: "To the Front Page",
@@ -218,7 +223,12 @@ let default_translations = {
   fi: {
     message: {
       index: {
-        logIn: "Kirjaudu sisään",
+        loginmethods: [
+          {
+            msg: "Kirjaudu SSO:ta käyttäen",
+            href: "/login",
+          },
+        ],
       },
       error: {
         frontPage: "Etusivulle",

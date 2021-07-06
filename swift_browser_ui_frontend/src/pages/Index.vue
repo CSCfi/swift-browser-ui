@@ -59,29 +59,39 @@
       </div>
       <div
         v-if="!forbid"
-        class="buttons"
+        class="buttons block has-text-centered"
       >
-        <a
-          class="button is-primary center"
-          href="/login"
-        >{{ $t("message.index.logIn") }}</a>
+        <b-button
+          v-for="item in $t('message.index.loginmethods')"
+          :key="item.msg"
+          class="center"
+          tag="a"
+          type="is-primary"
+          :href="item.href"
+        >
+          {{ item.msg }}
+        </b-button>
       </div>
       <div
         v-if="notindex"
-        class="buttons"
+        class="buttons block has-text-centered"
       >
-        <a
-          class="button is-primary center"
+        <b-button
+          class="center"
+          tag="a"
+          type="is-primary"
           href="/"
-        >{{ $t("message.error.frontPage") }}</a>
+        >
+          {{ $t("message.error.frontPage") }}
+        </b-button>
       </div>
       <b-field class="locale-changer center">
         <b-select
           v-model="$i18n.locale"
           placeholder="Language"
           icon="earth"
-          expanded
           @input="setCookieLang ()"
+          expanded
         >
           <option
             v-for="lang in langs"
