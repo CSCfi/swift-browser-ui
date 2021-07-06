@@ -6,6 +6,8 @@ let default_translations = {
   en: {
     message: {
       index: {
+        formName: "Openstack Account",
+        logIn: "Log In",
         loginmethods: [
           {
             msg: "Log In with SSO",
@@ -223,6 +225,8 @@ let default_translations = {
   fi: {
     message: {
       index: {
+        formName: "Openstack Käyttäjä",
+        logIn: "Kirjaudu sisään",
         loginmethods: [
           {
             msg: "Kirjaudu SSO:ta käyttäen",

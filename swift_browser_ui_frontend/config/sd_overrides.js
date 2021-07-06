@@ -3,6 +3,7 @@ let lang_overrides = {
   en: {
     message: {
       index: {
+        formName: "CSC Account",
         loginmethods: [
           {
             msg: "Log In using Haka",
@@ -45,6 +46,7 @@ let lang_overrides = {
   },
   fi: {
     message: {
+      formName: "CSC Käyttäjä",
       index: {
         loginmethods: [
           {

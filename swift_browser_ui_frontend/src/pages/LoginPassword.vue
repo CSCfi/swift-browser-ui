@@ -25,7 +25,7 @@
       </div>
       <div class="content has-text-centered">
         <h2 class="title is-4 is-csc-secondary">
-          CSC Login
+          {{ $t("message.index.formName") }}
         </h2>
       </div>
       <div class="block">
@@ -54,7 +54,11 @@
           <b-field
             class="center"
           >
-            <b-input type="submit" />
+            <input
+              class="button is-primary loginbutton"
+              type="submit"
+              :value="$t('message.index.logIn')"
+            >
           </b-field>
         </form>
       </div>
@@ -105,6 +109,9 @@ html, body {
 .center {
   width: 50%;
   margin: auto;
+}
+.loginbutton {
+  width: 100%;
 }
 .csc-logo {
   justify-content: center;
