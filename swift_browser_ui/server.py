@@ -13,7 +13,7 @@ import uvloop
 import cryptography.fernet
 import aiohttp.web
 
-from .front import index, browse
+from .front import index, browse, loginpassword
 from .login import (
     handle_login,
     handle_logout,
@@ -112,6 +112,7 @@ async def servinit() -> aiohttp.web.Application:
     app.add_routes(
         [
             aiohttp.web.get("/", index),
+            aiohttp.web.get("/loginpassword", loginpassword),
             aiohttp.web.get("/browse", browse),
             # Route all URLs prefixed by /browse to the browser page, as this is
             # an spa
