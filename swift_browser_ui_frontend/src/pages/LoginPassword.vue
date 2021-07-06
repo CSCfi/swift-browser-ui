@@ -28,34 +28,36 @@
           CSC Login
         </h2>
       </div>
-      <form
-        method="POST"
-        action="/login/credentials"
-      >
-        <b-field
-          class="center"
-          label="Username"
+      <div class="block">
+        <form
+          method="POST"
+          action="/login/credentials"
         >
-          <b-input
-            type="text"
-            name="username"
-          />
-        </b-field>
-        <b-field
-          class="center"
-          label="Password"
-        >
-          <b-input
-            name="password"
-            type="password"
-          />
-        </b-field>
-        <b-field
-          class="center"
-        >
-          <b-input type="submit" />
-        </b-field>
-      </form>
+          <b-field
+            class="center"
+            label="Username"
+          >
+            <b-input
+              type="text"
+              name="username"
+            />
+          </b-field>
+          <b-field
+            class="center"
+            label="Password"
+          >
+            <b-input
+              name="password"
+              type="password"
+            />
+          </b-field>
+          <b-field
+            class="center"
+          >
+            <b-input type="submit" />
+          </b-field>
+        </form>
+      </div>
       <b-field class="block locale-changer center">
         <b-select
           v-model="$i18n.locale"

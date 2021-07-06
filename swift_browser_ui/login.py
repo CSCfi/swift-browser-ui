@@ -92,9 +92,9 @@ def test_token(
             f"from address {request.remote} :: {time.ctime()}"
         )
     if unscoped is None:
-        raise aiohttp.web.HTTPClientError(reason="Token missing from query")
+        raise aiohttp.web.HTTPBadRequest(reason="Token missing from query")
     if not (re.match("[a-f0-9]{32}", unscoped) and len(unscoped) == 32):
-        raise aiohttp.web.HTTPClientError(reason="Token is malformed")
+        raise aiohttp.web.HTTPBadRequest(reason="Token is malformed")
 
     log.info("Got OS token in login return")
 
@@ -114,7 +114,7 @@ async def credentials_login_end(
         username = str(form["username"])
         password = str(form["password"])
     except KeyError:
-        raise aiohttp.web.HTTPClientError(reason="Username or password not provided")
+        raise aiohttp.web.HTTPBadRequest(reason="Username or password not provided")
 
     log.debug(f"username: {username}, password: {password}")
 

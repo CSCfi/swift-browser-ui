@@ -59,11 +59,12 @@
       </div>
       <div
         v-if="!forbid"
+        class="block"
       >
         <div 
           v-for="item in $t('message.index.loginmethods')"
           :key="item.msg"
-          class="buttons block has-text-centered"
+          class="block buttons has-text-centered"
         >
           <b-button
             class="center"
@@ -88,7 +89,7 @@
           {{ $t("message.error.frontPage") }}
         </b-button>
       </div>
-      <b-field class="locale-changer center">
+      <b-field class="locale-changer block center">
         <b-select
           v-model="$i18n.locale"
           placeholder="Language"
