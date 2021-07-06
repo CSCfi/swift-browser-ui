@@ -36,13 +36,19 @@
           class="center"
           label="Username"
         >
-          <b-input />
+          <b-input
+            type="text"
+            name="username"
+          />
         </b-field>
         <b-field
           class="center"
           label="Password"
         >
-          <b-input />
+          <b-input
+            name="password"
+            type="password"
+          />
         </b-field>
         <b-field
           class="center"
@@ -50,7 +56,7 @@
           <b-input type="submit" />
         </b-field>
       </form>
-      <b-field class="locale-changer center">
+      <b-field class="block locale-changer center">
         <b-select
           v-model="$i18n.locale"
           placeholder="Language"

@@ -59,18 +59,21 @@
       </div>
       <div
         v-if="!forbid"
-        class="buttons block has-text-centered"
       >
-        <b-button
+        <div 
           v-for="item in $t('message.index.loginmethods')"
           :key="item.msg"
-          class="center"
-          tag="a"
-          type="is-primary"
-          :href="item.href"
+          class="buttons block has-text-centered"
         >
-          {{ item.msg }}
-        </b-button>
+          <b-button
+            class="center"
+            tag="a"
+            type="is-primary"
+            :href="item.href"
+          >
+            {{ item.msg }}
+          </b-button>
+        </div>
       </div>
       <div
         v-if="notindex"
