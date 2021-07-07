@@ -1,6 +1,6 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "1.1.0b2",
+  "version": "1.1.0b3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -11,18 +11,18 @@
   },
   "dependencies": {
     "@vue/cli-service": "^5.0.0-beta.2",
-    "buefy": "^0.9.7",
-    "core-js": "^3.14.0",
+    "buefy": "^0.9.8",
+    "core-js": "^3.15.2",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
-    "node-sass": "^6.0.0",
+    "node-sass": "^6.0.1",
     "resumablejs": "^1.1.0",
     "sass-loader": "^12.1.0",
     "serve": "^12.0.0",
     "vue": "^2.6.14",
-    "vue-i18n": "^8.24.4",
+    "vue-i18n": "^8.24.5",
     "vue-material-design-icons": "^4.12.1",
-    "vue-router": "^3.5.1",
+    "vue-router": "^3.5.2",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
@@ -31,8 +31,8 @@
     "@vue/cli-service": "^5.0.0-beta.2",
     "babel-eslint": "^10.1.0",
     "cli-highlight": "^2.1.11",
-    "eslint": "^7.28.0",
-    "eslint-plugin-vue": "^7.11.1",
+    "eslint": "^7.30.0",
+    "eslint-plugin-vue": "^7.12.1",
     "eslint-utils": "^3.0.0",
     "vue-template-compiler": "^2.6.14"
   },

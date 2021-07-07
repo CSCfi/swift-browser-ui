@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "@/pages/Index.vue";
+import App from "@/pages/LoginPassword.vue";
 import Buefy from "buefy";
 import VueI18n from "vue-i18n";
 
@@ -20,15 +20,9 @@ const i18n = new VueI18n({
 });
 
 new Vue({
-  name: "Forbidden",
+  name: "LoginPassword",
   i18n,
   data: {
-    notindex: true,
-    badrequest: false,
-    unauth: false,
-    forbid: true,
-    notfound: false,
-    uidown: false,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
   },
   created() {
@@ -42,7 +36,7 @@ new Vue({
                         i18n.locale +
                         "; path=/; expires="
                         + expiryDate.toUTCString();
-    },  
+    },
   },
   ...App,
 }).$mount("#app");

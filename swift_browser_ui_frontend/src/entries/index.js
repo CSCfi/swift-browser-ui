@@ -24,6 +24,7 @@ new Vue({
   i18n,
   data: {
     notindex: false,
+    badrequest: false,
     uidown: false,
     unauth: false,
     forbid: false,

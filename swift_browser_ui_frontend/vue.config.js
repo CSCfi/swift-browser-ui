@@ -8,6 +8,13 @@ module.exports = {  // eslint-disable-line
       title: "Swift browser UI",
       chunks: ["chunk-vendors", "chunk-common", "index"],
     },
+    badrequest: {
+      entry: "src/entries/badrequest.js",
+      template: "public/index.html",
+      filename: "400.html",
+      title: "Bad Request",
+      chunks: ["chunk-vendors", "chunk-common", "badrequest"],
+    },
     unauth: {
       entry: "src/entries/unauth.js",
       template: "public/index.html",
@@ -49,6 +56,13 @@ module.exports = {  // eslint-disable-line
       filename: "login.html",
       title: "Swift browser UI – Login",
       chunks: ["chunk-vendors", "chunk-common", "login"],
+    },
+    loginpassword: {
+      entry: "src/entries/loginpassword.js",
+      template: "public/index.html",
+      filename: "loginpassword.html",
+      title: "Swift browser UI – Login",
+      chunks: ["chunk-vendors", "chunk-common", "loginpassword"],
     },
   },
 };
