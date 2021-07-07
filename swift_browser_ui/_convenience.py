@@ -338,7 +338,7 @@ def os_get_token_from_credentials(
         setd["auth_endpoint_url"],
         username=username,
         password=password,
-        user_domain_name="Default",
+        user_domain_name=setd["os_user_domain"],
         unscoped=True,
     )
 
