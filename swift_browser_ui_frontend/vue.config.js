@@ -13,7 +13,7 @@ module.exports = {  // eslint-disable-line
       template: "public/index.html",
       filename: "400.html",
       title: "Bad Request",
-      chunks: ["chunk-vendors", "chunk-common", "unauth"],
+      chunks: ["chunk-vendors", "chunk-common", "badrequest"],
     },
     unauth: {
       entry: "src/entries/unauth.js",
