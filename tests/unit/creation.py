@@ -50,6 +50,17 @@ def get_request_with_fernet():
     return ret
 
 
+def get_request_with_login_form():
+    ret = get_request_with_fernet()
+    ret.set_post(
+        {
+            "username": "test",
+            "password": "password",
+        }
+    )
+    return ret
+
+
 def get_request_with_mock_openstack():
     """Create a request with a openstack mock-up service & session."""
     ret = get_request_with_fernet()
