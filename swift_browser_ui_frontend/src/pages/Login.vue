@@ -42,7 +42,8 @@
     >
       <b>{{ formname }}</b><br>
       <input
-        class="inputbox"
+        id="inputbox"
+        class="formField"
         type="text"
         name="token"
       ><br>
@@ -61,12 +62,12 @@
       >
         <b>{{ loginformname }}</b><br>
         <input
-          class="inputbox"
+          class="formField"
           type="text"
           name="username"
         ><br>
         <input
-          class="inputbox"
+          class="formField"
           type="password"
           name="password"
         ><br>
@@ -121,7 +122,11 @@ form {
   font-family: sans-serif;
 }
 
-.inputbox {
+#inputbox {
+  width: 40ch
+}
+
+.formField {
   width: 40ch;
 }
 </style>
