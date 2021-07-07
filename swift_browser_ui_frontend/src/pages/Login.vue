@@ -43,11 +43,37 @@
       <b>{{ formname }}</b><br>
       <input
         id="inputbox"
+        class="formField"
         type="text"
         name="token"
       ><br>
       <input type="submit">
     </form>
+    <div>
+      <h2>Alternative login process</h2>
+      <p class="maintext">
+        Alternatively you can use this form to log in with a username
+        and password.
+      </p>
+      <form
+        id="classicform"
+        method="POST"
+        action="/login/credentials"
+      >
+        <b>{{ loginformname }}</b><br>
+        <input
+          class="formField"
+          type="text"
+          name="username"
+        ><br>
+        <input
+          class="formField"
+          type="password"
+          name="password"
+        ><br>
+        <input type="submit">
+      </form>
+    </div>
   </div>
 </template>
 
@@ -97,6 +123,10 @@ form {
 }
 
 #inputbox {
+  width: 40ch
+}
+
+.formField {
   width: 40ch;
 }
 </style>

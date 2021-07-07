@@ -6,15 +6,27 @@ let default_translations = {
   en: {
     message: {
       index: {
+        formName: "Openstack Account",
         logIn: "Log In",
+        loginmethods: [
+          {
+            msg: "Log In with SSO",
+            href: "/login",
+          },
+        ],
       },
       error: {
         frontPage: "To the Front Page",
+        BadRequest: "400 - Bad Request",
+        BadRequest_text: "Something was wrong with the request. This can " +
+                         "be for example due to missing password and/or " +
+                         "username.",
         UIdown: "503 - Service Unavailable",
         UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
-                           "in. Use the button below to Log in.",
+                           "in, or the log in credentials were incorrect. " +
+                           "Use the button below to Log in.",
         Notfound: "404 – Could not find the page that was requested.",
         Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
@@ -217,10 +229,20 @@ let default_translations = {
   fi: {
     message: {
       index: {
+        formName: "Openstack Käyttäjä",
         logIn: "Kirjaudu sisään",
+        loginmethods: [
+          {
+            msg: "Kirjaudu SSO:ta käyttäen",
+            href: "/login",
+          },
+        ],
       },
       error: {
         frontPage: "Etusivulle",
+        BadRequest: "400 - Virheellinen pyyntö",
+        BadRequest_text: "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
+                         "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
@@ -430,7 +452,12 @@ function nestedJoin (dst, src) {
   let to_assign = [];
   for (let [key, value] of Object.entries(src)) {
     if (typeof(value) == "object") {
-      to_assign.push([key, nestedJoin(dst[key], src[key])]);
+      if (key in dst) {
+        to_assign.push([key, nestedJoin(dst[key], src[key])]);
+      }
+      else {
+        to_assign.push([key, src[key]]);
+      }
     } else {
       to_assign.push([key, value]);
     }

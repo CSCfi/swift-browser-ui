@@ -147,9 +147,9 @@ def get_nav_out(drv):
 def login(drv):
     """Log in the user in a specific selenium driver instance."""
     try:
-        wait_for_clickable(drv.find_element_by_link_text("Log In"))
+        wait_for_clickable(drv.find_element_by_link_text("Log In with SSO"))
     except NoSuchElementException:
-        wait_for_clickable(drv.find_element_by_link_text("Kirjaudu sisään"))
+        wait_for_clickable(drv.find_element_by_link_text("Kirjaudu SSO:ta käyttäen"))
     drv.implicitly_wait(1)
 
     login_field = drv.find_element_by_id("inputbox")

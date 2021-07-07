@@ -12,10 +12,18 @@ import aiohttp
 import swift_browser_ui.login
 import swift_browser_ui.settings
 
-from .creation import get_request_with_fernet, get_request_with_mock_openstack
-from .mockups import return_project_avail, return_test_swift_endpoint
-from .mockups import return_invalid
-from .mockups import mock_token_project_avail
+from .creation import (
+    get_request_with_fernet,
+    get_request_with_login_form,
+    get_request_with_mock_openstack,
+)
+from .mockups import (
+    return_project_avail,
+    return_test_swift_endpoint,
+    return_invalid,
+    mock_token_project_avail,
+    return_mock_token,
+)
 
 _path = "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso"
 
@@ -209,6 +217,57 @@ class LoginTestClass(asynctest.TestCase):
             req.headers["X-Auth-Token"] = token
 
             resp = await swift_browser_ui.login.sso_query_end(req)
+
+            # Test for the correct values
+            assert req.app["Sessions"]  # nosec
+            session = list(req.app["Sessions"].keys())[0]
+            self.assertTrue(req.app["Sessions"][session]["Token"] is not None)
+            self.assertNotEqual(req.app["Sessions"][session]["Avail"], "INVALID")
+            self.assertEqual(
+                req.app["Sessions"][session]["active_project"],
+                {
+                    "name": "placeholder",
+                    "id": "placeholder",
+                },
+            )
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers["Location"], "/browse")
+            self.assertIn("S3BROW_SESSION", resp.cookies)
+
+    async def test_credential_query_end(self):
+        """Test credential query end."""
+        patch1 = unittest.mock.patch(
+            "swift_browser_ui.login.setd",
+            new={
+                "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
+                "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
+                "session_lifetime": 28800,
+                "history_lifetime": 2592000,
+            },
+        )
+        patch2 = unittest.mock.patch(
+            "swift_browser_ui.login.os_get_token_from_credentials",
+            new=return_mock_token,
+        )
+        # Patch away the convenience function for checking project availability
+        patch3 = unittest.mock.patch(
+            "swift_browser_ui.login.get_availability_from_token",
+            new=return_project_avail,
+        )
+
+        patch4 = unittest.mock.patch("keystoneauth1.identity.v3.Token")
+
+        patch5 = unittest.mock.patch("keystoneauth1.session.Session")
+
+        patch6 = unittest.mock.patch("swiftclient.service.SwiftService")
+
+        patch7 = unittest.mock.patch(
+            "swift_browser_ui.login.test_swift_endpoint", new=return_test_swift_endpoint
+        )
+
+        with patch1, patch2, patch3, patch4, patch5, patch6, patch7:
+            req = get_request_with_login_form()
+            resp = await swift_browser_ui.login.credentials_login_end(req)
 
             # Test for the correct values
             assert req.app["Sessions"]  # nosec

@@ -2,6 +2,19 @@
 let lang_overrides = {
   en: {
     message: {
+      index: {
+        formName: "CSC Account",
+        loginmethods: [
+          {
+            msg: "Log In using Haka",
+            href: "/login",
+          },
+          {
+            msg: "Log in with CSC Login",
+            href: "/loginpassword",
+          },
+        ],
+      },
       program_name: "SD Connect",
       program_description: "SD Connect provides a simple-to-use web user " +
         "interface, along with a command line interface, for storing " +
@@ -33,6 +46,19 @@ let lang_overrides = {
   },
   fi: {
     message: {
+      formName: "CSC Käyttäjä",
+      index: {
+        loginmethods: [
+          {
+            msg: "Kirjaudu Haka:lla",
+            href: "/login",
+          },
+          {
+            msg: "Kirjaudu CSC käyttäjällä",
+            href: "/loginpassword",
+          },
+        ],
+      },
       program_name: "SD Connect",
       program_description: "SD Connect tarjoaa yksinkertaisen " +
         "web-käyttöliittymän ja komentorivikäyttöliittymän sensitiivisen " +

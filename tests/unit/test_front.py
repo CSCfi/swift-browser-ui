@@ -50,3 +50,18 @@ class FrontendTestCase(AioHTTPTestCase):
             response = await self.client.request("GET", "/")
             self.assertEqual(response.status, 200)
             self.assertEqual(response.headers["Content-type"], "text/html")
+
+    @unittest_run_loop
+    async def test_loginpassword(self):
+        """Test /loginpassword handler."""
+        patch_setd = unittest.mock.patch(
+            "swift_browser_ui.front.setd",
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
+        )
+        patch_check = unittest.mock.patch(
+            "swift_browser_ui.front.session_check", new=self.return_true
+        )
+        with patch_setd, patch_check:
+            response = await self.client.request("GET", "/loginpassword")
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.headers["Content-type"], "text/html")

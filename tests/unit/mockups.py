@@ -106,6 +106,11 @@ mock_token_output = {
 }
 
 
+def return_mock_token(_, _a):
+    """Return a mock token."""
+    return "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+
 def return_same_cookie(_):
     """Return same cookie."""
     return ("placeholder", "placeholder")

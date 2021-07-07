@@ -7,6 +7,7 @@ import "@/css/prod.scss";
 new Vue ({
   data: {
     formname: "Token id:",
+    loginformname: "Openstack account:",
   },
   created() {
     document.title = this.$t("message.program_name");

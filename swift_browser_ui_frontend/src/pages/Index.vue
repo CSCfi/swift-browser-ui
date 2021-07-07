@@ -25,6 +25,14 @@
       </div>
       <div class="block">
         <b-message
+          v-if="badrequest"
+          :title="$t('message.error.BadRequest')"
+          type="is-warning"
+          has-icon
+        >
+          {{ $t('message.error.BadRequest_text') }}
+        </b-message>
+        <b-message
           v-if="unauth"
           :title="$t('message.error.Unauthorized')"
           type="is-warning"
@@ -59,23 +67,37 @@
       </div>
       <div
         v-if="!forbid"
-        class="buttons"
+        class="block"
       >
-        <a
-          class="button is-primary center"
-          href="/login"
-        >{{ $t("message.index.logIn") }}</a>
+        <div 
+          v-for="item in $t('message.index.loginmethods')"
+          :key="item.msg"
+          class="block buttons has-text-centered"
+        >
+          <b-button
+            class="center"
+            tag="a"
+            type="is-primary"
+            :href="item.href"
+          >
+            {{ item.msg }}
+          </b-button>
+        </div>
       </div>
       <div
         v-if="notindex"
-        class="buttons"
+        class="buttons block has-text-centered"
       >
-        <a
-          class="button is-primary center"
+        <b-button
+          class="center"
+          tag="a"
+          type="is-primary"
           href="/"
-        >{{ $t("message.error.frontPage") }}</a>
+        >
+          {{ $t("message.error.frontPage") }}
+        </b-button>
       </div>
-      <b-field class="locale-changer center">
+      <b-field class="locale-changer block center">
         <b-select
           v-model="$i18n.locale"
           placeholder="Language"

@@ -20,13 +20,13 @@ const i18n = new VueI18n({
 });
 
 new Vue({
-  name: "Forbidden",
+  name: "BadRequest",
   i18n,
   data: {
     notindex: true,
-    badrequest: false,
+    badrequest: true,
     unauth: false,
-    forbid: true,
+    forbid: false,
     notfound: false,
     uidown: false,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],

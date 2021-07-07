@@ -69,6 +69,7 @@ setd: Dict[str, Union[str, int, None]] = {
     "sharing_request_token": environ.get("SWIFT_UI_SHARING_REQUEST_TOKEN", None),
     "has_trust": environ.get("BROWSER_START_HAS_TRUST", False),
     "set_origin_address": environ.get("BROWSER_START_SET_ORIGIN_ADDRESS", None),
+    "os_user_domain": environ.get("OS_USER_DOMAIN_NAME", "Default"),
     "logfile": None,
     "port": 8080,
     "verbose": False,
