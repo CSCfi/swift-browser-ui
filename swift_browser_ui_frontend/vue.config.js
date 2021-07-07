@@ -8,6 +8,13 @@ module.exports = {  // eslint-disable-line
       title: "Swift browser UI",
       chunks: ["chunk-vendors", "chunk-common", "index"],
     },
+    badrequest: {
+      entry: "src/entries/badrequest.js",
+      template: "public/index.html",
+      filename: "400.html",
+      title: "Bad Request",
+      chunks: ["chunk-vendors", "chunk-common", "unauth"],
+    },
     unauth: {
       entry: "src/entries/unauth.js",
       template: "public/index.html",

@@ -17,6 +17,10 @@ let default_translations = {
       },
       error: {
         frontPage: "To the Front Page",
+        BadRequest: "400 - Bad Request",
+        BadRequest_text: "Something was wrong with the request. This can " +
+                         "be for example due to missing password and/or " +
+                         "username.",
         UIdown: "503 - Service Unavailable",
         UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
@@ -236,6 +240,9 @@ let default_translations = {
       },
       error: {
         frontPage: "Etusivulle",
+        BadRequest: "400 - Virheellinen pyyntö",
+        BadRequest_text: "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
+                         "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",

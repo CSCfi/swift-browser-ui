@@ -32,6 +32,8 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
     """Return the correct HTTP Error page."""
     try:
         response = await handler(request)
+        if response.status == 400:
+            return return_error_response(400)
         if response.status == 401:
             return return_error_response(401)
         if response.status == 403:
@@ -40,6 +42,8 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
             return return_error_response(404)
         return response
     except web.HTTPException as ex:
+        if ex.status == 400:
+            return return_error_response(400)
         if ex.status == 401:
             return return_error_response(401)
         if ex.status == 403:

@@ -125,9 +125,7 @@ async def credentials_login_end(
             password,
         )
     except keystoneauth1.exceptions.http.BadRequest:
-        raise aiohttp.web.HTTPBadRequest(
-            reason="No username or password provided."
-        )
+        raise aiohttp.web.HTTPBadRequest(reason="No username or password provided.")
     except keystoneauth1.exceptions.http.Unauthorized:
         raise aiohttp.web.HTTPUnauthorized(
             reason="Wrong username or password, or no access to the service."

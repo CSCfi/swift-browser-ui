@@ -25,6 +25,14 @@
       </div>
       <div class="block">
         <b-message
+          v-if="badrequest"
+          :title="$t('message.error.BadRequest')"
+          type="is-warning"
+          has-icon
+        >
+          {{ $t('message.error.BadRequest_text') }}
+        </b-message>
+        <b-message
           v-if="unauth"
           :title="$t('message.error.Unauthorized')"
           type="is-warning"
