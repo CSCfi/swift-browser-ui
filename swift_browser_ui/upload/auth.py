@@ -10,7 +10,7 @@ import secrets
 
 import aiohttp.web
 
-from swift_browser_ui._convenience import initiate_os_session
+from ..ui._convenience import initiate_os_session
 
 AiohttpHandler = typing.Callable[
     [aiohttp.web.Request],

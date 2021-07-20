@@ -9,9 +9,11 @@ import aiohttp.client
 
 import keystoneauth1.session
 
-import swift_upload_runner.common as common
 import ssl
 import certifi
+
+from . import common
+
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

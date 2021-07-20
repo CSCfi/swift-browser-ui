@@ -11,10 +11,10 @@ import aiohttp.client
 
 import keystoneauth1.session
 
-import swift_upload_runner.common as common
-
 import ssl
 import certifi
+
+from . import common
 
 
 ssl_context = ssl.create_default_context()

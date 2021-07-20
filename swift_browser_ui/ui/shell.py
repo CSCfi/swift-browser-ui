@@ -8,14 +8,14 @@ import typing
 import click
 
 
-from .__init__ import __version__
+# from ..__init__ import __version__
 from .settings import setd, set_key, FORMAT
 from .server import servinit, run_server_insecure, run_server_secure
 from ._convenience import setup_logging as conv_setup_logging
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="swift-browser-ui")
+# @click.version_option(version=__version__, prog_name="swift-browser-ui")
 @click.option(
     "-v", "--verbose", is_flag=True, default=False, help="Increase program verbosity."
 )

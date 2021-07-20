@@ -6,6 +6,14 @@ with the object storage.
 """
 
 
+from . import (
+    ui,
+    sharing,
+    request,
+    upload,
+)
+
+
 __name__ = "swift_browser_ui"
 __version__ = "1.1.0b3"
 __author__ = "CSC Developers"
