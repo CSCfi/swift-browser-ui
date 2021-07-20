@@ -12,7 +12,7 @@ import json
 import time
 
 import cryptography.fernet
-from swift_browser_ui._convenience import generate_cookie
+from swift_browser_ui.ui._convenience import generate_cookie
 
 from .mockups import Mock_Request, Mock_Service, Mock_Session
 

@@ -6,7 +6,7 @@ import unittest.mock
 import logging
 
 
-import swift_browser_ui.server
+import swift_browser_ui.ui.server
 
 
 # Import some mock-ups that are already made before
