@@ -5,7 +5,7 @@ from swift_browser_ui import __name__, __version__, __author__
 setuptools.setup(
     name=__name__,
     version=__version__,
-    description="Object browser for OS_swift API",
+    description="Object browser Web UI for Openstack Swift API",
     author=__author__,
     project_urls={
         "Source": "https://github.com/CSCfi/swift-browser-ui",
@@ -20,6 +20,7 @@ setuptools.setup(
         "gunicorn>=20.0.1",
         "uvloop==0.15.2",
         "certifi==2021.5.30",
+        "asyncpg==0.23.0",
     ],
     extras_require={
         "test": [
@@ -43,7 +44,10 @@ setuptools.setup(
     platforms="any",
     entry_points={
         "console_scripts": [
-            "swift-browser-ui=swift_browser_ui.shell:main",
+            "swift-browser-ui=swift_browser_ui:ui.shell.main",
+            "swift-x-account-sharing=swift_browser_ui:sharing.server.main",
+            "swift-sharing-request=swift_browser_ui:request.server.main",
+            "swift-upload-runner=swift_browser_ui:upload.server.main",
         ]
     },
     classifiers=[
