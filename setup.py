@@ -38,16 +38,16 @@ setuptools.setup(
         "docs": ["sphinx==4.0.3", "sphinx_rtd_theme==0.5.2", "selenium==3.141.0"],
         "ui_test": ["pytest==6.2.4", "selenium==3.141.0 ", "pytest-timeout==1.4.2"],
     },
-    packages=[__name__],
+    packages=setuptools.find_packages(),
     package_data={__name__: ["static/*", "static/js/*", "static/css/*", "static/img/*"]},
     include_package_data=True,
     platforms="any",
     entry_points={
         "console_scripts": [
-            "swift-browser-ui=swift_browser_ui:ui.shell.main",
-            "swift-x-account-sharing=swift_browser_ui:sharing.server.main",
-            "swift-sharing-request=swift_browser_ui:request.server.main",
-            "swift-upload-runner=swift_browser_ui:upload.server.main",
+            "swift-browser-ui=swift_browser_ui.launcher:run_ui",
+            "swift-x-account-sharing=swift_browser_ui.launcher:run_sharing",
+            "swift-sharing-request=swift_browser_ui.launcher:run_request",
+            "swift-upload-runner=swift_browser_ui.launcher:run_upload",
         ]
     },
     classifiers=[
