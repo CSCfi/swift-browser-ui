@@ -12,7 +12,7 @@ import keystoneauth1.session
 import ssl
 import certifi
 
-from . import common
+from swift_browser_ui.upload import common
 
 
 LOGGER = logging.getLogger(__name__)

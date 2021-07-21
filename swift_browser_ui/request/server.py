@@ -9,12 +9,12 @@ import aiohttp.web
 import uvloop
 import typing
 
-from .middleware import (
+from swift_browser_ui.request.middleware import (
     add_cors,
     check_db_conn,
     catch_uniqueness_error,
 )
-from .api import (
+from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
     handle_user_made_request_listing,
@@ -25,9 +25,9 @@ from .api import (
     handle_user_list_tokens,
     handle_health_check
 )
-from .db import DBConn
-from .preflight import handle_delete_preflight
-from .auth import (
+from swift_browser_ui.request.db import DBConn
+from swift_browser_ui.request.preflight import handle_delete_preflight
+from swift_browser_ui.request.auth import (
     read_in_keys,
     handle_validate_authentication,
 )

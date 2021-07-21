@@ -13,8 +13,8 @@ import uvloop
 import cryptography.fernet
 import aiohttp.web
 
-from .front import index, browse, loginpassword
-from .login import (
+from swift_browser_ui.ui.front import index, browse, loginpassword
+from swift_browser_ui.ui.login import (
     handle_login,
     handle_logout,
     sso_query_begin,
@@ -22,7 +22,7 @@ from .login import (
     credentials_login_end,
     token_rescope,
 )
-from .api import (
+from swift_browser_ui.ui.api import (
     swift_list_buckets,
     swift_list_objects,
     swift_download_object,
@@ -45,18 +45,18 @@ from .api import (
     swift_check_object_chunk,
     swift_replicate_container,
 )
-from .health import handle_health_check
-from .settings import setd
-from .middlewares import error_middleware
-from .discover import handle_discover
-from .signature import (
+from swift_browser_ui.ui.health import handle_health_check
+from swift_browser_ui.ui.settings import setd
+from swift_browser_ui.ui.middlewares import error_middleware
+from swift_browser_ui.ui.discover import handle_discover
+from swift_browser_ui.ui.signature import (
     handle_signature_request,
     handle_ext_token_create,
     handle_ext_token_list,
     handle_ext_token_remove,
 )
-from .misc_handlers import handle_bounce_direct_access_request
-from ._convenience import clear_session_info
+from swift_browser_ui.ui.misc_handlers import handle_bounce_direct_access_request
+from swift_browser_ui.ui._convenience import clear_session_info
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

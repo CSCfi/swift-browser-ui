@@ -14,7 +14,7 @@ from multidict import MultiDictProxy
 import typing
 import urllib.error
 
-from ._convenience import (
+from swift_browser_ui.ui._convenience import (
     disable_cache,
     decrypt_cookie,
     generate_cookie,
@@ -26,7 +26,7 @@ from ._convenience import (
     test_swift_endpoint,
     clear_session_info,
 )
-from .settings import setd
+from swift_browser_ui.ui.settings import setd
 
 
 async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.Response:

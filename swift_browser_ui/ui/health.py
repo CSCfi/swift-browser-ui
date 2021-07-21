@@ -7,8 +7,8 @@ import time
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
 
-from .settings import setd
-from .signature import sign
+from swift_browser_ui.ui.settings import setd
+from swift_browser_ui.ui.signature import sign
 
 
 def _set_error_status(

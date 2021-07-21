@@ -6,8 +6,8 @@ import aiohttp.web
 
 from cryptography.fernet import InvalidToken
 
-from .settings import setd
-from ._convenience import session_check
+from swift_browser_ui.ui.settings import setd
+from swift_browser_ui.ui._convenience import session_check
 
 
 async def browse(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:

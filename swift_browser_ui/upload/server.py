@@ -12,11 +12,19 @@ import aiohttp.client
 
 import uvloop
 
-from .middleware import add_cors
-from .auth import handle_login, read_in_keys, handle_validate_authentication
-from .api import handle_get_object, handle_get_container
-from .api import handle_post_object_chunk, handle_post_object_options
-from .api import handle_health_check
+from swift_browser_ui.upload.middleware import add_cors
+from swift_browser_ui.upload.auth import (
+    handle_login,
+    read_in_keys,
+    handle_validate_authentication,
+)
+from swift_browser_ui.upload.api import (
+    handle_get_object,
+    handle_get_container,
+    handle_post_object_chunk,
+    handle_post_object_options,
+    handle_health_check,
+)
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

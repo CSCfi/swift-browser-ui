@@ -10,7 +10,7 @@ import aiohttp.web
 import uvloop
 
 
-from .api import (
+from swift_browser_ui.sharing.api import (
     has_access_handler,
     access_details_handler,
     gave_access_handler,
@@ -23,17 +23,17 @@ from .api import (
     handle_user_list_tokens,
     handle_health_check,
 )
-from .db import DBConn
-from .middleware import (
+from swift_browser_ui.sharing.db import DBConn
+from swift_browser_ui.sharing.middleware import (
     add_cors,
     check_db_conn,
-    catch_uniqueness_error
+    catch_uniqueness_error,
 )
-from .auth import (
+from swift_browser_ui.sharing.auth import (
     read_in_keys,
     handle_validate_authentication,
 )
-from .preflight import handle_delete_preflight
+from swift_browser_ui.sharing.preflight import handle_delete_preflight
 
 
 logging.basicConfig(level=logging.DEBUG)

@@ -4,10 +4,16 @@
 import aiohttp.web
 import asyncio
 
-from .common import get_auth_instance, get_upload_instance
-from .common import parse_multipart_in
-from .download import FileDownloadProxy, ContainerArchiveDownloadProxy
-from .replicate import ObjectReplicationProxy
+from swift_browser_ui.upload.common import (
+    get_auth_instance,
+    get_upload_instance,
+    parse_multipart_in,
+)
+from swift_browser_ui.upload.download import (
+    FileDownloadProxy,
+    ContainerArchiveDownloadProxy,
+)
+from swift_browser_ui.upload.replicate import ObjectReplicationProxy
 
 
 async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:

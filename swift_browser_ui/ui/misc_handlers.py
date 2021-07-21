@@ -3,7 +3,7 @@
 
 import aiohttp.web
 
-from ._convenience import session_check
+from swift_browser_ui.ui._convenience import session_check
 
 
 async def handle_bounce_direct_access_request(

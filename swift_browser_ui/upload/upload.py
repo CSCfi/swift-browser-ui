@@ -14,7 +14,7 @@ import keystoneauth1.session
 import ssl
 import certifi
 
-from . import common
+from swift_browser_ui.upload import common
 
 
 ssl_context = ssl.create_default_context()

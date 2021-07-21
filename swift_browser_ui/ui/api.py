@@ -9,10 +9,14 @@ from swiftclient.service import SwiftError
 from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
-from ._convenience import api_check, initiate_os_service, get_tempurl_key
-from ._convenience import open_upload_runner_session, sign
-
-from .settings import setd
+from swift_browser_ui.ui._convenience import (
+    api_check,
+    initiate_os_service,
+    get_tempurl_key,
+    open_upload_runner_session,
+    sign,
+)
+from swift_browser_ui.ui.settings import setd
 
 
 async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:

@@ -6,7 +6,7 @@ import typing
 import aiohttp.web
 from asyncpg import UniqueViolationError
 
-from .db import DBConn
+from swift_browser_ui.sharing.db import DBConn
 
 
 AiohttpHandler = typing.Callable[

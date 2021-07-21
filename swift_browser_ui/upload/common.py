@@ -6,7 +6,7 @@ import typing
 import aiohttp.web
 import keystoneauth1.session
 
-from . import upload
+from swift_browser_ui.upload import upload
 
 
 def generate_download_url(

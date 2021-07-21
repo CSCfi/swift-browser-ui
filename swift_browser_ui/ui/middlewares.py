@@ -5,7 +5,7 @@ import typing
 
 from aiohttp import web
 
-from .settings import setd
+from swift_browser_ui.ui.settings import setd
 
 AiohttpHandler = typing.Callable[
     [web.Request], typing.Coroutine[typing.Awaitable, typing.Any, web.Response]

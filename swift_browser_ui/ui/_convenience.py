@@ -26,8 +26,7 @@ from cryptography.fernet import InvalidToken
 import swiftclient.service
 import swiftclient.client
 
-
-from .settings import setd
+from swift_browser_ui.ui.settings import setd
 
 import ssl
 import certifi

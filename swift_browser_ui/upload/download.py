@@ -16,8 +16,11 @@ import keystoneauth1.session
 
 import requests
 
-from .common import generate_download_url, get_path_from_list
-from .common import get_download_host
+from swift_browser_ui.upload.common import (
+    generate_download_url,
+    get_path_from_list,
+    get_download_host,
+)
 
 
 LOGGER = logging.getLogger(__name__)

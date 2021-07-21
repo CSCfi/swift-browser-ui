@@ -7,7 +7,7 @@ import aiohttp.web
 from asyncpg import InterfaceError
 
 
-from .db import handle_dropped_connection
+from swift_browser_ui.request.db import handle_dropped_connection
 
 
 MODULE_LOGGER = logging.getLogger("api")

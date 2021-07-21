@@ -4,7 +4,7 @@
 from typing import Union
 import aiohttp.web
 
-from .settings import setd
+from swift_browser_ui.ui.settings import setd
 
 
 async def handle_discover(_: Union[aiohttp.web.Request, None]) -> aiohttp.web.Response:
