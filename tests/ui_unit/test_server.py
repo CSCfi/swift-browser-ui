@@ -1,5 +1,5 @@
 """
-Module for testing ``swift_browser_ui.server``.
+Module for testing ``swift_browser_ui.ui.server``.
 
 Contains the tests for ``front.py``.
 """
@@ -13,9 +13,9 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 import aiohttp
 import asynctest
 
-from swift_browser_ui.server import servinit, run_server_insecure
-from swift_browser_ui.server import kill_sess_on_shutdown, run_server_secure
-from swift_browser_ui.settings import setd
+from swift_browser_ui.ui.server import servinit, run_server_insecure
+from swift_browser_ui.ui.server import kill_sess_on_shutdown, run_server_secure
+from swift_browser_ui.ui.settings import setd
 
 from .creation import get_request_with_mock_openstack
 
@@ -59,10 +59,10 @@ class TestRunServerFunctions(unittest.TestCase):
         """Test run_server_secure function."""
         run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
         patch_run_app = unittest.mock.patch(
-            "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
+            "swift_browser_ui.ui.server.aiohttp.web.run_app", run_app_mock
         )
         patch_ssl_defcontext = unittest.mock.patch(
-            "swift_browser_ui.server.ssl.create_default_context",
+            "swift_browser_ui.ui.server.ssl.create_default_context",
             self.mock_ssl_context_creation,
         )
         with patch_run_app, patch_ssl_defcontext:
@@ -73,7 +73,7 @@ class TestRunServerFunctions(unittest.TestCase):
         """Test run_server_insecure function."""
         run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
         with unittest.mock.patch(
-            "swift_browser_ui.server.aiohttp.web.run_app", run_app_mock
+            "swift_browser_ui.ui.server.aiohttp.web.run_app", run_app_mock
         ):
             run_server_insecure(None)
             run_app_mock.assert_called_once()
@@ -111,15 +111,15 @@ class AppTestCase(AioHTTPTestCase):
         # a single compact function is better overall. – Sampsa Penna
         new_setd = {"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"}
         patch_setd_front = unittest.mock.patch(
-            "swift_browser_ui.front.setd",
+            "swift_browser_ui.ui.front.setd",
             new=new_setd,
         )
         patch_setd_middleware = unittest.mock.patch(
-            "swift_browser_ui.middlewares.setd",
+            "swift_browser_ui.ui.middlewares.setd",
             new=new_setd,
         )
         patch_setd_login = unittest.mock.patch(
-            "swift_browser_ui.login.setd",
+            "swift_browser_ui.ui.login.setd",
             new=new_setd,
         )
         with patch_setd_front, patch_setd_middleware, patch_setd_login:

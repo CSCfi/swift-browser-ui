@@ -6,7 +6,7 @@ import os
 
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
-from swift_browser_ui.server import servinit
+from swift_browser_ui.ui.server import servinit
 
 
 class FrontendTestCase(AioHTTPTestCase):
@@ -25,11 +25,11 @@ class FrontendTestCase(AioHTTPTestCase):
     async def test_browse(self):
         """Test /browse handler."""
         patch_setd = unittest.mock.patch(
-            "swift_browser_ui.front.setd",
+            "swift_browser_ui.ui.front.setd",
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         patch_check = unittest.mock.patch(
-            "swift_browser_ui.front.session_check", new=self.return_true
+            "swift_browser_ui.ui.front.session_check", new=self.return_true
         )
         with patch_setd, patch_check:
             response = await self.client.request("GET", "/browse")
@@ -40,11 +40,11 @@ class FrontendTestCase(AioHTTPTestCase):
     async def test_index(self):
         """Test / handler."""
         patch_setd = unittest.mock.patch(
-            "swift_browser_ui.front.setd",
+            "swift_browser_ui.ui.front.setd",
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         patch_check = unittest.mock.patch(
-            "swift_browser_ui.front.session_check", new=self.return_true
+            "swift_browser_ui.ui.front.session_check", new=self.return_true
         )
         with patch_setd, patch_check:
             response = await self.client.request("GET", "/")
@@ -55,11 +55,11 @@ class FrontendTestCase(AioHTTPTestCase):
     async def test_loginpassword(self):
         """Test /loginpassword handler."""
         patch_setd = unittest.mock.patch(
-            "swift_browser_ui.front.setd",
+            "swift_browser_ui.ui.front.setd",
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         patch_check = unittest.mock.patch(
-            "swift_browser_ui.front.session_check", new=self.return_true
+            "swift_browser_ui.ui.front.session_check", new=self.return_true
         )
         with patch_setd, patch_check:
             response = await self.client.request("GET", "/loginpassword")

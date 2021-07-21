@@ -1,4 +1,4 @@
-"""Module for testing ``swift_browser_ui.api``."""
+"""Module for testing ``swift_browser_ui.ui.api``."""
 
 import json
 import hashlib
@@ -12,19 +12,19 @@ import asynctest
 
 from swiftclient.service import SwiftError
 
-from swift_browser_ui.api import get_os_user, os_list_projects
-from swift_browser_ui.api import swift_list_buckets, swift_list_objects
-from swift_browser_ui.api import swift_download_object
-from swift_browser_ui.api import get_metadata_object
-from swift_browser_ui.api import get_metadata_bucket
-from swift_browser_ui.api import get_project_metadata
-from swift_browser_ui.api import get_os_active_project
-from swift_browser_ui.api import swift_download_shared_object
-from swift_browser_ui.api import swift_download_container
-from swift_browser_ui.api import swift_upload_object_chunk
-from swift_browser_ui.api import swift_replicate_container
-from swift_browser_ui.api import swift_check_object_chunk
-from swift_browser_ui.settings import setd
+from swift_browser_ui.ui.api import get_os_user, os_list_projects
+from swift_browser_ui.ui.api import swift_list_buckets, swift_list_objects
+from swift_browser_ui.ui.api import swift_download_object
+from swift_browser_ui.ui.api import get_metadata_object
+from swift_browser_ui.ui.api import get_metadata_bucket
+from swift_browser_ui.ui.api import get_project_metadata
+from swift_browser_ui.ui.api import get_os_active_project
+from swift_browser_ui.ui.api import swift_download_shared_object
+from swift_browser_ui.ui.api import swift_download_container
+from swift_browser_ui.ui.api import swift_upload_object_chunk
+from swift_browser_ui.ui.api import swift_replicate_container
+from swift_browser_ui.ui.api import swift_check_object_chunk
+from swift_browser_ui.ui.settings import setd
 
 from .creation import get_request_with_mock_openstack
 
@@ -398,12 +398,12 @@ class TestProxyFunctions(asynctest.TestCase):
 
         self.api_check_mock = unittest.mock.MagicMock(return_value="session_key")
         self.patch_api_check = unittest.mock.patch(
-            "swift_browser_ui.api.api_check", self.api_check_mock
+            "swift_browser_ui.ui.api.api_check", self.api_check_mock
         )
 
         self.session_open_mock = asynctest.CoroutineMock(return_value="test_runner_id")
         self.patch_runner_session = unittest.mock.patch(
-            "swift_browser_ui.api.open_upload_runner_session", self.session_open_mock
+            "swift_browser_ui.ui.api.open_upload_runner_session", self.session_open_mock
         )
 
         self.sign_mock = asynctest.CoroutineMock(
@@ -412,10 +412,10 @@ class TestProxyFunctions(asynctest.TestCase):
                 "valid_until": "test-valid",
             }
         )
-        self.patch_sign = unittest.mock.patch("swift_browser_ui.api.sign", self.sign_mock)
+        self.patch_sign = unittest.mock.patch("swift_browser_ui.ui.api.sign", self.sign_mock)
 
         self.setd_mock = {"upload_external_endpoint": "http://test-endpoint:9092/"}
-        self.patch_setd = unittest.mock.patch("swift_browser_ui.api.setd", self.setd_mock)
+        self.patch_setd = unittest.mock.patch("swift_browser_ui.ui.api.setd", self.setd_mock)
 
     async def test_swift_download_share_object(self):
         """Test share object download handler."""

@@ -3,7 +3,7 @@
 import unittest
 from click.testing import CliRunner
 
-from swift_browser_ui.shell import cli, start
+from swift_browser_ui.ui.shell import cli, start
 
 
 class TestService(unittest.TestCase):
@@ -59,7 +59,7 @@ class TestService(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertIn("swift-browser-ui, version ", result.output)
 
-    @unittest.mock.patch("swift_browser_ui.shell.servinit")
+    @unittest.mock.patch("swift_browser_ui.ui.shell.servinit")
     def test_shell_start(self, mock_server):
         """Test that the cli start function runs with the wanted parameters."""
         # Test if the start command runs as it should

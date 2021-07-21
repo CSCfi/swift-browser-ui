@@ -1,4 +1,4 @@
-"""Module for testing ``swift_browser_ui._convenience``."""
+"""Module for testing ``swift_browser_ui.ui._convenience``."""
 
 
 import hashlib
@@ -12,14 +12,14 @@ from aiohttp.web import HTTPForbidden
 import cryptography.fernet
 from swiftclient.service import SwiftService
 from keystoneauth1.session import Session
-from swift_browser_ui._convenience import api_check, generate_cookie
-from swift_browser_ui._convenience import disable_cache, decrypt_cookie
-from swift_browser_ui._convenience import session_check, setup_logging
-from swift_browser_ui._convenience import get_availability_from_token
-from swift_browser_ui._convenience import initiate_os_service
-from swift_browser_ui._convenience import initiate_os_session
-from swift_browser_ui._convenience import check_csrf, clear_session_info
-from swift_browser_ui.settings import setd
+from swift_browser_ui.ui._convenience import api_check, generate_cookie
+from swift_browser_ui.ui._convenience import disable_cache, decrypt_cookie
+from swift_browser_ui.ui._convenience import session_check, setup_logging
+from swift_browser_ui.ui._convenience import get_availability_from_token
+from swift_browser_ui.ui._convenience import initiate_os_service
+from swift_browser_ui.ui._convenience import initiate_os_session
+from swift_browser_ui.ui._convenience import check_csrf, clear_session_info
+from swift_browser_ui.ui.settings import setd
 
 from .creation import get_request_with_fernet, get_request_with_mock_openstack
 from .creation import get_full_crypted_session_cookie
@@ -219,7 +219,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_get_availability_from_token(self):
         """Test the get_availability_from_token function."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"},
         ):
 
@@ -236,7 +236,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_initiate_os_session(self):
         """Test initiate_os_session function."""
         with unittest.mock.patch(
-            "swift_browser_ui.settings.setd",
+            "swift_browser_ui.ui.settings.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             ret = initiate_os_session(
@@ -247,7 +247,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_initiate_os_service(self):
         """Test initiate_os_servce function."""
         with unittest.mock.patch(
-            "swift_browser_ui.settings.setd",
+            "swift_browser_ui.ui.settings.setd",
             new={
                 "auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3",
                 "swift_endpoint_url": "http://obj.exampleosep.com:443/v1",
@@ -260,7 +260,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_check_csrf_os_skip(self):
         """Test check_csrf when skipping referer from OS."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             testreq = get_request_with_fernet()
@@ -273,7 +273,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_check_csrf_incorrect_referer(self):
         """Test check_csrf when Referer header is incorrect."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             testreq = get_request_with_fernet()
@@ -287,7 +287,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_check_csrf_incorrect_signature(self):
         """Test check_csrf when signature doesn't match."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             testreq = get_request_with_fernet()
@@ -301,7 +301,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_check_csrf_no_referer(self):
         """Test check_csrf when no Referer header is present."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             testreq = get_request_with_fernet()
@@ -313,7 +313,7 @@ class TestConvenienceFunctions(unittest.TestCase):
     def test_check_csrf_correct_referer(self):
         """Test check_csrf when the session is valid."""
         with unittest.mock.patch(
-            "swift_browser_ui._convenience.setd",
+            "swift_browser_ui.ui._convenience.setd",
             new={"auth_endpoint_url": "http://example-auth.exampleosep.com:5001/v3"},
         ):
             testreq = get_request_with_fernet()
