@@ -16,12 +16,9 @@ class MockRequestContextManager(asynctest.TestCase):
 
     def __init__(self, *args, **kwargs):
         """."""
-        self.resp = SimpleNamespace(**{
-            "text": asynctest.CoroutineMock(
-                return_value="[]"
-            ),
-            "status": 200
-        })
+        self.resp = SimpleNamespace(
+            **{"text": asynctest.CoroutineMock(return_value="[]"), "status": 200}
+        )
 
     async def __aenter__(self, *args, **kwargs):
         """."""
@@ -33,11 +30,7 @@ class MockGenericContextManager(MockRequestContextManager):
 
     def __init__(self, *args, **kwargs):
         """."""
-        super(MockGenericContextManager, self).__init__(
-            self,
-            *args,
-            **kwargs
-        )
+        super(MockGenericContextManager, self).__init__(self, *args, **kwargs)
 
     async def __aexit__(self, *excinfo):
         """Perform assertions done upon exit."""
@@ -52,11 +45,7 @@ class MockDeleteContextManager(MockRequestContextManager):
 
     def __init__(self, *args, **kwargs):
         """."""
-        super(MockDeleteContextManager, self).__init__(
-            self,
-            *args,
-            **kwargs
-        )
+        super(MockDeleteContextManager, self).__init__(self, *args, **kwargs)
 
     async def __aexit__(self, *excinfo):
         """."""
@@ -67,18 +56,18 @@ class BindingsClassTestCase(asynctest.TestCase):
 
     def setUp(self):
         """Set up relevant mocks."""
-        self.session_mock = SimpleNamespace(**{
-            "close": asynctest.CoroutineMock(),
-            "get": MockGenericContextManager,
-            "post": MockGenericContextManager,
-            "delete": MockDeleteContextManager,
-        })
-        self.session_open_mock = unittest.mock.Mock(
-            return_value=self.session_mock
+        self.session_mock = SimpleNamespace(
+            **{
+                "close": asynctest.CoroutineMock(),
+                "get": MockGenericContextManager,
+                "post": MockGenericContextManager,
+                "delete": MockDeleteContextManager,
+            }
         )
+        self.session_open_mock = unittest.mock.Mock(return_value=self.session_mock)
         self.session_open_patch = unittest.mock.patch(
             "swift_browser_ui.request.bindings.bind.aiohttp.ClientSession",
-            new=self.session_open_mock
+            new=self.session_open_mock,
         )
 
         self.signature_mock = unittest.mock.Mock(
@@ -86,7 +75,7 @@ class BindingsClassTestCase(asynctest.TestCase):
         )
         self.patch_signature = unittest.mock.patch(
             "swift_browser_ui.request.bindings.bind.sign_api_request",
-            new=self.signature_mock
+            new=self.signature_mock,
         )
 
     async def test_add_access_request(self):
@@ -94,9 +83,7 @@ class BindingsClassTestCase(asynctest.TestCase):
         with self.patch_signature, self.session_open_patch:
             async with SwiftSharingRequest("http://example") as client:
                 await client.add_access_request(
-                    "test-user",
-                    "test-container",
-                    "test-woner"
+                    "test-user", "test-container", "test-woner"
                 )
 
     async def test_list_made_requests(self):

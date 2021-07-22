@@ -23,7 +23,7 @@ from swift_browser_ui.request.api import (
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
-    handle_health_check
+    handle_health_check,
 )
 from swift_browser_ui.request.db import DBConn
 from swift_browser_ui.request.preflight import handle_delete_preflight
@@ -37,16 +37,12 @@ logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
-async def resume_on_start(
-        app: aiohttp.web.Application
-) -> None:
+async def resume_on_start(app: aiohttp.web.Application) -> None:
     """Resume old instance on start."""
     await app["db_conn"].open()
 
 
-async def graceful_shutdown(
-        app: aiohttp.web.Application
-) -> None:
+async def graceful_shutdown(app: aiohttp.web.Application) -> None:
     """Correctly close the service."""
     if app["db_conn"] is not None:
         await app["db_conn"].close()
@@ -66,32 +62,39 @@ async def init_server() -> aiohttp.web.Application:
     app["db_conn"] = DBConn()
     app["tokens"] = []
 
-    app.add_routes([
-        aiohttp.web.get("/health", handle_health_check),
-    ])
+    app.add_routes(
+        [
+            aiohttp.web.get("/health", handle_health_check),
+        ]
+    )
 
-    app.add_routes([
-        aiohttp.web.options("/request/user/{user}/{container}",
-                            handle_delete_preflight),
-        aiohttp.web.post("/request/user/{user}/{container}",
-                         handle_share_request_post),
-        aiohttp.web.delete("/request/user/{user}/{container}",
-                           handle_user_share_request_delete),
-        aiohttp.web.get("/request/user/{user}",
-                        handle_user_made_request_listing),
-        aiohttp.web.get("/request/owner/{user}",
-                        handle_user_owned_request_listing),
-        aiohttp.web.get("/request/container/{container}",
-                        handle_container_request_listing),
-    ])
+    app.add_routes(
+        [
+            aiohttp.web.options(
+                "/request/user/{user}/{container}", handle_delete_preflight
+            ),
+            aiohttp.web.post(
+                "/request/user/{user}/{container}", handle_share_request_post
+            ),
+            aiohttp.web.delete(
+                "/request/user/{user}/{container}", handle_user_share_request_delete
+            ),
+            aiohttp.web.get("/request/user/{user}", handle_user_made_request_listing),
+            aiohttp.web.get("/request/owner/{user}", handle_user_owned_request_listing),
+            aiohttp.web.get(
+                "/request/container/{container}", handle_container_request_listing
+            ),
+        ]
+    )
 
-    app.add_routes([
-        aiohttp.web.options("/token/{project}/{id}",
-                            handle_delete_preflight),
-        aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
-        aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
-        aiohttp.web.get("/token/{project}", handle_user_list_tokens),
-    ])
+    app.add_routes(
+        [
+            aiohttp.web.options("/token/{project}/{id}", handle_delete_preflight),
+            aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
+            aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
+            aiohttp.web.get("/token/{project}", handle_user_list_tokens),
+        ]
+    )
 
     app.on_startup.append(resume_on_start)
     app.on_startup.append(read_in_keys)
@@ -101,13 +104,11 @@ async def init_server() -> aiohttp.web.Application:
 
 
 def run_server_devel(
-        app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
+    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
 ) -> None:
     """Run the server in development mode (without HTTPS)."""
     aiohttp.web.run_app(
-        app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
-        port=9091
+        app, access_log=aiohttp.web.logging.getLogger("aiohttp.access"), port=9091
     )
 
 

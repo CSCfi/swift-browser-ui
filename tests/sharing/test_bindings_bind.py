@@ -16,13 +16,13 @@ class MockRequestContextManager(asynctest.TestCase):
 
     def __init__(self, *args, **kwargs):
         """."""
-        self.resp = SimpleNamespace(**{
-            "text": asynctest.CoroutineMock(
-                return_value="[]"
-            ),
-            "status": 200,
-            "url": "http://example",
-        })
+        self.resp = SimpleNamespace(
+            **{
+                "text": asynctest.CoroutineMock(return_value="[]"),
+                "status": 200,
+                "url": "http://example",
+            }
+        )
 
     async def __aenter__(self, *args, **kwargs):
         """."""
@@ -34,11 +34,7 @@ class MockGenericContextManager(MockRequestContextManager):
 
     def __init__(self, *args, **kwargs):
         """."""
-        super(MockGenericContextManager, self).__init__(
-            self,
-            *args,
-            **kwargs
-        )
+        super(MockGenericContextManager, self).__init__(self, *args, **kwargs)
 
     async def __aexit__(self, *excinfo):
         """Perform assertions done upon exit."""
@@ -53,11 +49,9 @@ class MockDeleteContextManager(asynctest.TestCase):
 
     def __init__(self, *args, **kwargs):
         """."""
-        self.resp = SimpleNamespace(**{
-            "status": 204,
-            "url": "http://example",
-            "reason": "reason"
-        })
+        self.resp = SimpleNamespace(
+            **{"status": 204, "url": "http://example", "reason": "reason"}
+        )
 
     async def __aenter__(self, *args, **kwargs):
         """."""
@@ -72,19 +66,19 @@ class BindingsClassTestCase(asynctest.TestCase):
 
     def setUp(self):
         """Set up relevant mocks."""
-        self.session_mock = SimpleNamespace(**{
-            "close": asynctest.CoroutineMock(),
-            "get": MockGenericContextManager,
-            "post": MockGenericContextManager,
-            "patch": MockGenericContextManager,
-            "delete": MockDeleteContextManager,
-        })
-        self.session_open_mock = unittest.mock.Mock(
-            return_value=self.session_mock
+        self.session_mock = SimpleNamespace(
+            **{
+                "close": asynctest.CoroutineMock(),
+                "get": MockGenericContextManager,
+                "post": MockGenericContextManager,
+                "patch": MockGenericContextManager,
+                "delete": MockDeleteContextManager,
+            }
         )
+        self.session_open_mock = unittest.mock.Mock(return_value=self.session_mock)
         self.session_open_patch = unittest.mock.patch(
             "swift_browser_ui.sharing.bindings.bind.aiohttp.ClientSession",
-            new=self.session_open_mock
+            new=self.session_open_mock,
         )
 
         self.signature_mock = unittest.mock.Mock(
@@ -92,7 +86,7 @@ class BindingsClassTestCase(asynctest.TestCase):
         )
         self.patch_signature = unittest.mock.patch(
             "swift_browser_ui.sharing.bindings.bind.sign_api_request",
-            new=self.signature_mock
+            new=self.signature_mock,
         )
 
     async def test_parse_list_to_string(self):
@@ -112,9 +106,7 @@ class BindingsClassTestCase(asynctest.TestCase):
         with self.patch_signature, self.session_open_patch:
             async with SwiftXAccountSharing("http://example") as client:
                 await client.get_access_details(
-                    "test-user",
-                    "test-container",
-                    "test-owner"
+                    "test-user", "test-container", "test-owner"
                 )
 
     async def test_get_share(self):
@@ -127,10 +119,7 @@ class BindingsClassTestCase(asynctest.TestCase):
         """Test get_share_details API binding."""
         with self.patch_signature, self.session_open_patch:
             async with SwiftXAccountSharing("http://example") as client:
-                await client.get_share_details(
-                    "test-user",
-                    "test-container"
-                )
+                await client.get_share_details("test-user", "test-container")
 
     async def test_share_new_access(self):
         """Test share_new_access API binding."""
@@ -141,7 +130,7 @@ class BindingsClassTestCase(asynctest.TestCase):
                     "test-container",
                     ["test-user1", "test-user2", "test-user3"],
                     ["r", "s"],
-                    "http://example"
+                    "http://example",
                 )
 
     async def test_share_edit_access(self):

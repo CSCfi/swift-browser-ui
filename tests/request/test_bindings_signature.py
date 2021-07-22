@@ -15,12 +15,10 @@ class SignatureModuleTestCase(asynctest.TestCase):
 
     async def test_sign_api_request(self):
         """Test sign_api_request function."""
-        os_environ_mock = unittest.mock.Mock(
-            return_value="testkey"
-        )
+        os_environ_mock = unittest.mock.Mock(return_value="testkey")
         os_environ_patch = unittest.mock.patch(
             "swift_browser_ui.request.bindings.signature.os.environ.get",
-            new=os_environ_mock
+            new=os_environ_mock,
         )
 
         with os_environ_patch:

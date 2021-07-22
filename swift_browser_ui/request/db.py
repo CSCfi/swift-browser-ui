@@ -12,24 +12,15 @@ import aiohttp.web
 
 
 MODULE_LOGGER = logging.getLogger("db")
-MODULE_LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
+MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 
-def handle_dropped_connection(
-        request: aiohttp.web.Request
-) -> None:
+def handle_dropped_connection(request: aiohttp.web.Request) -> None:
     """Handle dropped database connection."""
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Lost database connection, reconnecting..."
-    )
+    MODULE_LOGGER.log(logging.ERROR, "Lost database connection, reconnecting...")
     request.app["db_conn"].erase()
-    asyncio.ensure_future(
-        request.app["db_conn"].open()
-    )
-    raise aiohttp.web.HTTPServiceUnavailable(
-        reason="No database connection."
-    )
+    asyncio.ensure_future(request.app["db_conn"].open())
+    raise aiohttp.web.HTTPServiceUnavailable(reason="No database connection.")
 
 
 class DBConn:
@@ -48,8 +39,7 @@ class DBConn:
                     password=os.environ.get("REQUEST_DB_PASSWORD", None),
                     user=os.environ.get("REQUEST_DB_USER", "request"),
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
-                    database=os.environ.get("REQUEST_DB_DATABASE",
-                                            "swiftrequest")
+                    database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest"),
                 )
             except (ConnectionError, OSError) as exp:
                 self.conn = None
@@ -58,19 +48,13 @@ class DBConn:
                     logging.ERROR,
                     "Failed to establish database connection. "
                     "Retrying in %d seconds...",
-                    slp
+                    slp,
                 )
-                self.log.log(
-                    logging.ERROR,
-                    "Failure information: %s",
-                    str(exp)
-                )
+                self.log.log(logging.ERROR, "Failure information: %s", str(exp))
                 await asyncio.sleep(slp)
             except asyncpg.InvalidPasswordError as exp:
                 self.log.log(
-                    logging.ERROR,
-                    "Invalid password for database. Info: %s",
-                    str(exp)
+                    logging.ERROR, "Invalid password for database. Info: %s", str(exp)
                 )
                 self.log.log(
                     logging.ERROR,
@@ -91,9 +75,7 @@ class DBConn:
         self.conn = None
 
     @staticmethod
-    async def parse_query(
-        query: typing.List[asyncpg.Record]
-    ) -> typing.List[dict]:
+    async def parse_query(query: typing.List[asyncpg.Record]) -> typing.List[dict]:
         """Parse a database query list to JSON serializable form."""
         return [
             {
@@ -101,14 +83,11 @@ class DBConn:
                 "user": rec["recipient"],
                 "owner": rec["container_owner"],
                 "date": rec["created"].isoformat(),
-            } for rec in query
+            }
+            for rec in query
         ]
 
-    async def add_request(
-        self, user: str,
-        container: str,
-        owner: str
-    ) -> bool:
+    async def add_request(self, user: str, container: str, owner: str) -> bool:
         """Add an access request to the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -124,14 +103,11 @@ class DBConn:
                 """,
                 container,
                 owner,
-                user
+                user,
             )
             return True
 
-    async def get_request_owned(
-        self,
-        user: str
-    ) -> typing.List:
+    async def get_request_owned(self, user: str) -> typing.List:
         """Get the requests owned by the getter."""
         query = await self.conn.fetch(
             """
@@ -140,14 +116,11 @@ class DBConn:
             WHERE container_owner = $1
             ;
             """,
-            user
+            user,
         )
         return await self.parse_query(query)
 
-    async def get_request_made(
-        self,
-        user: str
-    ) -> typing.List:
+    async def get_request_made(self, user: str) -> typing.List:
         """Get the requests made by the getter."""
         query = await self.conn.fetch(
             """
@@ -156,14 +129,11 @@ class DBConn:
             WHERE recipient = $1
             ;
             """,
-            user
+            user,
         )
         return await self.parse_query(query)
 
-    async def get_request_container(
-        self,
-        container: str
-    ) -> typing.List:
+    async def get_request_container(self, container: str) -> typing.List:
         """Get the requests made for a container."""
         query = await self.conn.fetch(
             """
@@ -172,16 +142,11 @@ class DBConn:
             WHERE container = $1
             ;
             """,
-            container
+            container,
         )
         return await self.parse_query(query)
 
-    async def delete_request(
-        self,
-        container: str,
-        owner: str,
-        recipient: str
-    ) -> bool:
+    async def delete_request(self, container: str, owner: str, recipient: str) -> bool:
         """Delete an access request from the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -195,14 +160,11 @@ class DBConn:
                 """,
                 container,
                 owner,
-                recipient
+                recipient,
             )
         return True
 
-    async def get_tokens(
-            self,
-            token_owner: str
-    ) -> typing.List[dict]:
+    async def get_tokens(self, token_owner: str) -> typing.List[dict]:
         """Get tokens created for a project."""
         query = await self.conn.fetch(
             """
@@ -211,15 +173,11 @@ class DBConn:
             WHERE token_owner = $1
             ;
             """,
-            token_owner
+            token_owner,
         )
         return list(query)
 
-    async def revoke_token(
-            self,
-            token_owner: str,
-            token_identifier: str
-    ) -> None:
+    async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
         """Remove a token from the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -231,15 +189,10 @@ class DBConn:
                 ;
                 """,
                 token_owner,
-                token_identifier
+                token_identifier,
             )
 
-    async def add_token(
-            self,
-            token_owner: str,
-            token: str,
-            identifier: str
-    ) -> None:
+    async def add_token(self, token_owner: str, token: str, identifier: str) -> None:
         """Add a token to the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -255,5 +208,5 @@ class DBConn:
                 """,
                 token_owner,
                 token,
-                identifier
+                identifier,
             )

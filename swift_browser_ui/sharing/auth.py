@@ -23,62 +23,46 @@ from swift_browser_ui.sharing.db import handle_dropped_connection
 
 AiohttpHandler = typing.Callable[
     [aiohttp.web.Request],
-    typing.Coroutine[
-        typing.Awaitable,
-        typing.Any,
-        aiohttp.web.Response
-    ]
+    typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response],
 ]
 
 
 LOGGER = logging.getLogger("swift_x_account_sharing.auth")
-LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
+LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 
-async def read_in_keys(
-        app: aiohttp.web.Application
-) -> None:
+async def read_in_keys(app: aiohttp.web.Application) -> None:
     """Read in keys to the application."""
     keys = os.environ.get("SWIFT_UI_API_AUTH_TOKENS", None)
     app["tokens"] = keys.split(",") if keys is not None else []
     if app["tokens"]:
-        app["tokens"] = [
-            token.encode("utf-8") for token in app["tokens"]
-        ]
+        app["tokens"] = [token.encode("utf-8") for token in app["tokens"]]
 
 
 async def test_signature(
-        tokens: typing.List[bytes],
-        signature: str,
-        message: str,
-        validity: str,
+    tokens: typing.List[bytes],
+    signature: str,
+    message: str,
+    validity: str,
 ) -> None:
     """Validate signature against the given tokens."""
     # Check signature expiration
     if int(validity) < time.time():
         LOGGER.debug(f"Signature validity expired: {validity}")
-        raise aiohttp.web.HTTPUnauthorized(
-            reason="Signature validity expired"
-        )
+        raise aiohttp.web.HTTPUnauthorized(reason="Signature validity expired")
     byte_message = message.encode("utf-8")
     for token in tokens:
-        digest = hmac.new(
-            token,
-            byte_message,
-            digestmod="sha256"
-        ).hexdigest()
+        digest = hmac.new(token, byte_message, digestmod="sha256").hexdigest()
         if secrets.compare_digest(digest, signature):
             return
     LOGGER.debug(f"Missing valid query signature for signature {signature}")
-    raise aiohttp.web.HTTPUnauthorized(
-        reason="Missing valid query signature"
-    )
+    raise aiohttp.web.HTTPUnauthorized(reason="Missing valid query signature")
 
 
 @aiohttp.web.middleware
 async def handle_validate_authentication(
-        request: aiohttp.web.Request,
-        handler: AiohttpHandler,
+    request: aiohttp.web.Request,
+    handler: AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
     try:
@@ -115,15 +99,10 @@ async def handle_validate_authentication(
         else:
             if request.path != "/health":
                 LOGGER.debug(f"No project ID found in request {request}")
-                raise aiohttp.web.HTTPUnauthorized(
-                    reason="No project ID in request"
-                )
+                raise aiohttp.web.HTTPUnauthorized(reason="No project ID in request")
 
     await test_signature(
-        request.app["tokens"] + project_tokens,
-        signature,
-        validity + path,
-        validity
+        request.app["tokens"] + project_tokens, signature, validity + path, validity
     )
 
     return await handler(request)

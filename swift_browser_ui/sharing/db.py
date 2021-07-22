@@ -12,24 +12,15 @@ import aiohttp.web
 
 
 MODULE_LOGGER = logging.getLogger("db")
-MODULE_LOGGER.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
+MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 
-def handle_dropped_connection(
-        request: aiohttp.web.Request
-) -> None:
+def handle_dropped_connection(request: aiohttp.web.Request) -> None:
     """Handle dropped database connection."""
-    MODULE_LOGGER.log(
-        logging.ERROR,
-        "Lost database connection, reconnecting..."
-    )
+    MODULE_LOGGER.log(logging.ERROR, "Lost database connection, reconnecting...")
     request.app["db_conn"].erase()
-    asyncio.ensure_future(
-        request.app["db_conn"].open()
-    )
-    raise aiohttp.web.HTTPServiceUnavailable(
-        reason="No database connection."
-    )
+    asyncio.ensure_future(request.app["db_conn"].open())
+    raise aiohttp.web.HTTPServiceUnavailable(reason="No database connection.")
 
 
 class DBConn:
@@ -52,7 +43,7 @@ class DBConn:
                     password=os.environ.get("SHARING_DB_PASSWORD", None),
                     user=os.environ.get("SHARING_DB_USER", "sharing"),
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
-                    database=os.environ.get("SHARING_DB_NAME", "swiftsharing")
+                    database=os.environ.get("SHARING_DB_NAME", "swiftsharing"),
                 )
             except (ConnectionError, OSError) as exp:
                 self.conn = None
@@ -60,19 +51,13 @@ class DBConn:
                 self.log.error(
                     "Failed to establish database connection. "
                     "Retrying in %s seconds...",
-                    slp
+                    slp,
                 )
-                self.log.log(
-                    logging.ERROR,
-                    "Failure information: %s",
-                    str(exp)
-                )
+                self.log.log(logging.ERROR, "Failure information: %s", str(exp))
                 await asyncio.sleep(slp)
             except asyncpg.InvalidPasswordError as exp:
                 self.log.log(
-                    logging.ERROR,
-                    "Invalid password for database. Info: %s",
-                    str(exp)
+                    logging.ERROR, "Invalid password for database. Info: %s", str(exp)
                 )
                 self.log.log(
                     logging.ERROR,
@@ -89,12 +74,12 @@ class DBConn:
             await self.conn.close()
 
     async def add_share(
-            self,
-            owner: str,
-            container: str,
-            userlist: typing.List[str],
-            access: typing.List[str],
-            address: str
+        self,
+        owner: str,
+        container: str,
+        userlist: typing.List[str],
+        access: typing.List[str],
+        address: str,
     ) -> bool:
         """Add a share action to the database."""
         async with self.conn.transaction():
@@ -123,11 +108,11 @@ class DBConn:
         return True
 
     async def edit_share(
-            self,
-            owner: str,
-            container: str,
-            userlist: typing.List[str],
-            access: typing.List[str]
+        self,
+        owner: str,
+        container: str,
+        userlist: typing.List[str],
+        access: typing.List[str],
     ) -> bool:
         """Edit a share action in the database."""
         async with self.conn.transaction():
@@ -153,10 +138,7 @@ class DBConn:
         return True
 
     async def delete_share(
-            self,
-            owner: str,
-            container: str,
-            userlist: typing.List[str]
+        self, owner: str, container: str, userlist: typing.List[str]
     ) -> bool:
         """Delete a share action from the database."""
         async with self.conn.transaction():
@@ -176,11 +158,7 @@ class DBConn:
                 )
         return True
 
-    async def delete_container_shares(
-        self,
-        owner: str,
-        container: str
-    ) -> bool:
+    async def delete_container_shares(self, owner: str, container: str) -> bool:
         """Delete all shares for a container in the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -192,14 +170,11 @@ class DBConn:
                 ;
                 """,
                 container,
-                owner
+                owner,
             )
         return True
 
-    async def get_access_list(
-            self,
-            user: str
-    ) -> typing.List[dict]:
+    async def get_access_list(self, user: str) -> typing.List[dict]:
         """Get the containers shared to the specified user."""
         query = await self.conn.fetch(
             """
@@ -215,15 +190,12 @@ class DBConn:
             {
                 "container": i["container"],
                 "owner": i["container_owner"],
-                "sharingdate": i["sharingdate"].strftime("%d %b %Y")
+                "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
             }
             for i in query
         ]
 
-    async def get_shared_list(
-            self,
-            user: str
-    ) -> typing.List[str]:
+    async def get_shared_list(self, user: str) -> typing.List[str]:
         """Get the containers that the user has shared."""
         query = await self.conn.fetch(
             """
@@ -238,10 +210,7 @@ class DBConn:
         return [i["container"] for i in query]
 
     async def get_access_container_details(
-            self,
-            user: str,
-            owner: str,
-            container: str
+        self, user: str, owner: str, container: str
     ) -> dict:
         """Get shared container details for share receiver."""
         query = await self.conn.fetchrow(
@@ -281,9 +250,7 @@ class DBConn:
         }
 
     async def get_shared_container_details(
-            self,
-            owner: str,
-            container: str
+        self, owner: str, container: str
     ) -> typing.List[dict]:
         """Get shared container details for sharer."""
         query = await self.conn.fetch(
@@ -313,19 +280,18 @@ class DBConn:
             if i["r_write"]:
                 access.append("w")
 
-            ret.append({
-                "container": i["container"],
-                "owner": i["container_owner"],
-                "sharedTo": i["recipient"],
-                "address": i["address"],
-                "access": access,
-            })
+            ret.append(
+                {
+                    "container": i["container"],
+                    "owner": i["container_owner"],
+                    "sharedTo": i["recipient"],
+                    "address": i["address"],
+                    "access": access,
+                }
+            )
         return ret
 
-    async def get_tokens(
-            self,
-            token_owner: str
-    ) -> typing.List[dict]:
+    async def get_tokens(self, token_owner: str) -> typing.List[dict]:
         """Get tokens created for a project."""
         query = await self.conn.fetch(
             """
@@ -334,15 +300,11 @@ class DBConn:
             WHERE token_owner = $1
             ;
             """,
-            token_owner
+            token_owner,
         )
         return list(query)
 
-    async def revoke_token(
-            self,
-            token_owner: str,
-            token_identifier: str
-    ) -> None:
+    async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
         """Remove a token from the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -354,15 +316,10 @@ class DBConn:
                 ;
                 """,
                 token_owner,
-                token_identifier
+                token_identifier,
             )
 
-    async def add_token(
-            self,
-            token_owner: str,
-            token: str,
-            identifier: str
-    ) -> None:
+    async def add_token(self, token_owner: str, token: str, identifier: str) -> None:
         """Add a token to the database."""
         async with self.conn.transaction():
             await self.conn.execute(
@@ -378,5 +335,5 @@ class DBConn:
                 """,
                 token_owner,
                 token,
-                identifier
+                identifier,
             )

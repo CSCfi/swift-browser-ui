@@ -14,7 +14,7 @@ from swift_browser_ui.request.server import (
     graceful_shutdown,
     init_server,
     run_server_devel,
-    main
+    main,
 )
 from swift_browser_ui.request.db import DBConn
 
@@ -24,14 +24,14 @@ class ServerTestCase(asynctest.TestCase):
 
     def setUp(self):
         """Set up relevant mocks."""
-        self.mock_db_conn = SimpleNamespace(**{
-            "open": asynctest.CoroutineMock(),
-            "close": asynctest.CoroutineMock(),
-        })
+        self.mock_db_conn = SimpleNamespace(
+            **{
+                "open": asynctest.CoroutineMock(),
+                "close": asynctest.CoroutineMock(),
+            }
+        )
 
-        self.mock_application = {
-            "db_conn": self.mock_db_conn
-        }
+        self.mock_application = {"db_conn": self.mock_db_conn}
 
     async def test_resume_on_start(self):
         """Test resume on start function."""
@@ -52,12 +52,9 @@ class ServerTestCase(asynctest.TestCase):
 
     async def test_run_server_devel(self):
         """Test server development mode launch function."""
-        run_app_mock = unittest.mock.MagicMock(
-            aiohttp.web.run_app
-        )
+        run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
         run_app_patch = unittest.mock.patch(
-            "swift_browser_ui.request.server.aiohttp.web.run_app",
-            new=run_app_mock
+            "swift_browser_ui.request.server.aiohttp.web.run_app", new=run_app_mock
         )
         with run_app_patch:
             run_server_devel(None)
@@ -66,15 +63,11 @@ class ServerTestCase(asynctest.TestCase):
     async def test_main_wrong_version(self):
         """Test main function call when Python version is too old."""
         sys_version_patch = unittest.mock.patch(
-            "swift_browser_ui.request.server.sys.version_info",
-            new=(3, 5)
+            "swift_browser_ui.request.server.sys.version_info", new=(3, 5)
         )
-        sys_exit_mock = unittest.mock.Mock(
-            side_effect=KeyboardInterrupt
-        )
+        sys_exit_mock = unittest.mock.Mock(side_effect=KeyboardInterrupt)
         sys_exit_patch = unittest.mock.patch(
-            "swift_browser_ui.request.server.sys.exit",
-            new=sys_exit_mock
+            "swift_browser_ui.request.server.sys.exit", new=sys_exit_mock
         )
         with sys_version_patch, sys_exit_patch:
             with self.assertRaises(KeyboardInterrupt):
@@ -85,13 +78,11 @@ class ServerTestCase(asynctest.TestCase):
         """Test main function call when all is correct."""
         run_server_mock = unittest.mock.Mock()
         run_server_patch = unittest.mock.patch(
-            "swift_browser_ui.request.server.run_server_devel",
-            new=run_server_mock
+            "swift_browser_ui.request.server.run_server_devel", new=run_server_mock
         )
         init_server_patch = unittest.mock.Mock()
         init_server_patch = unittest.mock.patch(
-            "swift_browser_ui.request.server.init_server",
-            new=init_server_patch
+            "swift_browser_ui.request.server.init_server", new=init_server_patch
         )
         with run_server_patch, init_server_patch:
             main()

@@ -98,7 +98,8 @@ class LoginTestClass(asynctest.TestCase):
         patch5 = unittest.mock.patch("swiftclient.service.SwiftService")
 
         patch6 = unittest.mock.patch(
-            "swift_browser_ui.ui.login.test_swift_endpoint", new=return_test_swift_endpoint
+            "swift_browser_ui.ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint,
         )
 
         with patch1, patch2, patch3, patch4, patch5, patch6:
@@ -151,7 +152,8 @@ class LoginTestClass(asynctest.TestCase):
         patch5 = unittest.mock.patch("swiftclient.service.SwiftService")
 
         patch6 = unittest.mock.patch(
-            "swift_browser_ui.ui.login.test_swift_endpoint", new=return_test_swift_endpoint
+            "swift_browser_ui.ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint,
         )
 
         with patch1, patch2, patch3, patch4, patch5, patch6:
@@ -207,7 +209,8 @@ class LoginTestClass(asynctest.TestCase):
         patch5 = unittest.mock.patch("swiftclient.service.SwiftService")
 
         patch6 = unittest.mock.patch(
-            "swift_browser_ui.ui.login.test_swift_endpoint", new=return_test_swift_endpoint
+            "swift_browser_ui.ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint,
         )
 
         with patch1, patch2, patch3, patch4, patch5, patch6:
@@ -262,7 +265,8 @@ class LoginTestClass(asynctest.TestCase):
         patch6 = unittest.mock.patch("swiftclient.service.SwiftService")
 
         patch7 = unittest.mock.patch(
-            "swift_browser_ui.ui.login.test_swift_endpoint", new=return_test_swift_endpoint
+            "swift_browser_ui.ui.login.test_swift_endpoint",
+            new=return_test_swift_endpoint,
         )
 
         with patch1, patch2, patch3, patch4, patch5, patch6, patch7:

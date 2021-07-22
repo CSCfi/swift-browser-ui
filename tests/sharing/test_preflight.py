@@ -15,11 +15,7 @@ class PreflightHandlerTestCase(asynctest.TestCase):
         """Test handle_delete_preflight handler function."""
         resp = await handle_delete_preflight(None)
         self.assertEqual(
-            resp.headers["Access-Control-Allow-Methods"],
-            "POST, OPTIONS, DELETE"
+            resp.headers["Access-Control-Allow-Methods"], "POST, OPTIONS, DELETE"
         )
-        self.assertEqual(
-            resp.headers["Access-Control-Max-age"],
-            "84600"
-        )
+        self.assertEqual(resp.headers["Access-Control-Max-age"], "84600")
         self.assertIsInstance(resp, aiohttp.web.Response)

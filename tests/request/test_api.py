@@ -15,7 +15,7 @@ from swift_browser_ui.request.api import (
     handle_user_owned_request_listing,
     handle_user_made_request_listing,
     handle_container_request_listing,
-    handle_user_share_request_delete
+    handle_user_share_request_delete,
 )
 
 
@@ -24,33 +24,32 @@ class APITestClass(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.mock_request = SimpleNamespace(**{
-            "app": {
-                "db_conn":
-                    SimpleNamespace(**{
-                        "add_request": asynctest.mock.CoroutineMock(),
-                        "get_request_owned": asynctest.mock.CoroutineMock(),
-                        "get_request_made": asynctest.mock.CoroutineMock(),
-                        "get_request_container":
-                            asynctest.mock.CoroutineMock(),
-                        "delete_request": asynctest.mock.CoroutineMock(),
-                    })
-            },
-            "query": {
-                "owner": "AUTH_otherexample",
-            },
-            "match_info": {
-                "container": "test",
-                "user": "test",
+        self.mock_request = SimpleNamespace(
+            **{
+                "app": {
+                    "db_conn": SimpleNamespace(
+                        **{
+                            "add_request": asynctest.mock.CoroutineMock(),
+                            "get_request_owned": asynctest.mock.CoroutineMock(),
+                            "get_request_made": asynctest.mock.CoroutineMock(),
+                            "get_request_container": asynctest.mock.CoroutineMock(),
+                            "delete_request": asynctest.mock.CoroutineMock(),
+                        }
+                    )
+                },
+                "query": {
+                    "owner": "AUTH_otherexample",
+                },
+                "match_info": {
+                    "container": "test",
+                    "user": "test",
+                },
             }
-        })
-
-        self.json_mock = unittest.mock.MagicMock(
-            aiohttp.web.json_response
         )
+
+        self.json_mock = unittest.mock.MagicMock(aiohttp.web.json_response)
         self.patch_json_dump = unittest.mock.patch(
-            "swift_browser_ui.request.api.aiohttp.web.json_response",
-            new=self.json_mock
+            "swift_browser_ui.request.api.aiohttp.web.json_response", new=self.json_mock
         )
 
     async def test_endpoint_has_access_correct(self):
@@ -90,35 +89,36 @@ class APITestLostDatabaseConnection(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.mock_request = SimpleNamespace(**{
-            "app": {
-                "db_conn":
-                    SimpleNamespace(**{
-                        "add_request": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_request_owned": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_request_made": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_request_container": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "delete_request": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                    })
-            },
-            "query": {
-                "owner": "test-owner"
-            },
-            "match_info": {
-                "container": "test-container",
-                "user": "test-user",
+        self.mock_request = SimpleNamespace(
+            **{
+                "app": {
+                    "db_conn": SimpleNamespace(
+                        **{
+                            "add_request": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_request_owned": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_request_made": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_request_container": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "delete_request": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                        }
+                    )
+                },
+                "query": {"owner": "test-owner"},
+                "match_info": {
+                    "container": "test-container",
+                    "user": "test-user",
+                },
             }
-        })
+        )
 
         self.handle_dropped_connection_mock = unittest.mock.Mock(
             side_effect=aiohttp.web.HTTPServiceUnavailable(
@@ -127,7 +127,7 @@ class APITestLostDatabaseConnection(asynctest.TestCase):
         )
         self.patch_handle_dropped_connection = unittest.mock.patch(
             "swift_browser_ui.request.api.handle_dropped_connection",
-            new=self.handle_dropped_connection_mock
+            new=self.handle_dropped_connection_mock,
         )
 
     async def test_endpoint_has_access_interface_error(self):

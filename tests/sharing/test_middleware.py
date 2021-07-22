@@ -13,7 +13,7 @@ from swift_browser_ui.sharing.db import DBConn
 from swift_browser_ui.sharing.middleware import (
     add_cors,
     check_db_conn,
-    catch_uniqueness_error
+    catch_uniqueness_error,
 )
 
 
@@ -22,25 +22,21 @@ class MiddlewareTestCase(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.mock_request = SimpleNamespace(**{
-            "headers": {
-                "origin": "http://localhost:8080"
-            },
-            "app": {
-                "db_conn": DBConn()
-            },
-            "path": "/test"
-        })
-        self.mock_handler = asynctest.CoroutineMock(
-            return_value=aiohttp.web.Response()
+        self.mock_request = SimpleNamespace(
+            **{
+                "headers": {"origin": "http://localhost:8080"},
+                "app": {"db_conn": DBConn()},
+                "path": "/test",
+            }
         )
+        self.mock_handler = asynctest.CoroutineMock(return_value=aiohttp.web.Response())
 
     async def test_add_cors(self):
         """Test CORS header addition middleware."""
         resp = await add_cors(self.mock_request, self.mock_handler)
         self.assertEqual(
             resp.headers["Access-Control-Allow-Origin"],
-            self.mock_request.headers["origin"]
+            self.mock_request.headers["origin"],
         )
 
     async def test_check_db_conn_nonexistent(self):
@@ -60,7 +56,4 @@ class MiddlewareTestCase(asynctest.TestCase):
             side_effect=UniqueViolationError
         )
         with self.assertRaises(aiohttp.web.HTTPConflict):
-            await catch_uniqueness_error(
-                self.mock_request,
-                unique_violating_handler
-            )
+            await catch_uniqueness_error(self.mock_request, unique_violating_handler)

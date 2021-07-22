@@ -412,10 +412,14 @@ class TestProxyFunctions(asynctest.TestCase):
                 "valid_until": "test-valid",
             }
         )
-        self.patch_sign = unittest.mock.patch("swift_browser_ui.ui.api.sign", self.sign_mock)
+        self.patch_sign = unittest.mock.patch(
+            "swift_browser_ui.ui.api.sign", self.sign_mock
+        )
 
         self.setd_mock = {"upload_external_endpoint": "http://test-endpoint:9092/"}
-        self.patch_setd = unittest.mock.patch("swift_browser_ui.ui.api.setd", self.setd_mock)
+        self.patch_setd = unittest.mock.patch(
+            "swift_browser_ui.ui.api.setd", self.setd_mock
+        )
 
     async def test_swift_download_share_object(self):
         """Test share object download handler."""

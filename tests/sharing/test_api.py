@@ -29,39 +29,36 @@ class APITestClass(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.mock_request = SimpleNamespace(**{
-            "app": {
-                "db_conn": SimpleNamespace(**{
-                    "add_share": asynctest.CoroutineMock(),
-                    "edit_share": asynctest.CoroutineMock(),
-                    "delete_share": asynctest.CoroutineMock(),
-                    "delete_container_shares": asynctest.CoroutineMock(),
-                    "get_access_list": asynctest.CoroutineMock(),
-                    "get_shared_list": asynctest.CoroutineMock(),
-                    "get_access_container_details": asynctest.CoroutineMock(),
-                    "get_shared_container_details": asynctest.CoroutineMock(),
-                }),
-            },
-            "query": {
-                "user": "AUTH_example",
-                "owner": "AUTH_otherexample",
-                "container": "test-container-1",
-                "access": "r,w,l",
-                "address": "https://placeholder.os:443"
-            },
-            "match_info": {
-                "container": "test",
-                "user": "test",
-                "owner": "test"
+        self.mock_request = SimpleNamespace(
+            **{
+                "app": {
+                    "db_conn": SimpleNamespace(
+                        **{
+                            "add_share": asynctest.CoroutineMock(),
+                            "edit_share": asynctest.CoroutineMock(),
+                            "delete_share": asynctest.CoroutineMock(),
+                            "delete_container_shares": asynctest.CoroutineMock(),
+                            "get_access_list": asynctest.CoroutineMock(),
+                            "get_shared_list": asynctest.CoroutineMock(),
+                            "get_access_container_details": asynctest.CoroutineMock(),
+                            "get_shared_container_details": asynctest.CoroutineMock(),
+                        }
+                    ),
+                },
+                "query": {
+                    "user": "AUTH_example",
+                    "owner": "AUTH_otherexample",
+                    "container": "test-container-1",
+                    "access": "r,w,l",
+                    "address": "https://placeholder.os:443",
+                },
+                "match_info": {"container": "test", "user": "test", "owner": "test"},
             }
-        })
-
-        self.json_mock = unittest.mock.MagicMock(
-            aiohttp.web.json_response
         )
+
+        self.json_mock = unittest.mock.MagicMock(aiohttp.web.json_response)
         self.patch_json_dump = unittest.mock.patch(
-            "swift_browser_ui.sharing.api.aiohttp.web.json_response",
-            new=self.json_mock
+            "swift_browser_ui.sharing.api.aiohttp.web.json_response", new=self.json_mock
         )
 
     async def test_endpoint_has_access_correct(self):
@@ -119,49 +116,48 @@ class APILostDatabaseConnectionClass(asynctest.TestCase):
 
     def setUp(self):
         """Set up necessary mocks."""
-        self.mock_request = SimpleNamespace(**{
-            "app": {
-                "db_conn":
-                    SimpleNamespace(**{
-                        "get_access_list": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_access_container_details": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_shared_list": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "get_shared_container_details": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "add_share": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "edit_share": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "delete_share": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                        "delete_container_shares": asynctest.mock.Mock(
-                            side_effect=InterfaceError('Lost connection')
-                        ),
-                    })
-            },
-            "query": {
-                "user": "AUTH_example",
-                "owner": "AUTH_otherexample",
-                "container": "test-container-1",
-                "access": "r,w,l",
-                "address": "https://placeholder.os:443"
-            },
-            "match_info": {
-                "container": "test",
-                "user": "test",
-                "owner": "test"
+        self.mock_request = SimpleNamespace(
+            **{
+                "app": {
+                    "db_conn": SimpleNamespace(
+                        **{
+                            "get_access_list": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_access_container_details": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_shared_list": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "get_shared_container_details": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "add_share": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "edit_share": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "delete_share": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                            "delete_container_shares": asynctest.mock.Mock(
+                                side_effect=InterfaceError("Lost connection")
+                            ),
+                        }
+                    )
+                },
+                "query": {
+                    "user": "AUTH_example",
+                    "owner": "AUTH_otherexample",
+                    "container": "test-container-1",
+                    "access": "r,w,l",
+                    "address": "https://placeholder.os:443",
+                },
+                "match_info": {"container": "test", "user": "test", "owner": "test"},
             }
-        })
+        )
 
         self.handle_dropped_connection_mock = unittest.mock.Mock(
             side_effect=aiohttp.web.HTTPServiceUnavailable(
@@ -170,7 +166,7 @@ class APILostDatabaseConnectionClass(asynctest.TestCase):
         )
         self.patch_handle_dropped_connection = unittest.mock.patch(
             "swift_browser_ui.sharing.api.handle_dropped_connection",
-            new=self.handle_dropped_connection_mock
+            new=self.handle_dropped_connection_mock,
         )
 
     async def test_endpoint_has_access_interface_error(self):
