@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import asynctest
 
 
-from swift_x_account_sharing.bindings.bind import SwiftXAccountSharing
+from swift_browser_ui.sharing.bindings.bind import SwiftXAccountSharing
 
 
 class MockRequestContextManager(asynctest.TestCase):
@@ -83,7 +83,7 @@ class BindingsClassTestCase(asynctest.TestCase):
             return_value=self.session_mock
         )
         self.session_open_patch = unittest.mock.patch(
-            "swift_x_account_sharing.bindings.bind.aiohttp.ClientSession",
+            "swift_browser_ui.sharing.bindings.bind.aiohttp.ClientSession",
             new=self.session_open_mock
         )
 
@@ -91,7 +91,7 @@ class BindingsClassTestCase(asynctest.TestCase):
             return_value={"valid": "60", "signature": "example"}
         )
         self.patch_signature = unittest.mock.patch(
-            "swift_x_account_sharing.bindings.bind.sign_api_request",
+            "swift_browser_ui.sharing.bindings.bind.sign_api_request",
             new=self.signature_mock
         )
 

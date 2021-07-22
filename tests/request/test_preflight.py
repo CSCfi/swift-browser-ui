@@ -5,7 +5,7 @@ import asynctest
 import aiohttp
 
 
-from swift_sharing_request.preflight import handle_delete_preflight
+from swift_browser_ui.request.preflight import handle_delete_preflight
 
 
 class HandleDeletePreflightTestCase(asynctest.TestCase):

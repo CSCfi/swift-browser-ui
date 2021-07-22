@@ -10,7 +10,7 @@ import asynctest
 from asyncpg import InterfaceError
 
 
-from swift_sharing_request.api import (
+from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
     handle_user_made_request_listing,
@@ -49,7 +49,7 @@ class APITestClass(asynctest.TestCase):
             aiohttp.web.json_response
         )
         self.patch_json_dump = unittest.mock.patch(
-            "swift_sharing_request.api.aiohttp.web.json_response",
+            "swift_browser_ui.request.api.aiohttp.web.json_response",
             new=self.json_mock
         )
 
@@ -126,7 +126,7 @@ class APITestLostDatabaseConnection(asynctest.TestCase):
             )
         )
         self.patch_handle_dropped_connection = unittest.mock.patch(
-            "swift_sharing_request.api.handle_dropped_connection",
+            "swift_browser_ui.request.api.handle_dropped_connection",
             new=self.handle_dropped_connection_mock
         )
 

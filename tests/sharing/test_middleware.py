@@ -9,8 +9,8 @@ import aiohttp.web
 from asyncpg import UniqueViolationError
 
 
-from swift_x_account_sharing.db import DBConn
-from swift_x_account_sharing.middleware import (
+from swift_browser_ui.sharing.db import DBConn
+from swift_browser_ui.sharing.middleware import (
     add_cors,
     check_db_conn,
     catch_uniqueness_error

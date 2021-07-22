@@ -9,7 +9,7 @@ import aiohttp.web
 import asynctest
 
 
-from swift_x_account_sharing.server import (
+from swift_browser_ui.sharing.server import (
     init_server,
     run_server_devel
 )
@@ -31,7 +31,7 @@ class TestRunServerFunctions(unittest.TestCase):
         """Test the development mode run server function."""
         run_app_mock = unittest.mock.MagicMock(aiohttp.web.run_app)
         with unittest.mock.patch(
-                "swift_x_account_sharing.server.aiohttp.web.run_app",
+                "swift_browser_ui.sharing.server.aiohttp.web.run_app",
                 new=run_app_mock
         ):
             run_server_devel(None)

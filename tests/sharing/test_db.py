@@ -9,8 +9,8 @@ import asynctest
 import asyncpg
 import aiohttp.web
 
-from swift_x_account_sharing.db import DBConn
-from swift_x_account_sharing.db import handle_dropped_connection
+from swift_browser_ui.sharing.db import DBConn
+from swift_browser_ui.sharing.db import handle_dropped_connection
 import datetime
 
 
@@ -32,7 +32,7 @@ class HandleDroppedTestClass(asynctest.TestCase):
             asyncio.ensure_future
         )
         self.patch_asyncio_ensure_future = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncio.ensure_future",
+            "swift_browser_ui.sharing.db.asyncio.ensure_future",
             new=self.ensure_future_mock
         )
 
@@ -54,7 +54,7 @@ class DBConnTestClass(asynctest.TestCase):
             "close": asynctest.CoroutineMock()
         })
         self.patch_asyncpg_connection = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncpg.Connection",
+            "swift_browser_ui.sharing.db.asyncpg.Connection",
             new=self.asyncpg_connection_mock
         )
 
@@ -62,7 +62,7 @@ class DBConnTestClass(asynctest.TestCase):
             return_value=self.asyncpg_connection_mock,
         )
         self.patch_asyncpg_connect = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncpg.connect",
+            "swift_browser_ui.sharing.db.asyncpg.connect",
             new=self.asyncpg_connect_mock
         )
 
@@ -70,7 +70,7 @@ class DBConnTestClass(asynctest.TestCase):
             side_effect=ConnectionError
         )
         self.patch_asyncpg_connect_connection_error = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncpg.connect",
+            "swift_browser_ui.sharing.db.asyncpg.connect",
             new=self.asyncpg_connect_mock_connection_error
         )
 
@@ -78,7 +78,7 @@ class DBConnTestClass(asynctest.TestCase):
             side_effect=asyncpg.InvalidPasswordError("Invalid")
         )
         self.patch_asyncpg_connect_invalid_password = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncpg.connect",
+            "swift_browser_ui.sharing.db.asyncpg.connect",
             new=self.asyncpg_connect_mock_invalid_pwd
         )
 
@@ -86,7 +86,7 @@ class DBConnTestClass(asynctest.TestCase):
             return_value=True
         )
         self.patch_os_environ_get = unittest.mock.patch(
-            "swift_x_account_sharing.db.os.environ.get",
+            "swift_browser_ui.sharing.db.os.environ.get",
             new=self.os_environ_mock
         )
 
@@ -94,7 +94,7 @@ class DBConnTestClass(asynctest.TestCase):
             side_effect=Exception
         )
         self.patch_asyncio_sleep = unittest.mock.patch(
-            "swift_x_account_sharing.db.asyncio.sleep",
+            "swift_browser_ui.sharing.db.asyncio.sleep",
             new=self.asyncio_sleep_mock
         )
 

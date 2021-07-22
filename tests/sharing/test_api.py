@@ -12,7 +12,7 @@ import aiohttp.web
 from asyncpg import InterfaceError
 
 
-from swift_x_account_sharing.api import (
+from swift_browser_ui.sharing.api import (
     has_access_handler,
     access_details_handler,
     gave_access_handler,
@@ -60,7 +60,7 @@ class APITestClass(asynctest.TestCase):
             aiohttp.web.json_response
         )
         self.patch_json_dump = unittest.mock.patch(
-            "swift_x_account_sharing.api.aiohttp.web.json_response",
+            "swift_browser_ui.sharing.api.aiohttp.web.json_response",
             new=self.json_mock
         )
 
@@ -169,7 +169,7 @@ class APILostDatabaseConnectionClass(asynctest.TestCase):
             )
         )
         self.patch_handle_dropped_connection = unittest.mock.patch(
-            "swift_x_account_sharing.api.handle_dropped_connection",
+            "swift_browser_ui.sharing.api.handle_dropped_connection",
             new=self.handle_dropped_connection_mock
         )
 

@@ -11,11 +11,11 @@ import aiohttp.web
 import asynctest
 
 
-from swift_x_account_sharing.auth import (
+from swift_browser_ui.sharing.auth import (
     read_in_keys,
     handle_validate_authentication
 )
-from swift_x_account_sharing.auth import test_signature as t_signature
+from swift_browser_ui.sharing.auth import test_signature as t_signature
 
 
 class AuthModuleTestCase(asynctest.TestCase):
@@ -31,7 +31,7 @@ class AuthModuleTestCase(asynctest.TestCase):
             return_value="a,b,c,d,e,f"
         )
         os_environ_patch = unittest.mock.patch(
-            "swift_x_account_sharing.auth.os.environ.get",
+            "swift_browser_ui.sharing.auth.os.environ.get",
             new=os_environ_mock
         )
         with os_environ_patch:
@@ -71,7 +71,7 @@ class AuthModuleTestCase(asynctest.TestCase):
         """Test authentication validation handler success."""
         t_singature_mock = asynctest.CoroutineMock()
         t_signature_patch = unittest.mock.patch(
-            "swift_x_account_sharing.auth.test_signature",
+            "swift_browser_ui.sharing.auth.test_signature",
             t_singature_mock
         )
 

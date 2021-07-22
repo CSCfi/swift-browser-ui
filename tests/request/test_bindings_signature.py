@@ -7,7 +7,7 @@ import unittest.mock
 import asynctest
 
 
-from swift_sharing_request.bindings.signature import sign_api_request
+from swift_browser_ui.request.bindings.signature import sign_api_request
 
 
 class SignatureModuleTestCase(asynctest.TestCase):
@@ -19,7 +19,7 @@ class SignatureModuleTestCase(asynctest.TestCase):
             return_value="testkey"
         )
         os_environ_patch = unittest.mock.patch(
-            "swift_sharing_request.bindings.signature.os.environ.get",
+            "swift_browser_ui.request.bindings.signature.os.environ.get",
             new=os_environ_mock
         )
 
