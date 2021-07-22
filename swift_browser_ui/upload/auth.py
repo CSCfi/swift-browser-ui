@@ -28,7 +28,7 @@ async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.StreamRespon
         token = login_form["token"]
         request.app[session_key] = {}
         request.app[session_key]["uploads"] = {}
-        request.app[session_key]["auth"] = initiate_os_session(token, project)
+        request.app[session_key]["auth"] = initiate_os_session(str(token), str(project))
 
         resp = aiohttp.web.Response(status=200, body="OK")
         resp.cookies["RUNNER_SESSION_ID"] = session_key
