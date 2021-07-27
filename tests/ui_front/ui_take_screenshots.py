@@ -38,7 +38,7 @@ class ObjBrowserScreenshot:
         self.options = webdriver.firefox.options.Options()
         self.options.headless = True
         self.server_process = subprocess.Popen(  # nosec
-            ["python", "-m", "tests.unit.mock_server"],
+            ["python", "-m", "tests.ui_unit.mock_server"],
             stdout=subprocess.PIPE,
         )
         self.drv = webdriver.Firefox(options=self.options)
