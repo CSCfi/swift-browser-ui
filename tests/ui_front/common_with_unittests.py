@@ -19,7 +19,7 @@ class BaseUITestClass(unittest.TestCase):
     def setUp(self):
         """Start webserver with mock API."""
         self.server_process = subprocess.Popen(  # nosec
-            ["python", "-m", "tests.unit.mock_server"], stdout=subprocess.PIPE
+            ["python", "-m", "tests.ui_unit.mock_server"], stdout=subprocess.PIPE
         )
         time.sleep(3.0)
 
