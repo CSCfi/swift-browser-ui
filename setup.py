@@ -39,7 +39,7 @@ setuptools.setup(
         "ui_test": ["pytest==6.2.4", "selenium==3.141.0 ", "pytest-timeout==1.4.2"],
     },
     packages=setuptools.find_packages(),
-    package_data={__name__: ["static/*", "static/js/*", "static/css/*", "static/img/*"]},
+    package_data={__name__: ["ui/static/*", "ui/static/js/*", "ui/static/css/*", "ui/static/img/*"]},
     include_package_data=True,
     platforms="any",
     entry_points={
