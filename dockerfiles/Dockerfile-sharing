@@ -7,7 +7,7 @@ RUN apk add --update \
 
 COPY requirements.txt /root/swift_sharing/requirements.txt
 COPY setup.py /root/swift_sharing/setup.py
-COPY swift_x_account_sharing /root/swift_sharing/swift_x_account_sharing
+COPY swift_browser_ui /root/swift_sharing/swift_browser_ui
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_sharing/requirements.txt \
@@ -31,7 +31,7 @@ RUN mkdir -p /app
 
 WORKDIR /app
 
-COPY ./deploy/app.sh /app/app.sh
+COPY ./deploy/app-sharing.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 

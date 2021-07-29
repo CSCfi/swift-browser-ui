@@ -7,7 +7,7 @@ RUN apk add --update \
 
 COPY requirements.txt /root/swift_request/requirements.txt
 COPY setup.py /root/swift_request/setup.py
-COPY swift_sharing_request /root/swift_request/swift_sharing_request
+COPY swift_browser_ui /root/swift_request/swift_browser_ui
 
 RUN pip install --upgrade pip\
     && pip install -r /root/swift_request/requirements.txt \
@@ -31,7 +31,7 @@ RUN mkdir -p /app
 
 WORKDIR /app
 
-COPY ./deploy/app.sh /app/app.sh
+COPY ./deploy/app-request.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 
