@@ -6,8 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-devel": "vue-cli-service build --mode development",
-    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request"
+    "build-devel": "vue-cli-service build --mode development"
   },
   "dependencies": {
     "@vue/cli-service": "^5.0.0-beta.2",
