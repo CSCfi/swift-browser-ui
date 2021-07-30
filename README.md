@@ -20,9 +20,9 @@ Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
 Readmes on the additional APIs for container sharing, access requests, and
 better upload and download functionality are in their separate files.
 
-* Container sharing – `README-sharing.md`
-* Container access requests – `README-request.md`
-* Additional upload and download functionality `README-runner.md`
+* [Container sharing](README-sharing.md)
+* [Container access requests](README-request.md)
+* [Additional upload and download functionality](README-runner.md)
 
 ### Requirements
 
