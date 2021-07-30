@@ -17,16 +17,21 @@ compliant object storage, supporting SSO with SAML2 federated authentication.
 
 Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
 
+Readmes on the additional APIs for container sharing, access requests, and
+better upload and download functionality are in their separate files.
+
+* Container sharing – `README-sharing.md`
+* Container access requests – `README-request.md`
+* Additional upload and download functionality `README-runner.md`
+
 ### Requirements
 
 Python 3.6+ required (recommended 3.7+)
 
-The dependencies mentioned in `requirements.txt` and an account that has access
-rights to [CSC Pouta](https://docs.csc.fi/cloud/pouta/) platform, 
-and is taking part to at least one project as
-object storage is project specific.
+The dependencies mentioned in `requirements.txt` and a suitable storage backend
+supporting usage via Openstack Object Storage API. (e.g. Ceph RGW, Openstack Swift)
 
-### Usage
+### Usage – UI
 
 At the current state the program configs can be specified either via environment
 variables or command line arguments. These usage directions assume envvars to be used.
