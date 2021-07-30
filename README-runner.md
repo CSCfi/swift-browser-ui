@@ -10,7 +10,7 @@ as an archive without intermediary storage, as well as proxying downloads from
 shared containers, i.e. containers where the project has access via an ACL entry.
 
 ### Installation
-`pip install git+https://github.com/cscfi/swift-upload-runner.git`
+`pip install .`
 
 ### Running
 
