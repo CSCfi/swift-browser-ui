@@ -1,7 +1,3 @@
-![Python style check](https://github.com/CSCfi/swift-sharing-request/workflows/Python%20style%20check/badge.svg)
-![Javascript ESLint check](https://github.com/CSCfi/swift-sharing-request/workflows/Javascript%20ESLint%20check/badge.svg)
-![Python Unit Tests](https://github.com/CSCfi/swift-sharing-request/workflows/Python%20Unit%20Tests/badge.svg)
-
 ### swift-request-backend
 API for requesting access to swift containers, to enable more fluid container
 sharing process, the main use being the abstraction of separation of the
