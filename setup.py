@@ -18,7 +18,7 @@ setuptools.setup(
         "keystoneauth1==4.3.1",
         "click==8.0.1",
         "gunicorn>=20.0.1",
-        "uvloop==0.15.2",
+        "uvloop==0.15.3",
         "certifi==2021.5.30",
         "asyncpg==0.23.0",
     ],
