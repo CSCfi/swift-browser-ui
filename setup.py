@@ -35,7 +35,7 @@ setuptools.setup(
             "asynctest==0.13.0",
             "black==21.6b0",
         ],
-        "docs": ["sphinx==4.0.3", "sphinx_rtd_theme==0.5.2", "selenium==3.141.0"],
+        "docs": ["sphinx==4.1.2", "sphinx_rtd_theme==0.5.2", "selenium==3.141.0"],
         "ui_test": ["pytest==6.2.4", "selenium==3.141.0 ", "pytest-timeout==1.4.2"],
     },
     packages=setuptools.find_packages(),
