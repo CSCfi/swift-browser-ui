@@ -5,7 +5,7 @@ from swift_browser_ui import __name__, __version__, __author__
 setuptools.setup(
     name=__name__,
     version=__version__,
-    description="Object browser for OS_swift API",
+    description="Object browser Web UI for Openstack Swift API",
     author=__author__,
     project_urls={
         "Source": "https://github.com/CSCfi/swift-browser-ui",
@@ -20,6 +20,7 @@ setuptools.setup(
         "gunicorn>=20.0.1",
         "uvloop==0.15.2",
         "certifi==2021.5.30",
+        "asyncpg==0.23.0",
     ],
     extras_require={
         "test": [
@@ -37,13 +38,18 @@ setuptools.setup(
         "docs": ["sphinx==4.0.3", "sphinx_rtd_theme==0.5.2", "selenium==3.141.0"],
         "ui_test": ["pytest==6.2.4", "selenium==3.141.0 ", "pytest-timeout==1.4.2"],
     },
-    packages=[__name__],
-    package_data={__name__: ["static/*", "static/js/*", "static/css/*", "static/img/*"]},
+    packages=setuptools.find_packages(),
+    package_data={
+        __name__: ["ui/static/*", "ui/static/js/*", "ui/static/css/*", "ui/static/img/*"]
+    },
     include_package_data=True,
     platforms="any",
     entry_points={
         "console_scripts": [
-            "swift-browser-ui=swift_browser_ui.shell:main",
+            "swift-browser-ui=swift_browser_ui.launcher:run_ui",
+            "swift-x-account-sharing=swift_browser_ui.launcher:run_sharing",
+            "swift-sharing-request=swift_browser_ui.launcher:run_request",
+            "swift-upload-runner=swift_browser_ui.launcher:run_upload",
         ]
     },
     classifiers=[

@@ -66,7 +66,10 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/source/swift_browser_ui
+docs/source/swift_browser_ui.ui
+docs/source/swift_browser_ui.sharing
+docs/source/swift_browser_ui.request
+docs/source/swift_browser_ui.upload
 
 # PyBuilder
 target/
@@ -120,3 +123,6 @@ src/server.py
 setenvs*
 swift_browser_ui_frontend/src/common/swift_sharing_request_bind.js
 swift_browser_ui_frontend/src/common/swift_x_account_sharing_bind.js
+
+# Tests
+tests/ui_front/swift-browser-ui

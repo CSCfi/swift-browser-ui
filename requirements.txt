@@ -8,3 +8,4 @@ sphinx_rtd_theme==0.5.2
 uvloop==0.15.2
 gunicorn>=20.0.1
 certifi==2021.5.30
+asyncpg==0.23.0
