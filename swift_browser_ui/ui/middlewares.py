@@ -40,6 +40,8 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
             return return_error_response(403)
         if response.status == 404:
             return return_error_response(404)
+        if response.status == 409:
+            return response
         return response
     except web.HTTPException as ex:
         if ex.status == 400:
@@ -50,6 +52,8 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
             return return_error_response(403)
         if ex.status == 404:
             return return_error_response(404)
+        if ex.status == 409:
+            raise ex
         if ex.status > 404 and ex.status < 500:
             # we forbid all dubios and unauthorized requests
             return return_error_response(403)
