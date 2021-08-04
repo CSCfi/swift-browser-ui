@@ -49,6 +49,24 @@ export default {
     createContainer: function () {
       swiftCreateContainer(this.container).then(() => {
         this.$router.go(-1);
+      }).catch((err) => {
+        console.log(err);
+        if (err.message.match("name")) {
+          this.$buefy.toast.open({
+            message: this.$t("message.error.inUse"),
+          });
+        }
+        else if (err.message.match("creation")) {
+          this.$buefy.toast.open({
+            message: this.$t("message.error.createFail"),
+          });
+        }
+        else {
+          this.$buefy.toast.open({
+            message: err.message,
+            type: "is-danger",
+          });
+        }
       });
     },
   },
