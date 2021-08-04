@@ -101,7 +101,10 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     # Return HTTPCreated upon a successful creation
     if res["success"]:
         return aiohttp.web.Response(status=201)
-    raise aiohttp.web.HTTPClientError(reason=res["error"])
+    if res["error"].http_status == 409:
+        request.app["Log"].info(res["error"].http_status)
+        raise aiohttp.web.HTTPConflict(reason="Container name in use")
+    raise aiohttp.web.HTTPServerError(reason=res["error"].msg)
 
 
 async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
