@@ -1,0 +1,1 @@
+../../swift_browser_ui_frontend/src/common/swift_x_account_sharing_bind.js

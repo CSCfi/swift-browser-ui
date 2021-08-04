@@ -1,18 +1,17 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "1.1.0b3",
+  "version": "1.1.0b4",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-devel": "vue-cli-service build --mode development",
-    "prepare": "git clone https://github.com/CSCfi/swift-x-account-sharing.git && cp swift-x-account-sharing/bindings/js/swift_x_account_sharing_bind.js src/common && rm -rf swift-x-account-sharing && git clone https://github.com/CSCfi/swift-sharing-request.git && cp swift-sharing-request/bindings/js/swift_sharing_request_bind.js src/common && rm -rf swift-sharing-request"
+    "build-devel": "vue-cli-service build --mode development"
   },
   "dependencies": {
     "@vue/cli-service": "^5.0.0-beta.2",
     "buefy": "^0.9.8",
-    "core-js": "^3.15.2",
+    "core-js": "^3.16.0",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node-sass": "^6.0.1",
@@ -20,7 +19,7 @@
     "sass-loader": "^12.1.0",
     "serve": "^12.0.0",
     "vue": "^2.6.14",
-    "vue-i18n": "^8.24.5",
+    "vue-i18n": "^8.25.0",
     "vue-material-design-icons": "^4.12.1",
     "vue-router": "^3.5.2",
     "vuex": "^3.6.2"
@@ -31,8 +30,8 @@
     "@vue/cli-service": "^5.0.0-beta.2",
     "babel-eslint": "^10.1.0",
     "cli-highlight": "^2.1.11",
-    "eslint": "^7.30.0",
-    "eslint-plugin-vue": "^7.12.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^7.15.0",
     "eslint-utils": "^3.0.0",
     "vue-template-compiler": "^2.6.14"
   },

@@ -1,0 +1,302 @@
+openapi: "3.0.2"
+info:
+  title: "swift-x-account-sharing"
+  description: "Database and API for storing / querying Openstack Swift ACL information"
+  version: "0.1.0"
+  license:
+    name: MIT
+tags:
+  - name: API Endpoints
+    description: Endpoints for sharing information queries
+paths:
+  /access/{user}:
+    get:
+      tags:
+        - API Endpoints
+      summary: List container names that have been shared to the user.
+      parameters:
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HasAccess"
+        400:
+          description: Client Error
+  /access/{user}/{container}:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get details of a container that has been shared to the user.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be queried.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: owner
+        in: query
+        description: The container owner
+        required: true
+        schema:
+          type: string
+          example: AUTH_otherexample
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDetails"
+        400:
+          description: Client Error
+  /share/{owner}:
+    get:
+      tags:
+        - API Endpoints
+      summary: List container names that the user has shared to someone else.
+      parameters:
+      - name: owner
+        in: path
+        description: The user requesting the shared container listing.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GaveAccess"
+        400:
+          description: Client Error
+  /share/{owner}/{container}:
+    get:
+      tags:
+        - API Endpoints
+      summary: Get details of a container that the user has shared.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be queried.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: owner
+        in: path
+        description: The user that is requesting the sharing details.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    post:
+      tags:
+        - API Endpoints
+      summary: Give user / users access rights on a specified container.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be shared.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is shared to.
+        required: true
+        schema:
+          type: string
+          example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
+      - name: access
+        in: query
+        description: The access types to be granted.
+        required: true
+        schema:
+          type: string
+          example: "r,l,w"
+      - name: owner
+        in: path
+        description: The owner of the container to be shared.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: address
+        in: query
+        description: The address of the container to be shared.
+        required: true
+        schema:
+          type: string
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    patch:
+      tags:
+        - API Endpoints
+      summary: Edit specified user's access rights on a specified container.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be edited.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is shared to.
+        required: true
+        schema:
+          type: string
+          example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
+      - name: access
+        in: query
+        description: The access types to be granted.
+        required: true
+        schema:
+          type: string
+          example: "r,l,w"
+      - name: owner
+        in: path
+        description: The owner of the container to be edited.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    delete:
+      tags:
+        - API Endpoints
+      summary: Revoke specified access to container from the user/users specified in the query.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be revoked.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is revoked from.
+        required: true
+        schema:
+          type: string
+          example: "user1,user2,user3,user4"
+      - name: owner
+        in: path
+        description: The owner of the shared container.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        204:
+          description: OK
+        404:
+          description: Not Found
+        400:
+          description: Client Error
+
+components:
+  schemas:
+
+    ListedContainer:
+      type: object
+      properties:
+        container:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+
+    DetailedContainer:
+      type: object
+      properties:
+        container:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+        shared:
+          type: string
+          description: The user the container was shared to.
+          example: AUTH_otherexample
+        address:
+          type: string
+          description: The URL of the container.
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
+        rights:
+          type: string
+          description: The rights that the user has / was given to.
+
+    HasAccess:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedContainer"
+
+    GetDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
+
+    GaveAccess:
+      type: array
+      items:
+        type: string
+
+    SharedDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
