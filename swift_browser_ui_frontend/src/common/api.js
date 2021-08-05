@@ -237,6 +237,12 @@ export async function swiftCreateContainer (
     fetchURL, { method: "PUT", credentials: "same-origin" },
   );
   if (ret.status != 201) {
+    if (ret.status == 409) {
+      throw new Error("Container name already in use.");
+    }
+    if (ret.status == 400) {
+      throw new Error("Invalid container name");
+    }
     throw new Error("Container creation not successful.");
   }
 }
