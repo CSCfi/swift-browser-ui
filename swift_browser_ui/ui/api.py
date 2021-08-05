@@ -101,6 +101,8 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     # Return HTTPCreated upon a successful creation
     if res["success"]:
         return aiohttp.web.Response(status=201)
+    if res["error"].http_status == 400:
+        raise aiohttp.web.HTTPBadRequest(reason="Invalid container name")
     if res["error"].http_status == 409:
         request.app["Log"].info(res["error"].http_status)
         raise aiohttp.web.HTTPConflict(reason="Container name in use")

@@ -240,6 +240,9 @@ export async function swiftCreateContainer (
     if (ret.status == 409) {
       throw new Error("Container name already in use.");
     }
+    if (ret.status == 400) {
+      throw new Error("Invalid container name");
+    }
     throw new Error("Container creation not successful.");
   }
 }
