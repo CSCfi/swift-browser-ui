@@ -287,6 +287,9 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
         status=302,
     )
     response.headers["Location"] = dloadurl
+    response.headers["Content-Type"] = dict(
+        list(serv.stat(request.query["bucket"], [request.query["objkey"]]))[0]["items"]
+    )["Content Type"]
     return response
 
 
