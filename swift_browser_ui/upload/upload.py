@@ -209,6 +209,7 @@ class ResumableFileUploadProxy:
                 headers={
                     "X-Auth-Token": self.auth.get_token(),
                     "Content-Length": str(self.total_size),
+                    "Content-Type": str(self.content_type),
                 },
                 timeout=UPL_TIMEOUT,
                 ssl=ssl_context,
