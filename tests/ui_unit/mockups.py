@@ -351,6 +351,7 @@ class Mock_Service:
                     i
                 ]["Obj_S3_example"]
             to_add["success"] = True
+            to_add["headers"]["content-type"] = "binary/octet-stream"
             to_add["object"] = i
             ret.append(to_add)
         return ret
