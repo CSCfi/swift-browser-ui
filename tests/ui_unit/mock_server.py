@@ -42,6 +42,11 @@ def mock_initiate_swift_service(_):
         # with envvar.
         size_range=(1, int(environ.get("TEST_MAX_OBJECT_SIZE", 1048576))),
     )
+    # Add mock data for object metadata
+    for key in serv.containers.keys():
+        serv.set_swift_meta_container(key)
+        for obj in serv.containers[key]:
+            serv.set_swift_meta_object(key, obj["name"])
     # The downloads aren't mocked, so no contents to any file. This isn't
     # something we need to test, and also would consume too much resources.
     # NOTE: Some random metadata creation could be added here.

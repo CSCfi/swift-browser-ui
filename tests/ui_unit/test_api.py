@@ -159,7 +159,14 @@ class APITestClass(asynctest.TestCase):
         container = "test-container-0"
         o_name = self.request.app["Sessions"][self.cookie]["ST_conn"].containers[
             container
-        ][0]
+        ][0]["name"]
+
+        self.request.app["Sessions"][self.cookie]["ST_conn"].set_swift_meta_container(
+            "test-container-0"
+        )
+        self.request.app["Sessions"][self.cookie]["ST_conn"].set_swift_meta_object(
+            "test-container-0", o_name
+        )
 
         self.request.query["bucket"] = container
         self.request.query["objkey"] = o_name
