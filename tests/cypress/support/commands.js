@@ -24,10 +24,8 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-const baseUrl = "http://localhost:" + Cypress.env("port") + "/"
-
 Cypress.Commands.add("login", ( loginMessage ) => {
-    cy.visit(baseUrl)
+    cy.visit(Cypress.config().baseUrl)
     cy.contains(loginMessage).parent().click()
     cy.wait(1000)
     cy.get('#inputbox').type('abcdefabcdefabcdefabcdefabcdefab')
