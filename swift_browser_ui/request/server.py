@@ -9,11 +9,7 @@ import aiohttp.web
 import uvloop
 import typing
 
-from swift_browser_ui.request.middleware import (
-    add_cors,
-    check_db_conn,
-    catch_uniqueness_error,
-)
+import swift_browser_ui.common.common_middleware
 from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
@@ -52,10 +48,10 @@ async def init_server() -> aiohttp.web.Application:
     """Initialize the sharing request server."""
     app = aiohttp.web.Application(
         middlewares=[
-            add_cors,  # type: ignore
-            check_db_conn,  # type: ignore
+            swift_browser_ui.common.common_middleware.add_cors,  # type: ignore
+            swift_browser_ui.common.common_middleware.check_db_conn,  # type: ignore
             handle_validate_authentication,  # type: ignore
-            catch_uniqueness_error,  # type: ignore
+            swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type: ignore
         ]
     )
 

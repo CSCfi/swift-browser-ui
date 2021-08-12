@@ -12,7 +12,7 @@ import aiohttp.client
 
 import uvloop
 
-from swift_browser_ui.upload.middleware import add_cors
+import swift_browser_ui.common.common_middleware
 from swift_browser_ui.upload.auth import (
     handle_login,
     read_in_keys,
@@ -35,7 +35,7 @@ logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server for handling the upload runner API."""
-    middlewares: typing.List[typing.Coroutine] = [add_cors]  # type: ignore
+    middlewares: typing.List[typing.Coroutine] = [swift_browser_ui.common.common_middleware.add_cors]  # type: ignore
 
     if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", None):
         middlewares.append(handle_validate_authentication)  # type: ignore

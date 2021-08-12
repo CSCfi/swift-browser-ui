@@ -24,11 +24,7 @@ from swift_browser_ui.sharing.api import (
     handle_health_check,
 )
 from swift_browser_ui.sharing.db import DBConn
-from swift_browser_ui.sharing.middleware import (
-    add_cors,
-    check_db_conn,
-    catch_uniqueness_error,
-)
+import swift_browser_ui.common.common_middleware
 from swift_browser_ui.sharing.auth import (
     read_in_keys,
     handle_validate_authentication,
@@ -57,10 +53,10 @@ async def init_server() -> aiohttp.web.Application:
     """Initialize the server."""
     app = aiohttp.web.Application(
         middlewares=[
-            add_cors,  # type:ignore
-            check_db_conn,  # type:ignore
+            swift_browser_ui.common.common_middleware.add_cors,  # type:ignore
+            swift_browser_ui.common.common_middleware.check_db_conn,  # type:ignore
             handle_validate_authentication,  # type:ignore
-            catch_uniqueness_error,  # type:ignore
+            swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type:ignore
         ]
     )
 
