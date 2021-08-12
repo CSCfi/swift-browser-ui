@@ -10,6 +10,7 @@ import uvloop
 import typing
 
 import swift_browser_ui.common.common_middleware
+import swift_browser_ui.common.common_handlers
 from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
@@ -22,7 +23,6 @@ from swift_browser_ui.request.api import (
     handle_health_check,
 )
 from swift_browser_ui.request.db import DBConn
-from swift_browser_ui.request.preflight import handle_delete_preflight
 from swift_browser_ui.request.auth import (
     read_in_keys,
     handle_validate_authentication,
@@ -67,7 +67,8 @@ async def init_server() -> aiohttp.web.Application:
     app.add_routes(
         [
             aiohttp.web.options(
-                "/request/user/{user}/{container}", handle_delete_preflight
+                "/request/user/{user}/{container}",
+                swift_browser_ui.common.common_handlers.handle_delete_preflight,
             ),
             aiohttp.web.post(
                 "/request/user/{user}/{container}", handle_share_request_post
@@ -85,7 +86,10 @@ async def init_server() -> aiohttp.web.Application:
 
     app.add_routes(
         [
-            aiohttp.web.options("/token/{project}/{id}", handle_delete_preflight),
+            aiohttp.web.options(
+                "/token/{project}/{id}",
+                swift_browser_ui.common.common_handlers.handle_delete_preflight,
+            ),
             aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
             aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
             aiohttp.web.get("/token/{project}", handle_user_list_tokens),
