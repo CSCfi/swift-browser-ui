@@ -126,7 +126,7 @@ class APITestLostDatabaseConnection(asynctest.TestCase):
             )
         )
         self.patch_handle_dropped_connection = unittest.mock.patch(
-            "swift_browser_ui.request.api.handle_dropped_connection",
+            "swift_browser_ui.request.api.common_db.handle_dropped_connection",
             new=self.handle_dropped_connection_mock,
         )
 

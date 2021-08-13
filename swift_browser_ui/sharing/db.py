@@ -8,19 +8,10 @@ import random
 import typing
 
 import asyncpg
-import aiohttp.web
 
 
 MODULE_LOGGER = logging.getLogger("db")
 MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
-
-
-def handle_dropped_connection(request: aiohttp.web.Request) -> None:
-    """Handle dropped database connection."""
-    MODULE_LOGGER.log(logging.ERROR, "Lost database connection, reconnecting...")
-    request.app["db_conn"].erase()
-    asyncio.ensure_future(request.app["db_conn"].open())
-    raise aiohttp.web.HTTPServiceUnavailable(reason="No database connection.")
 
 
 class DBConn:

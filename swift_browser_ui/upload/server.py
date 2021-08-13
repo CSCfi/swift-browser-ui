@@ -13,9 +13,9 @@ import aiohttp.client
 import uvloop
 
 import swift_browser_ui.common.common_middleware
+import swift_browser_ui.common.common_util
 from swift_browser_ui.upload.auth import (
     handle_login,
-    read_in_keys,
     handle_validate_authentication,
 )
 from swift_browser_ui.upload.api import (
@@ -42,7 +42,7 @@ async def servinit() -> aiohttp.web.Application:
 
     app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
-    app.on_startup.append(read_in_keys)
+    app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
     app.on_shutdown.append(kill_client)
 
     # Add client session for aiohttp requests

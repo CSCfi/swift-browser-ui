@@ -11,6 +11,8 @@ import typing
 
 import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_handlers
+import swift_browser_ui.common.common_util
+
 from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
@@ -23,10 +25,6 @@ from swift_browser_ui.request.api import (
     handle_health_check,
 )
 from swift_browser_ui.request.db import DBConn
-from swift_browser_ui.request.auth import (
-    read_in_keys,
-    handle_validate_authentication,
-)
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -50,7 +48,7 @@ async def init_server() -> aiohttp.web.Application:
         middlewares=[
             swift_browser_ui.common.common_middleware.add_cors,  # type: ignore
             swift_browser_ui.common.common_middleware.check_db_conn,  # type: ignore
-            handle_validate_authentication,  # type: ignore
+            swift_browser_ui.common.common_middleware.handle_validate_authentication,  # type: ignore
             swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type: ignore
         ]
     )
@@ -97,7 +95,7 @@ async def init_server() -> aiohttp.web.Application:
     )
 
     app.on_startup.append(resume_on_start)
-    app.on_startup.append(read_in_keys)
+    app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
     app.on_shutdown.append(graceful_shutdown)
 
     return app

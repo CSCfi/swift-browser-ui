@@ -6,7 +6,7 @@ import os
 import aiohttp.web
 from asyncpg import InterfaceError
 
-from swift_browser_ui.sharing.db import handle_dropped_connection
+import swift_browser_ui.common.common_db as common_db
 
 
 MODULE_LOGGER = logging.getLogger("api")
@@ -21,7 +21,7 @@ async def has_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respon
             request.match_info["user"]
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG, "Returning following access list: %s", str(access_list)
@@ -40,7 +40,7 @@ async def access_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Re
             request.match_info["container"],
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG, "Returning following access details: %s", str(access_details)
@@ -57,7 +57,7 @@ async def gave_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respo
             request.match_info["owner"]
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -76,7 +76,7 @@ async def shared_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Re
             request.match_info["owner"], request.match_info["container"]
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -99,7 +99,7 @@ async def share_container_handler(request: aiohttp.web.Request) -> aiohttp.web.R
             request.query["address"],
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -121,7 +121,7 @@ async def edit_share_handler(request: aiohttp.web.Request) -> aiohttp.web.Respon
             request.query["access"].split(","),
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -141,7 +141,7 @@ async def delete_share_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
             request.query["user"].split(","),
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
     except KeyError:
         # If can't find user from query, the client wants a bulk unshare
         return await delete_container_shares_handler(request)
@@ -164,7 +164,7 @@ async def delete_container_shares_handler(
             request.match_info["owner"], request.match_info["container"]
         )
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -193,7 +193,7 @@ async def handle_user_add_token(request: aiohttp.web.Request) -> aiohttp.web.Res
     try:
         await request.app["db_conn"].add_token(project, token, identifier)
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     return aiohttp.web.Response(status=200)
 
@@ -206,7 +206,7 @@ async def handle_user_delete_token(request: aiohttp.web.Request) -> aiohttp.web.
     try:
         await request.app["db_conn"].revoke_token(project, identifier)
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     return aiohttp.web.Response(status=200)
 
@@ -218,7 +218,7 @@ async def handle_user_list_tokens(request: aiohttp.web.Request) -> aiohttp.web.R
     try:
         tokens = await request.app["db_conn"].get_tokens(project)
     except InterfaceError:
-        handle_dropped_connection(request)
+        common_db.handle_dropped_connection(request)
 
     # Return only the identifiers
     return aiohttp.web.json_response([rec["identifier"] for rec in tokens])
