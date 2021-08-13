@@ -10,12 +10,8 @@ import secrets
 
 import aiohttp.web
 
+import swift_browser_ui.common.types
 from swift_browser_ui.ui._convenience import initiate_os_session
-
-AiohttpHandler = typing.Callable[
-    [aiohttp.web.Request],
-    typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response],
-]
 
 
 async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
@@ -68,7 +64,7 @@ async def test_signature(
 @aiohttp.web.middleware
 async def handle_validate_authentication(
     request: aiohttp.web.Request,
-    handler: AiohttpHandler,
+    handler: swift_browser_ui.common.types.AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
     try:
