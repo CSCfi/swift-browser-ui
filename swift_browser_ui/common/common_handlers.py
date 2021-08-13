@@ -5,7 +5,9 @@ import aiohttp.web
 import typing
 
 
-async def handle_delete_preflight(_: typing.Union[aiohttp.web.Request, None]):
+async def handle_delete_preflight(
+    _: typing.Union[aiohttp.web.Request, None]
+) -> aiohttp.web.Response:
     """Serve correct response headers to allowed DELETE preflight query."""
     resp = aiohttp.web.Response(
         headers={
