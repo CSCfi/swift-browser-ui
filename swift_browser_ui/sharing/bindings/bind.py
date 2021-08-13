@@ -6,7 +6,7 @@ import typing
 import logging
 import aiohttp
 
-from .signature import sign_api_request
+import swift_browser_ui.common.signature
 
 import ssl
 import certifi
@@ -63,7 +63,7 @@ class SwiftXAccountSharing:
         path = f"/access/{username}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
 
@@ -74,7 +74,7 @@ class SwiftXAccountSharing:
         path = f"/access/{username}/{container}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
         params.update({"owner": owner})
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
@@ -85,7 +85,7 @@ class SwiftXAccountSharing:
         path = f"/share/{username}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
             return await self._handler_response(resp)
@@ -95,7 +95,7 @@ class SwiftXAccountSharing:
         path = f"/share/{username}/{container}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
             return await self._handler_response(resp)
@@ -112,7 +112,7 @@ class SwiftXAccountSharing:
         path = f"/share/{username}/{container}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
 
         params.update(
             {
@@ -136,7 +136,7 @@ class SwiftXAccountSharing:
         path = f"/share/{username}/{container}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
         params.update(
             {
                 "user": self.parse_list_to_string(userlist),
@@ -154,7 +154,7 @@ class SwiftXAccountSharing:
         path = f"/share/{username}/{container}"
         url = self.url + path
 
-        params = sign_api_request(path)
+        params = swift_browser_ui.common.signature.sign_api_request(path)
         params.update(
             {
                 "user": self.parse_list_to_string(userlist),

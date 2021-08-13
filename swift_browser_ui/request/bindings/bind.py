@@ -7,7 +7,7 @@ import typing
 import logging
 import aiohttp
 
-from .signature import sign_api_request
+import swift_browser_ui.common.signature
 
 import ssl
 import certifi
@@ -56,7 +56,7 @@ class SwiftSharingRequest:
         path = f"/request/user/{user}/{container}"
         url = self.url + path
 
-        signature = sign_api_request(path)
+        signature = swift_browser_ui.common.signature.sign_api_request(path)
 
         params = {
             "owner": owner,
@@ -73,7 +73,7 @@ class SwiftSharingRequest:
         path = f"/request/user/{user}"
         url = self.url + path
 
-        signature = sign_api_request(path)
+        signature = swift_browser_ui.common.signature.sign_api_request(path)
 
         params = {
             "valid": signature["valid"],
@@ -89,7 +89,7 @@ class SwiftSharingRequest:
         path = f"/request/owner/{user}"
         url = self.url + path
 
-        signature = sign_api_request(path)
+        signature = swift_browser_ui.common.signature.sign_api_request(path)
 
         params = {
             "valid": signature["valid"],
@@ -107,7 +107,7 @@ class SwiftSharingRequest:
 
         project = os.environ.get("OS_PROJECT_ID", None)
 
-        signature = sign_api_request(path)
+        signature = swift_browser_ui.common.signature.sign_api_request(path)
 
         params = {
             "valid": signature["valid"],
@@ -127,7 +127,7 @@ class SwiftSharingRequest:
         path = "/request/user/{username}/{container}"
         url = self.url + path
 
-        signature = sign_api_request(path)
+        signature = swift_browser_ui.common.signature.sign_api_request(path)
 
         params = {
             "owner": owner,
