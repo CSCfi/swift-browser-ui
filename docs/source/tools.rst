@@ -33,7 +33,7 @@ Tests are written to be run with `Pytest <https://docs.pytest.org/en/latest/>`_.
 writing the tests:
 
 * `tox for test automation <https://tox.readthedocs.io/en/latest/>`_
-* `selenium-python for UI test automation <https://selenium-python.readthedocs.io/>`_
+* `cypress for UI test automation <https://www.cypress.io/>`_
 * `asynctest for implementing async testing with TestCase class <https://asynctest.readthedocs.io/en/latest/>`_
 * `pytest-timeout for timing out UI tests, which can hang when failing <https://pypi.org/project/pytest-timeout/1.2.1/>`_
 
@@ -47,9 +47,6 @@ Documentation
 -------------
 
 The documentation is automatically built with `sphinx <http://www.sphinx-doc.org/en/master/>`_
-
-Selenium and the test server are also used for automating the documentation
-screenshots.
 
 Charts
 ~~~~~~
