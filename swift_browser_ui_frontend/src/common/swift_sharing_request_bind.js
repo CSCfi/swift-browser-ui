@@ -2,8 +2,8 @@
 
 class SwiftSharingRequest {
   // Swift sharing request backend client.
-  
-  constructor (
+
+  constructor(
     address,
     signatureAddress = "",
   ) {
@@ -21,7 +21,7 @@ class SwiftSharingRequest {
         this.signatureAddress);
       signatureUrl.searchParams.append("path", toSign);
       let signed = await fetch(
-        signatureUrl, {method: "GET", credentials: "same-origin"},
+        signatureUrl, { method: "GET", credentials: "same-origin" },
       );
       return signed.json();
     }
@@ -45,13 +45,13 @@ class SwiftSharingRequest {
       "/request/user/".concat(username, "/", container),
     );
 
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let resp = fetch(
-      url, {method: "POST"},
+      url, { method: "POST" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return resp;
   }
@@ -66,13 +66,13 @@ class SwiftSharingRequest {
       60,
       "/request/user/".concat(username),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
-  
+
     let resp = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return resp;
   }
@@ -87,13 +87,13 @@ class SwiftSharingRequest {
       60,
       "/request/owner/".concat(username),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
-  
+
     let resp = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return resp;
   }
@@ -108,13 +108,13 @@ class SwiftSharingRequest {
       60,
       "/request/container/".concat(container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
-  
+
     let resp = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return resp;
   }
@@ -134,15 +134,15 @@ class SwiftSharingRequest {
       60,
       "/request/user/".concat(username, "/", container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let deleted = fetch(
-      url, {method: "DELETE"},
+      url, { method: "DELETE" },
     ).then(
       (resp) => {
-        if (resp.status == 200) {return true;}
-        else {return false;}
+        if (resp.status == 200) { return true; }
+        else { return false; }
       },
     );
     return deleted;

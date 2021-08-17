@@ -2,8 +2,8 @@
 
 class SwiftXAccountSharing {
   // Swift cross account sharing backend client.
-  
-  constructor (
+
+  constructor(
     address,
     signatureAddress = "",
   ) {
@@ -11,7 +11,7 @@ class SwiftXAccountSharing {
     this.signatureAddress = signatureAddress;
   }
 
-  _parseListString (
+  _parseListString(
     toParse,
   ) {
     // Parse the JS list into comma separated values in string.
@@ -32,7 +32,7 @@ class SwiftXAccountSharing {
         this.signatureAddress);
       signatureUrl.searchParams.append("path", toSign);
       let signed = await fetch(
-        signatureUrl, {method: "GET", credentials: "same-origin"},
+        signatureUrl, { method: "GET", credentials: "same-origin" },
       );
       return signed.json();
     }
@@ -41,7 +41,7 @@ class SwiftXAccountSharing {
     }
   }
 
-  async getAccess (
+  async getAccess(
     username,
   ) {
     // List the containers the user has been given access to.
@@ -51,18 +51,18 @@ class SwiftXAccountSharing {
       60,
       "/access/".concat(username),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let containers = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return containers;
   }
 
-  async getAccessDetails (
+  async getAccessDetails(
     username,
     container,
     owner,
@@ -76,19 +76,19 @@ class SwiftXAccountSharing {
       60,
       "/access/".concat(username, "/", container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     url.searchParams.append("owner", owner);
     let details = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return details;
   }
 
-  async getShare (
+  async getShare(
     username,
   ) {
     // List the containers the user has shared to another user / users.
@@ -98,13 +98,13 @@ class SwiftXAccountSharing {
       60,
       "/share/".concat(username),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let shared = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return shared;
   }
@@ -122,13 +122,13 @@ class SwiftXAccountSharing {
       60,
       "/share/".concat(username, "/", container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let details = fetch(
-      url, {method: "GET"},
+      url, { method: "GET" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return details;
   }
@@ -152,13 +152,13 @@ class SwiftXAccountSharing {
       60,
       "/share/".concat(username, "/", container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let shared = fetch(
-      url, {method: "POST"},
+      url, { method: "POST" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return shared;
   }
@@ -180,13 +180,13 @@ class SwiftXAccountSharing {
       60,
       "/share/".concat(username, "/", container),
     );
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let shared = fetch(
-      url, {method: "PATCH"},
+      url, { method: "PATCH" },
     ).then(
-      (resp) => {return resp.json();},
+      (resp) => { return resp.json(); },
     );
     return shared;
   }
@@ -207,11 +207,11 @@ class SwiftXAccountSharing {
     );
 
     url.searchParams.append("user", this._parseListString(userlist));
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let deleted = fetch(
-      url, {method: "DELETE"},
+      url, { method: "DELETE" },
     ).then(
       (resp) => {
         return resp.status == 204 ? true : false;
@@ -219,7 +219,7 @@ class SwiftXAccountSharing {
     );
     return deleted;
   }
-  
+
   async shareContainerDeleteAccess(
     username,
     container,
@@ -234,11 +234,11 @@ class SwiftXAccountSharing {
       "/share/".concat(username, "/", container),
     );
 
-    url.searchParams.append("valid", signed.valid_until);
+    url.searchParams.append("valid", signed.valid);
     url.searchParams.append("signature", signed.signature);
 
     let deleted = fetch(
-      url, {method: "DELETE"},
+      url, { method: "DELETE" },
     ).then(
       (resp) => {
         return resp.status == 204 ? true : false;

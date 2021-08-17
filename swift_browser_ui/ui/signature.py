@@ -8,7 +8,7 @@ import secrets
 
 import aiohttp.web
 
-from ._convenience import session_check, api_check, get_tempurl_key, sign
+import swift_browser_ui.ui._convenience
 
 from .settings import setd
 
@@ -20,7 +20,7 @@ async def handle_signature_request(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle call for an API call signature."""
-    session_check(request)
+    swift_browser_ui.ui._convenience.session_check(request)
 
     try:
         valid_for = int(request.match_info["valid"])
@@ -30,12 +30,14 @@ async def handle_signature_request(
             reason="Signable path missing from query string."
         )
 
-    return aiohttp.web.json_response(await sign(valid_for, path_to_sign))
+    return aiohttp.web.json_response(
+        await swift_browser_ui.ui._convenience.sign(valid_for, path_to_sign)
+    )
 
 
 async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token create."""
-    session = api_check(request)
+    session = swift_browser_ui.ui._convenience.api_check(request)
 
     project = request.app["Sessions"][session]["active_project"]["id"]
 
@@ -53,7 +55,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
         raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}/{ident}"
-    signature = await sign(3600, path)
+    signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
     resp_sharing = await client.post(
         f"{sharing_api_address}{path}",
@@ -92,7 +94,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
 
 async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token delete."""
-    session = api_check(request)
+    session = swift_browser_ui.ui._convenience.api_check(request)
 
     project = request.app["Sessions"][session]["active_project"]["id"]
 
@@ -107,7 +109,7 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
         raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}/{ident}"
-    signature = await sign(3600, path)
+    signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
     await client.delete(
         f"{sharing_api_address}{path}",
@@ -131,7 +133,7 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
 
 async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for listing API tokens."""
-    session = api_check(request)
+    session = swift_browser_ui.ui._convenience.api_check(request)
 
     project = request.app["Sessions"][session]["active_project"]["id"]
 
@@ -144,7 +146,7 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
         raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}"
-    signature = await sign(3600, path)
+    signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
     sharing_tokens = await client.get(
         f"{sharing_api_address}{path}",
@@ -178,14 +180,14 @@ async def handle_form_post_signature(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle call for a form signature."""
-    session = api_check(request)
+    session = swift_browser_ui.ui._convenience.api_check(request)
     LOGGER.info(f"API call for download object from {request.remote}, sess: {session}")
 
     serv = request.app["Sessions"][session]["ST_conn"]
     sess = request.app["Sessions"][session]["OS_sess"]
     container = request.match_info["container"]
 
-    temp_url_key = await get_tempurl_key(
+    temp_url_key = await swift_browser_ui.ui._convenience.get_tempurl_key(
         serv,
         # container
     )
