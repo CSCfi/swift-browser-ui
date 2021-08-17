@@ -6,6 +6,7 @@
     <div class="field is-grouped">
       <p class="control">
         <b-select
+          data-testid="bucketsPerPage"
           v-model="perPage"
         >
           <option value="5">

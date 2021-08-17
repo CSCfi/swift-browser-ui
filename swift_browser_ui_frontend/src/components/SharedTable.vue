@@ -8,6 +8,7 @@
       group-multiline
     >
       <b-select
+        data-testid="bucketsPerPage"
         v-model="perPage"
       >
         <option value="5">

@@ -6,6 +6,7 @@
       class="groupControls"
     >
       <b-select
+        data-testid="bucketsPerPage"
         v-model="perPage"
         :disabled="!isPaginated"
       >
