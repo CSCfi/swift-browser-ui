@@ -24,12 +24,17 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("login", ( loginMessage ) => {
+Cypress.Commands.add("login", (loginMessage) => {
     cy.visit(Cypress.config().baseUrl)
     cy.contains(loginMessage).parent().click()
     cy.wait(1000)
     cy.get('#inputbox').type('abcdefabcdefabcdefabcdefabcdefab')
     cy.get('#retform > [type="submit"]').click()
     cy.wait(1000)
-  })
-  
+})
+
+// some exceptions like API reponse from delete we are not catching
+// and we don't need to, thus we ignore
+Cypress.on("uncaught:exception", () => {
+    return false
+})
