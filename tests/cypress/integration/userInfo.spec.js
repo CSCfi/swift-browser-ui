@@ -66,3 +66,21 @@ describe("Retrieve User information", function () {
     })
 
 })
+
+describe("Switch Languages after login", function () {
+
+    beforeEach(function () {
+        cy.login(' Log In with SSO ')
+    });
+
+    afterEach(function () {
+        cy.contains('Kirjaudu ulos').click()
+    });
+
+    it("should login the user with English but switch to Finnish", () => {
+        cy.get('.locale-changer > div > span select').select('Suomeksi')
+        cy.contains('Nykyinen projekti')
+        cy.get('.input').invoke('attr', 'placeholder').should('contain', 'Etsi nimellä')
+    })
+
+})
