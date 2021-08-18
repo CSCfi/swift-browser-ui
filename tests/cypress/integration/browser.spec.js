@@ -39,7 +39,7 @@ describe("Browse buckets and test operations", function () {
           cy.get('td').eq(0).click()
           cy.get('td').eq(1).then(($elem) => {
             expect($elem.get(0).innerText.trim()).to.have.lengthOf(40)
-          }).then((value) => {})
+          })
         })
     })
 
