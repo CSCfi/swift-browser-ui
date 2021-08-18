@@ -30,12 +30,8 @@ Python Modules
     :toctree: swift_browser_ui.sharing
 
     swift_browser_ui.sharing.bindings.bind
-    swift_browser_ui.sharing.bindings.signature
     swift_browser_ui.sharing.api
-    swift_browser_ui.sharing.auth
     swift_browser_ui.sharing.db
-    swift_browser_ui.sharing.middleware
-    swift_browser_ui.sharing.preflight
     swift_browser_ui.sharing.server
     swift_browser_ui.sharing.shared
 
@@ -47,12 +43,8 @@ Python Modules
     :toctree: swift_browser_ui.request
 
     swift_browser_ui.request.bindings.bind
-    swift_browser_ui.request.bindings.signature
     swift_browser_ui.request.api
-    swift_browser_ui.request.auth
     swift_browser_ui.request.db
-    swift_browser_ui.request.middleware
-    swift_browser_ui.request.preflight
     swift_browser_ui.request.server
 
 .. automodule:: swift_browser_ui.upload
@@ -66,7 +58,6 @@ Python Modules
     swift_browser_ui.upload.auth
     swift_browser_ui.upload.common
     swift_browser_ui.upload.download
-    swift_browser_ui.upload.middleware
     swift_browser_ui.upload.replicate
     swift_browser_ui.upload.server
     swift_browser_ui.upload.upload
