@@ -20,7 +20,7 @@ setuptools.setup(
         "gunicorn>=20.0.1",
         "uvloop==0.15.3",
         "certifi==2021.5.30",
-        "asyncpg==0.23.0",
+        "asyncpg==0.24.0",
     ],
     extras_require={
         "test": [
