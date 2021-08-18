@@ -32,20 +32,17 @@ To run environments seprately use:
 User Interface Testing
 ----------------------
 
-User Interface tests are developed using `Selenium Webdriver <https://selenium-python.readthedocs.io>`_,
+User Interface tests are developed using `cypress <https://www.cypress.io/>`_,
 and the tests are developed for both Firefox and Chrome web browsers.
-When using `tox` the UI tests are run using a headless browser and this is
-set by the environment variable ``TEST_ENABLE_HEADLESS`` to any value. The
-test server port is changed with the ``TEST_SERVER_PORT`` environment
-variable to enable parallel execution in local testing envinronment.
 
 .. code-block:: console
 
-    $ tox -l
-    $ # run UI tests in firefox
-    $ tox -e firefox
-    $ # run UI tests in chrome
-    $ tox -e chrome
+    $ cd swift_browser_ui_frontend/
+    $ npm install 
+    $ npm run build
+    $ cd  ..
+    $ npm install cypress
+    $ npx cypress open
 
 UI Screenshots
 ~~~~~~~~~~~~~~

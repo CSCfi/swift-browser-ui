@@ -1,0 +1,14 @@
+{
+    "baseUrl": "http://localhost:8080",
+    "fixturesFolder": "tests/cypress/fixtures",
+    "integrationFolder": "tests/cypress/integration",
+    "supportFile": "tests/cypress/support/index.js",
+    "pluginsFile": "tests/cypress/plugins/index.js",
+    "viewportWidth": 1280,
+    "viewportHeight": 720,
+    "retries": {
+      "runMode": 3,
+      "openMode": 0
+    },
+    "videoCompression": false
+}

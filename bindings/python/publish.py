@@ -14,9 +14,11 @@ import swift_x_account_sharing_bind
 import fire
 
 
-logging.basicConfig(format='%(levelname)-8s %(asctime)s | %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S %p',
-                    level=logging.INFO)
+logging.basicConfig(
+    format="%(levelname)-8s %(asctime)s | %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    level=logging.INFO,
+)
 
 
 class Publish:
@@ -38,17 +40,17 @@ class Publish:
                 logging.ERROR,
                 "Swift X Account sharing API environment variables %s%s",
                 "haven't been sourced. Please source the file if it is ",
-                "available, or download a new one from the storage UI."
+                "available, or download a new one from the storage UI.",
             )
         async with swift_x_account_sharing_bind.SwiftXAccountSharing(
-                client_url
+            client_url
         ) as client:
             await client.share_new_access(
                 os.environ.get("OS_PROJECT_ID", None),
                 container,
                 recipient,
                 rights,
-                self._get_address()
+                self._get_address(),
             )
 
     def share(self, container, recipient, *args):
@@ -61,14 +63,10 @@ class Publish:
                 logging.ERROR,
                 "Openstack RC file hasn't been sourced in the working %s%s",
                 "environment. Please source an Openstack RC file to enable",
-                " the use of Openstack tools."
+                " the use of Openstack tools.",
             )
             sys.exit(-1)
-        command = [
-            "swift",
-            "post",
-            container
-        ]
+        command = ["swift", "post", container]
         rights = []
         # If read access is specified in arguments, grant read access.
         if "r" in args:
@@ -85,11 +83,7 @@ class Publish:
         logging.log(logging.INFO, f"Running POST: {command}")
         subprocess.call(command)  # nosec
 
-        asyncio.run(self._push_share(
-            container,
-            [recipient],
-            rights
-        ))
+        asyncio.run(self._push_share(container, [recipient], rights))
 
     def publish(self, path, recipient, *args):
         """
@@ -102,23 +96,13 @@ class Publish:
                 logging.ERROR,
                 "Openstack RC file hasn't been sourced in the working %s%s",
                 "environment. Please source an Openstack RC file to enable",
-                " the use of Openstack tools."
+                " the use of Openstack tools.",
             )
             sys.exit(-1)
 
-        container = (
-            "shared-upload-"
-            + recipient
-            + "-"
-            + time.strftime("%Y%m%d-%H%M%S")
-        )
+        container = "shared-upload-" + recipient + "-" + time.strftime("%Y%m%d-%H%M%S")
 
-        subprocess.call([  # nosec
-            "swift",
-            "upload",
-            container,
-            path
-        ])
+        subprocess.call(["swift", "upload", container, path])  # nosec
 
         self.share(container, recipient, *args)
 
