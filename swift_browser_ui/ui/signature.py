@@ -26,7 +26,7 @@ async def handle_signature_request(
         valid_for = int(request.match_info["valid"])
         path_to_sign = request.query["path"]
     except KeyError:
-        raise aiohttp.web.HTTPClientError(
+        raise aiohttp.web.HTTPBadRequest(
             reason="Signable path missing from query string."
         )
 

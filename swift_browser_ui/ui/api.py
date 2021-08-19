@@ -552,7 +552,7 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     # the API is exposed for the user and thus can't expose any sensitive info
     if not meta_cont:
         request.app["Log"].error("Container not specified.")
-        raise aiohttp.web.HTTPClientError()
+        raise aiohttp.web.HTTPBadRequest()
 
     conn = request.app["Sessions"][session]["ST_conn"]
 

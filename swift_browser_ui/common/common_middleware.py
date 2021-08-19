@@ -66,7 +66,7 @@ async def handle_validate_authentication(
         path = request.url.path
     except KeyError:
         LOGGER.debug("Query string missing validity or signature")
-        raise aiohttp.web.HTTPClientError(
+        raise aiohttp.web.HTTPBadRequest(
             reason="Query string missing validity or signature"
         )
 
