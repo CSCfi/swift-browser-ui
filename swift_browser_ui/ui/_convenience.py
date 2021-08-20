@@ -428,7 +428,7 @@ async def open_upload_runner_session(
             data={"token": token},
             params={
                 "signature": signature["signature"],
-                "valid": signature["valid_until"],
+                "valid": signature["valid"],
             },
             ssl=ssl_context,
         ) as resp:
