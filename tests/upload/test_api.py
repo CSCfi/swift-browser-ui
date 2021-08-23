@@ -44,7 +44,6 @@ class APITestClass(asynctest.TestCase):
             **{
                 "prepare": asynctest.mock.CoroutineMock(),
                 "headers": {},
-                "headers": {},
             }
         )
         self.mock_streamresponse_init = unittest.mock.Mock(
