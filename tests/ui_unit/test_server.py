@@ -17,7 +17,7 @@ from swift_browser_ui.ui.server import servinit, run_server_insecure
 from swift_browser_ui.ui.server import kill_sess_on_shutdown, run_server_secure
 from swift_browser_ui.ui.settings import setd
 
-from .creation import get_request_with_mock_openstack
+from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
 # Set static folder in settings so it can be tested

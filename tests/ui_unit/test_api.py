@@ -26,7 +26,7 @@ from swift_browser_ui.ui.api import swift_replicate_container
 from swift_browser_ui.ui.api import swift_check_object_chunk
 from swift_browser_ui.ui.settings import setd
 
-from .creation import get_request_with_mock_openstack
+from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
 class APITestClass(asynctest.TestCase):
@@ -416,7 +416,7 @@ class TestProxyFunctions(asynctest.TestCase):
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
                 "signature": "test-signature",
-                "valid_until": "test-valid",
+                "valid": "test-valid",
             }
         )
         self.patch_sign = unittest.mock.patch(
