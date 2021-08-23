@@ -61,7 +61,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
         f"{sharing_api_address}{path}",
         data={"token": token},
         params={
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         },
     )
@@ -69,7 +69,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
         f"{request_api_address}{path}",
         data={"token": token},
         params={
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
             "signature": signature["signature"],
         },
     )
@@ -115,14 +115,14 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
         f"{sharing_api_address}{path}",
         params={
             "signature": signature["signature"],
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
         },
     )
     await client.delete(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
         },
     )
 
@@ -152,14 +152,14 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
         f"{sharing_api_address}{path}",
         params={
             "signature": signature["signature"],
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
         },
     )
     request_tokens = await client.get(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
-            "valid": signature["valid_until"],
+            "valid": signature["valid"],
         },
     )
     sharing_tokens_text = await sharing_tokens.text()
