@@ -100,7 +100,7 @@ class DBConn:
         access: typing.List[str],
     ) -> bool:
         """Edit a share action in the database."""
-        async with self.pool.acquire as conn:
+        async with self.pool.acquire() as conn:
             async with conn.transaction():
                 for key in userlist:
                     await conn.execute(
@@ -164,40 +164,38 @@ class DBConn:
 
     async def get_access_list(self, user: str) -> typing.List[dict]:
         """Get the containers shared to the specified user."""
-        async with self.pool.acquire() as conn:
-            query = await conn.fetch(
-                """
-                SELECT container, container_owner, sharingdate
-                FROM Shares
-                WHERE recipient = $1
-                ;
-                """,
-                user,
-            )
+        query = await self.pool.fetch(
+            """
+            SELECT container, container_owner, sharingdate
+            FROM Shares
+            WHERE recipient = $1
+            ;
+            """,
+            user,
+        )
 
-            return [
-                {
-                    "container": i["container"],
-                    "owner": i["container_owner"],
-                    "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
-                }
-                for i in query
-            ]
+        return [
+            {
+                "container": i["container"],
+                "owner": i["container_owner"],
+                "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
+            }
+            for i in query
+        ]
 
     async def get_shared_list(self, user: str) -> typing.List[str]:
         """Get the containers that the user has shared."""
-        async with self.pool.acquire() as conn:
-            query = await conn.fetch(
-                """
-                SELECT DISTINCT
-                    container
-                FROM Shares
-                WHERE container_owner = $1
-                """,
-                user,
-            )
+        query = await self.pool.fetch(
+            """
+            SELECT DISTINCT
+                container
+            FROM Shares
+            WHERE container_owner = $1
+            """,
+            user,
+        )
 
-            return [i["container"] for i in query]
+        return [i["container"] for i in query]
 
     async def get_access_container_details(
         self, user: str, owner: str, container: str

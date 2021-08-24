@@ -45,6 +45,8 @@ async def check_db_conn(
     """Check if an established database connection exists."""
     if request.path == "/health":
         return await handler(request)
+    if request.app["db_conn"] is None:
+        return await handler(request)
     if request.app["db_conn"].pool is None:
         raise aiohttp.web.HTTPServiceUnavailable(
             reason="Database connection not established."
