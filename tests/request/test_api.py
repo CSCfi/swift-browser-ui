@@ -7,7 +7,6 @@ from types import SimpleNamespace
 
 import aiohttp
 import asynctest
-from asyncpg import InterfaceError
 
 
 from swift_browser_ui.request.api import (

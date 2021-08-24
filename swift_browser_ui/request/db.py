@@ -39,13 +39,13 @@ class DBConn:
                     "Failed to establish database connection. "
                     "Pool will retry reconnection automatically...",
                 )
-                await asyncio.sleep(random.randint(2, 5))
+                await asyncio.sleep(random.randint(2, 5))  # nosec
             except asyncpg.exceptions.InvalidPasswordError:
                 self.log.error("Invalid username or password for database.")
-                await asyncio.sleep(random.randint(2, 5))
+                await asyncio.sleep(random.randint(2, 5))  # nosec
             except asyncpg.exceptions.CannotConnectNowError:
                 self.log.error("Database is not ready yet.")
-                await asyncio.sleep(random.randint(2, 5))
+                await asyncio.sleep(random.randint(2, 5))  # nosec
 
     async def close(self) -> None:
         """Gracefully close the database."""

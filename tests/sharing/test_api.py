@@ -9,9 +9,6 @@ import asynctest
 import aiohttp.web
 
 
-from asyncpg import InterfaceError
-
-
 from swift_browser_ui.sharing.api import (
     has_access_handler,
     access_details_handler,
