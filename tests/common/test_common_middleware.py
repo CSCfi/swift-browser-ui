@@ -19,7 +19,7 @@ class CommonMiddlewareTestCase(asynctest.TestCase):
         self.mock_request = types.SimpleNamespace(
             **{
                 "headers": {"origin": "http://localhost:8080"},
-                "app": {"db_conn": types.SimpleNamespace(**{"conn": None})},
+                "app": {"db_conn": types.SimpleNamespace(**{"pool": None})},
                 "path": "/test",
             }
         )
@@ -37,13 +37,13 @@ class CommonMiddlewareTestCase(asynctest.TestCase):
 
     async def test_check_db_conn_nonexistent(self):
         """Test database connection guard on failure."""
-        self.mock_request.app["db_conn"].conn = None
+        self.mock_request.app["db_conn"].pool = None
         with self.assertRaises(aiohttp.web.HTTPServiceUnavailable):
             await middle.check_db_conn(self.mock_request, self.mock_handler)
 
     async def test_check_db_conn_existing(self):
         """Test database connection guard on success."""
-        self.mock_request.app["db_conn"].conn = "placeholder"
+        self.mock_request.app["db_conn"].pool = "placeholder"
         resp = await middle.check_db_conn(self.mock_request, self.mock_handler)
         self.assertIsInstance(resp, aiohttp.web.Response)
 
