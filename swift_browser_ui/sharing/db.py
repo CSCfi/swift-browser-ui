@@ -36,8 +36,8 @@ class DBConn:
                     user=os.environ.get("SHARING_DB_USER", "sharing"),
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing"),
-                    min_size=10,
-                    max_size=50,
+                    min_size=os.environ.get("SHARING_DB_MIN_CONNECTIONS", 10),
+                    max_size=os.environ.get("SHARING_DB_MAX_CONNECTIONS", 49),
                 )
             except (ConnectionError, OSError) as exp:
                 try:

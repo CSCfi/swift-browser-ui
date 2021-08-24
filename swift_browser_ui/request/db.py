@@ -31,8 +31,8 @@ class DBConn:
                     user=os.environ.get("REQUEST_DB_USER", "request"),
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest"),
-                    min_size=10,
-                    max_size=50,
+                    min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 10),
+                    max_size=os.environ.get("REQUEST_DB_MAX_CONNECTIONS", 49),
                 )
             except (ConnectionError, OSError) as exp:
                 try:
