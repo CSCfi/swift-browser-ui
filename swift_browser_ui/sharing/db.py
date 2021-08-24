@@ -19,33 +19,39 @@ class DBConn:
 
     def __init__(self) -> None:
         """Initialize connection variable."""
-        self.conn: asyncpg.connection.Connection = None
+        self.pool: asyncpg.Pool = None
         self.log = MODULE_LOGGER
 
     def erase(self) -> None:
         """Erase the connection."""
-        self.conn = None
+        self.pool.terminate()
+        self.pool = None
 
     async def open(self) -> None:
         """Initialize the database connection."""
-        while self.conn is None:
+        while self.pool is None:
             try:
-                self.conn = await asyncpg.connect(
+                self.pool = await asyncpg.create_pool(
                     password=os.environ.get("SHARING_DB_PASSWORD", None),
                     user=os.environ.get("SHARING_DB_USER", "sharing"),
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing"),
+                    min_size=10,
+                    max_size=50,
                 )
             except (ConnectionError, OSError) as exp:
-                self.conn = None
-                slp = random.randint(5, 15)  # nosec
-                self.log.error(
-                    "Failed to establish database connection. "
-                    "Retrying in %s seconds...",
-                    slp,
-                )
-                self.log.log(logging.ERROR, "Failure information: %s", str(exp))
-                await asyncio.sleep(slp)
+                try:
+                    self.pool.terminate()  # type: ignore
+                finally:
+                    self.pool = None
+                    slp = random.randint(5, 15)  # nosec
+                    self.log.error(
+                        "Failed to establish database connection. "
+                        "Retrying in %s seconds...",
+                        slp,
+                    )
+                    self.log.log(logging.ERROR, "Failure information: %s", str(exp))
+                    await asyncio.sleep(slp)
             except asyncpg.InvalidPasswordError as exp:
                 self.log.log(
                     logging.ERROR, "Invalid password for database. Info: %s", str(exp)
@@ -55,14 +61,17 @@ class DBConn:
                     "User: %s",
                     os.environ.get("SHARING_DB_USER", "request"),
                 )
-                self.conn = None
-                slp = random.randint(5, 15)  # nosec
-                await asyncio.sleep(slp)
+                try:
+                    self.pool.terminate()  # type: ignore
+                finally:
+                    self.pool = None
+                    slp = random.randint(5, 15)  # nosec
+                    await asyncio.sleep(slp)
 
     async def close(self) -> None:
         """Safely close the database connection."""
-        if self.conn is not None:
-            await self.conn.close()
+        if self.pool is not None:
+            await self.pool.close()
 
     async def add_share(
         self,
@@ -73,30 +82,31 @@ class DBConn:
         address: str,
     ) -> bool:
         """Add a share action to the database."""
-        async with self.conn.transaction():
-            for key in userlist:
-                await self.conn.execute(
-                    """
-                    INSERT INTO Shares (
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                for key in userlist:
+                    await conn.execute(
+                        """
+                        INSERT INTO Shares (
+                            container,
+                            container_owner,
+                            recipient,
+                            r_read,
+                            r_write,
+                            sharingdate,
+                            address
+                        ) VALUES (
+                            $1, $2, $3, $4, $5, NOW(), $6
+                        );
+                        """,
                         container,
-                        container_owner,
-                        recipient,
-                        r_read,
-                        r_write,
-                        sharingdate,
-                        address
-                    ) VALUES (
-                        $1, $2, $3, $4, $5, NOW(), $6
-                    );
-                    """,
-                    container,
-                    owner,
-                    key,
-                    "r" in access,
-                    "w" in access,
-                    address,
-                )
-        return True
+                        owner,
+                        key,
+                        "r" in access,
+                        "w" in access,
+                        address,
+                    )
+            return True
 
     async def edit_share(
         self,
@@ -106,105 +116,110 @@ class DBConn:
         access: typing.List[str],
     ) -> bool:
         """Edit a share action in the database."""
-        async with self.conn.transaction():
-            for key in userlist:
-                await self.conn.execute(
-                    """
-                    UPDATE Shares
-                    SET
-                        r_read = $1,
-                        r_write = $2
-                    WHERE
-                        container = $3 AND
-                        container_owner = $4 AND
-                        recipient = $5
-                    ;
-                    """,
-                    "r" in access,
-                    "w" in access,
-                    container,
-                    owner,
-                    key,
-                )
-        return True
+        async with self.pool.acquire as conn:
+            async with conn.transaction():
+                for key in userlist:
+                    await conn.execute(
+                        """
+                        UPDATE Shares
+                        SET
+                            r_read = $1,
+                            r_write = $2
+                        WHERE
+                            container = $3 AND
+                            container_owner = $4 AND
+                            recipient = $5
+                        ;
+                        """,
+                        "r" in access,
+                        "w" in access,
+                        container,
+                        owner,
+                        key,
+                    )
+            return True
 
     async def delete_share(
         self, owner: str, container: str, userlist: typing.List[str]
     ) -> bool:
         """Delete a share action from the database."""
-        async with self.conn.transaction():
-            for key in userlist:
-                await self.conn.execute(
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                for key in userlist:
+                    await conn.execute(
+                        """
+                        DELETE FROM Shares
+                        WHERE
+                            container = $1 AND
+                            container_owner = $2 AND
+                            recipient = $3
+                        ;
+                        """,
+                        container,
+                        owner,
+                        key,
+                    )
+            return True
+
+    async def delete_container_shares(self, owner: str, container: str) -> bool:
+        """Delete all shares for a container in the database."""
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
                     """
                     DELETE FROM Shares
                     WHERE
                         container = $1 AND
-                        container_owner = $2 AND
-                        recipient = $3
+                        container_owner = $2
                     ;
                     """,
                     container,
                     owner,
-                    key,
                 )
-        return True
-
-    async def delete_container_shares(self, owner: str, container: str) -> bool:
-        """Delete all shares for a container in the database."""
-        async with self.conn.transaction():
-            await self.conn.execute(
-                """
-                DELETE FROM Shares
-                WHERE
-                    container = $1 AND
-                    container_owner = $2
-                ;
-                """,
-                container,
-                owner,
-            )
-        return True
+            return True
 
     async def get_access_list(self, user: str) -> typing.List[dict]:
         """Get the containers shared to the specified user."""
-        query = await self.conn.fetch(
-            """
-            SELECT container, container_owner, sharingdate
-            FROM Shares
-            WHERE recipient = $1
-            ;
-            """,
-            user,
-        )
+        async with self.pool.acquire() as conn:
+            query = await conn.fetch(
+                """
+                SELECT container, container_owner, sharingdate
+                FROM Shares
+                WHERE recipient = $1
+                ;
+                """,
+                user,
+            )
 
-        return [
-            {
-                "container": i["container"],
-                "owner": i["container_owner"],
-                "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
-            }
-            for i in query
-        ]
+            return [
+                {
+                    "container": i["container"],
+                    "owner": i["container_owner"],
+                    "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
+                }
+                for i in query
+            ]
 
     async def get_shared_list(self, user: str) -> typing.List[str]:
         """Get the containers that the user has shared."""
-        query = await self.conn.fetch(
-            """
-            SELECT DISTINCT
-                container
-            FROM Shares
-            WHERE container_owner = $1
-            """,
-            user,
-        )
+        async with self.pool.acquire() as conn:
+            query = await conn.fetch(
+                """
+                SELECT DISTINCT
+                    container
+                FROM Shares
+                WHERE container_owner = $1
+                """,
+                user,
+            )
 
-        return [i["container"] for i in query]
+            return [i["container"] for i in query]
 
     async def get_access_container_details(
         self, user: str, owner: str, container: str
     ) -> dict:
         """Get shared container details for share receiver."""
-        query = await self.conn.fetchrow(
+        query = await self.pool.fetchrow(
             """
             SELECT
                 container,
@@ -244,7 +259,7 @@ class DBConn:
         self, owner: str, container: str
     ) -> typing.List[dict]:
         """Get shared container details for sharer."""
-        query = await self.conn.fetch(
+        query = await self.pool.fetch(
             """
             SELECT
                 container,
@@ -284,7 +299,7 @@ class DBConn:
 
     async def get_tokens(self, token_owner: str) -> typing.List[dict]:
         """Get tokens created for a project."""
-        query = await self.conn.fetch(
+        query = await self.pool.fetch(
             """
             SELECT *
             FROM Tokens
@@ -297,34 +312,36 @@ class DBConn:
 
     async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
         """Remove a token from the database."""
-        async with self.conn.transaction():
-            await self.conn.execute(
-                """
-                DELETE FROM Tokens
-                WHERE
-                    token_owner = $1 AND
-                    identifier = $2
-                ;
-                """,
-                token_owner,
-                token_identifier,
-            )
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    """
+                    DELETE FROM Tokens
+                    WHERE
+                        token_owner = $1 AND
+                        identifier = $2
+                    ;
+                    """,
+                    token_owner,
+                    token_identifier,
+                )
 
     async def add_token(self, token_owner: str, token: str, identifier: str) -> None:
         """Add a token to the database."""
-        async with self.conn.transaction():
-            await self.conn.execute(
-                """
-                INSERT INTO Tokens(
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    """
+                    INSERT INTO Tokens(
+                        token_owner,
+                        token,
+                        identifier
+                    ) VALUES (
+                        $1, $2, $3
+                    )
+                    ;
+                    """,
                     token_owner,
                     token,
-                    identifier
-                ) VALUES (
-                    $1, $2, $3
+                    identifier,
                 )
-                ;
-                """,
-                token_owner,
-                token,
-                identifier,
-            )

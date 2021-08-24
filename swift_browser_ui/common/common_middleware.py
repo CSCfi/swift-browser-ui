@@ -47,7 +47,7 @@ async def check_db_conn(
     if request.path == "/health":
         return await handler(request)
     try:
-        if request.app["db_conn"].conn is None:
+        if request.app["db_conn"].pool is None:
             raise aiohttp.web.HTTPServiceUnavailable(reason="No database connection")
     except AttributeError:
         pass
