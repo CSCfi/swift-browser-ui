@@ -5,11 +5,10 @@ import logging
 import os
 import typing
 
-import aiohttp
+import aiohttp.web
 import asyncpg.exceptions
 
 import swift_browser_ui.common.types
-import swift_browser_ui.common.common_db
 import swift_browser_ui.common.signature
 
 
@@ -46,12 +45,14 @@ async def check_db_conn(
     """Check if an established database connection exists."""
     if request.path == "/health":
         return await handler(request)
+    if request.app["db_conn"].pool is None:
+        raise aiohttp.web.HTTPServiceUnavailable(
+            reason="Database connection not established."
+        )
     try:
-        if request.app["db_conn"].pool is None:
-            raise aiohttp.web.HTTPServiceUnavailable(reason="No database connection")
-    except AttributeError:
-        pass
-    return await handler(request)
+        return await handler(request)
+    except (asyncpg.exceptions.InterfaceError):
+        raise aiohttp.web.HTTPServiceUnavailable(reason="Database connection error")
 
 
 @aiohttp.web.middleware
@@ -90,7 +91,7 @@ async def handle_validate_authentication(
                     for rec in await request.app["db_conn"].get_tokens(project)
                 ]
             except asyncpg.exceptions.InterfaceError:
-                swift_browser_ui.common.common_db.handle_dropped_connection(request)
+                pass
         else:
             if request.path != "/health":
                 LOGGER.debug(f"No project ID found in request {request}")

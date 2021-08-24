@@ -3,9 +3,9 @@
 
 import os
 import logging
+import typing
 import asyncio
 import random
-import typing
 
 import asyncpg
 
@@ -23,7 +23,7 @@ class DBConn:
         self.log = MODULE_LOGGER
 
     def erase(self) -> None:
-        """Erase the connection."""
+        """Immediately erase the connection."""
         self.pool.terminate()
         self.pool = None
 
@@ -39,34 +39,18 @@ class DBConn:
                     min_size=os.environ.get("SHARING_DB_MIN_CONNECTIONS", 10),
                     max_size=os.environ.get("SHARING_DB_MAX_CONNECTIONS", 49),
                 )
-            except (ConnectionError, OSError) as exp:
-                try:
-                    self.pool.terminate()  # type: ignore
-                finally:
-                    self.pool = None
-                    slp = random.randint(5, 15)  # nosec
-                    self.log.error(
-                        "Failed to establish database connection. "
-                        "Retrying in %s seconds...",
-                        slp,
-                    )
-                    self.log.log(logging.ERROR, "Failure information: %s", str(exp))
-                    await asyncio.sleep(slp)
-            except asyncpg.InvalidPasswordError as exp:
-                self.log.log(
-                    logging.ERROR, "Invalid password for database. Info: %s", str(exp)
+            except (ConnectionError, OSError):
+                self.log.error(
+                    "Failed to establish connection. "
+                    "Pool will retry connection automatically.",
                 )
-                self.log.log(
-                    logging.ERROR,
-                    "User: %s",
-                    os.environ.get("SHARING_DB_USER", "request"),
-                )
-                try:
-                    self.pool.terminate()  # type: ignore
-                finally:
-                    self.pool = None
-                    slp = random.randint(5, 15)  # nosec
-                    await asyncio.sleep(slp)
+                await asyncio.sleep(random.randint(2, 5))
+            except asyncpg.exceptions.InvalidPasswordError:
+                self.log.error("Invalid username or password for database.")
+                await asyncio.sleep(random.randint(2, 5))
+            except asyncpg.exceptions.CannotConnectNowError:
+                self.log.error("Database is not ready yet.")
+                await asyncio.sleep(random.randint(2, 5))
 
     async def close(self) -> None:
         """Safely close the database connection."""

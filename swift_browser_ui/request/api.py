@@ -4,10 +4,6 @@
 import logging
 import os
 import aiohttp.web
-from asyncpg import InterfaceError
-
-
-import swift_browser_ui.common.common_db as common_db
 
 
 MODULE_LOGGER = logging.getLogger("api")
@@ -20,10 +16,7 @@ async def handle_share_request_post(request: aiohttp.web.Request) -> aiohttp.web
     user = request.match_info["user"]
     owner = request.query["owner"]
 
-    try:
-        await request.app["db_conn"].add_request(user, container, owner)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    await request.app["db_conn"].add_request(user, container, owner)
 
     return aiohttp.web.json_response(
         {"container": container, "user": user, "owner": owner, "date": None}
@@ -36,10 +29,7 @@ async def handle_user_owned_request_listing(
     """Handle query for listing the requests owned by the user."""
     user = request.match_info["user"]
     ret = []
-    try:
-        ret = await request.app["db_conn"].get_request_owned(user)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    ret = await request.app["db_conn"].get_request_owned(user)
 
     MODULE_LOGGER.log(logging.DEBUG, f"Returning requests owned by user: {ret}")
 
@@ -52,10 +42,7 @@ async def handle_user_made_request_listing(
     """Handle query listing for the requests created by the user."""
     user = request.match_info["user"]
     ret = []
-    try:
-        ret = await request.app["db_conn"].get_request_made(user)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    ret = await request.app["db_conn"].get_request_made(user)
 
     MODULE_LOGGER.log(logging.DEBUG, f"Returning requests made by user: {ret}")
 
@@ -68,10 +55,7 @@ async def handle_container_request_listing(
     """Handle query for listing the container share requests."""
     container = request.match_info["container"]
     ret = []
-    try:
-        ret = await request.app["db_conn"].get_request_container(container)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    ret = await request.app["db_conn"].get_request_container(container)
 
     MODULE_LOGGER.log(logging.DEBUG, f"Returning container shared requests: {ret}")
 
@@ -86,10 +70,7 @@ async def handle_user_share_request_delete(
     user = request.match_info["user"]
     owner = request.query["owner"]
 
-    try:
-        await request.app["db_conn"].delete_request(container, owner, user)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    await request.app["db_conn"].delete_request(container, owner, user)
 
     MODULE_LOGGER.log(logging.DEBUG, f"Deleted {container} for owner {owner}")
 
@@ -111,10 +92,7 @@ async def handle_user_add_token(request: aiohttp.web.Request) -> aiohttp.web.Res
             MODULE_LOGGER.log(logging.ERROR, "No token present")
             raise aiohttp.web.HTTPBadRequest(reason="No token present")
 
-    try:
-        await request.app["db_conn"].add_token(project, token, identifier)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    await request.app["db_conn"].add_token(project, token, identifier)
 
     return aiohttp.web.Response(status=200)
 
@@ -124,10 +102,7 @@ async def handle_user_delete_token(request: aiohttp.web.Request) -> aiohttp.web.
     project = request.match_info["project"]
     identifier = request.match_info["id"]
 
-    try:
-        await request.app["db_conn"].revoke_token(project, identifier)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    await request.app["db_conn"].revoke_token(project, identifier)
 
     MODULE_LOGGER.log(logging.DEBUG, f"Deleted {identifier} for project {project}")
 
@@ -138,10 +113,7 @@ async def handle_user_list_tokens(request: aiohttp.web.Request) -> aiohttp.web.R
     """Get project token listing."""
     project = request.match_info["project"]
     tokens = []
-    try:
-        tokens = await request.app["db_conn"].get_tokens(project)
-    except InterfaceError:
-        common_db.handle_dropped_connection(request)
+    tokens = await request.app["db_conn"].get_tokens(project)
 
     # Return only the identifiers
     return aiohttp.web.json_response([rec["identifier"] for rec in tokens])
