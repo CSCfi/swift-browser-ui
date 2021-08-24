@@ -72,7 +72,7 @@ class CommonTestClass(asynctest.TestCase):
 
     async def test_get_upload_instance(self):
         """Test get_upload_instance function."""
-        mock_upload = unittest.mock.create_autospec(
+        mock_upload = asynctest.create_autospec(
             swift_browser_ui.upload.common.upload.ResumableFileUploadProxy
         )
         patch_upload = unittest.mock.patch(
