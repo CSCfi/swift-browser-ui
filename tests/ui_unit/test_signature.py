@@ -26,7 +26,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
 
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
-                "valid_until": 15000000,
+                "valid": 15000000,
                 "signature": "test-signature",
             }
         )
@@ -182,7 +182,7 @@ class SignatureTokenTestClass(asynctest.TestCase):
 
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
-                "valid_until": 15000000,
+                "valid": 15000000,
                 "signature": "test-signature",
             }
         )
