@@ -36,7 +36,7 @@ class DBConn:
                     user=os.environ.get("SHARING_DB_USER", "sharing"),
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing"),
-                    min_size=os.environ.get("SHARING_DB_MIN_CONNECTIONS", 10),
+                    min_size=os.environ.get("SHARING_DB_MIN_CONNECTIONS", 0),
                     max_size=os.environ.get("SHARING_DB_MAX_CONNECTIONS", 49),
                     timeout=os.environ.get("SHARING_DB_TIMEOUT", 120),
                     command_timeout=os.environ.get("SHARING_DB_COMMAND_TIMEOUT", 180),

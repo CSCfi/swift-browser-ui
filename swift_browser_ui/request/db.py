@@ -31,7 +31,7 @@ class DBConn:
                     user=os.environ.get("REQUEST_DB_USER", "request"),
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest"),
-                    min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 10),
+                    min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 0),
                     max_size=os.environ.get("REQUEST_DB_MAX_CONNECTIONS", 49),
                     timeout=os.environ.get("REQUEST_DB_TIMEOUT", 120),
                     command_timeout=os.environ.get("REQUEST_DB_COMMAND_TIMEOUT", 180),
