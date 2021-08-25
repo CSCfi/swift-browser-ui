@@ -10,8 +10,12 @@ import swift_browser_ui.ui.server
 
 
 # Import some mock-ups that are already made before
-from .mockups import return_project_avail, return_test_swift_endpoint
-from .mockups import Mock_Service, Mock_Session
+from tests.common.mockups import (
+    return_project_avail,
+    return_test_swift_endpoint,
+    Mock_Service,
+    Mock_Session,
+)
 
 
 SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))

@@ -320,7 +320,7 @@ async def swift_download_shared_object(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=303)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -354,7 +354,7 @@ async def swift_download_container(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=303)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -387,7 +387,7 @@ async def swift_upload_object_chunk(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -422,7 +422,7 @@ async def swift_replicate_container(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     for i in request.query.keys():
         path += f"&{i}={request.query[i]}"
@@ -459,7 +459,7 @@ async def swift_check_object_chunk(
     path += f"?{request.query_string}"
     path += f"&session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -552,7 +552,7 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     # the API is exposed for the user and thus can't expose any sensitive info
     if not meta_cont:
         request.app["Log"].error("Container not specified.")
-        raise aiohttp.web.HTTPClientError()
+        raise aiohttp.web.HTTPBadRequest()
 
     conn = request.app["Sessions"][session]["ST_conn"]
 

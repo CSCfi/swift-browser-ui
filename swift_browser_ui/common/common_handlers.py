@@ -1,4 +1,4 @@
-"""Module containing preflight OPTIONS handlers."""
+"""Module containing handlers common to swift_browser_ui services."""
 
 
 import aiohttp.web

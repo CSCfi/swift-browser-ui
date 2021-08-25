@@ -14,7 +14,6 @@ import urllib.request
 import requests
 import typing
 import time
-import hmac
 
 import aiohttp
 import aiohttp.web
@@ -25,6 +24,8 @@ from cryptography.fernet import InvalidToken
 
 import swiftclient.service
 import swiftclient.client
+
+import swift_browser_ui.common.signature
 
 from swift_browser_ui.ui.settings import setd
 
@@ -55,25 +56,16 @@ async def sign(
     path: str,
 ) -> dict:
     """Perform a general signature."""
-    valid_until = str(int(time.time() + valid_for))
-    to_sign = (valid_until + path).encode("utf-8")
-
     try:
-        digest = hmac.new(
-            key=str(setd["sharing_request_token"]).encode("utf-8"),
-            msg=to_sign,
-            digestmod="sha256",
-        ).hexdigest()
-    except KeyError:
+        key = str(setd["sharing_request_token"]).encode("utf-8")
+    except (KeyError, AttributeError):
         raise aiohttp.web.HTTPNotImplemented(
-            reason="Server doesn't have signing permissions"
-        )
-    except AttributeError:
-        raise aiohttp.web.HTTPNotImplemented(
-            reason="Server doesn't have signing permissions"
+            reason="Server doesn't have signing permissions."
         )
 
-    return {"signature": digest, "valid_until": valid_until}
+    return swift_browser_ui.common.signature.sign_api_request(
+        path, valid_for=valid_for, key=key
+    )
 
 
 def setup_logging() -> None:
@@ -436,7 +428,7 @@ async def open_upload_runner_session(
             data={"token": token},
             params={
                 "signature": signature["signature"],
-                "valid": signature["valid_until"],
+                "valid": signature["valid"],
             },
             ssl=ssl_context,
         ) as resp:

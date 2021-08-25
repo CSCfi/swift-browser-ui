@@ -74,7 +74,7 @@ class BindingsClassTestCase(asynctest.TestCase):
             return_value={"valid": "60", "signature": "example"}
         )
         self.patch_signature = unittest.mock.patch(
-            "swift_browser_ui.request.bindings.bind.sign_api_request",
+            "swift_browser_ui.common.signature.sign_api_request",
             new=self.signature_mock,
         )
 

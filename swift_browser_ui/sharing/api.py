@@ -4,9 +4,6 @@
 import logging
 import os
 import aiohttp.web
-from asyncpg import InterfaceError
-
-from swift_browser_ui.sharing.db import handle_dropped_connection
 
 
 MODULE_LOGGER = logging.getLogger("api")
@@ -16,12 +13,7 @@ MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 async def has_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle has-access endpoint query."""
     access_list = []
-    try:
-        access_list = await request.app["db_conn"].get_access_list(
-            request.match_info["user"]
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    access_list = await request.app["db_conn"].get_access_list(request.match_info["user"])
 
     MODULE_LOGGER.log(
         logging.DEBUG, "Returning following access list: %s", str(access_list)
@@ -33,14 +25,11 @@ async def has_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respon
 async def access_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
     access_details = dict()
-    try:
-        access_details = await request.app["db_conn"].get_access_container_details(
-            request.match_info["user"],
-            request.query["owner"],
-            request.match_info["container"],
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    access_details = await request.app["db_conn"].get_access_container_details(
+        request.match_info["user"],
+        request.query["owner"],
+        request.match_info["container"],
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG, "Returning following access details: %s", str(access_details)
@@ -52,12 +41,9 @@ async def access_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Re
 async def gave_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle gave-access endpoint query."""
     shared_list = []
-    try:
-        shared_list = await request.app["db_conn"].get_shared_list(
-            request.match_info["owner"]
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    shared_list = await request.app["db_conn"].get_shared_list(
+        request.match_info["owner"]
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -71,12 +57,9 @@ async def gave_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respo
 async def shared_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
     shared_details = dict()
-    try:
-        shared_details = await request.app["db_conn"].get_shared_container_details(
-            request.match_info["owner"], request.match_info["container"]
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    shared_details = await request.app["db_conn"].get_shared_container_details(
+        request.match_info["owner"], request.match_info["container"]
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -90,16 +73,13 @@ async def shared_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Re
 async def share_container_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle share-container endpoint query."""
     shared: bool = False
-    try:
-        shared = await request.app["db_conn"].add_share(
-            request.match_info["owner"],
-            request.match_info["container"],
-            request.query["user"].split(","),
-            request.query["access"].split(","),
-            request.query["address"],
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    shared = await request.app["db_conn"].add_share(
+        request.match_info["owner"],
+        request.match_info["container"],
+        request.query["user"].split(","),
+        request.query["access"].split(","),
+        request.query["address"],
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -113,15 +93,12 @@ async def share_container_handler(request: aiohttp.web.Request) -> aiohttp.web.R
 async def edit_share_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle container shared rights editions."""
     edited: bool = False
-    try:
-        edited = await request.app["db_conn"].edit_share(
-            request.match_info["owner"],
-            request.match_info["container"],
-            request.query["user"].split(","),
-            request.query["access"].split(","),
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    edited = await request.app["db_conn"].edit_share(
+        request.match_info["owner"],
+        request.match_info["container"],
+        request.query["user"].split(","),
+        request.query["access"].split(","),
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -140,8 +117,6 @@ async def delete_share_handler(request: aiohttp.web.Request) -> aiohttp.web.Resp
             request.match_info["container"],
             request.query["user"].split(","),
         )
-    except InterfaceError:
-        handle_dropped_connection(request)
     except KeyError:
         # If can't find user from query, the client wants a bulk unshare
         return await delete_container_shares_handler(request)
@@ -159,12 +134,9 @@ async def delete_container_shares_handler(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Delete all shares from a container."""
-    try:
-        await request.app["db_conn"].delete_container_shares(
-            request.match_info["owner"], request.match_info["container"]
-        )
-    except InterfaceError:
-        handle_dropped_connection(request)
+    await request.app["db_conn"].delete_container_shares(
+        request.match_info["owner"], request.match_info["container"]
+    )
 
     MODULE_LOGGER.log(
         logging.DEBUG,
@@ -190,10 +162,7 @@ async def handle_user_add_token(request: aiohttp.web.Request) -> aiohttp.web.Res
             MODULE_LOGGER.log(logging.ERROR, "No token present")
             raise aiohttp.web.HTTPBadRequest(reason="No token present")
 
-    try:
-        await request.app["db_conn"].add_token(project, token, identifier)
-    except InterfaceError:
-        handle_dropped_connection(request)
+    await request.app["db_conn"].add_token(project, token, identifier)
 
     return aiohttp.web.Response(status=200)
 
@@ -203,10 +172,7 @@ async def handle_user_delete_token(request: aiohttp.web.Request) -> aiohttp.web.
     project = request.match_info["project"]
     identifier = request.match_info["id"]
 
-    try:
-        await request.app["db_conn"].revoke_token(project, identifier)
-    except InterfaceError:
-        handle_dropped_connection(request)
+    await request.app["db_conn"].revoke_token(project, identifier)
 
     return aiohttp.web.Response(status=200)
 
@@ -215,10 +181,7 @@ async def handle_user_list_tokens(request: aiohttp.web.Request) -> aiohttp.web.R
     """Get project token listing."""
     project = request.match_info["project"]
     tokens = []
-    try:
-        tokens = await request.app["db_conn"].get_tokens(project)
-    except InterfaceError:
-        handle_dropped_connection(request)
+    tokens = await request.app["db_conn"].get_tokens(project)
 
     # Return only the identifiers
     return aiohttp.web.json_response([rec["identifier"] for rec in tokens])

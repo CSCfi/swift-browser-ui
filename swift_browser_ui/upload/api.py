@@ -120,7 +120,7 @@ async def handle_get_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.R
 
 
 async def handle_post_object_options(
-    request: aiohttp.web.Request,
+    _: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle options request for posting the object chunk."""
     resp = aiohttp.web.Response(
@@ -148,7 +148,7 @@ async def handle_get_container(
     container = request.match_info["container"]
 
     # Create headers
-    resp.headers["Content-Type"] = "binary/octet-stream"
+    resp.headers["Content-Type"] = "application/x-tar"
     # Don't give content length, as the content length depends on
     # compressibility
     # Suggest {project_name}-{container}.tar as file name
