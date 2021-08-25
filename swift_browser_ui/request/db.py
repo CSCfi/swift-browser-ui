@@ -33,6 +33,11 @@ class DBConn:
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest"),
                     min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 10),
                     max_size=os.environ.get("REQUEST_DB_MAX_CONNECTIONS", 49),
+                    timeout=os.environ.get("REQUEST_DB_TIMEOUT", 120),
+                    command_timeout=os.environ.get("REQUEST_DB_COMMAND_TIMEOUT", 180),
+                    max_inactive_connection_lifetime=os.environ.get(
+                        "REQUEST_DB_MAX_INACTIVE_CONN_LIFETIME", 0
+                    ),
                 )
             except (ConnectionError, OSError):
                 self.log.error(
