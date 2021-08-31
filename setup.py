@@ -33,7 +33,7 @@ setuptools.setup(
             "flake8-docstrings==1.6.0",
             "pytest-xdist==2.3.0",
             "asynctest==0.13.0",
-            "black==21.7b0",
+            "black==21.8b0",
         ],
         "docs": ["sphinx==4.1.2", "sphinx_rtd_theme==0.5.2"],
         "ui_test": ["pytest==6.2.4", "pytest-timeout==1.4.2"],
