@@ -9,6 +9,7 @@
     >
       <b-select
         v-model="perPage"
+        data-testid="bucketsPerPage"
       >
         <option value="5">
           5 {{ $t('message.table.pageNb') }}

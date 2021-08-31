@@ -1,0 +1,42 @@
+name: End-to-end tests
+on: [pull_request]
+
+jobs:
+  cypress-e2e-headless:
+    name: Cypress e2e
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["14"]
+        browser: ["firefox", "chrome"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Frontend
+        run: |
+          pushd swift_browser_ui_frontend
+          sudo npm install -g npm@7.20.5
+          npm install
+          npm run build
+      - name: Setup and Run backend
+        run: |
+          pip install -r requirements.txt
+          python -m tests.ui_unit.mock_server &
+      - run: npm i cypress
+      - uses: cypress-io/github-action@v2
+        with:
+          install: false
+          browser: ${{ matrix.browser }}
+          headless: true
+          env: port=8080
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 5
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 5

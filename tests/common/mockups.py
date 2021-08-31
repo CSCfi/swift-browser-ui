@@ -176,6 +176,7 @@ class Mock_Request:
         self.headers = {}
         self.cookies = {}
         self.query = {}
+        self.match_info = {}
         self.remote = "127.0.0.1"
         self.url = yarl.URL("http://localhost:8080")
         self.post_data = {}
@@ -199,6 +200,16 @@ class Mock_Request:
         """
         for i in cookies.keys():
             self.cookies[i] = cookies[i]
+
+    def set_query(self, query):
+        """Set mock request query."""
+        for i in query.keys():
+            self.query[i] = query[i]
+
+    def set_match(self, match):
+        """Set mock request match_info."""
+        for i in match.keys():
+            self.match_info[i] = match[i]
 
     def set_post(self, data):
         """Set post data."""
@@ -351,6 +362,7 @@ class Mock_Service:
                     i
                 ]["Obj_S3_example"]
             to_add["success"] = True
+            to_add["headers"]["content-type"] = "binary/octet-stream"
             to_add["object"] = i
             ret.append(to_add)
         return ret

@@ -14,7 +14,7 @@ import time
 import cryptography.fernet
 from swift_browser_ui.ui._convenience import generate_cookie
 
-from .mockups import Mock_Request, Mock_Service, Mock_Session
+from tests.common.mockups import Mock_Request, Mock_Service, Mock_Session
 
 
 def add_csrf_to_cookie(cookie, req, bad_sign=False):

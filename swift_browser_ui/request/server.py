@@ -9,11 +9,10 @@ import aiohttp.web
 import uvloop
 import typing
 
-from swift_browser_ui.request.middleware import (
-    add_cors,
-    check_db_conn,
-    catch_uniqueness_error,
-)
+import swift_browser_ui.common.common_middleware
+import swift_browser_ui.common.common_handlers
+import swift_browser_ui.common.common_util
+
 from swift_browser_ui.request.api import (
     handle_share_request_post,
     handle_user_owned_request_listing,
@@ -26,11 +25,6 @@ from swift_browser_ui.request.api import (
     handle_health_check,
 )
 from swift_browser_ui.request.db import DBConn
-from swift_browser_ui.request.preflight import handle_delete_preflight
-from swift_browser_ui.request.auth import (
-    read_in_keys,
-    handle_validate_authentication,
-)
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -52,10 +46,10 @@ async def init_server() -> aiohttp.web.Application:
     """Initialize the sharing request server."""
     app = aiohttp.web.Application(
         middlewares=[
-            add_cors,  # type: ignore
-            check_db_conn,  # type: ignore
-            handle_validate_authentication,  # type: ignore
-            catch_uniqueness_error,  # type: ignore
+            swift_browser_ui.common.common_middleware.add_cors,  # type: ignore
+            swift_browser_ui.common.common_middleware.check_db_conn,  # type: ignore
+            swift_browser_ui.common.common_middleware.handle_validate_authentication,  # type: ignore
+            swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type: ignore
         ]
     )
 
@@ -71,7 +65,8 @@ async def init_server() -> aiohttp.web.Application:
     app.add_routes(
         [
             aiohttp.web.options(
-                "/request/user/{user}/{container}", handle_delete_preflight
+                "/request/user/{user}/{container}",
+                swift_browser_ui.common.common_handlers.handle_delete_preflight,
             ),
             aiohttp.web.post(
                 "/request/user/{user}/{container}", handle_share_request_post
@@ -89,7 +84,10 @@ async def init_server() -> aiohttp.web.Application:
 
     app.add_routes(
         [
-            aiohttp.web.options("/token/{project}/{id}", handle_delete_preflight),
+            aiohttp.web.options(
+                "/token/{project}/{id}",
+                swift_browser_ui.common.common_handlers.handle_delete_preflight,
+            ),
             aiohttp.web.post("/token/{project}/{id}", handle_user_add_token),
             aiohttp.web.delete("/token/{project}/{id}", handle_user_delete_token),
             aiohttp.web.get("/token/{project}", handle_user_list_tokens),
@@ -97,7 +95,7 @@ async def init_server() -> aiohttp.web.Application:
     )
 
     app.on_startup.append(resume_on_start)
-    app.on_startup.append(read_in_keys)
+    app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
     app.on_shutdown.append(graceful_shutdown)
 
     return app

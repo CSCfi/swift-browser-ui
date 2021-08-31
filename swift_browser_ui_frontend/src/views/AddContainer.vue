@@ -49,6 +49,26 @@ export default {
     createContainer: function () {
       swiftCreateContainer(this.container).then(() => {
         this.$router.go(-1);
+      }).catch((err) => {
+        console.log(err);
+        if (err.message.match("Container name already in use")) {
+          this.$buefy.toast.open({
+            message: this.$t("message.error.inUse"),
+            type: "is-danger",
+          });
+        }
+        else if (err.message.match("Invalid container name")) {
+          this.$buefy.toast.open({
+            message: this.$t("message.error.invalidName"),
+            type: "is-danger",
+          });
+        }
+        else {
+          this.$buefy.toast.open({
+            message: this.$t("message.error.createFail"),
+            type: "is-danger",
+          });
+        }
       });
     },
   },

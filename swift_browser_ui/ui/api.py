@@ -101,7 +101,12 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     # Return HTTPCreated upon a successful creation
     if res["success"]:
         return aiohttp.web.Response(status=201)
-    raise aiohttp.web.HTTPClientError(reason=res["error"])
+    if res["error"].http_status == 400:
+        raise aiohttp.web.HTTPBadRequest(reason="Invalid container name")
+    if res["error"].http_status == 409:
+        request.app["Log"].info(res["error"].http_status)
+        raise aiohttp.web.HTTPConflict(reason="Container name in use")
+    raise aiohttp.web.HTTPServerError(reason=res["error"].msg)
 
 
 async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -282,6 +287,9 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
         status=302,
     )
     response.headers["Location"] = dloadurl
+    response.headers["Content-Type"] = list(
+        serv.stat(request.query["bucket"], [request.query["objkey"]])
+    )[0]["headers"]["content-type"]
     return response
 
 
@@ -312,7 +320,7 @@ async def swift_download_shared_object(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=303)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -346,7 +354,7 @@ async def swift_download_container(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=303)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -379,7 +387,7 @@ async def swift_upload_object_chunk(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -414,7 +422,7 @@ async def swift_replicate_container(
 
     path += f"?session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     for i in request.query.keys():
         path += f"&{i}={request.query[i]}"
@@ -451,7 +459,7 @@ async def swift_check_object_chunk(
     path += f"?{request.query_string}"
     path += f"&session={runner_id}"
     path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid_until']}"
+    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
@@ -544,7 +552,7 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     # the API is exposed for the user and thus can't expose any sensitive info
     if not meta_cont:
         request.app["Log"].error("Container not specified.")
-        raise aiohttp.web.HTTPClientError()
+        raise aiohttp.web.HTTPBadRequest()
 
     conn = request.app["Sessions"][session]["ST_conn"]
 

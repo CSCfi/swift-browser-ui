@@ -10,8 +10,12 @@ import swift_browser_ui.ui.server
 
 
 # Import some mock-ups that are already made before
-from .mockups import return_project_avail, return_test_swift_endpoint
-from .mockups import Mock_Service, Mock_Session
+from tests.common.mockups import (
+    return_project_avail,
+    return_test_swift_endpoint,
+    Mock_Service,
+    Mock_Session,
+)
 
 
 SESSION_MODE = bool(environ.get("TEST_SESSION_MODE", False))
@@ -42,6 +46,11 @@ def mock_initiate_swift_service(_):
         # with envvar.
         size_range=(1, int(environ.get("TEST_MAX_OBJECT_SIZE", 1048576))),
     )
+    # Add mock data for object metadata
+    for key in serv.containers.keys():
+        serv.set_swift_meta_container(key)
+        for obj in serv.containers[key]:
+            serv.set_swift_meta_object(key, obj["name"])
     # The downloads aren't mocked, so no contents to any file. This isn't
     # something we need to test, and also would consume too much resources.
     # NOTE: Some random metadata creation could be added here.

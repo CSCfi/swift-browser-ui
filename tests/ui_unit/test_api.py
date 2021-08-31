@@ -26,7 +26,7 @@ from swift_browser_ui.ui.api import swift_replicate_container
 from swift_browser_ui.ui.api import swift_check_object_chunk
 from swift_browser_ui.ui.settings import setd
 
-from .creation import get_request_with_mock_openstack
+from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
 class APITestClass(asynctest.TestCase):
@@ -159,7 +159,14 @@ class APITestClass(asynctest.TestCase):
         container = "test-container-0"
         o_name = self.request.app["Sessions"][self.cookie]["ST_conn"].containers[
             container
-        ][0]
+        ][0]["name"]
+
+        self.request.app["Sessions"][self.cookie]["ST_conn"].set_swift_meta_container(
+            "test-container-0"
+        )
+        self.request.app["Sessions"][self.cookie]["ST_conn"].set_swift_meta_object(
+            "test-container-0", o_name
+        )
 
         self.request.query["bucket"] = container
         self.request.query["objkey"] = o_name
@@ -409,7 +416,7 @@ class TestProxyFunctions(asynctest.TestCase):
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
                 "signature": "test-signature",
-                "valid_until": "test-valid",
+                "valid": "test-valid",
             }
         )
         self.patch_sign = unittest.mock.patch(

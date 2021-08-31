@@ -1,11 +1,10 @@
-"""Module for testing preflight handling middleware."""
+"""Module for testing common handlers."""
 
 
 import asynctest
 import aiohttp
 
-
-from swift_browser_ui.sharing.preflight import handle_delete_preflight
+import swift_browser_ui.common.common_handlers
 
 
 class PreflightHandlerTestCase(asynctest.TestCase):
@@ -13,7 +12,7 @@ class PreflightHandlerTestCase(asynctest.TestCase):
 
     async def test_handle_delete_preflight(self):
         """Test handle_delete_preflight handler function."""
-        resp = await handle_delete_preflight(None)
+        resp = await swift_browser_ui.common.common_handlers.handle_delete_preflight(None)
         self.assertEqual(
             resp.headers["Access-Control-Allow-Methods"], "POST, OPTIONS, DELETE"
         )

@@ -12,12 +12,12 @@ import aiohttp
 import swift_browser_ui.ui.login
 import swift_browser_ui.ui.settings
 
-from .creation import (
+from tests.ui_unit.creation import (
     get_request_with_fernet,
     get_request_with_login_form,
     get_request_with_mock_openstack,
 )
-from .mockups import (
+from tests.common.mockups import (
     return_project_avail,
     return_test_swift_endpoint,
     return_invalid,

@@ -21,22 +21,22 @@ class SignatureMiscTestClass(asynctest.TestCase):
         """Set up relevant mocks."""
         self.session_check_mock = unittest.mock.Mock()
         self.session_check_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.session_check", self.session_check_mock
+            "swift_browser_ui.ui._convenience.session_check", self.session_check_mock
         )
 
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
-                "valid_until": 15000000,
+                "valid": 15000000,
                 "signature": "test-signature",
             }
         )
         self.sign_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.sign", self.sign_mock
+            "swift_browser_ui.ui._convenience.sign", self.sign_mock
         )
 
         self.api_check_mock = unittest.mock.Mock(return_value="test-session")
         self.api_check_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.api_check", self.api_check_mock
+            "swift_browser_ui.ui._convenience.api_check", self.api_check_mock
         )
 
         self.mock_request = types.SimpleNamespace(
@@ -69,7 +69,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
 
         self.get_tempurl_key_mock = asynctest.CoroutineMock(return_value="test-key")
         self.get_tempurl_key_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.get_tempurl_key", self.get_tempurl_key_mock
+            "swift_browser_ui.ui._convenience.get_tempurl_key", self.get_tempurl_key_mock
         )
 
         self.mock_request_noval = types.SimpleNamespace(
@@ -182,17 +182,17 @@ class SignatureTokenTestClass(asynctest.TestCase):
 
         self.sign_mock = asynctest.CoroutineMock(
             return_value={
-                "valid_until": 15000000,
+                "valid": 15000000,
                 "signature": "test-signature",
             }
         )
         self.sign_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.sign", self.sign_mock
+            "swift_browser_ui.ui._convenience.sign", self.sign_mock
         )
 
         self.api_check_mock = unittest.mock.Mock(return_value="test-session")
         self.api_check_patch = unittest.mock.patch(
-            "swift_browser_ui.ui.signature.api_check", self.api_check_mock
+            "swift_browser_ui.ui._convenience.api_check", self.api_check_mock
         )
 
     async def test_handle_ext_token_create_correct(self):

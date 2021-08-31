@@ -21,10 +21,14 @@ from swift_browser_ui.ui._convenience import initiate_os_session
 from swift_browser_ui.ui._convenience import check_csrf, clear_session_info
 from swift_browser_ui.ui.settings import setd
 
-from .creation import get_request_with_fernet, get_request_with_mock_openstack
-from .creation import get_full_crypted_session_cookie
-from .creation import add_csrf_to_cookie, encrypt_cookie
-from .mockups import mock_token_output, urlopen
+from tests.ui_unit.creation import (
+    get_request_with_fernet,
+    get_request_with_mock_openstack,
+    get_full_crypted_session_cookie,
+    add_csrf_to_cookie,
+    encrypt_cookie,
+)
+from tests.common.mockups import mock_token_output, urlopen
 
 
 class TestConvenienceFunctions(unittest.TestCase):

@@ -36,6 +36,9 @@ let default_translations = {
                         "performed, contact the service administrator. " +
                         "Otherwise head back to the front page from the " +
                         "button below.",
+        inUse: "Bucket name already in use.",
+        invalidName: "Bucket name is invalid.",
+        createFail: "Bucket creation failed.",
       },
       help: "Help",
       helplink: "",
@@ -256,6 +259,9 @@ let default_translations = {
                         "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
                         "paluu etusivulle on mahdollista oheisesta " +
                         "painikkeesta",
+        inUse: "Säiliön nimi on jo käytössä.",
+        invalidName: "Säiliön nimi ei kelpaa.",
+        createFail: "Säiliön luonti epäonnistui.",
       },
       help: "Apua",
       helplink: "",

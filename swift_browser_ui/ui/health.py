@@ -7,8 +7,9 @@ import time
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
 
+import swift_browser_ui.common.signature
+
 from swift_browser_ui.ui.settings import setd
-from swift_browser_ui.ui.signature import sign
 
 
 def _set_error_status(
@@ -128,10 +129,10 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
     services: typing.Dict[str, typing.Any] = dict()
     performance: typing.Dict[str, typing.Any] = dict()
 
-    signature = await sign(60, "/health")
+    signature = swift_browser_ui.common.signature.sign_api_request("/health")
     api_params = {
         "signature": signature["signature"],
-        "valid": signature["valid_until"],
+        "valid": signature["valid"],
     }
 
     await get_x_account_sharing(services, request, web_client, api_params, performance)
