@@ -74,21 +74,27 @@ class HandleValidateAuthTest(asynctest.TestCase):
             "swift_browser_ui.common.signature.test_signature", t_singature_mock
         )
 
+        get_tokens_mock = asynctest.CoroutineMock(
+            return_value=[{"token": "example-token"}]
+        )
+
         handler_mock = asynctest.CoroutineMock()
         request_mock = types.SimpleNamespace(
             **{
                 "app": {
                     "tokens": ["awefi"],
+                    "db_conn": types.SimpleNamespace(**{"get_tokens": get_tokens_mock}),
                 },
                 "query": {"signature": "a", "valid": "b"},
-                "match_info": {},
+                "match_info": {"user": "example_project"},
                 "url": types.SimpleNamespace(**{"path": "c"}),
-                "path": "/health",
+                "path": "/not-health",
             }
         )
 
         with t_signature_patch:
             await middle.handle_validate_authentication(request_mock, handler_mock)
+        get_tokens_mock.assert_awaited_once()
 
     async def test_handle_validate_authentication_failure(self):
         """Test authentication validation handler failure."""
@@ -98,8 +104,19 @@ class HandleValidateAuthTest(asynctest.TestCase):
                 "query": {"signature": "a", "vali": "b"},
                 "match_info": {},
                 "url": types.SimpleNamespace(**{"path": "c"}),
-                "path": "/health",
+                "path": "/not-health",
             }
         )
         with self.assertRaises(aiohttp.web.HTTPClientError):
             await middle.handle_validate_authentication(request_mock, handler_mock)
+
+    async def test_handle_validate_authentication_health(self):
+        """Test authentication validation handler upon health check."""
+        handler_mock = asynctest.CoroutineMock()
+        request_mock = types.SimpleNamespace(
+            **{
+                "path": "/health",
+            }
+        )
+        await middle.handle_validate_authentication(request_mock, handler_mock)
+        handler_mock.assert_awaited_once()
