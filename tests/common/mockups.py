@@ -179,6 +179,7 @@ class Mock_Request:
         self.match_info = {}
         self.remote = "127.0.0.1"
         self.url = yarl.URL("http://localhost:8080")
+        self.path = "/"
         self.post_data = {}
 
     def set_headers(self, headers):
@@ -214,6 +215,9 @@ class Mock_Request:
     def set_post(self, data):
         """Set post data."""
         self.post_data = data
+
+    def set_path(self, path):
+        self.path = path
 
     async def post(self):
         """Return post data."""

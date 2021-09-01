@@ -50,6 +50,7 @@ class AuthTestClass(asynctest.TestCase):
         """Test swift_browser_ui.upload.auth.handle_validate_authentication."""
         handler_mock = asynctest.CoroutineMock()
         req = tests.common.mockups.Mock_Request()
+        req.set_path("/")
 
         t_singature_mock = asynctest.CoroutineMock()
         t_signature_patch = unittest.mock.patch(
@@ -75,3 +76,16 @@ class AuthTestClass(asynctest.TestCase):
                 req, handler_mock
             )
         handler_mock.assert_called_once()
+
+    async def test_handle_validate_authentication_health_endpoint(self):
+        """Test handle_validate_authentication with health endpoint."""
+        req = tests.common.mockups.Mock_Request()
+        req.set_path("/health")
+
+        handler_mock = asynctest.CoroutineMock()
+
+        await swift_browser_ui.upload.auth.handle_validate_authentication(
+            req,
+            handler_mock,
+        )
+        handler_mock.assert_awaited_once()
