@@ -38,6 +38,9 @@ async def handle_validate_authentication(
     handler: swift_browser_ui.common.types.AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
+    if request.path == "/health":
+        return await handler(request)
+
     try:
         signature = request.query["signature"]
         validity = request.query["valid"]
