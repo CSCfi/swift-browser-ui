@@ -42,8 +42,31 @@ export async function syncContainerACLs(client, project) {
   let aclmeta = acl.access;
   let currentsharing = await client.getShare(project);
 
+  // Delete stale shared access entries from the database
+  console.log(currentsharing);
+  for (let container of currentsharing) {
+    console.log("checking container existence for ", container);
+    console.log(aclmeta);
+    console.log("compare: ", !(Object.keys(aclmeta).includes(container)));
+    if (!(Object.keys(aclmeta).includes(container))) {
+      console.log("container", container, " no longer exists, removing");
+      let resp = await client.shareContainerDeleteAccess(
+        project,
+        container,
+      );
+      if (resp) {
+        console.log("container access deletion successful");
+      } else {
+        console.log("container access deletion failed");
+      }
+    } else {
+      continue;
+    }
+  }
+
   // sync new shares into the sharing database
   for (let container of Object.keys(aclmeta)) {
+    console.log("adding new containers per ACL listing");
     let currentdetails = [];
     if (currentsharing.includes(container)) {
       currentdetails = await client.getShareDetails(
