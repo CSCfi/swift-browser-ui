@@ -92,7 +92,7 @@
               icon="folder-outline"
               size="is-small"
             /> 
-            {{ props.row.name }}
+            {{ props.row.name | truncate(100) }}
           </span>
           <span
             v-else
@@ -102,7 +102,7 @@
               icon="folder"
               size="is-small"
             /> 
-            {{ props.row.name }}
+            {{ props.row.name | truncate(100) }}
           </span>
         </template>
       </b-table-column>
@@ -280,6 +280,11 @@ export default {
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,
+  },
+  filters:{
+    truncate(value, length) {
+      return value.length > length ? value.substr(0, length) + "..." : value;
+    },
   },
   data: function () {
     return {

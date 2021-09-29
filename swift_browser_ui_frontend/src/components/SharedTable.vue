@@ -58,7 +58,7 @@
               icon="folder"
               size="is-small"
             />
-            {{ props.row.container }}
+            {{ props.row.container | truncate(80) }}
           </span>
         </template>
       </b-table-column>
@@ -128,6 +128,11 @@ export default {
   components: {
     ContainerDownloadLink,
     ReplicateContainerButton,
+  },
+  filters: {
+    truncate(value, length) {
+      return value.length > length ? value.substr(0, length) + "..." : value;
+    },
   },
   data: function () {
     return {

@@ -48,7 +48,7 @@
         :label="$t('message.share.container')"
       >
         <template #default="props">
-          {{ props.row.container }}
+          {{ props.row.container |truncate(80) }}
         </template>
       </b-table-column>
       <b-table-column
@@ -99,6 +99,11 @@ import delay from "lodash/delay";
 
 export default {
   name: "ShareRequestsTable",
+  filters: {
+    truncate(value, length) {
+      return value.length > length ? value.substr(0, length) + "..." : value;
+    },
+  },
   data () {
     return {
       perPage: 10,
