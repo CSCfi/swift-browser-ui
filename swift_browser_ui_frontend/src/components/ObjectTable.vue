@@ -126,13 +126,13 @@
           <b-icon
             icon="folder"
             size="is-small"
-          /> <b>{{ getFolderName(props.row.name) }}</b>
+          /> <b>{{ getFolderName(props.row.name) | truncate(100) }}</b>
         </span>
         <span v-else-if="renderFolders">
-          {{ props.row.name.replace(getPrefix(), '') }}
+          {{ props.row.name.replace(getPrefix(), '') | truncate(100) }}
         </span>
         <span v-else>
-          {{ props.row.name }}
+          {{ props.row.name | truncate(100) }}
         </span>
       </b-table-column>
       <b-table-column
@@ -314,6 +314,11 @@ export default {
     FolderUploadForm,
     ReplicateContainerButton,
     DeleteObjectsButton,
+  },
+  filters:{
+    truncate(value, length) {
+      return value.length > length ? value.substr(0, length) + "..." : value;
+    },
   },
   data: function () {
     return {
