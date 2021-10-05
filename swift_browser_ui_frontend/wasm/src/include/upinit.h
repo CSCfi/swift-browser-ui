@@ -17,7 +17,7 @@ int read_in_keys(
 /*
 Open and allocate an upload session
 */
-struct SESSION open_session(
+struct SESSION *open_session(
     const char *resumableId,
     const char *destContainer);
 
