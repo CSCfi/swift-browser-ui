@@ -28,7 +28,6 @@ setuptools.setup(
             "pytest==6.2.5",
             "pytest-cov==2.12.1",
             "coverage==6.0",
-            "coveralls==3.2.0",
             "flake8==3.9.2",
             "flake8-docstrings==1.6.0",
             "pytest-xdist==2.4.0",
@@ -40,7 +39,12 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
     package_data={
-        __name__: ["ui/static/*", "ui/static/js/*", "ui/static/css/*", "ui/static/img/*"]
+        __name__: [
+            "ui/static/*",
+            "ui/static/js/*",
+            "ui/static/css/*",
+            "ui/static/img/*",
+        ]
     },
     include_package_data=True,
     platforms="any",
