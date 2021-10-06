@@ -1,6 +1,6 @@
 {
   "name": "swift_browser_ui_frontend_npm",
-  "version": "1.1.0b5",
+  "version": "1.1.0b6",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
