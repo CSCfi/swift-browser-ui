@@ -13,13 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup node
-        uses: actions/setup-node@v2.4.0
+        uses: actions/setup-node@v2.4.1
         with:
           node-version: ${{ matrix.node }}
       - name: Install dependencies
         run: |
           pushd swift_browser_ui_frontend
-          npm install
+          sudo npm install -g npm@7.24.1
+          npm ci
       - name: Run eslint
         run: |
           pushd swift_browser_ui_frontend

@@ -28,7 +28,7 @@ updates:
     target-branch: "devel"
     open-pull-requests-limit: 10
   - package-ecosystem: docker
-    directory: "/"
+    directory: "/dockerfiles"
     schedule:
       interval: "weekly"
       day: "monday"

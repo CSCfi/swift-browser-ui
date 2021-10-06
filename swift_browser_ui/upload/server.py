@@ -53,9 +53,9 @@ async def servinit() -> aiohttp.web.Application:
     # Add auth related routes
     # Can use direct project post for creating a session, as it's intuitive
     # and POST upload against an account doesn't exist
-    app.add_routes([aiohttp.web.post("/{project}", handle_login)])
-
     app.add_routes([aiohttp.web.get("/health", handle_health_check)])
+
+    app.add_routes([aiohttp.web.post("/{project}", handle_login)])
 
     # Add api routes
     app.add_routes(

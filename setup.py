@@ -14,8 +14,8 @@ setuptools.setup(
     install_requires=[
         "aiohttp==3.7.4.post0",
         "python-swiftclient==3.12.0",
-        "cryptography==3.4.8",
-        "keystoneauth1==4.3.1",
+        "cryptography==35.0.0",
+        "keystoneauth1==4.4.0",
         "click==8.0.1",
         "gunicorn>=20.0.1",
         "uvloop==0.16.0",
@@ -24,23 +24,27 @@ setuptools.setup(
     ],
     extras_require={
         "test": [
-            "tox==3.24.3",
+            "tox==3.24.4",
             "pytest==6.2.5",
-            "pytest-cov==2.12.1",
-            "coverage==5.5",
-            "coveralls==3.2.0",
+            "pytest-cov==3.0.0",
+            "coverage==6.0",
             "flake8==3.9.2",
             "flake8-docstrings==1.6.0",
-            "pytest-xdist==2.3.0",
+            "pytest-xdist==2.4.0",
             "asynctest==0.13.0",
-            "black==21.8b0",
+            "black==21.9b0",
         ],
-        "docs": ["sphinx==4.1.2", "sphinx_rtd_theme==0.5.2"],
+        "docs": ["sphinx==4.2.0", "sphinx_rtd_theme==1.0.0"],
         "ui_test": ["pytest==6.2.5", "pytest-timeout==1.4.2"],
     },
     packages=setuptools.find_packages(),
     package_data={
-        __name__: ["ui/static/*", "ui/static/js/*", "ui/static/css/*", "ui/static/img/*"]
+        __name__: [
+            "ui/static/*",
+            "ui/static/js/*",
+            "ui/static/css/*",
+            "ui/static/img/*",
+        ]
     },
     include_package_data=True,
     platforms="any",
