@@ -5,44 +5,59 @@
 #ifndef SWIFT_UI_UPLOAD_TYPES
 #define SWIFT_UI_UPLOAD_TYPES
 
+#ifndef SWIFT_UI_UPLOAD_CHUNK_SIZE
+#define SWIFT_UI_UPLOAD_CHUNK_SIZE 5242880
+#endif
+
 // Encryption session storage
-typedef struct ENCRYPT_SESSION
+struct ENCRYPT_SESSION
 {
-    unsigned char seckey[crypto_kx_SECRETKEYBYTES];
-    unsigned char pubkey[crypto_kx_PUBLICKEYBYTES];
-    unsigned char *recv_keys;
+    uint8_t seckey[crypto_kx_SECRETKEYBYTES];
+    uint8_t pubkey[crypto_kx_PUBLICKEYBYTES];
+    uint8_t *recv_keys;
     unsigned int recv_key_amount;
 };
 
-// Upload session storage
-typedef struct UPLOAD_SESSION
+// Resumable file chunk upload data
+struct UPLOADCHUNK
 {
-    char *resumableIdStr[37];
+    unsigned int chunkNumber;      // Index number of the chunk
+    unsigned int chunkSize;        // The size of the current chunk
+    unsigned int totalSize;        // The total size of the upload
+    char uploadFileIdentifier[37]; // The unique identifier for the upload
+    unsigned int status;           // chunk status, 0 waiting, 1 uploading, 2 done, 3 error, 4 aborted
+};
+
+// Resumable file upload data
+struct UPLOADFILE
+{
+    char *url;
+    char *fileName;                // The upload file name
+    char *relativePath;            // The upload full path
+    char uploadFileIdentifier[37]; // The unique ID of the file upload
+    unsigned int totalSize;        // The total size of the upload
+    unsigned int totalChunks;      // The total chunk amount in the upload
+    unsigned int isUploading;      // upload status, 0 waiting, 1 uploading, 2 done, 3 error, 4 aborted
+    struct UPLOADCHUNK *chunks;
+    struct UPLOADFILE *nextFile; // pointer to the next file
+};
+
+// Upload session storage
+struct UPLOAD_SESSION
+{
+    char uploadIdStr[37];
     char *destContainer;
+    char *destProject;
+    struct UPLOADFILE *files;
+    int total_files;
 };
 
 // Complete session storage containing both upload and encryption information
-typedef struct SESSION
+struct SESSION
 {
     struct ENCRYPT_SESSION *encrypt;
     struct UPLOAD_SESSION *upload;
 };
 
-// Resumable file upload data
-typedef struct RESUMABLEFILE
-{
-    const char *url;
-    const uint64_t resumableTotalSize;
-    const uint64_t resumableTotalChunks;
-    unsigned int isUploading;
-};
-
-// Resumable file chunk upload data
-typedef struct RESUMABLECHUNK
-{
-    const uint64_t resumableChunkNumber;
-    const uint64_t resumableChunkSize;
-    const uint64_t resumableTotalSize;
-    const char *resumableIdentifier;
-};
+// Misc
 #endif

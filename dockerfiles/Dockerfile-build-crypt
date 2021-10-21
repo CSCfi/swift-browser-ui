@@ -1,0 +1,83 @@
+# Build libsodium
+FROM emscripten/emsdk:latest AS SODIUM
+
+RUN wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable.tar.gz \
+    && tar xvf libsodium-1.0.18-stable.tar.gz && cd libsodium-stable \
+    && dist-build/emscripten.sh --sumo
+
+# Build openssl
+FROM emscripten/emsdk:latest AS OPENSSL
+
+RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz \
+    && tar xvf openssl-1.1.1l.tar.gz \
+    && cd openssl-1.1.1l \
+    && emconfigure ./Configure linux-generic64 no-asm no-threads no-engine no-hw no-weak-ssl-ciphers no-dtls no-shared no-dso --prefix=/emsdk/upstream \
+    && sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile \
+    && sed -i '/^CFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
+    && sed -i '/^CXXFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
+    && emmake make -j 2 all \
+    && emmake make install
+
+# Build libcrypt4gh
+FROM emscripten/emsdk:latest AS LIBCRYPT4GH
+
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
+
+RUN sudo apt-get update \
+    && sudo apt-get upgrade -y \
+    && sudo apt-get install -y autoconf
+
+RUN git clone https://github.com/silverdaz/libcrypt4gh.git
+
+# We'll skip linking libraries since emcc only produces static libraries
+# Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
+RUN  export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
+    && export LDFLAGS="-L/emsdk/upstream/lib" \
+    && cd libcrypt4gh \
+    && autoreconf \
+    && sed -i 's/$(LIBS) //' Makefile.in \
+    && emconfigure ./configure --prefix=/emsdk/upstream \
+    && emmake make \
+    && emmake make install
+
+# Build libcrypt4gh-keys
+FROM emscripten/emsdk:latest AS LIBCRYPT4GHKEYS
+
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
+
+COPY --from=OPENSSL /emsdk/upstream/include/ /emsdk/upstream/include/
+COPY --from=OPENSSL /emsdk/upstream/lib/ /emsdk/upstream/lib/
+
+RUN sudo apt-get update \
+    && sudo apt-get upgrade -y \
+    && sudo apt-get install -y autoconf build-essential
+
+RUN git clone https://github.com/silverdaz/libcrypt4gh-keys.git
+
+# We'll skip linking libraries since emcc only produces static libraries
+# Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
+RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
+    && export LDFLAGS="-L/emsdk/upstream/lib" \
+    && cd libcrypt4gh-keys \
+    && autoreconf \
+    && sed -i 's/$(LIBS) //' Makefile.in \
+    && emconfigure ./configure --prefix=/emsdk/upstream --with-openssl=/emsdk/upstream \
+    && emmake make \
+    && emmake make install
+
+# Build wasm encpryption
+FROM emscripten/emsdk:latest
+
+COPY --from=LIBCRYPT4GH /emsdk/upstream/include/ /emsdk/upstream/include/
+COPY --from=LIBCRYPT4GH /emsdk/upstream/lib/ /emsdk/upstream/lib/
+
+COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/include/ /emsdk/upstream/include/
+COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/lib/ /emsdk/upstream/lib/
+
+COPY swift_browser_ui_frontend/wasm/ /src/
+
+RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
+    && export EMCC_FORCE_STDLIBS=libc \
+    && emmake make

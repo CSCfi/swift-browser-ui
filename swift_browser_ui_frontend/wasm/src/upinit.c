@@ -2,6 +2,7 @@
 Init functions for folder upload
 */
 
+#define _XOPEN_SOURCE 500
 #include <unistd.h>
 #include <fcntl.h>
 #include <sodium.h>
@@ -22,8 +23,7 @@ Add a public key from ftw entry
 int add_recv_key(
     const char *path,
     const struct stat *st,
-    int ftype,
-    struct FTW *ftw)
+    int flag)
 {
     // We'll use a 1024 byte buffer, enough for both ed25519 ssh and
     // c4gh keys.
@@ -32,9 +32,8 @@ int add_recv_key(
     int fd;
     int amount;
 
-    switch (ftype)
+    if (flag == FTW_F)
     {
-    case FTW_F:
         fd = open(path, O_RDONLY);
         amount = read(fd, fout, 1024);
         // Skip if couldn't read from the file or current session is NULL
@@ -74,10 +73,6 @@ int add_recv_key(
                 sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (current->recv_key_amount));
         }
         current->recv_key_amount++;
-        break;
-    // Ignore everything other than ordinary files
-    default:
-        break;
     }
 finalAddRecv:
     free(fout);
@@ -89,10 +84,10 @@ finalAddRecv:
 Read in the keys for upload encryption
 */
 int read_in_keys(
-    const struct UPLOAD_SESSION *resumableSession,
+    const struct UPLOAD_SESSION *uploadSession,
     struct ENCRYPT_SESSION *sess)
 {
-    chdir(resumableSession->resumableIdStr);
+    chdir(uploadSession->uploadIdStr);
     // Read in the private key
     // We assume current working directory to be of the correct structure
     // JS side takes care of that
@@ -105,22 +100,23 @@ int read_in_keys(
         sess->pubkey);
     // Read in the receiving keys
     current = sess;
-    ftw(
-        "data",
+    nftw(
+        "keys",
         add_recv_key,
-        5 // using at most 5 file descriptors for now
-    );
+        5, // using at most 5 file descriptors for now
+        FTW_PHYS);
 finalReadIn:
     current = NULL;
     free(passphrase);
     chdir("..");
+    return 0;
 }
 
 /*
-Open and allocate an upload session
+Open and allocate an encrypted upload session
 */
-struct SESSION *open_session(
-    const char *resumableId,
+struct SESSION *open_session_enc(
+    const char *uploadId,
     const char *destContainer)
 {
     struct SESSION *ret = malloc(sizeof(struct SESSION));
@@ -128,9 +124,9 @@ struct SESSION *open_session(
     ret->upload = malloc(sizeof(struct UPLOAD_SESSION));
     ret->encrypt = malloc(sizeof(struct ENCRYPT_SESSION));
     // Initialize the sessions
-    ret->upload->destContainer = malloc(strlen(destContainer));
+    ret->upload->destContainer = malloc(strlen(destContainer + 1));
     strcpy(ret->upload->destContainer, destContainer);
-    strcpy(ret->upload->resumableIdStr, resumableId);
+    strcpy(ret->upload->uploadIdStr, uploadId);
     ret->encrypt->recv_keys = NULL;
     ret->encrypt->recv_key_amount = 0;
     return ret;
@@ -142,12 +138,31 @@ Close and free an upload session
 void close_session(
     struct SESSION *sess)
 {
-    if (sess->encrypt->recv_keys)
+    if (sess->encrypt)
     {
-        free(sess->encrypt->recv_keys);
+        if (sess->encrypt->recv_keys)
+        {
+            free(sess->encrypt->recv_keys);
+        }
+        free(sess->encrypt);
     }
     free(sess->upload->destContainer);
-    free(sess->encrypt);
     free(sess->upload);
     free(sess);
+}
+
+/*
+Open and allocate an unencrypted upload session
+*/
+struct SESSION *open_session_unenc(
+    const char *uploadIdStr,
+    const char *destContainer)
+{
+    struct SESSION *ret = malloc(sizeof(struct SESSION));
+    ret->upload = malloc(sizeof(struct UPLOAD_SESSION));
+    ret->encrypt = NULL;
+    ret->upload->destContainer = malloc(strlen(destContainer + 1));
+    strcpy(ret->upload->destContainer, destContainer);
+    strcpy(ret->upload->uploadIdStr, uploadIdStr);
+    return ret;
 }

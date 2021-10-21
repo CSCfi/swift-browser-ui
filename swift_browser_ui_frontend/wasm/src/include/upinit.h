@@ -15,10 +15,17 @@ int read_in_keys(
     struct ENCRYPT_SESSION *sess);
 
 /*
-Open and allocate an upload session
+Open and allocate an encrypted upload session
 */
-struct SESSION *open_session(
-    const char *resumableId,
+struct SESSION *open_session_enc(
+    const char *uploadId,
+    const char *destContainer);
+
+/*
+Open and allocate an unencrypted upload session
+*/
+struct SESSION *open_session_unenc(
+    const char *uploadId,
     const char *destContainer);
 
 /*
