@@ -65,6 +65,11 @@ export default {
       dropFiles: [],
     };
   },
+  computed: {
+    res() {
+      return this.$store.state.resumableClient;
+    },
+  },
   methods: {
     encryptFiles: function () {
       // Add keys to the filesystem
@@ -85,6 +90,19 @@ export default {
       this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");
       this.encryptFiles();
       this.$buefy.toast.open("Encryption successful.");
+      this.$store.commit("setAltContainer", this.container);
+      let files = [];
+      for (let f of this.dropFiles) {
+        files.push(
+          new Blob(
+            FS.readFile("/data/" + f.name + ".c4gh"), // eslint-disable-line
+            {
+              type: "binary/octet-stream",
+            },
+          ),
+        );
+      }
+      this.res.addFiles(files, undefined);
     },
   },
 };
