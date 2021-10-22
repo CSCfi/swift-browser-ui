@@ -107,8 +107,8 @@ COPY requirements.txt /root/swift_ui/requirements.txt
 COPY setup.py /root/swift_ui/setup.py
 COPY swift_browser_ui /root/swift_ui/swift_browser_ui
 COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist /root/swift_ui/swift_browser_ui_frontend/dist
-COPY --from=WASMCRYPT /src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/js/libupload.js
-COPY --from=WASMCRYPT /src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/libupload.wasm
+COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/js/libupload.js
+COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/libupload.wasm
 
 RUN pip install --upgrade pip && \
     pip install -r /root/swift_ui/requirements.txt && \
