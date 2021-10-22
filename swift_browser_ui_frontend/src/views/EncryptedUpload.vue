@@ -76,10 +76,15 @@ export default {
       }
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
+      for (let f of this.dropFiles) {
+        FS.writeFile("/data/" + f.name, f.arrayBuffer()); // eslint-disable-line
+      }
+      _main(); // eslint-disable-line
     },
     encryptAndUpload: function () {
-      this.$buefy.toast.open("Encrypting files");
+      this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");
       this.encryptFiles();
+      this.$buefy.toast.open("Encryption successful.");
     },
   },
 };
