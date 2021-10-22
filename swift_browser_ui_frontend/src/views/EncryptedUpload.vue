@@ -11,14 +11,6 @@
         maxlength="1024"
       />
     </b-field>
-    <b-field label="Public Key">
-      <b-input
-        v-model="pubkey"
-        placeholder="Sender public key"
-        type="textarea"
-        maxlength="1024"
-      />
-    </b-field>
     <b-field label="Receiver Public Keys">
       <b-taginput
         v-model="recvkeys"
@@ -68,15 +60,26 @@ export default {
   data() {
     return {
       privkey: "",
-      pubkey: "",
       recvkeys: [],
       container: "",
       dropFiles: [],
     };
   },
   methods: {
+    encryptFiles: function () {
+      // Add keys to the filesystem
+      FS.mkdir("/keys"); // eslint-disable-line
+      FS.mkdir("/keys/recv_keys"); // eslint-disable-line
+      FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
+      for (let i = 0; i < this.recvkeys.length; i++) {
+        FS.writeFile("/keys/pubkey_" + toString(i), this.recvkeys[i]); // eslint-disable-line
+      }
+      // Add files to the filesystem
+      FS.mkdir("/data"); // eslint-disable-line
+    },
     encryptAndUpload: function () {
-      this.$buefy.toast.open("Init upload");
+      this.$buefy.toast.open("Encrypting files");
+      this.encryptFiles();
     },
   },
 };
