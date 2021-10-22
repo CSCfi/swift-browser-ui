@@ -84,7 +84,7 @@ export default {
       for (let f of this.dropFiles) {
         FS.writeFile("/data/" + f.name, f.arrayBuffer()); // eslint-disable-line
       }
-      _main(); // eslint-disable-line
+      _encrypt_folder(); // eslint-disable-line
     },
     encryptAndUpload: function () {
       this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");

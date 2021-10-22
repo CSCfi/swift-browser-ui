@@ -115,7 +115,7 @@ final_eup:
     return ret;
 }
 
-int main(void)
-{
-    return encrypt_folder();
-}
+// int main(void)
+// {
+//     return encrypt_folder();
+// }
