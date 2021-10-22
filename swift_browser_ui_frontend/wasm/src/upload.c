@@ -90,7 +90,6 @@ Encrypt a folder using crypt4gh.
 */
 int encrypt_folder(void)
 {
-    chdir("to_upload");
     int ret = 0;
     sess = open_session_enc("placeholder", "placeholder");
 
