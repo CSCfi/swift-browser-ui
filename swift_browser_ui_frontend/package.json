@@ -31,7 +31,7 @@
     "babel-eslint": "^10.1.0",
     "cli-highlight": "^2.1.11",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^7.18.0",
+    "eslint-plugin-vue": "^7.20.0",
     "eslint-utils": "^3.0.0",
     "vue-template-compiler": "^2.6.14"
   },
