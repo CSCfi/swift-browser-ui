@@ -75,15 +75,19 @@ export default {
       // Add keys to the filesystem
       FS.mkdir("/keys"); // eslint-disable-line
       FS.mkdir("/keys/recv_keys"); // eslint-disable-line
+      console.log(this.privkey);
       FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
+      console.log("added private key");
       for (let i = 0; i < this.recvkeys.length; i++) {
         FS.writeFile("/keys/pubkey_" + toString(i), this.recvkeys[i]); // eslint-disable-line
       }
+      console.log("added receiver keys");
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
-        FS.writeFile("/data/" + f.name, f.arrayBuffer()); // eslint-disable-line
+        FS.writeFile("/data/" + f.name, new Uint8Array(f.arrayBuffer())); // eslint-disable-line
       }
+      console.log("added files to upload");
       _encrypt_folder(); // eslint-disable-line
     },
     encryptAndUpload: function () {
