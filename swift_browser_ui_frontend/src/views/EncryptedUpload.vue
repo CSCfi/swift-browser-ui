@@ -85,7 +85,9 @@ export default {
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
-        FS.writeFile("/data/" + f.name, new Uint8Array(f.arrayBuffer())); // eslint-disable-line
+        let buf = new Uint8Array(f.arrayBuffer());
+        console.log(buf);
+        FS.writeFile("/data/" + f.name, buf); // eslint-disable-line
       }
       console.log("added files to upload");
       _encrypt_folder(); // eslint-disable-line

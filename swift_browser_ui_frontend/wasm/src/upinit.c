@@ -91,11 +91,11 @@ int read_in_keys(
     // Read in the private key
     // We assume current working directory to be of the correct structure
     // JS side takes care of that
-    char *passphrase = malloc(1024); // KiB buffer should be enough for a passphrase
-    scanf("%1023s", passphrase);
+    // char *passphrase = malloc(1024); // KiB buffer should be enough for a passphrase
+    // scanf("%1023s", passphrase);
     crypt4gh_private_key_from_file(
         "keys/pk.key",
-        passphrase,
+        "",
         sess->seckey,
         sess->pubkey);
     // Read in the receiving keys
@@ -107,7 +107,7 @@ int read_in_keys(
         FTW_PHYS);
 finalReadIn:
     current = NULL;
-    free(passphrase);
+    // free(passphrase);
     chdir("..");
     return 0;
 }
