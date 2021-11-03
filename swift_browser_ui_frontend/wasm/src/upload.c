@@ -73,14 +73,14 @@ Encrypt the files inside a path listing.
 */
 int encrypt_files(void)
 {
-    chdir(sess->upload->uploadIdStr);
+    // chdir(sess->upload->uploadIdStr);
     if (!sess)
     {
         return 1;
     }
     return nftw(
         "data",
-        encrypt_file,
+        &encrypt_file,
         5, // using at most 5 file descriptors
         FTW_PHYS);
 }
@@ -91,22 +91,29 @@ Encrypt a folder using crypt4gh.
 int encrypt_folder(void)
 {
     int ret = 0;
+    printf("Initializing the upload session\n");
     sess = open_session_enc("placeholder", "placeholder");
 
+    printf("Reading in the key files\n");
     ret = read_in_keys(
         sess->upload,
         sess->encrypt);
     if (ret)
     {
+        printf("Failure in reading in keys – aborting\n");
         goto final_eup;
     }
 
+    printf("Encrypting files\n");
     ret = encrypt_files();
     if (ret)
     {
+        printf("Failure in file encryption – aborting\n");
         goto final_eup;
     }
+    printf("Successfully encrypted the files\n");
 final_eup:
+    printf("Closing the encryption session\n");
     if (sess)
     {
         close_session(sess);
