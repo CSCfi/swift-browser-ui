@@ -54,6 +54,7 @@ int encrypt_file(
             sess->encrypt->pubkey,
             sess->encrypt->recv_keys,
             sess->encrypt->recv_key_amount);
+        printf("Successfully encrypted %s\n", fname_out);
     }
 finalEncFile:
     if (fd_in)

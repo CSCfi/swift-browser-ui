@@ -79,7 +79,10 @@ export default {
       FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       console.log("added private key");
       for (let i = 0; i < this.recvkeys.length; i++) {
-        FS.writeFile("/keys/recv_keys/pubkey_" + toString(i), this.recvkeys[i]); // eslint-disable-line
+        FS.writeFile( // eslint-disable-line
+          "/keys/recv_keys/pubkey_" + i.toString(),
+          this.recvkeys[i],
+        );
       }
       console.log("added receiver keys");
       // Add files to the filesystem
