@@ -34,7 +34,7 @@ int encrypt_file(
     int fd_out = 0;
     int ret = 0;
 
-    char *fname_out = malloc(strlen(path) + 6);
+    char *fname_out = calloc(strlen(path) + 6, sizeof(char));
     strncpy(fname_out, path, strlen(path));
     strcat(fname_out, ".c4gh");
 
