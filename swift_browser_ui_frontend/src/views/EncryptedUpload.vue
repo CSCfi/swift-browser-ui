@@ -89,8 +89,9 @@ export default {
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
         let buf = new Uint8Array(f.arrayBuffer());
-        console.log(buf);
-        FS.writeFile("/data/" + f.name, buf); // eslint-disable-line
+        let outname = "/data/" + f.name;
+        console.log(outname);
+        FS.writeFile(outname, buf); // eslint-disable-line
       }
       console.log("added files to upload");
       _encrypt_folder(); // eslint-disable-line
@@ -102,9 +103,11 @@ export default {
       this.$store.commit("setAltContainer", this.container);
       let files = [];
       for (let f of this.dropFiles) {
+        let outname = "/data/" + f.name + ".c4gh";
+        console.log(outname);
         files.push(
           new Blob(
-            FS.readFile("/data/" + f.name + ".c4gh"), // eslint-disable-line
+            FS.readFile(outname), // eslint-disable-line
             {
               type: "binary/octet-stream",
             },
