@@ -105,14 +105,17 @@ export default {
       for (let f of this.dropFiles) {
         let outname = "/data/" + f.name + ".c4gh";
         console.log(outname);
-        files.push(
-          new Blob(
-            FS.readFile(outname), // eslint-disable-line
-            {
-              type: "binary/octet-stream",
-            },
-          ),
+        let newFile = new Blob(
+          FS.readFile(outname), // eslint-disable-line
+          {
+            type: "binary/octet-stream",
+          },
         );
+        newFile.name = f.name + ".c4gh";
+        console.log(newFile.name);
+        console.log(newFile.size);
+        console.log(newFile.type);
+        files.push(newFile);
       }
       this.res.addFiles(files, undefined);
     },
