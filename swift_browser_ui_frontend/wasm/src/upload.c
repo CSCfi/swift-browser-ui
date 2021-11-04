@@ -27,7 +27,8 @@ struct SESSION *sess = NULL;
 int encrypt_file(
     const char *path,
     const struct stat *st,
-    int flag)
+    int flag,
+    struct FTW *ftws)
 {
     int fd_in = 0;
     int fd_out = 0;

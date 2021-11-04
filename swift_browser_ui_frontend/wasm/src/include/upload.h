@@ -10,7 +10,8 @@ Definitions of a single folder upload session
 int encrypt_file(
     const char *path,
     const struct stat *st,
-    int flag);
+    int flag,
+    struct FTW *ftws);
 
 int encrypt_files(void);
 

@@ -8,6 +8,15 @@ Upload process initialization functions.
 #define SWIFT_UI_UPLOAD_UPINIT_INCLUDED
 
 /*
+Add a public key from ftw entry
+*/
+int add_recv_key(
+    const char *path,
+    const struct stat *st,
+    int flag,
+    struct FTW *ftws);
+
+/*
 Read in the keys for upload encryption
 */
 int read_in_keys(

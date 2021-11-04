@@ -24,7 +24,8 @@ Add a public key from ftw entry
 int add_recv_key(
     const char *path,
     const struct stat *st,
-    int flag)
+    int flag,
+    struct FTW *ftws)
 {
     // We'll use a 1024 byte buffer, enough for both ed25519 ssh and
     // c4gh keys.
