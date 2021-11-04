@@ -118,7 +118,7 @@ int read_in_keys(
     printf("Reading in the receiver keys.\n");
     current = sess;
     nftw(
-        "keys",
+        "keys/recv_keys",
         &add_recv_key,
         5, // using at most 5 file descriptors for now
         FTW_PHYS);
