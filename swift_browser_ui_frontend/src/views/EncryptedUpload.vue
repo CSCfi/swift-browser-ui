@@ -71,7 +71,7 @@ export default {
     },
   },
   methods: {
-    encryptFiles: function () {
+    encryptFiles: async function () {
       // Add keys to the filesystem
       FS.mkdir("/keys"); // eslint-disable-line
       FS.mkdir("/keys/recv_keys"); // eslint-disable-line
@@ -88,7 +88,7 @@ export default {
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
-        let buf = new Uint8Array(f.arrayBuffer());
+        let buf = new Uint8Array(await f.arrayBuffer());
         console.log(buf);
         let outname = "/data/" + f.name;
         console.log(outname);
@@ -99,26 +99,27 @@ export default {
     },
     encryptAndUpload: function () {
       this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");
-      this.encryptFiles();
-      this.$buefy.toast.open("Encryption successful.");
-      this.$store.commit("setAltContainer", this.container);
-      let files = [];
-      for (let f of this.dropFiles) {
-        let outname = "/data/" + f.name + ".c4gh";
-        console.log(outname);
-        let newFile = new Blob(
-          FS.readFile(outname), // eslint-disable-line
-          {
-            type: "binary/octet-stream",
-          },
-        );
-        newFile.name = f.name + ".c4gh";
-        console.log(newFile.name);
-        console.log(newFile.size);
-        console.log(newFile.type);
-        files.push(newFile);
-      }
-      this.res.addFiles(files, undefined);
+      this.encryptFiles().then(() => {
+        this.$buefy.toast.open("Encryption successful.");
+        this.$store.commit("setAltContainer", this.container);
+        let files = [];
+        for (let f of this.dropFiles) {
+          let outname = "/data/" + f.name + ".c4gh";
+          console.log(outname);
+          let newFile = new Blob(
+            FS.readFile(outname), // eslint-disable-line
+            {
+              type: "binary/octet-stream",
+            },
+          );
+          newFile.name = f.name + ".c4gh";
+          console.log(newFile.name);
+          console.log(newFile.size);
+          console.log(newFile.type);
+          files.push(newFile);
+        }
+        this.res.addFiles(files, undefined);
+      });
     },
   },
 };
