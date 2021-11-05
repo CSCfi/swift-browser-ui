@@ -107,7 +107,7 @@ export default {
           let outname = "/data/" + f.name + ".c4gh";
           console.log(outname);
           let newFile = new Blob(
-            FS.readFile(outname), // eslint-disable-line
+            [FS.readFile(outname).buffer], // eslint-disable-line
             {
               type: "binary/octet-stream",
             },
