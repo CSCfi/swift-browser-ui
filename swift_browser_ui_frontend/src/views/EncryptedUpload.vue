@@ -89,6 +89,7 @@ export default {
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
         let buf = new Uint8Array(f.arrayBuffer());
+        console.log(buf);
         let outname = "/data/" + f.name;
         console.log(outname);
         FS.writeFile(outname, buf); // eslint-disable-line
