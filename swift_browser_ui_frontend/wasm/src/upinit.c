@@ -105,12 +105,13 @@ int read_in_keys(
     // Read in the private key
     // We assume current working directory to be of the correct structure
     // JS side takes care of that
-    // char *passphrase = malloc(1024); // KiB buffer should be enough for a passphrase
-    // fgets(passphrase, 1023, stdin);
+    sess->passphrase = calloc(1024, sizeof(char));
+    fgets(sess->passphrase, 1023, stdin);
+    printf("%s\n", sess->passphrase);
     printf("Reading in the private key.\n");
     crypt4gh_private_key_from_file(
         "keys/pk.key",
-        "password",
+        sess->passphrase ? sess->passphrase : "\0",
         // passphrase,
         sess->seckey,
         sess->pubkey);
@@ -146,6 +147,7 @@ struct SESSION *open_session_enc(
     ret->upload->destContainer = malloc(strlen(destContainer + 1));
     strcpy(ret->upload->destContainer, destContainer);
     strcpy(ret->upload->uploadIdStr, uploadId);
+    ret->encrypt->passphrase = NULL;
     ret->encrypt->recv_keys = NULL;
     ret->encrypt->recv_key_amount = 0;
     printf("Successfully allocated the encrypted upload session.\n");
@@ -165,6 +167,10 @@ void close_session(
         {
             printf("Freeing the receiver keys\n");
             free(sess->encrypt->recv_keys);
+        }
+        if (sess->encrypt->passphrase) {
+            printf("Freeing the key passphrase\n");
+            free(sess->encrypt->passphrase);
         }
         printf("Freeing the encryption session.\n");
         free(sess->encrypt);

@@ -15,6 +15,7 @@ struct ENCRYPT_SESSION
     uint8_t seckey[crypto_kx_SECRETKEYBYTES];
     uint8_t pubkey[crypto_kx_PUBLICKEYBYTES];
     uint8_t *recv_keys;
+    char *passphrase;
     unsigned int recv_key_amount;
 };
 
