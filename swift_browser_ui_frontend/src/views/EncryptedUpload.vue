@@ -75,26 +75,20 @@ export default {
       // Add keys to the filesystem
       FS.mkdir("/keys"); // eslint-disable-line
       FS.mkdir("/keys/recv_keys"); // eslint-disable-line
-      console.log(this.privkey);
       FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
-      console.log("added private key");
       for (let i = 0; i < this.recvkeys.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
           this.recvkeys[i],
         );
       }
-      console.log("added receiver keys");
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
       for (let f of this.dropFiles) {
         let buf = new Uint8Array(await f.arrayBuffer());
-        console.log(buf);
         let outname = "/data/" + f.name;
-        console.log(outname);
         FS.writeFile(outname, buf); // eslint-disable-line
       }
-      console.log("added files to upload");
       _encrypt_folder(); // eslint-disable-line
     },
     encryptAndUpload: function () {
@@ -105,7 +99,6 @@ export default {
         let files = [];
         for (let f of this.dropFiles) {
           let outname = "/data/" + f.name + ".c4gh";
-          console.log(outname);
           let newFile = new Blob(
             [FS.readFile(outname).buffer], // eslint-disable-line
             {
@@ -113,9 +106,6 @@ export default {
             },
           );
           newFile.name = f.name + ".c4gh";
-          console.log(newFile.name);
-          console.log(newFile.size);
-          console.log(newFile.type);
           files.push(newFile);
         }
         this.res.addFiles(files, undefined);
