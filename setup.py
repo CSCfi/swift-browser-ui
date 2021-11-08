@@ -35,7 +35,7 @@ setuptools.setup(
             "black==21.10b0",
         ],
         "docs": ["sphinx==4.2.0", "sphinx_rtd_theme==1.0.0"],
-        "ui_test": ["pytest==6.2.5", "pytest-timeout==1.4.2"],
+        "ui_test": ["pytest==6.2.5", "pytest-timeout==2.0.1"],
     },
     packages=setuptools.find_packages(),
     package_data={
