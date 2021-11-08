@@ -17,7 +17,7 @@
     "node-sass": "^6.0.1",
     "resumablejs": "^1.1.0",
     "sass-loader": "^12.1.0",
-    "serve": "^12.0.1",
+    "serve": "^13.0.2",
     "vue": "^2.6.14",
     "vue-i18n": "^8.26.5",
     "vue-material-design-icons": "^4.13.0",
