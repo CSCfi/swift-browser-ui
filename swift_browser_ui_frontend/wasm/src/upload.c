@@ -90,7 +90,7 @@ int encrypt_files(void)
 /*
 Encrypt a folder using crypt4gh.
 */
-int encrypt_folder(void)
+int encrypt_folder(char *passphrase)
 {
     int ret = 0;
     printf("Initializing the upload session\n");
@@ -98,6 +98,7 @@ int encrypt_folder(void)
 
     printf("Reading in the key files\n");
     ret = read_in_keys(
+        passphrase,
         sess->upload,
         sess->encrypt);
     if (ret)

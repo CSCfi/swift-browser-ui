@@ -15,7 +15,7 @@ int encrypt_file(
 
 int encrypt_files(void);
 
-int encrypt_folder(void);
+int encrypt_folder(char *passphrase);
 
 int main(void);
 #endif

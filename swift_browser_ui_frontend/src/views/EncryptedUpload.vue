@@ -11,6 +11,13 @@
         maxlength="1024"
       />
     </b-field>
+    <b-field label="Private Key Passphrase">
+      <b-input
+        v-model="passphrase"
+        placeholder="Private key passphrase"
+        type="password"
+      />
+    </b-field>
     <b-field label="Receiver Public Keys">
       <b-taginput
         v-model="recvkeys"
@@ -62,6 +69,7 @@ export default {
       privkey: "",
       recvkeys: [],
       container: "",
+      passphrase: "",
       dropFiles: [],
     };
   },
@@ -89,7 +97,14 @@ export default {
         let outname = "/data/" + f.name;
         FS.writeFile(outname, buf); // eslint-disable-line
       }
-      _encrypt_folder(); // eslint-disable-line
+
+      let res = Module.ccall( // eslint-disable-line
+        "encrypt_folder",
+        "number",
+        ["string"],
+        [this.passphrase],
+      );
+      console.log(res);
     },
     encryptAndUpload: function () {
       this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");

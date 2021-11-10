@@ -20,6 +20,7 @@ int add_recv_key(
 Read in the keys for upload encryption
 */
 int read_in_keys(
+    char *passphrase,
     const struct UPLOAD_SESSION *resumableSession,
     struct ENCRYPT_SESSION *sess);
 
