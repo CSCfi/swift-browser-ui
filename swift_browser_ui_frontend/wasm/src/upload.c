@@ -125,7 +125,34 @@ final_eup:
     return ret;
 }
 
-// int main(void)
-// {
-//     return encrypt_folder();
-// }
+/*
+Encrypt a folder using crypt4gh with ephemeral keys.
+*/
+int encrypt_folder_ephemeral() {
+    int ret = 0;
+    sess = open_session_enc("placeholder", "placeholder");
+
+    printf("Reading in the key files\n");
+    ret = read_in_recv_keys(sess->encrypt);
+    if(ret) {
+        printf("Failure in reading in keys – aborting\n");
+        goto final_eph_eup;
+    }
+
+    printf("Encrypting files\n");
+    ret = encrypt_files();
+    if (ret)
+    {
+        printf("Failure in file encryption – aborting\n");
+        goto final_eph_eup;
+    }
+    printf("Successfully encrypted the files\n");
+final_eph_eup:
+    printf("Closing the encryption session\n");
+    if (sess)
+    {
+        close_session(sess);
+    }
+    sess = NULL;
+    return ret;
+}

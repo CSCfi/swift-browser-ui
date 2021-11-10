@@ -17,6 +17,11 @@ int add_recv_key(
     struct FTW *ftws);
 
 /*
+Read in the receiver keys
+*/
+int read_in_recv_keys(struct ENCRYPT_SESSION *sess);
+
+/*
 Read in the keys for upload encryption
 */
 int read_in_keys(

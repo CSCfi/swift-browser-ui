@@ -95,6 +95,33 @@ finalAddRecv:
 }
 
 /*
+Read in the receiver keys
+*/
+int read_in_recv_keys(struct ENCRYPT_SESSION *sess) {
+    int ret = -2;
+    if (!sess) {
+        goto finalReadRecv;
+    }
+
+    // Create an ephemeral keypair
+    crypto_kx_keypair(
+        sess->seckey,
+        sess->pubkey
+    );
+
+    current = sess;
+    ret = nftw(
+        "keys/recv_keys",
+        &add_recv_key,
+        5, // use at most 5 file descriptors
+        FTW_PHYS
+    );
+finalReadRecv:
+    current = NULL;
+    return ret;
+}
+
+/*
 Read in the keys for upload encryption
 */
 int read_in_keys(
@@ -102,10 +129,10 @@ int read_in_keys(
     const struct UPLOAD_SESSION *uploadSession,
     struct ENCRYPT_SESSION *sess)
 {
-    // chdir(uploadSession->uploadIdStr);
     // Read in the private key
     // We assume current working directory to be of the correct structure
     // JS side takes care of that
+    int ret = 0;
     strncpy(sess->passphrase, passphrase, 1023);
     printf("%s\n", sess->passphrase);
     printf("Reading in the private key.\n");
@@ -118,7 +145,7 @@ int read_in_keys(
     // Read in the receiving keys
     printf("Reading in the receiver keys.\n");
     current = sess;
-    nftw(
+    ret = nftw(
         "keys/recv_keys",
         &add_recv_key,
         5, // using at most 5 file descriptors for now
@@ -128,7 +155,7 @@ finalReadIn:
     current = NULL;
     // free(passphrase);
     // chdir("..");
-    return 0;
+    return ret;
 }
 
 /*
