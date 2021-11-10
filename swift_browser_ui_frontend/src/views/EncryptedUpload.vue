@@ -3,7 +3,13 @@
     id="encryption"
     class="contents"
   >
-    <b-field label="Private Key">
+    <b-field label="Ephemeral Private Key">
+      <b-switch
+        v-model="ephemeral"
+        size="is-large"
+      />
+    </b-field>
+    <b-field v-if="!ephemeral" label="Private Key">
       <b-input
         v-model="privkey"
         placeholder="Sender private key"
@@ -11,7 +17,7 @@
         maxlength="1024"
       />
     </b-field>
-    <b-field label="Private Key Passphrase">
+    <b-field v-if="!ephemeral" label="Private Key Passphrase">
       <b-input
         v-model="passphrase"
         placeholder="Private key passphrase"
@@ -66,6 +72,7 @@ export default {
   name: "EncryptedUpload",
   data() {
     return {
+      ephemeral: true,
       privkey: "",
       recvkeys: [],
       container: "",
@@ -83,7 +90,10 @@ export default {
       // Add keys to the filesystem
       FS.mkdir("/keys"); // eslint-disable-line
       FS.mkdir("/keys/recv_keys"); // eslint-disable-line
-      FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
+      // Only add private key if we're not using ephemeral key upload
+      if (!this.ephemeral) {
+        FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
+      }
       for (let i = 0; i < this.recvkeys.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
@@ -98,12 +108,22 @@ export default {
         FS.writeFile(outname, buf); // eslint-disable-line
       }
 
-      let res = Module.ccall( // eslint-disable-line
-        "encrypt_folder",
-        "number",
-        ["string"],
-        [this.passphrase],
-      );
+      let res = 0;
+      if(!this.ephemeral) {
+        res = Module.ccall( // eslint-disable-line
+          "encrypt_folder",
+          "number",
+          ["string"],
+          [this.passphrase],
+        );
+      } else {
+        res = Module.ccall( // eslint-disable-line
+          "encrypt_folder_ephemeral",
+          "number",
+          [],
+          [],
+        );
+      }
       console.log(res);
     },
     encryptAndUpload: function () {
