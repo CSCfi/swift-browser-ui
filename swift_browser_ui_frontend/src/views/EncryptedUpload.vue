@@ -9,7 +9,10 @@
         size="is-large"
       />
     </b-field>
-    <b-field v-if="!ephemeral" label="Private Key">
+    <b-field
+      v-if="!ephemeral"
+      label="Private Key"
+    >
       <b-input
         v-model="privkey"
         placeholder="Sender private key"
@@ -17,7 +20,10 @@
         maxlength="1024"
       />
     </b-field>
-    <b-field v-if="!ephemeral" label="Private Key Passphrase">
+    <b-field
+      v-if="!ephemeral"
+      label="Private Key Passphrase"
+    >
       <b-input
         v-model="passphrase"
         placeholder="Private key passphrase"
