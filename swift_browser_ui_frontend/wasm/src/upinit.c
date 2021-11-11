@@ -104,6 +104,7 @@ int read_in_recv_keys(struct ENCRYPT_SESSION *sess) {
     }
 
     // Create an ephemeral keypair
+    randombytes_stir();
     crypto_kx_keypair(
         sess->seckey,
         sess->pubkey
