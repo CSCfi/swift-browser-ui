@@ -70,6 +70,9 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
 # Build wasm encryption
 FROM emscripten/emsdk:latest AS WASMCRYPT
 
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
+COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
+
 COPY --from=LIBCRYPT4GH /emsdk/upstream/include/ /emsdk/upstream/include/
 COPY --from=LIBCRYPT4GH /emsdk/upstream/lib/ /emsdk/upstream/lib/
 
