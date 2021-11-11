@@ -6,22 +6,18 @@
       :projects="projects"
     />
     <ProgressBar v-if="isUploading || isChunking" />
-    <div
-      class="breadcrumb"
-      aria-label="breadcrumbs"
+    <b-breadcrumb
+      style="margin-left:5%;margin-top:1%;font-size:1rem;"
     >
-      <ul
-        id="breadcrumb-list"
-        style="margin-left:5%;margin-top:1%;"
+      <b-breadcrumb-item
+        v-for="item in getRouteAsList ()"
+        :key="item.alias"
+        :to="item.address"
+        tag="router-link"
       >
-        <BreadcrumbListElement
-          v-for="item in getRouteAsList ()"
-          :key="item.alias"
-          :alias="item.alias"
-          :address="item.address"
-        />
-      </ul>
-    </div>
+        {{ item.alias | truncate(100) }}
+      </b-breadcrumb-item>
+    </b-breadcrumb>
     <router-view />
     <b-loading
       :is-full-page="isFullPage"
@@ -46,6 +42,17 @@
     </footer>
   </div>
 </template>
+
+<script>
+export default {
+  name: "BrowserPage",
+  filters: {
+    truncate(value, length) {
+      return value.length > length ? value.substr(0, length) + "..." : value;
+    },
+  },
+};
+</script>
 
 <style>
 html, body {
