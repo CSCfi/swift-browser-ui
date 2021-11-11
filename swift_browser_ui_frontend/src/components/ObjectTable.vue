@@ -417,7 +417,7 @@ export default {
         });
       } else {
         this.$router.push({
-          name: "Objects",
+          name: "ObjectsView",
           params: {
             user: this.$route.params.user,
             project: this.$route.params.project,
@@ -536,7 +536,7 @@ export default {
         });
       } else {
         this.$router.push({
-          name: "Objects",
+          name: "ObjectsView",
           params: {
             project: this.$route.params.project,
             owner: this.$route.params.owner,

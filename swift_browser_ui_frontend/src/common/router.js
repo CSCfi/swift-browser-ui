@@ -1,16 +1,16 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Dashboard from "@/views/Dashboard.vue";
-import Containers from "@/views/Containers.vue";
-import Objects from "@/views/Objects.vue";
+import DashboardView from "@/views/Dashboard.vue";
+import ContainersView from "@/views/Containers.vue";
+import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects";
 import ShareRequests from "@/views/ShareRequests";
 import SharedTo from "@/views/SharedTo";
 import SharedFrom from "@/views/SharedFrom";
-import Sharing from "@/views/Sharing";
+import SharingView from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
-import Tokens from "@/views/Tokens";
+import TokensView from "@/views/Tokens";
 import CreateContainer from "@/views/AddContainer";
 import DirectShare from "@/views/DirectShare";
 
@@ -36,8 +36,8 @@ export default new Router({
     },
     {
       path: "/browse/sharing/share",
-      name: "Sharing",
-      component: Sharing,
+      name: "SharingView",
+      component: SharingView,
     },
     {
       path: "/browse/container/add",
@@ -66,23 +66,23 @@ export default new Router({
     },
     {
       path: "/browse/tokens/:project",
-      name: "Tokens",
-      component: Tokens,
+      name: "TokensView",
+      component: TokensView,
     },
     {
       path: "/browse/:user",
-      name: "Dashboard",
-      component: Dashboard,
+      name: "DashboardView",
+      component: DashboardView,
     },
     {
       path: "/browse/:user/:project",
-      name: "Containers",
-      component: Containers,
+      name: "ContainersView",
+      component: ContainersView,
     },
     {
       path: "/browse/:user/:project/:container",
-      name: "Objects",
-      component: Objects,
+      name: "ObjectsView",
+      component: ObjectsView,
     },
   ],
 });
