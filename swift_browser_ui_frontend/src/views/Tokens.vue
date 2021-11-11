@@ -121,7 +121,7 @@ import {
 } from "@/common/api";
 
 export default {
-  name: "Tokens",
+  name: "TokensView",
   data () {
     return {
       tokens: [],

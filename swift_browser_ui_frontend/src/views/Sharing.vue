@@ -73,7 +73,7 @@ import {
 } from "@/common/api";
 
 export default {
-  name: "Sharing",
+  name: "SharingView",
   data () {
     return {
       tags: [],

@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "@/pages/Login.vue";
+import App from "@/pages/LoginPage.vue";
 
 // Import project css
 import "@/css/prod.scss";
