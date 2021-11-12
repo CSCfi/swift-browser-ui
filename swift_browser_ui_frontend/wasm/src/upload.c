@@ -75,7 +75,6 @@ Encrypt the files inside a path listing.
 */
 int encrypt_files(void)
 {
-    // chdir(sess->upload->uploadIdStr);
     if (!sess)
     {
         return 1;
@@ -93,10 +92,8 @@ Encrypt a folder using crypt4gh.
 int encrypt_folder(char *passphrase)
 {
     int ret = 0;
-    printf("Initializing the upload session\n");
     sess = open_session_enc("placeholder", "placeholder");
 
-    printf("Reading in the key files\n");
     ret = read_in_keys(
         passphrase,
         sess->upload,
@@ -107,7 +104,6 @@ int encrypt_folder(char *passphrase)
         goto final_eup;
     }
 
-    printf("Encrypting files\n");
     ret = encrypt_files();
     if (ret)
     {
@@ -116,7 +112,6 @@ int encrypt_folder(char *passphrase)
     }
     printf("Successfully encrypted the files\n");
 final_eup:
-    printf("Closing the encryption session\n");
     if (sess)
     {
         close_session(sess);
@@ -132,14 +127,12 @@ int encrypt_folder_ephemeral() {
     int ret = 0;
     sess = open_session_enc("placeholder", "placeholder");
 
-    printf("Reading in the key files\n");
     ret = read_in_recv_keys(sess->encrypt);
     if(ret) {
         printf("Failure in reading in keys – aborting\n");
         goto final_eph_eup;
     }
 
-    printf("Encrypting files\n");
     ret = encrypt_files();
     if (ret)
     {
@@ -148,7 +141,6 @@ int encrypt_folder_ephemeral() {
     }
     printf("Successfully encrypted the files\n");
 final_eph_eup:
-    printf("Closing the encryption session\n");
     if (sess)
     {
         close_session(sess);

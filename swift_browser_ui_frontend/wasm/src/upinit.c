@@ -29,7 +29,6 @@ int add_recv_key(
 {
     // We'll use a 1024 byte buffer, enough for both ed25519 ssh and
     // c4gh keys.
-    printf("add_recv_key called\n");
     char *fout = calloc(1024, sizeof(char));
     unsigned char pub[crypto_kx_PUBLICKEYBYTES];
     int fd;
@@ -37,7 +36,6 @@ int add_recv_key(
 
     if (flag == FTW_F)
     {
-        printf("Is a file. Reading in receiving key.");
         fd = open(path, O_RDONLY);
         amount = read(fd, fout, 1023);
         // Skip if couldn't read from the file or current session is NULL
@@ -46,38 +44,24 @@ int add_recv_key(
             printf("Failed to open the receiver key.\n");
             goto finalAddRecv;
         }
-        // Reuse amount for pubkey return value
-        // amount = crypt4gh_public_key_from_blob(
-        //     fout,
-        //     amount,
-        //     pub);
-        // if (amount)
-        // {
-        //     printf("Failed to decode the receiver key\n");
-        //     goto finalAddRecv;
-        // }
         // We need space for the new key inside encrypt session
         if (!current->recv_key_amount || !current->recv_keys)
         {
-            printf("Allocating the initial key slot\n");
             current->recv_keys = malloc(
                 sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES);
         }
         else
         {
-            printf("Allocating a new key slot\n");
             current->recv_keys = realloc(
                 current->recv_keys,
                 sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (current->recv_key_amount + 1));
         }
-        printf("Reading in the receiver public key.\n");
         amount = crypt4gh_public_key_from_blob(
             fout,
             amount,
             current->recv_keys + (sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * current->recv_key_amount));
         if (amount)
         {
-            printf("Key read unsuccessful for %s, unallocate key memory.\n", path);
             current->recv_keys = realloc(
                 current->recv_keys,
                 sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (current->recv_key_amount));
@@ -118,6 +102,7 @@ int read_in_recv_keys(struct ENCRYPT_SESSION *sess) {
         FTW_PHYS
     );
 finalReadRecv:
+    printf("Successfully read in the keys.\n");
     current = NULL;
     return ret;
 }
@@ -140,7 +125,6 @@ int read_in_keys(
     crypt4gh_private_key_from_file(
         "keys/pk.key",
         sess->passphrase ? sess->passphrase : "\0",
-        // passphrase,
         sess->seckey,
         sess->pubkey);
     // Read in the receiving keys
@@ -154,8 +138,6 @@ int read_in_keys(
 finalReadIn:
     printf("Successfully read in the keys.\n");
     current = NULL;
-    // free(passphrase);
-    // chdir("..");
     return ret;
 }
 
@@ -166,7 +148,6 @@ struct SESSION *open_session_enc(
     const char *uploadId,
     const char *destContainer)
 {
-    printf("Allocating the encrypted upload session.\n");
     struct SESSION *ret = malloc(sizeof(struct SESSION));
     // Allocate encrypt and upload sessions
     ret->upload = malloc(sizeof(struct UPLOAD_SESSION));
@@ -178,7 +159,6 @@ struct SESSION *open_session_enc(
     ret->encrypt->passphrase = calloc(1024, sizeof(char));
     ret->encrypt->recv_keys = NULL;
     ret->encrypt->recv_key_amount = 0;
-    printf("Successfully allocated the encrypted upload session.\n");
     return ret;
 }
 
@@ -188,22 +168,17 @@ Close and free an upload session
 void close_session(
     struct SESSION *sess)
 {
-    printf("Closing the upload session.\n");
     if (sess->encrypt)
     {
         if (sess->encrypt->recv_keys)
         {
-            printf("Freeing the receiver keys\n");
             free(sess->encrypt->recv_keys);
         }
         if (sess->encrypt->passphrase) {
-            printf("Freeing the key passphrase\n");
             free(sess->encrypt->passphrase);
         }
-        printf("Freeing the encryption session.\n");
         free(sess->encrypt);
     }
-    printf("Freeing the upload session.\n");
     free(sess->upload->destContainer);
     free(sess->upload);
     free(sess);
