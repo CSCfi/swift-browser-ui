@@ -281,7 +281,7 @@ new Vue({
           retl.push({
             alias: this.$t("message.containers")
                    + this.$store.state.active.name,
-            address: {name: "Containers"},
+            address: {name: "ContainersView"},
           });
         }
       }
