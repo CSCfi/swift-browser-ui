@@ -67,11 +67,6 @@ async def swift_list_buckets(request: aiohttp.web.Request) -> aiohttp.web.Respon
         # response at once
         serv = request.app["Sessions"][session]["ST_conn"].list()
         [_unpack(i, cont, request) for i in serv]
-        # for a bucket with no objects
-        if not cont:
-            # return empty object
-            request.app["Log"].debug("Empty container list.")
-            raise aiohttp.web.HTTPNotFound()
         return aiohttp.web.json_response(cont)
     except SwiftError:
         request.app["Log"].error("SwiftError occured return empty container list.")
