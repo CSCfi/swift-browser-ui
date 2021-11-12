@@ -7,7 +7,6 @@ import VueI18n from "vue-i18n";
 
 // Project Vue components
 import BrowserNavbar from "@/components/BrowserNavbar.vue";
-import BreadcrumbListElement from "@/components/Breadcrumb.vue";
 
 // Project JS functions
 import getLangCookie from "@/common/conv";
@@ -49,7 +48,6 @@ new Vue({
   store,
   components: {
     BrowserNavbar,
-    BreadcrumbListElement,
     ProgressBar,
   },
   computed: {
