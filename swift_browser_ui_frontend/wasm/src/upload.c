@@ -22,7 +22,7 @@ Using global variable scope for the key variables to enable using them
 inside the `encrypt_file` function. Without global scope would need to pass
 the keys inside ftw.
 */
-struct SESSION *sess = NULL;
+struct ENCRYPT_SESSION *sess = NULL;
 
 int encrypt_file(
     const char *path,
@@ -50,10 +50,10 @@ int encrypt_file(
         ret = crypt4gh_encrypt(
             fd_in,
             fd_out,
-            sess->encrypt->seckey,
-            sess->encrypt->pubkey,
-            sess->encrypt->recv_keys,
-            sess->encrypt->recv_key_amount);
+            sess->seckey,
+            sess->pubkey,
+            sess->recv_keys,
+            sess->recv_key_amount);
         printf("Successfully encrypted %s\n", fname_out);
     }
 finalEncFile:
@@ -92,12 +92,11 @@ Encrypt a folder using crypt4gh.
 int encrypt_folder(char *passphrase)
 {
     int ret = 0;
-    sess = open_session_enc("placeholder", "placeholder");
+    sess = open_session_enc();
 
     ret = read_in_keys(
         passphrase,
-        sess->upload,
-        sess->encrypt);
+        sess);
     if (ret)
     {
         printf("Failure in reading in keys – aborting\n");
@@ -125,9 +124,9 @@ Encrypt a folder using crypt4gh with ephemeral keys.
 */
 int encrypt_folder_ephemeral() {
     int ret = 0;
-    sess = open_session_enc("placeholder", "placeholder");
+    sess = open_session_enc();
 
-    ret = read_in_recv_keys(sess->encrypt);
+    ret = read_in_recv_keys(sess);
     if(ret) {
         printf("Failure in reading in keys – aborting\n");
         goto final_eph_eup;

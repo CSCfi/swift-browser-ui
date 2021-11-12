@@ -112,7 +112,6 @@ Read in the keys for upload encryption
 */
 int read_in_keys(
     char *passphrase,
-    const struct UPLOAD_SESSION *uploadSession,
     struct ENCRYPT_SESSION *sess)
 {
     // Read in the private key
@@ -142,23 +141,17 @@ finalReadIn:
 }
 
 /*
-Open and allocate an encrypted upload session
+Open and allocate an encryption session
 */
-struct SESSION *open_session_enc(
-    const char *uploadId,
-    const char *destContainer)
-{
-    struct SESSION *ret = malloc(sizeof(struct SESSION));
-    // Allocate encrypt and upload sessions
-    ret->upload = malloc(sizeof(struct UPLOAD_SESSION));
-    ret->encrypt = malloc(sizeof(struct ENCRYPT_SESSION));
-    // Initialize the sessions
-    ret->upload->destContainer = malloc(strlen(destContainer + 1));
-    strcpy(ret->upload->destContainer, destContainer);
-    strcpy(ret->upload->uploadIdStr, uploadId);
-    ret->encrypt->passphrase = calloc(1024, sizeof(char));
-    ret->encrypt->recv_keys = NULL;
-    ret->encrypt->recv_key_amount = 0;
+struct ENCRYPT_SESSION *open_session_enc(void) {
+    struct ENCRYPT_SESSION *ret = malloc(sizeof(struct ENCRYPT_SESSION));
+    if (!ret) {
+        return NULL;
+    }
+    // Initialize the encryption session
+    ret->passphrase = calloc(1024, sizeof(char));
+    ret->recv_keys = NULL;
+    ret->recv_key_amount = 0;
     return ret;
 }
 
@@ -166,36 +159,11 @@ struct SESSION *open_session_enc(
 Close and free an upload session
 */
 void close_session(
-    struct SESSION *sess)
-{
-    if (sess->encrypt)
-    {
-        if (sess->encrypt->recv_keys)
-        {
-            free(sess->encrypt->recv_keys);
-        }
-        if (sess->encrypt->passphrase) {
-            free(sess->encrypt->passphrase);
-        }
-        free(sess->encrypt);
+    struct ENCRYPT_SESSION *sess 
+) {
+    if (sess) {
+        free(sess->recv_keys);
+        free(sess->passphrase);
+        free(sess);
     }
-    free(sess->upload->destContainer);
-    free(sess->upload);
-    free(sess);
-}
-
-/*
-Open and allocate an unencrypted upload session
-*/
-struct SESSION *open_session_unenc(
-    const char *uploadIdStr,
-    const char *destContainer)
-{
-    struct SESSION *ret = malloc(sizeof(struct SESSION));
-    ret->upload = malloc(sizeof(struct UPLOAD_SESSION));
-    ret->encrypt = NULL;
-    ret->upload->destContainer = malloc(strlen(destContainer + 1));
-    strcpy(ret->upload->destContainer, destContainer);
-    strcpy(ret->upload->uploadIdStr, uploadIdStr);
-    return ret;
 }
