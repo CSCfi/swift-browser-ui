@@ -3,7 +3,7 @@
     id="encryption"
     class="contents"
   >
-    <b-field label="Ephemeral Private Key">
+    <b-field :label="$t('message.encrypt.ephemeral')"> 
       <b-switch
         v-model="ephemeral"
         size="is-large"
@@ -11,36 +11,36 @@
     </b-field>
     <b-field
       v-if="!ephemeral"
-      label="Private Key"
+      :label="$t('message.encrypt.pk')"
     >
       <b-input
         v-model="privkey"
-        placeholder="Sender private key"
+        :placeholder="$t('message.encrypt.pk_msg')"
         type="textarea"
         maxlength="1024"
       />
     </b-field>
     <b-field
       v-if="!ephemeral"
-      label="Private Key Passphrase"
+      :label="$t('message.encrypt.phrase')"
     >
       <b-input
         v-model="passphrase"
-        placeholder="Private key passphrase"
+        :placeholder="$t('message.encrypt.phrase_msg')"
         type="password"
       />
     </b-field>
-    <b-field label="Receiver Public Keys">
+    <b-field :label="$t('message.encrypt.pubkey')">
       <b-taginput
         v-model="recvkeys"
-        placeholder="Paste a receiver public key"
+        :placeholder="$t('message.encrypt.pubkey_msg')"
         type="textarea"
       />
     </b-field>
-    <b-field label="Container">
+    <b-field :label="$t('message.encrypt.bucket')">
       <b-input
         v-model="container"
-        placeholder="Upload container"
+        :placeholder="$t('message.encrypt.bucket_msg')"
       />
     </b-field>
     <b-field>
@@ -58,17 +58,21 @@
                 size="is-large"
               />
             </p>
-            <p>Drop files that will be encrypted and uploaded.</p>
+            <p>{{ $t('message.encrypt.drop_msg') }}</p>
           </div>
         </section>
       </b-upload>
     </b-field>
     <b-button
       type="is-success"
+      :disabled="noUpload"
       icon-left="upload"
       @click="encryptAndUpload"
     >
-      Encrypt and Upload
+      {{ $t('message.encrypt.enup').concat(
+        dropFiles.length,
+        $t('message.encrypt.enfiles'),
+      ) }}
     </b-button>
   </div>
 </template>
@@ -84,14 +88,54 @@ export default {
       container: "",
       passphrase: "",
       dropFiles: [],
+      noUpload: true,
     };
   },
   computed: {
     res() {
       return this.$store.state.resumableClient;
     },
+    isUploading() {
+      return this.$store.state.isUploading;
+    },
+  },
+  watch: {
+    container: function () {
+      this.$router.replace({
+        name: "EncryptedUpload",
+        params: {
+          "project": this.$route.params.project,
+          "container": this.container,
+        },
+      });
+      this.$route.params.container = this.container;
+      this.refreshNoUpload();
+    },
+    privkey: function () {
+      this.refreshNoUpload();
+    },
+    recvkeys: function () {
+      this.refreshNoUpload();
+    },
+    passphrase: function () {
+      this.refreshNoUpload();
+    },
+    dropFiles: function () {
+      this.refreshNoUpload();
+    },
+    ephemeral: function () {
+      this.refreshNoUpload();
+    },
+  },
+  created () {
+    this.setContainer();
   },
   methods: {
+    setContainer: function () {
+      if(this.$route.params.container) {
+        this.container = this.$route.params.container;
+      }
+    },
     encryptFiles: async function () {
       // Add keys to the filesystem
       FS.mkdir("/keys"); // eslint-disable-line
@@ -136,7 +180,7 @@ export default {
       this.$buefy.toast.open("Encrypting " + this.dropFiles.length + " files");
       this.encryptFiles().then(() => {
         this.$buefy.toast.open("Encryption successful.");
-        this.$store.commit("setAltContainer", this.container);
+        this.$store.commit("setAltContainer", this.$route.params.container);
         let files = [];
         for (let f of this.dropFiles) {
           let outname = "/data/" + f.name + ".c4gh";
@@ -151,6 +195,23 @@ export default {
         }
         this.res.addFiles(files, undefined);
       });
+    },
+    refreshNoUpload() {
+      if (this.ephemeral) {
+        this.noUpload = (
+          !this.recvkeys.length
+          || !this.container
+          || !this.dropFiles.length
+        );
+      } else {
+        this.noUpload (
+          !this.recvkeys.length
+            || !this.container
+            || !this.dropFiles.length
+            || !this.passphrase
+            || !this.privkey,
+        );
+      }
     },
   },
 };

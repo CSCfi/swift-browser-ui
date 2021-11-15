@@ -67,6 +67,19 @@
         <p class="control">
           <FolderUploadForm dropelement="container-table" />
         </p>
+        <p class="control">
+          <b-button
+            label="Upload Encrypted"
+            type="is-primary"
+            outlined
+            icon-left="lock"
+            tag="router-link"
+            :to="{name: 'EncryptedUpload', params: {
+              project: $route.params.project,
+              container: 'upload-'.concat(Date.now().toString()),
+            }}"
+          />
+        </p>
       </div>
     </b-field>
     <b-table

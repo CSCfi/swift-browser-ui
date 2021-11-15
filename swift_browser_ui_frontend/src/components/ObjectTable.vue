@@ -55,6 +55,19 @@
       </b-field>
       <div class="field has-addons uploadGroup">
         <p class="control">
+          <b-button
+            label="Upload Encrypted"
+            type="is-primary"
+            outlined
+            icon-left="lock"
+            tag="router-link"
+            :to="{name: 'EncryptedUpload', params: {
+              project: $route.params.project,
+              container: $route.params.container,
+            }}"
+          />
+        </p>
+        <p class="control">
           <FolderUploadForm dropelement="object-table" />
         </p>
         <p class="control">
