@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "monday"
     labels:
       - "pip dependencies"
@@ -12,7 +12,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/swift_browser_ui_frontend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "monday"
     labels:
       - "npm dependencies"
@@ -21,7 +21,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "monday"
     labels:
       - "github actions"
@@ -30,7 +30,7 @@ updates:
   - package-ecosystem: docker
     directory: "/dockerfiles"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "monday"
     labels:
       - "docker dependencies"
