@@ -107,10 +107,11 @@ class APITestClass(asynctest.TestCase):
         )
 
     async def test_list_without_containers(self):
-        """Test function list buckets on a project without object storage."""
+        """Test function list buckets on a project without containers."""
         self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(containers=0)
-        with self.assertRaises(HTTPNotFound):
-            _ = await swift_list_buckets(self.request)
+        response = await swift_list_buckets(self.request)
+        objects = json.loads(response.text)
+        self.assertEqual(objects, [])
 
     async def test_list_with_invalid_container(self):
         """Test function list objects with an invalid container id."""
