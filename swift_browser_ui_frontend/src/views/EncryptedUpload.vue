@@ -31,11 +31,21 @@
       />
     </b-field>
     <b-field :label="$t('message.encrypt.pubkey')">
-      <b-taginput
-        v-model="recvkeys"
+      <b-input
+        v-model="addRecvkey"
         :placeholder="$t('message.encrypt.pubkey_msg')"
         type="textarea"
+        maxlength="1024"
       />
+    </b-field>
+    <b-field>
+      <b-button
+        type="is-success"
+        icon-left="plus"
+        @click="appendPublicKey"
+      >
+        {{ $t("message.encrypt.addkey") }}
+      </b-button>
     </b-field>
     <b-field :label="$t('message.encrypt.bucket')">
       <b-input
@@ -63,6 +73,17 @@
         </section>
       </b-upload>
     </b-field>
+    <b-taglist>
+      <b-tag
+        v-for="item in recvkeys"
+        :key="item"
+        closable
+        type="is-info"
+        @close="recvkeys.splice(recvkeys.indexOf(item), 1)"
+      >
+        {{ item }}
+      </b-tag>
+    </b-taglist>
     <b-button
       type="is-success"
       :disabled="noUpload"
@@ -89,6 +110,7 @@ export default {
       passphrase: "",
       dropFiles: [],
       noUpload: true,
+      addRecvkey: "",
     };
   },
   computed: {
@@ -195,6 +217,10 @@ export default {
         }
         this.res.addFiles(files, undefined);
       });
+    },
+    appendPublicKey: function () {
+      this.recvkeys.push(this.addRecvkey);
+      this.addRecvkey = "";
     },
     refreshNoUpload() {
       if (this.ephemeral) {
