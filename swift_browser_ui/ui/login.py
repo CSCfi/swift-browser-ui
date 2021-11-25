@@ -5,6 +5,8 @@ import time
 import hashlib
 import json
 import re
+import base64
+import binascii
 
 # aiohttp
 import aiohttp.web
@@ -94,7 +96,13 @@ def test_token(
     if unscoped is None:
         raise aiohttp.web.HTTPBadRequest(reason="Token missing from query")
     if not (re.match("[a-f0-9]{32}", unscoped) and len(unscoped) == 32):
-        raise aiohttp.web.HTTPBadRequest(reason="Token is malformed")
+        try:
+            # Check the magic byte matches a fernet token
+            if not base64.urlsafe_b64decode(unscoped.encode("utf-8"))[:1] == b"\x80":
+                raise aiohttp.web.HTTPBadRequest(reason="Token is malformed")
+        # Handle failures in base64decode
+        except (binascii.Error, UnicodeDecodeError):
+            raise aiohttp.web.HTTPBadRequest(reason="Token is malformed")
 
     log.info("Got OS token in login return")
 
