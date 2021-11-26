@@ -55,7 +55,7 @@ the API during normal usage.
     Flowchart of the simplified API execute routes upon query.
 
 The api is documented in the api.yml file, that conforms to the OpenAPI
-specification (the file can be rendered with the `swagger editor <https://editor.swagger.io/>`_):
+specification (the file can be rendered with the `swagger editor <https://editor.swagger.io/?url=https://raw.githubusercontent.com/CSCfi/swift-browser-ui/master/docs/_static/api.yml>`_):
 
 .. literalinclude::  ./_static/api.yml
     :language: yaml
