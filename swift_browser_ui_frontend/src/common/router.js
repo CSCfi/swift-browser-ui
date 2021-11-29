@@ -40,7 +40,7 @@ export default new Router({
       component: SharingView,
     },
     {
-      path: "/browse/container/add",
+      path: "/browse/:user/:project/:container/add",
       name: "AddContainer",
       component: CreateContainer,
     },
