@@ -7,11 +7,9 @@
     target="_blank"
     :inverted="inverted"
     disabled
+    icon-left="download"
   >
-    <b-icon
-      icon="download"
-      size="is-small"
-    /> {{ $t('message.downloadContainer') }}
+    {{ $t('message.downloadContainer') }}
   </b-button>
   <b-button
     v-else
@@ -21,11 +19,9 @@
     target="_blank"
     :inverted="inverted"
     :href="download_link"
+    icon-left="download"
   >
-    <b-icon
-      icon="download"
-      size="is-small"
-    /> {{ $t('message.downloadContainer') }}
+    {{ $t('message.downloadContainer') }}
   </b-button>
 </template>
 

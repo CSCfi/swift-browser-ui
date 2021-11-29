@@ -7,11 +7,9 @@
       outlined
       disabled
       :inverted="inverted"
+      icon-left="content-copy"
     >
-      <b-icon
-        icon="content-copy"
-        size="is-small"
-      /> {{ $t('message.copy') }}
+      {{ $t('message.copy') }}
     </b-button>
     <b-button
       v-else
@@ -19,11 +17,9 @@
       outlined
       :inverted="inverted"
       disabled
+      icon-left="content-copy"
     >
-      <b-icon
-        icon="content-copy"
-        size="is-small"
-      /> {{ $t('message.copy') }}
+      {{ $t('message.copy') }}
     </b-button>
   </div>
   <div v-else>
@@ -33,6 +29,7 @@
       size="is-small"
       outlined
       :inverted="inverted"
+      icon-left="content-copy"
       @click="$router.push({
         name: 'ReplicateContainer',
         params: {
@@ -41,16 +38,14 @@
         }
       })"
     >
-      <b-icon
-        icon="content-copy"
-        size="is-small"
-      /> {{ $t('message.copy') }}
+      {{ $t('message.copy') }}
     </b-button>
     <b-button
       v-else
       type="is-primary"
       outlined
       :inverted="inverted"
+      icon-left="content-copy"
       @click="$router.push({
         name: 'ReplicateContainer',
         params: {
@@ -59,10 +54,7 @@
         }
       })"
     >
-      <b-icon
-        icon="content-copy"
-        size="is-small"
-      /> {{ $t('message.copy') }}
+      {{ $t('message.copy') }}
     </b-button>
   </div>
 </template>

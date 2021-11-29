@@ -179,11 +179,9 @@
                 outlined
                 size="is-small"
                 tag="a"
+                icon-left="download"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
               </b-button>
               <b-button
                 v-else-if="allowLargeDownloads"
@@ -195,11 +193,9 @@
                 outlined
                 size="is-small"
                 tag="a"
+                icon-left="download"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
               </b-button>
               <b-button
                 v-else
@@ -209,12 +205,10 @@
                 :inverted="props.row === selected ? true : false"
                 size="is-small"
                 tag="a"
+                icon-left="download"
                 @click="confirmDownload ()"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
               </b-button>
             </p>
           </div>
