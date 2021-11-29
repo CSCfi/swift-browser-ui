@@ -13,7 +13,7 @@ setuptools.setup(
     license="MIT",
     install_requires=[
         "aiohttp==3.8.1",
-        "python-swiftclient==3.12.0",
+        "python-swiftclient==3.13.0",
         "cryptography==36.0.0",
         "keystoneauth1==4.4.0",
         "click==8.0.3",
