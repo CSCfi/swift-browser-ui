@@ -1,0 +1,1329 @@
+openapi: "3.0.3"
+info:
+  title: "Swift Browser UI"
+  description: "API for querying Openstack Swift as well as working with Openstack Swift ACLs in order to enable sharing action."
+  version: "1.1.0"
+  license:
+    name: MIT
+tags:
+  - name: Frontend 
+    description: Endpoints for sharing request "Filtered proxied API from Openstack Swift used for a browser application"
+  - name: Sharing Request 
+    description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL share action request information."
+  - name: Sharing Account 
+    description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL information"
+  - name: Upload/Download 
+    description: Endpoints for uploading and downloading buckets/objects
+  
+paths:
+  /health:
+    get:
+      tags:
+        - Sharing Request
+        - Sharing Account
+        - Frontend
+      summary: health API
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+  /request/user/{user}/{container}:
+    post:
+      tags:
+        - Sharing Request 
+      summary: Publish a new request for access to a container
+      parameters:
+      - name: user
+        in: path
+        description: The user that's requesting access
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: container
+        in: path
+        description: The container that the access is requested to
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: owner
+        in: query
+        description: The container owner that the access is requested from.
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewRequest"
+    delete:
+      tags:
+        - Sharing Request 
+      summary: Delete an existing request for access
+      parameters:
+      - name: user
+        in: path
+        description: The user that originally requested access
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: container
+        in: path
+        description: The container that the access was requested to
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: owner
+        in: query
+        description: The container owner that the access was requeted from.
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+                schema:
+                  type: string
+                  example: OK
+    options:
+      tags:
+        - Sharing Request 
+      summary: Handle preflight for existing request for access
+      parameters:
+      - name: user
+        in: path
+        description: The user that originally requested access
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: container
+        in: path
+        description: The container that the access was requested to
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: owner
+        in: query
+        description: The container owner that the access was requeted from.
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          headers:
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: POST, OPTIONS, DELETE
+            Access-Control-Max-Age:
+              schema:
+                type: string
+                example: 84600
+  /request/user/{user}:
+    get:
+      tags:
+        - Sharing Request 
+      summary: List container share requests made by a user.
+      parameters:
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Requests"
+  /request/owner/{user}:
+    get:
+      tags:
+        - Sharing Request 
+      summary: List the requests owned by the user (made for the user).
+      parameters:
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Requests"
+  /request/container/{container}:
+    get:
+      tags:
+        - Sharing Request 
+      summary: List share requests made for a container.
+      parameters:
+      - name: container
+        in: path
+        description: The container queried for
+        required: true
+        schema:
+          type: string
+          example: test-container
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContainerRequests"
+  
+  /access/{user}:
+    get:
+      tags:
+        - Sharing Account 
+      summary: List container names that have been shared to the user.
+      parameters:
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HasAccess"
+        400:
+          description: Client Error
+  /access/{user}/{container}:
+    get:
+      tags:
+        - Sharing Account 
+      summary: Get details of a container that has been shared to the user.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be queried.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: path
+        description: The user querying
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: owner
+        in: query
+        description: The container owner
+        required: true
+        schema:
+          type: string
+          example: AUTH_otherexample
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDetails"
+        400:
+          description: Client Error
+  /share/{owner}:
+    get:
+      tags:
+        - Sharing Account 
+      summary: List container names that the user has shared to someone else.
+      parameters:
+      - name: owner
+        in: path
+        description: The user requesting the shared container listing.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GaveAccess"
+        400:
+          description: Client Error
+  /share/{owner}/{container}:
+    get:
+      tags:
+        - Sharing Account 
+      summary: Get details of a container that the user has shared.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be queried.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: owner
+        in: path
+        description: The user that is requesting the sharing details.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    post:
+      tags:
+        - Sharing Account 
+      summary: Give user / users access rights on a specified container.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be shared.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is shared to.
+        required: true
+        schema:
+          type: string
+          example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
+      - name: access
+        in: query
+        description: The access types to be granted.
+        required: true
+        schema:
+          type: string
+          example: "r,l,w"
+      - name: owner
+        in: path
+        description: The owner of the container to be shared.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      - name: address
+        in: query
+        description: The address of the container to be shared.
+        required: true
+        schema:
+          type: string
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    patch:
+      tags:
+        - Sharing Account 
+      summary: Edit specified user's access rights on a specified container.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be edited.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is shared to.
+        required: true
+        schema:
+          type: string
+          example: "AUTH_user1,AUTH_user2,AUTH_user3,AUTH_user4"
+      - name: access
+        in: query
+        description: The access types to be granted.
+        required: true
+        schema:
+          type: string
+          example: "r,l,w"
+      - name: owner
+        in: path
+        description: The owner of the container to be edited.
+        required: true
+        schema:
+          type: string
+          example: AUTH_example
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SharedDetails"
+        400:
+          description: Client Error
+    delete:
+      tags:
+        - Sharing Account 
+      summary: Revoke specified access to container from the user/users specified in the query.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be revoked.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is revoked from.
+        required: true
+        schema:
+          type: string
+          example: "user1,user2,user3,user4"
+      - name: owner
+        in: path
+        description: The owner of the shared container.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        204:
+          description: OK
+        404:
+          description: Not Found
+        400:
+          description: Client Error
+    options:
+      tags:
+        - Sharing Account 
+      summary: Serve correct response headers to allowed DELETE preflight query.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be revoked.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: user
+        in: query
+        description: The user / users that the container is revoked from.
+        required: true
+        schema:
+          type: string
+          example: "user1,user2,user3,user4"
+      - name: owner
+        in: path
+        description: The owner of the shared container.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          headers:
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: POST, OPTIONS, DELETE
+            Access-Control-Max-Age:
+              schema:
+                type: string
+                example: 84600
+  
+  /token/{project}/{id}:
+    post:
+      tags:
+        - Sharing Account
+        - Sharing Request
+      summary: Add a token to the user.
+      parameters:
+      - name: project
+        in: path
+        description: The project where the token is to be added.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: id
+        in: path
+        description: The id of the token.
+        required: true
+        schema:
+          type: string
+          example: "id1"
+      responses:
+        200:
+          description: OK
+    delete:
+      tags:
+        - Sharing Account
+        - Sharing Request
+      summary: Delete a token to the user.
+      parameters:
+      - name: project
+        in: path
+        description: The project where the token is to be added.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: id
+        in: path
+        description: The id of the token.
+        required: true
+        schema:
+          type: string
+          example: "id1"
+      responses:
+        200:
+          description: OK
+    options:
+      tags:
+        - Sharing Account
+        - Sharing Request
+      summary: Serve correct response headers to allowed DELETE preflight query.
+      parameters:
+      - name: project
+        in: path
+        description: The project where the token is to be revoked.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: id
+        in: path
+        description: The id of the token.
+        required: true
+        schema:
+          type: string
+          example: "id1"
+      responses:
+        200:
+          description: OK
+          headers:
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: POST, OPTIONS, DELETE
+            Access-Control-Max-Age:
+              schema:
+                type: string
+                example: 84600
+  /token/{project}:
+    get:
+      tags:
+        - Sharing Account
+        - Sharing Request
+      summary: Handle call for listing API tokens.
+      parameters:
+      - name: project
+        in: path
+        description: The project where the token is to be revoked.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['id1']
+  /api/username:
+    get:
+      tags:
+        - Frontend 
+      summary: Get Openstack username for the authenticated user.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Username'
+        403:
+          description: Unauthorized
+  /api/projects:
+    get:
+      tags:
+        - Frontend 
+      summary: Get Openstack projects available for the authenticated user.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+        403:
+          description: Unauthorized
+  /api/project/active:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the project that the user currently has active.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        403:
+          description: Unauthorized
+  /api/project/acl:
+    get:
+      tags:
+        - Frontend 
+      summary: Fetch a compilation of ACL information for sharing discovery.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectAcl'
+        403:
+          description: Unauthorized
+          
+  /api/project/address:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the project specific object storage address.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: http://endpoint
+        403:
+          description: Unauthorized
+  /api/project/meta:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the filtered project metadata for the currently active project.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMeta'
+        403:
+          description: Unauthorized
+  /api/buckets:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the listing for containers in the currently active project.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Containers'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/bucket/objects:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the listing for objects in a given container.
+      parameters:
+      - name: bucket
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Objects'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+          
+  /api/bucket/meta:
+    get:
+      tags:
+        - Frontend 
+      summary: Get container metadata.
+      parameters:
+      - name: container
+        in: query
+        description: The container the metadata of which is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meta'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/bucket/object/meta:
+    get:
+      tags:
+        - Frontend 
+      summary: Get object(s) metadata.
+      parameters:
+      - name: container
+        in: query
+        description: The container in which the queried objects are.
+        schema:
+          type: string
+          example: test-container-1
+      - name: object
+        in: query
+        description: The comma separated list of objects, the metadata of which is to be queried. (if querying metadata)
+        schema:
+          type: string
+          example: test-object-1,test-object-2,test-object-3
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meta'
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/shared/objects:
+    get:
+      tags:
+        - Frontend 
+      summary: Get the listing for objects in a known shared container.
+      parameters:
+      - name: container
+        in: query
+        description: The container that is to be queried.
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Objects"
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /api/object/dload:
+    get:
+      tags:
+        - Frontend 
+      summary: Download the object specified in the download link.
+      parameters:
+      - name: bucket
+        in: query
+        description: The container from which to download
+        schema:
+          type: string
+          example: test-container-1
+      - name: objkey
+        in: query
+        description: The object key that is to be queried.
+        schema:
+          type: string
+          example: example-object-name
+      responses:
+        302:
+          description: OK
+        403:
+          description: Unauthorized
+        404:
+          description: Not Found
+  
+  /api/containers/{container}:
+    put:
+      tags:
+        - Frontend
+      summary: Create a new container according to the name specified.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be created.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        201:
+          description: Created
+        400:
+          description: Invalid container name
+        409:
+          description: Container name in use
+    delete:
+      tags:
+        - Frontend
+      summary: Delete an empty container.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be deleted.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        204:
+          description: No Content
+        500:
+          description: Container deletion failure
+          
+  /api/access/{container}:
+    post:
+      tags:
+        - Frontend
+      summary: Add access for a project in container acl.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        201:
+          description: Created
+          
+    delete:
+      tags:
+        - Frontend
+      summary: Remove all allowed projects from container acl.
+      parameters:
+      - name: container
+        in: path
+        description: The container that is to be deleted.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          
+  /token/{id}:
+    get:
+      tags:
+        - Frontend
+      summary: Handle call for an API token create.
+      parameters:
+      - name: id
+        in: path
+        description: The id of the token to be created.
+        required: true
+        schema:
+          type: string
+          example: token_id
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+    delete:
+      tags:
+        - Frontend
+      summary: Handle call for an API token delete.
+      parameters:
+      - name: id
+        in: path
+        description: The id that is to be deleted.
+        required: true
+        schema:
+          type: string
+          example: token_id
+      responses:
+        204:
+          description: No Content
+
+  /token:
+    get:
+      tags:
+        - Frontend
+      summary: Handle call for listing API tokens.
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ['11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111']
+
+
+  /{project}/{container}/{object_name}:
+    get:
+      tags:
+        - Upload/Download
+      summary: Request for getting object content.
+      parameters:
+      - name: project
+        in: path
+        description: The project name.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: container
+        in: path
+        description: The container name.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      - name: object_name
+        in: path
+        description: The object name.
+        required: true
+        schema:
+          type: string
+          example: test-object_name-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                
+  /{project}/{container}:
+    post:
+      tags:
+        - Upload/Download
+      summary: Handle request for posting an object chunk.
+      parameters:
+      - name: project
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: container
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        201:
+          description: Created
+        200:
+          description: OK
+    get:
+      tags:
+        - Upload/Download
+      summary: Handle request for getting container contents as an archive.
+      parameters:
+      - name: project
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: container
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          content:
+            application/x-tar:
+              schema:
+                type: string
+                format: binary
+    options:
+      tags:
+        - Upload/Download
+      summary: Handle request for getting object content.
+      parameters:
+      - name: project
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-project-1
+      - name: container
+        in: path
+        description: The container that is to be added acls to.
+        required: true
+        schema:
+          type: string
+          example: test-container-1
+      responses:
+        200:
+          description: OK
+          headers:
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+                example: POST, OPTIONS, GET
+            Access-Control-Max-Age:
+              schema:
+                type: string
+                example: 84600
+components:
+  schemas:
+
+    NewRequest:
+      type: object
+      properties:
+        user:
+          type: string
+          description: The user requesting access
+          example: AUTH_example
+        container:
+          type: string
+          description: The container the access is requested for
+          example: test-container
+        owner:
+          type: string
+          description: The owner that the access is requested from
+          example: AUTH_example
+        date:
+          type: string
+          description: The date the request was posted
+          example: "2012-04-23T18:25:43.511Z"
+
+    ListedRequest:
+      type: object
+      properties:
+        user:
+          type: string
+          description: The user requesting access
+          example: AUTH_example
+        container:
+          type: string
+          description: The container the access is requested for
+          example: test-container
+        owner:
+          type: string
+          description: The owner that the access is requested from
+          example: AUTH_example
+        date:
+          type: string
+          description: The date the request was posted
+          example: "2012-04-23T18:25:43.511Z"
+
+    Requests:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedRequest"
+
+    ContainerRequests:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedRequest"
+        
+    ListedContainer:
+      type: object
+      properties:
+        container:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+
+    DetailedContainer:
+      type: object
+      properties:
+        container:
+          type: string
+          description: The container name.
+          example: test-container-1
+        owner:
+          type: string
+          description: The real owner of the container.
+          example: AUTH_example
+        shared:
+          type: string
+          description: The user the container was shared to.
+          example: AUTH_otherexample
+        address:
+          type: string
+          description: The URL of the container.
+          example: "https://example-obj-store.os-example.com:443/swift/v1/AUTH_example/test-container-1"
+        rights:
+          type: string
+          description: The rights that the user has / was given to.
+
+    HasAccess:
+      type: array
+      items:
+        $ref: "#/components/schemas/ListedContainer"
+
+    GetDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
+
+    GaveAccess:
+      type: array
+      items:
+        type: string
+
+    SharedDetails:
+      type: array
+      items:
+        $ref: "#/components/schemas/DetailedContainer"
+        
+    Username:
+      type: string
+      example: test_user_name
+      description: Openstack username that's authenticated for the session cookie.
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          example: placeholder_openstack_project_id
+          description: Unique ID for identifying the exact project to Openstack.
+        name:
+          type: string
+          example: placeholcer_openstack_project_name
+          description: Projct name, also used for parsing the project URL for e.g. using the object storage
+
+    Projects:
+      type: array
+      items:
+        $ref: '#/components/schemas/Project'
+
+    ProjectMeta:
+      type: object
+      properties:
+        Account:
+          type: string
+          example: AUTH_placeholder_openstack_project_name
+          description: The account used for the project object storage in the currently active project (this is different from the Openstack account)
+        Containers:
+          type: integer
+          example: 10
+          description: The amount of containers in the currently active project.
+        Objects:
+          type: integer
+          example: 200
+          description: The amount of objects in the currently active project.
+        Bytes:
+          type: integer
+          example: 4294967296
+          description: The total amount of storage usage in bytes for the currently active project.
+    
+    ProjectAcl:
+      type: object
+      properties:
+        address: 
+          type: string
+          example: host
+        access:
+          type: object
+          example:
+            containerName1: 
+              ownerID1: 
+                read: "*"
+                write: "*"
+            containerName2:
+               ownerID2: 
+                read: "*"
+            
+    Container:
+      type: object
+      properties:
+        name:
+          type: string
+          example: test-container-1
+          description: The unique container name, that is used for identifying the container and creating the container URL.
+        count:
+          type: integer
+          example: 10
+          description: The amount of objects in the container.
+        bytes:
+          type: integer
+          example: 4294967296
+          description: The amount of storage used by the objects in the container.
+
+    Containers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Container'
+
+    SwiftObject:
+      type: object
+      properties:
+        hash:
+          type: string
+          example: Picture an example ETag here
+          description: The object hash
+        name:
+          type: string
+          example: example-object
+          description: The unique object name, also used for parsing the object URL.
+        last_modified:
+          type: string
+          example: "2019-08-02T11:07:48.979100"
+          description: The date of last modification for the object
+        bytes:
+          type: integer
+          example: 2048
+          description: The object size in bytes
+        content_type:
+          type: string
+          example: binary/octet-stream
+          description: The object content type.
+
+    Objects:
+      type: array
+      items:
+        $ref: '#/components/schemas/SwiftObject'
+
+    SSSMeta:
+      type: object
+      properties:
+        atime:
+          type: string
+          example: 1536648772
+          description: Time of object addition.
+        gname:
+          type: string
+          example: example-object-name
+          description: S3 generated object name.
+
+    MetaItem:
+      type: object
+      properties:
+        example-metadata:
+          type: string
+          example: example-metadata
+          description: Example metadata key-value pair, there can be an arbitrary amount of keys-value pairs present.
+        s3cmd-attrs:
+          type: object
+          example:
+            $ref: '#/components/schemas/SSSMeta'
+          description: Amazon S3 client created metadata, if that's present.
+
+    Meta:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetaItem'
+        
+    Health:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          example: "Ok"
+        degraded:
+          type: array
+          items:
+            type: string
+            example: database
+        services:
+          type: object
+          required:
+          - status
+          properties:
+            status:
+              type: string
+              example: "Ok"
+            degraded:
+              type: array
+              items:
+                type: string
+                example: database
+        performance:
+          type: object
+          required:
+          - status
+          properties:
+            status:
+              type: string
+              example: "Ok"
+            degraded:
+              type: array
+              items:
+                type: string
+                example: database
+
