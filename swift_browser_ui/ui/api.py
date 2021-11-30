@@ -749,7 +749,7 @@ async def remove_project_container_acl(
 
     # Remove specific project form both ACLs
     read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
-    read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
+    write_acl = write_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
 
     meta_options = {
         "read_acl": read_acl,
