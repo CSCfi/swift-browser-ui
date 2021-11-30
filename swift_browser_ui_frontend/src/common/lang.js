@@ -63,6 +63,7 @@ let default_translations = {
         created: "Created",
         folderDetails: "No details for folders",
         clearChecked: "Clear checked",
+        showTags: "Display tags",
       },
       discover: {
         sync_shares: "Synchronize shared buckets",
@@ -185,12 +186,15 @@ let default_translations = {
       copy: " Copy",
       create: "Create",
       delete: "Delete",
+      edit: "Edit",
+      save: "Save",
       createContainerButton: "Create Bucket",
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
       container_ops: {
         addContainer: "Add a new bucket",
+        editContainer: "Editing bucket: ",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage: "Are you sure you want to delete this " +
                               "bucket?",
@@ -199,6 +203,8 @@ let default_translations = {
         containerMessage: "The name of the new bucket",
         fullDelete: "Deleting a bucket with contents requires deleting " +
                     "all objects inside it first.",
+        tagName: "Tags",
+        tagMessage: "Press enter to add.",
       },
       objects: {
         deleteConfirm: "Delete Objects",
@@ -286,6 +292,7 @@ let default_translations = {
         created: "Luotu",
         folderDetails: "Ei yksityiskohtia kansioille",
         clearChecked: "Poista valinnat",
+        showTags: "Näytä Tägit",
       },
       discover: {
         sync_shares: "Synkronoi jaetut säiliöt",
@@ -409,18 +416,23 @@ let default_translations = {
       copy: " Kopioi",
       create: "Luo",
       delete: "Poista",
+      edit: "Muokkaa",
+      save: "Tallenna",
       createContainerButton: "Luo säiliö",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
       container_ops: {
         addContainer: "Luo uusi säiliö",
+        editContainer: "Muokataan säiliötä: ",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
         containerName: "Säiliö",
         containerMessage: "Uuden säiliön nimi",
         fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
+        tagName: "Tägit",
+        tagMessage: "Paina 'enter' lisätäksesi.",
       },
       objects: {
         deleteConfirm: "Poista objektit",

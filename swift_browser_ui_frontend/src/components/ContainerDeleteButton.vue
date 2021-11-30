@@ -55,7 +55,7 @@ export default {
         type: "is-success",
       });
       swiftDeleteContainer(this.container).then(() => {
-        this.$store.commit("updateContainers");
+        this.$store.dispatch("updateContainers");
       });
     },
   },

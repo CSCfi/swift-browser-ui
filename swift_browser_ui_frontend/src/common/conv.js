@@ -1,3 +1,8 @@
+
+import {
+  getBucketMeta,
+} from "./api";
+
 export default function getLangCookie () {
   let matches = document.cookie.match(new RegExp(
     "(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)",
@@ -50,4 +55,14 @@ export function getHumanReadableSize (val) {
       break;
   }
   return ret;
+}
+
+export async function getTagsForContainer(containerName) {
+  let tags = [];
+  await getBucketMeta(containerName).then(meta => {
+    if ("usertags" in meta[1]) {
+      tags = meta[1]["usertags"].split(";");
+    }
+  });
+  return tags;
 }

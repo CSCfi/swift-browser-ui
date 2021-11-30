@@ -84,11 +84,20 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
         request.app["Log"].info(
             f"API call for container creation from {request.remote}, sess {session}"
         )
+
+        req_json = await request.json()
+        tags = req_json.get("tags", None)
+
+        headers = {}
+        if tags:
+            headers["X-Container-Meta-UserTags"] = tags
+
         # Shamelessly use private methods from SwiftService to avoid writing
         # own implementation
         res = request.app["Sessions"][session]["ST_conn"]._create_container_job(
-            get_conn(request.app["Sessions"][session]["ST_conn"]._options),
-            request.match_info["container"],
+            conn=get_conn(request.app["Sessions"][session]["ST_conn"]._options),
+            container=request.match_info["container"],
+            headers=headers,
         )
     except (SwiftError, ClientException):
         request.app["Log"].error("Container creation failed.")
@@ -525,6 +534,29 @@ async def get_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Respo
     }
 
     return aiohttp.web.json_response([ret["container"], ret["headers"]])
+
+
+async def update_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Update metadata for a container."""
+    session = api_check(request)
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    # Get required variables from query string
+    container = request.query.get("container", "") or None
+    meta = await request.json()
+
+    meta = [(key, value) for key, value in meta.items()]
+
+    conn = request.app["Sessions"][session]["ST_conn"]
+    ret = conn.post(container=container, options={"meta": meta})
+
+    if not ret["success"]:
+        raise aiohttp.web.HTTPNotFound
+
+    return aiohttp.web.HTTPNoContent()
 
 
 async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:

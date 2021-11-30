@@ -44,6 +44,7 @@ from swift_browser_ui.ui.api import (
     swift_upload_object_chunk,
     swift_check_object_chunk,
     swift_replicate_container,
+    update_metadata_bucket,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
@@ -158,6 +159,7 @@ async def servinit() -> aiohttp.web.Application:
             aiohttp.web.get("/api/projects", os_list_projects),
             aiohttp.web.get("/api/project/active", get_os_active_project),
             aiohttp.web.get("/api/bucket/meta", get_metadata_bucket),
+            aiohttp.web.post("/api/bucket/meta", update_metadata_bucket),
             aiohttp.web.get("/api/bucket/object/meta", get_metadata_object),
             aiohttp.web.get("/api/project/meta", get_project_metadata),
             aiohttp.web.get("/api/project/acl", get_access_control_metadata),
