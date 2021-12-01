@@ -62,8 +62,8 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                :to="{name: 'Dashboard', params: {user: uname}}"
-                :class="!($route.name == 'Dashboard') ? 
+                :to="{name: 'DashboardView', params: {user: uname}}"
+                :class="!($route.name == 'DashboardView') ? 
                   'button is-primary is-outlined' : 
                   'button is-primary has-text-light'"
               >
@@ -74,10 +74,10 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                :to="{name: 'Containers',
+                :to="{name: 'ContainersView',
                       params: {user: uname, project: active.name}}"
-                :class="!($route.name == 'Containers'
-                  || $route.name == 'Objects') ? 
+                :class="!($route.name == 'ContainersView'
+                  || $route.name == 'ObjectsView') ? 
                   'button is-primary is-outlined' : 
                   'button is-primary has-text-light'"
               >

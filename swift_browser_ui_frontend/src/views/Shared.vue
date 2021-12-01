@@ -37,7 +37,7 @@ import RequestSharing from "@/components/RequestSharing";
 import ShareRequests from "@/components/ShareRequests";
 
 export default {
-  name: "Shared",
+  name: "SharedView",
   components: {
     SharedTable,
     SharedOutTable,

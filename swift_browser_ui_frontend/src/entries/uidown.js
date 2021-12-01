@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "@/pages/Index.vue";
+import App from "@/pages/IndexPage.vue";
 import Buefy from "buefy";
 import VueI18n from "vue-i18n";
 

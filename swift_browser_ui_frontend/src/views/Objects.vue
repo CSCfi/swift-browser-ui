@@ -8,7 +8,7 @@
 import ObjectTable from "@/components/ObjectTable";
 
 export default {
-  name: "Objects",
+  name: "ObjectsView",
   components: {ObjectTable},
 };
 </script>

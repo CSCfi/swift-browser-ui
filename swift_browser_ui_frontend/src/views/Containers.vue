@@ -189,7 +189,7 @@
                 size="is-small"
                 inverted
                 @click="$router.push({
-                  name: 'Sharing',
+                  name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
@@ -204,7 +204,7 @@
                 outlined
                 size="is-small"
                 @click="$router.push({
-                  name: 'Sharing',
+                  name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
@@ -274,7 +274,7 @@ import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
 
 export default {
-  name: "Containers",
+  name: "ContainersView",
   components: {
     FolderUploadForm,
     ContainerDownloadLink,

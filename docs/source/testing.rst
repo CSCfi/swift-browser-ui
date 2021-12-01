@@ -43,13 +43,3 @@ and the tests are developed for both Firefox and Chrome web browsers.
     $ cd  ..
     $ npm install cypress
     $ npx cypress open
-
-UI Screenshots
-~~~~~~~~~~~~~~
-
-We provide an utility for generating UI screenshots based on the functions
-implemented in the UI testing scenarios. The utility can be run using:
-
-.. code-block:: console
-
-    $ python -m tests.ui.ui_take_screenshots

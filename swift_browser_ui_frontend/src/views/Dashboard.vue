@@ -120,7 +120,7 @@
                 type="is-primary"
                 outlined
                 @click="$router.push({
-                  name: 'Tokens',
+                  name: 'TokensView',
                   params: {
                     project: $store.state.active.id
                   }
@@ -140,7 +140,7 @@
 import { getProjectMeta } from "@/common/api";
 
 export default {
-  name: "Dashboard",
+  name: "DashboardView",
   // The view for the application user page for showing the user
   // information in a bit more detail. Shows e.g. the storage
   // expenditure and the billing unit (BU) usage caused by that.

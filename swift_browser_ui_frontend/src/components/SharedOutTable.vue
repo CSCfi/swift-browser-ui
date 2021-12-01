@@ -35,7 +35,7 @@
             type="is-primary"
             outlined
             @click="$router.push({
-              name: 'Sharing'
+              name: 'SharingView'
             })"
           >
             {{ $t('message.share.new_share_button') }}

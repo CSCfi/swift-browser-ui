@@ -51,7 +51,7 @@
 
 <script>
 export default {
-  name: "Sharing",
+  name: "SharingView",
   props: ["container"],
   data () {
     return {

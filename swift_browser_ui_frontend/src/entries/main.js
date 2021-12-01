@@ -1,13 +1,12 @@
 // Project main imports
 import Vue from "vue";
-import App from "@/pages/Browser.vue";
+import App from "@/pages/BrowserPage.vue";
 import Buefy from "buefy";
 import router from "@/common/router";
 import VueI18n from "vue-i18n";
 
 // Project Vue components
 import BrowserNavbar from "@/components/BrowserNavbar.vue";
-import BreadcrumbListElement from "@/components/Breadcrumb.vue";
 
 // Project JS functions
 import getLangCookie from "@/common/conv";
@@ -17,7 +16,7 @@ import { getProjects } from "@/common/api";
 import getActiveProject from "@/common/api";
 import { changeProjectApi } from "@/common/api";
 
-// Import Sharing and Request API
+// Import SharingView and Request API
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
@@ -49,7 +48,6 @@ new Vue({
   store,
   components: {
     BrowserNavbar,
-    BreadcrumbListElement,
     ProgressBar,
   },
   computed: {
@@ -267,7 +265,7 @@ new Vue({
       
       retl.push({
         alias: this.$store.state.uname,
-        address: {name: "Dashboard"},
+        address: {name: "DashboardView"},
       });
 
       if (this.$route.params.project != undefined) {
@@ -281,7 +279,7 @@ new Vue({
           retl.push({
             alias: this.$t("message.containers")
                    + this.$store.state.active.name,
-            address: {name: "Containers"},
+            address: {name: "ContainersView"},
           });
         }
       }
@@ -289,7 +287,7 @@ new Vue({
       if (this.$route.params.container != undefined) {
         retl.push({
           alias: this.$route.params.container,
-          address: {name: "Objects"},
+          address: {name: "ObjectsView"},
         });
       }
 
