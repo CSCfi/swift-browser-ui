@@ -20,52 +20,52 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/browse/sharing/to/:project",
+      path: "/browse/:user/:project/sharing/to",
       name: "SharedTo",
       component: SharedTo,
     },
     {
-      path: "/browse/sharing/from/:project",
+      path: "/browse/:user/:project/sharing/from",
       name: "SharedFrom",
       component: SharedFrom,
     },
     {
-      path: "/browse/sharing/requests/:project",
+      path: "/browse/:user/:project/sharing/requests",
       name: "ShareRequests",
       component: ShareRequests,
     },
     {
-      path: "/browse/sharing/share",
+      path: "/browse/:user/:project/sharing/share",
       name: "SharingView",
       component: SharingView,
     },
     {
-      path: "/browse/container/add",
+      path: "/browse/:user/:project/add",
       name: "AddContainer",
       component: CreateContainer,
     },
     {
-      path: "/browse/sharing/requestdirect",
+      path: "/browse/:user/:project/sharing/requestdirect",
       name: "DirectRequest",
       component: DirectRequest,
     },
     {
-      path: "/browse/sharing/sharedirect",
+      path: "/browse/:user/:project/sharing/sharedirect",
       name: "DirectShare",
       component: DirectShare,
     },
     {
-      path: "/browse/shared/:project/:owner/:container",
+      path: "/browse/:user/:project/:container/shared/:owner",
       name: "SharedObjects",
       component: SharedObjects,
     },
     {
-      path: "/browse/replicate/:project/:container",
+      path: "/browse/:user/:project/:container/replicate",
       name: "ReplicateContainer",
       component: ReplicationView,
     },
     {
-      path: "/browse/tokens/:project",
+      path: "/browse/:user/:project/tokens",
       name: "TokensView",
       component: TokensView,
     },
