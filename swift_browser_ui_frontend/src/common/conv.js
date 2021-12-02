@@ -34,6 +34,26 @@ function check_duplicate(container, share, currentdetails) {
   } return false;
 }
 
+function check_acl_mismatch(acl_cur, acl_sharing) {
+  // Check if the ACLs mismatch
+  if (
+    !(("read" in acl_sharing) && acl_cur.access.includes("r"))
+    || !(("write" in acl_sharing) && acl_cur.access.includes("w"))
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function check_stale(detail, access) {
+  // Check if access detail entry has become stale
+  if (!(detail.sharedTo in access)) {
+    return true; // is stale
+  }
+  // Additionally check ACL mismatch
+  return check_acl_mismatch(detail, access[detail.sharedTo]);
+}
+
 export async function syncContainerACLs(client, project) {
   let acl = await getAccessControlMeta();
 
@@ -41,31 +61,41 @@ export async function syncContainerACLs(client, project) {
   let aclmeta = acl.access;
   let currentsharing = await client.getShare(project);
 
-  // Delete stale shared access entries from the database
-  console.log(currentsharing);
+  // Delete stale shared container access entries from the database
   for (let container of currentsharing) {
-    console.log("checking container existence for ", container);
-    console.log(aclmeta);
-    console.log("compare: ", !(Object.keys(aclmeta).includes(container)));
     if (!(Object.keys(aclmeta).includes(container))) {
-      console.log("container", container, " no longer exists, removing");
       let resp = await client.shareContainerDeleteAccess(
         project,
         container,
       );
-      if (resp) {
-        console.log("container access deletion successful");
-      } else {
-        console.log("container access deletion failed");
+      if (!resp) {
+        console.log("Container access deletion failed");
       }
     } else {
       continue;
     }
   }
 
-  // sync new shares into the sharing database
+  // Refresh current sharing information
+  currentsharing = await client.getShare(project);
+  // Prune stale shared user access entries from the database
+  for (let container of currentsharing) {
+    let containerDetails = await client.getShareDetails(project, container);
+    for (let detail of containerDetails) {
+      if(check_stale(detail, aclmeta[container])) {
+        await client.shareDeleteAccess(
+          project,
+          container,
+          [detail.sharedTo],
+        );
+      }
+    }
+  }
+
+  // Refresh current sharing information
+  currentsharing = await client.getShare(project);
+  // Sync potential new shares into the sharing database
   for (let container of Object.keys(aclmeta)) {
-    console.log("adding new containers per ACL listing");
     let currentdetails = [];
     if (currentsharing.includes(container)) {
       currentdetails = await client.getShareDetails(
