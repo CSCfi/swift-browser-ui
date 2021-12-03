@@ -1,5 +1,8 @@
 module.exports = {  // eslint-disable-line
   publicPath: "/static",
+  devServer: {
+    proxy: "http://localhost:8080",
+  },
   pages: {
     index: {
       entry: "src/entries/index.js",

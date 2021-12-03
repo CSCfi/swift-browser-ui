@@ -138,6 +138,59 @@ def start(
         run_server_secure(servinit(), ssl_cert_file, ssl_cert_key)
 
 
+@cli.command("shell", short_help="Run a shell in the app context.")
+def shell_command() -> None:
+    """Run an interactive Python shell in the app context.
+    The application will populate the default
+    namespace of this shell according to its configuration.
+
+    Borrowed from the Flask shell command:
+    https://github.com/pallets/flask/blob/2.0.2/src/flask/cli.py#L867
+    """
+    import asyncio
+    import code
+    import os
+
+    try:
+        import IPython
+    except ImportError:
+        IPython = None
+
+    app = asyncio.run(servinit())
+    ctx = {"app": app}
+    # Support the regular Python interpreter startup script if someone
+    # is using it.
+    startup = os.environ.get("PYTHONSTARTUP")
+    if startup and os.path.isfile(startup):
+        with open(startup) as f:
+            eval(compile(f.read(), startup, "exec"), ctx)  # nosec
+
+    interactive_hook = getattr(sys, "__interactivehook__", None)
+
+    if interactive_hook is not None:
+        try:
+            import readline
+            from rlcompleter import Completer
+        except ImportError:
+            pass
+        else:
+            readline.set_completer(Completer(ctx).complete)
+        interactive_hook()
+
+    banner = (
+        f"Python {sys.version} on {sys.platform}\n" f"swift-browser-ui v{__version__}\n"
+    )
+    message = (
+        "This shell exposes the 'app' variable. Especially useful with "
+        "'set_session_devmode' enabled and after you have logged in through the browser"
+    )
+
+    if IPython:
+        IPython.embed(header=message)
+    else:
+        code.interact(banner=banner + "\n\n" + message, local=ctx)
+
+
 def main() -> None:
     """Run the CLI."""
     cli(  # pylint: disable=no-value-for-parameter,unexpected-keyword-arg

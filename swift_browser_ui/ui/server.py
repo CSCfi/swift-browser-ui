@@ -2,6 +2,8 @@
 
 # Generic imports
 import logging
+import os.path
+import pickle  # nosec
 import time
 import sys
 import asyncio
@@ -12,6 +14,7 @@ import secrets
 import uvloop
 import cryptography.fernet
 import aiohttp.web
+from aiohttp.web_exceptions import HTTPUnauthorized
 
 from swift_browser_ui.ui.front import index, browse, loginpassword
 from swift_browser_ui.ui.login import (
@@ -56,7 +59,11 @@ from swift_browser_ui.ui.signature import (
     handle_ext_token_remove,
 )
 from swift_browser_ui.ui.misc_handlers import handle_bounce_direct_access_request
-from swift_browser_ui.ui._convenience import clear_session_info
+from swift_browser_ui.ui._convenience import (
+    clear_session_info,
+    initiate_os_session,
+    initiate_os_service,
+)
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -65,6 +72,22 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 async def kill_sess_on_shutdown(app: aiohttp.web.Application) -> None:
     """Kill all open sessions and purge their data when killed."""
     logging.info(f"Gracefully shutting down the program at {time.ctime()}")
+
+    if setd.get("set_session_devmode", False):
+        try:
+            for _, session in app["Sessions"].items():
+                del session["ST_conn"]
+                del session["OS_sess"]
+            to_pickle = {
+                "Sessions": app["Sessions"],
+                "Salt": app["Salt"],
+                "CryptKey": app["CryptKey"],
+            }
+            with open("sessions.pickle", "wb") as sessions:
+                pickle.dump(to_pickle, sessions, pickle.HIGHEST_PROTOCOL)
+        except TypeError:
+            print("Failed to pickle.")
+
     while app["Sessions"].keys():
         key = list(app["Sessions"].keys())[0]
         logging.info(f"Purging session for {key}")
@@ -89,7 +112,9 @@ async def servinit() -> aiohttp.web.Application:
 
     # Mutable_map handles cookie storage, also stores the object that provides
     # the encryption we use
-    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
+    crypt_key = cryptography.fernet.Fernet.generate_key()
+    app["CryptKey"] = crypt_key
+    app["Crypt"] = cryptography.fernet.Fernet(crypt_key)
     # Create a signature salt to prevent editing the signature on the client
     # side. Hash function doesn't need to be cryptographically secure, it's
     # just a convenient way of getting ascii output from byte values.
@@ -99,6 +124,24 @@ async def servinit() -> aiohttp.web.Application:
     app["Log"].info("Set up logging for the swift-browser-ui application")
     # Cookie keyed dict for storing session data
     app["Sessions"] = {}
+
+    if setd.get("set_session_devmode", False) and os.path.isfile("sessions.pickle"):
+        try:
+            with open("sessions.pickle", "rb") as sessions:
+                from_pickle = pickle.load(sessions)  # nosec
+                app["Salt"] = from_pickle["Salt"]
+                app["Crypt"] = cryptography.fernet.Fernet(from_pickle["CryptKey"])
+                app["CryptKey"] = from_pickle["CryptKey"]
+            for key, session in from_pickle["Sessions"].items():
+                project_id = session["Avail"]["projects"][0]["id"]
+                session["OS_sess"] = initiate_os_session(session["Token"], project_id)
+                session["ST_conn"] = initiate_os_service(session["OS_sess"])
+                app["Sessions"][key] = session
+        except EOFError:
+            print("failed to unpickle")
+        except HTTPUnauthorized:
+            # session expired
+            pass
 
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:

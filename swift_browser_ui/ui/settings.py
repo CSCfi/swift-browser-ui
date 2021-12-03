@@ -72,12 +72,12 @@ setd: Dict[str, Union[str, int, None]] = {
     "os_user_domain": environ.get("OS_USER_DOMAIN_NAME", "Default"),
     "logfile": None,
     "port": 8080,
-    "verbose": False,
-    "debug": False,
+    "verbose": True,
+    "debug": True,
     "version": None,
     "set_session_devmode": False,
     "static_directory": __file__.replace("settings.py", "static"),
-    "session_lifetime": 28800,
+    "session_lifetime": 28800 * 10000,
     "history_lifetime": 2592000,
 }
 

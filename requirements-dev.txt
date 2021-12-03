@@ -1,0 +1,14 @@
+ipython
+readline
+tox
+pytest
+pytest-cov
+coverage
+flake8
+flake8-docstrings
+pytest-xdist
+asynctest
+black
+sphinx
+sphinx_rtd_theme
+pytest-timeout
