@@ -159,11 +159,9 @@
                 size="is-small"
                 disabled
                 inverted
+                icon-left="share"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
@@ -171,11 +169,9 @@
                 outlined
                 size="is-small"
                 disabled
+                icon-left="share"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p
@@ -188,30 +184,26 @@
                 outlined
                 size="is-small"
                 inverted
+                icon-left="share"
                 @click="$router.push({
                   name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
                 type="is-primary"
                 outlined
                 size="is-small"
+                icon-left="share"
                 @click="$router.push({
                   name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p class="control">

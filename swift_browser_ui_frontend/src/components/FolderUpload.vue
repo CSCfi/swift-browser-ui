@@ -4,12 +4,10 @@
       v-if="isUploading"
       type="is-primary"
       outlined
+      icon-left="cancel"
       @click="res.cancel()"
     >
-      <b-icon
-        icon="cancel"
-        size="is-small"
-      />{{ $t('message.cancelupload') }}
+      {{ $t('message.cancelupload') }}
     </b-button>
     <UploadButton
       v-else
