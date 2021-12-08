@@ -45,6 +45,11 @@ export default new Router({
       component: CreateContainer,
     },
     {
+      path: "/browse/:user/:project/:container/edit",
+      name: "EditContainer",
+      component: CreateContainer,
+    },
+    {
       path: "/browse/:user/:project/sharing/requestdirect",
       name: "DirectRequest",
       component: DirectRequest,

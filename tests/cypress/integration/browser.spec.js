@@ -11,7 +11,7 @@ describe("Browse buckets and test operations", function () {
   it("should be able to filter table, adjust display buckets per page and pagination", () => {
     cy.get('[data-testid="bucketsPerPage"]').select('5 per page')
     cy.contains('1-5 / 10')
-    cy.contains('Paginated').parent().click()
+    cy.get('[data-testid="paginationSwitch"]').click()
     cy.get('[data-testid="bucketsPerPage"]').should('be.disabled')
     cy.get('.input').type('test-container-5')
   })
@@ -24,7 +24,7 @@ describe("Browse buckets and test operations", function () {
         .within(() => {
           cy.get('td').eq(0).then(($elem) => {
             cy.get($elem).dblclick()
-            cy.url().should('eq', Cypress.config().baseUrl + '/browse/test_user_id/placeholder/' + $elem.get(0).innerText.trim())
+            cy.url().should('eq', Cypress.config().baseUrl + '/browse/test_user_id/placeholder/' + $elem.get(0).innerText.split('\n')[0].trim())
             cy.wait(2000)
             
           })
@@ -64,4 +64,33 @@ describe("Browse buckets and test operations", function () {
 
   })
 
+  it("should display, add, remove tags", () => {
+    // container list loads with tags
+    cy.get('tbody .tags .tag').should('have.length', 40)
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 4)
+    
+    // // remove one tag
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('h1').should('contain', 'Editing bucket')
+    cy.get('.delete').first().click()
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 3)
+
+    // // add few tags
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('.taginput input').type('adding.couple more')
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 6)
+
+    // remove all tags from a bucket
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('.taginput-container').children('span').should('have.length', 6)
+    cy.get('.delete').each(el => {
+      cy.get('.delete').first().click()
+      cy.wait(100)
+    });
+    cy.get('.taginput-container').children('span').should('have.length', 0)
+    cy.get('button').contains('Save').click()
+    cy.get('tbody .tags .tag').should('have.length', 36)
+  })
 })

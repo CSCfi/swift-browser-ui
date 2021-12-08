@@ -33,11 +33,17 @@
         </option>
       </b-select>
       <div class="control is-flex">
-        <b-switch 
+        <b-switch
           v-if="bList.length < 500"
           v-model="isPaginated"
+          data-testid="paginationSwitch"
         >
           {{ $t('message.table.paginated') }}
+        </b-switch>
+        <b-switch
+          v-model="showTags"
+        >
+          {{ $t('message.table.showTags') }}
         </b-switch>
       </div>
       <b-field class="control searchBox">
@@ -87,23 +93,26 @@
         :label="$t('message.table.name')"
       >
         <template #default="props">
-          <span v-if="!props.row.count">
-            <b-icon
-              icon="folder-outline"
-              size="is-small"
-            /> 
-            {{ props.row.name | truncate(100) }}
-          </span>
-          <span
-            v-else
-            class="has-text-weight-bold"
+          <span 
+            :class="props.row.count ? 'has-text-weight-bold' : ''"
           >
             <b-icon
-              icon="folder"
+              :icon="props.row.count ? 'folder' : 'folder-outline'"
               size="is-small"
-            /> 
+            />
             {{ props.row.name | truncate(100) }}
           </span>
+          <b-taglist v-if="showTags">
+            <b-tag
+              v-for="tag in tags[props.row.name]"
+              :key="tag"
+              :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
+              rounded
+              ellipsis
+            >
+              {{ tag }}
+            </b-tag>
+          </b-taglist>
         </template>
       </b-table-column>
       <b-table-column
@@ -223,6 +232,22 @@
                 :smallsize="true"
               />
             </p>
+            <p class="control">
+              <b-button
+                tag="router-link"
+                type="is-primary"
+                outlined
+                size="is-small"
+                icon-left="pencil"
+                :inverted="selected==props.row ? true : false"
+                :to="{
+                  name: 'EditContainer',
+                  params: {container: props.row.name}
+                }"
+              >
+                {{ $t('message.edit') }}
+              </b-button>
+            </p>
           </div>
         </template>
       </b-table-column>
@@ -283,6 +308,7 @@ export default {
       files: [],
       folders: [],
       bList: [],
+      tags: {},
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -290,6 +316,7 @@ export default {
       searchQuery: "",
       currentPage: 1,
       shareModalIsActive: false,
+      showTags: true,
     };
   },
   computed: {
@@ -299,6 +326,9 @@ export default {
     containers () {
       return this.$store.state.containerCache;
     },
+    containerTags() {
+      return this.$store.state.containerTagsCache;
+    },
   },
   watch: {
     searchQuery: function () {
@@ -307,6 +337,9 @@ export default {
     },
     containers: function () {
       this.bList = this.containers;
+    },
+    containerTags: function () {
+      this.tags = this.containerTags; // {"containerName": ["tag1", "tag2"]}
     },
   },
   created: function () {
@@ -321,11 +354,11 @@ export default {
     this.fetchContainers();
   },
   methods: {
-    fetchContainers: function () {
+    fetchContainers: async function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
       if(this.bList.length < 1) {
-        this.$store.commit("updateContainers");
+        await this.$store.dispatch("updateContainers");
       }
     },
     checkPageFromRoute: function () {

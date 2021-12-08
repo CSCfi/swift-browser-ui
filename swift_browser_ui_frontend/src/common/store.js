@@ -3,10 +3,13 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import { getBuckets } from "@/common/api";
-import { 
+import {
   getObjects,
   getSharedObjects,
 } from "./api";
+import {
+  getTagsForContainer,
+} from "./conv";
 
 Vue.use(Vuex);
 
@@ -20,6 +23,7 @@ const store = new Vuex.Store({
     isFullPage: true,
     objectCache: [],
     containerCache: [],
+    containerTagsCache: {}, // {"containerName": ["tag1", "tag2"]}
     langs: [
       {ph: "In English", value: "en"},
       {ph: "Suomeksi", value: "fi"},
@@ -33,18 +37,12 @@ const store = new Vuex.Store({
     altContainer: undefined,
   },
   mutations: {
-    updateContainers (state) {
+    loading(state, payload) {
+      state.isLoading = payload;
+    },
+    updateContainers (state, payload) {
       // Update container cache with the new container listing.
-      state.isLoading = true;
-      getBuckets().then((ret) => {
-        if (ret.status != 200) {
-          state.isLoading = false;
-        }
-        state.containerCache = ret;
-        state.isLoading = false;
-      }).catch(() => {
-        state.isLoading = false;
-      });
+      state.containerCache = payload;
     },
     updateObjects (
       state,
@@ -89,7 +87,13 @@ const store = new Vuex.Store({
         });
       }
     },
-    eraseObjects (state) {
+    updateContainerTags(state, payload) {
+      state.containerTagsCache = { 
+        ...state.containerTagsCache, 
+        [payload.containerName]: payload.tags,
+      };
+    },
+    eraseObjects(state) {
       state.objectCache = [];
     },
     setProjects (state, newProjects) {
@@ -144,6 +148,33 @@ const store = new Vuex.Store({
     },
     eraseAltContainer (state) {
       state.altContainer = undefined;
+    },
+  },
+  actions: {
+    updateContainers: async function ({ commit, dispatch }) {
+      commit("loading", true);
+      let containers = [];
+      await getBuckets().then((ret) => {
+        if (ret.status != 200) {
+          commit("loading", false);
+        }
+        containers = ret;
+        commit("updateContainers", ret);
+        commit("loading", false);
+      }).catch(() => {
+        commit("loading", false);
+      });
+      dispatch("updateContainerTags", containers);
+      return containers;
+    },
+    updateContainerTags: function ({ commit }, containers) {
+      containers.map(async container => {
+        const tags = await getTagsForContainer(container.name);
+        commit(
+          "updateContainerTags", 
+          {containerName: container.name, tags},
+        );
+      });
     },
   },
 });

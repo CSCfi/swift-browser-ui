@@ -72,6 +72,40 @@ export async function getBuckets () {
   return buckets;
 }
 
+export async function getBucketMeta (
+  container,
+){
+  let url = new URL(
+    "/api/bucket/meta?container=".concat(encodeURI(container)),
+    document.location.origin,
+  );
+
+  let ret = await fetch(
+    url, {method: "GET", credentials: "same-origin"},
+  );
+  return ret.json();
+}
+
+export async function updateBucketMeta (
+  container,
+  metadata,
+){
+  let url = new URL(
+    "/api/bucket/meta?container=".concat(encodeURI(container)),
+    document.location.origin,
+  );
+
+  let ret = await fetch(
+    url,
+    {
+      method: "POST",
+      credentials: "same-origin",
+      body: JSON.stringify(metadata),
+    },
+  );
+  return ret;
+}
+
 export async function getObjects (container) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
@@ -227,21 +261,29 @@ export async function getSharedContainerAddress () {
 
 export async function swiftCreateContainer (
   container,
+  tags,
 ) {
   // Create a container matching the specified name.
   let fetchURL = new URL( "/api/containers/".concat(
     container,
   ), document.location.origin);
 
+  let body = {
+    tags,
+  };
   let ret = await fetch(
-    fetchURL, { method: "PUT", credentials: "same-origin" },
+    fetchURL, { 
+      method: "PUT", 
+      credentials: "same-origin",
+      body: JSON.stringify(body),
+    },
   );
   if (ret.status != 201) {
     if (ret.status == 409) {
       throw new Error("Container name already in use.");
     }
     if (ret.status == 400) {
-      throw new Error("Invalid container name");
+      throw new Error("Invalid container or tag name");
     }
     throw new Error("Container creation not successful.");
   }

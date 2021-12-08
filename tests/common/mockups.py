@@ -223,6 +223,11 @@ class Mock_Request:
         """Return post data."""
         return self.post_data
 
+    async def json(self):
+        if isinstance(self.post_data, str):
+            return json.loads(self.post_data)
+        return self.post_data
+
 
 class Mock_Service:
     """
@@ -377,21 +382,32 @@ class Mock_Service:
         ret["headers"] = {}
         if "Acc_example" in self.cont_meta[args[0]].keys():
             ret["container"] = args[0]
-            ret["headers"]["x-container-meta-obj-example"] = "example"
+            ret["headers"].update(self.cont_meta[args[0]])
             ret["success"] = True
         return ret
 
-    def post(self, options=None):
+    def post(self, container=None, options=None):
         """Mock the post call of SwiftService."""
-        # Get the URL key 2
-        key = options["meta"][0].split(":")[1]
-        self.meta["tempurl_key_2"] = key
+        if container:
+            for (meta, value) in options.get("meta", []):
+                if not value:
+                    del self.cont_meta[container][f"x-container-meta-{meta}"]
+                    continue
+                self.cont_meta[container][f"x-container-meta-{meta}"] = value
+        else:
+            # Get the URL key 2
+            key = options["meta"][0].split(":")[1]
+            self.meta["tempurl_key_2"] = key
         return {"success": True}
 
     def set_swift_meta_container(self, container):
         """Generate test swift metadata for a container."""
         self.cont_meta[container] = {}
         self.obj_meta[container] = {}
+        self.cont_meta[container]["x-container-meta-obj-example"] = "example"
+        self.cont_meta[container]["x-container-meta-usertags"] = ";".join(
+            ["SD-Connect", "with", "container", "tags"]
+        )
         self.cont_meta[container]["Acc_example"] = "example"
 
     def set_swift_meta_object(self, container, obj):

@@ -747,6 +747,37 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
+    post:
+      tags:
+        - Frontend
+      summary: Update user created container metadata.
+      parameters:
+        - name: container
+          in: query
+          description: The container which metadata will be updated.
+          schema:
+            type: string
+            example: test-container-1
+          required: true
+      requestBody:
+        description: Bucket metadata as a key-value object. Updates must include all the metadata for the bucket. Omitted keys are removed by the swift backend.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+              example:
+                owner: project-team
+      responses:
+        204:
+          description: Container metadata was updated. No Content.
+        403:
+          description: Unauthorized
+        404:
+          description: Container was not found
   /api/shared/objects:
     get:
       tags:

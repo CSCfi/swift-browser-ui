@@ -205,7 +205,7 @@ new Vue({
     endUpload: function () {
       this.$store.commit("eraseAltContainer");
       this.$store.commit("stopUploading");
-      this.$store.commit("updateContainers");
+      this.$store.dispatch("updateContainers");
       window.onbeforeunload = undefined;
     },
     startChunking: function () {

@@ -12,7 +12,11 @@ import asynctest
 
 from swiftclient.service import SwiftError
 
-from swift_browser_ui.ui.api import get_os_user, os_list_projects
+from swift_browser_ui.ui.api import (
+    get_os_user,
+    os_list_projects,
+    update_metadata_bucket,
+)
 from swift_browser_ui.ui.api import swift_list_buckets, swift_list_objects
 from swift_browser_ui.ui.api import swift_download_object
 from swift_browser_ui.ui.api import get_metadata_object
@@ -230,7 +234,40 @@ class APITestClass(asynctest.TestCase):
         resp = await get_metadata_bucket(self.request)
         resp = json.loads(resp.text)
 
-        expected = ["test-container-0", {"obj-example": "example"}]  # nosec
+        expected = [
+            "test-container-0",
+            {"obj-example": "example", "usertags": "SD-Connect;with;container;tags"},
+        ]
+        self.assertEqual(resp, expected)
+
+    async def test_set_container_meta_swift(self):
+        """Test metadata API endpoint with container metadata."""
+        req_sessions = self.request.app["Sessions"]
+        req_sessions[self.cookie]["ST_conn"].init_with_data(
+            containers=1,
+            object_range=(1, 1),
+            size_range=(252144, 252144),
+        )
+        req_sessions[self.cookie]["ST_conn"].meta = {
+            "tempurl_key_1": None,
+            "tempurl_key_2": None,
+        }
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
+
+        self.request.query["container"] = "test-container-0"
+        self.request.set_post('{"usertags":"tags;for;testing"}')
+
+        post_rest = await update_metadata_bucket(self.request)
+        self.assertEqual(post_rest.status, 204)
+
+        self.request.set_post(None)
+        resp = await get_metadata_bucket(self.request)
+        resp = json.loads(resp.text)
+
+        expected = [
+            "test-container-0",
+            {"obj-example": "example", "usertags": "tags;for;testing"},
+        ]
         self.assertEqual(resp, expected)
 
     async def test_get_object_meta_swift(self):
