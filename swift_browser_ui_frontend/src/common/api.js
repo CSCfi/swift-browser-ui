@@ -2,77 +2,77 @@
 
 import { getHumanReadableSize } from "@/common/conv";
 
-export async function getUser () {
+export async function getUser() {
   // Function to get the username of the currently displayed user.
-  let getUserURL = new URL( "/api/username", document.location.origin );
+  let getUserURL = new URL("/api/username", document.location.origin);
   let uname = fetch(
     getUserURL, { method: "GET", credentials: "same-origin" },
   ).then(
-    function( response ) { return response.json(); },
+    function (response) { return response.json(); },
   ).then(
-    function( uname ) { return uname; },
+    function (uname) { return uname; },
   );
   return uname;
 }
 
-export async function getProjects () {
+export async function getProjects() {
   // Fetch available projects from the API
-  let getProjectsURL = new URL( "/api/projects", document.location.origin );
+  let getProjectsURL = new URL("/api/projects", document.location.origin);
   let projects = fetch(
     getProjectsURL, { method: "GET", credentials: "same-origin" },
   ).then(
-    function( response ) { return response.json(); },
+    function (response) { return response.json(); },
   ).then(
-    function ( ret ) {
+    function (ret) {
       return ret;
     },
   );
   return projects;
 }
 
-export async function changeProjectApi ( newProject ) {
+export async function changeProjectApi(newProject) {
   // Change the project that the user is currently browsing
   // Returns true if the project change is successful, otherwise false
-  let rescopeURL = new URL( "/login/rescope", document.location.origin );
-  rescopeURL.searchParams.append( "project", newProject );
+  let rescopeURL = new URL("/login/rescope", document.location.origin);
+  rescopeURL.searchParams.append("project", newProject);
   let ret = fetch(
     rescopeURL, { method: "GET", credentials: "same-origin" },
   ).then(
-    function( resp ) {
+    function (resp) {
       return resp.status == 204 ? true : false;
     },
   );
   return ret;
 }
 
-export default async function getActiveProject () {
+export default async function getActiveProject() {
   // Fetch the active project from the API
   // Returns the active project name if the fetch is successful, otherwise
   // returns nothing
-  let getProjectURL = new URL( "/api/project/active", 
-    document.location.origin );
+  let getProjectURL = new URL("/api/project/active",
+    document.location.origin);
   let activeProj = fetch(
     getProjectURL, { method: "GET", credentials: "same-origin" },
   ).then(
-    function( resp ) {
+    function (resp) {
       return resp.json();
     },
   );
   return activeProj;
 }
 
-export async function getBuckets () {
-  let getBucketsUrl = new URL( "/api/buckets", document.location.origin );
+export async function getBuckets() {
+  let getBucketsUrl = new URL("/api/buckets", document.location.origin);
   // Fetch containers from the API for the user that's currently logged in
   let buckets = fetch(
     getBucketsUrl, { method: "GET", credentials: "same-origin" },
   ).then(
-    function ( resp ) { return resp.json(); },
+    function (resp) { return resp.json(); },
   );
   return buckets;
 }
 
-export async function getBucketMeta (
+export async function getBucketMeta(
   container,
 ){
   let url = new URL(
@@ -86,7 +86,7 @@ export async function getBucketMeta (
   return ret.json();
 }
 
-export async function updateBucketMeta (
+export async function updateBucketMeta(
   container,
   metadata,
 ){
@@ -106,20 +106,20 @@ export async function updateBucketMeta (
   return ret;
 }
 
-export async function getObjects (container) {
+export async function getObjects(container) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL( "/api/bucket/objects", document.location.origin );
+  let objUrl = new URL("/api/bucket/objects", document.location.origin);
   // Search parameter named bucket to avoid changing the API after changing
   // over from S3 to Swift
-  objUrl.searchParams.append( "bucket", container );
+  objUrl.searchParams.append("bucket", container);
   let objects = fetch(
     objUrl, { method: "GET", credentials: "same-origin" },
   ).then(
-    function ( resp ) { return resp.json(); },
+    function (resp) { return resp.json(); },
   ).then(
-    function( ret ) {
-      for ( let i = 0; i < ret.length; i++ ) {
+    function (ret) {
+      for (let i = 0; i < ret.length; i++) {
         ret[i]["url"] = (
           "/api/object/dload?bucket=" + container +
           "&objkey=" + ret[i]["name"]
@@ -131,25 +131,25 @@ export async function getObjects (container) {
   return objects;
 }
 
-export async function getSharedObjects (
+export async function getSharedObjects(
   project,
   container,
   url,
 ) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL( "/api/shared/objects", document.location.origin );
+  let objUrl = new URL("/api/shared/objects", document.location.origin);
   // Search parameter named bucket to avoid changing the API after changing
   // over from S3 to Swift
-  objUrl.searchParams.append( "storageurl", url);
-  objUrl.searchParams.append( "container", container );
+  objUrl.searchParams.append("storageurl", url);
+  objUrl.searchParams.append("container", container);
   let objects = fetch(
     objUrl, { method: "GET", credentials: "same-origin" },
   ).then(
-    function ( resp ) { return resp.json(); },
+    function (resp) { return resp.json(); },
   ).then(
-    function( ret ) {
-      for ( let i = 0; i < ret.length; i++ ) {
+    function (ret) {
+      for (let i = 0; i < ret.length; i++) {
         ret[i]["url"] = (
           "/download/" + project +
           "/" + container +
@@ -162,14 +162,14 @@ export async function getSharedObjects (
   return objects;
 }
 
-export async function getProjectMeta () {
+export async function getProjectMeta() {
   // Fetch project metadata for the currently active project, containing
   // the project data usage, container amount and object amount.
-  let metaURL = new URL( "/api/project/meta", document.location.origin );
+  let metaURL = new URL("/api/project/meta", document.location.origin);
   let ret = fetch(
     metaURL, { method: "GET", credentials: "same-origin" },
-  ).then( function ( resp ) { return resp.json(); } )
-    .then( function ( json_ret ) {
+  ).then(function (resp) { return resp.json(); })
+    .then(function (json_ret) {
       let newRet = json_ret;
       newRet["Size"] = getHumanReadableSize(newRet["Bytes"]);
       if (newRet["Bytes"] > 10995116277760) {
@@ -192,17 +192,17 @@ export async function getProjectMeta () {
 }
 
 
-export async function getAccessControlMeta () {
+export async function getAccessControlMeta() {
   // Fetch the ACL metadata for all project containers.
-  let metaURL = new URL( "/api/project/acl", document.location.origin );
+  let metaURL = new URL("/api/project/acl", document.location.origin);
   let ret = fetch(
-    metaURL, {method: "GET", credentials: "same-origin" },
-  ).then(function (ret) {return ret.json();});
+    metaURL, { method: "GET", credentials: "same-origin" },
+  ).then(function (ret) { return ret.json(); });
   return ret;
 }
 
 
-export async function removeAccessControlMeta (
+export async function removeAccessControlMeta(
   container,
   project = undefined,
 ) {
@@ -217,12 +217,12 @@ export async function removeAccessControlMeta (
   }
 
   await fetch(
-    aclURL, {method: "DELETE", credentials: "same-origin"},
+    aclURL, { method: "DELETE", credentials: "same-origin" },
   );
 }
 
 
-export async function addAccessControlMeta (
+export async function addAccessControlMeta(
   container,
   rights,
   projects,
@@ -240,12 +240,12 @@ export async function addAccessControlMeta (
   aclURL.searchParams.append("rights", rights_str);
 
   await fetch(
-    aclURL, {method: "POST", credentials: "same-origin"},
+    aclURL, { method: "POST", credentials: "same-origin" },
   );
 }
 
 
-export async function getSharedContainerAddress () {
+export async function getSharedContainerAddress() {
   // Get the project specific address for container sharing
   let addrURL = new URL(
     "/api/project/address",
@@ -253,18 +253,18 @@ export async function getSharedContainerAddress () {
   );
 
   let ret = await fetch(
-    addrURL, {method: "GET", credentials: "same-origin"},
+    addrURL, { method: "GET", credentials: "same-origin" },
   );
   return ret.json();
 }
 
 
-export async function swiftCreateContainer (
+export async function swiftCreateContainer(
   container,
   tags,
 ) {
   // Create a container matching the specified name.
-  let fetchURL = new URL( "/api/containers/".concat(
+  let fetchURL = new URL("/api/containers/".concat(
     container,
   ), document.location.origin);
 
@@ -290,10 +290,10 @@ export async function swiftCreateContainer (
 }
 
 
-export async function swiftDeleteContainer (
+export async function swiftDeleteContainer(
   container,
 ) {
-  let fetchURL = new URL ( "/api/containers/".concat(
+  let fetchURL = new URL("/api/containers/".concat(
     container,
   ), document.location.origin);
 
@@ -306,17 +306,17 @@ export async function swiftDeleteContainer (
 }
 
 
-export async function swiftDeleteObjects (
+export async function swiftDeleteObjects(
   container,
   objects,
 ) {
-  let fetchURL = new URL ( "/api/containers/".concat(
+  let fetchURL = new URL("/api/containers/".concat(
     container,
   ), document.location.origin);
   fetchURL.searchParams.append("objects", objects.toString());
 
   let ret = await fetch(
-    fetchURL, {method: "DELETE", credentials: "same-origin" },
+    fetchURL, { method: "DELETE", credentials: "same-origin" },
   );
   if (ret.status != 204) {
     throw new Error("Object / objects deletion not successful.");
@@ -324,7 +324,7 @@ export async function swiftDeleteObjects (
 }
 
 
-export async function swiftCopyContainer (
+export async function swiftCopyContainer(
   project,
   container,
   source_project,
@@ -332,7 +332,7 @@ export async function swiftCopyContainer (
 ) {
   // Replicate the container from a specified source to the location
 
-  let fetchURL = new URL( "/replicate/".concat(
+  let fetchURL = new URL("/replicate/".concat(
     project, "/",
     container,
   ), document.location.origin);
@@ -352,12 +352,12 @@ export async function swiftCopyContainer (
 }
 
 
-export async function createExtToken (
+export async function createExtToken(
   id,
 ) {
   // Tell backend to create a new project scoped API token
 
-  let fetchURL = new URL ( "/token/".concat(
+  let fetchURL = new URL("/token/".concat(
     id,
   ), document.location.origin);
 
@@ -373,10 +373,10 @@ export async function createExtToken (
 }
 
 
-export async function listTokens () {
+export async function listTokens() {
   // Get all tokens created for the project by id
 
-  let fetchURL = new URL ( "/token", document.location.origin);
+  let fetchURL = new URL("/token", document.location.origin);
 
   let ret = await fetch(
     fetchURL, { method: "GET", credentials: "same-origin" },
@@ -390,12 +390,12 @@ export async function listTokens () {
 }
 
 
-export async function removeToken (
+export async function removeToken(
   id,
 ) {
   // Tell backend to delete API tokens matching the ID
 
-  let fetchURL = new URL ("/token/".concat(
+  let fetchURL = new URL("/token/".concat(
     id,
   ), document.location.origin);
 

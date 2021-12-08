@@ -20,6 +20,9 @@ import { changeProjectApi } from "@/common/api";
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
+// Import container ACL sync
+import { syncContainerACLs } from "@/common/conv";
+
 // Import project state
 import store from "@/common/store";
 
@@ -31,6 +34,9 @@ import Resumable from "resumablejs";
 
 // Upload progress button
 import ProgressBar from "@/components/UploadProgressBar";
+
+// Import delay
+import delay from "lodash/delay";
 
 Vue.config.productionTip = false;
 
@@ -135,8 +141,18 @@ new Vue({
           );
         }
       });
+    delay(
+      this.containerSyncWrapper,
+      5000,
+    );
   },
   methods: {
+    containerSyncWrapper: function () {
+      syncContainerACLs(
+        this.$store.state.client,
+        this.$store.state.active.id,
+      );
+    },
     // Following are the methods used for resumablejs, as the methods
     // need to have access to the vue instance.
     addFileToast: function () {

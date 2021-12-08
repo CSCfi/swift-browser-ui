@@ -2,6 +2,7 @@
 
 import time
 import typing
+import asyncio
 
 import aiohttp.web
 from swiftclient.exceptions import ClientException
@@ -719,6 +720,9 @@ async def get_access_control_metadata(
         if acl:
             acls[c["name"]] = acl
 
+        # Force a yield point for execution
+        await asyncio.sleep(0)
+
     return aiohttp.web.json_response(
         {
             "address": host,
@@ -749,7 +753,7 @@ async def remove_project_container_acl(
 
     # Remove specific project form both ACLs
     read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
-    read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
+    write_acl = write_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
 
     meta_options = {
         "read_acl": read_acl,
