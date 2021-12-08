@@ -64,15 +64,10 @@ export async function syncContainerACLs(client, project) {
   // Delete stale shared container access entries from the database
   for (let container of currentsharing) {
     if (!(Object.keys(aclmeta).includes(container))) {
-      let resp = await client.shareContainerDeleteAccess(
+      await client.shareContainerDeleteAccess(
         project,
         container,
       );
-      if (!resp) {
-        console.log("Container access deletion failed");
-      }
-    } else {
-      continue;
     }
   }
 
