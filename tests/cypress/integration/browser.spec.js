@@ -38,7 +38,7 @@ describe("Browse buckets and test operations", function () {
         .within(() => {
           cy.get('td').eq(0).click()
           cy.get('td').eq(1).then(($elem) => {
-            expect($elem.get(0).innerText.trim()).to.have.lengthOf(40)
+            expect($elem.get(0).innerText.split('\n')[0].trim()).to.have.lengthOf(40)
           })
         })
     })
@@ -64,19 +64,19 @@ describe("Browse buckets and test operations", function () {
 
   })
 
-  it("should display, add, remove tags", () => {
+  it("should display, add, remove container tags", () => {
     // container list loads with tags
     cy.get('tbody .tags .tag').should('have.length', 40)
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 4)
     
-    // // remove one tag
+    // remove one tag
     cy.get('tbody tr').contains('Edit').click()
     cy.get('h1').should('contain', 'Editing bucket')
     cy.get('.delete').first().click()
     cy.get('button').contains('Save').click()
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 3)
 
-    // // add few tags
+    // add few tags
     cy.get('tbody tr').contains('Edit').click()
     cy.get('.taginput input').type('adding.couple more')
     cy.get('button').contains('Save').click()
@@ -87,10 +87,39 @@ describe("Browse buckets and test operations", function () {
     cy.get('.taginput-container').children('span').should('have.length', 6)
     cy.get('.delete').each(el => {
       cy.get('.delete').first().click()
-      cy.wait(100)
     });
     cy.get('.taginput-container').children('span').should('have.length', 0)
     cy.get('button').contains('Save').click()
     cy.get('tbody .tags .tag').should('have.length', 36)
+  })
+
+  it("should display, add, remove object tags", () => {
+    cy.get('tbody tr').first().dblclick()
+
+    // object list loads with tags
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 3)
+    
+    // remove one tag
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('h1').should('contain', 'Editing object')
+    cy.get('.delete').first().click()
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 2)
+
+    // add few tags
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('.taginput input').type('adding.couple more')
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 5)
+
+    // remove all tags from an object
+    cy.get('tbody tr').contains('Edit').click()
+    cy.get('.taginput-container').children('span').should('have.length', 5)
+    cy.get('.delete').each(el => {
+      cy.get('.delete').first().click()
+    });
+    cy.get('.taginput-container').children('span').should('have.length', 0)
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
   })
 })

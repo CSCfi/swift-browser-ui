@@ -192,6 +192,8 @@ let default_translations = {
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
+      tagName: "Tags",
+      tagMessage: "Press enter to add.",
       container_ops: {
         addContainer: "Add a new bucket",
         editContainer: "Editing bucket: ",
@@ -203,10 +205,10 @@ let default_translations = {
         containerMessage: "The name of the new bucket",
         fullDelete: "Deleting a bucket with contents requires deleting " +
                     "all objects inside it first.",
-        tagName: "Tags",
-        tagMessage: "Press enter to add.",
       },
       objects: {
+        objectName: "Object",
+        editObject: "Editing object: ",
         deleteConfirm: "Delete Objects",
         deleteObjects: "Delete Object / Objects",
         deleteSuccess: "Objects deleted",
@@ -422,6 +424,8 @@ let default_translations = {
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
+      tagName: "Tägit",
+      tagMessage: "Paina 'enter' lisätäksesi.",
       container_ops: {
         addContainer: "Luo uusi säiliö",
         editContainer: "Muokataan säiliötä: ",
@@ -431,10 +435,10 @@ let default_translations = {
         containerName: "Säiliö",
         containerMessage: "Uuden säiliön nimi",
         fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
-        tagName: "Tägit",
-        tagMessage: "Paina 'enter' lisätäksesi.",
       },
       objects: {
+        objectName: "Objekti",
+        editObject: "Muokataan objekti: ",
         deleteConfirm: "Poista objektit",
         deleteObjects: "Poista objekti / objektit",
         deleteSuccess: "Objektit poistettu",

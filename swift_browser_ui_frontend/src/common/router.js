@@ -3,6 +3,7 @@ import Router from "vue-router";
 import DashboardView from "@/views/Dashboard.vue";
 import ContainersView from "@/views/Containers.vue";
 import ObjectsView from "@/views/Objects.vue";
+import EditObjectView from "@/views/EditObject.vue";
 import SharedObjects from "@/views/SharedObjects";
 import ShareRequests from "@/views/ShareRequests";
 import SharedTo from "@/views/SharedTo";
@@ -88,6 +89,11 @@ export default new Router({
       path: "/browse/:user/:project/:container",
       name: "ObjectsView",
       component: ObjectsView,
+    },
+    {
+      path: "/browse/:user/:project/:container/:object/edit",
+      name: "EditObjectView",
+      component: EditObjectView,
     },
   ],
 });

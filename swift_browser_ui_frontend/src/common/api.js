@@ -1,6 +1,9 @@
 // API fetch functions.
 
-import { getHumanReadableSize } from "@/common/conv";
+import { 
+  getHumanReadableSize, 
+  makeGetObjectsMetaURL,
+} from "@/common/conv";
 
 export async function getUser() {
   // Function to get the username of the currently displayed user.
@@ -131,7 +134,42 @@ export async function getObjects(container) {
   return objects;
 }
 
-export async function getSharedObjects(
+export async function getObjectsMeta (
+  container,
+  objects,
+  url,
+){
+  if (url === undefined) {  
+    url = makeGetObjectsMetaURL(container, objects);
+  }
+
+  let ret = await fetch(
+    url, {method: "GET", credentials: "same-origin"},
+  );
+  return ret.json();
+}
+
+export async function updateObjectMeta (
+  container,
+  objectMeta,
+){
+  let url = new URL(
+    "/api/bucket/object/meta?container=".concat(encodeURI(container)),
+    document.location.origin,
+  );
+
+  let ret = await fetch(
+    url,
+    {
+      method: "POST",
+      credentials: "same-origin",
+      body: JSON.stringify([objectMeta]),
+    },
+  );
+  return ret;
+}
+
+export async function getSharedObjects (
   project,
   container,
   url,

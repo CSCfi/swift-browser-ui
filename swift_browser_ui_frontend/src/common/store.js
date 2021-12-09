@@ -9,6 +9,8 @@ import {
 } from "./api";
 import {
   getTagsForContainer,
+  getTagsForObjects,
+  makeGetObjectsMetaURL,
 } from "./conv";
 
 Vue.use(Vuex);
@@ -22,6 +24,7 @@ const store = new Vuex.Store({
     isLoading: false,
     isFullPage: true,
     objectCache: [],
+    objectTagsCache: {}, // {"objectName": ["tag1", "tag2"]}
     containerCache: [],
     containerTagsCache: {}, // {"containerName": ["tag1", "tag2"]}
     langs: [
@@ -44,53 +47,23 @@ const store = new Vuex.Store({
       // Update container cache with the new container listing.
       state.containerCache = payload;
     },
+    updateContainerTags(state, payload) {
+      state.containerTagsCache = { 
+        ...state.containerTagsCache, 
+        [payload.containerName]: payload.tags,
+      };
+    },
     updateObjects (
       state,
       payload,
     ) {
       // Update object cache with the new object listing.
-      let container = payload.route.params.container;
-      state.isLoading = true;
-      if (payload.route.name == "SharedObjects") {
-        state.client.getAccessDetails(
-          payload.route.params.project,
-          container,
-          payload.route.params.owner,
-        ).then(
-          (ret) => {
-            return getSharedObjects(
-              payload.route.params.owner,
-              container,
-              ret.address,
-            );
-          },
-        ).then(
-          (ret) => {
-            state.isLoading = false;
-            state.objectCache = ret;
-          },
-        ).catch(() => {
-          state.objectCache = [];
-          state.isLoading = false;
-        });
-      }
-      else {
-        getObjects(container).then((ret) => {
-          if (ret.status != 200) {
-            state.isLoading = false;
-          }
-          state.objectCache = ret;
-          state.isLoading = false;
-        }).catch(() => {
-          state.objectCache = [];
-          state.isLoading = false;
-        });
-      }
+      state.objectCache = payload;
     },
-    updateContainerTags(state, payload) {
-      state.containerTagsCache = { 
-        ...state.containerTagsCache, 
-        [payload.containerName]: payload.tags,
+    updateObjectTags (state, payload) {
+      state.objectTagsCache = { 
+        ...state.objectTagsCache, 
+        [payload.objectName]: payload.tags,
       };
     },
     eraseObjects(state) {
@@ -175,6 +148,74 @@ const store = new Vuex.Store({
           {containerName: container.name, tags},
         );
       });
+    },
+    updateObjects: async function ({ commit, dispatch, client }, route) {
+      let container = route.params.container;
+      commit("loading", true);
+      if (route.name == "SharedObjects") {
+        await client.getAccessDetails(
+          route.params.project,
+          container,
+          route.params.owner,
+        ).then(
+          (ret) => {
+            return getSharedObjects(
+              route.params.owner,
+              container,
+              ret.address,
+            );
+          },
+        ).then(
+          (ret) => {
+            commit("loading", false);
+            commit("updateObjects", ret);
+          },
+        ).catch(() => {
+          commit("updateObjects", []);
+          commit("loading", false);
+        });
+      } else {
+        await getObjects(container).then((ret) => {
+          if (ret.status != 200) {
+            commit("loading", false);
+          }
+          commit("updateObjects", ret);
+          commit("loading", false);
+        }).catch(() => {
+          commit("updateObjects", []);
+          commit("loading", false);
+        });
+      }
+      dispatch("updateObjectTags", route);
+    },
+    updateObjectTags: async function ({ commit, state }, route) {
+      if (!state.objectCache.length) {
+        return;
+      }
+      let objectList = [];
+      for (let i = 0; i < state.objectCache.length; i++) {
+        // Object names end up in the URL, which has hard length limits.
+        // The aiohttp backend has a limit of 2048. The maximum size
+        // for object name is 1024. Set it to a safe enough amount.
+        // We split the requests to prevent reaching said limits.
+        objectList.push(state.objectCache[i].name);
+        const url = makeGetObjectsMetaURL(route.params.container, objectList);
+        if (
+          i === state.objectCache.length - 1
+          || url.href.length > 2000
+        ) {
+          getTagsForObjects(route.params.container, objectList, url)
+            .then(tags => 
+              tags.map(item => {
+                commit(
+                  "updateObjectTags", 
+                  {objectName: item[0], tags: item[1]},
+                );
+              }),
+            );
+          objectList = [];
+        }
+      }
     },
   },
 });
