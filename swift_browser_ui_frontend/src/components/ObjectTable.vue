@@ -603,11 +603,15 @@ export default {
       var name_re = new RegExp(safeKey, "i");
       if (this.renderFolders) {
         this.oList = this.getFolderContents().filter(
-          element => element.name.match(name_re),
+          element => 
+            element.name.match(name_re)
+            || this.tags[element.name].join("\n").match(name_re),
         );
       } else {
         this.oList = this.objects.filter(
-          element => element.name.match(name_re),
+          element => 
+            element.name.match(name_re)
+            || this.tags[element.name].join("\n").match(name_re),
         );
       }
     },

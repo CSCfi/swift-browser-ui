@@ -391,7 +391,9 @@ export default {
       var safeKey = escapeRegExp(this.searchQuery);
       var name_cmp = new RegExp(safeKey, "i");
       this.bList = this.containers.filter(
-        element => element.name.match(name_cmp),
+        element => 
+          element.name.match(name_cmp)
+          || this.tags[element.name].join("\n").match(name_cmp),
       );
     },
   },
