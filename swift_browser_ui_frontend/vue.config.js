@@ -1,5 +1,10 @@
 module.exports = {  // eslint-disable-line
   publicPath: "/static",
+  devServer: {
+    // eslint-disable-next-line
+    proxy: `${process.env.BACKEND_HOST || "http://localhost"}:${process.env.BACKEND_PORT || "8080"}`,
+    hot: true,
+  },
   pages: {
     index: {
       entry: "src/entries/index.js",
