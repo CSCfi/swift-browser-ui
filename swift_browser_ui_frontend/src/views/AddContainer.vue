@@ -25,8 +25,8 @@
     </b-field>
     <b-field
       horizontal
-      :label="$t('message.container_ops.tagName')"
-      :message="$t('message.container_ops.tagMessage')"
+      :label="$t('message.tagName')"
+      :message="$t('message.tagMessage')"
     >
       <b-taginput
         v-model="tags"
@@ -63,6 +63,7 @@ import {
   updateBucketMeta,
 } from "@/common/api";
 import {
+  taginputConfirmKeys,
   getTagsForContainer,
 } from "@/common/conv";
 
@@ -73,7 +74,7 @@ export default {
       container: "",
       tags: [],
       create: true,
-      taginputConfirmKeys: [",", ";", ":", ".", " ", "Tab", "Enter"],
+      taginputConfirmKeys,
     };
   },
   beforeMount () {

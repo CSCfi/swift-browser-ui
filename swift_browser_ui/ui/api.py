@@ -6,7 +6,7 @@ import asyncio
 
 import aiohttp.web
 from swiftclient.exceptions import ClientException
-from swiftclient.service import SwiftError
+from swiftclient.service import SwiftError, SwiftPostObject
 from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
@@ -492,7 +492,7 @@ async def get_object_metadata(
             for i in res
         ]
 
-        # Strip unnecessary specifcations from header names and split open s3
+        # Strip unnecessary specifications from header names and split open s3
         # information so that it doesn't have to be done in the browser
         for i in res:
             i[1] = {k.replace("x-object-meta-", ""): v for k, v in i[1].items()}
@@ -587,6 +587,47 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
     return aiohttp.web.json_response(await get_object_metadata(conn, meta_cont, meta_obj))
+
+
+async def update_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Update metadata for an object."""
+    session = api_check(request)
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    # Get required variables from query string
+    container = request.query.get("container", "") or None
+    objects = await request.json()
+
+    if not (container or objects):
+        raise aiohttp.web.HTTPBadRequest
+
+    objects_post = []
+    try:
+        for (name, meta) in objects:
+            meta = [(key, value) for key, value in meta.items() if value]
+            objects_post.append(
+                SwiftPostObject(
+                    object_name=name,
+                    options={
+                        "meta": meta,
+                    },
+                )
+            )
+    except ValueError as e:
+        request.app["Log"].error(f"Payload seems to be malformed: {e}")
+        raise aiohttp.web.HTTPBadRequest
+
+    conn = request.app["Sessions"][session]["ST_conn"]
+    ret = conn.post(container=container, objects=objects_post)
+
+    for r in ret:
+        if not r["success"]:
+            raise aiohttp.web.HTTPNotFound
+
+    return aiohttp.web.HTTPNoContent()
 
 
 async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Response:

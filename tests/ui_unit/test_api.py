@@ -16,6 +16,7 @@ from swift_browser_ui.ui.api import (
     get_os_user,
     os_list_projects,
     update_metadata_bucket,
+    update_metadata_object,
 )
 from swift_browser_ui.ui.api import swift_list_buckets, swift_list_objects
 from swift_browser_ui.ui.api import swift_download_object
@@ -298,7 +299,49 @@ class APITestClass(asynctest.TestCase):
 
         resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
-        expected = [[objkey, {"obj-example": "example"}]]
+        expected = [[objkey, {"obj-example": "example", "usertags": "objects;with;tags"}]]
+        self.assertEqual(resp, expected)
+
+    async def test_set_object_meta_swift(self):
+        """Test metadata API endpoint with container metadata."""
+        req_sessions = self.request.app["Sessions"]
+        req_sessions[self.cookie]["ST_conn"].init_with_data(
+            containers=1,
+            object_range=(1, 1),
+            size_range=(252144, 252144),
+        )
+        container = "test-container-0"
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(container)
+        for obj in req_sessions[self.cookie]["ST_conn"].obj_meta.keys():
+            req_sessions[self.cookie]["ST_conn"].set_swift_meta_object(container, obj)
+
+        obj = list(req_sessions[self.cookie]["ST_conn"].obj_meta[container])[0]
+        self.request.query["container"] = container
+        self.request.set_post(
+            json.dumps(
+                [
+                    [
+                        obj,
+                        {"usertags": "tags;for;testing"},
+                    ]
+                ]
+            )
+        )
+
+        post_resp = await update_metadata_object(self.request)
+        self.assertEqual(post_resp.status, 204)
+
+        self.request.set_post(None)
+        self.request.query["object"] = obj
+        resp = await get_metadata_object(self.request)
+        resp = json.loads(resp.text)
+
+        expected = [
+            [
+                obj,
+                {"obj-example": "example", "usertags": "tags;for;testing"},
+            ]
+        ]
         self.assertEqual(resp, expected)
 
     async def test_get_object_meta_s3(self):
@@ -372,7 +415,10 @@ class APITestClass(asynctest.TestCase):
         resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
 
-        comp = [[i, {"obj-example": "example"}] for i in [j["name"] for j in objs]]
+        comp = [
+            [i, {"usertags": "objects;with;tags", "obj-example": "example"}]
+            for i in [j["name"] for j in objs]
+        ]
 
         self.assertEqual(resp, comp)
 

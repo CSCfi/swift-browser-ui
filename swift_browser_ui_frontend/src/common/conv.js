@@ -1,6 +1,8 @@
+
 import {
   getBucketMeta,
   getAccessControlMeta,
+  getObjectsMeta,
 } from "./api";
 
 export default function getLangCookie() {
@@ -153,12 +155,32 @@ export function getHumanReadableSize(val) {
   return ret;
 }
 
-export async function getTagsForContainer(containerName) {
-  let tags = [];
-  await getBucketMeta(containerName).then(meta => {
-    if ("usertags" in meta[1]) {
-      tags = meta[1]["usertags"].split(";");
-    }
-  });
-  return tags;
+function extractTags(meta) {
+  if ("usertags" in meta[1]) {
+    return meta[1]["usertags"].split(";");
+  }
+  return [];
 }
+
+export async function getTagsForContainer(containerName) {
+  let meta = await getBucketMeta(containerName);
+  return extractTags(meta);
+}
+
+export async function getTagsForObjects(containerName, objectList, url) {
+  let meta = await getObjectsMeta(containerName, objectList, url);
+  meta.map(item => item[1] = extractTags(item));
+  return meta;
+}
+
+export function makeGetObjectsMetaURL(container, objects) {
+  return new URL(  
+    "/api/bucket/object/meta?container="
+      .concat(encodeURI(container))
+      .concat("&object=")
+      .concat(encodeURI(objects.join(","))),
+    document.location.origin,
+  );
+}
+
+export const taginputConfirmKeys = [",", ";", ":", ".", " ", "Tab", "Enter"];

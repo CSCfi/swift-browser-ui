@@ -42,6 +42,11 @@
           {{ $t('message.renderFolders') }}
         </b-switch>
       </div>
+      <div class="control is-flex">
+        <b-switch v-model="showTags">
+          {{ $t('message.table.showTags') }}
+        </b-switch>
+      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -134,6 +139,17 @@
         <span v-else>
           {{ props.row.name | truncate(100) }}
         </span>
+        <b-taglist v-if="displayTags(props.row.name)">
+          <b-tag
+            v-for="tag in tags[props.row.name]"
+            :key="tag"
+            :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
+            rounded
+            ellipsis
+          >
+            {{ tag }}
+          </b-tag>
+        </b-taglist>
       </b-table-column>
       <b-table-column
         v-slot="props"
@@ -209,6 +225,25 @@
                 @click="confirmDownload ()"
               >
                 {{ $t('message.download') }}
+              </b-button>
+            </p>
+            <p
+              v-if="displayTags(props.row.name)" 
+              class="control"
+            >
+              <b-button 
+                tag="router-link"
+                type="is-primary"
+                outlined
+                size="is-small"
+                icon-left="pencil"
+                :inverted="selected==props.row ? true : false"
+                :to="{
+                  name: 'EditObjectView',
+                  params: {container, object: props.row.name}
+                }"
+              >
+                {{ $t('message.edit') }}
               </b-button>
             </p>
           </div>
@@ -317,9 +352,11 @@ export default {
   data: function () {
     return {
       oList: [],
+      tags: {},
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
+      showTags: true,
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
@@ -334,8 +371,14 @@ export default {
     queryPage () {
       return this.$route.query.page || 1;
     },
+    container () {
+      return this.$route.params.container;
+    },
     objects () {
       return this.$store.state.objectCache;
+    },
+    objectTags() {
+      return this.$store.state.objectTagsCache;
     },
   },
   watch: {
@@ -357,6 +400,9 @@ export default {
         this.oList = this.objects;
       }
       this.checkedRows = [];
+    },
+    objectTags: function () {
+      this.tags = this.objectTags; // {"objectName": ["tag1", "tag2"]}
     },
     prefix: function () {
       if (this.renderFolders) {
@@ -382,10 +428,7 @@ export default {
   methods: {
     updateObjects: function () {
       // Update current object listing in Vuex if length is too little
-      this.$store.commit({
-        type: "updateObjects",
-        route: this.$route,
-      });
+      this.$store.dispatch("updateObjects", this.$route);
     },
     isRowCheckable: function (row) {
       return this.renderFolders ? this.isFile(row.name) : true;
@@ -567,6 +610,9 @@ export default {
           element => element.name.match(name_re),
         );
       }
+    },
+    displayTags: function (name) {
+      return this.showTags && !(this.renderFolders && !this.isFile(name));
     },
   },
 };
