@@ -197,6 +197,8 @@ let default_translations = {
       container_ops: {
         addContainer: "Add a new bucket",
         editContainer: "Editing bucket: ",
+        norename: "It is not possible to rename buckets. " +
+        "However, you can copy them with a new name.",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage: "Are you sure you want to delete this " +
                               "bucket?",
@@ -209,6 +211,8 @@ let default_translations = {
       objects: {
         objectName: "Object",
         editObject: "Editing object: ",
+        norename: "It is not possible to rename objects. " +
+        "However, you can copy them with a new name.",
         deleteConfirm: "Delete Objects",
         deleteObjects: "Delete Object / Objects",
         deleteSuccess: "Objects deleted",
@@ -429,6 +433,8 @@ let default_translations = {
       container_ops: {
         addContainer: "Luo uusi säiliö",
         editContainer: "Muokataan säiliötä: ",
+        norename: "Säiliötä ei voi nimetä uudelleen, " +
+        "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
@@ -439,6 +445,8 @@ let default_translations = {
       objects: {
         objectName: "Objekti",
         editObject: "Muokataan objekti: ",
+        norename: "Objektia ei voi nimetä uudelleen, " +
+        "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista objektit",
         deleteObjects: "Poista objekti / objektit",
         deleteSuccess: "Objektit poistettu",

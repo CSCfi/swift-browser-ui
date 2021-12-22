@@ -10,6 +10,9 @@
           : $t('message.container_ops.editContainer') + container
       }}
     </h1>
+    <b-message type="is-info">
+      {{ $t('message.container_ops.norename') }}
+    </b-message>
     <b-field
       horizontal
       :label="$t('message.container_ops.containerName')"

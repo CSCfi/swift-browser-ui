@@ -6,6 +6,9 @@
     <h1 class="title is-3">
       {{ $t('message.objects.editObject') + object }}
     </h1>
+    <b-message type="is-info">
+      {{ $t('message.objects.norename') }}
+    </b-message>
     <b-field
       horizontal
       :label="$t('message.objects.objectName')"
