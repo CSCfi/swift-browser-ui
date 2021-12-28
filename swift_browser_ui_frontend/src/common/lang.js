@@ -171,7 +171,7 @@ let default_translations = {
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested: "No shared buckets have been requested for the " +
                       "project.",
-      searchBy: "Search by Name",
+      searchBy: "Search by Name or Tag",
       sharing: "Sharing - ",
       containers: "Buckets - ",
       upload: " Upload",
@@ -403,7 +403,7 @@ let default_translations = {
                     "tai niiden käyttöä ei ole sallittu.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
-      searchBy: "Etsi nimellä",
+      searchBy: "Etsi nimellä tai tägillä",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
       upload: " Lähetä",
