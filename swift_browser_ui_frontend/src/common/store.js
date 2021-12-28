@@ -149,11 +149,11 @@ const store = new Vuex.Store({
         );
       });
     },
-    updateObjects: async function ({ commit, dispatch, client }, route) {
+    updateObjects: async function ({ commit, dispatch, state }, route) {
       let container = route.params.container;
       commit("loading", true);
       if (route.name == "SharedObjects") {
-        await client.getAccessDetails(
+        await state.client.getAccessDetails(
           route.params.project,
           container,
           route.params.owner,

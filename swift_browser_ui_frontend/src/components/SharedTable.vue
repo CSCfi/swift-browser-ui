@@ -160,11 +160,14 @@ export default {
       }
     },
     getConAddr: function (row) {
-      return "/browse/shared/".concat(
-        this.$route.params.project,
-        "/", row.owner,
-        "/", row.container,
-      );
+      return {
+        name: "SharedObjects",
+        params: {
+          project: this.$route.params.project,
+          owner: row.owner,
+          container: row.container,
+        },
+      };
     },
   },
 };
