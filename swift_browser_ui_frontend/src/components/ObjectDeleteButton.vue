@@ -53,7 +53,7 @@ export default {
         this.$route.params.container,
         to_remove,
       ).then(() => {
-        this.$store.dispatch("updateObjects", this.$route);
+        this.$store.dispatch("updateObjects", {route: this.$route});
       });
     },
   },

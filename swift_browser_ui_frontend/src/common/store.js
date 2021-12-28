@@ -124,7 +124,7 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    updateContainers: async function ({ commit, dispatch }) {
+    updateContainers: async function ({ commit, dispatch }, signal) {
       commit("loading", true);
       let containers = [];
       await getBuckets().then((ret) => {
@@ -137,19 +137,22 @@ const store = new Vuex.Store({
       }).catch(() => {
         commit("loading", false);
       });
-      dispatch("updateContainerTags", containers);
+      dispatch("updateContainerTags", {containers, signal});
       return containers;
     },
-    updateContainerTags: function ({ commit }, containers) {
+    updateContainerTags: function ({ commit }, {containers, signal}) {
       containers.map(async container => {
-        const tags = await getTagsForContainer(container.name);
+        const tags = await getTagsForContainer(container.name, signal);
         commit(
           "updateContainerTags", 
           {containerName: container.name, tags},
         );
       });
     },
-    updateObjects: async function ({ commit, dispatch, state }, route) {
+    updateObjects: async function (
+      { commit, dispatch, state }, 
+      {route, signal},
+    ) {
       let container = route.params.container;
       commit("loading", true);
       if (route.name == "SharedObjects") {
@@ -175,7 +178,10 @@ const store = new Vuex.Store({
           commit("loading", false);
         });
       } else {
-        await getObjects(container).then((ret) => {
+        await getObjects(
+          container,
+          signal,
+        ).then((ret) => {
           if (ret.status != 200) {
             commit("loading", false);
           }
@@ -186,9 +192,9 @@ const store = new Vuex.Store({
           commit("loading", false);
         });
       }
-      dispatch("updateObjectTags", route);
+      dispatch("updateObjectTags", {route, signal});
     },
-    updateObjectTags: async function ({ commit, state }, route) {
+    updateObjectTags: async function ({ commit, state }, {route, signal}) {
       if (!state.objectCache.length) {
         return;
       }
@@ -204,7 +210,12 @@ const store = new Vuex.Store({
           i === state.objectCache.length - 1
           || url.href.length > 2000
         ) {
-          getTagsForObjects(route.params.container, objectList, url)
+          getTagsForObjects(
+            route.params.container, 
+            objectList, 
+            url,
+            signal,
+          )
             .then(tags => 
               tags.map(item => {
                 commit(

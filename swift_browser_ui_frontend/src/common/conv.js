@@ -162,13 +162,18 @@ function extractTags(meta) {
   return [];
 }
 
-export async function getTagsForContainer(containerName) {
-  let meta = await getBucketMeta(containerName);
+export async function getTagsForContainer(containerName, signal) {
+  let meta = await getBucketMeta(containerName, signal);
   return extractTags(meta);
 }
 
-export async function getTagsForObjects(containerName, objectList, url) {
-  let meta = await getObjectsMeta(containerName, objectList, url);
+export async function getTagsForObjects(
+  containerName, 
+  objectList, 
+  url, 
+  signal,
+) {
+  let meta = await getObjectsMeta(containerName, objectList, url, signal);
   meta.map(item => item[1] = extractTags(item));
   return meta;
 }

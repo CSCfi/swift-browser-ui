@@ -317,6 +317,7 @@ export default {
       currentPage: 1,
       shareModalIsActive: false,
       showTags: true,
+      abortController: null,
     };
   },
   computed: {
@@ -348,17 +349,24 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
+    this.abortController = new AbortController();
     this.getDirectCurrentPage();
   },
   mounted() {
     this.fetchContainers();
+  },
+  beforeDestroy () {
+    this.abortController.abort();
   },
   methods: {
     fetchContainers: async function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
       if(this.bList.length < 1) {
-        await this.$store.dispatch("updateContainers");
+        await this.$store.dispatch(
+          "updateContainers", 
+          this.abortController.signal,
+        );
       }
     },
     checkPageFromRoute: function () {

@@ -170,7 +170,7 @@ new Vue({
         type: "is-success",
       });
       if (this.$route.params.container != undefined) {
-        this.$store.dispatch("updateObjects", this.$route);
+        this.$store.dispatch("updateObjects", {route: this.$route});
       }
     },
     fileFailureToast: function (file) {

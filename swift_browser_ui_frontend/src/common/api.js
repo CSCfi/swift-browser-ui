@@ -77,6 +77,7 @@ export async function getBuckets() {
 
 export async function getBucketMeta(
   container,
+  signal,
 ){
   let url = new URL(
     "/api/bucket/meta?container=".concat(encodeURI(container)),
@@ -84,7 +85,7 @@ export async function getBucketMeta(
   );
 
   let ret = await fetch(
-    url, {method: "GET", credentials: "same-origin"},
+    url, {method: "GET", credentials: "same-origin", signal},
   );
   return ret.json();
 }
@@ -109,7 +110,7 @@ export async function updateBucketMeta(
   return ret;
 }
 
-export async function getObjects(container) {
+export async function getObjects(container, signal) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
   let objUrl = new URL("/api/bucket/objects", document.location.origin);
@@ -117,7 +118,7 @@ export async function getObjects(container) {
   // over from S3 to Swift
   objUrl.searchParams.append("bucket", container);
   let objects = fetch(
-    objUrl, { method: "GET", credentials: "same-origin" },
+    objUrl, { method: "GET", credentials: "same-origin", signal },
   ).then(
     function (resp) { return resp.json(); },
   ).then(
@@ -138,13 +139,14 @@ export async function getObjectsMeta (
   container,
   objects,
   url,
+  signal,
 ){
   if (url === undefined) {  
     url = makeGetObjectsMetaURL(container, objects);
   }
 
   let ret = await fetch(
-    url, {method: "GET", credentials: "same-origin"},
+    url, {method: "GET", credentials: "same-origin", signal},
   );
   return ret.json();
 }

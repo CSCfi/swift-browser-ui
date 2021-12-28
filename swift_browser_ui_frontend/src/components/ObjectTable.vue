@@ -362,6 +362,7 @@ export default {
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
+      abortController: null,
     };
   },
   computed: {
@@ -419,16 +420,23 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
+    this.abortController = new AbortController();
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
   mounted () {
     this.updateObjects();
   },
+  beforeDestroy () {
+    this.abortController.abort();
+  },
   methods: {
     updateObjects: function () {
       // Update current object listing in Vuex if length is too little
-      this.$store.dispatch("updateObjects", this.$route);
+      this.$store.dispatch(
+        "updateObjects", 
+        {route: this.$route, signal: this.abortController.signal},
+      );
     },
     isRowCheckable: function (row) {
       return this.renderFolders ? this.isFile(row.name) : true;
