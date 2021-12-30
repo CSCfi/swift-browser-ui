@@ -97,7 +97,8 @@ COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && npm install -g npm@7.20.5 \
-    && npm install \
+    && npm install
+RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && npm run build-devel
 
 FROM python:3.8-alpine3.12 as BACKEND
@@ -115,8 +116,8 @@ COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_fron
 COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/js/libupload.wasm
 
 RUN pip install --upgrade pip && \
-    pip install -r /root/swift_ui/requirements.txt && \
-    pip install /root/swift_ui
+    pip install -r /root/swift_ui/requirements.txt
+RUN pip install /root/swift_ui
 
 FROM python:3.8-alpine3.12
 
