@@ -1,5 +1,7 @@
 <template>
-  <div id="object-table">
+  <div
+    id="object-table"
+  >
     <b-field
       grouped
       group-multiline
@@ -56,19 +58,17 @@
       <div class="field has-addons uploadGroup">
         <p class="control">
           <b-button
-            label="Upload Encrypted"
+            :label="$t('message.upload')"
             type="is-primary"
             outlined
-            icon-left="lock"
+            icon-left="upload"
             tag="router-link"
-            :to="{name: 'EncryptedUpload', params: {
-              project: $route.params.project,
+            :to="{name: 'UploadView', params: {
+              project: ($route.params.owner ? $route.params.owner
+                : $route.params.project),
               container: $route.params.container,
             }}"
           />
-        </p>
-        <p class="control">
-          <FolderUploadForm dropelement="object-table" />
         </p>
         <p class="control">
           <ContainerDownloadLink />
@@ -345,7 +345,6 @@ import { getHumanReadableSize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
@@ -353,7 +352,6 @@ export default {
   name: "ObjectTable",
   components: {
     ContainerDownloadLink,
-    FolderUploadForm,
     ReplicateContainerButton,
     DeleteObjectsButton,
   },

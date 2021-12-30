@@ -34,6 +34,9 @@ async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamR
     resp.headers["Content-Type"] = await download.a_get_type()
     resp.headers["Content-Length"] = str(await download.a_get_size())
 
+    if "origin" in request.headers:
+        resp.headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+
     await resp.prepare(request)
 
     # Create a task for writing the output into the StreamResponse

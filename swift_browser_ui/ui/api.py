@@ -367,18 +367,21 @@ async def swift_download_container(
     return resp
 
 
-async def swift_upload_object_chunk(
+async def get_upload_session(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
-    """Point a user to the object upload runner."""
+    """Return a pre-signed upload runner session for upload target."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for object upload runner from "
+        "API call for object upload runner info request from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
+    try:
+        project: str = request.match_info["project"]
+        container: str = request.match_info["container"]
+    except KeyError:
+        raise aiohttp.web.HTTPBadRequest
 
     runner_id = await open_upload_runner_session(
         session,
@@ -390,16 +393,13 @@ async def swift_upload_object_chunk(
     path = f"/{project}/{container}"
     signature = await sign(3600, path)
 
-    path += f"?session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    resp = aiohttp.web.Response(status=307)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    request.app["Log"].info(f"redirecting {session} to {resp.headers['Location']}")
-
-    return resp
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "url": f"{setd['upload_external_endpoint']}{path}",
+            "signature": signature,
+        }
+    )
 
 
 async def swift_replicate_container(
@@ -431,40 +431,6 @@ async def swift_replicate_container(
 
     for i in request.query.keys():
         path += f"&{i}={request.query[i]}"
-
-    resp = aiohttp.web.Response(status=307)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    return resp
-
-
-async def swift_check_object_chunk(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Point check for object existence to the upload runner."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call to check object existence in upload runner from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-
-    path = f"/{project}/{container}"
-    signature = await sign(3600, path)
-
-    path += f"?{request.query_string}"
-    path += f"&session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
 
     resp = aiohttp.web.Response(status=307)
     resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"

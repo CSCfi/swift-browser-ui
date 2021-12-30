@@ -9,21 +9,33 @@
     >
       {{ $t('message.cancelupload') }}
     </b-button>
-    <UploadButton
+    <b-field 
       v-else
-      :id="id"
-    />
+      class="file is-primary"
+    >
+      <b-upload
+        v-model="files"
+        class="file-label"
+        multiple
+        @input="beginUpload"
+      >
+        <span class="file-cta">
+          <b-icon
+            class="file-icon"
+            icon="upload"
+          />
+          <span class="file-label">{{ $t('message.upload') }}</span>
+        </span>
+      </b-upload>
+    </b-field>
   </div>
 </template>
 
 <script>
-import UploadButton from "@/components/UploadButton";
+import { getUploadEndpoint } from "@/common/api";
 
 export default {
   name: "FolderUploadForm",
-  components: {
-    UploadButton,
-  },
   props: {
     dropelement: {
       default: "",
@@ -33,6 +45,7 @@ export default {
   data: function () {
     return {
       id: "upload-".concat(Date.now().toString()),
+      files: [],
     };
   },
   computed: {
@@ -42,16 +55,28 @@ export default {
     isUploading () {
       return this.$store.state.isUploading;
     },
-  },
-  mounted () {
-    this.registerToResumable();
+    active () {
+      return this.$store.state.active;
+    },
   },
   methods: {
-    registerToResumable: function () {
-      // Add elements to listen
-      if(this.dropelement != "") {
-        this.res.assignDrop(document.getElementById(this.dropelement));
+    aBeginUpload: async function () {
+      let altContainer = "upload-".concat(Date.now().toString());
+      if (this.$route.params.container) {
+        altContainer = this.$route.params.container;
       }
+
+      let uploadInfo = await getUploadEndpoint(
+        this.$route.params.owner ? this.$route.params.owner : this.active.id,
+        altContainer,
+      );
+      this.$store.commit("setAltContainer", altContainer);
+      this.$store.commit("setUploadInfo", uploadInfo);
+      
+      this.res.addFiles(this.files, undefined);
+    },
+    beginUpload: function() {
+      this.aBeginUpload();
     },
   },
 };
