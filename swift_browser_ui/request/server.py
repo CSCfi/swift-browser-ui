@@ -33,6 +33,8 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 async def resume_on_start(app: aiohttp.web.Application) -> None:
     """Resume old instance on start."""
+    app["db_conn"] = DBConn()
+    app["tokens"] = []
     await app["db_conn"].open()
 
 
@@ -52,9 +54,6 @@ async def init_server() -> aiohttp.web.Application:
             swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type: ignore
         ]
     )
-
-    app["db_conn"] = DBConn()
-    app["tokens"] = []
 
     app.add_routes(
         [

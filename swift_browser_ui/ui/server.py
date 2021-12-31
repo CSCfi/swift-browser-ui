@@ -64,6 +64,22 @@ from swift_browser_ui.ui._convenience import clear_session_info
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
+async def startup(app: aiohttp.web.Application) -> None:
+    """Add startup web server state configuration."""
+    # Mutable_map handles cookie storage, also stores the object that provides
+    # the encryption we use
+    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
+    # Create a signature salt to prevent editing the signature on the client
+    # side. Hash function doesn't need to be cryptographically secure, it's
+    # just a convenient way of getting ascii output from byte values.
+    app["Salt"] = secrets.token_hex(64)
+    # Set application specific logging
+    app["Log"] = logging.getLogger("swift-browser-ui")
+    app["Log"].info("Set up logging for the swift-browser-ui application")
+    # Cookie keyed dict for storing session data
+    app["Sessions"] = {}
+
+
 async def kill_sess_on_shutdown(app: aiohttp.web.Application) -> None:
     """Kill all open sessions and purge their data when killed."""
     logging.info(f"Gracefully shutting down the program at {time.ctime()}")
@@ -88,19 +104,6 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(middlewares=[error_middleware])  # type: ignore
-
-    # Mutable_map handles cookie storage, also stores the object that provides
-    # the encryption we use
-    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
-    # Create a signature salt to prevent editing the signature on the client
-    # side. Hash function doesn't need to be cryptographically secure, it's
-    # just a convenient way of getting ascii output from byte values.
-    app["Salt"] = secrets.token_hex(64)
-    # Set application specific logging
-    app["Log"] = logging.getLogger("swift-browser-ui")
-    app["Log"].info("Set up logging for the swift-browser-ui application")
-    # Cookie keyed dict for storing session data
-    app["Sessions"] = {}
 
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:
@@ -214,6 +217,7 @@ async def servinit() -> aiohttp.web.Application:
         ]
     )
 
+    app.on_startup.append(startup)
     app.on_startup.append(open_client_to_app)
 
     # Add graceful shutdown handler
