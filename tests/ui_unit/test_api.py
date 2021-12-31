@@ -26,9 +26,7 @@ from swift_browser_ui.ui.api import get_project_metadata
 from swift_browser_ui.ui.api import get_os_active_project
 from swift_browser_ui.ui.api import swift_download_shared_object
 from swift_browser_ui.ui.api import swift_download_container
-from swift_browser_ui.ui.api import swift_upload_object_chunk
 from swift_browser_ui.ui.api import swift_replicate_container
-from swift_browser_ui.ui.api import swift_check_object_chunk
 from swift_browser_ui.ui.settings import setd
 
 from tests.ui_unit.creation import get_request_with_mock_openstack
@@ -532,16 +530,6 @@ class TestProxyFunctions(asynctest.TestCase):
             self.assertIn("test-endpoint", resp.headers["Location"])
             self.assertEqual(303, resp.status)
 
-    async def test_swift_upload_object_chunk(self):
-        """Test upload object chunk handler."""
-        with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
-            resp = await swift_upload_object_chunk(self.mock_request)
-
-            self.assertIn("test-signature", resp.headers["Location"])
-            self.assertIn("test-valid", resp.headers["Location"])
-            self.assertIn("test-endpoint", resp.headers["Location"])
-            self.assertEqual(307, resp.status)
-
     async def test_swift_replicate_container(self):
         """Test replicate container handler."""
         with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
@@ -555,14 +543,3 @@ class TestProxyFunctions(asynctest.TestCase):
             self.assertIn("test-container-2", resp.headers["Location"])
             self.assertIn("from_project", resp.headers["Location"])
             self.assertIn("test-project-2", resp.headers["Location"])
-
-    async def test_swift_check_object_chunk(self):
-        """Test upload object chunk handler."""
-        with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
-            resp = await swift_check_object_chunk(self.mock_request)
-
-            self.assertIn("test-signature", resp.headers["Location"])
-            self.assertIn("test-valid", resp.headers["Location"])
-            self.assertIn("test-endpoint", resp.headers["Location"])
-            self.assertEqual(307, resp.status)
-            self.assertIn("&test-query=test-value", resp.headers["Location"])
