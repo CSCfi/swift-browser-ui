@@ -34,7 +34,6 @@ writing the tests:
 
 * `tox for test automation <https://tox.readthedocs.io/en/latest/>`_
 * `cypress for UI test automation <https://www.cypress.io/>`_
-* `asynctest for implementing async testing with TestCase class <https://asynctest.readthedocs.io/en/latest/>`_
 * `pytest-timeout for timing out UI tests, which can hang when failing <https://pypi.org/project/pytest-timeout/1.2.1/>`_
 
 UI tests also require the WebDrivers for Chrome and Firefox, if tests are to

@@ -2,17 +2,16 @@
 
 
 import types
-import unittest.mock
+import unittest
 
 import aiohttp.web
-import asynctest.mock
 
 import swift_browser_ui.upload.api
 
 import tests.common.mockups
 
 
-class APITestClass(asynctest.TestCase):
+class APITestClass(unittest.IsolatedAsyncioTestCase):
     """Test class for swift_browser_ui.upload.api functions."""
 
     def setUp(self) -> None:
@@ -26,13 +25,11 @@ class APITestClass(asynctest.TestCase):
 
         self.mock_upload_instance = types.SimpleNamespace(
             **{
-                "a_add_chunk": asynctest.mock.CoroutineMock(return_value="add-success"),
-                "a_check_segment": asynctest.mock.CoroutineMock(
-                    return_value="check-success"
-                ),
+                "a_add_chunk": unittest.mock.AsyncMock(return_value="add-success"),
+                "a_check_segment": unittest.mock.AsyncMock(return_value="check-success"),
             }
         )
-        self.mock_get_upload_instance = asynctest.mock.CoroutineMock(
+        self.mock_get_upload_instance = unittest.mock.AsyncMock(
             return_value=self.mock_upload_instance
         )
         self.patch_get_upload_instance = unittest.mock.patch(
@@ -42,7 +39,7 @@ class APITestClass(asynctest.TestCase):
 
         self.mock_response = types.SimpleNamespace(
             **{
-                "prepare": asynctest.mock.CoroutineMock(),
+                "prepare": unittest.mock.AsyncMock(),
                 "headers": {},
             }
         )
@@ -53,13 +50,11 @@ class APITestClass(asynctest.TestCase):
             "aiohttp.web.StreamResponse", self.mock_streamresponse_init
         )
 
-        self.mock_a_begin = asynctest.mock.CoroutineMock()
-        self.mock_a_get_type = asynctest.mock.CoroutineMock(
-            return_value="binary/octet-stream"
-        )
-        self.mock_a_get_size = asynctest.mock.CoroutineMock(return_value="1024")
-        self.mock_a_write = asynctest.mock.CoroutineMock()
-        self.mock_a_begin_container = asynctest.mock.CoroutineMock()
+        self.mock_a_begin = unittest.mock.AsyncMock()
+        self.mock_a_get_type = unittest.mock.AsyncMock(return_value="binary/octet-stream")
+        self.mock_a_get_size = unittest.mock.AsyncMock(return_value="1024")
+        self.mock_a_write = unittest.mock.AsyncMock()
+        self.mock_a_begin_container = unittest.mock.AsyncMock()
         self.mock_download = types.SimpleNamespace(
             **{
                 "a_begin_download": self.mock_a_begin,
@@ -102,7 +97,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_handle_replicate_container(self):
         """Test swift_browser_ui.upload.api.handle_replicate_container."""
-        mock_copy_from_container = asynctest.mock.CoroutineMock()
+        mock_copy_from_container = unittest.mock.AsyncMock()
         mock_replicator = types.SimpleNamespace(
             **{"a_copy_from_container": mock_copy_from_container}
         )
@@ -135,7 +130,7 @@ class APITestClass(asynctest.TestCase):
 
     async def test_handle_replicate_object(self):
         """Test swift_brwser_ui.upload.api.handle_replicate_object."""
-        mock_copy_object = asynctest.mock.CoroutineMock()
+        mock_copy_object = unittest.mock.AsyncMock()
         mock_replicator = types.SimpleNamespace(**{"a_copy_object": mock_copy_object})
         mock_init_replicator = unittest.mock.Mock(return_value=mock_replicator)
         patch_replicator = unittest.mock.patch(
@@ -171,13 +166,13 @@ class APITestClass(asynctest.TestCase):
     async def test_handle_post_object_chunk(self):
         """Test swift_browser_ui.upload.api.handle_post_object_chunk."""
         # Test for the edge cases of rerouted POST
-        mock_handle_repl_object = asynctest.mock.CoroutineMock(
+        mock_handle_repl_object = unittest.mock.AsyncMock(
             return_value=aiohttp.web.Response()
         )
         patch_handle_repl_object = unittest.mock.patch(
             "swift_browser_ui.upload.api.handle_replicate_object", mock_handle_repl_object
         )
-        mock_handle_repl_container = asynctest.mock.CoroutineMock(
+        mock_handle_repl_container = unittest.mock.AsyncMock(
             return_value=aiohttp.web.Response()
         )
         patch_handle_repl_container = unittest.mock.patch(
@@ -197,7 +192,7 @@ class APITestClass(asynctest.TestCase):
         mock_handle_repl_container.assert_called_once()
 
         # The actual test for uploaded object chunk post
-        mock_parse_multipart_in = asynctest.mock.CoroutineMock(
+        mock_parse_multipart_in = unittest.mock.AsyncMock(
             return_value=("example-query", "example-data")
         )
         patch_parse_multipart_in = unittest.mock.patch(
@@ -245,9 +240,7 @@ class APITestClass(asynctest.TestCase):
         # Handle edge case of uploaded object chunk check
         req = tests.common.mockups.Mock_Request()
         req.set_query({"resumableChunkNumber": 1})
-        mock_get_object_chunk = asynctest.mock.CoroutineMock(
-            return_value="get-chunk-success"
-        )
+        mock_get_object_chunk = unittest.mock.AsyncMock(return_value="get-chunk-success")
         patch_get_object_chunk = unittest.mock.patch(
             "swift_browser_ui.upload.api.handle_get_object_chunk", mock_get_object_chunk
         )

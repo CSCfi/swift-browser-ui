@@ -4,7 +4,7 @@
 import unittest
 import os
 
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 
 from swift_browser_ui.ui.server import servinit
 
@@ -21,7 +21,6 @@ class FrontendTestCase(AioHTTPTestCase):
         """."""
         return True
 
-    @unittest_run_loop
     async def test_browse(self):
         """Test /browse handler."""
         patch_setd = unittest.mock.patch(
@@ -36,7 +35,6 @@ class FrontendTestCase(AioHTTPTestCase):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.headers["Content-type"], "text/html")
 
-    @unittest_run_loop
     async def test_index(self):
         """Test / handler."""
         patch_setd = unittest.mock.patch(
@@ -51,7 +49,6 @@ class FrontendTestCase(AioHTTPTestCase):
             self.assertEqual(response.status, 200)
             self.assertEqual(response.headers["Content-type"], "text/html")
 
-    @unittest_run_loop
     async def test_loginpassword(self):
         """Test /loginpassword handler."""
         patch_setd = unittest.mock.patch(

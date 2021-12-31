@@ -8,7 +8,6 @@ import types
 import logging
 
 from aiohttp.web import HTTPNotFound
-import asynctest
 
 from swiftclient.service import SwiftError
 
@@ -34,7 +33,7 @@ from swift_browser_ui.ui.settings import setd
 from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
-class APITestClass(asynctest.TestCase):
+class APITestClass(unittest.IsolatedAsyncioTestCase):
     """Testing the Object Browser API."""
 
     def setUp(self):
@@ -457,7 +456,7 @@ class APITestClass(asynctest.TestCase):
         self.request = None
 
 
-class TestProxyFunctions(asynctest.TestCase):
+class TestProxyFunctions(unittest.IsolatedAsyncioTestCase):
     """Test the handlers proxying information to the upload runner."""
 
     def setUp(self):
@@ -492,12 +491,12 @@ class TestProxyFunctions(asynctest.TestCase):
             "swift_browser_ui.ui.api.api_check", self.api_check_mock
         )
 
-        self.session_open_mock = asynctest.CoroutineMock(return_value="test_runner_id")
+        self.session_open_mock = unittest.mock.AsyncMock(return_value="test_runner_id")
         self.patch_runner_session = unittest.mock.patch(
             "swift_browser_ui.ui.api.open_upload_runner_session", self.session_open_mock
         )
 
-        self.sign_mock = asynctest.CoroutineMock(
+        self.sign_mock = unittest.mock.AsyncMock(
             return_value={
                 "signature": "test-signature",
                 "valid": "test-valid",

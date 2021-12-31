@@ -4,8 +4,7 @@
 from types import SimpleNamespace
 
 
-import unittest.mock
-import asynctest
+import unittest
 import aiohttp.web
 
 
@@ -21,7 +20,7 @@ from swift_browser_ui.sharing.api import (
 )
 
 
-class APITestClass(asynctest.TestCase):
+class APITestClass(unittest.IsolatedAsyncioTestCase):
     """Test the sharing backend public API."""
 
     def setUp(self):
@@ -31,14 +30,14 @@ class APITestClass(asynctest.TestCase):
                 "app": {
                     "db_conn": SimpleNamespace(
                         **{
-                            "add_share": asynctest.CoroutineMock(),
-                            "edit_share": asynctest.CoroutineMock(),
-                            "delete_share": asynctest.CoroutineMock(),
-                            "delete_container_shares": asynctest.CoroutineMock(),
-                            "get_access_list": asynctest.CoroutineMock(),
-                            "get_shared_list": asynctest.CoroutineMock(),
-                            "get_access_container_details": asynctest.CoroutineMock(),
-                            "get_shared_container_details": asynctest.CoroutineMock(),
+                            "add_share": unittest.mock.AsyncMock(),
+                            "edit_share": unittest.mock.AsyncMock(),
+                            "delete_share": unittest.mock.AsyncMock(),
+                            "delete_container_shares": unittest.mock.AsyncMock(),
+                            "get_access_list": unittest.mock.AsyncMock(),
+                            "get_shared_list": unittest.mock.AsyncMock(),
+                            "get_access_container_details": unittest.mock.AsyncMock(),
+                            "get_shared_container_details": unittest.mock.AsyncMock(),
                         }
                     ),
                 },
