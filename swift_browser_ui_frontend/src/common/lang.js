@@ -5,13 +5,6 @@ import lang_overrides from "@/assets/lang_overrides";
 let default_translations = {
   en: {
     message: {
-      keys: {
-        default: {
-          project: "5e26ea3590b94423aea712aad7a289d4",
-          container: "sd-public-keys",
-          object: "sd-pubkey-c4gh.pub",
-        },
-      },
       index: {
         formName: "Openstack Account",
         logIn: "Log In",
@@ -289,13 +282,6 @@ let default_translations = {
   },
   fi: {
     message: {
-      keys: {
-        default: {
-          project: "5e26ea3590b94423aea712aad7a289d4",
-          container: "sd-public-keys",
-          object: "sd-pubkey-c4gh.pub",
-        },
-      },
       index: {
         formName: "Openstack Käyttäjä",
         logIn: "Kirjaudu sisään",
