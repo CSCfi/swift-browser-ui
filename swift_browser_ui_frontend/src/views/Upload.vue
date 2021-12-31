@@ -456,9 +456,10 @@ export default {
         this.$store.commit("setAltContainer", this.$route.params.container);
         let files = [];
         for (let f of this.files) {
+          let path = f.relativePath ? f.relativePath : f.name;
           let outname = (
             "/data/"
-            + (f.relativePath ? f.relativePath : f.name)
+            + path
             + ".c4gh");
           let newFile = new Blob(
             [FS.readFile(outname).buffer], // eslint-disable-line
@@ -466,6 +467,7 @@ export default {
               type: "binary/octet-stream",
             },
           );
+          newFile.relativePath = path + ".c4gh";
           newFile.name = f.name + ".c4gh";
           files.push(newFile);
         }

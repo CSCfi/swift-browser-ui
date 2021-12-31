@@ -40,6 +40,7 @@ const store = new Vuex.Store({
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
+    currentPrefix: "",
   },
   mutations: {
     loading(state, payload) {
@@ -135,6 +136,12 @@ const store = new Vuex.Store({
     },
     eraseTransfer (state) {
       state.transfer = [];
+    },
+    setPrefix (state, prefix) {
+      state.currentPrefix = prefix;
+    },
+    erasePrefix (state) {
+      state.currentPrefix = "";
     },
   },
   actions: {

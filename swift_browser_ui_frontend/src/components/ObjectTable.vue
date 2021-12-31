@@ -419,6 +419,7 @@ export default {
     prefix: function () {
       if (this.renderFolders) {
         this.oList = this.getFolderContents();
+        this.$store.commit("setPrefix", this.prefix);
       }
     },
     queryPage: function () {
@@ -429,6 +430,7 @@ export default {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
+    this.$store.commit("erasePrefix");
   },
   beforeMount () {
     this.abortController = new AbortController();

@@ -96,6 +96,9 @@ new Vue({
     uploadInfo () {
       return this.$store.state.uploadInfo;
     },
+    prefix () {
+      return this.$store.state.currentPrefix;
+    },
   },
   created() {
     document.title = this.$t("message.program_name");
@@ -238,14 +241,14 @@ new Vue({
       for (const param of params) {
         let newParam = param.split("=");
         // check if we should move the file under a pseudofolder
-        // using the current prefix defined in route for the url
+        // using the current prefix defined in state for the url
         if (
           newParam[0].match("resumableRelativePath")
-          && this.$route.query.prefix != undefined
+          && this.prefix != undefined
         ) {
           retUrl.searchParams.append(
             newParam[0],
-            this.$route.query.prefix + newParam[1],
+            this.prefix + newParam[1],
           );
         } else {
           retUrl.searchParams.append(newParam[0], newParam[1]);
