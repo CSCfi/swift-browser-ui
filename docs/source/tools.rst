@@ -52,6 +52,6 @@ Charts
 ~~~~~~
 The charts in documentation are made with `Dia <http://dia-installer.de/doc/en/index.html>`_. The program is old
 fashioned, but versatile and can be installed without adding repositories,
-with the added benefit of not requiring the use of browser toools for making
+with the added benefit of not requiring the use of browser tools for making
 the charts. Charts are located in ``docs/charts``, and the exported vector
 graphics file is linked into the documentation image directory.

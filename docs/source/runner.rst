@@ -45,7 +45,7 @@ Full containers can be downloaded from the UI using the download button either
 on the table row in the container listing, or a download button on the top of
 the table when viewing an open container. Downloading whole containers works
 the same in both owned and shared containers. The runner archives the
-container while the download is taking place, in order to prevent aditional
+container while the download is taking place, in order to prevent additional
 waiting for an archiving operation to finish. This has the added benefit of
 not requiring any intermediary storage for the archiving operation on the
 server side.

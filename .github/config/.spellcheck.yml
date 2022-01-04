@@ -1,0 +1,42 @@
+matrix:
+- name: Markdown
+  aspell:
+    lang: en
+    ignore-case: true
+  dictionary:
+    wordlists:
+    - .github/config/.wordlist.txt
+    encoding: utf-8
+  pipeline:
+  - pyspelling.filters.markdown:
+  - pyspelling.filters.context:
+      context_visible_first: true
+      escapes: '\\[\\`~]'
+      delimiters:
+      # Ignore text between inline back ticks as this is code or hightlight words
+      - open: '(?P<open>`+)'
+        close: '(?P=open)'
+      # Ignore surrounded in <> as in RST it is link
+      - open: '<([A-Za-z0-9-_:.]+)|(https?://[^\s/$.?#].[^\s]+|[A-Za-z0-9-_:.]+)'
+        close: '>'
+  sources:
+  - 'docs/source/*.rst'
+  - '**/*.md'
+  default_encoding: utf-8
+- name: English Language spellcheck
+  aspell:
+    lang: en
+    ignore-case: true
+  dictionary:
+    wordlists:
+    - .github/config/.wordlist.txt
+    - .github/config/.finnishwords.txt
+  pipeline:
+  - pyspelling.filters.javascript:
+      jsdocs: false
+      line_comments: false
+      block_comments: false
+      strings: true
+      decode_escapes: false
+  sources:
+  - swift_browser_ui_frontend/src/common/lang.js
