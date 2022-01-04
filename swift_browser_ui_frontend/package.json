@@ -11,7 +11,7 @@
   "dependencies": {
     "@vue/cli-service": "^5.0.0-rc.1",
     "buefy": "^0.9.14",
-    "core-js": "^3.19.2",
+    "core-js": "^3.20.2",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node-sass": "^6.0.1",
