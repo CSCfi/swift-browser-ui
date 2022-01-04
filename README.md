@@ -17,7 +17,7 @@ compliant object storage, supporting SSO with SAML2 federated authentication.
 
 Project documentation is hosted on readthedocs: https://swift-browser-ui.rtfd.io
 
-Readmes on the additional APIs for container sharing, access requests, and
+Information on the additional APIs for container sharing, access requests, and
 better upload and download functionality are in their separate files.
 
 * [Container sharing](README-sharing.md)

@@ -126,3 +126,6 @@ swift_browser_ui_frontend/src/common/swift_x_account_sharing_bind.js
 
 # Tests
 tests/ui_front/swift-browser-ui
+
+# ignore pyspelling
+dictionary.dic

@@ -23,14 +23,14 @@ let default_translations = {
                          "username.",
         UIdown: "503 - Service Unavailable",
         UIdown_text: "Allas User Interface is currently Unavailable",
-        Unauthorized: "401 – Not logged in",
+        Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
                            "in, or the log in credentials were incorrect. " +
                            "Use the button below to Log in.",
-        Notfound: "404 – Could not find the page that was requested.",
-        Notfound_text: "The front page, however, can be found – in the link " +
+        Notfound: "404 – Could not find the page that was requested.",
+        Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
-        Forbidden: "403 – Wait, that is forbidden!",
+        Forbidden: "403 – Wait, that is forbidden!",
         Forbidden_text: "The previous request could not be fulfilled. " +
                         "If said operation should be allowed to be " +
                         "performed, contact the service administrator. " +
@@ -145,7 +145,7 @@ let default_translations = {
       },
       request: {
         project: "Project",
-        container: "Bucket / Identfier",
+        container: "Bucket / Identifier",
         container_message: "The requested bucket name",
         owner: "Owner Project Identifier",
         owner_message: "Project Identifier of the bucket owner",
@@ -260,12 +260,12 @@ let default_translations = {
                          "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
-        Unauthorized: "401 – Kirjaudu sisään",
+        Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
                            "jonka voi toteuttaa oheisesta painikkeesta.",
         Notfound: "404 – Etsittyä sivua ei löydetty.",
         Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
-        Forbidden: "403 – Tuo on kiellettyä.",
+        Forbidden: "403 – Tuo on kiellettyä.",
         Forbidden_text: "Edellinen operaatio ei ole sallittu. Mikäli " +
                         "kyseisen operaation tulisi olla sallittu, ota " +
                         "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
@@ -400,7 +400,7 @@ let default_translations = {
       downloadAltLarge: "Hyväksy suuren tiedoston lataus",
       largeDownMessage: "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
                         "erikseen. Paina hyväksyäksesi suuret lataukset " +
-                        "nykyisen kirjautumisen ajaksi.",
+                        "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
       emptyProject: "Projektilla ei ole säiliöitä " +
