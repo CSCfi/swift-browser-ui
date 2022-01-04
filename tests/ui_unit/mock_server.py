@@ -2,8 +2,8 @@
 
 
 from os import environ
-import unittest.mock
 import logging
+import unittest.mock
 
 
 import swift_browser_ui.ui.server

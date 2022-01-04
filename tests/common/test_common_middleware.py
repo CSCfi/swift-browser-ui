@@ -2,9 +2,7 @@
 
 
 import types
-import unittest.mock
-
-import asynctest
+import unittest
 import aiohttp.web
 
 import asyncpg.exceptions
@@ -12,7 +10,7 @@ import asyncpg.exceptions
 import swift_browser_ui.common.common_middleware as middle
 
 
-class CommonMiddlewareTestCase(asynctest.TestCase):
+class CommonMiddlewareTestCase(unittest.IsolatedAsyncioTestCase):
     """Common midleware unit test class"""
 
     def setUp(self):
@@ -24,7 +22,7 @@ class CommonMiddlewareTestCase(asynctest.TestCase):
             }
         )
         self.app_mock = {}
-        self.mock_handler = asynctest.CoroutineMock(return_value=aiohttp.web.Response())
+        self.mock_handler = unittest.mock.AsyncMock(return_value=aiohttp.web.Response())
         super().setUp()
 
     async def test_add_cors(self):
@@ -55,7 +53,7 @@ class CommonMiddlewareTestCase(asynctest.TestCase):
 
     async def test_catch_uniqueness_error(self):
         """Test uniqueness error catch middleware."""
-        unique_violating_handler = asynctest.CoroutineMock(
+        unique_violating_handler = unittest.mock.AsyncMock(
             side_effect=asyncpg.exceptions.UniqueViolationError
         )
         with self.assertRaises(aiohttp.web.HTTPConflict):
@@ -64,21 +62,21 @@ class CommonMiddlewareTestCase(asynctest.TestCase):
             )
 
 
-class HandleValidateAuthTest(asynctest.TestCase):
+class HandleValidateAuthTest(unittest.IsolatedAsyncioTestCase):
     """Auth middleware tests."""
 
     async def test_handle_validate_authentication_success(self):
         """Test authentication validation handler success."""
-        t_singature_mock = asynctest.CoroutineMock()
+        t_singature_mock = unittest.mock.AsyncMock()
         t_signature_patch = unittest.mock.patch(
             "swift_browser_ui.common.signature.test_signature", t_singature_mock
         )
 
-        get_tokens_mock = asynctest.CoroutineMock(
+        get_tokens_mock = unittest.mock.AsyncMock(
             return_value=[{"token": "example-token"}]
         )
 
-        handler_mock = asynctest.CoroutineMock()
+        handler_mock = unittest.mock.AsyncMock()
         request_mock = types.SimpleNamespace(
             **{
                 "app": {
@@ -98,7 +96,7 @@ class HandleValidateAuthTest(asynctest.TestCase):
 
     async def test_handle_validate_authentication_failure(self):
         """Test authentication validation handler failure."""
-        handler_mock = asynctest.CoroutineMock()
+        handler_mock = unittest.mock.AsyncMock()
         request_mock = types.SimpleNamespace(
             **{
                 "query": {"signature": "a", "vali": "b"},
@@ -112,7 +110,7 @@ class HandleValidateAuthTest(asynctest.TestCase):
 
     async def test_handle_validate_authentication_health(self):
         """Test authentication validation handler upon health check."""
-        handler_mock = asynctest.CoroutineMock()
+        handler_mock = unittest.mock.AsyncMock()
         request_mock = types.SimpleNamespace(
             **{
                 "path": "/health",

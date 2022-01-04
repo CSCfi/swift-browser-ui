@@ -6,7 +6,6 @@ import unittest
 import json
 import types
 
-import asynctest
 import aiohttp
 
 import swift_browser_ui.ui.login
@@ -28,7 +27,7 @@ from tests.common.mockups import (
 _path = "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso"
 
 
-class LoginTestClass(asynctest.TestCase):
+class LoginTestClass(unittest.IsolatedAsyncioTestCase):
     """Testing the Object Browser API."""
 
     async def test_handle_login(self):

@@ -6,7 +6,6 @@ import os
 
 from aiohttp.web import HTTPUnauthorized, HTTPForbidden, HTTPNotFound
 from aiohttp.web import Response, HTTPClientError, FileResponse
-import asynctest
 
 from swift_browser_ui.ui.middlewares import error_middleware
 from swift_browser_ui.ui.front import index
@@ -40,7 +39,7 @@ async def return_400_handler(with_exception):
     return Response(status=400)
 
 
-class MiddlewareTestClass(asynctest.TestCase):
+class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
     """Testing the error middleware."""
 
     async def test_401_return(self):

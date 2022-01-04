@@ -1,10 +1,7 @@
 """Module for testing server.py."""
 
 
-import unittest.mock
-
-
-import asynctest
+import unittest
 import aiohttp
 
 
@@ -15,7 +12,7 @@ from swift_browser_ui.request.server import (
 )
 
 
-class ServerTestCase(asynctest.TestCase):
+class ServerTestCase(unittest.IsolatedAsyncioTestCase):
     """Test case for testing server module functions."""
 
     async def test_init_server(self):

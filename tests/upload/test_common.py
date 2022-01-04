@@ -1,9 +1,8 @@
 """Unit tests for swift_browser_ui.upload.common module."""
 
 
-import unittest.mock
+import unittest
 
-import asynctest
 import aiohttp
 
 import swift_browser_ui.upload.common
@@ -11,7 +10,7 @@ import swift_browser_ui.upload.common
 import tests.common.mockups
 
 
-class CommonTestClass(asynctest.TestCase):
+class CommonTestClass(unittest.IsolatedAsyncioTestCase):
     """Test class for testing swift_browser_ui.upload.common functions."""
 
     def setUp(self):
@@ -72,7 +71,7 @@ class CommonTestClass(asynctest.TestCase):
 
     async def test_get_upload_instance(self):
         """Test get_upload_instance function."""
-        mock_upload = asynctest.create_autospec(
+        mock_upload = unittest.mock.create_autospec(
             swift_browser_ui.upload.common.upload.ResumableFileUploadProxy
         )
         patch_upload = unittest.mock.patch(

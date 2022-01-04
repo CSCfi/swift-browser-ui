@@ -1,24 +1,21 @@
 """Module for testing the bindings module / class."""
 
 
-import unittest.mock
+import unittest
 from types import SimpleNamespace
-
-
-import asynctest
 
 
 from swift_browser_ui.sharing.bindings.bind import SwiftXAccountSharing
 
 
-class MockRequestContextManager(asynctest.TestCase):
+class MockRequestContextManager(unittest.IsolatedAsyncioTestCase):
     """Mock class for aiohttp request context manager."""
 
     def __init__(self, *args, **kwargs):
         """."""
         self.resp = SimpleNamespace(
             **{
-                "text": asynctest.CoroutineMock(return_value="[]"),
+                "text": unittest.mock.AsyncMock(return_value="[]"),
                 "status": 200,
                 "url": "http://example",
             }
@@ -44,7 +41,7 @@ class MockGenericContextManager(MockRequestContextManager):
 # Delete method mock context manager won't have any assertions in the
 # __aexit__ method, since there's no real assertable functionality.
 # Functionality will be tested in integration testing.
-class MockDeleteContextManager(asynctest.TestCase):
+class MockDeleteContextManager(unittest.IsolatedAsyncioTestCase):
     """Mock class for aiohttp delete context manager."""
 
     def __init__(self, *args, **kwargs):
@@ -61,14 +58,14 @@ class MockDeleteContextManager(asynctest.TestCase):
         """."""
 
 
-class BindingsClassTestCase(asynctest.TestCase):
+class BindingsClassTestCase(unittest.IsolatedAsyncioTestCase):
     """Bindings class test case."""
 
     def setUp(self):
         """Set up relevant mocks."""
         self.session_mock = SimpleNamespace(
             **{
-                "close": asynctest.CoroutineMock(),
+                "close": unittest.mock.AsyncMock(),
                 "get": MockGenericContextManager,
                 "post": MockGenericContextManager,
                 "patch": MockGenericContextManager,

@@ -1,16 +1,15 @@
 """Unit tests for swift_browser_ui.upload.auth module."""
 
 
-import unittest.mock
+import unittest
 
-import asynctest
 import aiohttp.web
 
 import swift_browser_ui.upload.auth
 import tests.common.mockups
 
 
-class AuthTestClass(asynctest.TestCase):
+class AuthTestClass(unittest.IsolatedAsyncioTestCase):
     """Test class for swift_browser_ui.upload.auth functions."""
 
     def setUp(self):
@@ -48,11 +47,11 @@ class AuthTestClass(asynctest.TestCase):
 
     async def test_handle_validate_authentication(self):
         """Test swift_browser_ui.upload.auth.handle_validate_authentication."""
-        handler_mock = asynctest.CoroutineMock()
+        handler_mock = unittest.mock.AsyncMock()
         req = tests.common.mockups.Mock_Request()
         req.set_path("/")
 
-        t_singature_mock = asynctest.CoroutineMock()
+        t_singature_mock = unittest.mock.AsyncMock()
         t_signature_patch = unittest.mock.patch(
             "swift_browser_ui.common.signature.test_signature", t_singature_mock
         )
@@ -82,7 +81,7 @@ class AuthTestClass(asynctest.TestCase):
         req = tests.common.mockups.Mock_Request()
         req.set_path("/health")
 
-        handler_mock = asynctest.CoroutineMock()
+        handler_mock = unittest.mock.AsyncMock()
 
         await swift_browser_ui.upload.auth.handle_validate_authentication(
             req,

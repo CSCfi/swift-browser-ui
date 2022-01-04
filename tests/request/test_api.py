@@ -6,7 +6,6 @@ from types import SimpleNamespace
 
 
 import aiohttp
-import asynctest
 
 
 from swift_browser_ui.request.api import (
@@ -18,7 +17,7 @@ from swift_browser_ui.request.api import (
 )
 
 
-class APITestClass(asynctest.TestCase):
+class APITestClass(unittest.IsolatedAsyncioTestCase):
     """Test class for testing API functions."""
 
     def setUp(self):
@@ -28,11 +27,11 @@ class APITestClass(asynctest.TestCase):
                 "app": {
                     "db_conn": SimpleNamespace(
                         **{
-                            "add_request": asynctest.mock.CoroutineMock(),
-                            "get_request_owned": asynctest.mock.CoroutineMock(),
-                            "get_request_made": asynctest.mock.CoroutineMock(),
-                            "get_request_container": asynctest.mock.CoroutineMock(),
-                            "delete_request": asynctest.mock.CoroutineMock(),
+                            "add_request": unittest.mock.AsyncMock(),
+                            "get_request_owned": unittest.mock.AsyncMock(),
+                            "get_request_made": unittest.mock.AsyncMock(),
+                            "get_request_container": unittest.mock.AsyncMock(),
+                            "delete_request": unittest.mock.AsyncMock(),
                         }
                     )
                 },

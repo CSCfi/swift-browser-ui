@@ -9,9 +9,8 @@ import os
 import unittest
 import ssl
 
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 import aiohttp
-import asynctest
 
 from swift_browser_ui.ui.server import servinit, run_server_insecure
 from swift_browser_ui.ui.server import kill_sess_on_shutdown, run_server_secure
@@ -24,7 +23,7 @@ from tests.ui_unit.creation import get_request_with_mock_openstack
 setd["static_directory"] = os.getcwd() + "/swift_browser_ui_frontend"
 
 
-class TestServinitMethod(asynctest.TestCase):
+class TestServinitMethod(unittest.IsolatedAsyncioTestCase):
     """Small test case for servinit."""
 
     async def test_servinit(self):
@@ -35,7 +34,7 @@ class TestServinitMethod(asynctest.TestCase):
         self.assertTrue(app is not None)
 
 
-class TestServerShutdownHandler(asynctest.TestCase):
+class TestServerShutdownHandler(unittest.IsolatedAsyncioTestCase):
     """Test case for the server graceful shutdown handler."""
 
     async def test_kill_sess_on_shutdown(self):
@@ -92,7 +91,6 @@ class AppTestCase(AioHTTPTestCase):
         """Retrieve web Application for test."""
         return await servinit()
 
-    @unittest_run_loop
     async def test_working_routes(self):
         """
         Test all the specified server routes.
