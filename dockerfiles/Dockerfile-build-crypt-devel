@@ -8,10 +8,10 @@ RUN wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stab
 # Build openssl
 FROM emscripten/emsdk:latest AS OPENSSL
 
-RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz \
-    && bash -c 'if [[ $(sha256sum < openssl-1.1.1l.tar.gz) != *$(curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz.sha256)* ]]; then echo $(sha256sum < openssl-1.1.1l.tar.gz) $(curl https://www.openssl.org/source/openssl-1.1.1l.tar.gz.sha256); echo Downloaded file checksum does not match. ; exit 1; fi' \
-    && tar xvf openssl-1.1.1l.tar.gz \
-    && cd openssl-1.1.1l \
+RUN wget https://www.openssl.org/source/openssl-1.1.1m.tar.gz \
+    && bash -c 'if [[ $(sha256sum < openssl-1.1.1m.tar.gz) != *$(curl https://www.openssl.org/source/openssl-1.1.1m.tar.gz.sha256)* ]]; then echo $(sha256sum < openssl-1.1.1m.tar.gz) $(curl https://www.openssl.org/source/openssl-1.1.1m.tar.gz.sha256); echo Downloaded file checksum does not match. ; exit 1; fi' \
+    && tar xvf openssl-1.1.1m.tar.gz \
+    && cd openssl-1.1.1m \
     && emconfigure ./Configure linux-generic64 no-asm no-threads no-engine no-hw no-weak-ssl-ciphers no-dtls no-shared no-dso --prefix=/emsdk/upstream \
     && sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile \
     && sed -i '/^CFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
