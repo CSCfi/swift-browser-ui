@@ -18,8 +18,8 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     projects: [],
-    active: undefined,
-    uname: undefined,
+    active: {},
+    uname: "",
     multipleProjects: false,
     isLoading: false,
     isFullPage: true,
