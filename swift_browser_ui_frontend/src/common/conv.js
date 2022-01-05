@@ -189,3 +189,10 @@ export function makeGetObjectsMetaURL(container, objects) {
 }
 
 export const taginputConfirmKeys = [",", ";", ":", ".", " ", "Tab", "Enter"];
+
+export function truncate(value, length) {
+  if (!value) {
+    return "";
+  }
+  return value.length > length ? value.substr(0, length) + "..." : value;
+}

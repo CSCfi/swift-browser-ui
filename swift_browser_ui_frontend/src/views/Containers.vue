@@ -282,7 +282,7 @@
 </template>
 
 <script>
-import { getHumanReadableSize } from "@/common/conv";
+import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import FolderUploadForm from "@/components/FolderUpload";
@@ -299,9 +299,7 @@ export default {
     DeleteContainerButton,
   },
   filters:{
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+    truncate,
   },
   data: function () {
     return {

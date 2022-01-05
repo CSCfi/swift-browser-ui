@@ -95,14 +95,14 @@
 </template>
 
 <script>
+import { truncate } from "@/common/conv";
+
 import delay from "lodash/delay";
 
 export default {
   name: "ShareRequestsTable",
   filters: {
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+    truncate,
   },
   data () {
     return {
