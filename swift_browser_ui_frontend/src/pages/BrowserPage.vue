@@ -5,7 +5,7 @@
     @dragover="itemdrop = true"
     @dragleave="itemdrop = false"
   >
-    <label
+    <div
       v-if="itemdrop"
       class="upload-draggable is-full-page"
       style="width: 100%;height: 100%;margin: auto;"
@@ -17,8 +17,11 @@
       <p class="has-text-centered">
         {{ $t('message.dropFiles') }}
       </p>
-    </label>
-    <div v-else>
+    </div>
+    <div
+      v-else
+      id="subContainer"
+    >
       <BrowserNavbar
         :langs="langs"
         :multiple-projects="multipleProjects"
@@ -81,9 +84,14 @@ html, body {
 
 #mainContainer {
   height: 100%;
+}
+
+#subContainer {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
+
 .contents {
   flex: 1 0 auto;
 }
