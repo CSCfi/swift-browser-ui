@@ -11,6 +11,7 @@ import {
   getTagsForContainer,
   getTagsForObjects,
   makeGetObjectsMetaURL,
+  filterSegments,
 } from "./conv";
 
 Vue.use(Vuex);
@@ -171,7 +172,7 @@ const store = new Vuex.Store({
         ).then(
           (ret) => {
             commit("loading", false);
-            commit("updateObjects", ret);
+            commit("updateObjects", filterSegments(ret));
           },
         ).catch(() => {
           commit("updateObjects", []);
@@ -185,7 +186,7 @@ const store = new Vuex.Store({
           if (ret.status != 200) {
             commit("loading", false);
           }
-          commit("updateObjects", ret);
+          commit("updateObjects", filterSegments(ret));
           commit("loading", false);
         }).catch(() => {
           commit("updateObjects", []);

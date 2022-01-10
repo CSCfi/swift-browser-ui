@@ -196,3 +196,9 @@ export function truncate(value, length) {
   }
   return value.length > length ? value.substr(0, length) + "..." : value;
 }
+
+const SEGMENT_REGEX = /^\.segments\/(.*)\/[0-9]{8}$/;
+export function filterSegments(objects) {
+  return objects.filter(o =>
+    o.name.match(SEGMENT_REGEX) === null);
+}
