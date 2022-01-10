@@ -328,7 +328,7 @@
 </template>
 
 <script>
-import { getHumanReadableSize } from "@/common/conv";
+import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
@@ -344,10 +344,8 @@ export default {
     ReplicateContainerButton,
     DeleteObjectsButton,
   },
-  filters:{
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+  filters: {
+    truncate,
   },
   data: function () {
     return {

@@ -44,12 +44,12 @@
 </template>
 
 <script>
+import { truncate } from "@/common/conv";
+
 export default {
   name: "BrowserPage",
   filters: {
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+    truncate,
   },
 };
 </script>
