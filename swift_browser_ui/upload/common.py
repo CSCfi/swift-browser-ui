@@ -9,6 +9,10 @@ import keystoneauth1.session
 from swift_browser_ui.upload import upload
 
 
+DATA_PREFIX = "data/"
+SEGMENTS_PREFIX = ".segments/"
+
+
 def generate_download_url(
     host: str,
     container: typing.Union[str, None] = None,

@@ -60,7 +60,7 @@ class ResumableFileUploadProxy:
         self.ident: str = query["resumableIdentifier"]
         self.filename: str = query["resumableFilename"]
         # Will use the relative path for object names
-        self.path: str = query["resumableRelativePath"]
+        self.path: str = common.DATA_PREFIX + query["resumableRelativePath"]
 
         self.total_uploaded = 0
 
@@ -86,10 +86,9 @@ class ResumableFileUploadProxy:
 
     async def a_create_container(self, segmented: bool = False) -> None:
         """Create the container required by the upload."""
-        container = f"{self.container}_segments" if segmented else self.container
         async with self.client.put(
             common.generate_download_url(
-                common.get_download_host(self.auth, self.project), container
+                common.get_download_host(self.auth, self.project), self.container
             ),
             headers={"Content-Length": str(0), "X-Auth-Token": self.auth.get_token()},
             ssl=ssl_context,
@@ -114,21 +113,6 @@ class ResumableFileUploadProxy:
                         reason="No access to shared container"
                     )
                 await self.a_create_container()
-        if self.segmented:
-            async with self.client.head(
-                common.generate_download_url(
-                    common.get_download_host(self.auth, self.project),
-                    f"{self.container}_segments",
-                ),
-                headers={"X-Auth-Token": self.auth.get_token()},
-                ssl=ssl_context,
-            ) as resp:
-                if resp.status != 204:
-                    if self.project != self.auth.get_project_id():
-                        raise aiohttp.web.HTTPBadRequest(
-                            reason="No access to shared segments"
-                        )
-                    await self.a_create_container(segmented=True)
 
     async def a_check_segment(
         self,
@@ -153,8 +137,9 @@ class ResumableFileUploadProxy:
         self,
     ) -> None:
         """Add manifest file after segmented upload finish."""
-        manifest = f"{self.container}_segments/{self.path}/"
-        LOGGER.info(f"Add manifest to {self.container}_segments.")
+        path = self.path.replace(common.DATA_PREFIX, "")
+        manifest = f"{self.container}/{common.SEGMENTS_PREFIX}{path}/"
+        LOGGER.info(f"Add manifest to {manifest}.")
         async with self.client.put(
             common.generate_download_url(
                 self.host, container=self.container, object_name=self.path
@@ -225,12 +210,13 @@ class ResumableFileUploadProxy:
 
         # Otherwise segmented upload
         segment_number: int = 0
+        path = self.path.replace(common.DATA_PREFIX, "")
         while len(self.done_chunks) < self.total_chunks:
             async with self.client.put(
                 common.generate_download_url(
                     self.host,
-                    container=self.container + "_segments",
-                    object_name=f"""{self.path}/{segment_number:08d}""",
+                    container=self.container,
+                    object_name=f"""{common.SEGMENTS_PREFIX}{path}/{segment_number:08d}""",
                 ),
                 data=self.generate_from_queue(),
                 headers={
