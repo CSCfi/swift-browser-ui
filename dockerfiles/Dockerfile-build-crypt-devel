@@ -29,7 +29,7 @@ RUN sudo apt-get update \
     && sudo apt-get upgrade -y \
     && sudo apt-get install -y autoconf
 
-RUN git clone https://github.com/silverdaz/libcrypt4gh.git
+RUN git clone https://github.com/CSCfi/libcrypt4gh
 
 # We'll skip linking libraries since emcc only produces static libraries
 # Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
@@ -55,7 +55,7 @@ RUN sudo apt-get update \
     && sudo apt-get upgrade -y \
     && sudo apt-get install -y autoconf build-essential
 
-RUN git clone https://github.com/silverdaz/libcrypt4gh-keys.git
+RUN git clone https://github.com/CSCfi/libcrypt4gh-keys.git
 
 # We'll skip linking libraries since emcc only produces static libraries
 # Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
@@ -87,7 +87,7 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && emmake make
 
 # Build UI with encryption
-FROM node:14.17.1-alpine3.12 as FRONTEND
+FROM node:14.18.2-alpine3.15 as FRONTEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
@@ -96,12 +96,12 @@ RUN apk add --update \
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm install -g npm@7.20.5 \
+    && npm install -g npm@8.3.0 \
     && npm install
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && npm run build-devel
 
-FROM python:3.8-alpine3.12 as BACKEND
+FROM python:3.8-alpine3.15 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git \
@@ -119,7 +119,7 @@ RUN pip install --upgrade pip && \
     pip install -r /root/swift_ui/requirements.txt
 RUN pip install /root/swift_ui
 
-FROM python:3.8-alpine3.12
+FROM python:3.8-alpine3.15
 
 RUN apk add --no-cache --update bash
 
