@@ -14,7 +14,7 @@ setuptools.setup(
     install_requires=[
         "aiohttp==3.8.1",
         "python-swiftclient==3.13.0",
-        "cryptography==36.0.0",
+        "cryptography==36.0.1",
         "keystoneauth1==4.4.0",
         "click==8.0.3",
         "gunicorn>=20.0.1",
@@ -24,18 +24,17 @@ setuptools.setup(
     ],
     extras_require={
         "test": [
-            "tox==3.24.4",
+            "tox==3.24.5",
             "pytest==6.2.5",
             "pytest-cov==3.0.0",
             "coverage==6.2",
             "flake8==4.0.1",
             "flake8-docstrings==1.6.0",
-            "pytest-xdist==2.4.0",
-            "asynctest==0.13.0",
-            "black== 21.11b1",
+            "pytest-xdist==2.5.0",
+            "black== 21.12b0",
         ],
-        "docs": ["sphinx==4.3.1", "sphinx_rtd_theme==1.0.0"],
-        "ui_test": ["pytest==6.2.5", "pytest-timeout==2.0.1"],
+        "docs": ["sphinx==4.3.2", "sphinx_rtd_theme==1.0.0"],
+        "ui_test": ["pytest==6.2.5", "pytest-timeout==2.0.2"],
     },
     packages=setuptools.find_packages(),
     package_data={

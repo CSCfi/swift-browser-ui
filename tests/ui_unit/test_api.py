@@ -8,11 +8,15 @@ import types
 import logging
 
 from aiohttp.web import HTTPNotFound
-import asynctest
 
 from swiftclient.service import SwiftError
 
-from swift_browser_ui.ui.api import get_os_user, os_list_projects
+from swift_browser_ui.ui.api import (
+    get_os_user,
+    os_list_projects,
+    update_metadata_bucket,
+    update_metadata_object,
+)
 from swift_browser_ui.ui.api import swift_list_buckets, swift_list_objects
 from swift_browser_ui.ui.api import swift_download_object
 from swift_browser_ui.ui.api import get_metadata_object
@@ -21,15 +25,13 @@ from swift_browser_ui.ui.api import get_project_metadata
 from swift_browser_ui.ui.api import get_os_active_project
 from swift_browser_ui.ui.api import swift_download_shared_object
 from swift_browser_ui.ui.api import swift_download_container
-from swift_browser_ui.ui.api import swift_upload_object_chunk
 from swift_browser_ui.ui.api import swift_replicate_container
-from swift_browser_ui.ui.api import swift_check_object_chunk
 from swift_browser_ui.ui.settings import setd
 
 from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
-class APITestClass(asynctest.TestCase):
+class APITestClass(unittest.IsolatedAsyncioTestCase):
     """Testing the Object Browser API."""
 
     def setUp(self):
@@ -230,7 +232,40 @@ class APITestClass(asynctest.TestCase):
         resp = await get_metadata_bucket(self.request)
         resp = json.loads(resp.text)
 
-        expected = ["test-container-0", {"obj-example": "example"}]  # nosec
+        expected = [
+            "test-container-0",
+            {"obj-example": "example", "usertags": "SD-Connect;with;container;tags"},
+        ]
+        self.assertEqual(resp, expected)
+
+    async def test_set_container_meta_swift(self):
+        """Test metadata API endpoint with container metadata."""
+        req_sessions = self.request.app["Sessions"]
+        req_sessions[self.cookie]["ST_conn"].init_with_data(
+            containers=1,
+            object_range=(1, 1),
+            size_range=(252144, 252144),
+        )
+        req_sessions[self.cookie]["ST_conn"].meta = {
+            "tempurl_key_1": None,
+            "tempurl_key_2": None,
+        }
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container("test-container-0")
+
+        self.request.query["container"] = "test-container-0"
+        self.request.set_post('{"usertags":"tags;for;testing"}')
+
+        post_rest = await update_metadata_bucket(self.request)
+        self.assertEqual(post_rest.status, 204)
+
+        self.request.set_post(None)
+        resp = await get_metadata_bucket(self.request)
+        resp = json.loads(resp.text)
+
+        expected = [
+            "test-container-0",
+            {"obj-example": "example", "usertags": "tags;for;testing"},
+        ]
         self.assertEqual(resp, expected)
 
     async def test_get_object_meta_swift(self):
@@ -261,7 +296,49 @@ class APITestClass(asynctest.TestCase):
 
         resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
-        expected = [[objkey, {"obj-example": "example"}]]
+        expected = [[objkey, {"obj-example": "example", "usertags": "objects;with;tags"}]]
+        self.assertEqual(resp, expected)
+
+    async def test_set_object_meta_swift(self):
+        """Test metadata API endpoint with container metadata."""
+        req_sessions = self.request.app["Sessions"]
+        req_sessions[self.cookie]["ST_conn"].init_with_data(
+            containers=1,
+            object_range=(1, 1),
+            size_range=(252144, 252144),
+        )
+        container = "test-container-0"
+        req_sessions[self.cookie]["ST_conn"].set_swift_meta_container(container)
+        for obj in req_sessions[self.cookie]["ST_conn"].obj_meta.keys():
+            req_sessions[self.cookie]["ST_conn"].set_swift_meta_object(container, obj)
+
+        obj = list(req_sessions[self.cookie]["ST_conn"].obj_meta[container])[0]
+        self.request.query["container"] = container
+        self.request.set_post(
+            json.dumps(
+                [
+                    [
+                        obj,
+                        {"usertags": "tags;for;testing"},
+                    ]
+                ]
+            )
+        )
+
+        post_resp = await update_metadata_object(self.request)
+        self.assertEqual(post_resp.status, 204)
+
+        self.request.set_post(None)
+        self.request.query["object"] = obj
+        resp = await get_metadata_object(self.request)
+        resp = json.loads(resp.text)
+
+        expected = [
+            [
+                obj,
+                {"obj-example": "example", "usertags": "tags;for;testing"},
+            ]
+        ]
         self.assertEqual(resp, expected)
 
     async def test_get_object_meta_s3(self):
@@ -335,7 +412,10 @@ class APITestClass(asynctest.TestCase):
         resp = await get_metadata_object(self.request)
         resp = json.loads(resp.text)
 
-        comp = [[i, {"obj-example": "example"}] for i in [j["name"] for j in objs]]
+        comp = [
+            [i, {"usertags": "objects;with;tags", "obj-example": "example"}]
+            for i in [j["name"] for j in objs]
+        ]
 
         self.assertEqual(resp, comp)
 
@@ -374,7 +454,7 @@ class APITestClass(asynctest.TestCase):
         self.request = None
 
 
-class TestProxyFunctions(asynctest.TestCase):
+class TestProxyFunctions(unittest.IsolatedAsyncioTestCase):
     """Test the handlers proxying information to the upload runner."""
 
     def setUp(self):
@@ -409,12 +489,12 @@ class TestProxyFunctions(asynctest.TestCase):
             "swift_browser_ui.ui.api.api_check", self.api_check_mock
         )
 
-        self.session_open_mock = asynctest.CoroutineMock(return_value="test_runner_id")
+        self.session_open_mock = unittest.mock.AsyncMock(return_value="test_runner_id")
         self.patch_runner_session = unittest.mock.patch(
             "swift_browser_ui.ui.api.open_upload_runner_session", self.session_open_mock
         )
 
-        self.sign_mock = asynctest.CoroutineMock(
+        self.sign_mock = unittest.mock.AsyncMock(
             return_value={
                 "signature": "test-signature",
                 "valid": "test-valid",
@@ -449,16 +529,6 @@ class TestProxyFunctions(asynctest.TestCase):
             self.assertIn("test-endpoint", resp.headers["Location"])
             self.assertEqual(303, resp.status)
 
-    async def test_swift_upload_object_chunk(self):
-        """Test upload object chunk handler."""
-        with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
-            resp = await swift_upload_object_chunk(self.mock_request)
-
-            self.assertIn("test-signature", resp.headers["Location"])
-            self.assertIn("test-valid", resp.headers["Location"])
-            self.assertIn("test-endpoint", resp.headers["Location"])
-            self.assertEqual(307, resp.status)
-
     async def test_swift_replicate_container(self):
         """Test replicate container handler."""
         with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
@@ -472,14 +542,3 @@ class TestProxyFunctions(asynctest.TestCase):
             self.assertIn("test-container-2", resp.headers["Location"])
             self.assertIn("from_project", resp.headers["Location"])
             self.assertIn("test-project-2", resp.headers["Location"])
-
-    async def test_swift_check_object_chunk(self):
-        """Test upload object chunk handler."""
-        with self.patch_api_check, self.patch_runner_session, self.patch_setd, self.patch_sign:
-            resp = await swift_check_object_chunk(self.mock_request)
-
-            self.assertIn("test-signature", resp.headers["Location"])
-            self.assertIn("test-valid", resp.headers["Location"])
-            self.assertIn("test-endpoint", resp.headers["Location"])
-            self.assertEqual(307, resp.status)
-            self.assertIn("&test-query=test-value", resp.headers["Location"])

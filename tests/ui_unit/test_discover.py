@@ -1,14 +1,12 @@
 """Module for testing ``swift_browser_ui.discover``."""
 
 import json
-import unittest.mock
-
-import asynctest
+import unittest
 
 from swift_browser_ui.ui.discover import handle_discover
 
 
-class DiscoverTestClass(asynctest.TestCase):
+class DiscoverTestClass(unittest.IsolatedAsyncioTestCase):
     """Testing the endpoint discovery handler."""
 
     async def test_valid_json_reply(self):

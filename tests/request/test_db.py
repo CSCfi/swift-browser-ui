@@ -5,28 +5,25 @@ import datetime
 import unittest
 from types import SimpleNamespace
 
-
-import asynctest
-import asynctest.mock
 import asyncpg
 
 
 from swift_browser_ui.request.db import DBConn
 
 
-class DBConnTestClass(asynctest.TestCase):
+class DBConnTestClass(unittest.IsolatedAsyncioTestCase):
     """Test database connection class code."""
 
     def setUp(self):
         """Set up necessary mocks."""
         self.asyncpg_pool_mock = SimpleNamespace(
             **{
-                "close": asynctest.mock.CoroutineMock(),
+                "close": unittest.mock.AsyncMock(),
                 "terminate": unittest.mock.Mock(),
             }
         )
 
-        self.asyncpg_pool_mock = asynctest.CoroutineMock(
+        self.asyncpg_pool_mock = unittest.mock.AsyncMock(
             return_value=self.asyncpg_pool_mock,
         )
         self.patch_asyncpg_pool = unittest.mock.patch(
@@ -34,7 +31,7 @@ class DBConnTestClass(asynctest.TestCase):
             new=self.asyncpg_pool_mock,
         )
 
-        self.asyncpg_connect_mock_connection_error = asynctest.CoroutineMock(
+        self.asyncpg_connect_mock_connection_error = unittest.mock.AsyncMock(
             side_effect=ConnectionError
         )
         self.patch_asyncpg_pool_connection_error = unittest.mock.patch(
@@ -42,7 +39,7 @@ class DBConnTestClass(asynctest.TestCase):
             new=self.asyncpg_connect_mock_connection_error,
         )
 
-        self.asyncpg_connect_mock_invalid_pwd = asynctest.CoroutineMock(
+        self.asyncpg_connect_mock_invalid_pwd = unittest.mock.AsyncMock(
             side_effect=asyncpg.InvalidPasswordError("Invalid")
         )
         self.patch_asyncpg_pool_invalid_password = unittest.mock.patch(
@@ -55,7 +52,7 @@ class DBConnTestClass(asynctest.TestCase):
             "swift_browser_ui.request.db.os.environ.get", new=self.os_environ_mock
         )
 
-        self.asyncio_sleep_mock = asynctest.CoroutineMock(side_effect=Exception)
+        self.asyncio_sleep_mock = unittest.mock.AsyncMock(side_effect=Exception)
         self.patch_asyncio_sleep = unittest.mock.patch(
             "swift_browser_ui.request.db.asyncio.sleep", new=self.asyncio_sleep_mock
         )
@@ -64,7 +61,7 @@ class DBConnTestClass(asynctest.TestCase):
 
     def test_db_erase(self):
         """Test connection erase method."""
-        mock_terminate = asynctest.mock.CoroutineMock()
+        mock_terminate = unittest.mock.Mock()
         self.db.pool = SimpleNamespace(**{"terminate": mock_terminate})
         self.db.erase()
         mock_terminate.assert_called_once()
@@ -104,17 +101,17 @@ class DBConnTestClass(asynctest.TestCase):
             self.db.pool.close.assert_awaited_once()
 
 
-class DBMethodTestCase(asynctest.TestCase):
+class DBMethodTestCase(unittest.IsolatedAsyncioTestCase):
     """Test database query methods."""
 
     def setUp(self):
         """Set up required mocks."""
-        self.connection_transaction_mock = asynctest.MagicMock(
+        self.connection_transaction_mock = unittest.mock.MagicMock(
             asyncpg.Connection.transaction
         )
 
         class AsyncpgConnectionMock:
-            fetch = asynctest.CoroutineMock(
+            fetch = unittest.mock.AsyncMock(
                 return_value=[
                     {
                         "container": "test-container",
@@ -124,7 +121,7 @@ class DBMethodTestCase(asynctest.TestCase):
                     }
                 ]
             )
-            fetchrow = asynctest.CoroutineMock(
+            fetchrow = unittest.mock.AsyncMock(
                 return_value={
                     "container": "test-container",
                     "container_owner": "test-owner",
@@ -132,7 +129,7 @@ class DBMethodTestCase(asynctest.TestCase):
                     "created": datetime.datetime(2017, 1, 1),
                 }
             )
-            execute = asynctest.CoroutineMock()
+            execute = unittest.mock.AsyncMock()
             transaction = self.connection_transaction_mock
 
             def __init__(self):
@@ -149,7 +146,7 @@ class DBMethodTestCase(asynctest.TestCase):
 
         self.asyncpg_pool_mock = SimpleNamespace(
             **{
-                "fetch": asynctest.CoroutineMock(
+                "fetch": unittest.mock.AsyncMock(
                     return_value=[
                         {
                             "container": "test-container",
@@ -159,7 +156,7 @@ class DBMethodTestCase(asynctest.TestCase):
                         }
                     ]
                 ),
-                "fetchrow": asynctest.CoroutineMock(
+                "fetchrow": unittest.mock.AsyncMock(
                     return_value={
                         "container": "test-container",
                         "container_owner": "test-owner",

@@ -4,8 +4,15 @@
     class="contents"
   >
     <h1 class="title is-3 addcontainerhead">
-      {{ $t('message.container_ops.addContainer') }}
+      {{ 
+        create 
+          ? $t('message.container_ops.addContainer') 
+          : $t('message.container_ops.editContainer') + container
+      }}
     </h1>
+    <b-message type="is-info">
+      {{ $t('message.container_ops.norename') }}
+    </b-message>
     <b-field
       horizontal
       :label="$t('message.container_ops.containerName')"
@@ -16,6 +23,24 @@
         name="container"
         expanded
         aria-required="true"
+        :disabled="!create"
+      />
+    </b-field>
+    <b-field
+      horizontal
+      :label="$t('message.tagName')"
+      :message="$t('message.tagMessage')"
+    >
+      <b-taginput
+        v-model="tags"
+        ellipsis
+        maxlength="20"
+        icon="label"
+        has-counter
+        rounded
+        type="is-primary"
+        :confirm-keys="taginputConfirmKeys"
+        :on-paste-separators="taginputConfirmKeys"
       />
     </b-field>
 
@@ -26,9 +51,9 @@
         <b-button
           type="is-primary"
           class="addcontainerbutton"
-          @click="createContainer ()"
+          @click="create ? createContainer () : updateContainer ()"
         >
-          {{ $t('message.create') }}
+          {{ create ? $t('message.create') : $t('message.save') }}
         </b-button>
       </p>
     </b-field>
@@ -36,18 +61,34 @@
 </template>
 
 <script>
-import {swiftCreateContainer} from "@/common/api";
+import {
+  swiftCreateContainer, 
+  updateBucketMeta,
+} from "@/common/api";
+import {
+  taginputConfirmKeys,
+  getTagsForContainer,
+} from "@/common/conv";
 
 export default {
   name: "CreateContainer",
   data () {
     return {
       container: "",
+      tags: [],
+      create: true,
+      taginputConfirmKeys,
     };
+  },
+  beforeMount () {
+    if (this.$route.name === "EditContainer") {
+      this.create = false;
+      this.getContainer();
+    }
   },
   methods: {
     createContainer: function () {
-      swiftCreateContainer(this.container).then(() => {
+      swiftCreateContainer(this.container, this.tags.join(";")).then(() => {
         this.$router.go(-1);
       }).catch((err) => {
         console.log(err);
@@ -69,6 +110,25 @@ export default {
             type: "is-danger",
           });
         }
+      });
+    },
+    getContainer: async function () {
+      const containerName = this.$route.params.container;
+      this.container = containerName;
+
+      const tags = this.$store.state.containerTagsCache[containerName];
+      if (!tags) {
+        this.tags = await getTagsForContainer(containerName);
+      } else {
+        this.tags = tags;
+      }
+    },
+    updateContainer: function () {
+      let meta = {
+        usertags: this.tags.join(";"),
+      };
+      updateBucketMeta(this.container, meta).then(() => {
+        this.$router.go(-1);
       });
     },
   },

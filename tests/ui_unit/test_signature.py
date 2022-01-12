@@ -4,7 +4,6 @@
 import types
 import unittest
 
-import asynctest
 import aiohttp
 
 from swift_browser_ui.ui.signature import handle_signature_request
@@ -14,7 +13,7 @@ from swift_browser_ui.ui.signature import handle_ext_token_list
 from swift_browser_ui.ui.signature import handle_form_post_signature
 
 
-class SignatureMiscTestClass(asynctest.TestCase):
+class SignatureMiscTestClass(unittest.IsolatedAsyncioTestCase):
     """Class for testing the signature module misc handlers."""
 
     def setUp(self):
@@ -24,7 +23,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
             "swift_browser_ui.ui._convenience.session_check", self.session_check_mock
         )
 
-        self.sign_mock = asynctest.CoroutineMock(
+        self.sign_mock = unittest.mock.AsyncMock(
             return_value={
                 "valid": 15000000,
                 "signature": "test-signature",
@@ -67,7 +66,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
             }
         )
 
-        self.get_tempurl_key_mock = asynctest.CoroutineMock(return_value="test-key")
+        self.get_tempurl_key_mock = unittest.mock.AsyncMock(return_value="test-key")
         self.get_tempurl_key_patch = unittest.mock.patch(
             "swift_browser_ui.ui._convenience.get_tempurl_key", self.get_tempurl_key_mock
         )
@@ -99,7 +98,7 @@ class SignatureMiscTestClass(asynctest.TestCase):
             self.assertIsInstance(resp, aiohttp.web.Response)
 
 
-class SignatureTokenTestClass(asynctest.TestCase):
+class SignatureTokenTestClass(unittest.IsolatedAsyncioTestCase):
     """Class for testing the token creation proxy handlers."""
 
     def setUp(self):
@@ -117,14 +116,14 @@ class SignatureTokenTestClass(asynctest.TestCase):
                     },
                     "api_client": types.SimpleNamespace(
                         **{
-                            "post": asynctest.CoroutineMock(
+                            "post": unittest.mock.AsyncMock(
                                 return_value=types.SimpleNamespace(**{"status": 200})
                             ),
-                            "delete": asynctest.CoroutineMock(),
-                            "get": asynctest.CoroutineMock(
+                            "delete": unittest.mock.AsyncMock(),
+                            "get": unittest.mock.AsyncMock(
                                 return_value=types.SimpleNamespace(
                                     **{
-                                        "text": asynctest.CoroutineMock(
+                                        "text": unittest.mock.AsyncMock(
                                             return_value="test-token"
                                         )
                                     }
@@ -147,11 +146,11 @@ class SignatureTokenTestClass(asynctest.TestCase):
                     },
                     "api_client": types.SimpleNamespace(
                         **{
-                            "post": asynctest.CoroutineMock(
+                            "post": unittest.mock.AsyncMock(
                                 return_value=types.SimpleNamespace(
                                     **{
                                         "status": 500,
-                                        "text": asynctest.CoroutineMock(
+                                        "text": unittest.mock.AsyncMock(
                                             return_value="Error"
                                         ),
                                         "url": "http://example-endpoint",
@@ -180,7 +179,7 @@ class SignatureTokenTestClass(asynctest.TestCase):
             "swift_browser_ui.ui.signature.setd", self.setd_mock_missing_endpoints
         )
 
-        self.sign_mock = asynctest.CoroutineMock(
+        self.sign_mock = unittest.mock.AsyncMock(
             return_value={
                 "valid": 15000000,
                 "signature": "test-signature",

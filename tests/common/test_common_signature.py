@@ -1,17 +1,16 @@
 """Module for testing singatures in bindings module."""
 
 
-import unittest.mock
 import hmac
 import time
 
-import asynctest
+import unittest
 import aiohttp.web
 
 import swift_browser_ui.common.signature
 
 
-class SignatureModuleTestCase(asynctest.TestCase):
+class SignatureModuleTestCase(unittest.IsolatedAsyncioTestCase):
     """Test case for signature related methods."""
 
     def setUp(self):

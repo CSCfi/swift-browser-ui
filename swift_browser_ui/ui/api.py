@@ -2,10 +2,11 @@
 
 import time
 import typing
+import asyncio
 
 import aiohttp.web
 from swiftclient.exceptions import ClientException
-from swiftclient.service import SwiftError
+from swiftclient.service import SwiftError, SwiftPostObject
 from swiftclient.service import SwiftService, get_conn  # for type hints
 from swiftclient.utils import generate_temp_url
 
@@ -84,11 +85,20 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
         request.app["Log"].info(
             f"API call for container creation from {request.remote}, sess {session}"
         )
+
+        req_json = await request.json()
+        tags = req_json.get("tags", None)
+
+        headers = {}
+        if tags:
+            headers["X-Container-Meta-UserTags"] = tags
+
         # Shamelessly use private methods from SwiftService to avoid writing
         # own implementation
         res = request.app["Sessions"][session]["ST_conn"]._create_container_job(
-            get_conn(request.app["Sessions"][session]["ST_conn"]._options),
-            request.match_info["container"],
+            conn=get_conn(request.app["Sessions"][session]["ST_conn"]._options),
+            container=request.match_info["container"],
+            headers=headers,
         )
     except (SwiftError, ClientException):
         request.app["Log"].error("Container creation failed.")
@@ -357,18 +367,21 @@ async def swift_download_container(
     return resp
 
 
-async def swift_upload_object_chunk(
+async def get_upload_session(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
-    """Point a user to the object upload runner."""
+    """Return a pre-signed upload runner session for upload target."""
     session = api_check(request)
     request.app["Log"].info(
-        "API call for object upload runner from "
+        "API call for object upload runner info request from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
+    try:
+        project: str = request.match_info["project"]
+        container: str = request.match_info["container"]
+    except KeyError:
+        raise aiohttp.web.HTTPBadRequest
 
     runner_id = await open_upload_runner_session(
         session,
@@ -380,16 +393,13 @@ async def swift_upload_object_chunk(
     path = f"/{project}/{container}"
     signature = await sign(3600, path)
 
-    path += f"?session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    resp = aiohttp.web.Response(status=307)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    request.app["Log"].info(f"redirecting {session} to {resp.headers['Location']}")
-
-    return resp
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "url": f"{setd['upload_external_endpoint']}{path}",
+            "signature": signature,
+        }
+    )
 
 
 async def swift_replicate_container(
@@ -428,40 +438,6 @@ async def swift_replicate_container(
     return resp
 
 
-async def swift_check_object_chunk(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Point check for object existence to the upload runner."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call to check object existence in upload runner from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-
-    path = f"/{project}/{container}"
-    signature = await sign(3600, path)
-
-    path += f"?{request.query_string}"
-    path += f"&session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    resp = aiohttp.web.Response(status=307)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    return resp
-
-
 async def get_object_metadata(
     conn: SwiftService, meta_cont: str, meta_obj: typing.Union[typing.List[str], None]
 ) -> typing.List[dict]:
@@ -482,7 +458,7 @@ async def get_object_metadata(
             for i in res
         ]
 
-        # Strip unnecessary specifcations from header names and split open s3
+        # Strip unnecessary specifications from header names and split open s3
         # information so that it doesn't have to be done in the browser
         for i in res:
             i[1] = {k.replace("x-object-meta-", ""): v for k, v in i[1].items()}
@@ -527,6 +503,29 @@ async def get_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Respo
     return aiohttp.web.json_response([ret["container"], ret["headers"]])
 
 
+async def update_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Update metadata for a container."""
+    session = api_check(request)
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    # Get required variables from query string
+    container = request.query.get("container", "") or None
+    meta = await request.json()
+
+    meta = [(key, value) for key, value in meta.items()]
+
+    conn = request.app["Sessions"][session]["ST_conn"]
+    ret = conn.post(container=container, options={"meta": meta})
+
+    if not ret["success"]:
+        raise aiohttp.web.HTTPNotFound
+
+    return aiohttp.web.HTTPNoContent()
+
+
 async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Get metadata for a container or for an object."""
     session = api_check(request)
@@ -554,6 +553,47 @@ async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Respo
     # Otherwise get object listing (object listing won't need to throw an
     # exception here incase of a failure – the function handles that)
     return aiohttp.web.json_response(await get_object_metadata(conn, meta_cont, meta_obj))
+
+
+async def update_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Update metadata for an object."""
+    session = api_check(request)
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    # Get required variables from query string
+    container = request.query.get("container", "") or None
+    objects = await request.json()
+
+    if not (container or objects):
+        raise aiohttp.web.HTTPBadRequest
+
+    objects_post = []
+    try:
+        for (name, meta) in objects:
+            meta = [(key, value) for key, value in meta.items() if value]
+            objects_post.append(
+                SwiftPostObject(
+                    object_name=name,
+                    options={
+                        "meta": meta,
+                    },
+                )
+            )
+    except ValueError as e:
+        request.app["Log"].error(f"Payload seems to be malformed: {e}")
+        raise aiohttp.web.HTTPBadRequest
+
+    conn = request.app["Sessions"][session]["ST_conn"]
+    ret = conn.post(container=container, objects=objects_post)
+
+    for r in ret:
+        if not r["success"]:
+            raise aiohttp.web.HTTPNotFound
+
+    return aiohttp.web.HTTPNoContent()
 
 
 async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -687,6 +727,9 @@ async def get_access_control_metadata(
         if acl:
             acls[c["name"]] = acl
 
+        # Force a yield point for execution
+        await asyncio.sleep(0)
+
     return aiohttp.web.json_response(
         {
             "address": host,
@@ -717,7 +760,7 @@ async def remove_project_container_acl(
 
     # Remove specific project form both ACLs
     read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
-    read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
+    write_acl = write_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
 
     meta_options = {
         "read_acl": read_acl,

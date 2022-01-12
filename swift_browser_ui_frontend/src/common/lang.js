@@ -23,14 +23,14 @@ let default_translations = {
                          "username.",
         UIdown: "503 - Service Unavailable",
         UIdown_text: "Allas User Interface is currently Unavailable",
-        Unauthorized: "401 – Not logged in",
+        Unauthorized: "401 – Not logged in",
         Unauthorized_text: "The action requested requires logging " +
                            "in, or the log in credentials were incorrect. " +
                            "Use the button below to Log in.",
-        Notfound: "404 – Could not find the page that was requested.",
-        Notfound_text: "The front page, however, can be found – in the link " +
+        Notfound: "404 – Could not find the page that was requested.",
+        Notfound_text: "The front page, however, can be found – in the link " +
                        "below.",
-        Forbidden: "403 – Wait, that is forbidden!",
+        Forbidden: "403 – Wait, that is forbidden!",
         Forbidden_text: "The previous request could not be fulfilled. " +
                         "If said operation should be allowed to be " +
                         "performed, contact the service administrator. " +
@@ -40,6 +40,7 @@ let default_translations = {
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
       },
+      dropFiles: "Drop files to upload.",
       help: "Help",
       helplink: "",
       program_name: "Object Browser",
@@ -63,6 +64,7 @@ let default_translations = {
         created: "Created",
         folderDetails: "No details for folders",
         clearChecked: "Clear checked",
+        showTags: "Display tags",
       },
       discover: {
         sync_shares: "Synchronize shared buckets",
@@ -144,7 +146,7 @@ let default_translations = {
       },
       request: {
         project: "Project",
-        container: "Bucket / Identfier",
+        container: "Bucket / Identifier",
         container_message: "The requested bucket name",
         owner: "Owner Project Identifier",
         owner_message: "Project Identifier of the bucket owner",
@@ -170,7 +172,7 @@ let default_translations = {
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested: "No shared buckets have been requested for the " +
                       "project.",
-      searchBy: "Search by Name",
+      searchBy: "Search by Name or Tag",
       sharing: "Sharing - ",
       containers: "Buckets - ",
       upload: " Upload",
@@ -185,12 +187,20 @@ let default_translations = {
       copy: " Copy",
       create: "Create",
       delete: "Delete",
+      remove: "Remove",
+      edit: "Edit",
+      save: "Save",
       createContainerButton: "Create Bucket",
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
+      tagName: "Tags",
+      tagMessage: "Press enter to add.",
       container_ops: {
         addContainer: "Add a new bucket",
+        editContainer: "Editing bucket: ",
+        norename: "It is not possible to rename buckets. " +
+        "However, you can copy them with a new name.",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage: "Are you sure you want to delete this " +
                               "bucket?",
@@ -201,6 +211,10 @@ let default_translations = {
                     "all objects inside it first.",
       },
       objects: {
+        objectName: "Object",
+        editObject: "Editing object: ",
+        norename: "It is not possible to rename objects. " +
+        "However, you can copy them with a new name.",
         deleteConfirm: "Delete Objects",
         deleteObjects: "Delete Object / Objects",
         deleteSuccess: "Objects deleted",
@@ -227,6 +241,43 @@ let default_translations = {
                    "token page.",
         tokenCopied: "Token copied.",
       },
+      encrypt: {
+        enTooLarge: "The total size of files amounts to more than 1024 " +
+                    "megabytes, which can lead to a failure in encryption. " +
+                    "Try uploading files in smaller batches, or encrypt " +
+                    "them before uploading normally.",
+        enFiles: "Encrypt files before upload",
+        fsWriteFail: "Failed to copy files into temporary file system. " +
+                     "Try refreshing and uploading in smaller batches.",
+        enFail: "Failed to encrypt files. This might be due to incorrectly " +
+                "loaded encryption engine, or unavailable memory. Try " +
+                "refreshing the page.",
+        files: "Files",
+        ephemeral: "Ephemeral private key",
+        pk: "Private key",
+        pk_msg: "Sender private key",
+        phrase: "Private key passphrase",
+        phrase_msg: "Private key passphrase",
+        pubkey: "Receiver public keys",
+        pubkey_msg: "Paste a receiver public key",
+        pubkeyLabel: "Public key",
+        addkey: "Add receiver public key",
+        addFiles: "Add files",
+        bucket: "Bucket",
+        bucket_msg: "Upload destination bucket",
+        dropMsg: "Click to add files that will be uploaded.",
+        enup: "Encrypt and Upload",
+        normup: "Upload",
+        upStart: "Started uploading.",
+        enStart: "Encrypting files. This might take a few minutes.",
+        enSuccess: "Encryption successful.",
+        table: {
+          name: "Name",
+          path: "Path",
+          size: "Size",
+          type: "Type",
+        },
+      },
     },
   },
   fi: {
@@ -248,12 +299,12 @@ let default_translations = {
                          "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
-        Unauthorized: "401 – Kirjaudu sisään",
+        Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
                            "jonka voi toteuttaa oheisesta painikkeesta.",
         Notfound: "404 – Etsittyä sivua ei löydetty.",
         Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
-        Forbidden: "403 – Tuo on kiellettyä.",
+        Forbidden: "403 – Tuo on kiellettyä.",
         Forbidden_text: "Edellinen operaatio ei ole sallittu. Mikäli " +
                         "kyseisen operaation tulisi olla sallittu, ota " +
                         "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
@@ -263,6 +314,7 @@ let default_translations = {
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
       },
+      dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",
       helplink: "",
       program_name: "Object Browser",
@@ -286,6 +338,7 @@ let default_translations = {
         created: "Luotu",
         folderDetails: "Ei yksityiskohtia kansioille",
         clearChecked: "Poista valinnat",
+        showTags: "Näytä Tägit",
       },
       discover: {
         sync_shares: "Synkronoi jaetut säiliöt",
@@ -387,14 +440,14 @@ let default_translations = {
       downloadAltLarge: "Hyväksy suuren tiedoston lataus",
       largeDownMessage: "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
                         "erikseen. Paina hyväksyäksesi suuret lataukset " +
-                        "nykyisen kirjautumisen ajaksi.",
+                        "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
       emptyProject: "Projektilla ei ole säiliöitä " +
                     "tai niiden käyttöä ei ole sallittu.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
-      searchBy: "Etsi nimellä",
+      searchBy: "Etsi nimellä tai tägillä",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
       upload: " Lähetä",
@@ -409,12 +462,20 @@ let default_translations = {
       copy: " Kopioi",
       create: "Luo",
       delete: "Poista",
+      remove: "Poista",
+      edit: "Muokkaa",
+      save: "Tallenna",
       createContainerButton: "Luo säiliö",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
+      tagName: "Tägit",
+      tagMessage: "Paina 'enter' lisätäksesi.",
       container_ops: {
         addContainer: "Luo uusi säiliö",
+        editContainer: "Muokataan säiliötä: ",
+        norename: "Säiliötä ei voi nimetä uudelleen, " +
+        "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
@@ -423,6 +484,10 @@ let default_translations = {
         fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
       },
       objects: {
+        objectName: "Objekti",
+        editObject: "Muokataan objekti: ",
+        norename: "Objektia ei voi nimetä uudelleen, " +
+        "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista objektit",
         deleteObjects: "Poista objekti / objektit",
         deleteSuccess: "Objektit poistettu",
@@ -446,6 +511,45 @@ let default_translations = {
                    "Varmistathan ottaneesi avaimen talteen ennen " +
                    "navigointia pois sivulta.",
         tokenCopied: "Avain kopioitu.",
+      },
+      encrypt: {
+        enTooLarge: "Tiedostojen yhteenlaskettu koko on yli 1024 " +
+                    "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
+                    "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
+                    "pienemmissä erissä tai salaa ne ennen lähettämistä " +
+                    "tavallisesti.",
+        enFiles: "Salaa tiedostot ennen lähetystä",
+        fsWriteFail: "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
+                     "ei onnistunut. Päivitä sivu ja koita uudelleen, tai " +
+                     "lähetä tiedostot pienemmissä erissä.",
+        enFail: "Tiedostojen salaus epäonnistui. Mahdollisia syitä ovat " +
+                "epäonnistunut salausohjelman lataus tai tilan loppuminen. " +
+                "Päivitä sivu ja kokeile uudelleen.",
+        files: "Tiedostot",
+        ephemeral: "Tilapäinen yksityinen avain",
+        pk: "Yksityinen avain",
+        pk_msg: "Lähettäjän yksityinen avain",
+        phrase: "Yksityisen avaimen salasana",
+        phrase_msg: "Yksityisen avaimen salasana",
+        addkey: "Lisää vastaanottajan julkinen avain",
+        addFiles: "Lisää tiedostoja",
+        pubkey: "Vastaanottajien julkiset avaimet",
+        pubkeyLabel: "Julkinen avain",
+        pubkey_msg: "Liitä vastaanottajan julkinen avain",
+        bucket: "Säiliö",
+        bucket_msg: "Kohdesäiliö",
+        dropMsg: "Klikkaa lisätäksesi tiedostoja lähetettäväksi.",
+        enup: "Salaa ja lähetä",
+        normup: "Lähetä",
+        upStart: "Aloitettiin tiedostojen lähetys.",
+        enStart: "Salataan tiedostoja. Tämä voi kestää muutaman minuutin.",
+        enSuccess: "Salaaminen onnistui.",
+        table: {
+          name: "Nimi",
+          path: "Polku",
+          size: "Koko",
+          type: "Tyyppi",
+        },
       },
     },
   },

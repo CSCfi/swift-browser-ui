@@ -36,7 +36,7 @@ enter.
 
 .. figure:: ./_static/images/screenshot-front-page
     :scale: 50%
-    :alt: Picture of the container listing, depicting a focusable table with rows descripting content.
+    :alt: Picture of the container listing, depicting a focusable table with rows describing content.
     :align: center
 
     Image of the container listing for an example project.
@@ -55,7 +55,7 @@ information on the objects, e.g.
 
 .. figure:: ./_static/images/screenshot-object-page
     :scale: 50%
-    :alt: Picture of the object listing, depicting a focusable table with rows descripting content.
+    :alt: Picture of the object listing, depicting a focusable table with rows describing content.
     :align: center
 
     Image of the object listing for an example container.

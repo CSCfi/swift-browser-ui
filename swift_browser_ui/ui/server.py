@@ -41,9 +41,10 @@ from swift_browser_ui.ui.api import (
     get_shared_container_address,
     swift_create_container,
     swift_delete_container,
-    swift_upload_object_chunk,
-    swift_check_object_chunk,
     swift_replicate_container,
+    update_metadata_bucket,
+    update_metadata_object,
+    get_upload_session,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
@@ -60,6 +61,22 @@ from swift_browser_ui.ui._convenience import clear_session_info
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+
+async def startup(app: aiohttp.web.Application) -> None:
+    """Add startup web server state configuration."""
+    # Mutable_map handles cookie storage, also stores the object that provides
+    # the encryption we use
+    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
+    # Create a signature salt to prevent editing the signature on the client
+    # side. Hash function doesn't need to be cryptographically secure, it's
+    # just a convenient way of getting ascii output from byte values.
+    app["Salt"] = secrets.token_hex(64)
+    # Set application specific logging
+    app["Log"] = logging.getLogger("swift-browser-ui")
+    app["Log"].info("Set up logging for the swift-browser-ui application")
+    # Cookie keyed dict for storing session data
+    app["Sessions"] = {}
 
 
 async def kill_sess_on_shutdown(app: aiohttp.web.Application) -> None:
@@ -86,19 +103,6 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     app = aiohttp.web.Application(middlewares=[error_middleware])  # type: ignore
-
-    # Mutable_map handles cookie storage, also stores the object that provides
-    # the encryption we use
-    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
-    # Create a signature salt to prevent editing the signature on the client
-    # side. Hash function doesn't need to be cryptographically secure, it's
-    # just a convenient way of getting ascii output from byte values.
-    app["Salt"] = secrets.token_hex(64)
-    # Set application specific logging
-    app["Log"] = logging.getLogger("swift-browser-ui")
-    app["Log"].info("Set up logging for the swift-browser-ui application")
-    # Cookie keyed dict for storing session data
-    app["Sessions"] = {}
 
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:
@@ -158,7 +162,9 @@ async def servinit() -> aiohttp.web.Application:
             aiohttp.web.get("/api/projects", os_list_projects),
             aiohttp.web.get("/api/project/active", get_os_active_project),
             aiohttp.web.get("/api/bucket/meta", get_metadata_bucket),
+            aiohttp.web.post("/api/bucket/meta", update_metadata_bucket),
             aiohttp.web.get("/api/bucket/object/meta", get_metadata_object),
+            aiohttp.web.post("/api/bucket/object/meta", update_metadata_object),
             aiohttp.web.get("/api/project/meta", get_project_metadata),
             aiohttp.web.get("/api/project/acl", get_access_control_metadata),
             aiohttp.web.post("/api/access/{container}", add_project_container_acl),
@@ -181,8 +187,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add upload routes
     app.add_routes(
         [
-            aiohttp.web.post("/upload/{project}/{container}", swift_upload_object_chunk),
-            aiohttp.web.get("/upload/{project}/{container}", swift_check_object_chunk),
+            aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
         ]
     )
 
@@ -210,6 +215,7 @@ async def servinit() -> aiohttp.web.Application:
         ]
     )
 
+    app.on_startup.append(startup)
     app.on_startup.append(open_client_to_app)
 
     # Add graceful shutdown handler

@@ -1,4 +1,4 @@
-FROM python:3.8-alpine3.13 as BACKEND
+FROM python:3.8-alpine3.15 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git \
@@ -13,7 +13,7 @@ RUN pip install --upgrade pip\
     && pip install -r /root/swift_upload_runner/requirements.txt \
     && pip install /root/swift_upload_runner
 
-FROM python:3.8-alpine3.13
+FROM python:3.8-alpine3.15
 
 RUN apk add --no-cache --update bash
 

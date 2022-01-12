@@ -2,17 +2,13 @@
 
 
 import unittest
-import unittest.mock
-
-
 import aiohttp.web
-import asynctest
 
 
 from swift_browser_ui.sharing.server import init_server, run_server_devel
 
 
-class TestInitServer(asynctest.TestCase):
+class TestInitServer(unittest.IsolatedAsyncioTestCase):
     """Test case for server initialization."""
 
     async def test_init_server(self):

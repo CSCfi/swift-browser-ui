@@ -10,7 +10,7 @@ A container can be shared from the "share" button in the UI, on the row of the
 container in the container listing. Clicking the button takes one to the
 container sharing view, in which the user needs to specify the project/projects
 the container is going to be shared to, and what rights to give. The view
-also contains a button to sychronize any requests for accessing the container,
+also contains a button to synchronize any requests for accessing the container,
 if any are present. In case the user doesn't want these requests fulfilled,
 they can be removed from the tags that are inputted into the sharing view.
 

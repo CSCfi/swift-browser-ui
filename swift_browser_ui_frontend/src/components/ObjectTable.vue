@@ -1,5 +1,7 @@
 <template>
-  <div id="object-table">
+  <div
+    id="object-table"
+  >
     <b-field
       grouped
       group-multiline
@@ -42,6 +44,11 @@
           {{ $t('message.renderFolders') }}
         </b-switch>
       </div>
+      <div class="control is-flex">
+        <b-switch v-model="showTags">
+          {{ $t('message.table.showTags') }}
+        </b-switch>
+      </div>
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
@@ -50,7 +57,18 @@
       </b-field>
       <div class="field has-addons uploadGroup">
         <p class="control">
-          <FolderUploadForm dropelement="object-table" />
+          <b-button
+            :label="$t('message.upload')"
+            type="is-primary"
+            outlined
+            icon-left="upload"
+            tag="router-link"
+            :to="{name: 'UploadView', params: {
+              project: ($route.params.owner ? $route.params.owner
+                : $route.params.project),
+              container: $route.params.container,
+            }}"
+          />
         </p>
         <p class="control">
           <ContainerDownloadLink />
@@ -134,6 +152,17 @@
         <span v-else>
           {{ props.row.name | truncate(100) }}
         </span>
+        <b-taglist v-if="displayTags(props.row.name)">
+          <b-tag
+            v-for="tag in tags[props.row.name]"
+            :key="tag"
+            :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
+            rounded
+            ellipsis
+          >
+            {{ tag }}
+          </b-tag>
+        </b-taglist>
       </b-table-column>
       <b-table-column
         v-slot="props"
@@ -179,11 +208,9 @@
                 outlined
                 size="is-small"
                 tag="a"
+                icon-left="download"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
               </b-button>
               <b-button
                 v-else-if="allowLargeDownloads"
@@ -195,11 +222,9 @@
                 outlined
                 size="is-small"
                 tag="a"
+                icon-left="download"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
               </b-button>
               <b-button
                 v-else
@@ -209,12 +234,29 @@
                 :inverted="props.row === selected ? true : false"
                 size="is-small"
                 tag="a"
+                icon-left="download"
                 @click="confirmDownload ()"
               >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.download') }}
+                {{ $t('message.download') }}
+              </b-button>
+            </p>
+            <p
+              v-if="displayTags(props.row.name)" 
+              class="control"
+            >
+              <b-button 
+                tag="router-link"
+                type="is-primary"
+                outlined
+                size="is-small"
+                icon-left="pencil"
+                :inverted="selected==props.row ? true : false"
+                :to="{
+                  name: 'EditObjectView',
+                  params: {container, object: props.row.name}
+                }"
+              >
+                {{ $t('message.edit') }}
               </b-button>
             </p>
           </div>
@@ -299,11 +341,10 @@
 </template>
 
 <script>
-import { getHumanReadableSize } from "@/common/conv";
+import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
@@ -311,26 +352,26 @@ export default {
   name: "ObjectTable",
   components: {
     ContainerDownloadLink,
-    FolderUploadForm,
     ReplicateContainerButton,
     DeleteObjectsButton,
   },
-  filters:{
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+  filters: {
+    truncate,
   },
   data: function () {
     return {
       oList: [],
+      tags: {},
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
+      showTags: true,
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
+      abortController: null,
     };
   },
   computed: {
@@ -340,8 +381,14 @@ export default {
     queryPage () {
       return this.$route.query.page || 1;
     },
+    container () {
+      return this.$route.params.container;
+    },
     objects () {
       return this.$store.state.objectCache;
+    },
+    objectTags() {
+      return this.$store.state.objectTagsCache;
     },
   },
   watch: {
@@ -364,9 +411,13 @@ export default {
       }
       this.checkedRows = [];
     },
+    objectTags: function () {
+      this.tags = this.objectTags; // {"objectName": ["tag1", "tag2"]}
+    },
     prefix: function () {
       if (this.renderFolders) {
         this.oList = this.getFolderContents();
+        this.$store.commit("setPrefix", this.prefix);
       }
     },
     queryPage: function () {
@@ -377,21 +428,26 @@ export default {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
+    this.$store.commit("erasePrefix");
   },
   beforeMount () {
+    this.abortController = new AbortController();
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
   mounted () {
     this.updateObjects();
   },
+  beforeDestroy () {
+    this.abortController.abort();
+  },
   methods: {
     updateObjects: function () {
       // Update current object listing in Vuex if length is too little
-      this.$store.commit({
-        type: "updateObjects",
-        route: this.$route,
-      });
+      this.$store.dispatch(
+        "updateObjects", 
+        {route: this.$route, signal: this.abortController.signal},
+      );
     },
     isRowCheckable: function (row) {
       return this.renderFolders ? this.isFile(row.name) : true;
@@ -566,13 +622,20 @@ export default {
       var name_re = new RegExp(safeKey, "i");
       if (this.renderFolders) {
         this.oList = this.getFolderContents().filter(
-          element => element.name.match(name_re),
+          element => 
+            element.name.match(name_re)
+            || this.tags[element.name].join("\n").match(name_re),
         );
       } else {
         this.oList = this.objects.filter(
-          element => element.name.match(name_re),
+          element => 
+            element.name.match(name_re)
+            || this.tags[element.name].join("\n").match(name_re),
         );
       }
+    },
+    displayTags: function (name) {
+      return this.showTags && !(this.renderFolders && !this.isFile(name));
     },
   },
 };

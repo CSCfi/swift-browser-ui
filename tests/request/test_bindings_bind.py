@@ -1,23 +1,20 @@
 """Module for testing the bindings module / class."""
 
 
-import unittest.mock
+import unittest
 from types import SimpleNamespace
-
-
-import asynctest
 
 
 from swift_browser_ui.request.bindings.bind import SwiftSharingRequest
 
 
-class MockRequestContextManager(asynctest.TestCase):
+class MockRequestContextManager(unittest.IsolatedAsyncioTestCase):
     """Mock class for aiohttp request context manager."""
 
     def __init__(self, *args, **kwargs):
         """."""
         self.resp = SimpleNamespace(
-            **{"text": asynctest.CoroutineMock(return_value="[]"), "status": 200}
+            **{"text": unittest.mock.AsyncMock(return_value="[]"), "status": 200}
         )
 
     async def __aenter__(self, *args, **kwargs):
@@ -51,14 +48,14 @@ class MockDeleteContextManager(MockRequestContextManager):
         """."""
 
 
-class BindingsClassTestCase(asynctest.TestCase):
+class BindingsClassTestCase(unittest.IsolatedAsyncioTestCase):
     """Bindings class test case."""
 
     def setUp(self):
         """Set up relevant mocks."""
         self.session_mock = SimpleNamespace(
             **{
-                "close": asynctest.CoroutineMock(),
+                "close": unittest.mock.AsyncMock(),
                 "get": MockGenericContextManager,
                 "post": MockGenericContextManager,
                 "delete": MockDeleteContextManager,

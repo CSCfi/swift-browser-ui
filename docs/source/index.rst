@@ -17,7 +17,7 @@ Out of the box the ``swift-browser-ui`` offers:
 * support for additional features like uploading files >5GiB in size;
 * support for federated authentication of an user with their HAKA credentials
   using OpenStack Keystone;
-* UI based on `Vue.js <https://vuejs.org/>`_ with `Buefy framework <https://buefy.org/documentation>`_;
+* UI based on `Vue.js <https://vuejs.org/>`_ with `Buefy framework <https://buefy.org>`_;
 * asynchronous web server.
 
 

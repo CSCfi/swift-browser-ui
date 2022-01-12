@@ -33,11 +33,17 @@
         </option>
       </b-select>
       <div class="control is-flex">
-        <b-switch 
+        <b-switch
           v-if="bList.length < 500"
           v-model="isPaginated"
+          data-testid="paginationSwitch"
         >
           {{ $t('message.table.paginated') }}
+        </b-switch>
+        <b-switch
+          v-model="showTags"
+        >
+          {{ $t('message.table.showTags') }}
         </b-switch>
       </div>
       <b-field class="control searchBox">
@@ -59,7 +65,17 @@
           </b-button>
         </p>
         <p class="control">
-          <FolderUploadForm dropelement="container-table" />
+          <b-button
+            :label="$t('message.upload')"
+            type="is-primary"
+            outlined
+            icon-left="upload"
+            tag="router-link"
+            :to="{name: 'UploadView', params: {
+              project: $route.params.project,
+              container: 'upload-'.concat(Date.now().toString()),
+            }}"
+          />
         </p>
       </div>
     </b-field>
@@ -87,23 +103,26 @@
         :label="$t('message.table.name')"
       >
         <template #default="props">
-          <span v-if="!props.row.count">
-            <b-icon
-              icon="folder-outline"
-              size="is-small"
-            /> 
-            {{ props.row.name | truncate(100) }}
-          </span>
-          <span
-            v-else
-            class="has-text-weight-bold"
+          <span 
+            :class="props.row.count ? 'has-text-weight-bold' : ''"
           >
             <b-icon
-              icon="folder"
+              :icon="props.row.count ? 'folder' : 'folder-outline'"
               size="is-small"
-            /> 
+            />
             {{ props.row.name | truncate(100) }}
           </span>
+          <b-taglist v-if="showTags">
+            <b-tag
+              v-for="tag in tags[props.row.name]"
+              :key="tag"
+              :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
+              rounded
+              ellipsis
+            >
+              {{ tag }}
+            </b-tag>
+          </b-taglist>
         </template>
       </b-table-column>
       <b-table-column
@@ -159,11 +178,9 @@
                 size="is-small"
                 disabled
                 inverted
+                icon-left="share"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
@@ -171,11 +188,9 @@
                 outlined
                 size="is-small"
                 disabled
+                icon-left="share"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p
@@ -188,30 +203,26 @@
                 outlined
                 size="is-small"
                 inverted
+                icon-left="share"
                 @click="$router.push({
                   name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
               <b-button
                 v-else
                 type="is-primary"
                 outlined
                 size="is-small"
+                icon-left="share"
                 @click="$router.push({
                   name: 'SharingView',
                   query: {container: props.row.name}
                 })"
               >
-                <b-icon
-                  icon="share"
-                  size="is-small"
-                /> {{ $t('message.share.share') }}
+                {{ $t('message.share.share') }}
               </b-button>
             </p>
             <p class="control">
@@ -230,6 +241,22 @@
                 :disabled="!props.row.bytes ? true : false"
                 :smallsize="true"
               />
+            </p>
+            <p class="control">
+              <b-button
+                tag="router-link"
+                type="is-primary"
+                outlined
+                size="is-small"
+                icon-left="pencil"
+                :inverted="selected==props.row ? true : false"
+                :to="{
+                  name: 'EditContainer',
+                  params: {container: props.row.name}
+                }"
+              >
+                {{ $t('message.edit') }}
+              </b-button>
             </p>
           </div>
         </template>
@@ -265,10 +292,9 @@
 </template>
 
 <script>
-import { getHumanReadableSize } from "@/common/conv";
+import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
@@ -276,21 +302,19 @@ import DeleteContainerButton from "@/components/ContainerDeleteButton";
 export default {
   name: "ContainersView",
   components: {
-    FolderUploadForm,
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,
   },
   filters:{
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+    truncate,
   },
   data: function () {
     return {
       files: [],
       folders: [],
       bList: [],
+      tags: {},
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -298,6 +322,8 @@ export default {
       searchQuery: "",
       currentPage: 1,
       shareModalIsActive: false,
+      showTags: true,
+      abortController: null,
     };
   },
   computed: {
@@ -306,6 +332,9 @@ export default {
     },
     containers () {
       return this.$store.state.containerCache;
+    },
+    containerTags() {
+      return this.$store.state.containerTagsCache;
     },
   },
   watch: {
@@ -316,6 +345,9 @@ export default {
     containers: function () {
       this.bList = this.containers;
     },
+    containerTags: function () {
+      this.tags = this.containerTags; // {"containerName": ["tag1", "tag2"]}
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
@@ -323,17 +355,24 @@ export default {
     this.debounceFilter = debounce(this.filter, 400);
   },
   beforeMount () {
+    this.abortController = new AbortController();
     this.getDirectCurrentPage();
   },
   mounted() {
     this.fetchContainers();
   },
+  beforeDestroy () {
+    this.abortController.abort();
+  },
   methods: {
-    fetchContainers: function () {
+    fetchContainers: async function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
       if(this.bList.length < 1) {
-        this.$store.commit("updateContainers");
+        await this.$store.dispatch(
+          "updateContainers", 
+          this.abortController.signal,
+        );
       }
     },
     checkPageFromRoute: function () {
@@ -366,7 +405,9 @@ export default {
       var safeKey = escapeRegExp(this.searchQuery);
       var name_cmp = new RegExp(safeKey, "i");
       this.bList = this.containers.filter(
-        element => element.name.match(name_cmp),
+        element => 
+          element.name.match(name_cmp)
+          || this.tags[element.name].join("\n").match(name_cmp),
       );
     },
   },

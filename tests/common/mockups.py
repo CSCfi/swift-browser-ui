@@ -223,6 +223,11 @@ class Mock_Request:
         """Return post data."""
         return self.post_data
 
+    async def json(self):
+        if isinstance(self.post_data, str):
+            return json.loads(self.post_data)
+        return self.post_data
+
 
 class Mock_Service:
     """
@@ -356,18 +361,13 @@ class Mock_Service:
     def ret_obj_stat(self, args):
         """Return object stats from stat query."""
         ret = []
-        for i in args[1]:
-            to_add = {}
-            to_add["headers"] = {}
-            if "Obj_example" in self.obj_meta[args[0]][i].keys():
-                to_add["headers"]["x-object-meta-obj-example"] = "example"
-            if "Obj_S3_example" in self.obj_meta[args[0]][i].keys():
-                to_add["headers"]["x-object-meta-s3cmd-attrs"] = self.obj_meta[args[0]][
-                    i
-                ]["Obj_S3_example"]
-            to_add["success"] = True
+        for obj in args[1]:
+            to_add = {
+                "headers": self.obj_meta[args[0]][obj],
+                "success": True,
+                "object": obj,
+            }
             to_add["headers"]["content-type"] = "binary/octet-stream"
-            to_add["object"] = i
             ret.append(to_add)
         return ret
 
@@ -377,33 +377,58 @@ class Mock_Service:
         ret["headers"] = {}
         if "Acc_example" in self.cont_meta[args[0]].keys():
             ret["container"] = args[0]
-            ret["headers"]["x-container-meta-obj-example"] = "example"
+            ret["headers"].update(self.cont_meta[args[0]])
             ret["success"] = True
         return ret
 
-    def post(self, options=None):
+    def post(self, container=None, objects=None, options=None):
         """Mock the post call of SwiftService."""
-        # Get the URL key 2
-        key = options["meta"][0].split(":")[1]
-        self.meta["tempurl_key_2"] = key
+
+        def update_meta(target, headers, meta):
+            for (meta, value) in meta:
+                if not value:
+                    del headers[f"x-{target}-meta-{meta}"]
+                    continue
+                headers[f"x-{target}-meta-{meta}"] = value
+
+        if container and objects:
+            for obj in objects:
+                update_meta(
+                    "object",
+                    self.obj_meta[container][obj.object_name],
+                    obj.options.get("meta", []),
+                )
+            return [{"success": True} for _ in objects]
+        elif container:
+            update_meta("container", self.cont_meta[container], options.get("meta", []))
+        else:
+            # Get the URL key 2
+            key = options["meta"][0].split(":")[1]
+            self.meta["tempurl_key_2"] = key
         return {"success": True}
 
     def set_swift_meta_container(self, container):
         """Generate test swift metadata for a container."""
         self.cont_meta[container] = {}
         self.obj_meta[container] = {}
+        self.cont_meta[container]["x-container-meta-obj-example"] = "example"
+        self.cont_meta[container]["x-container-meta-usertags"] = ";".join(
+            ["SD-Connect", "with", "container", "tags"]
+        )
         self.cont_meta[container]["Acc_example"] = "example"
 
     def set_swift_meta_object(self, container, obj):
         """Generate test swift metadata for an object."""
-        self.obj_meta[container][obj] = {}
-        self.obj_meta[container][obj]["Obj_example"] = "example"
+        self.obj_meta[container][obj] = {
+            "x-object-meta-usertags": "objects;with;tags",
+            "x-object-meta-obj-example": "example",
+        }
 
     def set_s3_meta_object(self, container, obj):
         """Generate test s3 metadata for an object."""
         self.obj_meta[container][obj] = {}
         self.obj_meta[container][obj][
-            "Obj_S3_example"
+            "x-object-meta-s3cmd-attrs"
         ] = "atime:1536648772/ctime:1536648921/gid:101/gname:example"
 
 

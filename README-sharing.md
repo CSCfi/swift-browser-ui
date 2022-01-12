@@ -1,5 +1,5 @@
 ### swift-x-account-sharing – OS swift container sharing backend
-Openstack Swift Access Control Lists don't natively implement querying
+Openstack Swift Access Control Lists don't inherently implement querying
 for containers that are shared for specific user. (i.e. if the user has
 access to these containers on the object storage platform) This backend
 is meant to be used as a workaround to implement the functionality, as

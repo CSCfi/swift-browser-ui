@@ -1,13 +1,13 @@
 """Module for testing common handlers."""
 
 
-import asynctest
+import unittest
 import aiohttp
 
 import swift_browser_ui.common.common_handlers
 
 
-class PreflightHandlerTestCase(asynctest.TestCase):
+class PreflightHandlerTestCase(unittest.IsolatedAsyncioTestCase):
     """Preflight handler test case."""
 
     async def test_handle_delete_preflight(self):

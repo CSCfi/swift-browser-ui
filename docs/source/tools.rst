@@ -34,7 +34,6 @@ writing the tests:
 
 * `tox for test automation <https://tox.readthedocs.io/en/latest/>`_
 * `cypress for UI test automation <https://www.cypress.io/>`_
-* `asynctest for implementing async testing with TestCase class <https://asynctest.readthedocs.io/en/latest/>`_
 * `pytest-timeout for timing out UI tests, which can hang when failing <https://pypi.org/project/pytest-timeout/1.2.1/>`_
 
 UI tests also require the WebDrivers for Chrome and Firefox, if tests are to
@@ -52,6 +51,6 @@ Charts
 ~~~~~~
 The charts in documentation are made with `Dia <http://dia-installer.de/doc/en/index.html>`_. The program is old
 fashioned, but versatile and can be installed without adding repositories,
-with the added benefit of not requiring the use of browser toools for making
+with the added benefit of not requiring the use of browser tools for making
 the charts. Charts are located in ``docs/charts``, and the exported vector
 graphics file is linked into the documentation image directory.

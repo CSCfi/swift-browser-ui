@@ -119,6 +119,7 @@
 </template>
 
 <script>
+import { truncate } from "@/common/conv";
 import delay from "lodash/delay";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
@@ -130,9 +131,7 @@ export default {
     ReplicateContainerButton,
   },
   filters: {
-    truncate(value, length) {
-      return value.length > length ? value.substr(0, length) + "..." : value;
-    },
+    truncate,
   },
   data: function () {
     return {
@@ -160,11 +159,14 @@ export default {
       }
     },
     getConAddr: function (row) {
-      return "/browse/shared/".concat(
-        this.$route.params.project,
-        "/", row.owner,
-        "/", row.container,
-      );
+      return {
+        name: "SharedObjects",
+        params: {
+          project: this.$route.params.project,
+          owner: row.owner,
+          container: row.container,
+        },
+      };
     },
   },
 };

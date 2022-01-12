@@ -3,6 +3,7 @@ import Router from "vue-router";
 import DashboardView from "@/views/Dashboard.vue";
 import ContainersView from "@/views/Containers.vue";
 import ObjectsView from "@/views/Objects.vue";
+import EditObjectView from "@/views/EditObject.vue";
 import SharedObjects from "@/views/SharedObjects";
 import ShareRequests from "@/views/ShareRequests";
 import SharedTo from "@/views/SharedTo";
@@ -13,6 +14,7 @@ import ReplicationView from "@/views/Replicate";
 import TokensView from "@/views/Tokens";
 import CreateContainer from "@/views/AddContainer";
 import DirectShare from "@/views/DirectShare";
+import UploadView from "@/views/Upload";
 
 Vue.use(Router);
 
@@ -45,6 +47,11 @@ export default new Router({
       component: CreateContainer,
     },
     {
+      path: "/browse/:user/:project/:container/edit",
+      name: "EditContainer",
+      component: CreateContainer,
+    },
+    {
       path: "/browse/:user/:project/sharing/requestdirect",
       name: "DirectRequest",
       component: DirectRequest,
@@ -53,6 +60,11 @@ export default new Router({
       path: "/browse/:user/:project/sharing/sharedirect",
       name: "DirectShare",
       component: DirectShare,
+    },
+    {
+      path: "/browse/upload/:project/:container",
+      name: "UploadView",
+      component: UploadView,
     },
     {
       path: "/browse/:user/:project/:container/shared/:owner",
@@ -83,6 +95,11 @@ export default new Router({
       path: "/browse/:user/:project/:container",
       name: "ObjectsView",
       component: ObjectsView,
+    },
+    {
+      path: "/browse/:user/:project/:container/:object/edit",
+      name: "EditObjectView",
+      component: EditObjectView,
     },
   ],
 });

@@ -1,13 +1,13 @@
 """Test swift_browser_ui.upload.server module."""
 
 
+import unittest
 import aiohttp.web
-import asynctest
 
 import swift_browser_ui.upload.server
 
 
-class ServerTestClass(asynctest.TestCase):
+class ServerTestClass(unittest.IsolatedAsyncioTestCase):
     """Test swift_browser_ui.upload.server module functions."""
 
     async def test_servinit(self):

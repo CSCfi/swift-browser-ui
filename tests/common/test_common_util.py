@@ -3,13 +3,11 @@
 
 import unittest
 
-import asynctest
-
 
 import swift_browser_ui.common.common_util
 
 
-class CommonUtilTestCase(asynctest.TestCase):
+class CommonUtilTestCase(unittest.IsolatedAsyncioTestCase):
     """Clkass for testing common utility functions."""
 
     def setUp(self):

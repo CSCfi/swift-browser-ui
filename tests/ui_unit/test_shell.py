@@ -1,6 +1,6 @@
 """Module for testing the project command line interface."""
 
-import unittest.mock
+import unittest
 from click.testing import CliRunner
 
 from swift_browser_ui.ui.shell import cli, start

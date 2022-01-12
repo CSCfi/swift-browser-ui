@@ -1,54 +1,24 @@
 """Module for testing server.py."""
 
 
-from types import SimpleNamespace
-import unittest.mock
-
-
-import asynctest
+import unittest
 import aiohttp
 
 
 from swift_browser_ui.request.server import (
-    resume_on_start,
-    graceful_shutdown,
     init_server,
     run_server_devel,
     main,
 )
-from swift_browser_ui.request.db import DBConn
 
 
-class ServerTestCase(asynctest.TestCase):
+class ServerTestCase(unittest.IsolatedAsyncioTestCase):
     """Test case for testing server module functions."""
-
-    def setUp(self):
-        """Set up relevant mocks."""
-        self.mock_db_conn = SimpleNamespace(
-            **{
-                "open": asynctest.CoroutineMock(),
-                "close": asynctest.CoroutineMock(),
-            }
-        )
-
-        self.mock_application = {"db_conn": self.mock_db_conn}
-
-    async def test_resume_on_start(self):
-        """Test resume on start function."""
-        await resume_on_start(self.mock_application)
-        self.mock_db_conn.open.assert_awaited_once()
-
-    async def test_graceful_shutdown(self):
-        """Test graceful shutdown function."""
-        await graceful_shutdown(self.mock_application)
-        self.mock_db_conn.close.assert_awaited_once()
 
     async def test_init_server(self):
         """Test init_server function."""
         app = await init_server()
         self.assertIsInstance(app, aiohttp.web.Application)
-        self.assertIsInstance(app["db_conn"], DBConn)
-        self.assertIsNotNone(app["tokens"])
 
     async def test_run_server_devel(self):
         """Test server development mode launch function."""
