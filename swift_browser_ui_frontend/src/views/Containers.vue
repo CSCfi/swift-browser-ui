@@ -65,7 +65,17 @@
           </b-button>
         </p>
         <p class="control">
-          <FolderUploadForm dropelement="container-table" />
+          <b-button
+            :label="$t('message.upload')"
+            type="is-primary"
+            outlined
+            icon-left="upload"
+            tag="router-link"
+            :to="{name: 'UploadView', params: {
+              project: $route.params.project,
+              container: 'upload-'.concat(Date.now().toString()),
+            }}"
+          />
         </p>
       </div>
     </b-field>
@@ -285,7 +295,6 @@
 import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-import FolderUploadForm from "@/components/FolderUpload";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
@@ -293,7 +302,6 @@ import DeleteContainerButton from "@/components/ContainerDeleteButton";
 export default {
   name: "ContainersView",
   components: {
-    FolderUploadForm,
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,

@@ -38,6 +38,9 @@ const store = new Vuex.Store({
     isChunking: false,
     uploadProgress: undefined,
     altContainer: undefined,
+    uploadInfo: undefined,
+    transfer: [],
+    currentPrefix: "",
   },
   mutations: {
     loading(state, payload) {
@@ -121,6 +124,24 @@ const store = new Vuex.Store({
     },
     eraseAltContainer (state) {
       state.altContainer = undefined;
+    },
+    setUploadInfo (state, uploadInfo) {
+      state.uploadInfo = uploadInfo;
+    },
+    eraseUploadInfo (state) {
+      state.uploadInfo = undefined;
+    },
+    appendFileTransfer (state, file) {
+      state.transfer.push(file);
+    },
+    eraseTransfer (state) {
+      state.transfer = [];
+    },
+    setPrefix (state, prefix) {
+      state.currentPrefix = prefix;
+    },
+    erasePrefix (state) {
+      state.currentPrefix = "";
     },
   },
   actions: {

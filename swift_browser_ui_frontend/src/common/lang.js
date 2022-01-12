@@ -40,6 +40,7 @@ let default_translations = {
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
       },
+      dropFiles: "Drop files to upload.",
       help: "Help",
       helplink: "",
       program_name: "Object Browser",
@@ -186,6 +187,7 @@ let default_translations = {
       copy: " Copy",
       create: "Create",
       delete: "Delete",
+      remove: "Remove",
       edit: "Edit",
       save: "Save",
       createContainerButton: "Create Bucket",
@@ -239,6 +241,43 @@ let default_translations = {
                    "token page.",
         tokenCopied: "Token copied.",
       },
+      encrypt: {
+        enTooLarge: "The total size of files amounts to more than 1024 " +
+                    "megabytes, which can lead to a failure in encryption. " +
+                    "Try uploading files in smaller batches, or encrypt " +
+                    "them before uploading normally.",
+        enFiles: "Encrypt files before upload",
+        fsWriteFail: "Failed to copy files into temporary filesystem. " +
+                     "Try refreshing and uploading in smaller batches.",
+        enFail: "Failed to encrypt files. This might be due to incorrectly " +
+                "loaded encryption engine, or unavailable memory. Try " +
+                "refreshing the page.",
+        files: "Files",
+        ephemeral: "Ephemeral private key",
+        pk: "Private key",
+        pk_msg: "Sender private key",
+        phrase: "Private key passphrase",
+        phrase_msg: "Private key passphrase",
+        pubkey: "Receiver public keys",
+        pubkey_msg: "Paste a receiver public key",
+        pubkeyLabel: "Public key",
+        addkey: "Add receiver public key",
+        addFiles: "Add files",
+        bucket: "Bucket",
+        bucket_msg: "Upload destination bucket",
+        dropMsg: "Click to add files that will be uploaded.",
+        enup: "Encrypt and Upload",
+        normup: "Upload",
+        upStart: "Started uploading.",
+        enStart: "Encrypting files. This might take a few minutes.",
+        enSuccess: "Encryption successful.",
+        table: {
+          name: "Name",
+          path: "Path",
+          size: "Size",
+          type: "Type",
+        },
+      },
     },
   },
   fi: {
@@ -275,6 +314,7 @@ let default_translations = {
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
       },
+      dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",
       helplink: "",
       program_name: "Object Browser",
@@ -422,6 +462,7 @@ let default_translations = {
       copy: " Kopioi",
       create: "Luo",
       delete: "Poista",
+      remove: "Poista",
       edit: "Muokkaa",
       save: "Tallenna",
       createContainerButton: "Luo säiliö",
@@ -470,6 +511,45 @@ let default_translations = {
                    "Varmistathan ottaneesi avaimen talteen ennen " +
                    "navigointia pois sivulta.",
         tokenCopied: "Avain kopioitu.",
+      },
+      encrypt: {
+        enTooLarge: "Tiedostojen yhteenlaskettu koko on yli 1024 " +
+                    "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
+                    "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
+                    "pienemmissä erissä tai salaa ne ennen lähettämistä " +
+                    "tavallisesti.",
+        enFiles: "Salaa tiedostot ennen lähetystä",
+        fsWriteFail: "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
+                     "ei onnistunut. Päivitä sivu ja koita uudelleen, tai " +
+                     "lähetä tiedostot pienemmissä erissä.",
+        enFail: "Tiedostojen salaus epäonnistui. Mahdollisia syitä ovat " +
+                "epäonnistunut salausohjelman lataus tai tilan loppuminen. " +
+                "Päivitä sivu ja kokeile uudelleen.",
+        files: "Tiedostot",
+        ephemeral: "Tilapäinen yksityinen avain",
+        pk: "Yksityinen avain",
+        pk_msg: "Lähettäjän yksityinen avain",
+        phrase: "Yksityisen avaimen salasana",
+        phrase_msg: "Yksityisen avaimen salasana",
+        addkey: "Lisää vastaanottajan julkinen avain",
+        addFiles: "Lisää tiedostoja",
+        pubkey: "Vastaanottajien julkiset avaimet",
+        pubkeyLabel: "Julkinen avain",
+        pubkey_msg: "Liitä vastaanottajan julkinen avain",
+        bucket: "Säiliö",
+        bucket_msg: "Kohdesäiliö",
+        dropMsg: "Klikkaa lisätäksesi tiedostoja lähetettäväksi.",
+        enup: "Salaa ja lähetä",
+        normup: "Lähetä",
+        upStart: "Aloitettiin tiedostojen lähetys.",
+        enStart: "Salataan tiedostoja. Tämä voi kestää muutaman minuutin.",
+        enSuccess: "Salaaminen onnistui.",
+        table: {
+          name: "Nimi",
+          path: "Polku",
+          size: "Koko",
+          type: "Tyyppi",
+        },
       },
     },
   },

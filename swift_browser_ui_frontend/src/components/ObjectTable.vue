@@ -1,5 +1,7 @@
 <template>
-  <div id="object-table">
+  <div
+    id="object-table"
+  >
     <b-field
       grouped
       group-multiline
@@ -55,7 +57,18 @@
       </b-field>
       <div class="field has-addons uploadGroup">
         <p class="control">
-          <FolderUploadForm dropelement="object-table" />
+          <b-button
+            :label="$t('message.upload')"
+            type="is-primary"
+            outlined
+            icon-left="upload"
+            tag="router-link"
+            :to="{name: 'UploadView', params: {
+              project: ($route.params.owner ? $route.params.owner
+                : $route.params.project),
+              container: $route.params.container,
+            }}"
+          />
         </p>
         <p class="control">
           <ContainerDownloadLink />
@@ -332,7 +345,6 @@ import { getHumanReadableSize, truncate } from "@/common/conv";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import FolderUploadForm from "@/components/FolderUpload";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
@@ -340,7 +352,6 @@ export default {
   name: "ObjectTable",
   components: {
     ContainerDownloadLink,
-    FolderUploadForm,
     ReplicateContainerButton,
     DeleteObjectsButton,
   },
@@ -406,6 +417,7 @@ export default {
     prefix: function () {
       if (this.renderFolders) {
         this.oList = this.getFolderContents();
+        this.$store.commit("setPrefix", this.prefix);
       }
     },
     queryPage: function () {
@@ -416,6 +428,7 @@ export default {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
+    this.$store.commit("erasePrefix");
   },
   beforeMount () {
     this.abortController = new AbortController();

@@ -14,6 +14,7 @@ import ReplicationView from "@/views/Replicate";
 import TokensView from "@/views/Tokens";
 import CreateContainer from "@/views/AddContainer";
 import DirectShare from "@/views/DirectShare";
+import UploadView from "@/views/Upload";
 
 Vue.use(Router);
 
@@ -59,6 +60,11 @@ export default new Router({
       path: "/browse/:user/:project/sharing/sharedirect",
       name: "DirectShare",
       component: DirectShare,
+    },
+    {
+      path: "/browse/upload/:project/:container",
+      name: "UploadView",
+      component: UploadView,
     },
     {
       path: "/browse/:user/:project/:container/shared/:owner",

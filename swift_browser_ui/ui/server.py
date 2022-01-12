@@ -41,11 +41,10 @@ from swift_browser_ui.ui.api import (
     get_shared_container_address,
     swift_create_container,
     swift_delete_container,
-    swift_upload_object_chunk,
-    swift_check_object_chunk,
     swift_replicate_container,
     update_metadata_bucket,
     update_metadata_object,
+    get_upload_session,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
@@ -188,8 +187,7 @@ async def servinit() -> aiohttp.web.Application:
     # Add upload routes
     app.add_routes(
         [
-            aiohttp.web.post("/upload/{project}/{container}", swift_upload_object_chunk),
-            aiohttp.web.get("/upload/{project}/{container}", swift_check_object_chunk),
+            aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
         ]
     )
 

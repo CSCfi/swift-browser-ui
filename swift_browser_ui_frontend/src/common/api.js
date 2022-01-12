@@ -447,3 +447,27 @@ export async function removeToken(
     throw new Error("Token deletion failed");
   }
 }
+
+
+export async function getUploadEndpoint(
+  project,
+  container,
+) {
+  // Fetch upload endpoint, session and signature information
+  let fetchURL = new URL("/upload/".concat(
+    project,
+    "/",
+    container,
+  ),
+  document.location.origin,
+  );
+  let ret = await fetch(
+    fetchURL, {method: "GET", credentials: "same-origin"},
+  );
+
+  if (ret.status != 200) {
+    throw new Error("Failed to get upload session information.");
+  }
+
+  return ret.json();
+}

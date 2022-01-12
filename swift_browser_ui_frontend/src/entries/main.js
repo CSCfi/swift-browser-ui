@@ -56,6 +56,12 @@ new Vue({
     BrowserNavbar,
     ProgressBar,
   },
+  data: function () {
+    return {
+      itemdrop: false,
+      files: [],
+    };
+  },
   computed: {
     projects () {
       return this.$store.state.projects;
@@ -86,6 +92,12 @@ new Vue({
     },
     altContainer () {
       return this.$store.state.altContainer;
+    },
+    uploadInfo () {
+      return this.$store.state.uploadInfo;
+    },
+    prefix () {
+      return this.$store.state.currentPrefix;
     },
   },
   created() {
@@ -147,6 +159,47 @@ new Vue({
     );
   },
   methods: {
+    dragHandler: function (e) {
+      e.preventDefault();
+      let dt = e.dataTransfer;
+      if (dt.types.indexOf("Files") >= 0) {
+        e.stopPropagation();
+        dt.dropEffect = "copy";
+        dt.effectAllowed = "copy";
+        this.itemdrop = true;
+      } else {
+        dt.dropEffect = "none";
+        dt.effectAllowed = "none";
+      }
+    },
+    dragLeaveHandler: function () {
+      this.itemdrop = false;
+    },
+    navUpload: function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.items) {
+        for (let item of e.dataTransfer.items) {
+          this.$store.commit("appendFileTransfer", item);
+        }
+      } else if (e.dataTransfer && e.dataTransfer.files) {
+        for (let file of e.dataTransfer.files) {
+          this.$store.commit("appendFileTransfer", file);
+        }
+      }
+      this.$router.push({
+        name: "UploadView",
+        params: {
+          project: this.$route.params.project,
+          container: (
+            this.$route.params.container ?
+              this.$route.params.container :
+              "upload-".concat(Date.now().toString())
+          ),
+        },
+      });
+      this.itemdrop = false;
+    },
     containerSyncWrapper: function () {
       syncContainerACLs(
         this.$store.state.client,
@@ -180,44 +233,47 @@ new Vue({
       });
     },
     getUploadUrl: function (params) {
-      let retUrl = new URL(
-        "/upload/".concat(
-          this.$route.params.owner ? this.$route.params.owner : this.active.id,
-          "/",
-          this.altContainer,
-        ),
-        document.location.origin,
-      );
+      // Bake upload runner information to the resumable url parameters.
+      let retUrl = new URL(this.uploadInfo.url);
+
+      console.log(this.uploadInfo.url);
+
       for (const param of params) {
         let newParam = param.split("=");
         // check if we should move the file under a pseudofolder
-        // using the current prefix defined in route for the url
+        // using the current prefix defined in state for the url
         if (
           newParam[0].match("resumableRelativePath")
-          && this.$route.query.prefix != undefined
+          && this.prefix != undefined
         ) {
           retUrl.searchParams.append(
             newParam[0],
-            this.$route.query.prefix + newParam[1],
+            this.prefix + newParam[1],
           );
         } else {
           retUrl.searchParams.append(newParam[0], newParam[1]);
         }
       }
-      return retUrl.toString();
+      retUrl.searchParams.append(
+        "session", this.uploadInfo.id,
+      );
+      retUrl.searchParams.append(
+        "valid", this.uploadInfo.signature.valid,
+      );
+      retUrl.searchParams.append(
+        "signature", this.uploadInfo.signature.signature,
+      );
+      console.log(retUrl);
+      return retUrl;
     },
     startUpload: function () {
-      let altContainer = "upload-".concat(Date.now().toString());
-      if (this.$route.params.container) {
-        altContainer = this.$route.params.container;
-      }
-      this.$store.commit("setAltContainer", altContainer);
       this.$store.commit("setUploading");
       window.onbeforeunload = function () {return "";};
     },
     endUpload: function () {
       this.$store.commit("eraseAltContainer");
       this.$store.commit("stopUploading");
+      this.$store.commit("eraseUploadInfo");
       this.$store.dispatch("updateContainers");
       window.onbeforeunload = undefined;
     },
@@ -245,7 +301,7 @@ new Vue({
       let res = new Resumable({
         target: this.getUploadUrl,
         testTarget: this.getUploadUrl,
-        chunkSize: 5242880,
+        chunkSize: 10485760,
         forceChunkSize: true,
         simultaneousUploads: 1,
       });
