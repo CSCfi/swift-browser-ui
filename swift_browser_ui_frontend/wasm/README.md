@@ -4,7 +4,7 @@
 In order to keep the C side of things as simple as possible, we assume the
 correct directory structure to always be in place when the upload loop is run.
 The filenames are also kept constant – JS side is relied upon to copy the
-correct private etc. keys to the filesystem from browser storage.
+correct private etc. keys to the file system from browser storage.
 
 The directory structure is as follows:
 

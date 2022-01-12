@@ -247,7 +247,7 @@ let default_translations = {
                     "Try uploading files in smaller batches, or encrypt " +
                     "them before uploading normally.",
         enFiles: "Encrypt files before upload",
-        fsWriteFail: "Failed to copy files into temporary filesystem. " +
+        fsWriteFail: "Failed to copy files into temporary file system. " +
                      "Try refreshing and uploading in smaller batches.",
         enFail: "Failed to encrypt files. This might be due to incorrectly " +
                 "loaded encryption engine, or unavailable memory. Try " +
