@@ -196,3 +196,29 @@ export function truncate(value, length) {
   }
   return value.length > length ? value.substr(0, length) + "..." : value;
 }
+
+const SEGMENT_REGEX = /^\.segments\/(.*)\/[0-9]{8}$/;
+const DATA_PREFIX = "data/";
+
+export function filterSegments(objects) {
+  // Calculate the size of segmented objects before filtering
+  // Only works if segments come before the object in the array
+  let segmentedObjSizes = {};
+  objects.forEach((obj) => {
+    const name = obj.name.replace(DATA_PREFIX, "");
+    const nameFromSegment = SEGMENT_REGEX.exec(name);
+    if (nameFromSegment === null && name in segmentedObjSizes) {
+      obj.bytes = segmentedObjSizes[name];
+      return;
+    }
+    if (nameFromSegment === null) {
+      return;
+    }
+    if (!(nameFromSegment[1] in segmentedObjSizes)) {
+      segmentedObjSizes[nameFromSegment[1]] = 0;
+    }
+    segmentedObjSizes[nameFromSegment[1]] += obj.bytes;
+  });
+  return objects.filter(o =>
+    o.name.match(SEGMENT_REGEX) === null);
+}
