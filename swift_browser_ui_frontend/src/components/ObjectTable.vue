@@ -9,7 +9,7 @@
     >
       <b-select
         v-model="perPage"
-        data-testid="bucketsPerPage"
+        data-testid="containersPerPage"
         :disabled="!isPaginated"
       >
         <option value="5">

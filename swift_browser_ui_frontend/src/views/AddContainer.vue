@@ -63,7 +63,7 @@
 <script>
 import {
   swiftCreateContainer, 
-  updateBucketMeta,
+  updateContainerMeta,
 } from "@/common/api";
 import {
   taginputConfirmKeys,
@@ -127,7 +127,7 @@ export default {
       let meta = {
         usertags: this.tags.join(";"),
       };
-      updateBucketMeta(this.container, meta).then(() => {
+      updateContainerMeta(this.container, meta).then(() => {
         this.$router.go(-1);
       });
     },

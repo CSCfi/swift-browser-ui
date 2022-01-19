@@ -1,4 +1,4 @@
-describe("Browse buckets and test operations", function () {
+describe("Browse containers and test operations", function () {
 
   beforeEach(function () {
     cy.login(' Log In with SSO ')
@@ -8,11 +8,11 @@ describe("Browse buckets and test operations", function () {
     cy.contains('Log Out').click()
   });
 
-  it("should be able to filter table, adjust display buckets per page and pagination", () => {
-    cy.get('[data-testid="bucketsPerPage"]').select('5 per page')
+  it("should be able to filter table, adjust display containers per page and pagination", () => {
+    cy.get('[data-testid="containersPerPage"]').select('5 per page')
     cy.contains('1-5 / 10')
     cy.get('[data-testid="paginationSwitch"]').click()
-    cy.get('[data-testid="bucketsPerPage"]').should('be.disabled')
+    cy.get('[data-testid="containersPerPage"]').should('be.disabled')
     cy.get('.input').type('test-container-5')
   })
 
@@ -82,7 +82,7 @@ describe("Browse buckets and test operations", function () {
     cy.get('button').contains('Save').click()
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 6)
 
-    // remove all tags from a bucket
+    // remove all tags from a container
     cy.get('tbody tr').contains('Edit').click()
     cy.get('.taginput-container').children('span').should('have.length', 6)
     cy.get('.delete').each(el => {

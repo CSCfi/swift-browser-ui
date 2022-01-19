@@ -13,7 +13,7 @@ tags:
   - name: Sharing Account 
     description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL information"
   - name: Upload/Download 
-    description: Endpoints for uploading and downloading buckets/objects
+    description: Endpoints for uploading and downloading containers/objects
   
 paths:
   /health:
@@ -655,7 +655,7 @@ paths:
                 $ref: '#/components/schemas/ProjectMeta'
         403:
           description: Unauthorized
-  /api/buckets:
+  /api/containers:
     get:
       tags:
         - Frontend 
@@ -671,13 +671,13 @@ paths:
           description: Unauthorized
         404:
           description: Not Found
-  /api/bucket/objects:
+  /api/container/objects:
     get:
       tags:
         - Frontend 
       summary: Get the listing for objects in a given container.
       parameters:
-      - name: bucket
+      - name: container
         in: query
         description: The container that is to be queried.
         schema:
@@ -695,7 +695,7 @@ paths:
         404:
           description: Not Found
           
-  /api/bucket/meta:
+  /api/container/meta:
     get:
       tags:
         - Frontend 
@@ -731,7 +731,7 @@ paths:
             example: test-container-1
           required: true
       requestBody:
-        description: Bucket metadata as a key-value object. Updates must include all the metadata for the bucket. Omitted keys are removed by the swift backend.
+        description: Container metadata as a key-value object. Updates must include all the metadata for the container. Omitted keys are removed by the swift backend.
         required: true
         content:
           application/json:
@@ -749,7 +749,7 @@ paths:
           description: Unauthorized
         404:
           description: Container was not found
-  /api/bucket/object/meta:
+  /api/container/object/meta:
     get:
       tags:
         - Frontend 
@@ -852,7 +852,7 @@ paths:
         - Frontend 
       summary: Download the object specified in the download link.
       parameters:
-      - name: bucket
+      - name: container
         in: query
         description: The container from which to download
         schema:

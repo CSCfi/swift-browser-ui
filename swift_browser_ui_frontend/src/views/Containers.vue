@@ -10,7 +10,7 @@
     >
       <b-select
         v-model="perPage"
-        data-testid="bucketsPerPage"
+        data-testid="containersPerPage"
         :disabled="!isPaginated"
       >
         <option value="5">
@@ -34,7 +34,7 @@
       </b-select>
       <div class="control is-flex">
         <b-switch
-          v-if="bList.length < 500"
+          v-if="cList.length < 500"
           v-model="isPaginated"
           data-testid="paginationSwitch"
         >
@@ -85,7 +85,7 @@
       hoverable
       narrowed
       default-sort="name"
-      :data="bList"
+      :data="cList"
       :selected.sync="selected"
       :current-page.sync="currentPage"
       :paginated="isPaginated"
@@ -313,7 +313,7 @@ export default {
     return {
       files: [],
       folders: [],
-      bList: [],
+      cList: [],
       tags: {},
       selected: undefined,
       isPaginated: true,
@@ -343,7 +343,7 @@ export default {
       this.debounceFilter();
     },
     containers: function () {
-      this.bList = this.containers;
+      this.cList = this.containers;
     },
     containerTags: function () {
       this.tags = this.containerTags; // {"containerName": ["tag1", "tag2"]}
@@ -368,7 +368,7 @@ export default {
     fetchContainers: async function () {
       // Get the container listing from the API if the listing hasn't yet
       // been cached.
-      if(this.bList.length < 1) {
+      if(this.cList.length < 1) {
         await this.$store.dispatch(
           "updateContainers", 
           this.abortController.signal,
@@ -404,7 +404,7 @@ export default {
       // request parameter should be sanitized first
       var safeKey = escapeRegExp(this.searchQuery);
       var name_cmp = new RegExp(safeKey, "i");
-      this.bList = this.containers.filter(
+      this.cList = this.containers.filter(
         element => 
           element.name.match(name_cmp)
           || this.tags[element.name].join("\n").match(name_cmp),
