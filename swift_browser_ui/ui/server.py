@@ -23,7 +23,7 @@ from swift_browser_ui.ui.login import (
     token_rescope,
 )
 from swift_browser_ui.ui.api import (
-    swift_list_buckets,
+    swift_list_containers,
     swift_list_objects,
     swift_download_object,
     swift_download_shared_object,
@@ -32,7 +32,7 @@ from swift_browser_ui.ui.api import (
     get_os_user,
     get_os_active_project,
     get_metadata_object,
-    get_metadata_bucket,
+    get_metadata_container,
     get_project_metadata,
     swift_list_shared_objects,
     get_access_control_metadata,
@@ -42,7 +42,7 @@ from swift_browser_ui.ui.api import (
     swift_create_container,
     swift_delete_container,
     swift_replicate_container,
-    update_metadata_bucket,
+    update_metadata_container,
     update_metadata_object,
     get_upload_session,
 )
@@ -152,19 +152,19 @@ async def servinit() -> aiohttp.web.Application:
     # Add api routes
     app.add_routes(
         [
-            aiohttp.web.get("/api/buckets", swift_list_buckets),
+            aiohttp.web.get("/api/containers", swift_list_containers),
             aiohttp.web.put("/api/containers/{container}", swift_create_container),
             aiohttp.web.delete("/api/containers/{container}", swift_delete_container),
-            aiohttp.web.get("/api/bucket/objects", swift_list_objects),
+            aiohttp.web.get("/api/container/objects", swift_list_objects),
             aiohttp.web.get("/api/object/dload", swift_download_object),
             aiohttp.web.get("/api/shared/objects", swift_list_shared_objects),
             aiohttp.web.get("/api/username", get_os_user),
             aiohttp.web.get("/api/projects", os_list_projects),
             aiohttp.web.get("/api/project/active", get_os_active_project),
-            aiohttp.web.get("/api/bucket/meta", get_metadata_bucket),
-            aiohttp.web.post("/api/bucket/meta", update_metadata_bucket),
-            aiohttp.web.get("/api/bucket/object/meta", get_metadata_object),
-            aiohttp.web.post("/api/bucket/object/meta", update_metadata_object),
+            aiohttp.web.get("/api/container/meta", get_metadata_container),
+            aiohttp.web.post("/api/container/meta", update_metadata_container),
+            aiohttp.web.get("/api/container/object/meta", get_metadata_object),
+            aiohttp.web.post("/api/container/object/meta", update_metadata_object),
             aiohttp.web.get("/api/project/meta", get_project_metadata),
             aiohttp.web.get("/api/project/acl", get_access_control_metadata),
             aiohttp.web.post("/api/access/{container}", add_project_container_acl),

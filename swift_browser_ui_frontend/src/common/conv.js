@@ -1,6 +1,6 @@
 
 import {
-  getBucketMeta,
+  getContainerMeta,
   getAccessControlMeta,
   getObjectsMeta,
 } from "./api";
@@ -163,7 +163,7 @@ function extractTags(meta) {
 }
 
 export async function getTagsForContainer(containerName, signal) {
-  let meta = await getBucketMeta(containerName, signal);
+  let meta = await getContainerMeta(containerName, signal);
   return extractTags(meta);
 }
 
@@ -180,7 +180,7 @@ export async function getTagsForObjects(
 
 export function makeGetObjectsMetaURL(container, objects) {
   return new URL(  
-    "/api/bucket/object/meta?container="
+    "/api/container/object/meta?container="
       .concat(encodeURI(container))
       .concat("&object=")
       .concat(encodeURI(objects.join(","))),

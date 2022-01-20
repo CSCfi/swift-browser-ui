@@ -64,23 +64,23 @@ export default async function getActiveProject() {
   return activeProj;
 }
 
-export async function getBuckets() {
-  let getBucketsUrl = new URL("/api/buckets", document.location.origin);
+export async function getContainers() {
+  let getContainersUrl = new URL("/api/containers", document.location.origin);
   // Fetch containers from the API for the user that's currently logged in
-  let buckets = fetch(
-    getBucketsUrl, { method: "GET", credentials: "same-origin" },
+  let containers = fetch(
+    getContainersUrl, { method: "GET", credentials: "same-origin" },
   ).then(
     function (resp) { return resp.json(); },
   );
-  return buckets;
+  return containers;
 }
 
-export async function getBucketMeta(
+export async function getContainerMeta(
   container,
   signal,
 ){
   let url = new URL(
-    "/api/bucket/meta?container=".concat(encodeURI(container)),
+    "/api/container/meta?container=".concat(encodeURI(container)),
     document.location.origin,
   );
 
@@ -90,12 +90,12 @@ export async function getBucketMeta(
   return ret.json();
 }
 
-export async function updateBucketMeta(
+export async function updateContainerMeta(
   container,
   metadata,
 ){
   let url = new URL(
-    "/api/bucket/meta?container=".concat(encodeURI(container)),
+    "/api/container/meta?container=".concat(encodeURI(container)),
     document.location.origin,
   );
 
@@ -113,10 +113,8 @@ export async function updateBucketMeta(
 export async function getObjects(container, signal) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
-  let objUrl = new URL("/api/bucket/objects", document.location.origin);
-  // Search parameter named bucket to avoid changing the API after changing
-  // over from S3 to Swift
-  objUrl.searchParams.append("bucket", container);
+  let objUrl = new URL("/api/container/objects", document.location.origin);
+  objUrl.searchParams.append("container", container);
   let objects = fetch(
     objUrl, { method: "GET", credentials: "same-origin", signal },
   ).then(
@@ -125,7 +123,7 @@ export async function getObjects(container, signal) {
     function (ret) {
       for (let i = 0; i < ret.length; i++) {
         ret[i]["url"] = (
-          "/api/object/dload?bucket=" + container +
+          "/api/object/dload?container=" + container +
           "&objkey=" + ret[i]["name"]
         );
       }
@@ -156,7 +154,7 @@ export async function updateObjectMeta (
   objectMeta,
 ){
   let url = new URL(
-    "/api/bucket/object/meta?container=".concat(encodeURI(container)),
+    "/api/container/object/meta?container=".concat(encodeURI(container)),
     document.location.origin,
   );
 
@@ -179,8 +177,6 @@ export async function getSharedObjects (
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
   let objUrl = new URL("/api/shared/objects", document.location.origin);
-  // Search parameter named bucket to avoid changing the API after changing
-  // over from S3 to Swift
   objUrl.searchParams.append("storageurl", url);
   objUrl.searchParams.append("container", container);
   let objects = fetch(

@@ -97,10 +97,10 @@
         </b-table-column>
       </b-table>
     </b-field>
-    <b-field :label="$t('message.encrypt.bucket')">
+    <b-field :label="$t('message.encrypt.container')">
       <b-input
         v-model="container"
-        :placeholder="$t('message.encrypt.bucket_msg')"
+        :placeholder="$t('message.encrypt.container_msg')"
       />
     </b-field>
     <b-field

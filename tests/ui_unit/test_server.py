@@ -133,9 +133,9 @@ class AppTestCase(AioHTTPTestCase):
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/login/rescope")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/buckets")
+            response = await self.client.request("GET", "/api/containers")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/bucket/objects")
+            response = await self.client.request("GET", "/api/container/objects")
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/api/object/dload")
             self.assertNotEqual(response.status, 404)
@@ -143,7 +143,7 @@ class AppTestCase(AioHTTPTestCase):
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/api/projects")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/bucket/meta")
+            response = await self.client.request("GET", "/api/container/meta")
             self.assertNotEqual(response.status, 404)
             response = await self.client.request(
                 "GET",

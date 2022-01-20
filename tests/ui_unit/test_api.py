@@ -14,13 +14,13 @@ from swiftclient.service import SwiftError
 from swift_browser_ui.ui.api import (
     get_os_user,
     os_list_projects,
-    update_metadata_bucket,
+    update_metadata_container,
     update_metadata_object,
 )
-from swift_browser_ui.ui.api import swift_list_buckets, swift_list_objects
+from swift_browser_ui.ui.api import swift_list_containers, swift_list_objects
 from swift_browser_ui.ui.api import swift_download_object
 from swift_browser_ui.ui.api import get_metadata_object
-from swift_browser_ui.ui.api import get_metadata_bucket
+from swift_browser_ui.ui.api import get_metadata_container
 from swift_browser_ui.ui.api import get_project_metadata
 from swift_browser_ui.ui.api import get_os_active_project
 from swift_browser_ui.ui.api import swift_download_shared_object
@@ -46,15 +46,15 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
 
     # Follows the testing of the different list functions
     async def test_list_containers_correct(self):
-        """Test function swift_list_buckets with a correct query."""
+        """Test function swift_list_containers with a correct query."""
         self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(
             containers=100,
             object_range=(0, 10),
             size_range=(65535, 262144),
         )
-        response = await swift_list_buckets(self.request)
-        buckets = json.loads(response.text)
-        buckets = [i["name"] for i in buckets]
+        response = await swift_list_containers(self.request)
+        containers = json.loads(response.text)
+        containers = [i["name"] for i in containers]
         comp = [
             i
             for i in self.request.app["Sessions"][self.cookie][
@@ -62,15 +62,15 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             ].containers.keys()
         ]
         # Test if return all the correct values from the mock service
-        self.assertEqual(buckets, comp)
+        self.assertEqual(containers, comp)
 
     async def test_list_containers_swift_error(self):
-        """Test function swift_list_buckets when raising SwiftError."""
+        """Test function swift_list_containers when raising SwiftError."""
         self.request.app["Sessions"][self.cookie]["ST_conn"].list = unittest.mock.Mock(
             side_effect=SwiftError("...")
         )
         with self.assertRaises(HTTPNotFound):
-            _ = await swift_list_buckets(self.request)
+            _ = await swift_list_containers(self.request)
 
     async def test_list_objects_correct(self):
         """Test function swift_list_objetcs with a correct query."""
@@ -80,7 +80,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             size_range=(65535, 262144),
         )
         for container in ["test-container-" + str(i) for i in range(0, 5)]:
-            self.request.query["bucket"] = container
+            self.request.query["container"] = container
             response = await swift_list_objects(self.request)
             objects = json.loads(response.text)
             objects = [i["hash"] for i in objects]
@@ -100,7 +100,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             size_range=(65535, 262144),
             has_content_type="text/html",
         )
-        self.request.query["bucket"] = "test-container-0"
+        self.request.query["container"] = "test-container-0"
         response = await swift_list_objects(self.request)
         objects = json.loads(response.text)
         self.assertEqual(
@@ -109,9 +109,9 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_list_without_containers(self):
-        """Test function list buckets on a project without containers."""
+        """Test function list containers on a project without containers."""
         self.request.app["Sessions"][self.cookie]["ST_conn"].init_with_data(containers=0)
-        response = await swift_list_buckets(self.request)
+        response = await swift_list_containers(self.request)
         objects = json.loads(response.text)
         self.assertEqual(objects, [])
 
@@ -124,8 +124,8 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             size_range=(65535, 262144),
         )
         self.request.query[
-            "bucket"
-        ] = """Free buckets causing havoc\
+            "container"
+        ] = """Free containers causing havoc\
                                           at the local market"""
         response = await swift_list_objects(self.request)
         objects = json.loads(response.text)
@@ -137,7 +137,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             containers=1,
             object_range=(0, 0),
         )
-        self.request.query["bucket"] = "test-container-0"
+        self.request.query["container"] = "test-container-0"
         with self.assertRaises(HTTPNotFound):
             _ = await swift_list_objects(self.request)
 
@@ -171,7 +171,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             "test-container-0", o_name
         )
 
-        self.request.query["bucket"] = container
+        self.request.query["container"] = container
         self.request.query["objkey"] = o_name
 
         # Set the swift endpoint URL
@@ -229,7 +229,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
         # Set up the query string
         self.request.query["container"] = "test-container-0"
 
-        resp = await get_metadata_bucket(self.request)
+        resp = await get_metadata_container(self.request)
         resp = json.loads(resp.text)
 
         expected = [
@@ -255,11 +255,11 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
         self.request.query["container"] = "test-container-0"
         self.request.set_post('{"usertags":"tags;for;testing"}')
 
-        post_rest = await update_metadata_bucket(self.request)
+        post_rest = await update_metadata_container(self.request)
         self.assertEqual(post_rest.status, 204)
 
         self.request.set_post(None)
-        resp = await get_metadata_bucket(self.request)
+        resp = await get_metadata_container(self.request)
         resp = json.loads(resp.text)
 
         expected = [

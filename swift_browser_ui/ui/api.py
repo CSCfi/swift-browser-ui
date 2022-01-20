@@ -48,9 +48,9 @@ def _unpack(
         request.app["Log"].error(item["error"])
 
 
-async def swift_list_buckets(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def swift_list_containers(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """
-    Return necessary information listing swift buckets in a project.
+    Return necessary information listing swift containers in a project.
 
     The function strips out e.g. the information on a success, since that's
     not necessary in this case and returns a JSON response containing all the
@@ -60,10 +60,10 @@ async def swift_list_buckets(request: aiohttp.web.Request) -> aiohttp.web.Respon
     try:
         session = api_check(request)
         request.app["Log"].info(
-            "API call for list buckets from "
+            "API call for list containers from "
             f"{request.remote}, sess: {session} :: {time.ctime()}"
         )
-        # The maximum amount of buckets / containers is measured in thousands,
+        # The maximum amount of containers / containers is measured in thousands,
         # so it's not necessary to think twice about iterating over the whole
         # response at once
         serv = request.app["Sessions"][session]["ST_conn"].list()
@@ -166,7 +166,7 @@ async def swift_delete_objects(request: aiohttp.web.Request) -> aiohttp.web.Resp
 
 async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """
-    List objects in a given bucket or container.
+    List objects in a given container or container.
 
     The function strips out e.g. the information on a success, since that's
     not necessary in this case and returns a JSON response containing all the
@@ -181,7 +181,7 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Respon
         )
 
         serv = request.app["Sessions"][session]["ST_conn"].list(
-            container=request.query["bucket"]
+            container=request.query["container"]
         )
         [_unpack(i, obj, request) for i in serv]
         if not obj:
@@ -278,7 +278,7 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
     host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
     path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
     request.app["Log"].debug(f"Using {host} as host and {path_begin} as path start.")
-    container = request.query["bucket"]
+    container = request.query["container"]
     object_key = request.query["objkey"]
     lifetime = 60 * 15
     # In the path creation, the stats['items'][0][1] is the tenant id from
@@ -293,7 +293,7 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
     )
     response.headers["Location"] = dloadurl
     response.headers["Content-Type"] = list(
-        serv.stat(request.query["bucket"], [request.query["objkey"]])
+        serv.stat(request.query["container"], [request.query["objkey"]])
     )[0]["headers"]["content-type"]
     return response
 
@@ -473,7 +473,7 @@ async def get_object_metadata(
         raise aiohttp.web.HTTPNotFound()
 
 
-async def get_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def get_metadata_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Get metadata for a container."""
     session = api_check(request)
     request.app["Log"].info(
@@ -503,7 +503,7 @@ async def get_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Respo
     return aiohttp.web.json_response([ret["container"], ret["headers"]])
 
 
-async def update_metadata_bucket(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def update_metadata_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Update metadata for a container."""
     session = api_check(request)
     request.app["Log"].info(

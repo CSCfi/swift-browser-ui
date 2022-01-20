@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { getBuckets } from "@/common/api";
+import { getContainers } from "@/common/api";
 import {
   getObjects,
   getSharedObjects,
@@ -149,7 +149,7 @@ const store = new Vuex.Store({
     updateContainers: async function ({ commit, dispatch }, signal) {
       commit("loading", true);
       let containers = [];
-      await getBuckets().then((ret) => {
+      await getContainers().then((ret) => {
         if (ret.status != 200) {
           commit("loading", false);
         }
