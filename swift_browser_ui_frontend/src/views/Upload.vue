@@ -235,15 +235,18 @@ export default {
   },
   watch: {
     container: function () {
-      this.$router.replace({
-        name: "UploadView",
-        params: {
-          "project": this.$route.params.project,
-          "container": this.container,
-        },
-      });
-      this.$route.params.container = this.container;
-      this.refreshNoUpload();
+      // the container is unique so we only need to check that
+      if (this.$route.params.container != this.container) {
+        this.$router.replace({
+          name: "UploadView",
+          params: {
+            "project": this.$route.params.project,
+            "container": this.container,
+          },
+        });
+        this.$route.params.container = this.container;
+        this.refreshNoUpload();
+      }
     },
     privkey: function () {
       this.refreshNoUpload();
