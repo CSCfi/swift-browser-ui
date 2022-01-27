@@ -236,8 +236,6 @@ new Vue({
       // Bake upload runner information to the resumable url parameters.
       let retUrl = new URL(this.uploadInfo.url);
 
-      console.log(this.uploadInfo.url);
-
       for (const param of params) {
         let newParam = param.split("=");
         // check if we should move the file under a pseudofolder
@@ -263,7 +261,6 @@ new Vue({
       retUrl.searchParams.append(
         "signature", this.uploadInfo.signature.signature,
       );
-      console.log(retUrl);
       return retUrl;
     },
     startUpload: function () {

@@ -418,7 +418,7 @@ export default {
         );
       }
       if (res != 0) {
-        console.log(res);
+
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.enFail"),
           duration: 15000,
