@@ -131,7 +131,7 @@ class ResumableFileUploadProxy:
         if chunk_number in self.done_chunks:
             return aiohttp.web.Response(status=200)
 
-        raise aiohttp.web.HTTPNotFound(reason="Chunk not yet uploaded")
+        return aiohttp.web.HTTPNoContent(reason="Chunk not yet uploaded")
 
     async def a_add_manifest(
         self,
