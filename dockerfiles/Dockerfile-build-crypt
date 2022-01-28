@@ -87,7 +87,7 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && emmake make
 
 # Build UI with encryption
-FROM node:14.18.2-alpine3.15 as FRONTEND
+FROM node:14.18.3-alpine3.15 as FRONTEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
