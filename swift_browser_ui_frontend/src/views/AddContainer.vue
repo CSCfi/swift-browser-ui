@@ -91,7 +91,7 @@ export default {
       swiftCreateContainer(this.container, this.tags.join(";")).then(() => {
         this.$router.go(-1);
       }).catch((err) => {
-        console.log(err);
+
         if (err.message.match("Container name already in use")) {
           this.$buefy.toast.open({
             message: this.$t("message.error.inUse"),

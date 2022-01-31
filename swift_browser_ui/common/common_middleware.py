@@ -21,10 +21,15 @@ async def add_cors(
     request: aiohttp.web.Request, handler: swift_browser_ui.common.types.AiohttpHandler
 ) -> aiohttp.web.Response:
     """Add CORS header for API responses."""
-    resp = await handler(request)
-    if "origin" in request.headers.keys():
-        resp.headers["Access-Control-Allow-Origin"] = request.headers["origin"]
-    return resp
+    try:
+        resp = await handler(request)
+        if "origin" in request.headers.keys():
+            resp.headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+        return resp
+    except aiohttp.web.HTTPError as error:
+        if "origin" in request.headers.keys():
+            error.headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+        raise error
 
 
 @aiohttp.web.middleware
