@@ -19,8 +19,9 @@ jobs:
       - name: Install dependencies
         run: |
           pushd swift_browser_ui_frontend
-          sudo npm install -g npm@8.3.2
+          npm install -g npm@8.3.2
           npm install
+          npm ci
       - name: Run eslint
         run: |
           pushd swift_browser_ui_frontend
