@@ -17,5 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - handle test chunk uploaded request as `204` instead of `404` as recommended by https://github.com/23/resumable.js#handling-get-or-test-requests
     - remove forgotten console.logs
 
+### Removed
+- The possibility to share containers with write-only (file drop) permissions (GH #475)
 
 [Unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...devel

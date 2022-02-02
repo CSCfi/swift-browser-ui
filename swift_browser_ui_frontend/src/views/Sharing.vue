@@ -83,6 +83,18 @@ export default {
       loading: false,
     };
   },
+  watch: {
+    read: function () {
+      if(!this.read) {
+        this.write = false;
+      }
+    },
+    write: function () {
+      if(this.write) {
+        this.read = true;
+      }
+    },
+  },
   beforeMount () {
     this.checkContainer();
   },
