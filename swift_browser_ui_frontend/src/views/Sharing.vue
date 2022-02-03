@@ -227,7 +227,11 @@ export default {
   }
 
   .sharingbutton {
-    margin: 1%;
+    margin: 1% 0;
+  }
+
+  .sharingbutton + .sharingbutton {
+    margin-left: 1%;
   }
 
   .syncbutton {
