@@ -7,14 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ["14"]
+        node: ["16"]
         browser: ["firefox", "chrome"]
     steps:
       - uses: actions/checkout@v2
       - name: Build Frontend
         run: |
           pushd swift_browser_ui_frontend
-          npm install -g npm@8.4.0
           npm install
           npm run build
       - name: Setup and Run backend
