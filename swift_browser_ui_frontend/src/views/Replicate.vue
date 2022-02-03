@@ -3,9 +3,14 @@
     id="replicateView"
     class="contents"
   >
+    <b-message
+      v-if="destinationExists"
+      type="is-danger"
+    >
+      {{ $t('message.replicate.destinationExists') }}
+    </b-message>
     <b-field grouped>
       <b-field
-        horizontal
         :label="$t('message.replicate.destinationLabel')"
         :message="$t('message.replicate.destinationMessage')"
         expanded
@@ -15,12 +20,7 @@
           name="container"
           expanded
         />
-      </b-field>
-      <b-field>
-        <p 
-          id="destinationButton"
-          class="control"
-        >
+        <p class="control">
           <button
             v-if="destinationExists"
             class="button is-primary"
@@ -28,12 +28,6 @@
           >
             {{ $t('message.copy') }}
           </button>
-          <span
-            v-if="destinationExists"
-            class="forbiddenDestination"
-          >
-            {{ $t('message.replicate.destinationExists') }}
-          </span>
           <button
             v-else
             class="button is-primary"
@@ -121,6 +115,7 @@ export default {
 }
 #replicateView {
   width: 90%;
+  margin: auto;
 }
 #destinationButton {
   display: flex;
