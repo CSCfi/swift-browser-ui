@@ -10,7 +10,6 @@
       {{ $t('message.objects.norename') }}
     </b-message>
     <b-field
-      horizontal
       :label="$t('message.objects.objectName')"
     >
       <b-input 
@@ -22,7 +21,6 @@
       />
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.tagName')"
       :message="$t('message.tagMessage')"
     >
@@ -39,9 +37,7 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
+    <b-field>
       <b-button
         type="is-primary"
         @click="updateObject ()"

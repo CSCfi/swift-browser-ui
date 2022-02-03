@@ -14,7 +14,6 @@
       {{ $t('message.container_ops.norename') }}
     </b-message>
     <b-field
-      horizontal
       :label="$t('message.container_ops.containerName')"
     >
       <b-input 
@@ -25,7 +24,6 @@
       />
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.tagName')"
       :message="$t('message.tagMessage')"
     >
@@ -42,9 +40,7 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
+    <b-field>
       <b-button
         type="is-primary"
         @click="create ? createContainer () : updateContainer ()"
