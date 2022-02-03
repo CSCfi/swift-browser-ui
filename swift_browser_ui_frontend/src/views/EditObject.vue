@@ -42,15 +42,12 @@
     <b-field
       horizontal
     >
-      <p class="control">
-        <b-button
-          type="is-primary"
-          class="editObjectButton"
-          @click="updateObject ()"
-        >
-          {{ $t('message.save') }}
-        </b-button>
-      </p>
+      <b-button
+        type="is-primary"
+        @click="updateObject ()"
+      >
+        {{ $t('message.save') }}
+      </b-button>
     </b-field>
   </div>
 </template>
@@ -115,8 +112,5 @@ export default {
   }
   hi.title {
     margin: 1% 1% 1% 0;
-  }
-  .editObjectButton {
-    margin: 1%;
   }
 </style>
