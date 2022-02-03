@@ -7,7 +7,6 @@ RUN apk add --update \
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm install -g npm@8.3.2 \
     && npm install \
     && npm run build
 
