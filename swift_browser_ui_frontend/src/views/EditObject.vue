@@ -4,7 +4,7 @@
     class="contents"
   >
     <h1 class="title is-3">
-      {{ $t('message.objects.editObject') + object }}
+      {{ $t('message.objects.editObject') + object.name }}
     </h1>
     <b-message type="is-info">
       {{ $t('message.objects.norename') }}
@@ -14,7 +14,7 @@
       :label="$t('message.objects.objectName')"
     >
       <b-input 
-        v-model="object"
+        v-model="object.name"
         name="object"
         expanded
         aria-required="true"
@@ -27,7 +27,7 @@
       :message="$t('message.tagMessage')"
     >
       <b-taginput
-        v-model="tags"
+        v-model="object.tags"
         ellipsis
         maxlength="20"
         icon="label"
@@ -68,9 +68,8 @@ export default {
   name: "EditObjectView",
   data () {
     return {
-      container: "",
-      object: "",
-      tags: [],
+      container: {id: 0, name: ""},
+      object: {id: 0, name: "", tags: []},
       taginputConfirmKeys,
     };
   },
@@ -79,29 +78,50 @@ export default {
   },
   methods: {
     getObject: async function () {
-      const containerName = this.$route.params.container;
-      const objectName = this.$route.params.object;
-      this.container = containerName;
-      this.object = objectName;
+      if(this.$route.name === "EditSharedObjectView") {
+        this.container.name = this.$route.params.container;
+        this.object.name = this.$route.params.object;
+        this.$store.state.objectCache.map(obj => {
+          if (obj.name === this.object.name) {
+            this.object.tags = obj.tags;
+          }
+        });
+      } else {
+        this.container = await this.$store.state.db.containers.get({
+          projectID: this.$store.state.active.id,
+          name: this.$route.params.container,
+        });
+        this.object = await this.$store.state.db.objects.get({
+          containerID: this.container.id,
+          name: this.$route.params.object,
+        });
+      }
 
-      const tags = this.$store.state.objectTagsCache[objectName];
-      if (!tags) {
-        const tags = await getTagsForObjects(containerName, [objectName]);
+      if (!this.object.tags.length) {
+        const tags = await getTagsForObjects(
+          this.container.name, [this.object.name],
+        );
         this.tags = tags[0][1] || [];
       } else {
-        this.tags = tags;
+        this.tags = this.object.tags;
       }
     },
     updateObject: function () {
       let objectMeta = [
-        this.object,
+        this.object.name,
         {
-          usertags: this.tags.join(";"),
+          usertags: this.object.tags.join(";"),
         },
       ];
-      updateObjectMeta(this.container, objectMeta).then(() => {
-        this.$router.go(-1);
-      });
+      updateObjectMeta(this.container.name, objectMeta)
+        .then(async () => {
+          if(this.$route.name === "EditObjectView") {
+            await this.$store.state.db.objects
+              .where(":id").equals(this.object.id)
+              .modify({tags: this.object.tags});
+          }
+          this.$router.go(-1);
+        });
     },
   },
 };

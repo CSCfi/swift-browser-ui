@@ -54,8 +54,15 @@ export default {
         message: this.$t("message.container_ops.deleteSuccess"),
         type: "is-success",
       });
-      swiftDeleteContainer(this.container).then(() => {
-        this.$store.dispatch("updateContainers");
+      const projectID = this.$store.state.active.id;
+      swiftDeleteContainer(this.container).then(async () => {
+        this.$store.dispatch("updateContainers", {projectID});
+        await this.$store.state.db.containers
+          .where({
+            projectID,
+            name: this.container,
+          })
+          .delete();
       });
     },
   },

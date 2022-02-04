@@ -34,7 +34,7 @@
       </b-select>
       <div class="control is-flex">
         <b-switch
-          v-if="cList.length < 500"
+          v-if="(containers.value || []).length < 500"
           v-model="isPaginated"
           data-testid="paginationSwitch"
         >
@@ -85,7 +85,7 @@
       hoverable
       narrowed
       default-sort="name"
-      :data="cList"
+      :data="containers.value"
       :selected.sync="selected"
       :current-page.sync="currentPage"
       :paginated="isPaginated"
@@ -114,7 +114,7 @@
           </span>
           <b-taglist v-if="showTags">
             <b-tag
-              v-for="tag in tags[props.row.name]"
+              v-for="tag in props.row.tags"
               :key="tag"
               :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
               rounded
@@ -292,8 +292,13 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import { 
+  getHumanReadableSize, 
+  truncate, 
+} from "@/common/conv";
 import debounce from "lodash/debounce";
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
@@ -313,8 +318,6 @@ export default {
     return {
       files: [],
       folders: [],
-      cList: [],
-      tags: {},
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -324,17 +327,12 @@ export default {
       shareModalIsActive: false,
       showTags: true,
       abortController: null,
+      containers: {value: []},
     };
   },
   computed: {
     active () {
       return this.$store.state.active;
-    },
-    containers () {
-      return this.$store.state.containerCache;
-    },
-    containerTags() {
-      return this.$store.state.containerTagsCache;
     },
   },
   watch: {
@@ -342,11 +340,8 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
-    containers: function () {
-      this.cList = this.containers;
-    },
-    containerTags: function () {
-      this.tags = this.containerTags; // {"containerName": ["tag1", "tag2"]}
+    active: function () {
+      this.fetchContainers();
     },
   },
   created: function () {
@@ -366,14 +361,20 @@ export default {
   },
   methods: {
     fetchContainers: async function () {
-      // Get the container listing from the API if the listing hasn't yet
-      // been cached.
-      if(this.cList.length < 1) {
-        await this.$store.dispatch(
-          "updateContainers", 
-          this.abortController.signal,
-        );
+      if (this.active.id === undefined) {
+        return;
       }
+      this.containers = useObservable(
+        liveQuery(() => 
+          this.$store.state.db.containers
+            .where({projectID: this.active.id})
+            .toArray(),
+        ),
+      );
+      await this.$store.dispatch(
+        "updateContainers", 
+        {projectID: this.active.id, signal: null},
+      );
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link

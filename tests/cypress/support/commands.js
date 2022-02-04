@@ -33,6 +33,9 @@ Cypress.Commands.add("login", (loginMessage) => {
     cy.wait(1000)
 })
 
+Cypress.Commands.add("deleteDB", () => {
+    indexedDB.deleteDatabase("sd-connect")
+})
 // some exceptions like API reponse from delete we are not catching
 // and we don't need to, thus we ignore
 Cypress.on("uncaught:exception", () => {

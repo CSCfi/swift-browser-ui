@@ -173,6 +173,7 @@ export async function getSharedObjects (
   project,
   container,
   url,
+  signal,
 ) {
   // Fetch objects contained in a container from the API for the user
   // that's currently logged in.
@@ -180,7 +181,7 @@ export async function getSharedObjects (
   objUrl.searchParams.append("storageurl", url);
   objUrl.searchParams.append("container", container);
   let objects = fetch(
-    objUrl, { method: "GET", credentials: "same-origin" },
+    objUrl, { method: "GET", credentials: "same-origin", signal },
   ).then(
     function (resp) { return resp.json(); },
   ).then(

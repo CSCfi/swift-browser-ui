@@ -33,7 +33,7 @@
       </b-select>
       <div class="control is-flex">
         <b-switch
-          v-if="oList.length < 500"
+          v-if="oList.value && oList.value.length < 500"
           v-model="isPaginated"
         >
           {{ $t('message.table.paginated') }}
@@ -106,13 +106,14 @@
       :checked-rows.sync="checkedRows"
       :is-row-checkable="isRowCheckable"
       default-sort="name"
-      :data="oList"
+      :data="oList.value"
       :selected.sync="selected"
       :current-page.sync="currentPage"
       :paginated="isPaginated"
       :per-page="perPage"
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
+      :row-class="row => !isVisible(row.id) ? 'is-hidden' : ''"
       @page-change="( page ) => addPageToURL( page )"
       @dblclick="(row) => {if (
         renderFolders &&
@@ -154,7 +155,7 @@
         </span>
         <b-taglist v-if="displayTags(props.row.name)">
           <b-tag
-            v-for="tag in tags[props.row.name]"
+            v-for="tag in props.row.tags"
             :key="tag"
             :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
             rounded
@@ -251,10 +252,7 @@
                 size="is-small"
                 icon-left="pencil"
                 :inverted="selected==props.row ? true : false"
-                :to="{
-                  name: 'EditObjectView',
-                  params: {container, object: props.row.name}
-                }"
+                :to="getEditRoute(container, props.row.name)"
               >
                 {{ $t('message.edit') }}
               </b-button>
@@ -274,7 +272,7 @@
             size="is-small"
             :inverted="props.row === selected ? true : false"
             :disabled="false"
-            :objects="props.row.name"
+            :objects="[props.row]"
           />
         </template>
       </b-table-column>
@@ -342,6 +340,8 @@
 
 <script>
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
@@ -360,8 +360,7 @@ export default {
   },
   data: function () {
     return {
-      oList: [],
-      tags: {},
+      oList: {value: []},
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
@@ -372,6 +371,8 @@ export default {
       currentPage: 1,
       checkedRows: [],
       abortController: null,
+      filteredObjects: [],
+      inCurrentFolder: [],
     };
   },
   computed: {
@@ -381,47 +382,62 @@ export default {
     queryPage () {
       return this.$route.query.page || 1;
     },
+    project () {
+      return this.$route.params.project;
+    },
     container () {
       return this.$route.params.container;
     },
-    objects () {
-      return this.$store.state.objectCache;
+    active () {
+      return this.$store.state.active;
     },
-    objectTags() {
-      return this.$store.state.objectTagsCache;
+    sharedObjects() {
+      return this.$store.state.objectCache;
     },
   },
   watch: {
+    active: function() {
+      this.updateObjects(); 
+    },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
     renderFolders: function () {
-      if (this.renderFolders) {
-        this.oList = this.getFolderContents();
-      } else {
-        this.oList = this.objects;
-      }
-    },
-    objects: function () {
-      if (this.renderFolders) {
-        this.oList = this.getFolderContents();
-      } else {
-        this.oList = this.objects;
-      }
+      this.selected = undefined;
       this.checkedRows = [];
+      if (this.renderFolders) {
+        this.inCurrentFolder = this.getFolderContents();
+      } else {
+        this.inCurrentFolder = [];
+        this.$route.query.prefix = "";
+      }
     },
-    objectTags: function () {
-      this.tags = this.objectTags; // {"objectName": ["tag1", "tag2"]}
+    sharedObjects: function () {
+      if(this.$route.name !== "SharedObjects") {
+        return;
+      }
+      this.oList = {value: this.sharedObjects};
     },
     prefix: function () {
       if (this.renderFolders) {
-        this.oList = this.getFolderContents();
+        this.inCurrentFolder = this.getFolderContents();
         this.$store.commit("setPrefix", this.prefix);
       }
     },
     queryPage: function () {
       this.currentPage = this.queryPage;
+    },
+    ["oList.value"]: async function() {
+      if (this.oList.value !== undefined && this.$route.query.selected) {
+        const selected = this.$route.query.selected;
+        const obj = this.oList.value.find(o => {
+          return o.name === selected;
+        });
+        if (obj) {
+          this.selected = obj;
+        }
+      }
     },
   },
   created: function () {
@@ -442,11 +458,45 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    updateObjects: function () {
-      // Update current object listing in Vuex if length is too little
+    updateObjects: async function () {
+      if (this.container === undefined || this.active.id === undefined) {
+        return;
+      }
+
+      if(this.$route.name === "SharedObjects") {
+        await this.$store.dispatch(
+          "updateSharedObjects", 
+          {
+            project: this.$route.params.project,
+            owner: this.$route.params.owner,
+            container: {
+              id: 0,
+              name: this.$route.params.container,
+            },
+            signal: this.abortController.signal,
+          },
+        );
+        return;
+      }
+
+      const container = await this.$store.state.db.containers
+        .get({
+          projectID:  this.active.id, 
+          name: this.container,
+        });
+      this.oList = useObservable(
+        liveQuery(() =>
+          this.$store.state.db.objects
+            .where({"containerID": container.id})
+            .toArray(),
+        ),
+      );
       this.$store.dispatch(
         "updateObjects", 
-        {route: this.$route, signal: this.abortController.signal},
+        {
+          container: container,
+          signal: this.abortController.signal,
+        },
       );
     },
     isRowCheckable: function (row) {
@@ -549,24 +599,24 @@ export default {
       var safeKey = escapeRegExp(this.getPrefix());
       let pre_re = new RegExp(safeKey);
 
-      let tmpList = this.objects.filter(
+      let tmpList = this.oList.value.filter(
         el => el.name.match(pre_re),
       );
 
-      let retList = [];
+      let idList = [];
+      let folders = new Set();
 
       tmpList.forEach(element => {
-        for (let i of retList) {
-          if (this.getFolderName(i.name).match(
-            this.getFolderName(element.name),
-          )) {
-            return;
-          }
-        }
-        retList.push(element);
-      });
+        let folderName = this.getFolderName(element.name);
 
-      return retList;
+        if (folders.has(folderName)) {
+          return;
+        }
+        folders.add(folderName);
+        idList.push(element.id);
+      });
+      
+      return idList;
     },
     getPrefix: function () {
       // Get current pseudofolder prefix
@@ -605,7 +655,7 @@ export default {
         });
       }
 
-      this.oList = this.getFolderContents();
+      this.inCurrentFolder = this.getFolderContents();
     },
     getFolderName: function (path) {
       // Get the name of the currently displayed pseudofolder
@@ -616,26 +666,63 @@ export default {
       // Return true if path represents a file in the active prefix context
       return path.replace(this.getPrefix(), "").match("/") ? false : true;
     },
+    isVisible: function(id) {
+      let visible = true;
+      if (
+        this.renderFolders 
+        && !this.inCurrentFolder.includes(id)
+      ) {
+        visible = false;
+      }
+      if (this.filteredObjects.includes(id)) {
+        visible = false;
+      }
+      return visible;
+    },
     filter: function () {
+      if(this.searchQuery.length === 0) {
+        this.filteredObjects = [];
+        return;
+      }
       // request parameter should be sanitized first
       var safeKey = escapeRegExp(this.searchQuery);
       var name_re = new RegExp(safeKey, "i");
-      if (this.renderFolders) {
-        this.oList = this.getFolderContents().filter(
-          element => 
-            element.name.match(name_re)
-            || this.tags[element.name].join("\n").match(name_re),
-        );
-      } else {
-        this.oList = this.objects.filter(
-          element => 
-            element.name.match(name_re)
-            || this.tags[element.name].join("\n").match(name_re),
-        );
+      function search (prev, element) {
+        if (
+          element.name.match(name_re) || 
+          (
+            element.tags && 
+            element.tags.join("\n").match(name_re)
+          )
+        ) {
+          return prev;
+        }
+        prev.push(element.id);
+        return prev;
       }
+      this.filteredObjects = this.oList.value.reduce(search, []);
     },
     displayTags: function (name) {
       return this.showTags && !(this.renderFolders && !this.isFile(name));
+    },
+    getEditRoute: function(containerName, objectName) {
+      if (this.$route.name == "SharedObjects") {
+        return {
+          name: "EditSharedObjectView",
+          params: {
+            container: containerName, 
+            object: objectName, 
+            owner: this.$route.params.owner,
+          },
+        };
+      }
+      return {
+        name: "EditObjectView",
+        params: {
+          container: containerName, 
+          object: objectName,
+        },
+      };
     },
   },
 };
