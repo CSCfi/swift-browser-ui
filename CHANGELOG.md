@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- GH #493 redesign upload UI
+    - let users know when keys are added by default
+    - compute sha256 of key instead of showing text
+
 ### Changed
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
@@ -30,6 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - alignment in edit view of containers & objects
     - copy container view as it was driving my ocd wild as well
     - sharing view button positioning
+    - token view make it consistent with other views
     - fix issue with accessing ws on devserver
+    - key existence should be checked with `$te` https://kazupon.github.io/vue-i18n/api/#vue-injected-methods
+    - check public key exists already before adding to the table
+
+### Removed
+- GH #493 redesign upload UI 
+    - removed vue-material-design-icons 
 
 [Unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...devel
