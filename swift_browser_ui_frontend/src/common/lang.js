@@ -254,7 +254,7 @@ let default_translations = {
                 "refreshing the page.",
         files: "Files",
         ephemeral: "Use own private key",
-        multipleReceivers: "Add other Receivers Public Keys",
+        multipleReceivers: "Add other receivers' public keys",
         pk: "Private key",
         pk_msg: "Sender private key",
         phrase: "Private key passphrase",
