@@ -87,6 +87,7 @@ käyttöliittymä
 käyttörajoista
 kehittänyt
 kelpaa
+kentällä
 kenttää
 kerran
 keskus
@@ -136,6 +137,7 @@ lisää
 lisätäksesi
 lisätietoja
 lisättiin
+lisättyjä
 loppuminen
 löydetty
 löytää
@@ -161,6 +163,7 @@ muokkaa
 mutta
 muussa
 muutaman
+muuttaa
 muuttaaksesi
 nämä
 navigointia
@@ -285,6 +288,7 @@ tägillä
 tägit
 tähän
 tai
+tällä
 tallenna
 tallennettujen
 tallennustilaan
@@ -338,6 +342,7 @@ valikossa
 valinnat
 valitse
 valittu
+valittuja
 valittuna
 varmasti
 varmistathan
@@ -350,6 +355,7 @@ virhe
 virheellinen
 voi
 voida
+voit
 voivat
 vuoksi
 yhden
