@@ -4,9 +4,14 @@
     class="contents"
   > 
     <b-message
+      v-if="$te('message.keys') && fixedrecvKeys.length > 0"
+      type="is-info"
+    >
+      {{ $t('message.keys.defaultKeysMessage') }}
+    </b-message>
+    <b-message
       v-if="tooLarge"
       type="is-danger"
-      has-icon
     >
       {{ $t('message.encrypt.enTooLarge') }}
     </b-message>
@@ -280,6 +285,7 @@ export default {
       useEncryption: true,
       privkey: "",
       recvkeys: [],
+      fixedrecvKeys:[],
       container: "",
       passphrase: "",
       files: [],
@@ -347,7 +353,7 @@ export default {
   },
   methods: {
     getPubKey: function () {
-      if (this.$t("message.keys")) {
+      if (this.$te("message.keys")) {
         for (let item of Object.entries(this.$t("message.keys"))) {
           fetch(
             "/download/"
@@ -357,7 +363,7 @@ export default {
           ).then(resp => {
             return resp.text();
           }).then(resp => {
-            this.recvkeys.push(resp);
+            this.fixedrecvKeys.push(resp);
           });
         }
       }
@@ -427,6 +433,8 @@ export default {
       if (!this.ephemeral) {
         FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       }
+      // we add the fixed set o keys to the ones added
+      this.recvkeys.concat(this.fixedrecvKeys);
       for (let i = 0; i < this.recvkeys.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
