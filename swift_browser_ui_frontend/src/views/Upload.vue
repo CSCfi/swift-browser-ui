@@ -4,10 +4,10 @@
     class="contents"
   > 
     <b-message
-      v-if="$te('message.keys') && fixedrecvKeys.length > 0"
+      v-if="$te('message.keys') && fixedRecvKeys.length > 0"
       type="is-info"
     >
-      {{ $t('message.keys.defaultKeysMessage') }}
+      {{ $t('message.encrypt.defaultKeysMessage') }}
     </b-message>
     <b-message
       v-if="tooLarge"
@@ -291,7 +291,7 @@ export default {
       privkey: "",
       recvkeys: [],
       recvHashedKeys: [],
-      fixedrecvKeys:[],
+      fixedRecvKeys:[],
       container: "",
       passphrase: "",
       files: [],
@@ -369,7 +369,7 @@ export default {
           ).then(resp => {
             return resp.text();
           }).then(resp => {
-            this.fixedrecvKeys.push(resp);
+            this.fixedRecvKeys.push(resp);
           });
         }
       }
@@ -440,7 +440,7 @@ export default {
         FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       }
       // we add the fixed set o keys to the ones added
-      this.recvkeys.concat(this.fixedrecvKeys);
+      this.recvkeys.concat(this.fixedRecvKeys);
       for (let i = 0; i < this.recvkeys.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
