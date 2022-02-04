@@ -222,3 +222,14 @@ export function filterSegments(objects) {
   return objects.filter(o =>
     o.name.match(SEGMENT_REGEX) === null);
 }
+
+export function tokenize(text, ignoreSmallerThan=2) {
+  // splits with non-word and non-digit chars
+  const split = text.toLowerCase().split(/[^\p{L}\d']/u);
+
+  // filters out small words and duplicates
+  const result = split.filter((item, index) => 
+    item.length >= ignoreSmallerThan && split.indexOf(item) === index,
+  );
+  return result;
+}

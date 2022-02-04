@@ -12,6 +12,7 @@ import {
   getTagsForObjects,
   makeGetObjectsMetaURL,
   filterSegments,
+  tokenize,
 } from "./conv";
 
 import { initDB } from "@/common/db";
@@ -146,6 +147,7 @@ const store = new Vuex.Store({
           commit("loading", false);
         });
       containers.forEach(cont => {
+        cont.tokens = tokenize(cont.name);
         cont.projectID = projectID;
       });
       await state.db.containers.bulkPut(containers).catch(() => {});
@@ -221,6 +223,7 @@ const store = new Vuex.Store({
       objects.forEach(obj => {
         obj.container = container.name;
         obj.containerID = container.id;
+        obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
       });
       const toDelete = [];
       existingObjects.map(oldObj => {

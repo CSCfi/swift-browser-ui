@@ -46,12 +46,44 @@
           {{ $t('message.table.showTags') }}
         </b-switch>
       </div>
-      <b-field class="control searchBox">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.searchBy')"
-        />
-      </b-field>
+      <b-autocomplete
+        id="searchbox"
+        v-model="searchQuery"
+        rounded
+        icon="magnify"
+        clearable
+        :placeholder="$t('message.searchBy')"
+        :data="searchResults"
+        field="name"
+        :open-on-focus="true"
+        :keep-first="true"
+        max-height="350px"
+        @select="option => $router.push(getSearchRoute(option))"
+      >
+        <template slot-scope="props">
+          <SearchResultItem 
+            :item="props.option"
+            :route="getSearchRoute"
+          />
+        </template>
+        <template #empty>
+          <div
+            v-if="searchQuery.length > 0"
+            class="media empty-search"
+          >
+            <b-loading
+              v-model="isSearching"
+              :is-full-page="false"
+            />
+            <div
+              v-show="!isSearching"
+              class="media-content"
+            >
+              {{ $t('message.search.empty') }}
+            </div>
+          </div>
+        </template>
+      </b-autocomplete>
       <div class="field has-addons uploadGroup">
         <p class="control">
           <b-button
@@ -295,11 +327,13 @@
 import { 
   getHumanReadableSize, 
   truncate, 
+  tokenize,
 } from "@/common/conv";
 import debounce from "lodash/debounce";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
+import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
@@ -307,6 +341,7 @@ import DeleteContainerButton from "@/components/ContainerDeleteButton";
 export default {
   name: "ContainersView",
   components: {
+    SearchResultItem,
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,
@@ -327,7 +362,9 @@ export default {
       shareModalIsActive: false,
       showTags: true,
       abortController: null,
+      searchResults: [],
       containers: {value: []},
+      isSearching: false,
     };
   },
   computed: {
@@ -338,7 +375,13 @@ export default {
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
-      this.debounceFilter();
+      if (this.searchQuery.length) {
+        this.isSearching = true;
+        this.debounceSearch();
+      } else {
+        this.isSearching = false;
+        this.searchResults = [];
+      }
     },
     active: function () {
       this.fetchContainers();
@@ -347,7 +390,7 @@ export default {
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
-    this.debounceFilter = debounce(this.filter, 400);
+    this.debounceSearch = debounce(this.search, 400);
   },
   beforeMount () {
     this.abortController = new AbortController();
@@ -401,15 +444,74 @@ export default {
       // Make getHumanReadableSize usable in instance namespace
       return getHumanReadableSize(size);
     },
-    filter: function() {
+    search: async function() {
+      if(this.searchQuery.length === 0) {
+        console.timeEnd("search " + this.searchQuery);
+        return;
+      }
       // request parameter should be sanitized first
-      var safeKey = escapeRegExp(this.searchQuery);
-      var name_cmp = new RegExp(safeKey, "i");
-      this.cList = this.containers.filter(
-        element => 
-          element.name.match(name_cmp)
-          || this.tags[element.name].join("\n").match(name_cmp),
-      );
+      const safeQuery = escapeRegExp(this.searchQuery);
+      const query = tokenize(safeQuery, 0);
+
+      function multipleQueryWords(item) {
+        // Narrows down search results when there are more than
+        // one query words
+        if (query.length === 1) {
+          return true;
+        }
+        let match = new Set();
+        query.map(q => {
+          item.tokens.map(i => {
+            if(i.startsWith(q)) {
+              match.add(q);
+              return;
+            }
+          });
+          if (item.tags === undefined) {
+            return;
+          }
+          item.tags.map(i => {
+            if(i.startsWith(q)) {
+              match.add(q);
+              return;
+            }
+          });
+        });
+        if (match.size === query.length) {
+          return true;
+        }
+        return false;
+      }
+
+      const containers = 
+        await this.$store.state.db.containers
+          .where("tokens")
+          .startsWithAnyOf(query)
+          .or("tags")
+          .startsWithAnyOfIgnoreCase(query)
+          .filter(multipleQueryWords)
+          .and(cont => cont.projectID === this.active.id)
+          .toArray();
+      this.searchResults = containers;
+      if(containers.length) {
+        this.isSearching = false;
+      }
+
+      const containerIDs = new Set(await this.$store.state.db.containers
+        .where({projectID: this.active.id}).primaryKeys());
+
+      const objects = 
+        await this.$store.state.db.objects
+          .where("tokens")
+          .startsWithAnyOf(query)
+          .or("tags")
+          .startsWithAnyOfIgnoreCase(query)
+          .filter(multipleQueryWords)
+          .and(obj => containerIDs.has(obj.containerID))
+          .toArray();
+      this.searchResults = containers.concat(objects);
+      this.isSearching = false;
+    },
     },
   },
 };
@@ -425,5 +527,12 @@ export default {
   text-align: center;
   margin-top: 5%;
   margin-bottom: 5%;
+}
+.autocomplete {
+  min-width: 30%;
+  margin-left: auto;
+}
+.empty-search {
+  height: 2rem;
 }
 </style>
