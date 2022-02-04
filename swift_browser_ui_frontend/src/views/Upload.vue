@@ -119,7 +119,7 @@
         <b-field>
           <b-table
             v-if="useEncryption"
-            :data="recvkeys"
+            :data="recvHashedKeys"
             paginated
             focusable
             hoverable
@@ -152,6 +152,11 @@
                 {{ $t('message.remove') }}
               </b-button>
             </b-table-column>
+            <template #empty>
+              <div class="has-text-centered">
+                {{ $t('message.encrypt.noRecipients') }}
+              </div>
+            </template>
           </b-table>
         </b-field>
       </div>
@@ -270,7 +275,7 @@
 
 <script>
 import { getUploadEndpoint } from "@/common/api";
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import { getHumanReadableSize, truncate, computeSHA256 } from "@/common/conv";
 
 export default {
   name: "UploadView",
@@ -285,6 +290,7 @@ export default {
       useEncryption: true,
       privkey: "",
       recvkeys: [],
+      recvHashedKeys: [],
       fixedrecvKeys:[],
       container: "",
       passphrase: "",
@@ -563,8 +569,11 @@ export default {
         });
       });
     },
-    appendPublicKey: function () {
-      this.recvkeys.push(this.addRecvkey);
+    appendPublicKey: async function () {
+      if (!this.recvkeys.includes(this.addRecvkey)){
+        this.recvkeys.push(this.addRecvkey);
+        this.recvHashedKeys.push(await computeSHA256(this.addRecvkey));
+      }
       this.addRecvkey = "";
     },
     refreshNoUpload() {
