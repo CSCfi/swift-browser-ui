@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
 - Redirect to front page when the session has expired. (GH #461)
 - Hide most errors from the browser's console. (GH #461)
+- Updated node.js base image to `node:16.13.2-alpine3.15`
+- update materialdesing icon link
+- update browsers list with `npx browserslist@latest --update-db`
+- add margin to top footer for clearer division between content and footer
+- redesign upload view as specified in issue #479
 
 ### Fixed
 - Double navigation to the UploadView (GH #473)
@@ -21,5 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - The possibility to share containers with write-only (file drop) permissions (GH #475)
+- GH #493 redesign upload UI 
+    - alignment in edit view of containers & objects
+    - copy container view as it was driving my ocd wild as well
+    - sharing view button positioning
+    - fix issue with accessing ws on devserver
 
 [Unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...devel
