@@ -285,6 +285,8 @@ let default_translations = {
         objects: "Objects",
         size: "Size",
         empty: "No results found",
+        buildingIndex: "This project has a large number of objects. Please, " +
+                       "wait while the search index is ready, and try again.",
       },
     },
   },
@@ -566,6 +568,8 @@ let default_translations = {
         objects: "Objektia",
         size: "Koko",
         empty: "Tuloksia ei löytynyt",
+        buildingIndex: "Tässä projektissa on suuri määrä kohteita. Odota, " +
+                       "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
       },
     },
   },

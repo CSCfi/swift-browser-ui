@@ -59,6 +59,7 @@
         :keep-first="true"
         max-height="350px"
         @select="option => $router.push(getSearchRoute(option))"
+        @focus="event => searchGainedFocus()"
       >
         <template slot-scope="props">
           <SearchResultItem 
@@ -512,6 +513,30 @@ export default {
       this.searchResults = containers.concat(objects);
       this.isSearching = false;
     },
+    searchGainedFocus: async function() {
+      const preferences = await this.$store.state.db.preferences.get(1);
+
+      const ojbCount = this.containers.value
+        .reduce((prev, cont) => prev + cont.count, 0);
+
+      if(
+        !(
+          this.active.id in preferences 
+          && preferences[this.active.id].largeProjectNotification
+        )
+        && ojbCount >= 10000
+      ) {
+        this.$buefy.notification.open({
+          message: this.$t("message.search.buildingIndex"),
+          type: "is-info",
+          position: "is-top-right",
+          duration: 20000,
+          hasIcon: true,
+        });
+        this.$store.state.db.preferences
+          .where(":id").equals(1)
+          .modify({[this.active.id]: {largeProjectNotification: true}});
+      }
     },
   },
 };

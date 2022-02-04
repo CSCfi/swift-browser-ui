@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - There is no ranking. Containers are returned before objects in the order they are in the IDB.
     - The search is different from the filtering in objects list. Query has to match beginning of tag or beginning of words extrated from the name.
     - Adding more words to the search narrows down the results.
+    - A message is shown when trying to search a large project before cache is created.
 
 ### Fixed
 - Double navigation to the UploadView (GH #473)

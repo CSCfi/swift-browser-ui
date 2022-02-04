@@ -8,6 +8,11 @@ export function initDB() {
     objects: "++id, &[containerID+name], *tags, *tokens",
     preferences: "id",
   });
+  db.preferences.count(count => {
+    if (count === 0) {
+      db.preferences.add({id: 1});
+    }
+  });
   
   return db;
 }
