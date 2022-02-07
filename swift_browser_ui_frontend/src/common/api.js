@@ -3,33 +3,84 @@
 import { 
   getHumanReadableSize, 
   makeGetObjectsMetaURL,
+  DEV,
 } from "@/common/conv";
+
+async function fetchWithCookie({method, url, body, signal}) {
+  return fetch(url, {
+    method,
+    body,
+    signal,
+    credentials: "same-origin",
+  })
+    .then(response => {
+      switch (response.status) {
+        case 401:
+        case 403:
+          window.location.pathname = "/unauth";
+          break;
+        case 500:
+          break;
+      }
+      
+      return response;
+    })
+    .catch(error => {
+      if(DEV) console.log("Fetch error. Might be a networking issue", error);
+      return error;
+    });
+}
+export async function GET(url, signal) {
+  return fetchWithCookie({
+    url,
+    signal,
+    method: "GET",
+  });
+}
+async function POST(url, body) {
+  return fetchWithCookie({
+    url,
+    body,
+    method: "POST",
+  });
+}
+async function PUT(url, body) {
+  return fetchWithCookie({
+    url,
+    body,
+    method: "PUT",
+  });
+}
+async function DELETE(url) {
+  return fetchWithCookie({
+    url,
+    method: "DELETE",
+  });
+}
 
 export async function getUser() {
   // Function to get the username of the currently displayed user.
   let getUserURL = new URL("/api/username", document.location.origin);
-  let uname = fetch(
-    getUserURL, { method: "GET", credentials: "same-origin" },
-  ).then(
-    function (response) { return response.json(); },
-  ).then(
-    function (uname) { return uname; },
-  );
+  let uname = GET(getUserURL)
+    .then(
+      function (response) { return response.json(); },
+    ).then(
+      function (uname) { return uname; },
+    );
   return uname;
 }
 
 export async function getProjects() {
   // Fetch available projects from the API
   let getProjectsURL = new URL("/api/projects", document.location.origin);
-  let projects = fetch(
-    getProjectsURL, { method: "GET", credentials: "same-origin" },
-  ).then(
-    function (response) { return response.json(); },
-  ).then(
-    function (ret) {
-      return ret;
-    },
-  );
+  let projects = GET(getProjectsURL)
+    .then(
+      function (response) { return response.json(); },
+    ).then(
+      function (ret) {
+        return ret;
+      },
+    );
   return projects;
 }
 
@@ -38,13 +89,12 @@ export async function changeProjectApi(newProject) {
   // Returns true if the project change is successful, otherwise false
   let rescopeURL = new URL("/login/rescope", document.location.origin);
   rescopeURL.searchParams.append("project", newProject);
-  let ret = fetch(
-    rescopeURL, { method: "GET", credentials: "same-origin" },
-  ).then(
-    function (resp) {
-      return resp.status == 204 ? true : false;
-    },
-  );
+  let ret = GET(rescopeURL)
+    .then(
+      function (resp) {
+        return resp.status == 204 ? true : false;
+      },
+    );
   return ret;
 }
 
@@ -54,24 +104,22 @@ export default async function getActiveProject() {
   // returns nothing
   let getProjectURL = new URL("/api/project/active",
     document.location.origin);
-  let activeProj = fetch(
-    getProjectURL, { method: "GET", credentials: "same-origin" },
-  ).then(
-    function (resp) {
-      return resp.json();
-    },
-  );
+  let activeProj = GET(getProjectURL)
+    .then(
+      function (resp) {
+        return resp.json();
+      },
+    );
   return activeProj;
 }
 
 export async function getContainers() {
   let getContainersUrl = new URL("/api/containers", document.location.origin);
   // Fetch containers from the API for the user that's currently logged in
-  let containers = fetch(
-    getContainersUrl, { method: "GET", credentials: "same-origin" },
-  ).then(
-    function (resp) { return resp.json(); },
-  );
+  let containers = GET(getContainersUrl)
+    .then(
+      function (resp) { return resp.json(); },
+    );
   return containers;
 }
 
@@ -84,9 +132,7 @@ export async function getContainerMeta(
     document.location.origin,
   );
 
-  let ret = await fetch(
-    url, {method: "GET", credentials: "same-origin", signal},
-  );
+  let ret = await GET(url, signal);
   return ret.json();
 }
 
@@ -99,14 +145,7 @@ export async function updateContainerMeta(
     document.location.origin,
   );
 
-  let ret = await fetch(
-    url,
-    {
-      method: "POST",
-      credentials: "same-origin",
-      body: JSON.stringify(metadata),
-    },
-  );
+  let ret = await POST(url, JSON.stringify(metadata));
   return ret;
 }
 
@@ -115,21 +154,20 @@ export async function getObjects(container, signal) {
   // that's currently logged in.
   let objUrl = new URL("/api/container/objects", document.location.origin);
   objUrl.searchParams.append("container", container);
-  let objects = fetch(
-    objUrl, { method: "GET", credentials: "same-origin", signal },
-  ).then(
-    function (resp) { return resp.json(); },
-  ).then(
-    function (ret) {
-      for (let i = 0; i < ret.length; i++) {
-        ret[i]["url"] = (
-          "/api/object/dload?container=" + container +
-          "&objkey=" + ret[i]["name"]
-        );
-      }
-      return ret;
-    },
-  );
+  let objects = GET(objUrl, signal)
+    .then(
+      function (resp) { return resp.json(); },
+    ).then(
+      function (ret) {
+        for (let i = 0; i < ret.length; i++) {
+          ret[i]["url"] = (
+            "/api/object/dload?container=" + container +
+            "&objkey=" + ret[i]["name"]
+          );
+        }
+        return ret;
+      },
+    );
   return objects;
 }
 
@@ -143,9 +181,7 @@ export async function getObjectsMeta (
     url = makeGetObjectsMetaURL(container, objects);
   }
 
-  let ret = await fetch(
-    url, {method: "GET", credentials: "same-origin", signal},
-  );
+  let ret = await GET(url, signal);
   return ret.json();
 }
 
@@ -158,14 +194,7 @@ export async function updateObjectMeta (
     document.location.origin,
   );
 
-  let ret = await fetch(
-    url,
-    {
-      method: "POST",
-      credentials: "same-origin",
-      body: JSON.stringify([objectMeta]),
-    },
-  );
+  let ret = await POST(url, JSON.stringify([objectMeta]));
   return ret;
 }
 
@@ -180,22 +209,21 @@ export async function getSharedObjects (
   let objUrl = new URL("/api/shared/objects", document.location.origin);
   objUrl.searchParams.append("storageurl", url);
   objUrl.searchParams.append("container", container);
-  let objects = fetch(
-    objUrl, { method: "GET", credentials: "same-origin", signal },
-  ).then(
-    function (resp) { return resp.json(); },
-  ).then(
-    function (ret) {
-      for (let i = 0; i < ret.length; i++) {
-        ret[i]["url"] = (
-          "/download/" + project +
-          "/" + container +
-          "/" + ret[i]["name"]
-        );
-      }
-      return ret;
-    },
-  );
+  let objects = GET(objUrl, signal)
+    .then(
+      function (resp) { return resp.json(); },
+    ).then(
+      function (ret) {
+        for (let i = 0; i < ret.length; i++) {
+          ret[i]["url"] = (
+            "/download/" + project +
+            "/" + container +
+            "/" + ret[i]["name"]
+          );
+        }
+        return ret;
+      },
+    );
   return objects;
 }
 
@@ -203,9 +231,8 @@ export async function getProjectMeta() {
   // Fetch project metadata for the currently active project, containing
   // the project data usage, container amount and object amount.
   let metaURL = new URL("/api/project/meta", document.location.origin);
-  let ret = fetch(
-    metaURL, { method: "GET", credentials: "same-origin" },
-  ).then(function (resp) { return resp.json(); })
+  let ret = GET(metaURL)
+    .then(function (resp) { return resp.json(); })
     .then(function (json_ret) {
       let newRet = json_ret;
       newRet["Size"] = getHumanReadableSize(newRet["Bytes"]);
@@ -232,9 +259,8 @@ export async function getProjectMeta() {
 export async function getAccessControlMeta() {
   // Fetch the ACL metadata for all project containers.
   let metaURL = new URL("/api/project/acl", document.location.origin);
-  let ret = fetch(
-    metaURL, { method: "GET", credentials: "same-origin" },
-  ).then(function (ret) { return ret.json(); });
+  let ret = GET(metaURL)
+    .then(function (ret) { return ret.json(); });
   return ret;
 }
 
@@ -253,9 +279,7 @@ export async function removeAccessControlMeta(
     aclURL.searchParams.append("project", project);
   }
 
-  await fetch(
-    aclURL, { method: "DELETE", credentials: "same-origin" },
-  );
+  await DELETE(aclURL);
 }
 
 
@@ -276,9 +300,7 @@ export async function addAccessControlMeta(
   aclURL.searchParams.append("projects", projects_csv);
   aclURL.searchParams.append("rights", rights_str);
 
-  await fetch(
-    aclURL, { method: "POST", credentials: "same-origin" },
-  );
+  await POST(aclURL);
 }
 
 
@@ -289,9 +311,7 @@ export async function getSharedContainerAddress() {
     document.location.origin,
   );
 
-  let ret = await fetch(
-    addrURL, { method: "GET", credentials: "same-origin" },
-  );
+  let ret = await GET(addrURL);
   return ret.json();
 }
 
@@ -308,13 +328,7 @@ export async function swiftCreateContainer(
   let body = {
     tags,
   };
-  let ret = await fetch(
-    fetchURL, { 
-      method: "PUT", 
-      credentials: "same-origin",
-      body: JSON.stringify(body),
-    },
-  );
+  let ret = await PUT(fetchURL, JSON.stringify(body));
   if (ret.status != 201) {
     if (ret.status == 409) {
       throw new Error("Container name already in use.");
@@ -334,9 +348,7 @@ export async function swiftDeleteContainer(
     container,
   ), document.location.origin);
 
-  let ret = await fetch(
-    fetchURL, { method: "DELETE", credentials: "same-origin" },
-  );
+  let ret = await DELETE(fetchURL);
   if (ret.status != 204) {
     throw new Error("Container deletion not successful.");
   }
@@ -352,9 +364,7 @@ export async function swiftDeleteObjects(
   ), document.location.origin);
   fetchURL.searchParams.append("objects", objects.toString());
 
-  let ret = await fetch(
-    fetchURL, { method: "DELETE", credentials: "same-origin" },
-  );
+  let ret = await DELETE(fetchURL);
   if (ret.status != 204) {
     throw new Error("Object / objects deletion not successful.");
   }
@@ -377,9 +387,7 @@ export async function swiftCopyContainer(
   fetchURL.searchParams.append("from_project", source_project);
   fetchURL.searchParams.append("from_container", source_container);
 
-  let ret = await fetch(
-    fetchURL, { method: "POST", credentials: "same-origin" },
-  );
+  let ret = await POST(fetchURL);
 
   if (ret.status != 202) {
     throw new Error("Container replication not successful.");
@@ -398,9 +406,7 @@ export async function createExtToken(
     id,
   ), document.location.origin);
 
-  let ret = await fetch(
-    fetchURL, { method: "GET", credentials: "same-origin" },
-  );
+  let ret = await GET(fetchURL);
 
   if (ret.status != 201) {
     throw new Error("Token creation failed");
@@ -415,9 +421,7 @@ export async function listTokens() {
 
   let fetchURL = new URL("/token", document.location.origin);
 
-  let ret = await fetch(
-    fetchURL, { method: "GET", credentials: "same-origin" },
-  );
+  let ret = await GET(fetchURL);
 
   if (ret.status != 200) {
     throw new Error("Token listing fetch failed");
@@ -436,9 +440,7 @@ export async function removeToken(
     id,
   ), document.location.origin);
 
-  let ret = await fetch(
-    fetchURL, { method: "DELETE", credentials: "same-origin" },
-  );
+  let ret = await DELETE(fetchURL);
 
   if (ret.status != 204) {
     throw new Error("Token deletion failed");
@@ -458,9 +460,7 @@ export async function getUploadEndpoint(
   ),
   document.location.origin,
   );
-  let ret = await fetch(
-    fetchURL, {method: "GET", credentials: "same-origin"},
-  );
+  let ret = await GET(fetchURL);
 
   if (ret.status != 200) {
     throw new Error("Failed to get upload session information.");

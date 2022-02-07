@@ -2,8 +2,12 @@ module.exports = {  // eslint-disable-line
   publicPath: "/static",
   devServer: {
     // eslint-disable-next-line
-    proxy: `${process.env.BACKEND_HOST || "http://localhost"}:${process.env.BACKEND_PORT || "8080"}`,
-    hot: true,
+    proxy: `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`,
+    hot: "only",
+    client: {
+      // eslint-disable-next-line
+      webSocketURL: `ws://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}/ws`,
+    },
   },
   pages: {
     index: {

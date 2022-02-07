@@ -155,6 +155,14 @@ export function getHumanReadableSize(val) {
   return ret;
 }
 
+export async function computeSHA256 ( keyContent ) {
+  const msgUint8 = new TextEncoder().encode(keyContent);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashHex;
+}
+
 function extractTags(meta) {
   if ("usertags" in meta[1]) {
     return meta[1]["usertags"].split(";");
@@ -233,3 +241,5 @@ export function tokenize(text, ignoreSmallerThan=2) {
   );
   return result;
 }
+
+export const DEV = process.env.NODE_ENV === "development";

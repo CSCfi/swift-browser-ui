@@ -48,7 +48,7 @@
         </div>
         <div class="navbar-end">
           <div
-            v-if="$t('message.helplink')"
+            v-if="$te('message.helplink')"
             class="navbar-item"
           >
             <div class="buttons">

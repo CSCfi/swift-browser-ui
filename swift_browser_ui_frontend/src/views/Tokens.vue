@@ -3,7 +3,6 @@
     <div class="tokenContents">
       <b-field grouped>
         <b-field
-          horizontal
           :label="$t('message.tokens.identLabel')"
           :message="$t('message.tokens.identMessage')"
           expanded
@@ -13,8 +12,7 @@
             name="newIdentifier"
             expanded
           />
-        </b-field>
-        <b-field>
+        
           <p
             id="submitButton"
             class="control"

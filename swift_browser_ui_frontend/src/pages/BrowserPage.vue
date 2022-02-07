@@ -132,4 +132,8 @@ html, body {
 .footer {
   flex-shrink: 0;
 }
+
+#footer {
+  margin-top: 15px;
+}
 </style>

@@ -97,6 +97,18 @@ export default {
       return this.$store.state.active;
     },
   },
+  watch: {
+    read: function () {
+      if(!this.read) {
+        this.write = false;
+      }
+    },
+    write: function () {
+      if(this.write) {
+        this.read = true;
+      }
+    },
+  },
   beforeMount () {
     this.setActive(100);
     this.setParams(100);

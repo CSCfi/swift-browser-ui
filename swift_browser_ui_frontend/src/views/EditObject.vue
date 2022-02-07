@@ -10,7 +10,6 @@
       {{ $t('message.objects.norename') }}
     </b-message>
     <b-field
-      horizontal
       :label="$t('message.objects.objectName')"
     >
       <b-input 
@@ -22,7 +21,6 @@
       />
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.tagName')"
       :message="$t('message.tagMessage')"
     >
@@ -39,18 +37,13 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
-      <p class="control">
-        <b-button
-          type="is-primary"
-          class="editObjectButton"
-          @click="updateObject ()"
-        >
-          {{ $t('message.save') }}
-        </b-button>
-      </p>
+    <b-field>
+      <b-button
+        type="is-primary"
+        @click="updateObject ()"
+      >
+        {{ $t('message.save') }}
+      </b-button>
     </b-field>
   </div>
 </template>
@@ -135,8 +128,5 @@ export default {
   }
   hi.title {
     margin: 1% 1% 1% 0;
-  }
-  .editObjectButton {
-    margin: 1%;
   }
 </style>

@@ -14,20 +14,16 @@
       {{ $t('message.container_ops.norename') }}
     </b-message>
     <b-field
-      horizontal
       :label="$t('message.container_ops.containerName')"
-      :message="$t('message.container_ops.containerMessage')"
     >
       <b-input 
         v-model="container"
         name="container"
-        expanded
         aria-required="true"
         :disabled="!create"
       />
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.tagName')"
       :message="$t('message.tagMessage')"
     >
@@ -44,18 +40,13 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
-      <p class="control">
-        <b-button
-          type="is-primary"
-          class="addcontainerbutton"
-          @click="create ? createContainer () : updateContainer ()"
-        >
-          {{ create ? $t('message.create') : $t('message.save') }}
-        </b-button>
-      </p>
+    <b-field>
+      <b-button
+        type="is-primary"
+        @click="create ? createContainer () : updateContainer ()"
+      >
+        {{ create ? $t('message.create') : $t('message.save') }}
+      </b-button>
     </b-field>
   </div>
 </template>
@@ -159,7 +150,5 @@ export default {
   .addcontainerhead {
     margin: 1% 1% 1% 0;
   }
-  .addcontainerbutton {
-    margin: 1%;
-  }
+
 </style>

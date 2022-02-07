@@ -30,6 +30,7 @@ http
 https
 imagepullpolicy
 javascript
+js
 json
 kaj
 lang
@@ -58,6 +59,7 @@ pouta
 proxying
 quickstart
 saml
+sha
 ssl
 sso
 subcommands
@@ -80,4 +82,3 @@ vue
 webdrivers
 websso
 yml
-js

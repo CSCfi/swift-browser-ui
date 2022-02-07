@@ -48,17 +48,17 @@
         </section>
         <section>
           <b-button
-            class="is-light sharingbutton"
-            @click="$router.go(-1)"
-          >
-            {{ $t('message.share.cancel') }}
-          </b-button>
-          <b-button
             class="is-primary sharingbutton"
             :loading="loading"
             @click="shareSubmit()"
           >
             {{ $t('message.share.confirm') }}
+          </b-button>
+          <b-button
+            class="is-light sharingbutton"
+            @click="$router.go(-1)"
+          >
+            {{ $t('message.share.cancel') }}
           </b-button>
         </section>
       </div>
@@ -82,6 +82,18 @@ export default {
       write: false,
       loading: false,
     };
+  },
+  watch: {
+    read: function () {
+      if(!this.read) {
+        this.write = false;
+      }
+    },
+    write: function () {
+      if(this.write) {
+        this.read = true;
+      }
+    },
   },
   beforeMount () {
     this.checkContainer();
@@ -215,7 +227,11 @@ export default {
   }
 
   .sharingbutton {
-    margin: 1%;
+    margin: 1% 0;
+  }
+
+  .sharingbutton + .sharingbutton {
+    margin-left: 1%;
   }
 
   .syncbutton {
