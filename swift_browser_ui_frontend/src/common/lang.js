@@ -39,6 +39,9 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
+        idb: "Browser not supported.",
+        idb_text: "This browser is not supported.\n" +
+                  "Please, use a supported browser.",
       },
       dropFiles: "Drop files to upload.",
       help: "Help",
@@ -323,6 +326,8 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
+        idb: "Selain ei tuettu.",
+        idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
       },
       dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",

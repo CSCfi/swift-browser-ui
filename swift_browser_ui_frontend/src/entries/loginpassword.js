@@ -24,6 +24,7 @@ new Vue({
   i18n,
   data: {
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
+    idb: true,
   },
   created() {
     document.title = this.$t("message.program_name");

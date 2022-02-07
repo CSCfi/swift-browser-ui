@@ -22,6 +22,7 @@ new Vue ({
   data: {
     formname: "Token id:",
     loginformname: "Openstack account:",
+    idb: true,
   },
   created() {
     document.title = this.$t("message.program_name");

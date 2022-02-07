@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
 - **BREAKING** swift-browser-ui doesn't work in Firefox's private mode, as it doesn't offer IndexedDB.
+    - There is a warning message at login, and it is not possible to login in unsupported browsers.
 - Improved performance by reducing number of requests after cache has been created.
     - While the cache is being created, there might be a degradation in performance for large projects.
     - Reduced number of requests for fetching object tags

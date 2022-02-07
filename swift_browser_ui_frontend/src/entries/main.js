@@ -39,9 +39,12 @@ import ProgressBar from "@/components/UploadProgressBar";
 // Import delay
 import delay from "lodash/delay";
 
-if (!checkIDB){
-  window.location.pathname = "/";
-}
+
+checkIDB().then(result => {
+  if (!result) {
+    window.location.pathname = "/";
+  }
+});
 
 Vue.config.productionTip = false;
 
