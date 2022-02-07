@@ -57,6 +57,7 @@
         field="name"
         :open-on-focus="true"
         :keep-first="true"
+        :loading="isSearching"
         max-height="350px"
         @select="option => $router.push(getSearchRoute(option))"
         @focus="event => searchGainedFocus()"
@@ -452,7 +453,7 @@ export default {
       }
       // request parameter should be sanitized first
       const safeQuery = escapeRegExp(this.searchQuery);
-      const query = tokenize(safeQuery, 0);
+      const query = tokenize(safeQuery.trim(), 0);
 
       function multipleQueryWords(item) {
         // Narrows down search results when there are more than
@@ -494,9 +495,6 @@ export default {
           .and(cont => cont.projectID === this.active.id)
           .toArray();
       this.searchResults = containers;
-      if(containers.length) {
-        this.isSearching = false;
-      }
 
       const containerIDs = new Set(await this.$store.state.db.containers
         .where({projectID: this.active.id}).primaryKeys());
@@ -512,6 +510,21 @@ export default {
           .toArray();
       this.searchResults = containers.concat(objects);
       this.isSearching = false;
+    },
+    getSearchRoute: function(item) {
+      if (!item) {
+        return null;
+      }
+      let route = {
+        name: "ObjectsView",
+        params: {
+          container: item.container || item.name,
+        },
+      };
+      if (item.container) {
+        route["query"] = {selected: item.name};
+      }
+      return route;
     },
     searchGainedFocus: async function() {
       const preferences = await this.$store.state.db.preferences.get(1);
