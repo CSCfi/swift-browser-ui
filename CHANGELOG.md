@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
+- Redirect to front page when the session has expired. (GH #461)
+- Hide most errors from the browser's console. (GH #461)
 
 ### Fixed
 - Double navigation to the UploadView (GH #473)

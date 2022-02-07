@@ -21,7 +21,7 @@ import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { syncContainerACLs } from "@/common/conv";
+import { syncContainerACLs, DEV } from "@/common/conv";
 
 // Import project state
 import store from "@/common/store";
@@ -38,7 +38,29 @@ import ProgressBar from "@/components/UploadProgressBar";
 // Import delay
 import delay from "lodash/delay";
 
+window.onerror = function(error) { 
+  if(DEV) console.log("Global error", error);
+  error.preventDefault();
+  error.stopPropagation();
+};
+window.addEventListener("unhandledrejection", function(event) {
+  if(DEV) console.log("unhandledrejection", event);
+  event.preventDefault();
+  event.stopPropagation();
+});
+window.addEventListener("rejectionhandled", function(event) {
+  if(DEV) console.log("rejectionhandled", event);
+  event.preventDefault();
+  event.stopPropagation();
+});
+
 Vue.config.productionTip = false;
+Vue.config.errorHandler = function(err, vm, info) { 
+  if(DEV) console.log("Vue error: ", err, vm, info);
+};
+Vue.config.warnHandler = function(msg, vm, info) { 
+  if(DEV) console.log("Vue warning: ", msg, vm, info);
+};
 
 Vue.use(Buefy);
 Vue.use(VueI18n);

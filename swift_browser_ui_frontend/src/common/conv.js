@@ -222,3 +222,5 @@ export function filterSegments(objects) {
   return objects.filter(o =>
     o.name.match(SEGMENT_REGEX) === null);
 }
+
+export const DEV = process.env.NODE_ENV === "development";

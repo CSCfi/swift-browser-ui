@@ -1,5 +1,9 @@
 // Swift cross account container sharing API JavaScript bindings module.
 
+import { 
+  GET,
+} from "@/common/api";
+
 class SwiftXAccountSharing {
   // Swift cross account sharing backend client.
 
@@ -31,9 +35,7 @@ class SwiftXAccountSharing {
       let signatureUrl = new URL("/sign/".concat(validFor),
         this.signatureAddress);
       signatureUrl.searchParams.append("path", toSign);
-      let signed = await fetch(
-        signatureUrl, { method: "GET", credentials: "same-origin" },
-      );
+      let signed = await GET(signatureUrl);
       return signed.json();
     }
     else {
