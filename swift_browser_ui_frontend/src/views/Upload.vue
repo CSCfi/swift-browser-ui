@@ -4,7 +4,7 @@
     class="contents"
   > 
     <b-message
-      v-if="$te('message.keys') && fixedRecvKeys.length > 0"
+      v-if="$te('message.keys') && pubkey.length > 0"
       type="is-info"
     >
       {{ $t('message.encrypt.defaultKeysMessage') }}
@@ -290,7 +290,6 @@ export default {
       privkey: "",
       recvkeys: [],
       recvHashedKeys: [],
-      fixedRecvKeys:[],
       container: "",
       passphrase: "",
       files: [],
@@ -311,6 +310,9 @@ export default {
     },
     transfer () {
       return this.$store.state.transfer;
+    },
+    pubkey () {
+      return this.$store.state.pubkey;
     },
   },
   watch: {
@@ -354,25 +356,8 @@ export default {
   },
   mounted() {
     this.setFiles();
-    this.getPubKey();
   },
   methods: {
-    getPubKey: function () {
-      if (this.$te("message.keys")) {
-        for (let item of Object.entries(this.$t("message.keys"))) {
-          fetch(
-            "/download/"
-              + item[1]["project"] + "/"
-              + item[1]["container"] + "/"
-              + item[1]["object"],
-          ).then(resp => {
-            return resp.text();
-          }).then(resp => {
-            this.fixedRecvKeys.push(resp);
-          });
-        }
-      }
-    },
     setFile: function (item, path) {
       let entry = undefined;
       if (item.isFile) {
@@ -439,8 +424,8 @@ export default {
         FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       }
       // we add the fixed set of keys to the ones the user added
-      let keysArray = this.recvkeys.concat(this.fixedRecvKeys);
-      keysArray = [...new Set([...this.recvkeys, ...this.fixedRecvKeys])];
+      let keysArray = this.recvkeys.concat(this.pubkey);
+      keysArray = [...new Set([...this.recvkeys, ...this.pubkey])];
       for (let i = 0; i < keysArray.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
@@ -583,14 +568,14 @@ export default {
     refreshNoUpload() {
       if (this.ephemeral) {
         this.noUpload = (
-          (!this.fixedRecvKeys.length && !this.recvkeys.length)
+          (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
         );
       } 
       if (this.ownPrivateKey) {
         this.noUpload = (
-          (!this.fixedRecvKeys.length && !this.recvkeys.length)
+          (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
           || (!this.passphrase && !this.privkey)

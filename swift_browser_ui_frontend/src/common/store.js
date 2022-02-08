@@ -41,6 +41,7 @@ const store = new Vuex.Store({
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
+    pubkey: [],
     currentPrefix: "",
   },
   mutations: {
@@ -137,6 +138,12 @@ const store = new Vuex.Store({
     },
     eraseTransfer (state) {
       state.transfer = [];
+    },
+    appendPubKey (state, key) {
+      state.pubkey.push(key);
+    },
+    erasePubKey (state) {
+      state.pubkey = [];
     },
     setPrefix (state, prefix) {
       state.currentPrefix = prefix;
