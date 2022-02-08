@@ -411,7 +411,6 @@ export default {
       else if ("function" === typeof item.getAsFile) {
         item = item.getAsFile();
         if (item instanceof File) {
-          item.relativePath = path + item.name;
           this.files.push(item);
         }
       }
@@ -421,6 +420,7 @@ export default {
         for (let file of this.transfer) {
           let entry = file;
           this.setFile(entry, "");
+          this.transfer.splice(file, 1);
         }
       }
     },
