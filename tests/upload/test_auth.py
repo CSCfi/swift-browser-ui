@@ -9,41 +9,69 @@ import swift_browser_ui.upload.auth
 import tests.common.mockups
 
 
-class AuthTestClass(unittest.IsolatedAsyncioTestCase):
+class AuthTestClass(tests.common.mockups.APITestBase):
     """Test class for swift_browser_ui.upload.auth functions."""
 
     def setUp(self):
         """."""
-        self.initiate_mock = unittest.mock.Mock(return_value="OS_Session")
-        self.patch_initiate = unittest.mock.patch(
-            "swift_browser_ui.upload.auth.initiate_os_session",
-            self.initiate_mock,
-        )
         super().setUp()
 
     async def test_handle_login(self):
         """Test swift_browser_ui.upload.auth.handle_login."""
-        req = tests.common.mockups.Mock_Request()
-
         with self.assertRaises(aiohttp.web.HTTPUnauthorized):
-            await swift_browser_ui.upload.auth.handle_login(req)
+            await swift_browser_ui.upload.auth.handle_login(self.mock_request)
 
-        req.set_match(
-            {
-                "project": "test-project",
-            }
+        self.mock_request.post.return_value = {
+            "token": "test-token",
+        }
+
+        self.mock_client_response.headers["X-Subject-Token"] = "test-token"  # nosec
+        self.mock_client_json = {
+            "token": {
+                "user": {
+                    "name": "test-user",
+                },
+                "catalog": [
+                    {
+                        "type": "object-store",
+                        "id": "test-id",
+                        "name": "swift",
+                        "endpoints": [
+                            {
+                            "region_id": 'default',
+                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
+                            "region": 'default',
+                            "interface": 'admin',
+                            "id": 'test-id',
+                            },
+                            {
+                            "region_id": 'default',
+                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
+                            "region": 'default',
+                            "interface": 'public',
+                            "id": 'test-id',
+                            },
+                            {
+                            "region_id": 'default',
+                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
+                            "region": 'default',
+                            "interface": 'internal',
+                            "id": 'test-id',
+                            },
+                        ],
+                    },
+                ],
+            },
+        }
+        self.mock_client_response.json = unittest.mock.AsyncMock(
+            return_value=self.mock_client_json,
         )
-        req.set_post(
-            {
-                "token": "test-token",
-            }
-        )
-        with self.patch_initiate:
-            resp = await swift_browser_ui.upload.auth.handle_login(req)
-            self.assertIsNotNone(resp.cookies["RUNNER_SESSION_ID"])
-            self.assertEqual(resp.status, 200)
-            session_key = resp.cookies["RUNNER_SESSION_ID"].value
-            self.assertEqual(req.app[session_key]["auth"], "OS_Session")
+
+        resp = await swift_browser_ui.upload.auth.handle_login(self.mock_request)
+        self.assertIsNotNone(resp.cookies["RUNNER_SESSION_ID"])
+        self.assertEqual(resp.status, 200)
+        session_key = resp.cookies["RUNNER_SESSION_ID"].value
+        self.assertIsNotNone(self.mock_request.app[session_key])
 
     async def test_handle_validate_authentication(self):
         """Test swift_browser_ui.upload.auth.handle_validate_authentication."""

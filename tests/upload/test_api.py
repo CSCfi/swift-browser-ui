@@ -11,16 +11,18 @@ import swift_browser_ui.upload.api
 import tests.common.mockups
 
 
-class APITestClass(unittest.IsolatedAsyncioTestCase):
+class APITestClass(tests.common.mockups.APITestBase):
     """Test class for swift_browser_ui.upload.api functions."""
 
     def setUp(self) -> None:
         """."""
-        self.request = tests.common.mockups.Mock_Request()
-
-        self.mock_get_auth = unittest.mock.Mock(return_value="auth")
-        self.patch_get_auth = unittest.mock.patch(
-            "swift_browser_ui.upload.api.get_auth_instance", self.mock_get_auth
+        super().setUp()
+        self.mock_get_session_id = unittest.mock.Mock(
+            return_value="test-id",
+        )
+        self.p_get_sess = unittest.mock.patch(
+            "swift_browser_ui.upload.api.get_session_id",
+            self.mock_get_session_id
         )
 
         self.mock_upload_instance = types.SimpleNamespace(
@@ -66,26 +68,19 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
         )
         self.mock_init_download = unittest.mock.Mock(return_value=self.mock_download)
 
-        return super().setUp()
-
     async def test_handle_get_object(self):
         """Test swift_browser_ui.upload.api.handle_get_object."""
-        req = tests.common.mockups.Mock_Request()
-        req.set_match(
-            {
-                "project": "test-project",
-                "container": "test-container",
-                "object_name": "test-object",
-            }
-        )
+        self.mock_request.match_info["project"] = "test-project"
+        self.mock_request.match_info["container"] = "test-container"
+        self.mock_request.match_info["object_name"] = "test-object"
 
         patch_init_download = unittest.mock.patch(
             "swift_browser_ui.upload.api.FileDownloadProxy",
             self.mock_init_download,
         )
 
-        with patch_init_download, self.patch_get_auth, self.patch_streamresponse:
-            resp = await swift_browser_ui.upload.api.handle_get_object(req)
+        with patch_init_download, self.p_get_sess, self.patch_streamresponse:
+            resp = await swift_browser_ui.upload.api.handle_get_object(self.mock_request)
 
         self.assertIs(resp, self.mock_response)
         self.mock_a_begin.assert_called_once_with(
@@ -106,21 +101,21 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             "swift_browser_ui.upload.api.ObjectReplicationProxy", mock_init_replicator
         )
 
-        req = tests.common.mockups.Mock_Request()
-        req.set_match({"project": "test-project", "container": "test-container"})
-        req.set_query(
-            {"from_project": "other-project", "from_container": "source-container"}
-        )
-        req.app["client"] = "client"
+        self.mock_request.query["from_project"] = "other-project"
+        self.mock_request.query["from_container"] = "source-container"
+        self.mock_request.match_info["project"] = "test-project"
+        self.mock_request.match_info["container"] = "test-container"
 
-        with self.patch_get_auth, patch_replicator:
-            resp = await swift_browser_ui.upload.api.handle_replicate_container(req)
+        with self.p_get_sess, patch_replicator:
+            resp = await swift_browser_ui.upload.api.handle_replicate_container(
+                self.mock_request,
+            )
 
         self.assertIsInstance(resp, aiohttp.web.Response)
         self.assertEqual(resp.status, 202)
         mock_init_replicator.assert_called_once_with(
-            "auth",
-            "client",
+            "placeholder",
+            self.mock_client,
             "test-project",
             "test-container",
             "other-project",
@@ -137,25 +132,22 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             "swift_browser_ui.upload.api.ObjectReplicationProxy", mock_init_replicator
         )
 
-        req = tests.common.mockups.Mock_Request()
-        req.set_match({"project": "test-project", "container": "test-container"})
-        req.set_query(
-            {
-                "from_project": "other-project",
-                "from_container": "source-container",
-                "from_object": "source-object",
-            }
-        )
-        req.app["client"] = "client"
+        self.mock_request.match_info["project"] = "test-project"
+        self.mock_request.match_info["container"] = "test-container"
+        self.mock_request.query["from_project"] = "other-project"
+        self.mock_request.query["from_container"] = "source-container"
+        self.mock_request.query["from_object"] = "source-object"
 
-        with self.patch_get_auth, patch_replicator:
-            resp = await swift_browser_ui.upload.api.handle_replicate_object(req)
+        with self.p_get_sess, patch_replicator:
+            resp = await swift_browser_ui.upload.api.handle_replicate_object(
+                self.mock_request,
+            )
 
         self.assertIsInstance(resp, aiohttp.web.Response)
         self.assertEqual(resp.status, 202)
         mock_init_replicator.assert_called_once_with(
-            "auth",
-            "client",
+            "placeholder",
+            self.mock_client,
             "test-project",
             "test-container",
             "other-project",
@@ -217,12 +209,12 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
         req = tests.common.mockups.Mock_Request()
         req.set_match({"project": "test-project", "container": "test-container"})
 
-        with self.assertRaises(aiohttp.web.HTTPBadRequest), self.patch_get_auth:
+        with self.assertRaises(aiohttp.web.HTTPBadRequest), self.p_get_sess:
             await swift_browser_ui.upload.api.handle_get_object_chunk(req)
 
         req.set_query({"resumableChunkNumber": 100})
 
-        with self.patch_get_auth, self.patch_get_upload_instance:
+        with self.p_get_sess, self.patch_get_upload_instance:
             resp = await swift_browser_ui.upload.api.handle_get_object_chunk(req)
 
         self.assertEqual(resp, "check-success")
@@ -238,32 +230,38 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
     async def test_handle_get_container(self):
         """Test swift_browser_ui.upload.api.handle_get_container."""
         # Handle edge case of uploaded object chunk check
-        req = tests.common.mockups.Mock_Request()
-        req.set_query({"resumableChunkNumber": 1})
-        mock_get_object_chunk = unittest.mock.AsyncMock(return_value="get-chunk-success")
+        self.mock_request.match_info["project"] = "test-project"
+        self.mock_request.match_info["container"] = "test-container"
+        self.mock_request.query["resumableChunkNumber"] = 1
+
+        mock_get_object_chunk = unittest.mock.AsyncMock(
+            return_value="get-chunk-success"
+        )
         patch_get_object_chunk = unittest.mock.patch(
             "swift_browser_ui.upload.api.handle_get_object_chunk", mock_get_object_chunk
         )
         with patch_get_object_chunk:
-            resp = await swift_browser_ui.upload.api.handle_get_container(req)
+            resp = await swift_browser_ui.upload.api.handle_get_container(
+                self.mock_request,
+            )
         self.assertEqual(resp, "get-chunk-success")
 
         # Test normal behaviour
-        req = tests.common.mockups.Mock_Request()
-        req.set_match({"project": "test-project", "container": "test-container"})
-
+        self.mock_request.query.pop("resumableChunkNumber")
         patch_init_download = unittest.mock.patch(
             "swift_browser_ui.upload.api.ContainerArchiveDownloadProxy",
             self.mock_init_download,
         )
 
-        with self.patch_get_auth, self.patch_streamresponse, patch_init_download:
-            resp = await swift_browser_ui.upload.api.handle_get_container(req)
+        with self.p_get_sess, self.patch_streamresponse, patch_init_download:
+            resp = await swift_browser_ui.upload.api.handle_get_container(
+                self.mock_request,
+            )
 
         self.assertIs(resp, self.mock_response)
         self.mock_download.a_write_to_response.assert_called_once()
         self.mock_init_download.assert_called_once_with(
-            "auth", "test-project", "test-container"
+            "placeholder", "test-project", "test-container"
         )
         self.assertEqual(resp.headers["Content-Type"], "application/x-tar")
         self.assertIsNotNone(resp.headers["Content-Disposition"])
