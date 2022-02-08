@@ -209,17 +209,19 @@ new Vue({
           this.$store.commit("appendFileTransfer", file);
         }
       }
-      this.$router.push({
-        name: "UploadView",
-        params: {
-          project: this.$route.params.project,
-          container: (
-            this.$route.params.container ?
-              this.$route.params.container :
-              "upload-".concat(Date.now().toString())
-          ),
-        },
-      });
+      if (this.$route.name != "UploadView") {
+        this.$router.push({
+          name: "UploadView",
+          params: {
+            project: this.$route.params.project,
+            container: (
+              this.$route.params.container ?
+                this.$route.params.container :
+                "upload-".concat(Date.now().toString())
+            ),
+          },
+        });
+      }
       this.itemdrop = false;
     },
     containerSyncWrapper: function () {
