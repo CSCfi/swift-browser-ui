@@ -146,8 +146,7 @@
                 icon-left="delete"
                 outlined
                 size="is-small"
-                @click.prevent="recvkeys.splice(
-                  recvkeys.indexOf(props.row), 1)"
+                @click.prevent="removePublicKey(props.row)"
               >
                 {{ $t('message.remove') }}
               </b-button>
@@ -439,12 +438,13 @@ export default {
       if (!this.ephemeral) {
         FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       }
-      // we add the fixed set o keys to the ones added
-      this.recvkeys.concat(this.fixedRecvKeys);
-      for (let i = 0; i < this.recvkeys.length; i++) {
+      // we add the fixed set of keys to the ones the user added
+      let keysArray = this.recvkeys.concat(this.fixedRecvKeys);
+      keysArray = [...new Set([...this.recvkeys, ...this.fixedRecvKeys])];
+      for (let i = 0; i < keysArray.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
-          this.recvkeys[i],
+          keysArray[i],
         );
       }
       // Add files to the filesystem
@@ -576,21 +576,24 @@ export default {
       }
       this.addRecvkey = "";
     },
+    removePublicKey: function (value){
+      this.recvHashedKeys.splice(this.recvkeys.indexOf(value), 1);
+      this.recvkeys.splice(this.recvkeys.indexOf(value), 1);
+    },
     refreshNoUpload() {
       if (this.ephemeral) {
         this.noUpload = (
-          !this.recvkeys.length
+          (!this.fixedRecvKeys.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
         );
       } 
       if (this.ownPrivateKey) {
         this.noUpload = (
-          !this.recvkeys.length
+          (!this.fixedRecvKeys.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
-          || !this.passphrase
-          || !this.privkey
+          || (!this.passphrase && !this.privkey)
         );
       }
     },
@@ -634,6 +637,13 @@ export default {
   flex-grow: 1;
   margin-top: -20px;
   justify-content: right;
+}
+
+@media screen and ( max-width: 1357px){
+  #encryptionOptions {
+    margin-top: 0;
+  }
+  
 }
 
 </style>
