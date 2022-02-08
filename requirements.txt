@@ -1,4 +1,5 @@
 aiohttp==3.8.1
+aiohttp_session==2.10.0
 python-swiftclient==3.13.0
 cryptography==36.0.1
 keystoneauth1==4.4.0

@@ -13,6 +13,7 @@ setuptools.setup(
     license="MIT",
     install_requires=[
         "aiohttp==3.8.1",
+        "aiohttp_session==2.10.0",
         "python-swiftclient==3.13.0",
         "cryptography==36.0.1",
         "keystoneauth1==4.4.0",
@@ -32,6 +33,7 @@ setuptools.setup(
             "flake8-docstrings==1.6.0",
             "pytest-xdist==2.5.0",
             "black== 22.1.0",
+            "asynctest==0.13.0",
         ],
         "docs": ["sphinx==4.4.0", "sphinx_rtd_theme==1.0.0"],
         "ui_test": ["pytest==6.2.5", "pytest-timeout==2.1.0"],

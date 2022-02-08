@@ -1,12 +1,11 @@
 """Module for handling queries for a valid Sharing/Request API signature."""
 
 
-import hmac
-import time
 import logging
 import secrets
 
 import aiohttp.web
+import aiohttp_session
 
 import swift_browser_ui.ui._convenience
 
@@ -20,8 +19,9 @@ async def handle_signature_request(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle call for an API call signature."""
-    swift_browser_ui.ui._convenience.session_check(request)
-
+    session = await aiohttp_session.get_session(request)
+    if not session["projects"]:
+        raise aiohttp.web.HTTPUnauthorized(reason="No valid project for session.")
     try:
         valid_for = int(request.match_info["valid"])
         path_to_sign = request.query["path"]
@@ -37,9 +37,11 @@ async def handle_signature_request(
 
 async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token create."""
-    session = swift_browser_ui.ui._convenience.api_check(request)
+    session = await aiohttp_session.get_session(request)
+    project = request.match_info["project"]
 
-    project = request.app["Sessions"][session]["active_project"]["id"]
+    if project not in session["projects"]:
+        raise aiohttp.web.HTTPForbidden(reason="No access to the project.")
 
     LOGGER.debug(f"Creating a scoped API token for {project}")
 
@@ -52,27 +54,29 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
     request_api_address = setd["request_internal_endpoint"]
 
     if not sharing_api_address or not request_api_address:
-        raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
+        raise aiohttp.web.HTTPNotFound(reason="External APIs not configured on server")
 
     path = f"/token/{project}/{ident}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
-    resp_sharing = await client.post(
+    async with client.post(
         f"{sharing_api_address}{path}",
         data={"token": token},
         params={
             "valid": signature["valid"],
             "signature": signature["signature"],
         },
-    )
-    resp_request = await client.post(
+    ) as c_resp:
+        resp_sharing = c_resp
+    async with client.post(
         f"{request_api_address}{path}",
         data={"token": token},
         params={
             "valid": signature["valid"],
             "signature": signature["signature"],
         },
-    )
+    ) as c_resp:
+        resp_request = c_resp
 
     if resp_sharing.status != 200 or resp_request.status != 200:
         resp_sharing_text = await resp_sharing.text()
@@ -94,9 +98,11 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
 
 async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for an API token delete."""
-    session = swift_browser_ui.ui._convenience.api_check(request)
+    session = await aiohttp_session.get_session(request)
 
-    project = request.app["Sessions"][session]["active_project"]["id"]
+    project = request.match_info["project"]
+    if project not in session["projects"]:
+        raise aiohttp.web.HTTPForbidden(reason="No access to the project.")
 
     ident = request.match_info["id"]
 
@@ -111,20 +117,22 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
     path = f"/token/{project}/{ident}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
-    await client.delete(
+    async with client.delete(
         f"{sharing_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid"],
         },
-    )
-    await client.delete(
+    ) as _:
+        pass
+    async with  client.delete(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid"],
         },
-    )
+    ) as _:
+        pass
 
     resp = aiohttp.web.Response(status=204)
 
@@ -133,9 +141,11 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
 
 async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle call for listing API tokens."""
-    session = swift_browser_ui.ui._convenience.api_check(request)
+    session = await aiohttp_session.get_session(request)
 
-    project = request.app["Sessions"][session]["active_project"]["id"]
+    project = request.match_info["project"]
+    if project not in session["projects"]:
+        raise aiohttp.web.HTTPForbidden(reason="No access to the project.")
 
     client: aiohttp.ClientSession = request.app["api_client"]
 
@@ -148,23 +158,22 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
     path = f"/token/{project}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
-    sharing_tokens = await client.get(
+    async with client.get(
         f"{sharing_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid"],
         },
-    )
-    request_tokens = await client.get(
+    ) as a_resp:
+        sharing_tokens_text = await a_resp.text()
+    async with client.get(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid"],
         },
-    )
-    sharing_tokens_text = await sharing_tokens.text()
-    request_tokens_text = await request_tokens.text()
-
+    ) as b_resp:
+        request_tokens_text = await b_resp.text()
     LOGGER.debug(f"Sharing tokens: {sharing_tokens_text}")
     LOGGER.debug(f"Request tokens: {request_tokens_text}")
 
@@ -174,65 +183,3 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
     resp = aiohttp.web.Response(text=sharing_tokens_text)
 
     return resp
-
-
-async def handle_form_post_signature(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Handle call for a form signature."""
-    session = swift_browser_ui.ui._convenience.api_check(request)
-    LOGGER.info(f"API call for download object from {request.remote}, sess: {session}")
-
-    serv = request.app["Sessions"][session]["ST_conn"]
-    sess = request.app["Sessions"][session]["OS_sess"]
-    container = request.match_info["container"]
-
-    temp_url_key = await swift_browser_ui.ui._convenience.get_tempurl_key(
-        serv,
-        # container
-    )
-    LOGGER.debug(f"Using {temp_url_key} as tempiorary URL key.")
-
-    host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
-    path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
-
-    try:
-        object_prefix = request.query["prefix"]
-    except KeyError:
-        object_prefix = ""
-    try:
-        redirect = request.query["redirect"]
-    except KeyError:
-        redirect = ""
-    max_file_count = int(request.query["count"])
-    max_file_size = 5368709119
-
-    expires = int(time.time() + 84600)
-    path = f"{path_begin}/{container}/"
-    if object_prefix:
-        path = path + object_prefix
-
-    hmac_body = "%s\n%s\n%s\n%s\n%s" % (
-        path,
-        redirect,
-        max_file_size,
-        max_file_count,
-        expires,
-    )
-
-    signature = hmac.new(
-        temp_url_key.encode("utf-8"), hmac_body.encode("utf-8"), digestmod="sha1"
-    ).hexdigest()
-
-    return aiohttp.web.json_response(
-        {
-            "signature": signature,
-            "max_file_size": max_file_size,
-            "max_file_count": max_file_count,
-            "expires": expires,
-            "host": host,
-            "path": path,
-            "container": container,
-            "prefix": object_prefix,
-        }
-    )

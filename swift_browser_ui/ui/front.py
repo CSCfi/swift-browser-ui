@@ -1,18 +1,27 @@
 """Web frontend functions for stand-alone running."""
 
 import typing
+import time
 
 import aiohttp.web
+import aiohttp_session
 
 from cryptography.fernet import InvalidToken
 
 from swift_browser_ui.ui.settings import setd
-from swift_browser_ui.ui._convenience import session_check
 
 
 async def browse(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve the browser SPA when running without a proxy."""
-    session_check(request)
+    session = await aiohttp_session.get_session(request)
+    try:
+        session["projects"]
+        session["token"]
+        if session["at"] + 28800 < time.time():
+            session.invalidate()
+            raise aiohttp.web.HTTPUnauthorized(reason="Token expired")
+    except KeyError:
+        raise aiohttp.web.HTTPUnauthorized(reason="No valid session.")
     response = aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/browse.html",
         headers={
@@ -30,7 +39,12 @@ async def index(
     """Serve the index page when running without a proxy."""
     try:
         if request is not None:
-            session_check(request)
+            session = await aiohttp_session.get_session(request)
+            session["projects"]
+            session["token"]
+            if session["at"] + 28800 < time.time():
+                session.invalidate()
+                raise aiohttp.web.HTTPUnauthorized(reason="Token expired")
             request.app["Log"].info("Redirecting an existing session to app")
             return aiohttp.web.Response(
                 status=303,
@@ -50,7 +64,12 @@ async def loginpassword(
     """Serve the username and password login page."""
     try:
         if request is not None:
-            session_check(request)
+            session = await aiohttp_session.get_session(request)
+            session["projects"]
+            session["token"]
+            if session["at"] + 28800 < time.time():
+                session.invalidate()
+                raise aiohttp.web.HTTPUnauthorized(reason="Token expired.")
             request.app["Log"].info("Redirecting an existing session to app")
             return aiohttp.web.Response(
                 status=303,
