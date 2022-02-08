@@ -12,8 +12,6 @@ import logging
 
 import aiohttp.web
 
-import keystoneauth1.session
-
 import requests
 
 from swift_browser_ui.upload.common import (
@@ -35,9 +33,7 @@ LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 class FileDownloadProxy:
     """A class for a single proxied download."""
 
-    def __init__(
-        self, auth: keystoneauth1.session.Session, chunk_size: int = 128 * 1024
-    ) -> None:
+    def __init__(self, session: dict, chunk_size: int = 128 * 1024) -> None:
         """."""
         # Establish a queue for the proxied file parts
         # Total queue size 128 * 256 * 1024 = 32MiB for now
@@ -45,7 +41,8 @@ class FileDownloadProxy:
             maxsize=int(os.environ.get("SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE", 256))
         )
         # Save the swift service
-        self.auth = auth
+        self.token = session["token"]
+        self.endpoint = session["endpoint"]
         self.t_dload: typing.Optional[threading.Thread] = None
         self.t_write: typing.Optional[threading.Thread] = None
         self.chunk_size: int = chunk_size
@@ -107,12 +104,12 @@ class FileDownloadProxy:
         )
         with requests.get(
             generate_download_url(
-                get_download_host(self.auth, project),
+                get_download_host(self.endpoint, project),
                 container=container,
                 object_name=object_name,
             ),
             headers={
-                "X-Auth-Token": self.auth.get_token(),
+                "X-Auth-Token": self.token,
                 "Accept-Encoding": "identity",
             },
             stream=True,
@@ -182,14 +179,14 @@ class TarInputWrapper:
 
     def __init__(
         self,
-        auth: keystoneauth1.session.Session,
+        session: dict,
         project: str,
         container: str,
         object_name: str,
     ) -> None:
         """."""
         # Initialize the download class
-        self.dload = FileDownloadProxy(auth)
+        self.dload = FileDownloadProxy(session)
 
         self.project = project
         self.container = container
@@ -262,13 +259,14 @@ class ContainerArchiveDownloadProxy:
 
     def __init__(
         self,
-        auth: keystoneauth1.session.Session,
+        session: dict,
         project: str,
         container: str,
         chunk_size: int = 128 * 1024,
     ) -> None:
         """."""
-        self.auth = auth
+        self.endpoint = session["endpoint"]
+        self.token = session["token"]
         self.download_queue: queue.Queue = queue.Queue(maxsize=3)
 
         self.output_queue = TarQueueWrapper()
@@ -364,9 +362,9 @@ class ContainerArchiveDownloadProxy:
         """Synchronize the list of objects to download."""
         with requests.get(
             generate_download_url(
-                get_download_host(self.auth, self.project), container=self.container
+                get_download_host(self.endpoint, self.project), container=self.container
             ),
-            headers={"X-Auth-Token": self.auth.get_token()},
+            headers={"X-Auth-Token": self.token},
             verify=True,
         ) as req:
             self.fs = self._parse_archive_fs(
@@ -397,9 +395,14 @@ class ContainerArchiveDownloadProxy:
                 else:
                     tar_info = fs[i]["tar_info"]
                     fileobj = TarInputWrapper(
-                        self.auth, self.project, self.container, tar_info.name
+                        {
+                            "token": self.token,
+                            "endpoint": self.endpoint,
+                        },
+                        self.project,
+                        self.container,
+                        tar_info.name,
                     )
-
                     self.download_queue.put({"fileobj": fileobj, "tar_info": tar_info})
 
     def tar_archiving_loop(
