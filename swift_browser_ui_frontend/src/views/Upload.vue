@@ -146,8 +146,7 @@
                 icon-left="delete"
                 outlined
                 size="is-small"
-                @click.prevent="recvkeys.splice(
-                  recvkeys.indexOf(props.row), 1)"
+                @click.prevent="removePublicKey(props.row)"
               >
                 {{ $t('message.remove') }}
               </b-button>
@@ -575,6 +574,10 @@ export default {
         this.recvHashedKeys.push(await computeSHA256(this.addRecvkey));
       }
       this.addRecvkey = "";
+    },
+    removePublicKey: function (value){
+      this.recvHashedKeys.splice(this.recvkeys.indexOf(value), 1);
+      this.recvkeys.splice(this.recvkeys.indexOf(value), 1);
     },
     refreshNoUpload() {
       if (this.ephemeral) {
