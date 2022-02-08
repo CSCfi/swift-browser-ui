@@ -639,4 +639,11 @@ export default {
   justify-content: right;
 }
 
+@media screen and ( max-width: 1357px){
+  #encryptionOptions {
+    margin-top: 0;
+  }
+  
+}
+
 </style>
