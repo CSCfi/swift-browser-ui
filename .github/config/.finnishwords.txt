@@ -137,6 +137,7 @@ lisää
 lisätäksesi
 lisätietoja
 lisättiin
+lisätty
 lisättyjä
 loppuminen
 löydetty
@@ -189,6 +190,7 @@ oikeuden
 oikeudet
 oikeuksia
 olemassa
+oletusarvoiset
 oletusarvojen
 olla
 omaa

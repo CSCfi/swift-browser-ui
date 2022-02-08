@@ -275,6 +275,7 @@ let default_translations = {
         enStart: "Encrypting files. This might take a few minutes.",
         enSuccess: "Encryption successful.",
         empty: "No files selected",
+        defaultKeysMessage: "Default public keys added.",
         table: {
           name: "Name",
           path: "Path",
@@ -552,6 +553,7 @@ let default_translations = {
         enStart: "Salataan tiedostoja. Tämä voi kestää muutaman minuutin.",
         enSuccess: "Salaaminen onnistui.",
         empty: "Ei valittuja tiedostoja",
+        defaultKeysMessage: "Oletusarvoiset julkiset avaimet lisätty.",
         table: {
           name: "Nimi",
           path: "Polku",
