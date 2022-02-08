@@ -92,8 +92,10 @@ export default {
 
       if (!this.object.tags.length) {
         const tags = await getTagsForObjects(
-          this.container.name, [this.object.name],
-        );
+          this.$route.params.project,
+          this.container.name,
+          [this.object.name],
+        )
         this.tags = tags[0][1] || [];
       } else {
         this.tags = this.object.tags;
@@ -106,15 +108,18 @@ export default {
           usertags: this.object.tags.join(";"),
         },
       ];
-      updateObjectMeta(this.container.name, objectMeta)
-        .then(async () => {
-          if(this.$route.name === "EditObjectView") {
-            await this.$store.state.db.objects
-              .where(":id").equals(this.object.id)
-              .modify({tags: this.object.tags});
-          }
-          this.$router.go(-1);
-        });
+      updateObjectMeta(
+        this.$route.params.project,
+        this.container,
+        objectMeta,
+      ).then(async () => {
+        if(this.$route.name === "EditObjectView") {
+          await this.$store.state.db.objects
+            .where(":id").equals(this.object.id)
+            .modify({tags: this.object.tags});
+        }
+        this.$router.go(-1);
+      })
     },
   },
 };

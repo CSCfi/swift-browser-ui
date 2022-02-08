@@ -13,8 +13,6 @@ import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
 import { getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
-import getActiveProject from "@/common/api";
-import { changeProjectApi } from "@/common/api";
 
 // Import SharingView and Request API
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
@@ -105,6 +103,9 @@ new Vue({
     active () {
       return this.$store.state.active;
     },
+    user () {
+      return this.$store.state.uname;
+    },
     isFullPage () {
       return this.$store.state.isFullPage;
     },
@@ -133,18 +134,19 @@ new Vue({
   created() {
     document.title = this.$t("message.program_name");
     this.createUploadInstance();
-    getUser().then(( value ) => {
-      this.$store.commit("setUname", value);
-    });
-    getProjects().then(async (value) => {
-      this.$store.commit("setProjects", value);
+    let initialize = async () => {
+      let user = await getUser();
+      let projects = await getProjects();
+      this.$store.commit("setUname", user);
+      this.$store.commit("setProjects", projects);
+
       const existingProjects = await this.$store.state.db.projects
         .toCollection()
         .primaryKeys();
-      await this.$store.state.db.projects.bulkPut(value);
+      await this.$store.state.db.projects.bulkPut(projects);
       const toDelete = [];
       existingProjects.map(async oldProj => {
-        if(!value.find(proj => proj.id === oldProj)) {
+        if(!projects.find(proj => proj.id === oldProj)) {
           toDelete.push(oldProj);
         }
       });
@@ -159,26 +161,40 @@ new Vue({
           .delete();
       }
 
-      getActiveProject().then((value) => {
-        this.$store.commit("setActive", value);
-        if (this.$route.params.user != undefined) {
-          if (
-            value.name != this.$route.params.project &&
-            this.$route.params.project != undefined
-          ) {
-            this.changeProject(this.$route.params.project);
-          }
+      let last_active = document.cookie
+        .split("; ")
+        .find(row => row.startsWith("LAST_ACTIVE"))
+        .split("=")[1];
+      let active;
+      if (last_active) {
+        active = projects[
+          projects.indexOf(projects.find(e => e.id == last_active))
+        ];
+      } else if (this.$route.params.user != undefined) {
+        if (
+          active.id != this.$route.params.project &&
+          this.$route.params.project != undefined
+        ) {
+          active = projects[this.$route.params.project];
         }
-        if (document.location.pathname == "/browse") {
-          this.$router.push(
-            "/browse/".concat(
-              this.$store.state.uname,
-              "/",
-              value.name,
-            ),
-          );
-        }
-      });
+      } else {
+        active = projects[0];
+      }
+      this.$store.commit("setActive", active);
+
+      if (document.location.pathname == "/browse") {
+        console.log("Pushing route to the browser.");
+        this.$router.push({
+          name: "ContainersView",
+          params: {
+            project: active.id,
+            user: user,
+          },
+        });
+      }
+    };
+    initialize().then(() => {
+      console.log("Application initialized.");
     });
     fetch("/discover")
       .then((resp) => {
@@ -205,7 +221,7 @@ new Vue({
       });
     delay(
       this.containerSyncWrapper,
-      5000,
+      10000,
     );
     if (this.$te("message.keys")) {
       for (let item of Object.entries(this.$t("message.keys"))) {
@@ -424,26 +440,6 @@ new Vue({
       }
 
       return retl;
-    },
-    changeProject: function (newProject) {
-      // Re-scope login to project given as a parameter.
-      changeProjectApi(newProject).then((ret) => {
-        if (ret) {
-          getActiveProject().then((value) => {
-            this.$store.commit("setActive", value);
-            this.$store.commit("updateContainers", undefined);
-            this.$store.commit("eraseObjects");
-            this.$router.push(
-              "/browse/" +
-              this.$store.state.uname + "/" +
-              this.$store.state.active["name"],
-            );
-            this.$router.go(0);
-          });
-        } else{
-          this.$router.push("/browse/" + this.$store.state.uname);
-        }
-      });
     },
   },
   ...App,

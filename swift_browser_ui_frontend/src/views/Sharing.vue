@@ -192,7 +192,7 @@ export default {
           this.container,
           this.tags,
           rights,
-          await getSharedContainerAddress(),
+          await getSharedContainerAddress(this.$route.params.project),
         );
       }
       catch(error) {
@@ -209,6 +209,7 @@ export default {
         }
       }
       await addAccessControlMeta(
+        this.$route.params.project,
         this.container,
         rights,
         this.tags, 

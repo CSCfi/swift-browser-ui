@@ -10,7 +10,7 @@
       {{ $t('message.encrypt.defaultKeysMessage') }}
     </b-message>
     <b-message
-      v-if="tooLarge"
+      v-if="tooLarge && useEncryption"
       type="is-danger"
     >
       {{ $t('message.encrypt.enTooLarge') }}
@@ -514,6 +514,7 @@ export default {
           message: this.$t("message.encrypt.upStart"),
           type: "is-success",
         });
+        this.$router.go(-1);
       });
     },
     encryptAndUpload: function () {

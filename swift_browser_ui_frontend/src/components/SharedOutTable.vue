@@ -141,6 +141,11 @@ export default {
       currentPage: 1,
     };
   },
+  computed: {
+    project () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getSharedContainers();
   },
@@ -158,10 +163,13 @@ export default {
       }
     },
     deleteContainerShare: function (container) {
-      removeAccessControlMeta(container).then(
+      removeAccessControlMeta(
+        this.project,
+        container,
+      ).then(
         () => {
           this.$store.state.client.shareContainerDeleteAccess(
-            this.$route.params.project,
+            this.project,
             container,
           ).then(() => {
             this.$buefy.toast.open({

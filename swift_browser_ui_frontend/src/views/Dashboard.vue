@@ -158,6 +158,11 @@ export default {
       ProjectSize: "10TiB",
     };
   },
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
+  },
   beforeMount(){
     // Fetch relevant things upon initializing the class instance
     this.fetchMeta();
@@ -167,7 +172,7 @@ export default {
     fetchMeta: function () {
       // Get the project metadata from the API using the API convenience
       // function in api.js
-      getProjectMeta().then((ret) => {
+      getProjectMeta(this.active.id).then((ret) => {
         this.Containers = ret["Containers"];
         this.Objects = ret["Objects"];
         this.Account = ret["Account"].replace("AUTH_", "");

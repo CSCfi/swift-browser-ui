@@ -49,13 +49,16 @@ export default {
         });
       }
     },
-    deleteContainer: function () {
+    deleteContainer: function() {
       this.$buefy.toast.open({
         message: this.$t("message.container_ops.deleteSuccess"),
         type: "is-success",
       });
       const projectID = this.$store.state.active.id;
-      swiftDeleteContainer(this.container).then(async () => {
+      swiftDeleteContainer(
+        projectID,
+        this.container,
+      ).then(async () => {
         this.$store.dispatch("updateContainers", {projectID});
         await this.$store.state.db.containers
           .where({
@@ -63,7 +66,7 @@ export default {
             name: this.container,
           })
           .delete();
-      });
+      })
     },
   },
 };

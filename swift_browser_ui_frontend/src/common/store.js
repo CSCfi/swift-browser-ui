@@ -3,10 +3,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import { getContainers } from "@/common/api";
-import {
-  getObjects,
-  getSharedObjects,
-} from "./api";
+import { getObjects } from "@/common/api";
 import {
   getTagsForContainer,
   getTagsForObjects,
@@ -135,34 +132,41 @@ const store = new Vuex.Store({
   },
   actions: {
     updateContainers: async function (
-      { state, commit, dispatch }, 
-      { projectID, signal }) 
-    {
+      { state, commit, dispatch },
+      { projectID, signal },
+    ) {
       const existingContainers = await state.db.containers
         .where({projectID})
         .toArray();
       if (existingContainers.length === 0) {
         commit("loading", true);
       }
-      let containers = await getContainers()
-        .then((ret) => {
-          if (ret.status != 200) {
-            commit("loading", false);
-          }
-          return ret;
-        }).catch(() => {
+      let containers;
+      let marker = "";
+      let newContainers = [];
+      do {
+        containers = [];
+        containers = await getContainers(
+          projectID,
+          marker,
+        ).catch(() => {
           commit("loading", false);
         });
-      containers.forEach(cont => {
-        cont.tokens = tokenize(cont.name);
-        cont.projectID = projectID;
-      });
-      await state.db.containers.bulkPut(containers).catch(() => {});
-      commit("loading", false);
-      await dispatch("updateContainerTags", {containers, signal});
+        commit("loading", false);
+        if(containers.length > 0) {
+          containers.forEach(cont => {
+            cont.tokens = tokenize(cont.name);
+            cont.projectID = projectID;
+          });
+          await state.db.containers.bulkPut(containers).cacth(() => {});
+          newContainers = newContainers.concat(containers);
+          marker = containers[containers.length - 1].name;
+        }
+      } while (containers.length > 0);
+      await dispatch("updateContainerTags", {projectID, newContainers, signal});
       const toDelete = [];
       existingContainers.map(oldCont => {
-        if(!containers.find(cont => cont.name === oldCont.name)) {
+        if(!newContainers.find(cont => cont.name == oldCont.name)) {
           toDelete.push(oldCont.id);
         }
       });
@@ -180,7 +184,6 @@ const store = new Vuex.Store({
         let updateObjects = true;
         const dbObjects = await state.db.objects
           .where({"containerID": container.id}).count();
-
         if (
           oldContainer &&
           container.count === oldContainer.count &&
@@ -194,56 +197,80 @@ const store = new Vuex.Store({
           await state.db.objects
             .where({"containerID": container.id}).delete();
         }
-        
         if (updateObjects) {
           dispatch(
             "updateObjects",
             {
-              container: container,
+              cotnainer: container,
               signal,
-            },
-          );
+            }
+          )
         }
       }
     },
-    updateContainerTags: function ({state}, {containers, signal}) {
+    updateContainerTags: function (
+      {state},
+      {projectID, containers, signal}
+    ) {
       containers.map(async container => {
-        const tags = await getTagsForContainer(container.name, signal) || null;
+        const tags = await getTagsForContainer(
+          projectID,
+          container,
+          signal,
+        ) || null;
         await state.db.containers
           .where({"projectID": container.projectID, "name": container.name})
           .modify({tags});
       });
     },
     updateObjects: async function (
-      { state, dispatch }, 
-      { container, signal },
+      { state, dispatch },
+      { projectID, container, signal },
     ) {
-      const isSegmentsContainer = container.name.match("_segments");
+      const isSegmentsContainer= container.name.match("_segments");
       const existingObjects = await state.db.objects
         .where({containerID: container.id}).toArray();
-      const objects = await getObjects(
-        container.name,
-        signal,
-      ).then(ret => {
-        return filterSegments(ret);
-      });
-      objects.forEach(obj => {
-        obj.container = container.name;
-        obj.containerID = container.id;
-        obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
-      });
-      const toDelete = [];
+      let newObjects = [];
+      let objects;
+      let marker = "";
+      do {
+        objects = await getObjects(
+          projectID,
+          container,
+          marker,
+          signal,
+        );
+        if (objects.length > 0) {
+          objects.forEach(obj => {
+            obj.container = container.name;
+            obj.containerID = container.id;
+            obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
+          })
+          await state.db.object.bulkPut(objects).catch(() => {});
+          newObjects = newObjects.concat(objects);
+          marker = objects[objects.length -1].name;
+        }
+      } while (objects.length > 0);
+  
+      let toDelete = [];
       existingObjects.map(oldObj => {
         if(!objects.find(obj => obj.name === oldObj.name)) {
           toDelete.push(oldObj.id);
         }
-      });
-      if (toDelete.length) {
+      })
+      if(toDelete.length) {
         await state.db.objects.bulkDelete(toDelete);
       }
-      await state.db.objects.bulkPut(objects).catch(() => {});
       if (!isSegmentsContainer) {
-        await dispatch("updateObjectTags", {container, signal});
+        await dispatch("updateObjectTags", {projectID, container, signal});
+      }
+    },
+    updateObjectTags: async function ({ commit, state }, {route, signal}) {
+      if (
+        !state.objectCache.length
+        || (state.objectCache.length > 25000)
+      ) {
+        return;
       }
     },
     updateObjectTags: async function (
@@ -265,11 +292,19 @@ const store = new Vuex.Store({
         // for object name is 1024. Set it to a safe enough amount.
         // We split the requests to prevent reaching said limits.
         objectList.push(objects[i].name);
-        const url = makeGetObjectsMetaURL(container.name, objectList);
-        if (i === objects.length - 1 || url.href.length >= 8192) {
-          const tags = await getTagsForObjects(
-            container.name, 
-            objectList, 
+        const url = makeGetObjectsMetaURL(
+          route.params.project,
+          container,
+          objectList,
+        );
+        if (
+          i === state.objectCache.length - 1
+          || url.href.length > 8192
+        ) {
+          getTagsForObjects(
+            route.params.project,
+            route.params.container,
+            objectList,
             url,
             signal,
           ).then(tags => tags);

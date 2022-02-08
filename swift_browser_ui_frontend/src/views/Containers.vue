@@ -388,6 +388,9 @@ export default {
     active: function () {
       this.fetchContainers();
     },
+    project: function () {
+      this.fetchContainers();
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on

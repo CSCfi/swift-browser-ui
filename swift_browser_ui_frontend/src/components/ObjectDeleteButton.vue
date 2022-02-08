@@ -56,22 +56,17 @@ export default {
         this.$store.state.db.objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
+        this.$route.params.project,
         this.$route.params.container,
         to_remove,
-      ).then(() => {
-        if(this.$route.name === "SharedObjects") {
-          this.$store.dispatch(
-            "updateSharedObjects", 
-            {
-              project: this.$route.params.project,
-              owner: this.$route.params.owner,
-              container: {
-                id: 0,
-                name: this.$route.params.container,
-              },
-            },
-          );
-        }
+      ).then(async () => {
+        await this.$store.dispatch(
+          "updateObjects",
+          {
+            projectID: this.$route.params.project,
+            container: this.$route.params.container,
+          },
+        );
       });
     },
   },
