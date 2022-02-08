@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add `defaultKeyMessage` to `lang.js` #494
 
 ### Changed
+
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
 - Redirect to front page when the session has expired. (GH #461)
@@ -29,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - key existence should be checked with `$te` https://kazupon.github.io/vue-i18n/api/#vue-injected-methods
     - check public key exists already before adding to the table
 
+- Drag and drop fixes #497
+    - stylize drag-and-drop overlay
+    - use Vue store to keep public keys
+
 
 ### Fixed
 
@@ -39,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - remove forgotten console.logs
 - fix issue with accessing ws on devserver #493
 - fix logic for disabling/enabling button for encryption, fix removal of public keys and fix upload encryption options selector positioning #494
+
+- Drag and drop fixes #497
+    - avoid redundant navigation to current location for UploadView
+    - clean drag-and-drop after files were added as DataTransferItemList are kept
 
 ### Removed
 
