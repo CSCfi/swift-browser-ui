@@ -4,6 +4,8 @@
 // https://github.com/aws-amplify/amplify-js/blob/7477d272587212c2a3cf0e86806f8ff4a03881e0/packages/datastore/src/util.ts#L337
 // https://stackoverflow.com/questions/52803941/reactjs-redux-and-dexiejs-indexeddb-error-in-incognito-mode-and-chrome-v69
 
+import { DEV } from "@/common/conv";
+
 let privateModeCheckResult;
 
 const isPrivateMode = () => {
@@ -51,7 +53,7 @@ export default async function checkIDB() {
   try {
     IDBKeyRange.only([1]);
   } catch (e) {
-    // console.log("Buggy Microsoft IndexedDB implementation");
+    if (DEV) console.log("Buggy Microsoft IndexedDB implementation");
     return false;
   }
 

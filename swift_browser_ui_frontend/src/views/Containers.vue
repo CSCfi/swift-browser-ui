@@ -448,7 +448,6 @@ export default {
     },
     search: async function() {
       if(this.searchQuery.length === 0) {
-        console.timeEnd("search " + this.searchQuery);
         return;
       }
       // request parameter should be sanitized first
