@@ -179,6 +179,20 @@ new Vue({
       this.containerSyncWrapper,
       5000,
     );
+    if (this.$te("message.keys")) {
+      for (let item of Object.entries(this.$t("message.keys"))) {
+        fetch(
+          "/download/"
+            + item[1]["project"] + "/"
+            + item[1]["container"] + "/"
+            + item[1]["object"],
+        ).then(resp => {
+          return resp.text();
+        }).then(resp => {
+          this.$store.commit("appendPubKey", resp);
+        });
+      }
+    }
   },
   methods: {
     dragHandler: function (e) {
@@ -209,17 +223,19 @@ new Vue({
           this.$store.commit("appendFileTransfer", file);
         }
       }
-      this.$router.push({
-        name: "UploadView",
-        params: {
-          project: this.$route.params.project,
-          container: (
-            this.$route.params.container ?
-              this.$route.params.container :
-              "upload-".concat(Date.now().toString())
-          ),
-        },
-      });
+      if (this.$route.name != "UploadView") {
+        this.$router.push({
+          name: "UploadView",
+          params: {
+            project: this.$route.params.project,
+            container: (
+              this.$route.params.container ?
+                this.$route.params.container :
+                "upload-".concat(Date.now().toString())
+            ),
+          },
+        });
+      }
       this.itemdrop = false;
     },
     containerSyncWrapper: function () {
