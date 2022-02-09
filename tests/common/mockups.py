@@ -3,6 +3,7 @@
 
 import json
 import yarl
+import unittest
 import unittest.mock
 import time
 import types
@@ -10,10 +11,8 @@ import logging
 
 import aiohttp_session
 
-import asynctest
 
-
-class APITestBase(asynctest.TestCase):
+class APITestBase(unittest.IsolatedAsyncioTestCase):
     """Base class for API tests using aiohttp client and server."""
 
     def setUp(self):
@@ -30,7 +29,7 @@ class APITestBase(asynctest.TestCase):
         self.session_return["projects"] = {
             "test-id-0": {
                 "id": "test-id-0",
-                "name": "test-name-0", 
+                "name": "test-name-0",
                 "token": "test-token-0",
                 "endpoint": "https://test-endpoint-0/v1/AUTH_test-id-0",
             },
@@ -41,13 +40,13 @@ class APITestBase(asynctest.TestCase):
                 "endpoint": "https://test-endpoint-1/v1/AUTH_test-id-1",
             },
         }
-        self.aiohttp_session_get_session_mock = asynctest.CoroutineMock()
+        self.aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
         self.aiohttp_session_get_session_mock.return_value = self.session_return
         self.p_get_sess = unittest.mock.patch(
-             "swift_browser_ui.ui.api.aiohttp_session.get_session",
-             self.aiohttp_session_get_session_mock,
+            "swift_browser_ui.ui.api.aiohttp_session.get_session",
+            self.aiohttp_session_get_session_mock,
         )
-        self.aiohttp_session_new_session_mock = asynctest.CoroutineMock()
+        self.aiohttp_session_new_session_mock = unittest.mock.AsyncMock()
         self.p_new_sess = unittest.mock.patch(
             "swift_browser_ui.ui.login.aiohttp_session.new_session",
             self.aiohttp_session_new_session_mock,
@@ -69,18 +68,20 @@ class APITestBase(asynctest.TestCase):
             self.aiohttp_json_response_mock,
         )
 
-        self.mock_response_write = asynctest.CoroutineMock()
-        self.mock_response_prepare = asynctest.CoroutineMock()
-        self.mock_response_write_eof = asynctest.CoroutineMock()
+        self.mock_response_write = unittest.mock.AsyncMock()
+        self.mock_response_prepare = unittest.mock.AsyncMock()
+        self.mock_response_write_eof = unittest.mock.AsyncMock()
         self.aiohttp_construct_response_mock = unittest.mock.Mock()
-        self.aiohttp_construct_response_mock.return_value = types.SimpleNamespace(**{
-            "status": 200,
-            "headers": {},
-            "cookie": {},
-            "write": self.mock_response_write,
-            "prepare": self.mock_response_prepare,
-            "write_eof": self.mock_response_write_eof,
-        })
+        self.aiohttp_construct_response_mock.return_value = types.SimpleNamespace(
+            **{
+                "status": 200,
+                "headers": {},
+                "cookie": {},
+                "write": self.mock_response_write,
+                "prepare": self.mock_response_prepare,
+                "write_eof": self.mock_response_write_eof,
+            }
+        )
         self.p_resp = unittest.mock.patch(
             "swift_browser_ui.ui.api.aiohttp.web.Response",
             self.aiohttp_construct_response_mock,
@@ -90,81 +91,104 @@ class APITestBase(asynctest.TestCase):
             self.aiohttp_construct_response_mock,
         )
 
-        self.mock_response_read = asynctest.CoroutineMock(
-            return_value=b"exampleread"
-        )
-        self.mock_iter = unittest.mock.Mock(
-            return_value=b"test-chunk"
-        )
-        async def citer (_):
+        self.mock_response_read = unittest.mock.AsyncMock(return_value=b"exampleread")
+        self.mock_iter = unittest.mock.Mock(return_value=b"test-chunk")
+
+        async def citer(_):
             for _ in range(0, 10):
                 yield self.mock_iter()
+
         self.mock_client_json = {}
         self.mock_client_text = ""
-        self.mock_client_response = types.SimpleNamespace(**{
-            "status": 200,
-            "headers": {},
-            "cookie": {},
-            "json": None,
-            "content": types.SimpleNamespace(**{
-                "iter_chunked": citer,
-            }),
-            "read": self.mock_response_read,
-            "text": asynctest.CoroutineMock(return_value=self.mock_client_text),
-            "url": "https://localhost:8080"
-        })
+        self.mock_client_response = types.SimpleNamespace(
+            **{
+                "status": 200,
+                "headers": {},
+                "cookie": {},
+                "json": None,
+                "content": types.SimpleNamespace(
+                    **{
+                        "iter_chunked": citer,
+                    }
+                ),
+                "read": self.mock_response_read,
+                "text": unittest.mock.AsyncMock(return_value=self.mock_client_text),
+                "url": "https://localhost:8080",
+            }
+        )
+
         class MockHandler(APITestBase):
             def __init__(self, mockresp):
                 """."""
                 self.mock_client_response = mockresp
+
             async def __aenter__(self):
                 return self.mock_client_response
+
             async def __aexit__(self, *_):
                 return
-        self.MockHandler = MockHandler
-        self.mock_client = types.SimpleNamespace(**{
-            "get": unittest.mock.Mock(return_value=self.MockHandler(
-                self.mock_client_response,
-            )),
-            "post": unittest.mock.Mock(return_value=self.MockHandler(
-                self.mock_client_response,
-            )),
-            "put": unittest.mock.Mock(return_value=self.MockHandler(
-                self.mock_client_response,
-            )),
-            "delete": unittest.mock.Mock(return_value=self.MockHandler(
-                self.mock_client_response,
-            )),
-            "head": unittest.mock.Mock(return_value=self.MockHandler(
-                self.mock_client_response,
-            )),
-        })
 
-        self.mock_request = types.SimpleNamespace(**{
-            "match_info": {
-                "project": "test-id-0",
-                "container": "test-container",
-                "object": "test-object",
-                "receiver": "test-project-1",
-            },
-            "cookies": {},
-            "query": {},
-            "headers": {},
-            "query_string": "",
-            "remote": "test-remote",
-            "json": None,
-            "post": asynctest.CoroutineMock(),
-            "app": {
-                "api_client": self.mock_client,
-                "client": self.mock_client,
-                "Log": unittest.mock.MagicMock(logging.Logger),
-                "test-id": "placeholder",
-            },
-            "url": types.SimpleNamespace(**{
-                "host": "https://localhost",
-            })
-        })
+        self.MockHandler = MockHandler
+        self.mock_client = types.SimpleNamespace(
+            **{
+                "get": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "post": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "put": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "delete": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "head": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+            }
+        )
+
+        self.mock_request = types.SimpleNamespace(
+            **{
+                "match_info": {
+                    "project": "test-id-0",
+                    "container": "test-container",
+                    "object": "test-object",
+                    "receiver": "test-project-1",
+                },
+                "cookies": {},
+                "query": {},
+                "headers": {},
+                "query_string": "",
+                "remote": "test-remote",
+                "json": None,
+                "post": unittest.mock.AsyncMock(),
+                "app": {
+                    "api_client": self.mock_client,
+                    "client": self.mock_client,
+                    "Log": unittest.mock.MagicMock(logging.Logger),
+                    "test-id": "placeholder",
+                },
+                "url": types.SimpleNamespace(
+                    **{
+                        "host": "https://localhost",
+                    }
+                ),
+            }
+        )
         super().setUp()
+
 
 mock_token_project_avail: dict = {
     "projects": [
@@ -183,9 +207,7 @@ mock_token_project_avail: dict = {
         {
             "is_domain": False,
             "description": "",
-            "links": {
-                "self": "https://place-holder-url:5001/v3/projects/placeholder"
-            },
+            "links": {"self": "https://place-holder-url:5001/v3/projects/placeholder"},
             "enabled": True,
             "id": "placeholder",
             "parent_id": "default",

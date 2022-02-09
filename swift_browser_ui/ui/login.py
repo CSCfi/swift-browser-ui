@@ -272,7 +272,7 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
                     pass
             session.invalidate()
         except aiohttp.web.HTTPUnauthorized:
-            log.info(f"Trying to log our an invalidated session")
+            log.info("Trying to log our an invalidated session")
             raise aiohttp.web.HTTPUnauthorized
     response = aiohttp.web.Response(status=303)
     response.headers["Location"] = "/"

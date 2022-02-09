@@ -9,7 +9,6 @@ import aiohttp
 import swift_browser_ui.ui.login
 import swift_browser_ui.ui.settings
 
-import tests.ui_unit.creation
 import tests.common.mockups
 
 _path = "/auth/OS-FEDERATION/identity_providers/haka/protocols/saml2/websso"
@@ -21,7 +20,9 @@ class LoginTestClass(tests.common.mockups.APITestBase):
     def setUp(self):
         """."""
         super().setUp()
-        self.setd_mock["static_directory"] = __file__.replace("/settings.py", "") + "/static"
+        self.setd_mock["static_directory"] = (
+            __file__.replace("/settings.py", "") + "/static"
+        )
         self.p_get_sess = unittest.mock.patch(
             "swift_browser_ui.ui.login.aiohttp_session.get_session",
             self.aiohttp_session_get_session_mock,
@@ -79,7 +80,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         with self.assertRaises(aiohttp.web.HTTPBadRequest):
             swift_browser_ui.ui.login.test_token(
                 {
-                    "token": b'1_HsWO4xZLCL5NRBpvF_Fg==',
+                    "token": b"1_HsWO4xZLCL5NRBpvF_Fg==",
                 },
                 self.mock_request,
             )
@@ -127,7 +128,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.ui.login.credentials_login_end(
                 self.mock_request,
             )
-        
+
         self.mock_request.post.return_value = {
             "username": "test-username",
             "password": "test-password",
@@ -154,8 +155,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         self.mock_client_response.headers["X-Subject-Token"] = "test-token"
         mock_login = unittest.mock.AsyncMock()
         patch_login = unittest.mock.patch(
-            "swift_browser_ui.ui.login.login_with_token",
-            mock_login
+            "swift_browser_ui.ui.login.login_with_token", mock_login
         )
         with patch_login:
             await swift_browser_ui.ui.login.credentials_login_end(
@@ -197,7 +197,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         """
         self.setd_mock["session_lifetime"] = 28800
         self.setd_mock["history_lifetime"] = 2592000
-        self.setd_mock["swift_endpoint_url"] = "http://obj.exampleosep.com:443/v1",
+        self.setd_mock["swift_endpoint_url"] = ("http://obj.exampleosep.com:443/v1",)
         patch1 = unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -225,25 +225,25 @@ class LoginTestClass(tests.common.mockups.APITestBase):
                         "name": "swift",
                         "endpoints": [
                             {
-                            "region_id": 'default',
-                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
-                            "region": 'default',
-                            "interface": 'admin',
-                            "id": 'test-id',
+                                "region_id": "default",
+                                "url": "https://test-swift:443/swift/v1/AUTH_test-id-0",
+                                "region": "default",
+                                "interface": "admin",
+                                "id": "test-id",
                             },
                             {
-                            "region_id": 'default',
-                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
-                            "region": 'default',
-                            "interface": 'public',
-                            "id": 'test-id',
+                                "region_id": "default",
+                                "url": "https://test-swift:443/swift/v1/AUTH_test-id-0",
+                                "region": "default",
+                                "interface": "public",
+                                "id": "test-id",
                             },
                             {
-                            "region_id": 'default',
-                            "url": 'https://test-swift:443/swift/v1/AUTH_test-id-0',
-                            "region": 'default',
-                            "interface": 'internal',
-                            "id": 'test-id',
+                                "region_id": "default",
+                                "url": "https://test-swift:443/swift/v1/AUTH_test-id-0",
+                                "region": "default",
+                                "interface": "internal",
+                                "id": "test-id",
                             },
                         ],
                     },
@@ -276,9 +276,9 @@ class LoginTestClass(tests.common.mockups.APITestBase):
                             "id": token,
                         },
                     },
-                    "scope": {"project": {"id": "what"}}
+                    "scope": {"project": {"id": "what"}},
                 }
-            }
+            },
         )
 
         self.mock_request.cookies["NAV_TO"] = "/test-nav"
@@ -291,14 +291,18 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         self.assertEqual(resp.headers["Location"], "/test-nav")
 
         self.mock_client_response.status = 401
-        with self.assertRaises(aiohttp.web.HTTPUnauthorized), patch1, patch2, self.p_new_sess:
+        with self.assertRaises(
+            aiohttp.web.HTTPUnauthorized
+        ), patch1, patch2, self.p_new_sess:
             await swift_browser_ui.ui.login.login_with_token(
                 self.mock_request,
                 token,
             )
 
         self.mock_client_response.status = 403
-        with self.assertRaises(aiohttp.web.HTTPForbidden), patch1, patch2, self.p_new_sess:
+        with self.assertRaises(
+            aiohttp.web.HTTPForbidden
+        ), patch1, patch2, self.p_new_sess:
             await swift_browser_ui.ui.login.login_with_token(
                 self.mock_request,
                 token,

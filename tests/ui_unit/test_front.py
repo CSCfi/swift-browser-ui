@@ -38,8 +38,8 @@ class FrontendTestCase(
         aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
         aiohttp_session_get_session_mock.return_value = session_return
         p_get_sess = unittest.mock.patch(
-             "swift_browser_ui.ui.front.aiohttp_session.get_session",
-             aiohttp_session_get_session_mock,
+            "swift_browser_ui.ui.front.aiohttp_session.get_session",
+            aiohttp_session_get_session_mock,
         )
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.front.setd",
@@ -63,8 +63,8 @@ class FrontendTestCase(
         aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
         aiohttp_session_get_session_mock.return_value = session_return
         p_get_sess = unittest.mock.patch(
-             "swift_browser_ui.ui.front.aiohttp_session.get_session",
-             aiohttp_session_get_session_mock,
+            "swift_browser_ui.ui.front.aiohttp_session.get_session",
+            aiohttp_session_get_session_mock,
         )
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.front.setd",
@@ -88,8 +88,8 @@ class FrontendTestCase(
         aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
         aiohttp_session_get_session_mock.return_value = session_return
         p_get_sess = unittest.mock.patch(
-             "swift_browser_ui.ui.front.aiohttp_session.get_session",
-             aiohttp_session_get_session_mock,
+            "swift_browser_ui.ui.front.aiohttp_session.get_session",
+            aiohttp_session_get_session_mock,
         )
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.front.setd",

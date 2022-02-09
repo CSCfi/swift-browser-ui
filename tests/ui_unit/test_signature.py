@@ -32,11 +32,7 @@ class SignatureMiscTestClass(
             "swift_browser_ui.ui._convenience.sign", self.sign_mock
         )
 
-        self.mock_request.match_info = {
-            "valid": 600,
-            "count": 60,
-            "project": "test-id-0"
-        }
+        self.mock_request.match_info = {"valid": 600, "count": 60, "project": "test-id-0"}
         self.mock_request.query = {
             "path": "/test/path",
             "count": "60",

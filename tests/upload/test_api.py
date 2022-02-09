@@ -21,8 +21,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             return_value="test-id",
         )
         self.p_get_sess = unittest.mock.patch(
-            "swift_browser_ui.upload.api.get_session_id",
-            self.mock_get_session_id
+            "swift_browser_ui.upload.api.get_session_id", self.mock_get_session_id
         )
 
         self.mock_upload_instance = types.SimpleNamespace(
@@ -234,9 +233,7 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.mock_request.match_info["container"] = "test-container"
         self.mock_request.query["resumableChunkNumber"] = 1
 
-        mock_get_object_chunk = unittest.mock.AsyncMock(
-            return_value="get-chunk-success"
-        )
+        mock_get_object_chunk = unittest.mock.AsyncMock(return_value="get-chunk-success")
         patch_get_object_chunk = unittest.mock.patch(
             "swift_browser_ui.upload.api.handle_get_object_chunk", mock_get_object_chunk
         )

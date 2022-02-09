@@ -120,7 +120,7 @@ async def get_availability_from_token(token: str, client: aiohttp.ClientSession)
     filtered_projects = list(
         filter(
             lambda d: d.get("enabled") is not False,
-            output_projects["projects"]  # type: ignore
+            output_projects["projects"],  # type: ignore
         )
     )
     filtered_domains = output_domains["domains"]  # type: ignore
@@ -165,9 +165,7 @@ async def get_tempurl_key(request: aiohttp.web.Request) -> str:
             },
         ) as ret:
             if ret.status != 204:
-                raise aiohttp.web.HTTPServerError(
-                    reason="TempURL key creation failure."
-                )
+                raise aiohttp.web.HTTPServerError(reason="TempURL key creation failure.")
     return temp_url_key
 
 

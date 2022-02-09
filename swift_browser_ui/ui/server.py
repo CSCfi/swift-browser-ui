@@ -2,7 +2,6 @@
 
 # Generic imports
 import logging
-import time
 import sys
 import asyncio
 import ssl
@@ -212,7 +211,6 @@ async def servinit() -> aiohttp.web.Application:
         ]
     )
 
-    app.on_startup.append(startup)
     app.on_startup.append(open_client_to_app)
 
     # Add graceful shutdown handler

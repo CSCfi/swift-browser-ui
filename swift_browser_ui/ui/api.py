@@ -188,7 +188,7 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
         resp = aiohttp.web.StreamResponse(
             status=ret.status,
         )
-        await resp.prepare(request) 
+        await resp.prepare(request)
         async for chunk in ret.content.iter_chunked(65535):
             await resp.write(chunk)
         await resp.write_eof()
@@ -547,7 +547,7 @@ async def remove_project_container_acl(
     container = request.match_info["container"]
     receiver = request.match_info["receiver"]
     headers: dict = {
-            "X-Auth-Token": session["projects"][project]["token"],
+        "X-Auth-Token": session["projects"][project]["token"],
     }
     async with client.head(
         f"{session['projects'][project]['endpoint']}/{container}",

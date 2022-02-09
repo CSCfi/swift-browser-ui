@@ -125,7 +125,7 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
         },
     ) as _:
         pass
-    async with  client.delete(
+    async with client.delete(
         f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],

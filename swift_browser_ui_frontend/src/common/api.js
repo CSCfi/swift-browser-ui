@@ -51,9 +51,10 @@ async function PUT(url, body) {
     method: "PUT",
   });
 }
-async function DELETE(url) {
+async function DELETE(url, body) {
   return fetchWithCookie({
     url,
+    body,
     method: "DELETE",
   });
 }
@@ -345,7 +346,9 @@ export async function swiftDeleteObjects(
   ), document.location.origin);
   fetchURL.searchParams.append("objects", true);
 
-  let ret = await DELETE(fetchURL);
+  let ret = await DELETE(
+    fetchURL, JSON.stringify(objects),
+  );
   if (ret.status != 204) {
     throw new Error("Object / objects deletion not successful.");
   }

@@ -7,8 +7,6 @@ import types
 
 import aiohttp.web
 
-import asynctest
-
 import tests.common.mockups
 import swift_browser_ui.ui.api
 
@@ -23,9 +21,7 @@ class APITestClass(tests.common.mockups.APITestBase):
     async def test_get_os_user(self):
         """Test session Openstack username fetch."""
         with self.p_get_sess, self.p_json_resp:
-            await swift_browser_ui.ui.api.get_os_user(
-                self.mock_request
-            )
+            await swift_browser_ui.ui.api.get_os_user(self.mock_request)
         self.aiohttp_json_response_mock.assert_called_once_with("testuser")
 
     async def test_os_list_projects(self):
@@ -34,21 +30,23 @@ class APITestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.ui.api.os_list_projects(
                 self.mock_request,
             )
-        self.aiohttp_json_response_mock.assert_called_once_with([
-            {
-                "id": "test-id-0",
-                "name": "test-name-0",
-            },
-            {
-                "id": "test-id-1",
-                "name": "test-name-1",
-            },
-        ])
+        self.aiohttp_json_response_mock.assert_called_once_with(
+            [
+                {
+                    "id": "test-id-0",
+                    "name": "test-name-0",
+                },
+                {
+                    "id": "test-id-1",
+                    "name": "test-name-1",
+                },
+            ]
+        )
 
     async def test_swift_list_containers(self):
         """Test container listing fetch from Openstack."""
         with self.p_get_sess, self.p_sresp:
-            resp = await swift_browser_ui.ui.api.swift_list_containers(
+            await swift_browser_ui.ui.api.swift_list_containers(
                 self.mock_request,
             )
             self.mock_response_prepare.assert_awaited_once()
@@ -64,9 +62,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.ui.api.swift_list_containers(
                 self.mock_request,
             )
-            self.aiohttp_construct_response_mock.assert_called_once_with(
-                status=401
-            )
+            self.aiohttp_construct_response_mock.assert_called_once_with(status=401)
             self.mock_response_write.assert_not_called()
             self.mock_response_prepare.assert_awaited_once()
             self.mock_response_write_eof.assert_awaited_once()
@@ -86,9 +82,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.ui.api.swift_list_objects(
                 self.mock_request,
             )
-            self.aiohttp_construct_response_mock.assert_called_once_with(
-                status=200
-            )
+            self.aiohttp_construct_response_mock.assert_called_once_with(status=200)
             self.mock_response_prepare.assert_awaited_once()
             self.mock_iter.assert_called()
             self.mock_response_write.assert_awaited()
@@ -171,9 +165,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             "swift_browser_ui.ui.api.get_tempurl_key",
             get_tempurl_key_mock,
         )
-        generate_tempurl_mock = unittest.mock.Mock(
-            return_value="?tempurl=true"
-        )
+        generate_tempurl_mock = unittest.mock.Mock(return_value="?tempurl=true")
         patch_tempurl = unittest.mock.patch(
             "swift_browser_ui.ui.api.generate_temp_url",
             generate_tempurl_mock,
@@ -186,14 +178,8 @@ class APITestClass(tests.common.mockups.APITestBase):
                 self.mock_request,
             )
         self.assertEqual(resp.status, 302)
-        self.assertEqual(
-            resp.headers["Location"],
-            "https://test-endpoint-0?tempurl=true"
-        )
-        self.assertEqual(
-            resp.headers["Content-Type"],
-            "test-content"
-        )
+        self.assertEqual(resp.headers["Location"], "https://test-endpoint-0?tempurl=true")
+        self.assertEqual(resp.headers["Content-Type"], "test-content")
         self.mock_client.head.assert_called_once()
         get_tempurl_key_mock.assert_awaited_once()
         generate_tempurl_mock.assert_called_once()
@@ -227,15 +213,13 @@ class APITestClass(tests.common.mockups.APITestBase):
             )
 
     async def test_swift_batch_get_object_meta(self):
-        """Test batch object metadata fetch with Openstack."""  
+        """Test batch object metadata fetch with Openstack."""
         mock_get_meta = unittest.mock.AsyncMock(return_value=("object", "meta"))
         patch_get_meta = unittest.mock.patch(
             "swift_browser_ui.ui.api._swift_get_object_metadata_wrapper",
             mock_get_meta,
         )
-        self.mock_request.query = {
-            "objects": "obja,objb,objc,objd,obje,objf"
-        }
+        self.mock_request.query = {"objects": "obja,objb,objc,objd,obje,objf"}
         with self.p_get_sess, patch_get_meta:
             await swift_browser_ui.ui.api.swift_get_batch_object_metadata(
                 self.mock_request,
@@ -244,7 +228,7 @@ class APITestClass(tests.common.mockups.APITestBase):
         mock_get_meta.assert_awaited()
 
     async def test_swift_get_container_meta(self):
-        """Test container metadata fetch with Openstack."""        
+        """Test container metadata fetch with Openstack."""
         self.mock_client_response.headers = {
             "X-Container-Meta-One": "examplemeta",
             "X-Container-Meta-Two": "examplemeta",
@@ -295,26 +279,41 @@ class APITestClass(tests.common.mockups.APITestBase):
 
         self.mock_request.json = unittest.mock.AsyncMock(
             return_value=[
-                ("test-object-0", {
-                    "test-meta-0": "test",
-                    "test-meta-1": "another_test",
-                }),
-                ("test-object-1", {
-                    "test-meta-0": "test",
-                    "test-meta-1": "another_test",
-                }),
-                ("test-object-2", {
-                    "test-meta-0": "test",
-                    "test-meta-1": "another_test",
-                }),
-                ("test-object-3", {
-                    "test-meta-0": "test",
-                    "test-meta-1": "another_test",
-                }),
-                ("test-object-4", {
-                    "test-meta-0": "test",
-                    "test-meta-1": "another_test",
-                }),
+                (
+                    "test-object-0",
+                    {
+                        "test-meta-0": "test",
+                        "test-meta-1": "another_test",
+                    },
+                ),
+                (
+                    "test-object-1",
+                    {
+                        "test-meta-0": "test",
+                        "test-meta-1": "another_test",
+                    },
+                ),
+                (
+                    "test-object-2",
+                    {
+                        "test-meta-0": "test",
+                        "test-meta-1": "another_test",
+                    },
+                ),
+                (
+                    "test-object-3",
+                    {
+                        "test-meta-0": "test",
+                        "test-meta-1": "another_test",
+                    },
+                ),
+                (
+                    "test-object-4",
+                    {
+                        "test-meta-0": "test",
+                        "test-meta-1": "another_test",
+                    },
+                ),
             ]
         )
 
@@ -327,16 +326,16 @@ class APITestClass(tests.common.mockups.APITestBase):
 
         # Cover failure
         mock_object_meta_update.return_value = 404
-        with self.p_get_sess, patch_meta_update, self.assertRaises(aiohttp.web.HTTPNotFound):
+        with self.p_get_sess, patch_meta_update, self.assertRaises(
+            aiohttp.web.HTTPNotFound
+        ):
             await swift_browser_ui.ui.api.swift_batch_update_object_metadata(
                 self.mock_request,
             )
 
     async def test_batch_swift_update_object_metadata_no_objects(self):
         """Test object metadata batch update with missing body."""
-        self.mock_request.json = unittest.mock.AsyncMock(
-            return_value=[]
-        )
+        self.mock_request.json = unittest.mock.AsyncMock(return_value=[])
         with self.p_get_sess, self.assertRaises(aiohttp.web.HTTPBadRequest):
             await swift_browser_ui.ui.api.swift_batch_update_object_metadata(
                 self.mock_request,
@@ -357,7 +356,6 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.assertEqual(resp.status, 200)
         self.mock_request.json.assert_awaited_once()
         self.mock_client.post.assert_called_once()
-
 
     async def test_swift_update_object_metadata_via_container(self):
         """Test object batch meta update via container meta update."""
@@ -386,7 +384,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                 self.mock_request,
             )
         self.mock_client.head.assert_called_once()
-    
+
     async def test_swift_get_project_metadata_fail(self):
         """Test project metadata fetch with failed request."""
         self.mock_client_response.status = 403
@@ -447,11 +445,10 @@ class APITestClass(tests.common.mockups.APITestBase):
             ret[1],
         )
 
-
     async def test_get_access_control_metadata(self):
         """Test get ACL metadata with Openstack."""
         acl_wrapper_mock = unittest.mock.AsyncMock(
-            return_value = (
+            return_value=(
                 "test-container",
                 {
                     "test-project-0": {
@@ -460,8 +457,9 @@ class APITestClass(tests.common.mockups.APITestBase):
                     "test-project-1": {
                         "write": "*",
                         "read": "*",
+                    },
                 },
-            }),
+            ),
         )
         p_acl_wrapper = unittest.mock.patch(
             "swift_browser_ui.ui.api._swift_get_container_acl_wrapper",
@@ -480,10 +478,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             )
         acl_wrapper_mock.assert_awaited()
         ret = json.loads(resp.body)
-        self.assertEqual(
-            "https://test-endpoint-0/v1/AUTH_test-id-0",
-            ret["address"]
-        )
+        self.assertEqual("https://test-endpoint-0/v1/AUTH_test-id-0", ret["address"])
         self.assertEqual(
             ret["access"],
             {
@@ -496,7 +491,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                         "read": "*",
                     },
                 }
-            }
+            },
         )
         # Cover edge case when ending in a 204
         self.mock_client_response.json = unittest.mock.AsyncMock(
@@ -505,9 +500,13 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.mock_client.get = unittest.mock.Mock(
             side_effect=[
                 self.MockHandler(self.mock_client_response),
-                self.MockHandler(types.SimpleNamespace(**{
-                    "status": 204,
-                })),
+                self.MockHandler(
+                    types.SimpleNamespace(
+                        **{
+                            "status": 204,
+                        }
+                    )
+                ),
             ]
         )
         with self.p_get_sess, p_acl_wrapper:
@@ -516,10 +515,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             )
         acl_wrapper_mock.assert_awaited()
         ret = json.loads(resp.body)
-        self.assertEqual(
-            "https://test-endpoint-0/v1/AUTH_test-id-0",
-            ret["address"]
-        )
+        self.assertEqual("https://test-endpoint-0/v1/AUTH_test-id-0", ret["address"])
         self.assertEqual(
             ret["access"],
             {
@@ -532,7 +528,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                         "read": "*",
                     },
                 }
-            }
+            },
         )
 
     async def test_remove_project_container_acl(self):
@@ -556,7 +552,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                 "X-Auth-Token": "test-token-0",
                 "X-Container-Read": "test-project-0:*,.r:*,.rlistings",
                 "X-Container-Write": "test-project-0:*",
-            }
+            },
         )
 
     async def test_remove_container_acl(self):
@@ -576,12 +572,12 @@ class APITestClass(tests.common.mockups.APITestBase):
                 "X-Auth-Token": "test-token-0",
                 "X-Container-Read": "",
                 "X-Container-Write": "",
-            }
+            },
         )
 
     async def test_add_project_container_acl(self):
         """Test project addition to container acl with Openstack."""
-        self.mock_client_response.headers={
+        self.mock_client_response.headers = {
             "X-Container-Read": "test-project-0:*,.r:*,.rlistings",
             "X-Container-Write": "test-project-0:*",
         }
@@ -602,7 +598,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                 "X-Auth-Token": "test-token-0",
                 "X-Container-Read": "test-project-0:*,.r:*,.rlistings,test-project-1:*",
                 "X-Container-Write": "test-project-0:*,test-project-1:*",
-            }
+            },
         )
 
 
@@ -621,8 +617,8 @@ class ProxyFunctionsTestClass(tests.common.mockups.APITestBase):
             "from_container": "test-container-2",
             "from_project": "test-project-2",
         }
-        self.mock_request.query_string = "&test-query=test-value§",
-        self.mock_request.remote = "remote",
+        self.mock_request.query_string = ("&test-query=test-value§",)
+        self.mock_request.remote = ("remote",)
 
         self.session_open_mock = unittest.mock.AsyncMock(return_value="test_runner_id")
         self.patch_runner_session = unittest.mock.patch(

@@ -85,10 +85,10 @@ class ResumableFileUploadProxy:
         if self.total_size >= 5368709120:
             self.segmented = True
 
-    async def a_create_container(self, segmented: bool = False) -> None:
+    async def a_create_container(self) -> None:
         """Create the container required by the upload."""
         async with self.client.put(
-            common.generate_download_url(self.host, container),
+            common.generate_download_url(self.host, self.container),
             headers={"Content-Length": str(0), "X-Auth-Token": self.token},
             ssl=ssl_context,
         ) as resp:

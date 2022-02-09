@@ -2,8 +2,6 @@
 
 import unittest
 
-import asynctest
-
 import aiohttp.web
 
 from requests.exceptions import ConnectionError  # type: ignore
@@ -86,7 +84,7 @@ class TestConvenienceFunctions(
             "swift_browser_ui.ui._convenience.setd",
             {"auth_endpoint_url": "http://example.osexampleserver.com:5001/v3"},
         )
-        self.mock_client_response.json = asynctest.CoroutineMock(
+        self.mock_client_response.json = unittest.mock.AsyncMock(
             side_effect=[
                 tests.common.mockups.mock_token_project_avail,
                 tests.common.mockups.mock_token_domain_avail,
@@ -113,18 +111,14 @@ class TestConvenienceFunctions(
             )
         self.assertIsNotNone(ret)
 
-        self.mock_client_response.headers = {
-            "X-Account-Meta-Temp-Url-Key": "test-key"
-        }
+        self.mock_client_response.headers = {"X-Account-Meta-Temp-Url-Key": "test-key"}
         with self.p_get_sess:
             ret = await swift_browser_ui.ui._convenience.get_tempurl_key(
                 self.mock_request,
             )
         self.assertEqual(ret, "test-key")
 
-        self.mock_client_response.headers = {
-            "X-Account-Meta-Temp-Url-Key-2": "test-key"
-        }
+        self.mock_client_response.headers = {"X-Account-Meta-Temp-Url-Key-2": "test-key"}
         with self.p_get_sess:
             ret = await swift_browser_ui.ui._convenience.get_tempurl_key(
                 self.mock_request,
