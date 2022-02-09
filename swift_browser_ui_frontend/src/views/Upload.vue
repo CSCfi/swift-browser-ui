@@ -228,7 +228,7 @@
     </b-table>
     <div class="uploadButtonContainer">
       <b-upload
-        v-model="$store.state.dropFiles"
+        v-model="files"
         multiple
         class="file is-primary"
       >
@@ -308,6 +308,14 @@ export default {
     },
     dropFiles () {
       return this.$store.state.dropFiles;
+    },
+    files: {
+      get () {
+        return this.$store.state.dropFiles.message;
+      },
+      set (value) {
+        this.$store.commit("appendDropFiles", value[0]);
+      },
     },
   },
   watch: {

@@ -119,12 +119,17 @@ const store = new Vuex.Store({
       state.transfer = [];
     },
     appendDropFiles (state, file) {
-      if (state.dropFiles.find(c => c.name === file.name) === undefined) {
+      if (state.dropFiles.find(({ relativePath }) => 
+        relativePath === String(file.relativePath)) === undefined 
+        && state.dropFiles.find(({ name }) => 
+          name === String(file.name)) === undefined) {
         state.dropFiles.push(file);
       } else {
         // we remove and push the file again to get new size
         // and if the file exists to referesh dropFiles var
-        state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
+        state.dropFiles = state.dropFiles.filter(v => {
+          return (v.relativePath !== file.relativePath && v.name !== file.name);
+        });
         state.dropFiles.push(file);
       }
     },
