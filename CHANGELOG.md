@@ -31,9 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - key existence should be checked with `$te` https://kazupon.github.io/vue-i18n/api/#vue-injected-methods
     - check public key exists already before adding to the table
 
-- Drag and drop fixes #497
+- Drag and drop fixes #497 and #498
     - stylize drag-and-drop overlay
     - use Vue store to keep public keys
+    - move drag and drop files as well as files uploaded by button to store
 
 - **BREAKING** swift-browser-ui doesn't work in Firefox's private mode, as it doesn't offer IndexedDB.
     - There is a warning message at login, and it is not possible to login in unsupported browsers.
@@ -46,7 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Adding more words to the search narrows down the results.
     - A message is shown when trying to search a large project before cache is created.
 
-
 ### Fixed
 
 - Double navigation to the UploadView (GH #473)
@@ -57,9 +57,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix issue with accessing ws on devserver #493
 - fix logic for disabling/enabling button for encryption, fix removal of public keys and fix upload encryption options selector positioning #494
 
-- Drag and drop fixes #497
+- Drag and drop fixes #497 and #498
     - avoid redundant navigation to current location for UploadView
     - clean drag-and-drop after files were added as DataTransferItemList are kept
+    
 
 ### Removed
 
