@@ -40,6 +40,7 @@ const store = new Vuex.Store({
     transfer: [],
     pubkey: [],
     currentPrefix: "",
+    dropFiles:[],
   },
   mutations: {
     loading(state, payload) {
@@ -116,6 +117,22 @@ const store = new Vuex.Store({
     },
     eraseTransfer (state) {
       state.transfer = [];
+    },
+    appendDropFiles (state, file) {
+      if (state.dropFiles.find(c => c.name === file.name) === undefined) {
+        state.dropFiles.push(file);
+      } else {
+        // we remove and push the file again to get new size
+        // and if the file exists to referesh dropFiles var
+        state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
+        state.dropFiles.push(file);
+      }
+    },
+    eraseDropFile (state, file) {
+      state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
+    },
+    eraseDropFiles (state) {
+      state.dropFiles = [];
     },
     appendPubKey (state, key) {
       state.pubkey.push(key);

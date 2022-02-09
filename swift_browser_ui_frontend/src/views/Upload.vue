@@ -162,7 +162,7 @@
     </div>
     <hr class="is-medium">
     <b-table
-      :data="files"
+      :data="dropFiles"
       paginated
       focusable
       hoverable
@@ -214,15 +214,7 @@
           icon-left="delete"
           outlined
           size="is-small"
-          @click="files.splice(
-            files.findIndex(i => {
-              if (i.relativePath) {
-                return i.relativePath === props.row.relativePath;
-              } else {
-                return i.name === props.row.name;
-              }
-            }), 1
-          )"
+          @click="$store.commit('eraseDropFile', props.row)"
         >
           {{ $t('message.remove') }}
         </b-button>
@@ -235,7 +227,7 @@
     </b-table>
     <div class="uploadButtonContainer">
       <b-upload
-        v-model="files"
+        v-model="$store.state.dropFiles"
         multiple
         class="file is-primary"
       >
@@ -292,7 +284,6 @@ export default {
       recvHashedKeys: [],
       container: "",
       passphrase: "",
-      files: [],
       tooLarge: false,
       noUpload: true,
       addRecvkey: "",
@@ -313,6 +304,9 @@ export default {
     },
     pubkey () {
       return this.$store.state.pubkey;
+    },
+    dropFiles () {
+      return this.$store.state.dropFiles;
     },
   },
   watch: {
@@ -343,7 +337,7 @@ export default {
     passphrase: function () {
       this.refreshNoUpload();
     },
-    files: function () {
+    dropFiles: function () {
       this.refreshNoUpload();
       this.checkUploadSize();
     },
@@ -363,10 +357,10 @@ export default {
       if (item.isFile) {
         item.file(file => {
           file.relativePath = path + file.name;
-          this.files.push(file);
+          this.$store.commit("appendDropFiles", file);
         });
       } else if (item instanceof File) {
-        this.files.push(item);
+        this.$store.commit("appendDropFiles", item);
       } else if (item.isDirectory) {
         entry = item;
       }
@@ -396,7 +390,8 @@ export default {
       else if ("function" === typeof item.getAsFile) {
         item = item.getAsFile();
         if (item instanceof File) {
-          this.files.push(item);
+          item.relativePath = path + item.name;
+          this.$store.commit("appendDropFiles", item);
         }
       }
     },
@@ -405,8 +400,8 @@ export default {
         for (let file of this.transfer) {
           let entry = file;
           this.setFile(entry, "");
-          this.transfer.splice(file, 1);
         }
+        this.$store.commit("eraseTransfer");
       }
     },
     setContainer: function () {
@@ -434,7 +429,7 @@ export default {
       }
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
-      for (let f of this.files) {
+      for (let f of this.dropFiles) {
         let buf = new Uint8Array(await f.arrayBuffer());
         handleDirectories: {
           if (f.relativePath) {
@@ -509,13 +504,16 @@ export default {
       this.res.addFiles(files, undefined);
     },
     beginUpload: function () {
-      this.aBeginUpload(this.files).then(() => {
+      this.aBeginUpload(this.dropFiles).then(() => {
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.upStart"),
           type: "is-success",
         });
+        this.$store.commit("eraseDropFiles");
         this.$router.go(-1);
+        
       });
+      
     },
     encryptAndUpload: function () {
       this.$buefy.toast.open({
@@ -531,7 +529,7 @@ export default {
         });
         this.$store.commit("setAltContainer", this.$route.params.container);
         let files = [];
-        for (let f of this.files) {
+        for (let f of this.dropFiles) {
           let path = f.relativePath ? f.relativePath : f.name;
           let outname = (
             "/data/"
@@ -552,6 +550,7 @@ export default {
             message: this.$t("message.encrypt.upStart"),
             type: "is-success",
           });
+          this.$store.commit("eraseDropFiles");
         });
       });
     },
@@ -571,21 +570,21 @@ export default {
         this.noUpload = (
           (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
-          || !this.files.length
+          || !this.dropFiles.length
         );
       } 
       if (this.ownPrivateKey) {
         this.noUpload = (
           (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
-          || !this.files.length
+          || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
         );
       }
     },
     checkUploadSize() {
       let size = 0;
-      for (let file of this.files) {
+      for (let file of this.dropFiles) {
         size += file.size;
       }
       this.tooLarge = size > 1073741824;
