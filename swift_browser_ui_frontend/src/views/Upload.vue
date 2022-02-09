@@ -185,7 +185,8 @@
         field="path"
         :label="$t('message.encrypt.table.path')"
       >
-        {{ props.row.relativePath | truncate(100) }}
+        {{ (!props.row.relativePath ? props.row.name : props.row.relativePath)
+          | truncate(100) }}
       </b-table-column>
       <b-table-column
         v-slot="props"
