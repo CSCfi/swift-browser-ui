@@ -80,6 +80,13 @@ export default {
   methods: {
     createContainer: function () {
       swiftCreateContainer(this.container, this.tags.join(";")).then(() => {
+        this.$store.state.db.containers.add({
+          projectID: this.$store.state.active.id,
+          name: this.container,
+          tags: this.tags,
+          count: 0,
+          bytes: 0,
+        });
         this.$router.go(-1);
       }).catch((err) => {
 
@@ -107,18 +114,26 @@ export default {
       const containerName = this.$route.params.container;
       this.container = containerName;
 
-      const tags = this.$store.state.containerTagsCache[containerName];
-      if (!tags) {
+      const container = await this.$store.state.db.containers.get({
+        projectID: this.$store.state.active.id,
+        name: this.container,
+      });
+      if (!container.tags) {
         this.tags = await getTagsForContainer(containerName);
       } else {
-        this.tags = tags;
+        this.tags = container.tags;
       }
     },
     updateContainer: function () {
       let meta = {
         usertags: this.tags.join(";"),
       };
-      updateContainerMeta(this.container, meta).then(() => {
+      updateContainerMeta(this.container, meta).then(async () => {
+        await this.$store.state.db.containers
+          .where({
+            projectID: this.$store.state.active.id,
+            name: this.container,
+          }).modify({tags: this.tags});
         this.$router.go(-1);
       });
     },

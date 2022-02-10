@@ -1,6 +1,7 @@
 describe("Browse containers and test operations", function () {
 
   beforeEach(function () {
+    cy.deleteDB()
     cy.login(' Log In with SSO ')
   });
 

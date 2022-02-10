@@ -31,6 +31,7 @@ etusivulle
 etusivun
 hakea
 haku
+hakuindeksi
 haluatko
 halutako
 haluttu
@@ -72,6 +73,7 @@ kansioille
 kansioina
 kanssa
 käytä
+Käytä
 käytettävissä
 käytetylle
 käytössä
@@ -100,6 +102,7 @@ kirjoitusoikeus
 klikkaa
 kohdesäiliö
 kohteen
+kohteita
 koita
 kokeile
 koko
@@ -112,6 +115,7 @@ kopioitu
 koskevia
 kulutuksesta
 kulutus
+kunnes
 kyseisen
 ladattavat
 lähetä
@@ -142,12 +146,14 @@ lisättyjä
 loppuminen
 löydetty
 löytää
+löytynyt
 luku
 lukuoikeus
 luo
 luonnin
 luonti
 luotu
+määrä
 määrästä
 mahdollisia
 mahdollista
@@ -184,6 +190,7 @@ objekti
 objektia
 objektit
 objektitietojärjestelmissä
+Odota
 oheisesta
 ohje
 oikeuden
@@ -234,6 +241,7 @@ projektilla
 projektille
 projektilta
 projektin
+projektissa
 projektista
 projektitunnisteet
 projektitunnisteille
@@ -266,6 +274,7 @@ salli
 sallittu
 selaamiseen
 selain
+selainta
 sisään
 sisäänkirjauksen
 sisällön
@@ -280,6 +289,7 @@ sivutus
 sopimus
 suuren
 suuret
+suuri
 suurten
 syitä
 synkronoi
@@ -302,7 +312,9 @@ tarkat
 tarkistathan
 tarkistussumma
 tarkoittaen
+Tässä
 tätä
+Tätä
 taustalla
 tavallisesti
 täytyy
@@ -323,7 +335,11 @@ tilankäyttö
 tilapäinen
 tilapäisesti
 toteuttaa
+tueta
+tuettu
+tuettua
 tulisi
+Tuloksia
 tunniste
 tunti
 tuo
@@ -346,6 +362,7 @@ valitse
 valittu
 valittuja
 valittuna
+valmis
 varmasti
 varmistathan
 vastaanottajan
@@ -370,3 +387,4 @@ yksityistä
 yli
 ylimääräisiä
 ylläpitoon
+yritä

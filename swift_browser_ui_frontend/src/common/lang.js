@@ -39,6 +39,9 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
+        idb: "Browser not supported.",
+        idb_text: "This browser is not supported.\n" +
+                  "Please, use a supported browser.",
       },
       dropFiles: "Drop files to upload.",
       help: "Help",
@@ -283,6 +286,16 @@ let default_translations = {
           type: "Type",
         },
       },
+      search: {
+        container: "Bucket",
+        folder: "Folder",
+        tags: "Tags",
+        objects: "Objects",
+        size: "Size",
+        empty: "No results found",
+        buildingIndex: "This project has a large number of objects. Please, " +
+                       "wait while the search index is ready, and try again.",
+      },
     },
   },
   fi: {
@@ -318,6 +331,8 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
+        idb: "Selain ei tuettu.",
+        idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
       },
       dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",
@@ -560,6 +575,16 @@ let default_translations = {
           size: "Koko",
           type: "Tyyppi",
         },
+      },
+      search: {
+        container: "Säiliö",
+        folder: "Kansio",
+        tags: "Tägit",
+        objects: "Objektia",
+        size: "Koko",
+        empty: "Tuloksia ei löytynyt",
+        buildingIndex: "Tässä projektissa on suuri määrä kohteita. Odota, " +
+                       "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
       },
     },
   },

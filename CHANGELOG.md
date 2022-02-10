@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - let users know when keys are added by default
     - compute sha256 of key instead of showing text
 - add `defaultKeyMessage` to `lang.js` #494
+- IndexedDB as local in-browser cache, with dexiejs as dependency.
 
 ### Changed
 
@@ -33,6 +34,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Drag and drop fixes #497
     - stylize drag-and-drop overlay
     - use Vue store to keep public keys
+
+- **BREAKING** swift-browser-ui doesn't work in Firefox's private mode, as it doesn't offer IndexedDB.
+    - There is a warning message at login, and it is not possible to login in unsupported browsers.
+- Improved performance by reducing number of requests after cache has been created.
+    - While the cache is being created, there might be a degradation in performance for large projects.
+    - Reduced number of requests for fetching object tags
+- Search box in Container View now searches across all containers and objects in the project using IndexedDB.
+    - There is no ranking. Containers are returned before objects in the order they are in the IDB.
+    - The search is different from the filtering in objects list. Query has to match beginning of tag or beginning of words extrated from the name.
+    - Adding more words to the search narrows down the results.
+    - A message is shown when trying to search a large project before cache is created.
 
 
 ### Fixed

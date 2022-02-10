@@ -22,6 +22,7 @@ import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
 import { syncContainerACLs, DEV } from "@/common/conv";
+import checkIDB from "@/common/idb_support";
 
 // Import project state
 import store from "@/common/store";
@@ -37,6 +38,13 @@ import ProgressBar from "@/components/UploadProgressBar";
 
 // Import delay
 import delay from "lodash/delay";
+
+
+checkIDB().then(result => {
+  if (!result) {
+    window.location.pathname = "/";
+  }
+});
 
 window.onerror = function(error) { 
   if(DEV) console.log("Global error", error);
@@ -128,9 +136,29 @@ new Vue({
     getUser().then(( value ) => {
       this.$store.commit("setUname", value);
     });
-    getProjects().then((value) => {
+    getProjects().then(async (value) => {
       this.$store.commit("setProjects", value);
-      
+      const existingProjects = await this.$store.state.db.projects
+        .toCollection()
+        .primaryKeys();
+      await this.$store.state.db.projects.bulkPut(value);
+      const toDelete = [];
+      existingProjects.map(async oldProj => {
+        if(!value.find(proj => proj.id === oldProj)) {
+          toDelete.push(oldProj);
+        }
+      });
+      if (toDelete.length) {
+        await this.$store.state.db.projects.bulkDelete(toDelete);
+        const containersCollection = this.$store.state.db.containers
+          .where("projectID").anyOf(toDelete);
+        const containers = await containersCollection.primaryKeys();
+        await containersCollection.delete();
+        await this.$store.state.db.objects
+          .where("containerID").anyOf(containers)
+          .delete();
+      }
+
       getActiveProject().then((value) => {
         this.$store.commit("setActive", value);
         if (this.$route.params.user != undefined) {

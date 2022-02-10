@@ -34,7 +34,7 @@
       </b-select>
       <div class="control is-flex">
         <b-switch
-          v-if="cList.length < 500"
+          v-if="(containers.value || []).length < 500"
           v-model="isPaginated"
           data-testid="paginationSwitch"
         >
@@ -46,12 +46,46 @@
           {{ $t('message.table.showTags') }}
         </b-switch>
       </div>
-      <b-field class="control searchBox">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.searchBy')"
-        />
-      </b-field>
+      <b-autocomplete
+        id="searchbox"
+        v-model="searchQuery"
+        rounded
+        icon="magnify"
+        clearable
+        :placeholder="$t('message.searchBy')"
+        :data="searchResults"
+        field="name"
+        :open-on-focus="true"
+        :keep-first="true"
+        :loading="isSearching"
+        max-height="350px"
+        @select="option => $router.push(getSearchRoute(option))"
+        @focus="event => searchGainedFocus()"
+      >
+        <template slot-scope="props">
+          <SearchResultItem 
+            :item="props.option"
+            :route="getSearchRoute"
+          />
+        </template>
+        <template #empty>
+          <div
+            v-if="searchQuery.length > 0"
+            class="media empty-search"
+          >
+            <b-loading
+              v-model="isSearching"
+              :is-full-page="false"
+            />
+            <div
+              v-show="!isSearching"
+              class="media-content"
+            >
+              {{ $t('message.search.empty') }}
+            </div>
+          </div>
+        </template>
+      </b-autocomplete>
       <div class="field has-addons uploadGroup">
         <p class="control">
           <b-button
@@ -85,7 +119,7 @@
       hoverable
       narrowed
       default-sort="name"
-      :data="cList"
+      :data="containers.value"
       :selected.sync="selected"
       :current-page.sync="currentPage"
       :paginated="isPaginated"
@@ -114,7 +148,7 @@
           </span>
           <b-taglist v-if="showTags">
             <b-tag
-              v-for="tag in tags[props.row.name]"
+              v-for="tag in props.row.tags"
               :key="tag"
               :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
               rounded
@@ -292,9 +326,16 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import { 
+  getHumanReadableSize, 
+  truncate, 
+  tokenize,
+} from "@/common/conv";
 import debounce from "lodash/debounce";
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
+import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
@@ -302,6 +343,7 @@ import DeleteContainerButton from "@/components/ContainerDeleteButton";
 export default {
   name: "ContainersView",
   components: {
+    SearchResultItem,
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,
@@ -313,8 +355,6 @@ export default {
     return {
       files: [],
       folders: [],
-      cList: [],
-      tags: {},
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -324,35 +364,35 @@ export default {
       shareModalIsActive: false,
       showTags: true,
       abortController: null,
+      searchResults: [],
+      containers: {value: []},
+      isSearching: false,
     };
   },
   computed: {
     active () {
       return this.$store.state.active;
     },
-    containers () {
-      return this.$store.state.containerCache;
-    },
-    containerTags() {
-      return this.$store.state.containerTagsCache;
-    },
   },
   watch: {
     searchQuery: function () {
       // Run debounced search every time the search box input changes
-      this.debounceFilter();
+      if (this.searchQuery.length) {
+        this.isSearching = true;
+        this.debounceSearch();
+      } else {
+        this.isSearching = false;
+        this.searchResults = [];
+      }
     },
-    containers: function () {
-      this.cList = this.containers;
-    },
-    containerTags: function () {
-      this.tags = this.containerTags; // {"containerName": ["tag1", "tag2"]}
+    active: function () {
+      this.fetchContainers();
     },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
-    this.debounceFilter = debounce(this.filter, 400);
+    this.debounceSearch = debounce(this.search, 400);
   },
   beforeMount () {
     this.abortController = new AbortController();
@@ -366,14 +406,20 @@ export default {
   },
   methods: {
     fetchContainers: async function () {
-      // Get the container listing from the API if the listing hasn't yet
-      // been cached.
-      if(this.cList.length < 1) {
-        await this.$store.dispatch(
-          "updateContainers", 
-          this.abortController.signal,
-        );
+      if (this.active.id === undefined) {
+        return;
       }
+      this.containers = useObservable(
+        liveQuery(() => 
+          this.$store.state.db.containers
+            .where({projectID: this.active.id})
+            .toArray(),
+        ),
+      );
+      await this.$store.dispatch(
+        "updateContainers", 
+        {projectID: this.active.id, signal: null},
+      );
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link
@@ -400,15 +446,109 @@ export default {
       // Make getHumanReadableSize usable in instance namespace
       return getHumanReadableSize(size);
     },
-    filter: function() {
+    search: async function() {
+      if(this.searchQuery.length === 0) {
+        return;
+      }
       // request parameter should be sanitized first
-      var safeKey = escapeRegExp(this.searchQuery);
-      var name_cmp = new RegExp(safeKey, "i");
-      this.cList = this.containers.filter(
-        element => 
-          element.name.match(name_cmp)
-          || this.tags[element.name].join("\n").match(name_cmp),
-      );
+      const safeQuery = escapeRegExp(this.searchQuery);
+      const query = tokenize(safeQuery.trim(), 0);
+
+      function multipleQueryWords(item) {
+        // Narrows down search results when there are more than
+        // one query words
+        if (query.length === 1) {
+          return true;
+        }
+        let match = new Set();
+        query.map(q => {
+          item.tokens.map(i => {
+            if(i.startsWith(q)) {
+              match.add(q);
+              return;
+            }
+          });
+          if (item.tags === undefined) {
+            return;
+          }
+          item.tags.map(i => {
+            if(i.startsWith(q)) {
+              match.add(q);
+              return;
+            }
+          });
+        });
+        if (match.size === query.length) {
+          return true;
+        }
+        return false;
+      }
+
+      const containers = 
+        await this.$store.state.db.containers
+          .where("tokens")
+          .startsWithAnyOf(query)
+          .or("tags")
+          .startsWithAnyOfIgnoreCase(query)
+          .filter(multipleQueryWords)
+          .and(cont => cont.projectID === this.active.id)
+          .toArray();
+      this.searchResults = containers;
+
+      const containerIDs = new Set(await this.$store.state.db.containers
+        .where({projectID: this.active.id}).primaryKeys());
+
+      const objects = 
+        await this.$store.state.db.objects
+          .where("tokens")
+          .startsWithAnyOf(query)
+          .or("tags")
+          .startsWithAnyOfIgnoreCase(query)
+          .filter(multipleQueryWords)
+          .and(obj => containerIDs.has(obj.containerID))
+          .toArray();
+      this.searchResults = containers.concat(objects);
+      this.isSearching = false;
+    },
+    getSearchRoute: function(item) {
+      if (!item) {
+        return null;
+      }
+      let route = {
+        name: "ObjectsView",
+        params: {
+          container: item.container || item.name,
+        },
+      };
+      if (item.container) {
+        route["query"] = {selected: item.name};
+      }
+      return route;
+    },
+    searchGainedFocus: async function() {
+      const preferences = await this.$store.state.db.preferences.get(1);
+
+      const ojbCount = this.containers.value
+        .reduce((prev, cont) => prev + cont.count, 0);
+
+      if(
+        !(
+          this.active.id in preferences 
+          && preferences[this.active.id].largeProjectNotification
+        )
+        && ojbCount >= 10000
+      ) {
+        this.$buefy.notification.open({
+          message: this.$t("message.search.buildingIndex"),
+          type: "is-info",
+          position: "is-top-right",
+          duration: 20000,
+          hasIcon: true,
+        });
+        this.$store.state.db.preferences
+          .where(":id").equals(1)
+          .modify({[this.active.id]: {largeProjectNotification: true}});
+      }
     },
   },
 };
@@ -424,5 +564,12 @@ export default {
   text-align: center;
   margin-top: 5%;
   margin-bottom: 5%;
+}
+.autocomplete {
+  min-width: 30%;
+  margin-left: auto;
+}
+.empty-search {
+  height: 2rem;
 }
 </style>

@@ -59,9 +59,6 @@
       :per-page="perPage"
       :pagination-simple="true"
       :default-sort-direction="defaultSortDirection"
-      @dblclick="(row) => $router.push(getConAddr(row))"
-      @keyup.native.enter="$router.push(getConAddr(selected))"
-      @keyup.native.space="$router.push(getConAddr(selected))"
     >
       <b-table-column
         sortable

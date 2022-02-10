@@ -72,6 +72,11 @@ export default new Router({
       component: SharedObjects,
     },
     {
+      path: "/browse/:user/:project/:container/shared/:owner/:object/edit",
+      name: "EditSharedObjectView",
+      component: EditObjectView,
+    },
+    {
       path: "/browse/:user/:project/:container/replicate",
       name: "ReplicateContainer",
       component: ReplicationView,
