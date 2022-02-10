@@ -244,6 +244,13 @@
         </span>
       </b-upload>
       <b-button
+        type="is-info is-light"
+        icon-left="cached"
+        @click="clearFiles"
+      >
+        {{ $t('message.encrypt.clearDrop') }}
+      </b-button>
+      <b-button
         v-if="useEncryption"
         id="uploadButton"
         type="is-success"
@@ -261,6 +268,13 @@
         @click="beginUpload"
       >
         {{ $t('message.encrypt.normup') }}
+      </b-button>
+      <b-button
+        type="is-light"
+        icon-left="cancel"
+        @click="cancelUpload"
+      >
+        {{ $t('message.encrypt.cancel') }}
       </b-button>
     </div>
   </div>
@@ -525,7 +539,6 @@ export default {
         });
         this.$store.commit("eraseDropFiles");
         this.$router.go(-1);
-        
       });
       
     },
@@ -564,7 +577,7 @@ export default {
             message: this.$t("message.encrypt.upStart"),
             type: "is-success",
           });
-          this.$store.commit("eraseDropFiles");
+          this.clearFiles();
         });
       });
     },
@@ -608,6 +621,13 @@ export default {
     localHumanReadableSize: function ( size ) {
       return getHumanReadableSize( size );
     },
+    clearFiles() {
+      this.$store.commit("eraseDropFiles");
+    },
+    cancelUpload() {
+      this.$store.commit("eraseDropFiles");
+      this.$router.go(-1);
+    },
   },
 };
 </script>
@@ -626,6 +646,11 @@ export default {
   margin-top: 2%;
   display: flex;
   flex-wrap: wrap;
+}
+
+.uploadButtonContainer .upload + button,
+.uploadButtonContainer #uploadButton + button {
+  margin-left: 1%;
 }
 
 #uploadButton {
