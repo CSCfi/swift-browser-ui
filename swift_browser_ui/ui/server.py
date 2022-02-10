@@ -72,9 +72,12 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
     await app["api_client"].close()
 
 
-async def servinit() -> aiohttp.web.Application:
+async def servinit(inject_middleware: typing.List[typing.Any]=[]) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
-    app = aiohttp.web.Application(middlewares=[error_middleware])  # type: ignore
+    middlewares = [error_middleware]
+    if inject_middleware:
+        middlewares = middlewares + inject_middleware
+    app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
     # Initialize aiohttp_session
     app["seckey"] = base64.urlsafe_b64decode(cryptography.fernet.Fernet.generate_key())

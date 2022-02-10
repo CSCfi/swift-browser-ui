@@ -167,6 +167,9 @@ function extractTags(meta) {
   if ("Usertags" in meta[1]) {
     return meta[1]["Usertags"].split(";");
   }
+  if ("usertags" in meta[1]) {
+    return meta[1]["usertags"].split(";");
+  }
   return [];
 }
 

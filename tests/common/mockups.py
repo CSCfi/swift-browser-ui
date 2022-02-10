@@ -95,8 +95,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
         self.mock_iter = unittest.mock.Mock(return_value=b"test-chunk")
 
         async def citer(_):
-            for _ in range(0, 10):
-                yield self.mock_iter()
+            yield self.mock_iter()
 
         self.mock_client_json = {}
         self.mock_client_text = ""

@@ -62,21 +62,14 @@ async function DELETE(url, body) {
 export async function getUser() {
   // Get username of the currently displayed user.
   let getUserURL = new URL("/api/username", document.location.origin);
-  let uname = GET(getUserURL)
-    .then(
-      function (response) { return response.json(); },
-    ).then(
-      function (uname) { return uname; },
-    );
-  return uname;
+  let uname = await GET(getUserURL);
+  return await uname.json();
 }
 
 export async function getProjects() {
   // Get available projects from the API.
   let getProjectsURL = new URL("/api/projects", document.location.origin);
-  let ret = await fetch(
-    getProjectsURL, { method: "GET", credentials: "same-origin" },
-  );
+  let ret = await GET(getProjectsURL);
   return await ret.json();
 }
 

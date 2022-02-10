@@ -115,19 +115,17 @@
           </p>
           <div class="field has-addons">
             <p class="control">
-              <b-button
-                class="control"
-                type="is-primary"
-                outlined
-                @click="$router.push({
+              <router-link
+                :to="{
                   name: 'TokensView',
                   params: {
-                    project: $store.state.active.id
+                    user: $store.state.uname,
+                    project: $store.state.active.id,
                   }
-                })"
+                }"
               >
                 {{ $t('message.dashboard.tokens') }}
-              </b-button>
+              </router-link>
             </p>
           </div>
         </div>

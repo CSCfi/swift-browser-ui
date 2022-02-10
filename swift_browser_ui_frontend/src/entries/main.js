@@ -135,6 +135,7 @@ new Vue({
     document.title = this.$t("message.program_name");
     this.createUploadInstance();
     let initialize = async () => {
+      let active;
       let user = await getUser();
       let projects = await getProjects();
       this.$store.commit("setUname", user);
@@ -161,10 +162,13 @@ new Vue({
           .delete();
       }
 
-      let last_active = document.cookie
-        .split("; ")
-        .find(row => row.startsWith("LAST_ACTIVE"))
-        .split("=")[1];
+      let last_active;
+      if(document.cookie.match("LAST_ACTIVE")) {
+        last_active = document.cookie
+          .split("; ")
+          .find(row => row.startsWith("LAST_ACTIVE"))
+          .split("=")[1];
+      }
       let active;
       if (last_active) {
         active = projects[

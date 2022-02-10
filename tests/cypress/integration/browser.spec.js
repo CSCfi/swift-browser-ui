@@ -25,7 +25,7 @@ describe("Browse containers and test operations", function () {
         .within(() => {
           cy.get('td').eq(0).then(($elem) => {
             cy.get($elem).dblclick()
-            cy.url().should('eq', Cypress.config().baseUrl + '/browse/test_user_id/placeholder/' + $elem.get(0).innerText.split('\n')[0].trim())
+            cy.url().should('eq', Cypress.config().baseUrl + '/browse/testuser/test-id-0/' + $elem.get(0).innerText.split('\n')[0].trim())
             cy.wait(2000)
             
           })
@@ -39,7 +39,7 @@ describe("Browse containers and test operations", function () {
         .within(() => {
           cy.get('td').eq(0).click()
           cy.get('td').eq(1).then(($elem) => {
-            expect($elem.get(0).innerText.split('\n')[0].trim()).to.have.lengthOf(40)
+            expect($elem.get(0).innerText.split('\n')[0].trim()).to.have.lengthOf(52)
           })
         })
     })
@@ -54,7 +54,7 @@ describe("Browse containers and test operations", function () {
         cy.get('li').contains(hashFirstElem).should('have.length', 1)
         // not sure we have a prettier way to do this
         // as cypress seems to have some issues with new window being opened
-        cy.get(':nth-child(1) > :nth-child(5) > .field > .control > .button').invoke('attr', 'href').should('contain', '&objkey=' + hashFirstElem)
+        cy.get(':nth-child(1) > :nth-child(5) > .field > .control > .button').invoke('attr', 'href').should('contain', '/test-object-' + hashFirstElem)
       })
     })
 
@@ -91,7 +91,7 @@ describe("Browse containers and test operations", function () {
     });
     cy.get('.taginput-container').children('span').should('have.length', 0)
     cy.get('button').contains('Save').click()
-    cy.get('tbody .tags .tag').should('have.length', 36)
+    cy.get('tbody .tags .tag').should('have.length', 0)
   })
 
   it("should display, add, remove object tags", () => {
