@@ -54,7 +54,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                 random.randint(  # nosec
                     self.object_range[0],
                     self.object_range[1],
-                )
+                ),
             ):  # nosec
                 ohash = hashlib.sha1(os.urandom(256)).hexdigest()  # nosec
                 to_append = {
@@ -68,7 +68,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                     "meta": {
                         "X-Object-Meta-Usertags": "objects;with;tags",
                         "X-Object-Meta-Obj-Example": "example",
-                    }
+                    },
                 }
                 to_append["content_type"] = "binary/octet-stream"
                 to_add.append(to_append)
@@ -80,17 +80,17 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                 "_objects": to_add,
                 "meta": {
                     "X-Container-Meta-Obj-Example": "example",
-                    "X-Container-Meta-Usertags": ";".join((
-                        "SD-Connect", "with", "container", "tags"
-                    )),
-                }
+                    "X-Container-Meta-Usertags": ";".join(
+                        ("SD-Connect", "with", "container", "tags")
+                    ),
+                },
             }
 
             self.container_meta = {
                 "X-Container-Meta-Obj-Example": "example",
-                "X-Container-Meta-Usertags": ";".join((
-                    "SD-Connect", "with", "container", "tags"
-                )),
+                "X-Container-Meta-Usertags": ";".join(
+                    ("SD-Connect", "with", "container", "tags")
+                ),
             }
             self.object_meta = {
                 "X-Object-Meta-Usertags": "objects;with;tags",
@@ -103,8 +103,8 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
         request: aiohttp.web.Request,
         handler: typing.Callable[
             [aiohttp.web.Request],
-            typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response]
-        ]
+            typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response],
+        ],
     ) -> aiohttp.web.Response:
         """Replace mock aiohttp client return data based on route."""
         if self.bodge_lock is None:
@@ -146,10 +146,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
 
             # Mock overrides for api related routes, ignoring user and projects since those'
             # are available in the session object
-            if (
-                request.method == "GET"
-                and re.match("^/api/test-id-\d$", request.path)
-            ):
+            if request.method == "GET" and re.match("^/api/test-id-\d$", request.path):
                 if "marker" not in request.query:
                     self.mock_iter.return_value = json.dumps(
                         list(self.containers.values())
@@ -169,20 +166,17 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                         objects = await request.json()
                         self.object_meta = {
                             f"X-Object-Meta-{k}": v
-                            for k, v
-                            in filter(lambda i: i[1], objects[0][1].items())
+                            for k, v in filter(lambda i: i[1], objects[0][1].items())
                         }
                         return aiohttp.web.HTTPNoContent()
                     container = await request.json()
                     self.container_meta = {
                         f"X-Container-Meta-{k}": v
-                        for k, v
-                        in filter(lambda i: i[1], container.items())
+                        for k, v in filter(lambda i: i[1], container.items())
                     }
                     return aiohttp.web.HTTPNoContent()
-            if (
-                request.method == "GET"
-                and re.match("^/api/meta/test-id-\d/.*$", request.path)
+            if request.method == "GET" and re.match(
+                "^/api/meta/test-id-\d/.*$", request.path
             ):
                 if "objects" in request.query:
                     print(self.object_meta)
@@ -190,9 +184,8 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                 else:
                     print(self.container_meta)
                     self.mock_client_response.headers = self.container_meta
-            if (
-                request.method == "GET"
-                and re.match("^/api/meta/test-id-\d$", request.path)
+            if request.method == "GET" and re.match(
+                "^/api/meta/test-id-\d$", request.path
             ):
                 self.mock_client_response.status = 204
                 self.mock_client_response.headers = {
@@ -230,9 +223,7 @@ def run_mock_server():
     inject.setUp()
     inject.reinit_with_data()
 
-    app = swift_browser_ui.ui.server.servinit(inject_middleware=[
-        inject.wrap_mock_swift
-    ])
+    app = swift_browser_ui.ui.server.servinit(inject_middleware=[inject.wrap_mock_swift])
     swift_browser_ui.ui.server.run_server_insecure(app)
 
 

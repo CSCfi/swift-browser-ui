@@ -187,7 +187,6 @@ new Vue({
       this.$store.commit("setActive", active);
 
       if (document.location.pathname == "/browse") {
-        console.log("Pushing route to the browser.");
         this.$router.push({
           name: "ContainersView",
           params: {
@@ -198,7 +197,7 @@ new Vue({
       }
     };
     initialize().then(() => {
-      console.log("Application initialized.");
+      return;
     });
     fetch("/discover")
       .then((resp) => {

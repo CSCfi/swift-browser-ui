@@ -72,7 +72,9 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
     await app["api_client"].close()
 
 
-async def servinit(inject_middleware: typing.List[typing.Any]=[]) -> aiohttp.web.Application:
+async def servinit(
+    inject_middleware: typing.List[typing.Any] = [],
+) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     middlewares = [error_middleware]
     if inject_middleware:
