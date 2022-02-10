@@ -4,7 +4,7 @@
     class="contents"
   > 
     <b-message
-      v-if="$te('message.keys') && fixedRecvKeys.length > 0"
+      v-if="$te('message.keys') && pubkey.length > 0"
       type="is-info"
     >
       {{ $t('message.encrypt.defaultKeysMessage') }}
@@ -146,8 +146,7 @@
                 icon-left="delete"
                 outlined
                 size="is-small"
-                @click.prevent="recvkeys.splice(
-                  recvkeys.indexOf(props.row), 1)"
+                @click.prevent="removePublicKey(props.row)"
               >
                 {{ $t('message.remove') }}
               </b-button>
@@ -291,7 +290,6 @@ export default {
       privkey: "",
       recvkeys: [],
       recvHashedKeys: [],
-      fixedRecvKeys:[],
       container: "",
       passphrase: "",
       files: [],
@@ -312,6 +310,9 @@ export default {
     },
     transfer () {
       return this.$store.state.transfer;
+    },
+    pubkey () {
+      return this.$store.state.pubkey;
     },
   },
   watch: {
@@ -355,25 +356,8 @@ export default {
   },
   mounted() {
     this.setFiles();
-    this.getPubKey();
   },
   methods: {
-    getPubKey: function () {
-      if (this.$te("message.keys")) {
-        for (let item of Object.entries(this.$t("message.keys"))) {
-          fetch(
-            "/download/"
-              + item[1]["project"] + "/"
-              + item[1]["container"] + "/"
-              + item[1]["object"],
-          ).then(resp => {
-            return resp.text();
-          }).then(resp => {
-            this.fixedRecvKeys.push(resp);
-          });
-        }
-      }
-    },
     setFile: function (item, path) {
       let entry = undefined;
       if (item.isFile) {
@@ -412,7 +396,6 @@ export default {
       else if ("function" === typeof item.getAsFile) {
         item = item.getAsFile();
         if (item instanceof File) {
-          item.relativePath = path + item.name;
           this.files.push(item);
         }
       }
@@ -422,6 +405,7 @@ export default {
         for (let file of this.transfer) {
           let entry = file;
           this.setFile(entry, "");
+          this.transfer.splice(file, 1);
         }
       }
     },
@@ -439,12 +423,13 @@ export default {
       if (!this.ephemeral) {
         FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
       }
-      // we add the fixed set o keys to the ones added
-      this.recvkeys.concat(this.fixedRecvKeys);
-      for (let i = 0; i < this.recvkeys.length; i++) {
+      // we add the fixed set of keys to the ones the user added
+      let keysArray = this.recvkeys.concat(this.pubkey);
+      keysArray = [...new Set([...this.recvkeys, ...this.pubkey])];
+      for (let i = 0; i < keysArray.length; i++) {
         FS.writeFile( // eslint-disable-line
           "/keys/recv_keys/pubkey_" + i.toString(),
-          this.recvkeys[i],
+          keysArray[i],
         );
       }
       // Add files to the filesystem
@@ -576,21 +561,24 @@ export default {
       }
       this.addRecvkey = "";
     },
+    removePublicKey: function (value){
+      this.recvHashedKeys.splice(this.recvkeys.indexOf(value), 1);
+      this.recvkeys.splice(this.recvkeys.indexOf(value), 1);
+    },
     refreshNoUpload() {
       if (this.ephemeral) {
         this.noUpload = (
-          !this.recvkeys.length
+          (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
         );
       } 
       if (this.ownPrivateKey) {
         this.noUpload = (
-          !this.recvkeys.length
+          (!this.pubkey.length && !this.recvkeys.length)
           || !this.container
           || !this.files.length
-          || !this.passphrase
-          || !this.privkey
+          || (!this.passphrase && !this.privkey)
         );
       }
     },
@@ -634,6 +622,13 @@ export default {
   flex-grow: 1;
   margin-top: -20px;
   justify-content: right;
+}
+
+@media screen and ( max-width: 1357px){
+  #encryptionOptions {
+    margin-top: 0;
+  }
+  
 }
 
 </style>
