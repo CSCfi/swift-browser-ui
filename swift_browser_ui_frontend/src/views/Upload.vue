@@ -230,6 +230,7 @@
       <b-upload
         v-model="files"
         multiple
+        accept
         class="file is-primary"
       >
         <span class="file-cta">
@@ -314,7 +315,11 @@ export default {
         return this.$store.state.dropFiles.message;
       },
       set (value) {
-        this.$store.commit("appendDropFiles", value[0]);
+        const files = Array.from(value);
+        files.forEach(element => {
+          this.$store.commit("appendDropFiles", element);
+        });
+        
       },
     },
   },
