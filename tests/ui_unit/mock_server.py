@@ -146,14 +146,14 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
 
             # Mock overrides for api related routes, ignoring user and projects since those'
             # are available in the session object
-            if request.method == "GET" and re.match("^/api/test-id-\d$", request.path):
+            if request.method == "GET" and re.match(r"^/api/test-id-\d$", request.path):
                 if "marker" not in request.query:
                     self.mock_iter.return_value = json.dumps(
                         list(self.containers.values())
                     ).encode("utf-8")
                 else:
                     self.mock_iter.return_value = json.dumps([]).encode("utf-8")
-            if re.match("^/api/test-id-\d/.*$", request.path):
+            if re.match(r"^/api/test-id-\d/.*$", request.path):
                 if request.method == "GET":
                     if "marker" not in request.query:
                         self.mock_iter.return_value = json.dumps(
@@ -176,7 +176,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                     }
                     return aiohttp.web.HTTPNoContent()
             if request.method == "GET" and re.match(
-                "^/api/meta/test-id-\d/.*$", request.path
+                r"^/api/meta/test-id-\d/.*$", request.path
             ):
                 if "objects" in request.query:
                     print(self.object_meta)
@@ -185,7 +185,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
                     print(self.container_meta)
                     self.mock_client_response.headers = self.container_meta
             if request.method == "GET" and re.match(
-                "^/api/meta/test-id-\d$", request.path
+                r"^/api/meta/test-id-\d$", request.path
             ):
                 self.mock_client_response.status = 204
                 self.mock_client_response.headers = {
