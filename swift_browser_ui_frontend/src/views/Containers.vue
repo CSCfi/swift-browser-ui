@@ -52,7 +52,7 @@
         rounded
         icon="magnify"
         clearable
-        :placeholder="$t('message.searchBy')"
+        :placeholder="$t('message.search.searchBy')"
         :data="searchResults"
         field="name"
         :open-on-focus="true"

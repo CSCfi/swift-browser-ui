@@ -175,7 +175,6 @@ let default_translations = {
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested: "No shared buckets have been requested for the " +
                       "project.",
-      searchBy: "Search by Name or Tag",
       sharing: "Sharing - ",
       containers: "Buckets - ",
       upload: " Upload",
@@ -216,6 +215,7 @@ let default_translations = {
       objects: {
         objectName: "Object",
         editObject: "Editing object: ",
+        filterBy: "Filter by Name or Tag",
         norename: "It is not possible to rename objects. " +
         "However, you can copy them with a new name.",
         deleteConfirm: "Delete Objects",
@@ -293,6 +293,7 @@ let default_translations = {
         objects: "Objects",
         size: "Size",
         empty: "No results found",
+        searchBy: "Search by Name or Tag",
         buildingIndex: "This project has a large number of objects. Please, " +
                        "wait while the search index is ready, and try again.",
       },
@@ -467,7 +468,6 @@ let default_translations = {
                     "tai niiden käyttöä ei ole sallittu.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
-      searchBy: "Etsi nimellä tai tägillä",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
       upload: " Lähetä",
@@ -506,6 +506,7 @@ let default_translations = {
       objects: {
         objectName: "Objekti",
         editObject: "Muokataan objekti: ",
+        filterBy: "Suodata nimellä tai tägillä",
         norename: "Objektia ei voi nimetä uudelleen, " +
         "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista objektit",
@@ -583,6 +584,7 @@ let default_translations = {
         objects: "Objektia",
         size: "Koko",
         empty: "Tuloksia ei löytynyt",
+        searchBy: "Etsi nimellä tai tägillä",
         buildingIndex: "Tässä projektissa on suuri määrä kohteita. Odota, " +
                        "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
       },
