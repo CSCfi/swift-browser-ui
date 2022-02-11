@@ -513,8 +513,9 @@ export default {
           .filter(cont => !cont.name.endsWith("_segments"))
           .filter(multipleQueryWordsAndRank)
           .and(cont => cont.projectID === this.active.id)
+          .limit(1000)
           .toArray();
-      this.searchResults = containers.sort(rankedSort);
+      this.searchResults = containers.sort(rankedSort).slice(0, 100);
 
       const containerIDs = new Set(await this.$store.state.db.containers
         .where({projectID: this.active.id})
@@ -529,9 +530,12 @@ export default {
           .startsWith(query[0])
           .filter(multipleQueryWordsAndRank)
           .and(obj => containerIDs.has(obj.containerID))
+          .limit(1000)
           .toArray();
 
-      this.searchResults = this.searchResults.concat(objects).sort(rankedSort);
+      this.searchResults = this.searchResults.concat(
+        objects.sort(rankedSort).slice(0, 100),
+      );
       this.isSearching = false;
     },
     getSearchRoute: function(item) {
