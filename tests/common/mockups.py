@@ -1,72 +1,243 @@
 """Mock-up classes and functions for testing swift_browser_ui."""
 
 
-import random
-import hashlib
-import os
-import datetime
 import json
 import yarl
-from urllib.error import HTTPError
-from contextlib import contextmanager
+import unittest
+import unittest.mock
+import time
+import types
+import logging
+
+import aiohttp_session
 
 
-from swiftclient.service import SwiftError
+class APITestBase(unittest.IsolatedAsyncioTestCase):
+    """Base class for API tests using aiohttp client and server."""
 
-
-mock_token_project_avail = json.dumps(
-    {
-        "projects": [
-            # there is a special use case when this is first
-            # as the list of projects might give 401
-            {
-                "is_domain": False,
-                "description": "Not enabled project",
-                "links": {"self": "https://place-holder-url:5001/v3/projects/no"},
-                "enabled": False,
-                "id": "no",
-                "parent_id": "default",
-                "domain_id": "default",
-                "name": "no",
+    def setUp(self):
+        """Set up mocks."""
+        self.session_return = aiohttp_session.Session(
+            "test-identity",
+            new=True,
+            data={},
+        )
+        self.session_return["token"] = "not-really-a-token"  # nosec
+        self.session_return["at"] = time.time()
+        self.session_return["referer"] = "http://localhost:8080"
+        self.session_return["uname"] = "testuser"
+        self.session_return["projects"] = {
+            "test-id-0": {
+                "id": "test-id-0",
+                "name": "test-name-0",
+                "token": "test-token-0",
+                "endpoint": "https://test-endpoint-0/v1/AUTH_test-id-0",
             },
-            {
-                "is_domain": False,
-                "description": "",
-                "links": {
-                    "self": "https://place-holder-url:5001/v3/projects/placeholder"
+            "test-id-1": {
+                "id": "test-id-1",
+                "name": "test-name-1",
+                "token": "test-token-1",
+                "endpoint": "https://test-endpoint-1/v1/AUTH_test-id-1",
+            },
+        }
+        self.aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
+        self.aiohttp_session_get_session_mock.return_value = self.session_return
+        self.p_get_sess = unittest.mock.patch(
+            "swift_browser_ui.ui.api.aiohttp_session.get_session",
+            self.aiohttp_session_get_session_mock,
+        )
+        self.aiohttp_session_new_session_mock = unittest.mock.AsyncMock()
+        self.p_new_sess = unittest.mock.patch(
+            "swift_browser_ui.ui.login.aiohttp_session.new_session",
+            self.aiohttp_session_new_session_mock,
+        )
+
+        self.setd_mock = {
+            "auth_endpoint_url": "https://example.os.com:5001/v3",
+            "set_origin_address": "https://localhost/login/websso",
+            "has_trust": True,
+            "upload_external_endpoint": "http://test-endpoint:9092/",
+        }
+        self.patch_setd = unittest.mock.patch(
+            "swift_browser_ui.ui.api.setd", self.setd_mock
+        )
+
+        self.aiohttp_json_response_mock = unittest.mock.Mock()
+        self.p_json_resp = unittest.mock.patch(
+            "swift_browser_ui.ui.api.aiohttp.web.json_response",
+            self.aiohttp_json_response_mock,
+        )
+
+        self.mock_response_write = unittest.mock.AsyncMock()
+        self.mock_response_prepare = unittest.mock.AsyncMock()
+        self.mock_response_write_eof = unittest.mock.AsyncMock()
+        self.aiohttp_construct_response_mock = unittest.mock.Mock()
+        self.aiohttp_construct_response_mock.return_value = types.SimpleNamespace(
+            **{
+                "status": 200,
+                "headers": {},
+                "cookie": {},
+                "write": self.mock_response_write,
+                "prepare": self.mock_response_prepare,
+                "write_eof": self.mock_response_write_eof,
+            }
+        )
+        self.p_resp = unittest.mock.patch(
+            "swift_browser_ui.ui.api.aiohttp.web.Response",
+            self.aiohttp_construct_response_mock,
+        )
+        self.p_sresp = unittest.mock.patch(
+            "swift_browser_ui.ui.api.aiohttp.web.StreamResponse",
+            self.aiohttp_construct_response_mock,
+        )
+
+        self.mock_response_read = unittest.mock.AsyncMock(return_value=b"exampleread")
+        self.mock_iter = unittest.mock.Mock(return_value=b"test-chunk")
+
+        async def citer(_):
+            yield self.mock_iter()
+
+        self.mock_client_json = {}
+        self.mock_client_text = ""
+        self.mock_client_response = types.SimpleNamespace(
+            **{
+                "status": 200,
+                "headers": {},
+                "cookie": {},
+                "json": None,
+                "content": types.SimpleNamespace(
+                    **{
+                        "iter_chunked": citer,
+                    }
+                ),
+                "read": self.mock_response_read,
+                "text": unittest.mock.AsyncMock(return_value=self.mock_client_text),
+                "url": "https://localhost:8080",
+            }
+        )
+
+        class MockHandler(APITestBase):
+            def __init__(self, mockresp):
+                """."""
+                self.mock_client_response = mockresp
+
+            async def __aenter__(self):
+                return self.mock_client_response
+
+            async def __aexit__(self, *_):
+                return
+
+        self.MockHandler = MockHandler
+        self.mock_client = types.SimpleNamespace(
+            **{
+                "get": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "post": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "put": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "delete": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+                "head": unittest.mock.Mock(
+                    return_value=self.MockHandler(
+                        self.mock_client_response,
+                    )
+                ),
+            }
+        )
+
+        self.mock_request = types.SimpleNamespace(
+            **{
+                "match_info": {
+                    "project": "test-id-0",
+                    "container": "test-container",
+                    "object": "test-object",
+                    "receiver": "test-project-1",
                 },
-                "enabled": True,
-                "id": "placeholder",
-                "parent_id": "default",
-                "domain_id": "default",
-                "name": "placeholder",
-            },
-            {
-                "is_domain": False,
-                "description": "Wololo yol aweii",
-                "links": {"self": "https://place-holder-url:5001/v3/projects/wol"},
-                "enabled": True,
-                "id": "wol",
-                "parent_id": "default",
-                "domain_id": "default",
-                "name": "wol",
-            },
-            {
-                "is_domain": False,
-                "description": "Hmmph, what is",
-                "links": {"self": "https://place-holder-url:5001/v3/projects/what"},
-                "enabled": True,
-                "id": "what",
-                "parent_id": "default",
-                "domain_id": "default",
-                "name": "what",
-            },
-        ],
-    }
-)
+                "cookies": {},
+                "query": {},
+                "headers": {},
+                "query_string": "",
+                "remote": "test-remote",
+                "json": None,
+                "post": unittest.mock.AsyncMock(),
+                "app": {
+                    "api_client": self.mock_client,
+                    "client": self.mock_client,
+                    "Log": unittest.mock.MagicMock(logging.Logger),
+                    "test-id": "placeholder",
+                },
+                "url": types.SimpleNamespace(
+                    **{
+                        "host": "https://localhost",
+                    }
+                ),
+            }
+        )
+        super().setUp()
 
 
-mock_token_domain_avail = json.dumps({"domains": []})
+mock_token_project_avail: dict = {
+    "projects": [
+        # there is a special use case when this is first
+        # as the list of projects might give 401
+        {
+            "is_domain": False,
+            "description": "Not enabled project",
+            "links": {"self": "https://place-holder-url:5001/v3/projects/no"},
+            "enabled": False,
+            "id": "no",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "no",
+        },
+        {
+            "is_domain": False,
+            "description": "",
+            "links": {"self": "https://place-holder-url:5001/v3/projects/placeholder"},
+            "enabled": True,
+            "id": "placeholder",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "placeholder",
+        },
+        {
+            "is_domain": False,
+            "description": "Wololo yol aweii",
+            "links": {"self": "https://place-holder-url:5001/v3/projects/wol"},
+            "enabled": True,
+            "id": "wol",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "wol",
+        },
+        {
+            "is_domain": False,
+            "description": "Hmmph, what is",
+            "links": {"self": "https://place-holder-url:5001/v3/projects/what"},
+            "enabled": True,
+            "id": "what",
+            "parent_id": "default",
+            "domain_id": "default",
+            "name": "what",
+        },
+    ],
+}
+
+
+mock_token_domain_avail: dict = {"domains": []}
 
 
 mock_token_output = {
@@ -106,67 +277,13 @@ mock_token_output = {
 }
 
 
-def return_mock_token(_, _a):
-    """Return a mock token."""
-    return "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-
-
-def return_same_cookie(_):
-    """Return same cookie."""
-    return ("placeholder", "placeholder")
-
-
-def return_invalid(_):
-    """Return invalid."""
-    return "INVALID"
-
-
-def return_project_avail(_):
-    """Return mocked unscoped token availability output."""
-    return mock_token_output
-
-
-def return_test_swift_endpoint(_):
-    """Return mocked test available swift."""
-    return None
-
-
-@contextmanager
-def urlopen(prq, timeout=10):
-    """Mockup class for opening keystone."""
-    yield MockKeystone(prq)
-
-
-class MockKeystone:
-    """Mockup class for OS Keystone to enable testing availability."""
-
-    def __init__(self, prq):
-        """Initialize Mock keystone."""
-        self.prq = prq
-
-    def read(self):
-        """Read request."""
-        if "X-auth-token" not in self.prq.headers:
-            raise HTTPError(
-                url=None, code=401, msg="Unauthorized", hdrs=self.prq.headers, fp=None
-            )
-        if "projects" in self.prq.full_url:
-            return mock_token_project_avail.encode("utf-8")
-        if "domains" in self.prq.full_url:
-            return mock_token_domain_avail.encode("utf-8")
-        else:
-            raise HTTPError(
-                url=None, code=401, msg="Unauthorized", hdrs=self.prq.headers, fp=None
-            )
-
-
 class Mock_Request:
     """
     Mock-up class for the aiohttp.web.Request.
 
     It contains the dictionary
     representation of the requests that will be passed to the functions.
-    (the actual request eing a MutableMapping instance)
+    (the actual request being a MutableMapping instance)
     """
 
     def __init__(self):
@@ -227,231 +344,3 @@ class Mock_Request:
         if isinstance(self.post_data, str):
             return json.loads(self.post_data)
         return self.post_data
-
-
-class Mock_Service:
-    """
-    Mock-up class for the Openstack service.
-
-    In this case a swiftclient.Service
-    instance. Contains the mock-ups for the relevant methods used in this
-    project. Also contains functions for generating test data, in case it is
-    necessary.
-    """
-
-    def __init__(self):
-        """."""
-        self.containers = {}
-        self.meta = {
-            "tempurl_key_1": None,
-            "tempurl_key_2": None,
-        }
-        self.cont_meta = {}
-        self.obj_meta = {}
-
-    def init_with_data(
-        self,
-        containers=0,
-        object_range=(0, 0),
-        size_range=(0, 0),
-        container_name_prefix="test-container-",
-        object_name_prefix=None,  # None for just the hash as name
-        has_content_type=None,
-    ):
-        """Initialize the Mock_Service instance with some test data."""
-        for i in range(0, containers):
-            to_add = []
-
-            # Iterate over a random amount of objects
-            for _ in range(0, random.randint(object_range[0], object_range[1])):  # nosec
-                ohash = hashlib.sha1(os.urandom(256)).hexdigest()  # nosec
-                if object_name_prefix is not None:
-                    oname = object_name_prefix + ohash
-                else:
-                    oname = ohash
-                to_append = {
-                    "hash": ohash,
-                    "name": oname,
-                    "last_modified": datetime.datetime.now().isoformat(),
-                    "bytes": random.randint(size_range[0], size_range[1]),  # nosec
-                }
-                if has_content_type:
-                    to_append["content_type"] = has_content_type
-                to_add.append(to_append)
-
-            self.containers[container_name_prefix + str(i)] = to_add
-
-    def list(self, container=None, options=None):
-        """Mock function for the service object / container listings."""
-        if container is None:
-            ret = []
-            for i in self.containers:
-                ret.append(
-                    {
-                        "name": i,
-                        "count": len(self.containers[i]),
-                        "bytes": sum([j["bytes"] for j in self.containers[i]]),
-                    }
-                )
-            return [{"success": True, "container": "mock-container", "listing": ret}]
-        if container is not None:
-            ret = []
-            try:
-                for i in self.containers[container]:
-                    to_append = {
-                        "hash": i["hash"],
-                        "name": i["name"],
-                        "last_modified": i["last_modified"],
-                        "bytes": i["bytes"],
-                    }
-                    if "content_type" in i.keys():
-                        to_append["content_type"] = i["content_type"]
-                    ret.append(to_append)
-                return [{"success": True, "container": container, "listing": ret}]
-            except KeyError:
-                raise SwiftError(None, container=container)
-        else:
-            return None
-
-    def stat(self, *args):
-        """Mock the stat call of SwiftService."""
-        ret = {}
-        ret["headers"] = {}
-        if not args:
-            object_amount = 0
-            bytes_total = 0
-            container_amount = len(self.containers)
-            # Iterate over all containers to figure out the amount of of
-            # objects
-            for i in self.containers:
-                object_amount = object_amount + len(self.containers[i])
-                # Iterate over all objects to get the total storage usage
-                for j in self.containers[i]:
-                    bytes_total = bytes_total + j["bytes"]
-            ret["items"] = [
-                (
-                    "Account",
-                    "AUTH_test_account",
-                ),
-                ("Containers", container_amount),
-                ("Objects", object_amount),
-                ("Bytes", bytes_total),
-                ("Random_garbage", "afjf0f3+3++"),
-                ("More_random_garbage", 349000909990),
-            ]
-            # Add the tempurl headers to the return dictionary, if they have
-            # been initialized
-            if self.meta["tempurl_key_1"] is not None:
-                ret["headers"]["x-account-meta-temp-url-key"] = self.meta["tempurl_key_1"]
-            if self.meta["tempurl_key_2"] is not None:
-                ret["headers"]["x-account-meta-temp-url-key-2"] = self.meta[
-                    "tempurl_key_2"
-                ]
-            return ret
-
-        if len(args) == 1:
-            # If the length is exactly one, then only a container was
-            # specified.
-            return self.ret_cont_stat(args)
-
-        # In any other case the query is for an object.
-        # Iterate over the object query list.
-        return self.ret_obj_stat(args)
-
-    def ret_obj_stat(self, args):
-        """Return object stats from stat query."""
-        ret = []
-        for obj in args[1]:
-            to_add = {
-                "headers": self.obj_meta[args[0]][obj],
-                "success": True,
-                "object": obj,
-            }
-            to_add["headers"]["content-type"] = "binary/octet-stream"
-            ret.append(to_add)
-        return ret
-
-    def ret_cont_stat(self, args):
-        """Return container stats from stat query."""
-        ret = {}
-        ret["headers"] = {}
-        if "Acc_example" in self.cont_meta[args[0]].keys():
-            ret["container"] = args[0]
-            ret["headers"].update(self.cont_meta[args[0]])
-            ret["success"] = True
-        return ret
-
-    def post(self, container=None, objects=None, options=None):
-        """Mock the post call of SwiftService."""
-
-        def update_meta(target, headers, meta):
-            for (meta, value) in meta:
-                if not value:
-                    del headers[f"x-{target}-meta-{meta}"]
-                    continue
-                headers[f"x-{target}-meta-{meta}"] = value
-
-        if container and objects:
-            for obj in objects:
-                update_meta(
-                    "object",
-                    self.obj_meta[container][obj.object_name],
-                    obj.options.get("meta", []),
-                )
-            return [{"success": True} for _ in objects]
-        elif container:
-            update_meta("container", self.cont_meta[container], options.get("meta", []))
-        else:
-            # Get the URL key 2
-            key = options["meta"][0].split(":")[1]
-            self.meta["tempurl_key_2"] = key
-        return {"success": True}
-
-    def set_swift_meta_container(self, container):
-        """Generate test swift metadata for a container."""
-        self.cont_meta[container] = {}
-        self.obj_meta[container] = {}
-        self.cont_meta[container]["x-container-meta-obj-example"] = "example"
-        self.cont_meta[container]["x-container-meta-usertags"] = ";".join(
-            ["SD-Connect", "with", "container", "tags"]
-        )
-        self.cont_meta[container]["Acc_example"] = "example"
-
-    def set_swift_meta_object(self, container, obj):
-        """Generate test swift metadata for an object."""
-        self.obj_meta[container][obj] = {
-            "x-object-meta-usertags": "objects;with;tags",
-            "x-object-meta-obj-example": "example",
-        }
-
-    def set_s3_meta_object(self, container, obj):
-        """Generate test s3 metadata for an object."""
-        self.obj_meta[container][obj] = {}
-        self.obj_meta[container][obj][
-            "x-object-meta-s3cmd-attrs"
-        ] = "atime:1536648772/ctime:1536648921/gid:101/gname:example"
-
-
-class Mock_Session:
-    """
-    Mock-up class for the Openstack keystoneauth1 session instance.
-
-    It contains the relevant methods for querying the OS identity API (aka.
-    keystone).
-    """
-
-    def __init__(self):
-        """Initialize Mock session."""
-        self.auth = None
-
-    def invalidate(self, _):
-        """Mock session invalidation."""
-        return True
-
-    def get_user_id(self):
-        """Fetch the user id from the mock OS Session."""
-        return "test_user_id"
-
-    def get_endpoint(self, service_type=None):
-        """Fetch a service endpoint from the mock OS Session."""
-        return "http://localhost:8443/swift/v1/AUTH_example"

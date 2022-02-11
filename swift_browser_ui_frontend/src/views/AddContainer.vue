@@ -79,9 +79,14 @@ export default {
   },
   methods: {
     createContainer: function () {
-      swiftCreateContainer(this.container, this.tags.join(";")).then(() => {
+      let projectID = this.$route.params.project;
+      swiftCreateContainer(
+        projectID,
+        this.container,
+        this.tags.join(";"),
+      ).then(() => {
         this.$store.state.db.containers.add({
-          projectID: this.$store.state.active.id,
+          projectID: projectID,
           name: this.container,
           tags: this.tags,
           count: 0,
@@ -89,7 +94,6 @@ export default {
         });
         this.$router.go(-1);
       }).catch((err) => {
-
         if (err.message.match("Container name already in use")) {
           this.$buefy.toast.open({
             message: this.$t("message.error.inUse"),
@@ -119,7 +123,10 @@ export default {
         name: this.container,
       });
       if (!container.tags) {
-        this.tags = await getTagsForContainer(containerName);
+        this.tags = await getTagsForContainer(
+          this.$route.params.project,
+          containerName,
+        );
       } else {
         this.tags = container.tags;
       }
@@ -128,10 +135,14 @@ export default {
       let meta = {
         usertags: this.tags.join(";"),
       };
-      updateContainerMeta(this.container, meta).then(async () => {
+      updateContainerMeta(
+        this.$route.params.project,
+        this.container,
+        meta,
+      ).then(async () => {
         await this.$store.state.db.containers
           .where({
-            projectID: this.$store.state.active.id,
+            projectID: this.$route.params.project,
             name: this.container,
           }).modify({tags: this.tags});
         this.$router.go(-1);

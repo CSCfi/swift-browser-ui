@@ -129,18 +129,29 @@ export default {
       latest: undefined,
     };
   },
+  computed: {
+    active () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getTokens();
   },
   methods: {
     getTokens: function () {
-      listTokens().then((ret) => {this.tokens = ret;});
+      listTokens(this.project).then((ret) => {this.tokens = ret;});
     },
     removeToken: function (identifier) {
-      removeToken(identifier).then(() => {this.getTokens();});
+      removeToken(
+        this.project,
+        identifier,
+      ).then(() => {this.getTokens();});
     },
     addToken: function (identifier) {
-      createExtToken(identifier).then((ret) => {
+      createExtToken(
+        this.project,
+        identifier,
+      ).then((ret) => {
         this.latest = ret;
         this.$buefy.notification.open({
           message: this.$t("message.tokens.copyToken"),

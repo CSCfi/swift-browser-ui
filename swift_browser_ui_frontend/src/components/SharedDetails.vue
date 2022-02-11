@@ -60,6 +60,11 @@ export default {
       allDetails: {},
     };
   },
+  computed: {
+    project () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getSharedDetails();
   },
@@ -76,6 +81,7 @@ export default {
       recipient,
     ) {
       removeAccessControlMeta(
+        this.project,
         this.container,
         recipient,
       ).then(() => {

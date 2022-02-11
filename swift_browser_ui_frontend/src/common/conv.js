@@ -57,7 +57,7 @@ function check_stale(detail, access) {
 }
 
 export async function syncContainerACLs(client, project) {
-  let acl = await getAccessControlMeta();
+  let acl = await getAccessControlMeta(project);
 
   let amount = 0;
   let aclmeta = acl.access;
@@ -164,34 +164,43 @@ export async function computeSHA256 ( keyContent ) {
 }
 
 function extractTags(meta) {
+  if ("Usertags" in meta[1]) {
+    return meta[1]["Usertags"].split(";");
+  }
   if ("usertags" in meta[1]) {
     return meta[1]["usertags"].split(";");
   }
   return [];
 }
 
-export async function getTagsForContainer(containerName, signal) {
-  let meta = await getContainerMeta(containerName, signal);
+export async function getTagsForContainer(project, containerName, signal) {
+  let meta = await getContainerMeta(project, containerName, signal);
   return extractTags(meta);
 }
 
 export async function getTagsForObjects(
+  project,
   containerName, 
   objectList, 
   url, 
   signal,
 ) {
-  let meta = await getObjectsMeta(containerName, objectList, url, signal);
+  let meta = await getObjectsMeta(
+    project, containerName, objectList, url, signal,
+  );
   meta.map(item => item[1] = extractTags(item));
   return meta;
 }
 
-export function makeGetObjectsMetaURL(container, objects) {
+export function makeGetObjectsMetaURL(project, container, objects) {
   return new URL(  
-    "/api/container/object/meta?container="
-      .concat(encodeURI(container))
-      .concat("&object=")
-      .concat(encodeURI(objects.join(","))),
+    "/api/meta/".concat(
+      encodeURI(project),
+      "/",
+      encodeURI(container),
+      "?objects=",
+      encodeURI(objects.join(",")),
+    ),
     document.location.origin,
   );
 }

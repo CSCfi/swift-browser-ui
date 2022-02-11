@@ -1,18 +1,17 @@
 """Project functions for handling API requests from front-end."""
 
+import re
 import time
 import typing
 import asyncio
+import urllib.parse
 
 import aiohttp.web
-from swiftclient.exceptions import ClientException
-from swiftclient.service import SwiftError, SwiftPostObject
-from swiftclient.service import SwiftService, get_conn  # for type hints
+import aiohttp_session
+
 from swiftclient.utils import generate_temp_url
 
 from swift_browser_ui.ui._convenience import (
-    api_check,
-    initiate_os_service,
     get_tempurl_key,
     open_upload_runner_session,
     sign,
@@ -22,718 +21,513 @@ from swift_browser_ui.ui.settings import setd
 
 async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Fetch the session owning OS user."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         f"API call for username from {request.remote}, sess: {session} :: {time.ctime()}"
     )
-
-    userid = request.app["Sessions"][session]["OS_sess"].get_user_id()
-
-    return aiohttp.web.json_response(userid)
-
-
-def _unpack(
-    item: dict, cont: typing.List[dict], request: aiohttp.web.Request
-) -> typing.Any:
-    """Unpack container list if the request was successful."""
-    if item["success"]:
-        tenant = (
-            f"Container: {item['container']}"
-            if item["container"]
-            else "No tenant specified, working with container"
-        )
-        request.app["Log"].info(f"{tenant} list unpacked successfully.")
-        return cont.extend(item["listing"])
-    else:
-        request.app["Log"].error(item["error"])
-
-
-async def swift_list_containers(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """
-    Return necessary information listing swift containers in a project.
-
-    The function strips out e.g. the information on a success, since that's
-    not necessary in this case and returns a JSON response containing all the
-    necessary data.
-    """
-    cont: typing.List[dict] = []
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            "API call for list containers from "
-            f"{request.remote}, sess: {session} :: {time.ctime()}"
-        )
-        # The maximum amount of containers / containers is measured in thousands,
-        # so it's not necessary to think twice about iterating over the whole
-        # response at once
-        serv = request.app["Sessions"][session]["ST_conn"].list()
-        [_unpack(i, cont, request) for i in serv]
-        return aiohttp.web.json_response(cont)
-    except SwiftError:
-        request.app["Log"].error("SwiftError occured return empty container list.")
-        raise aiohttp.web.HTTPNotFound()
-    except KeyError:
-        # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; possible broken swift auth.")
-        return aiohttp.web.json_response(cont)
-
-
-async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Create a new container according to the name specified."""
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            f"API call for container creation from {request.remote}, sess {session}"
-        )
-
-        req_json = await request.json()
-        tags = req_json.get("tags", None)
-
-        headers = {}
-        if tags:
-            headers["X-Container-Meta-UserTags"] = tags
-
-        # Shamelessly use private methods from SwiftService to avoid writing
-        # own implementation
-        res = request.app["Sessions"][session]["ST_conn"]._create_container_job(
-            conn=get_conn(request.app["Sessions"][session]["ST_conn"]._options),
-            container=request.match_info["container"],
-            headers=headers,
-        )
-    except (SwiftError, ClientException):
-        request.app["Log"].error("Container creation failed.")
-        raise aiohttp.web.HTTPServerError(reason="Container creation failure")
-    # Return HTTPCreated upon a successful creation
-    if res["success"]:
-        return aiohttp.web.Response(status=201)
-    if res["error"].http_status == 400:
-        raise aiohttp.web.HTTPBadRequest(reason="Invalid container name")
-    if res["error"].http_status == 409:
-        request.app["Log"].info(res["error"].http_status)
-        raise aiohttp.web.HTTPConflict(reason="Container name in use")
-    raise aiohttp.web.HTTPServerError(reason=res["error"].msg)
-
-
-async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Delete an empty container."""
-    if "objects" in request.query:
-        return await swift_delete_objects(request)
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            f"API call for container deletion from {request.remote}, sess {session}"
-        )
-        res = request.app["Sessions"][session]["ST_conn"].delete(
-            container=request.match_info["container"]
-        )
-    except (SwiftError, ClientException):
-        request.app["Log"].error("Container deletion failed.")
-        raise aiohttp.web.HTTPServerError(reason="Container deletion failure")
-    for item in res:
-        if not item["success"]:
-            raise aiohttp.web.HTTPServerError(reason=item["error"])
-    return aiohttp.web.Response(status=204)
-
-
-async def swift_delete_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Delete an object."""
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            f"API call for object deletion from {request.remote}, sess {session}"
-        )
-        options: typing.Dict[str, typing.Any] = {
-            "yes_all": False,
-            "leave_segments": False,
-            "version_id": None,
-            "prefix": request.query["prefix"] if "prefix" in request.query else None,
-            "versions": False,
-            "header": [],
-        }
-        res = request.app["Sessions"][session]["ST_conn"].delete(
-            container=request.match_info["container"],
-            objects=request.query["objects"].split(","),
-            options=options,
-        )
-    except (SwiftError, ClientException):
-        request.app["Log"].error("Object deletion failed.")
-        raise aiohttp.web.HTTPServerError(reason="Object deletion failure")
-    for item in res:
-        if not item["success"]:
-            raise aiohttp.web.HTTPServerError(reason=item["error"])
-    return aiohttp.web.Response(status=204)
-
-
-async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """
-    List objects in a given container or container.
-
-    The function strips out e.g. the information on a success, since that's
-    not necessary in this case and returns a JSON response containing all the
-    necessasry data.
-    """
-    obj: typing.List[dict] = []
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            "API call for list objects from "
-            f"{request.remote}, sess: {session} :: {time.ctime()}"
-        )
-
-        serv = request.app["Sessions"][session]["ST_conn"].list(
-            container=request.query["container"]
-        )
-        [_unpack(i, obj, request) for i in serv]
-        if not obj:
-            request.app["Log"].debug("Empty container object list.")
-            raise aiohttp.web.HTTPNotFound()
-
-        # Some tools leave unicode nulls to e.g. file hashes. These must be
-        # replaced as they break the utf-8 text rendering in browsers for some
-        # reason.
-        for i in obj:
-            i["hash"] = i["hash"].replace("\u0000", "")
-            if "content_type" not in i.keys():
-                i["content_type"] = "binary/octet-stream"
-            else:
-                i["content_type"] = i["content_type"].replace("\u0000", "")
-
-        return aiohttp.web.json_response(obj)
-    except SwiftError:
-        request.app["Log"].error("SwiftError occured return empty container list.")
-        return aiohttp.web.json_response(obj)
-    except KeyError:
-        # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; possible broken swift auth.")
-        return aiohttp.web.json_response(obj)
-
-
-async def swift_list_shared_objects(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """
-    List objects in a shared container.
-
-    The function strips out e.g. the information on a success, since that's
-    not necessary in this case and returns a JSON response containing all the
-    necessary data.
-    """
-    obj: typing.List[dict] = []
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            "API call for list shared objects from "
-            f"{request.remote}, sess: {session} :: {time.ctime()}"
-        )
-
-        # Establish a temporary Openstack SwiftService connection
-        tmp_serv = initiate_os_service(
-            request.app["Sessions"][session]["OS_sess"], url=request.query["storageurl"]
-        )
-        serv = tmp_serv.list(container=request.query["container"])
-        [_unpack(i, obj, request) for i in serv]
-
-        if not obj:
-            request.app["Log"].debug("Empty list in shared container.")
-            raise aiohttp.web.HTTPNotFound()
-
-        # Some tools leave unicode nulls to e.g. file hashes. These must be
-        # replaced as they break the utf-8 text rendering in browsers for some
-        # reason.
-        for i in obj:
-            i["hash"] = i["hash"].replace("\u0000", "")
-            if "content_type" not in i.keys():
-                i["content_type"] = "binary/octet-stream"
-            else:
-                i["content_type"] = i["content_type"].replace("\u0000", "")
-
-        return aiohttp.web.json_response(obj)
-
-    except SwiftError:
-        request.app["Log"].error("SwiftError occured return empty container list.")
-        return aiohttp.web.json_response(obj)
-    except ClientException as e:
-        request.app["Log"].error(e.msg)
-        return aiohttp.web.json_response(obj)
-    except KeyError:
-        # listing is missing; possible broken swift auth
-        request.app["Log"].error("listing is missing; possible broken swift auth.")
-        return aiohttp.web.json_response(obj)
-
-
-async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Point a user to a temporary pre-signed download URL."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call for download object from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    serv = request.app["Sessions"][session]["ST_conn"]
-    sess = request.app["Sessions"][session]["OS_sess"]
-
-    temp_url_key = await get_tempurl_key(serv)
-    request.app["Log"].debug(f"Using {temp_url_key} as temporary URL key")
-    # Generate temporary URL
-    host = sess.get_endpoint(service_type="object-store").split("/v1")[0]
-    path_begin = sess.get_endpoint(service_type="object-store").replace(host, "")
-    request.app["Log"].debug(f"Using {host} as host and {path_begin} as path start.")
-    container = request.query["container"]
-    object_key = request.query["objkey"]
-    lifetime = 60 * 15
-    # In the path creation, the stats['items'][0][1] is the tenant id from
-    # server statistics, the order should be significant, so this shouldn't
-    # be a problem
-    path = f"{path_begin}/{container}/{object_key}"
-
-    dloadurl = host + generate_temp_url(path, lifetime, temp_url_key, "GET")
-
-    response = aiohttp.web.Response(
-        status=302,
-    )
-    response.headers["Location"] = dloadurl
-    response.headers["Content-Type"] = list(
-        serv.stat(request.query["container"], [request.query["objkey"]])
-    )[0]["headers"]["content-type"]
-    return response
-
-
-async def swift_download_shared_object(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Point a user to the shared download runner."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call for shared download runner "
-        f"from {request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
-    object_name: str = request.match_info["object"]
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-    request.app["Sessions"][session]["runner"] = runner_id
-
-    path = f"/{project}/{container}/{object_name}"
-    signature = await sign(3600, path)
-
-    path += f"?session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    resp = aiohttp.web.Response(status=303)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    return resp
-
-
-async def swift_download_container(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Point a user to the container download runner."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call for container download runner from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-    request.app["Sessions"][session]["runner"] = runner_id
-
-    path = f"/{project}/{container}"
-    signature = await sign(3600, path)
-
-    path += f"?session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    resp = aiohttp.web.Response(status=303)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    return resp
-
-
-async def get_upload_session(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Return a pre-signed upload runner session for upload target."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call for object upload runner info request from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    try:
-        project: str = request.match_info["project"]
-        container: str = request.match_info["container"]
-    except KeyError:
-        raise aiohttp.web.HTTPBadRequest
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-
-    path = f"/{project}/{container}"
-    signature = await sign(3600, path)
-
-    return aiohttp.web.json_response(
-        {
-            "id": runner_id,
-            "url": f"{setd['upload_external_endpoint']}{path}",
-            "signature": signature,
-        }
-    )
-
-
-async def swift_replicate_container(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Point the user to container replication endpoint."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API call for replication endpoint from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    project: str = request.match_info["project"]
-    container: str = request.match_info["container"]
-
-    runner_id = await open_upload_runner_session(
-        session,
-        request,
-        request.app["Sessions"][session]["active_project"]["id"],
-        request.app["Sessions"][session]["Token"],
-    )
-
-    path = f"/{project}/{container}"
-    signature = await sign(3600, path)
-
-    path += f"?session={runner_id}"
-    path += f"&signature={signature['signature']}"
-    path += f"&valid={signature['valid']}"
-
-    for i in request.query.keys():
-        path += f"&{i}={request.query[i]}"
-
-    resp = aiohttp.web.Response(status=307)
-    resp.headers["Location"] = f"{setd['upload_external_endpoint']}{path}"
-
-    return resp
-
-
-async def get_object_metadata(
-    conn: SwiftService, meta_cont: str, meta_obj: typing.Union[typing.List[str], None]
-) -> typing.List[dict]:
-    """Get object metadata."""
-    try:
-        res = list(conn.stat(meta_cont, meta_obj))
-
-        # Fail if an object wasn't usable
-        if False in [i["success"] for i in res]:
-            raise aiohttp.web.HTTPNotFound()
-
-        # Filter for metadata not already served with the list request
-        res = [
-            [
-                i["object"],
-                dict(filter(lambda j: "x-object-meta" in j[0], i["headers"].items())),
-            ]
-            for i in res
-        ]
-
-        # Strip unnecessary specifications from header names and split open s3
-        # information so that it doesn't have to be done in the browser
-        for i in res:
-            i[1] = {k.replace("x-object-meta-", ""): v for k, v in i[1].items()}
-            if "s3cmd-attrs" in i[1].keys():
-                i[1]["s3cmd-attrs"] = {
-                    k: v
-                    for k, v in [j.split(":") for j in i[1]["s3cmd-attrs"].split("/")]
-                }
-        return res
-    except SwiftError:
-        # Fail if container wasn't found
-        raise aiohttp.web.HTTPNotFound()
-
-
-async def get_metadata_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Get metadata for a container."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API cal for project listing from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    # Get required variables from query string
-    meta_cont = (
-        request.query["container"] if "container" in request.query.keys() else None
-    )
-    conn = request.app["Sessions"][session]["ST_conn"]
-    # Get container listing if no object list was specified
-    ret = conn.stat(meta_cont)
-
-    if not ret["success"]:
-        raise aiohttp.web.HTTPNotFound()
-
-    # Strip any unnecessary information from the metadata headers
-    ret["headers"] = dict(
-        filter(lambda i: "x-container-meta" in i[0], ret["headers"].items())
-    )
-    ret["headers"] = {
-        k.replace("x-container-meta-", ""): v for k, v in ret["headers"].items()
-    }
-
-    return aiohttp.web.json_response([ret["container"], ret["headers"]])
-
-
-async def update_metadata_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Update metadata for a container."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API cal for updating container metadata from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    # Get required variables from query string
-    container = request.query.get("container", "") or None
-    meta = await request.json()
-
-    meta = [(key, value) for key, value in meta.items()]
-
-    conn = request.app["Sessions"][session]["ST_conn"]
-    ret = conn.post(container=container, options={"meta": meta})
-
-    if not ret["success"]:
-        raise aiohttp.web.HTTPNotFound
-
-    return aiohttp.web.HTTPNoContent()
-
-
-async def get_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Get metadata for a container or for an object."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API cal for project listing from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    # Get required variables from query string
-    meta_cont = (
-        request.query["container"] if "container" in request.query.keys() else None
-    )
-    meta_obj = request.query["object"].split(",") if "object" in request.query else None
-
-    # If no container was specified, raise an Unauthorized error – the user is
-    # not meant to see the account metadata information directly since it may
-    # contain sensitive data. This is not needed directly for the UI, but
-    # the API is exposed for the user and thus can't expose any sensitive info
-    if not meta_cont:
-        request.app["Log"].error("Container not specified.")
-        raise aiohttp.web.HTTPBadRequest()
-
-    conn = request.app["Sessions"][session]["ST_conn"]
-
-    # Otherwise get object listing (object listing won't need to throw an
-    # exception here incase of a failure – the function handles that)
-    return aiohttp.web.json_response(await get_object_metadata(conn, meta_cont, meta_obj))
-
-
-async def update_metadata_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Update metadata for an object."""
-    session = api_check(request)
-    request.app["Log"].info(
-        "API cal for updating container metadata from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
-    )
-
-    # Get required variables from query string
-    container = request.query.get("container", "") or None
-    objects = await request.json()
-
-    if not (container or objects):
-        raise aiohttp.web.HTTPBadRequest
-
-    objects_post = []
-    try:
-        for (name, meta) in objects:
-            meta = [(key, value) for key, value in meta.items() if value]
-            objects_post.append(
-                SwiftPostObject(
-                    object_name=name,
-                    options={
-                        "meta": meta,
-                    },
-                )
-            )
-    except ValueError as e:
-        request.app["Log"].error(f"Payload seems to be malformed: {e}")
-        raise aiohttp.web.HTTPBadRequest
-
-    conn = request.app["Sessions"][session]["ST_conn"]
-    ret = conn.post(container=container, objects=objects_post)
-
-    for r in ret:
-        if not r["success"]:
-            raise aiohttp.web.HTTPNotFound
-
-    return aiohttp.web.HTTPNoContent()
-
-
-async def get_project_metadata(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Get the bare minimum required project metadata from OS."""
-    # The project metadata needs to be filtered for sensitive information, as
-    # it contains e.g. temporary URL keys. These keys can be used to pull any
-    # object from the object storage, and thus shouldn't be provided for the
-    # user.
-    ret = dict()
-    try:
-        session = api_check(request)
-        request.app["Log"].info(
-            f"Api call for project metadata check from {request.remote}, sess: {session}"
-        )
-
-        conn = request.app["Sessions"][session]["ST_conn"]
-
-        # Get the account metadata listing
-        stat = dict(conn.stat()["items"])
-        ret = {
-            "Account": stat["Account"],
-            "Containers": stat["Containers"],
-            "Objects": stat["Objects"],
-            "Bytes": stat["Bytes"],
-        }
-        return aiohttp.web.json_response(ret)
-    except SwiftError:
-        request.app["Log"].error("SwiftError occured.")
-        return aiohttp.web.json_response(ret)
-    except ClientException as e:
-        request.app["Log"].error(e.msg)
-        return aiohttp.web.json_response(ret)
-    except KeyError:
-        request.app["Log"].error(
-            "items is missing; possible swift storage is not authorised for project."
-        )
-        return aiohttp.web.json_response(ret)
+    return aiohttp_session.web.json_response(session["uname"])
 
 
 async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Fetch the projects available for the open session."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call for project listing from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-
-    # Return the projects available for the session
+    # Filter out the tokens contained in session token
     return aiohttp.web.json_response(
-        request.app["Sessions"][session]["Avail"]["projects"]
+        [{"name": v["name"], "id": v["id"]} for _, v in session["projects"].items()]
     )
 
 
-async def get_os_active_project(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Fetch the project currently displayed to the session."""
-    session = api_check(request)
+async def swift_list_containers(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.StreamResponse:
+    """Proxy Swift list buckets available to a project."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+
+    project = request.match_info["project"]
     request.app["Log"].info(
-        "API call for current project from "
+        "API call for list buckets from "
+        f"{request.remote}, session: {session} :: {time.ctime()}"
+    )
+
+    query = request.query.copy()
+    query["format"] = "json"
+    try:
+        async with client.get(
+            session["projects"][project]["endpoint"],
+            headers={"X-Auth-Token": session["projects"][project]["token"]},
+            params=query,
+        ) as ret:
+            resp = aiohttp.web.StreamResponse(status=ret.status)
+            await resp.prepare(request)
+            if ret.status == 200:
+                async for chunk in ret.content.iter_chunked(65535):
+                    await resp.write(chunk)
+            await resp.write_eof()
+        return resp
+    except KeyError:
+        raise aiohttp.web.HTTPForbidden(
+            reason="Account does not have access to the project."
+        )
+
+
+async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Create a new container from name."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    request.app["Log"].info(
+        f"API call for container creation from {request.remote}, sess {session}"
+    )
+
+    req_json = await request.json()
+    tags = req_json.get("tags", None)
+
+    headers = {"X-Auth-Token": session["projects"][project]["token"]}
+    if tags:
+        headers["X-Container-Meta-UserTags"] = tags
+
+    async with client.put(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+        params=request.query,
+    ) as ret:
+        resp = aiohttp.web.Response(
+            status=ret.status,
+        )
+    return resp
+
+
+async def swift_delete_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Delete an empty container or batch delete objects."""
+    if "objects" in request.query:
+        return await swift_delete_objects(request)
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    request.app["Log"].info(
+        f"API call for container deletion from {request.remote}, sess {session}"
+    )
+    async with client.delete(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+        params=request.query,
+    ) as ret:
+        resp = aiohttp.web.Response(
+            status=ret.status,
+        )
+    return resp
+
+
+async def swift_delete_objects(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Delete objects."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    # Bulk deletion middleware wants a list of URL-safe object names separated
+    # with newlines
+    objects = (
+        "".join(
+            [urllib.parse.quote(f"/{container}/{i}") + "\n" for i in await request.json()]
+        )
+    ).encode("utf-8")
+    if len(objects) > 10000:
+        raise aiohttp.web.HTTPBadRequest(reason="Too many objects (>10000)")
+
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+            "Accept": "application/json",
+            "Content-Type": "text/plain",
+        },
+        params={
+            "bulk-delete": "true",
+        },
+        data=objects,
+    ) as ret:
+        resp = aiohttp.web.Response(status=ret.status, body=(await ret.read()))
+    return resp
+
+
+async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
+    """List objects in a given bucket or container."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    request.app["Log"].info(
+        "API call for list objects from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
-    return aiohttp.web.json_response(request.app["Sessions"][session]["active_project"])
+    query = request.query.copy()
+    query["format"] = "json"
+
+    # TODO: MOVE UNICODE NULL HANDLING TO FRONTEND
+    async with client.get(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+        params=query,
+    ) as ret:
+        resp = aiohttp.web.StreamResponse(
+            status=ret.status,
+        )
+        await resp.prepare(request)
+        async for chunk in ret.content.iter_chunked(65535):
+            await resp.write(chunk)
+        await resp.write_eof()
+
+    return resp
+
+
+async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Point a user to a temporary pre-signed download URL."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    object_name = request.match_info["object"]
+    container = request.match_info["container"]
+    request.app["Log"].info(
+        "API call for download {object_name} from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    temp_url_key = await get_tempurl_key(request)
+    request.app["Log"].debug(f"Using {temp_url_key} as temporary URL key")
+
+    # Generate temporary URL with the key
+    endpoint = session["projects"][project]["endpoint"]
+    host = endpoint.split("/v1")[0]
+    path_start = endpoint.replace(host, "")
+    url = host + generate_temp_url(
+        f"{path_start}/{container}/{object_name}",
+        600,  # Use 10 minute lifetime
+        temp_url_key,
+        "GET",
+    )
+
+    async with client.head(
+        f"{endpoint}/{container}/{object_name}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        ctype = ret.headers["Content-Type"]
+
+    return aiohttp.web.Response(
+        status=302,
+        headers={
+            "Location": url,
+            "Content-Type": ctype,
+        },
+    )
+
+
+async def _swift_get_object_metadata_wrapper(
+    request: aiohttp.web.Request, obj: str
+) -> tuple:
+    """Get metadata for a single object."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}/{obj}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        if ret.status != 200:
+            raise aiohttp.web.HTTPInternalServerError(reason="Failed to fetch metadata.")
+        meta = dict(filter(lambda i: "X-Object-Meta" in i[0], ret.headers.items()))
+        meta = {k.replace("X-Object-Meta-", ""): v for k, v in meta.items()}
+        if "s3cmd-attrs" in meta.keys():
+            meta["s3cmd-attrs"] = {
+                k: v for k, v in [j.split(":") for j in meta["s3cmd-attrs"].split("/")]
+            }
+    return (obj, meta)
+
+
+async def swift_get_batch_object_metadata(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Batch get metadata for objects."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API cal for batch object metadata listing "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    batch = []
+    for obj in request.query["objects"].split(","):
+        batch.append(_swift_get_object_metadata_wrapper(request, obj))
+    batch = await asyncio.gather(*batch, return_exceptions=False)
+    return aiohttp.web.json_response(batch)
+
+
+async def swift_get_metadata_container(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Get metadata for a container."""
+    if "objects" in request.query:
+        return await swift_get_batch_object_metadata(request)
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    request.app["Log"].info(
+        "API cal for project listing from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        headers = dict(filter(lambda i: "X-Container-Meta" in i[0], ret.headers.items()))
+    return aiohttp.web.json_response(
+        [
+            container,
+            {k.replace("X-Container-Meta-", ""): v for k, v in headers.items()},
+        ]
+    )
+
+
+async def _swift_update_object_meta_wrapper(
+    request: aiohttp.web.Request,
+    obj: str,
+    meta: typing.List[typing.Tuple[typing.Any, typing.Any]],
+) -> int:
+    """Update metadata for a single object."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    headers = {(f"X-Object-Meta-{k}"): v for k, v in meta}
+    headers.update(
+        {
+            "X-Auth-Token": session["projects"][project]["token"],
+        }
+    )
+
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}/{obj}",
+        headers=headers,
+    ) as ret:
+        return ret.status
+
+
+async def swift_batch_update_object_metadata(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Update metadata for an object."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    objects = await request.json()
+    if not objects:
+        raise aiohttp.web.HTTPBadRequest
+    batch = [
+        _swift_update_object_meta_wrapper(
+            request,
+            name,
+            [(key, value) for key, value in meta.items() if value],
+        )
+        for name, meta in objects
+    ]
+    batch = await asyncio.gather(*batch, return_exceptions=False)
+    for ret in batch:
+        if ret != 204:
+            raise aiohttp.web.HTTPNotFound
+    return aiohttp.web.HTTPNoContent()
+
+
+async def swift_update_container_metadata(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Update metadata for a container."""
+    if "objects" in request.query:
+        return await swift_batch_update_object_metadata(request)
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    request.app["Log"].info(
+        "API cal for updating container metadata from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    meta = await request.json()
+    meta = {f"X-Container-Meta-{k}": v for k, v in meta}
+    headers = {
+        "X-Auth-Token": session["projects"][project]["token"],
+    }
+    headers.update(meta)
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        return aiohttp.web.Response(status=ret.status)
+
+
+async def swift_get_project_metadata(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Get the bare minimum required project metadata from Openstack."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    request.app["Log"].info(
+        f"Api call for project metadata check from {request.remote}, sess: {session}"
+    )
+
+    async with client.head(
+        session["projects"][project]["endpoint"],
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        if ret.status != 204:
+            raise aiohttp.web.HTTPUnauthorized(
+                reason="Project is not valid for Object Storage"
+            )
+        return aiohttp.web.json_response(
+            {
+                "Account": project,
+                "Containers": ret.headers["X-Account-Container-Count"],
+                "Objects": ret.headers["X-Account-Object-Count"],
+                "Bytes": ret.headers["X-Account-Bytes-Used"],
+            }
+        )
 
 
 async def get_shared_container_address(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Get the project specific object storage address."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
+    project = request.match_info["project"]
     request.app["Log"].info(
         "API call for project specific storage from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    sess = request.app["Sessions"][session]["OS_sess"]
+    return aiohttp.web.json_response(session["projects"][project]["endpoint"])
 
-    host = sess.get_endpoint(service_type="object-store")
-    return aiohttp.web.json_response(host)
+
+async def _swift_get_container_acl_wrapper(
+    request: aiohttp.web.Request,
+    container: str,
+) -> typing.Tuple:
+    """Return container access control headers."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        acl = {}
+        if "X-Container-Read" in ret.headers:
+            r_meta = ret.headers["X-Container-Read"]
+            # Filter non-keystone ACL information out as unnecessary
+            r_meta = r_meta.replace(".r:*", "").replace(".rlistings", "")
+            r_meta = re.sub(
+                ",,",
+                "",
+                r_meta,
+            )
+            r_meta = r_meta.lstrip(",").rstrip(",").split(",")
+            print(r_meta)
+            try:
+                acl = {k: {"read": v} for k, v in [i.split(":") for i in r_meta]}
+            except ValueError:
+                acl = {}
+        if "X-Container-Write" in ret.headers:
+            # No need for write ACL filtering as it's project scope only
+            w_acl = {
+                k: {"write": v}
+                for k, v in [
+                    i.split(":") for i in ret.headers["X-Container-Write"].split(",")
+                ]
+            }
+            for k, v in w_acl.items():
+                try:
+                    acl[k].update(v)
+                except KeyError:
+                    acl[k] = v
+    return (container, acl)
 
 
 async def get_access_control_metadata(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Fetch a compilation of ACL information for sharing discovery."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call for project ACL info from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
+    client = request.app["api_client"]
+    project = request.match_info["project"]
 
-    serv = request.app["Sessions"][session]["ST_conn"]
-    sess = request.app["Sessions"][session]["OS_sess"]
-
-    # Get a list of containers
     containers: typing.List[dict] = []
-    [_unpack(i, containers, request) for i in serv.list()]
-
-    host = sess.get_endpoint(service_type="object-store")
-
-    # Get a list of ACL information
-    acls = {}
-    for c in containers:
-        acl = {}
-
-        c_meta = dict(serv.stat(container=c["name"])["items"])
-        # Create dictionaries keyed with projects that have access
-        if c_meta["Read ACL"]:
-            r_meta = c_meta["Read ACL"]
-            # Filter non-keystone ACL information out as unnecessary
-            r_meta = r_meta.replace(".r:*", "").replace(".rlistings", "")
-            # Handle residual double commas possibly left over
-            r_meta = r_meta.replace(",,", ",")
-            # Handle leading and trailing commas possibly left over
-            r_meta = r_meta.lstrip(",").rstrip(",").split(",")
-            try:
-                acl = {k: {"read": v} for k, v in [i.split(":") for i in r_meta]}
-            except ValueError:
-                acl = {}
-        if c_meta["Write ACL"]:
-            # No need for Write ACL filtering as it's project scope only
-            write_acl = {
-                k: {"write": v}
-                for k, v in [i.split(":") for i in c_meta["Write ACL"].split(",")]
-            }
-
-            for k, v in write_acl.items():
-                try:
-                    acl[k].update(v)
-                except KeyError:
-                    acl[k] = v
-
-        if acl:
-            acls[c["name"]] = acl
-
-        # Force a yield point for execution
-        await asyncio.sleep(0)
-
+    while True:
+        params = {
+            "limit": 10000,
+            "format": "json",
+        }
+        if len(containers) > 0:
+            params["marker"] = containers[-1]["name"]
+        async with client.get(
+            f"{session['projects'][project]['endpoint']}",
+            params=params,
+            headers={
+                "X-Auth-Token": session["projects"][project]["token"],
+            },
+        ) as ret:
+            print(ret.status)
+            if ret.status == 204:
+                break
+            page = await ret.json()
+            containers = containers + page
+            # If no items are returned, we've reached the end
+            if not len(page) > 0:
+                break
+    tasks = [
+        _swift_get_container_acl_wrapper(request, container["name"])
+        for container in containers
+    ]
+    ret = await asyncio.gather(*tasks)
     return aiohttp.web.json_response(
         {
-            "address": host,
-            "access": acls,
+            "address": session["projects"][project]["endpoint"],
+            "access": dict(
+                filter(
+                    lambda i: len(i[1]) > 0,
+                    ret,
+                )
+            ),
         }
     )
 
@@ -742,96 +536,218 @@ async def remove_project_container_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Remove access from a project in container acl."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to remove container ACL from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
+    client = request.app["api_client"]
 
-    serv = request.app["Sessions"][session]["ST_conn"]
-
+    project = request.match_info["project"]
     container = request.match_info["container"]
-    project = request.query["project"]
-
-    meta_headers = dict(serv.stat(container=container)["items"])
-
-    read_acl = meta_headers["Read ACL"]
-    write_acl = meta_headers["Write ACL"]
-
-    # Remove specific project form both ACLs
-    read_acl = read_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
-    write_acl = write_acl.replace(f"{project}:*", "").replace(",,", ",").rstrip(",")
-
-    meta_options = {
-        "read_acl": read_acl,
-        "write_acl": write_acl,
+    receiver = request.match_info["receiver"]
+    headers: dict = {
+        "X-Auth-Token": session["projects"][project]["token"],
     }
-
-    serv.post(container=container, options=meta_options)
-
-    return aiohttp.web.Response(status=200)
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if "X-Container-Read" in ret.headers:
+            headers["X-Container-Read"] = (
+                ret.headers["X-Container-Read"]
+                .replace(f"{receiver}:*", "")
+                .replace(",,", ",")
+                .rstrip(",")
+            )
+        if "X-Container-Write" in ret.headers:
+            headers["X-Container-Write"] = (
+                ret.headers["X-Container-Write"]
+                .replace(f"{receiver}:*", "")
+                .replace(",,", ",")
+                .rstrip(",")
+            )
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if ret.status == 204:
+            return aiohttp.web.Response(status=200)
+        else:
+            raise aiohttp.web.HTTPNotFound()
 
 
 async def remove_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Remove all allowed projects from container acl."""
-    # Since both removes are handled with the same endpoint, try the project
-    # specific one first
-    try:
-        return await remove_project_container_acl(request)
-    except KeyError:
-        session = api_check(request)
-        request.app["Log"].info(
-            "API call to remove projects fom container ACL from "
-            f"{request.remote}, sess: {session} :: {time.ctime()}"
-        )
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call to remove projects fom container ACL from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
 
-        serv = request.app["Sessions"][session]["ST_conn"]
-
-        container = request.match_info["container"]
-
-        meta_options = {
-            "read_acl": "",
-            "write_acl": "",
-        }
-
-        serv.post(container=container, options=meta_options)
-
-        return aiohttp.web.Response(status=200)
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+            "X-Container-Read": "",
+            "X-Container-Write": "",
+        },
+    ) as ret:
+        if ret.status == 204:
+            return aiohttp.web.Response(status=200)
+        else:
+            raise aiohttp.web.HTTPNotFound()
 
 
 async def add_project_container_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Add access for a project in container acl."""
-    session = api_check(request)
+    session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to add access for project in container from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    serv = request.app["Sessions"][session]["ST_conn"]
-
+    client = request.app["api_client"]
+    project = request.match_info["project"]
     container = request.match_info["container"]
-    projects = request.query["projects"].split(",")
-    request.app["Log"].debug(f"Requested container {container} and projects {projects}.")
-    meta_headers = dict(serv.stat(container=container)["items"])
+    receivers = request.query["projects"].split(",")
 
-    read_acl = meta_headers["Read ACL"]
-    write_acl = meta_headers["Write ACL"]
-    # Concatenate the new project to the ACL string
-    if "r" in request.query["rights"]:
-        for project in projects:
-            read_acl += f",{project}:*"
-        read_acl = read_acl.replace(",,", ",").lstrip(",")
-    if "w" in request.query["rights"]:
-        for project in projects:
-            write_acl += f",{project}:*"
-        read_acl = read_acl.replace(",,", ",").lstrip(",")
-
-    meta_options = {
-        "read_acl": read_acl,
-        "write_acl": write_acl,
+    headers = {
+        "X-Auth-Token": session["projects"][project]["token"],
     }
 
-    serv.post(container=container, options=meta_options)
+    read_acl = ""
+    write_acl = ""
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if "X-Container-Read" in ret.headers:
+            read_acl = ret.headers["X-Container-Read"]
+        if "X-Container-Write" in ret.headers:
+            write_acl = ret.headers["X-Container-Write"]
+    if "r" in request.query["rights"]:
+        for receiver in receivers:
+            read_acl += f",{receiver}:*"
+        read_acl = read_acl.replace(",,", ",").lstrip(",")
+    if "w" in request.query["rights"]:
+        for receiver in receivers:
+            write_acl += f",{receiver}:*"
+        write_acl = write_acl.replace(",,", ",").lstrip(",")
 
-    return aiohttp.web.Response(status=201)
+    headers["X-Container-Read"] = read_acl
+    headers["X-Container-Write"] = write_acl
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if ret.status == 204:
+            return aiohttp.web.Response(status=201)
+        else:
+            raise aiohttp.web.HTTPNotFound
+
+
+async def swift_download_shared_object(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Point a user to the shared download runner."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for shared download runner "
+        f"from {request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    path = (
+        f"/{request.match_info['project']}/"
+        + f"{request.match_info['container']}/"
+        + request.match_info["object"]
+    )
+    runner_id = await open_upload_runner_session(request)
+    signature = await sign(3600, path)
+    path += (
+        f"?session={runner_id}"
+        + f"&signature={signature['signature']}"
+        + f"&valid={signature['valid']}"
+    )
+    return aiohttp.web.Response(
+        status=303,
+        headers={
+            "Location": f"{setd['upload_external_endpoint']}{path}",
+        },
+    )
+
+
+async def swift_download_container(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Point a user to the container download runner."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for container download runner from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    path = f"/{request.match_info['project']}/" + f"{request.match_info['container']}"
+    runner_id = await open_upload_runner_session(request)
+    signature = await sign(3600, path)
+    path += (
+        f"?session={runner_id}"
+        + f"&signature={signature['signature']}"
+        + f"&valid={signature['valid']}"
+    )
+    return aiohttp.web.Response(
+        status=303,
+        headers={
+            "Location": f"{setd['upload_external_endpoint']}{path}",
+        },
+    )
+
+
+async def swift_replicate_container(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Point the user to container replication endpoint."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for replication endpoint from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    runner_id = open_upload_runner_session(request)
+    path = f"{request.match_info['project']}/" + f"{request.match_info['container']}"
+    signature = await sign(3600, path)
+    path += (
+        f"?session={runner_id}"
+        + f"&signature={signature['signature']}"
+        + f"&valid={signature['valid']}"
+    )
+    for i in request.query.keys():
+        path += f"&{i}={request.query[i]}"
+    return aiohttp.web.Response(
+        status=307,
+        headers={
+            "Location": f"{setd['upload_external_endpoint']}/{path}",
+        },
+    )
+
+
+async def get_upload_session(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Return a pre-signed upload runner session for upload target."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for object upload runner info request from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    runner_id = await open_upload_runner_session(request)
+    path = f"/{request.match_info['project']}/{request.match_info['container']}"
+    signature = await sign(3600, path)
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "url": f"{setd['upload_external_endpoint']}{path}",
+            "signature": signature,
+        }
+    )

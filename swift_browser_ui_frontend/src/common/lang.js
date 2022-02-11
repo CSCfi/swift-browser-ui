@@ -279,6 +279,8 @@ let default_translations = {
         enSuccess: "Encryption successful.",
         empty: "No files selected",
         defaultKeysMessage: "Default public keys added.",
+        clearDrop: "Clear Files",
+        cancel: "Cancel Upload",
         table: {
           name: "Name",
           path: "Path",
@@ -569,6 +571,8 @@ let default_translations = {
         enSuccess: "Salaaminen onnistui.",
         empty: "Ei valittuja tiedostoja",
         defaultKeysMessage: "Oletusarvoiset julkiset avaimet lisätty.",
+        clearDrop: "Tyhjennä tiedostot",
+        cancel: "Peruuta lataus",
         table: {
           name: "Nimi",
           path: "Polku",

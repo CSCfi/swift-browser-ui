@@ -5,7 +5,7 @@ import aiohttp.web
 import asyncio
 
 from swift_browser_ui.upload.common import (
-    get_auth_instance,
+    get_session_id,
     get_upload_instance,
     parse_multipart_in,
 )
@@ -18,9 +18,9 @@ from swift_browser_ui.upload.replicate import ObjectReplicationProxy
 
 async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
     """Handle a request for getting object content."""
-    auth = get_auth_instance(request)
+    session = get_session_id(request)
 
-    download = FileDownloadProxy(auth)
+    download = FileDownloadProxy(request.app[session])
 
     await download.a_begin_download(
         request.match_info["project"],
@@ -49,7 +49,7 @@ async def handle_replicate_container(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle request to replicating a container from a source."""
-    auth = get_auth_instance(request)
+    session = get_session_id(request)
 
     project = request.match_info["project"]
     container = request.match_info["container"]
@@ -58,7 +58,12 @@ async def handle_replicate_container(
     source_container = request.query["from_container"]
 
     replicator = ObjectReplicationProxy(
-        auth, request.app["client"], project, container, source_project, source_container
+        request.app[session],
+        request.app["client"],
+        project,
+        container,
+        source_project,
+        source_container,
     )
 
     asyncio.ensure_future(replicator.a_copy_from_container())
@@ -68,7 +73,7 @@ async def handle_replicate_container(
 
 async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request to replicating an object from a source."""
-    auth = get_auth_instance(request)
+    session = get_session_id(request)
 
     project = request.match_info["project"]
     container = request.match_info["container"]
@@ -78,7 +83,12 @@ async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.R
     source_object = request.query["from_object"]
 
     replicator = ObjectReplicationProxy(
-        auth, request.app["client"], project, container, source_project, source_container
+        request.app[session],
+        request.app["client"],
+        project,
+        container,
+        source_project,
+        source_container,
     )
 
     asyncio.ensure_future(replicator.a_copy_object(source_object))
@@ -105,8 +115,6 @@ async def handle_post_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.
 
 async def handle_get_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request for checking if a chunk exists."""
-    get_auth_instance(request)
-
     project = request.match_info["project"]
     container = request.match_info["container"]
 
@@ -143,7 +151,7 @@ async def handle_get_container(
     if "resumableChunkNumber" in request.query.keys():
         return await handle_get_object_chunk(request)
 
-    auth = get_auth_instance(request)
+    session = get_session_id(request)
 
     resp = aiohttp.web.StreamResponse()
 
@@ -160,7 +168,7 @@ async def handle_get_container(
 
     await resp.prepare(request)
 
-    download = ContainerArchiveDownloadProxy(auth, project, container)
+    download = ContainerArchiveDownloadProxy(request.app[session], project, container)
 
     await download.a_begin_container_download()
 

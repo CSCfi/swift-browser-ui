@@ -388,6 +388,9 @@ export default {
     active: function () {
       this.fetchContainers();
     },
+    project: function () {
+      this.fetchContainers();
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
@@ -406,19 +409,22 @@ export default {
   },
   methods: {
     fetchContainers: async function () {
-      if (this.active.id === undefined) {
+      if (
+        this.active.id === undefined
+        && this.$route.params.project === undefined
+      ) {
         return;
       }
       this.containers = useObservable(
         liveQuery(() => 
           this.$store.state.db.containers
-            .where({projectID: this.active.id})
+            .where({projectID: this.$route.params.project})
             .toArray(),
         ),
       );
       await this.$store.dispatch(
         "updateContainers", 
-        {projectID: this.active.id, signal: null},
+        {projectID: this.$route.params.project, signal: null},
       );
     },
     checkPageFromRoute: function () {

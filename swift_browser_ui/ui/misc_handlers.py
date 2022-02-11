@@ -2,15 +2,19 @@
 
 
 import aiohttp.web
-
-from swift_browser_ui.ui._convenience import session_check
+import aiohttp_session
 
 
 async def handle_bounce_direct_access_request(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Redirect user to a correct access request page."""
-    session_check(request)
+    session = await aiohttp_session.get_session(request)
+    try:
+        session["projects"]
+        session["token"]
+    except KeyError:
+        raise aiohttp.web.HTTPUnauthorized(reason="No valid session.")
 
     try:
         container = request.query["container"]

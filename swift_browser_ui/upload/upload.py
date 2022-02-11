@@ -9,8 +9,6 @@ import logging
 import aiohttp.web
 import aiohttp.client
 
-import keystoneauth1.session
-
 import ssl
 import certifi
 
@@ -36,7 +34,7 @@ class ResumableFileUploadProxy:
 
     def __init__(
         self,
-        auth: keystoneauth1.session.Session,
+        session: dict,
         query: dict,
         match: dict,
         client: aiohttp.client.ClientSession,
@@ -64,8 +62,17 @@ class ResumableFileUploadProxy:
 
         self.total_uploaded = 0
 
-        # Save the swift service
-        self.auth = auth
+        # Save the auth session information
+        self.endpoint: str = session["endpoint"]
+        LOGGER.info(f"Using endpoint: {self.endpoint}")
+        self.host: str = common.get_download_host(
+            self.endpoint,
+            self.project,
+        )
+        self.token: str = session["token"]
+        self.url: str = common.generate_download_url(
+            self.host, container=self.container, object_name=self.path
+        )
 
         # Get an aiohttp client
         self.client: aiohttp.client.ClientSession = client
@@ -73,24 +80,16 @@ class ResumableFileUploadProxy:
         # declare concatenated upload coroutine
         self.coro_upload: typing.Awaitable[typing.Any]
 
-        # Get object storage host
-        self.host: str = common.get_download_host(self.auth, self.project)
-        self.url: str = common.generate_download_url(
-            self.host, container=self.container, object_name=self.path
-        )
-
         # If file is sized under 5GiB, the upload is not segmented
         self.segmented: bool = False
         if self.total_size >= 5368709120:
             self.segmented = True
 
-    async def a_create_container(self, segmented: bool = False) -> None:
+    async def a_create_container(self) -> None:
         """Create the container required by the upload."""
         async with self.client.put(
-            common.generate_download_url(
-                common.get_download_host(self.auth, self.project), self.container
-            ),
-            headers={"Content-Length": str(0), "X-Auth-Token": self.auth.get_token()},
+            common.generate_download_url(self.host, self.container),
+            headers={"Content-Length": str(0), "X-Auth-Token": self.token},
             ssl=ssl_context,
         ) as resp:
             if resp.status not in {201, 202}:
@@ -101,14 +100,12 @@ class ResumableFileUploadProxy:
     ) -> None:
         """Check if the container is allowed."""
         async with self.client.head(
-            common.generate_download_url(
-                common.get_download_host(self.auth, self.project), self.container
-            ),
-            headers={"X-Auth-Token": self.auth.get_token()},
+            common.generate_download_url(self.host, self.container),
+            headers={"X-Auth-Token": self.token},
             ssl=ssl_context,
         ) as resp:
             if resp.status != 204:
-                if self.project != self.auth.get_project_id():
+                if self.project not in self.endpoint:
                     raise aiohttp.web.HTTPBadRequest(
                         reason="No access to shared container"
                     )
@@ -123,7 +120,7 @@ class ResumableFileUploadProxy:
         # Will also work with a manifest file, thus working with segmented
         # uploads as well
         async with self.client.head(
-            self.url, headers={"X-Auth-Token": self.auth.get_token()}, ssl=ssl_context
+            self.url, headers={"X-Auth-Token": self.token}, ssl=ssl_context
         ) as request:
             if request.status == 200:
                 return aiohttp.web.Response(status=200)
@@ -146,7 +143,7 @@ class ResumableFileUploadProxy:
             ),
             data=b"",
             headers={
-                "X-Auth-Token": self.auth.get_token(),
+                "X-Auth-Token": self.token,
                 "X-Object-Manifest": manifest,
             },
             ssl=ssl_context,
@@ -192,7 +189,7 @@ class ResumableFileUploadProxy:
                 self.url,
                 data=self.generate_from_queue(),
                 headers={
-                    "X-Auth-Token": self.auth.get_token(),
+                    "X-Auth-Token": self.token,
                     "Content-Length": str(self.total_size),
                     "Content-Type": str(self.content_type),
                 },
@@ -220,7 +217,7 @@ class ResumableFileUploadProxy:
                 ),
                 data=self.generate_from_queue(),
                 headers={
-                    "X-Auth-Token": self.auth.get_token(),
+                    "X-Auth-Token": self.token,
                     "Content-Type": "application/swiftclient-segment",
                 },
                 timeout=UPL_TIMEOUT,

@@ -7,8 +7,6 @@ import os
 import aiohttp.web
 import aiohttp.client
 
-import keystoneauth1.session
-
 import ssl
 import certifi
 
@@ -34,7 +32,7 @@ class ObjectReplicationProxy:
 
     def __init__(
         self,
-        auth: keystoneauth1.session.Session,
+        session: dict,
         client: aiohttp.client.ClientSession,
         project: str,
         container: str,
@@ -50,9 +48,12 @@ class ObjectReplicationProxy:
 
         self.client = client
 
-        self.auth = auth
-        self.host: str = common.get_download_host(self.auth, self.project)
-        self.source_host: str = common.get_download_host(self.auth, self.source_project)
+        self.endpoint: str = session["endpoint"]
+        self.token: str = session["token"]
+        self.host: str = common.get_download_host(self.endpoint, self.project)
+        self.source_host: str = common.get_download_host(
+            self.endpoint, self.source_project
+        )
 
     async def a_generate_object_from_reader(
         self, resp: aiohttp.client.ClientResponse
@@ -72,10 +73,8 @@ class ObjectReplicationProxy:
         container = f"{self.container}_segments" if segmented else self.container
         LOGGER.debug(f"Creating container {container}")
         async with self.client.put(
-            common.generate_download_url(
-                common.get_download_host(self.auth, self.project), container
-            ),
-            headers={"Content-Length": str(0), "X-Auth-Token": self.auth.get_token()},
+            common.generate_download_url(self.host, container),
+            headers={"Content-Length": str(0), "X-Auth-Token": self.token},
             ssl=ssl_context,
         ) as resp:
             if resp.status not in {201, 202}:
@@ -89,7 +88,7 @@ class ObjectReplicationProxy:
                 self.source_host, container=manifest.split("/")[0]
             ),
             headers={
-                "X-Auth-Token": self.auth.get_token(),
+                "X-Auth-Token": self.token,
                 "Accept-Encoding": "identity",
             },
             timeout=REPL_TIMEOUT,
@@ -120,14 +119,14 @@ class ObjectReplicationProxy:
             async with self.client.get(
                 from_url,
                 headers={
-                    "X-Auth-Token": self.auth.get_token(),
+                    "X-Auth-Token": self.token,
                     "Accept-Encoding": "identity",
                 },
                 timeout=REPL_TIMEOUT,
                 ssl=ssl_context,
             ) as resp_g:
                 length = int(resp_g.headers["Content-Length"])
-                headers = {"X-Auth-Token": self.auth.get_token()}
+                headers = {"X-Auth-Token": self.token}
 
                 if resp_g.status not in {200, 201, 202}:
                     raise aiohttp.web.HTTPNotFound(reason="Segment not found")
@@ -173,7 +172,7 @@ class ObjectReplicationProxy:
                 self.source_host, container=self.source_container, object_name=object_name
             ),
             headers={
-                "X-Auth-Token": self.auth.get_token(),
+                "X-Auth-Token": self.token,
                 "Accept-Encoding": "identity",
             },
             timeout=REPL_TIMEOUT,
@@ -189,7 +188,7 @@ class ObjectReplicationProxy:
 
             LOGGER.debug(f"Got headers: {resp_g.headers}")
 
-            headers = {"X-Auth-Token": self.auth.get_token()}
+            headers = {"X-Auth-Token": self.token}
 
             length = int(resp_g.headers["Content-Length"])
 
@@ -266,7 +265,7 @@ class ObjectReplicationProxy:
                 self.source_host,
                 container=self.source_container,
             ),
-            headers={"X-Auth-Token": self.auth.get_token()},
+            headers={"X-Auth-Token": self.token},
             timeout=REPL_TIMEOUT,
             ssl=ssl_context,
         ) as resp:
