@@ -504,13 +504,16 @@ export default {
           .startsWith(query[0])
           .or("tags")
           .startsWith(query[0])
+          .filter(cont => !cont.name.endsWith("_segments"))
           .filter(multipleQueryWords)
           .and(cont => cont.projectID === this.active.id)
           .toArray();
       this.searchResults = containers;
 
       const containerIDs = new Set(await this.$store.state.db.containers
-        .where({projectID: this.active.id}).primaryKeys());
+        .where({projectID: this.active.id})
+        .filter(cont => !cont.name.endsWith("_segments"))
+        .primaryKeys());
 
       const objects = 
         await this.$store.state.db.objects
