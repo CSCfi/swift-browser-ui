@@ -360,6 +360,7 @@ export default {
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
+      searchArray: [],
       currentPage: 1,
       shareModalIsActive: false,
       showTags: true,
@@ -375,13 +376,22 @@ export default {
     },
   },
   watch: {
-    searchQuery: function () {
+    searchQuery: function (previousSearchQuery, newSearchQuery) {
+      this.debounceSearch.cancel();
+      const query = this.searchQuery.trim();
       // Run debounced search every time the search box input changes
-      if (this.searchQuery.length) {
-        this.isSearching = true;
-        this.debounceSearch();
+      if (query.length > 1) {
+        if (previousSearchQuery.trim() !== newSearchQuery.trim()) {
+          this.isSearching = true;
+          // request parameter should be sanitized first
+          const safeQuery = escapeRegExp(query);
+          const newSearchArray = tokenize(safeQuery, 0);
+          this.searchArray = newSearchArray;
+          this.debounceSearch();
+        } else {
+          this.isSearching = false;
+        }
       } else {
-        this.isSearching = false;
         this.searchResults = [];
       }
     },
@@ -453,12 +463,10 @@ export default {
       return getHumanReadableSize(size);
     },
     search: async function() {
-      if(this.searchQuery.length === 0) {
+      if(this.searchArray.length === 0) {
         return;
       }
-      // request parameter should be sanitized first
-      const safeQuery = escapeRegExp(this.searchQuery);
-      const query = tokenize(safeQuery.trim(), 0);
+      const query = [...this.searchArray];
 
       function multipleQueryWords(item) {
         // Narrows down search results when there are more than
