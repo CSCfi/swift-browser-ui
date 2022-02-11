@@ -173,12 +173,17 @@ new Vue({
         active = projects[
           projects.indexOf(projects.find(e => e.id == last_active))
         ];
-      } else if (this.$route.params.user != undefined) {
+      } else if (
+        !(this.$route.params.user === undefined)
+      ) {
         if (
-          active.id != this.$route.params.project &&
-          this.$route.params.project != undefined
+          !(this.$route.params.project === undefined)
         ) {
-          active = projects[this.$route.params.project];
+          active = projects[
+            projects.indexOf(
+              projects.find(e => e.id == this.$route.params.project),
+            )
+          ];
         }
       } else {
         active = projects[0];

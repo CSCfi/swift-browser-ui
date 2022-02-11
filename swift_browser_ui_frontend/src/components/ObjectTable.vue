@@ -459,7 +459,13 @@ export default {
   },
   methods: {
     updateObjects: async function () {
-      if (this.container === undefined || this.active.id === undefined) {
+      if (
+        this.container === undefined 
+        || (
+          this.active.id === undefined
+          && this.$route.params.project
+        )
+      ) {
         return;
       }
 
