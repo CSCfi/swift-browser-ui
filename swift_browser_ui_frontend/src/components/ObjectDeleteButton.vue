@@ -71,14 +71,6 @@ export default {
               },
             },
           );
-        } else {
-          await this.$store.dispatch(
-            "updateObjects",
-            {
-              projectID: this.$route.params.project,
-              container: this.$route.params.container,
-            },
-          );
         }
       });
     },

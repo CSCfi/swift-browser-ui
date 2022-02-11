@@ -59,7 +59,6 @@ export default {
         projectID,
         this.container,
       ).then(async () => {
-        this.$store.dispatch("updateContainers", {projectID});
         await this.$store.state.db.containers
           .where({
             projectID,
