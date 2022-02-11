@@ -73,7 +73,7 @@ kansioille
 kansioina
 kanssa
 käytä
-Käytä
+käytä
 käytettävissä
 käytetylle
 käytössä
@@ -190,7 +190,7 @@ objekti
 objektia
 objektit
 objektitietojärjestelmissä
-Odota
+odota
 oheisesta
 ohje
 oikeuden
@@ -222,6 +222,7 @@ paloitellaan
 paluu
 palvelu
 palvelun
+peruuta
 pienemmissä
 piilota
 poiketa
@@ -312,9 +313,9 @@ tarkat
 tarkistathan
 tarkistussumma
 tarkoittaen
-Tässä
+tässä
 tätä
-Tätä
+tätä
 taustalla
 tavallisesti
 täytyy
@@ -339,11 +340,12 @@ tueta
 tuettu
 tuettua
 tulisi
-Tuloksia
+tuloksia
 tunniste
 tunti
 tuo
 tyhjä
+tyhjennä
 tyyppi
 ulos
 useisiin

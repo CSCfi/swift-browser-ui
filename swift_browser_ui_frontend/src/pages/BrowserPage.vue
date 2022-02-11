@@ -17,6 +17,12 @@
       @drop="navUpload"
     >
       <p>
+        <b-icon
+          icon="upload-multiple"
+          size="is-large"
+        />
+      </p>
+      <p>
         {{ $t('message.dropFiles') }}     
       </p>
     </div>
