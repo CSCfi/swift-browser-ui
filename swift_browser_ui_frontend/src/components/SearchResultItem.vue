@@ -4,10 +4,11 @@
   >
     <div class="media">
       <div class="media-content">
-        <span
-          :class="isContainer() ? 'has-text-weight-bold' : null"
-        >
-          {{ filename() }}
+        <span><b>{{ 
+          isContainer() 
+            ? $t('message.search.container')
+            : $t('message.search.object')
+        }}: </b> {{ filename() }}
         </span>
         <br>
         <small>

@@ -288,6 +288,7 @@ let default_translations = {
       },
       search: {
         container: "Bucket",
+        object: "Object",
         folder: "Folder",
         tags: "Tags",
         objects: "Objects",
@@ -579,6 +580,7 @@ let default_translations = {
       },
       search: {
         container: "Säiliö",
+        object: "Objekti",
         folder: "Kansio",
         tags: "Tägit",
         objects: "Objektia",
