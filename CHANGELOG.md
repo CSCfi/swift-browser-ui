@@ -41,10 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - While the cache is being created, there might be a degradation in performance for large projects.
     - Reduced number of requests for fetching object tags
 - Search box in Container View now searches across all containers and objects in the project using IndexedDB.
-    - There is no ranking. Containers are returned before objects in the order they are in the IDB.
+    - Tag matches are ordered first, then containers, and then objects. In each of these 3 categories, results are ordered based on the order the matched word appears.
     - The search is different from the filtering in objects list. Query has to match beginning of tag or beginning of words extrated from the name.
-    - Adding more words to the search narrows down the results.
+    - Renamed the search box in Object list to say "Filter" instead of "Search"
+    - Adding more words to the search narrows down the results. Only the first word searches the IDB, following words search in-memory.
     - A message is shown when trying to search a large project before cache is created.
+    - Matching results are highlighted.
+    - Results are limited to maximum 100 containers and 100 objects.
 
 
 ### Fixed
