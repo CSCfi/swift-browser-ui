@@ -65,6 +65,7 @@
         <template slot-scope="props">
           <SearchResultItem 
             :item="props.option"
+            :search-array="searchArray"
             :route="getSearchRoute"
           />
         </template>
