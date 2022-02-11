@@ -95,7 +95,7 @@ export default {
           this.$route.params.project,
           this.container.name,
           [this.object.name],
-        )
+        );
         this.tags = tags[0][1] || [];
       } else {
         this.tags = this.object.tags;
@@ -119,7 +119,7 @@ export default {
             .modify({tags: this.object.tags});
         }
         this.$router.go(-1);
-      })
+      });
     },
   },
 };

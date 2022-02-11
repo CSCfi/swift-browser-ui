@@ -34,7 +34,7 @@ class MockSwiftMiddleware(tests.common.mockups.APITestBase):
         """Set up mock Openstack Swift object storage contents."""
         super().setUp()
         self.containeramount = int(os.environ.get("TEST_CONTAINER_AMOUNT", 10))
-        self.object_range = (0, int(os.environ.get("TEST_MAX_OBJECT_AMOUNT", 100)))
+        self.object_range = (1, int(os.environ.get("TEST_MAX_OBJECT_AMOUNT", 100)))
         self.size_range = (1, int(os.environ.get("TEST_MAX_OBJECT_SIZE", 1048576)))
 
         self.bodge_lock = None

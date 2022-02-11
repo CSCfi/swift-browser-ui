@@ -79,8 +79,10 @@ describe("Browse containers and test operations", function () {
 
     // add few tags
     cy.get('tbody tr').contains('Edit').click()
+    cy.wait(250)
     cy.get('.taginput input').type('adding.couple more')
     cy.get('button').contains('Save').click()
+    cy.wait(250)
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 6)
 
     // remove all tags from a container
@@ -97,6 +99,7 @@ describe("Browse containers and test operations", function () {
   it("should display, add, remove object tags", () => {
     cy.get('tbody tr').first().dblclick()
 
+    cy.wait(1000)
     // object list loads with tags
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 3)
     
@@ -105,12 +108,15 @@ describe("Browse containers and test operations", function () {
     cy.get('h1').should('contain', 'Editing object')
     cy.get('.delete').first().click()
     cy.get('button').contains('Save').click()
+    cy.wait(1000)
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 2)
 
     // add few tags
     cy.get('tbody tr').contains('Edit').click()
+    cy.wait(1000)
     cy.get('.taginput input').type('adding.couple more')
     cy.get('button').contains('Save').click()
+    cy.wait(1000)
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 5)
 
     // remove all tags from an object
@@ -121,6 +127,7 @@ describe("Browse containers and test operations", function () {
     });
     cy.get('.taginput-container').children('span').should('have.length', 0)
     cy.get('button').contains('Save').click()
+    cy.wait(1000)
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
   })
 })

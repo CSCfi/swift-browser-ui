@@ -66,7 +66,7 @@ export default {
             name: this.container,
           })
           .delete();
-      })
+      });
     },
   },
 };

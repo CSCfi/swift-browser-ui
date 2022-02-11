@@ -158,12 +158,16 @@ const store = new Vuex.Store({
             cont.tokens = tokenize(cont.name);
             cont.projectID = projectID;
           });
-          await state.db.containers.bulkPut(containers).cacth(() => {});
+          await state.db.containers.bulkPut(containers).catch(() => {});
           newContainers = newContainers.concat(containers);
           marker = containers[containers.length - 1].name;
         }
       } while (containers.length > 0);
-      await dispatch("updateContainerTags", {projectID, newContainers, signal});
+      dispatch("updateContainerTags", {
+        projectID: projectID,
+        containers: newContainers,
+        signal,
+      });
       const toDelete = [];
       existingContainers.map(oldCont => {
         if(!newContainers.find(cont => cont.name == oldCont.name)) {
@@ -201,21 +205,22 @@ const store = new Vuex.Store({
           dispatch(
             "updateObjects",
             {
-              cotnainer: container,
-              signal,
-            }
-          )
+              projectID: projectID,
+              container: container,
+              signal: signal,
+            },
+          );
         }
       }
     },
     updateContainerTags: function (
       {state},
-      {projectID, containers, signal}
+      {projectID, containers, signal},
     ) {
       containers.map(async container => {
         const tags = await getTagsForContainer(
           projectID,
-          container,
+          container.name,
           signal,
         ) || null;
         await state.db.containers
@@ -236,7 +241,7 @@ const store = new Vuex.Store({
       do {
         objects = await getObjects(
           projectID,
-          container,
+          container.name,
           marker,
           signal,
         );
@@ -245,8 +250,8 @@ const store = new Vuex.Store({
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
-          })
-          await state.db.object.bulkPut(objects).catch(() => {});
+          });
+          await state.db.objects.bulkPut(objects).catch(() => {});
           newObjects = newObjects.concat(objects);
           marker = objects[objects.length -1].name;
         }
@@ -254,28 +259,24 @@ const store = new Vuex.Store({
   
       let toDelete = [];
       existingObjects.map(oldObj => {
-        if(!objects.find(obj => obj.name === oldObj.name)) {
+        if(!newObjects.find(obj => obj.name === oldObj.name)) {
           toDelete.push(oldObj.id);
         }
-      })
+      });
       if(toDelete.length) {
         await state.db.objects.bulkDelete(toDelete);
       }
       if (!isSegmentsContainer) {
-        await dispatch("updateObjectTags", {projectID, container, signal});
-      }
-    },
-    updateObjectTags: async function ({ commit, state }, {route, signal}) {
-      if (
-        !state.objectCache.length
-        || (state.objectCache.length > 25000)
-      ) {
-        return;
+        dispatch("updateObjectTags", {
+          projectID,
+          container,
+          signal,
+        });
       }
     },
     updateObjectTags: async function (
       { state, commit }, 
-      { container, signal, sharedObjects=undefined }) {
+      { projectID, container, signal, sharedObjects=undefined }) {
       let objectList = [];
 
       let objects = [];
@@ -285,7 +286,7 @@ const store = new Vuex.Store({
         objects = await state.db.objects
           .where({"containerID": container.id}).toArray();
       }
-      
+
       for (let i = 0; i < objects.length; i++) {
         // Object names end up in the URL, which has hard length limits.
         // The aiohttp backend has a limit of 8192. The maximum size
@@ -293,21 +294,21 @@ const store = new Vuex.Store({
         // We split the requests to prevent reaching said limits.
         objectList.push(objects[i].name);
         const url = makeGetObjectsMetaURL(
-          route.params.project,
-          container,
+          projectID,
+          container.name,
           objectList,
         );
         if (
-          i === state.objectCache.length - 1
+          i === objects.length - 1
           || url.href.length > 8192
         ) {
-          getTagsForObjects(
-            route.params.project,
-            route.params.container,
+          let tags = await getTagsForObjects(
+            projectID,
+            container.name,
             objectList,
             url,
             signal,
-          ).then(tags => tags);
+          );
           tags.map(item => {
             const objectName = item[0];
             const tags = item[1];
@@ -329,34 +330,32 @@ const store = new Vuex.Store({
       }
     },
     updateSharedObjects: async function (
-      { commit, dispatch, state }, 
-      { owner, project, container, signal },
+      { commit, dispatch }, 
+      { project, container, signal },
     ) {
       commit("loading", true);
-      await state.client.getAccessDetails(
-        project,
-        container.name,
-        owner,
-      ).then(
-        (ret) => {
-          return getSharedObjects(
-            owner,
-            container.name,
-            ret.address,
-            signal,
-          );
-        },
-      ).then(
-        (ret) => {
+      let sharedObjects = [];
+      let marker = "";
+      let objects = [];
+      do {
+        objects = await getObjects(
+          project,
+          container,
+          marker,
+          signal,
+        ).catch(() => {
           commit("loading", false);
-          const sharedObjects = filterSegments(ret);
-          commit("updateObjects", sharedObjects);
-          dispatch("updateObjectTags", {sharedObjects, container, signal});
-        },
-      ).catch(() => {
-        commit("updateObjects", []);
-        commit("loading", false);
-      });
+          commit("updateObjects", []);
+        });
+        if (objects.length > 0) {
+          sharedObjects = sharedObjects.concat(objects);
+          marker = objects[objects.length - 1].name;
+        }
+      } while (objects.length > 0);
+      commit("loading", false);
+      sharedObjects = filterSegments(sharedObjects);
+      commit("updateObjects", sharedObjects);
+      dispatch("updateObjectTags", {project, container, signal, sharedObjects});
     },
   },
 });

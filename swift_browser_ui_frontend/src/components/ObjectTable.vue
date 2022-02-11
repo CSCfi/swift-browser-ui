@@ -481,7 +481,7 @@ export default {
 
       const container = await this.$store.state.db.containers
         .get({
-          projectID:  this.active.id, 
+          projectID: this.$route.params.project, 
           name: this.container,
         });
       this.oList = useObservable(
@@ -494,6 +494,7 @@ export default {
       this.$store.dispatch(
         "updateObjects", 
         {
+          projectID: this.$route.params.project,
           container: container,
           signal: this.abortController.signal,
         },

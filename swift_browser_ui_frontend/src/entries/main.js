@@ -169,7 +169,6 @@ new Vue({
           .find(row => row.startsWith("LAST_ACTIVE"))
           .split("=")[1];
       }
-      let active;
       if (last_active) {
         active = projects[
           projects.indexOf(projects.find(e => e.id == last_active))
