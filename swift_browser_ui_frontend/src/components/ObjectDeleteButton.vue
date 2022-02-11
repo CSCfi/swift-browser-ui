@@ -60,13 +60,26 @@ export default {
         this.$route.params.container,
         to_remove,
       ).then(async () => {
-        await this.$store.dispatch(
-          "updateObjects",
-          {
-            projectID: this.$route.params.project,
-            container: this.$route.params.container,
-          },
-        );
+        if (this.$route.name === "SharedObjects") {
+          await this.$store.dispatch(
+            "updateSharedObjects",
+            {
+              project: this.$route.params.project,
+              container: {
+                name: this.$route.params.container,
+                id: 0,
+              },
+            },
+          );
+        } else {
+          await this.$store.dispatch(
+            "updateObjects",
+            {
+              projectID: this.$route.params.project,
+              container: this.$route.params.container,
+            },
+          );
+        }
       });
     },
   },

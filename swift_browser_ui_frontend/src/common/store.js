@@ -362,7 +362,7 @@ const store = new Vuex.Store({
       do {
         objects = await getObjects(
           project,
-          container,
+          container.name,
           marker,
           signal,
         ).catch(() => {
