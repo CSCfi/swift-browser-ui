@@ -71,7 +71,7 @@
         </template>
         <template #empty>
           <div
-            v-if="searchQuery.length > 0"
+            v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
             <b-loading
@@ -379,21 +379,23 @@ export default {
   watch: {
     searchQuery: function (previousSearchQuery, newSearchQuery) {
       this.debounceSearch.cancel();
-      const query = this.searchQuery.trim();
+      // request parameter should be sanitized first
+      const safeQuery = escapeRegExp(this.searchQuery);
+      const query = safeQuery.trim();
+      const newSearchArray = tokenize(query, 0);
       // Run debounced search every time the search box input changes
-      if (query.length > 1) {
+      if (newSearchArray.length > 0 && newSearchArray[0].length > 1) {
         if (previousSearchQuery.trim() !== newSearchQuery.trim()) {
           this.isSearching = true;
-          // request parameter should be sanitized first
-          const safeQuery = escapeRegExp(query);
-          const newSearchArray = tokenize(safeQuery, 0);
           this.searchArray = newSearchArray;
           this.debounceSearch();
         } else {
           this.isSearching = false;
         }
       } else {
+        this.isSearching = false;
         this.searchResults = [];
+        this.searchArray = [];
       }
     },
     active: function () {
