@@ -501,9 +501,9 @@ export default {
       const containers = 
         await this.$store.state.db.containers
           .where("tokens")
-          .startsWithAnyOf(query)
+          .startsWith(query[0])
           .or("tags")
-          .startsWithAnyOfIgnoreCase(query)
+          .startsWith(query[0])
           .filter(multipleQueryWords)
           .and(cont => cont.projectID === this.active.id)
           .toArray();
@@ -515,9 +515,9 @@ export default {
       const objects = 
         await this.$store.state.db.objects
           .where("tokens")
-          .startsWithAnyOf(query)
+          .startsWith(query[0])
           .or("tags")
-          .startsWithAnyOfIgnoreCase(query)
+          .startsWith(query[0])
           .filter(multipleQueryWords)
           .and(obj => containerIDs.has(obj.containerID))
           .toArray();
