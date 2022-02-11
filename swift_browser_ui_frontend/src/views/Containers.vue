@@ -469,25 +469,26 @@ export default {
       }
       const query = [...this.searchArray];
 
-      function multipleQueryWords(item) {
+      function multipleQueryWordsAndRank(item) {
         // Narrows down search results when there are more than
-        // one query words
-        if (query.length === 1) {
-          return true;
-        }
+        // Ranks results as such:
+        // Items with tag match have highest rank
+        // Ranks based on array index they match
+        const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
         query.map(q => {
-          item.tokens.map(i => {
-            if(i.startsWith(q)) {
-              match.add(q);
-              return;
-            }
-          });
-          if (item.tags === undefined) {
-            return;
+          if(item.tags !== undefined) {
+            item.tags.forEach((tag, i) => {
+              if(tag.startsWith(q)) {
+                item.rank = 0.0 + (i + 1) / 10;
+                match.add(q);
+                return;
+              }
+            });
           }
-          item.tags.map(i => {
-            if(i.startsWith(q)) {
+          item.tokens.forEach((token, i) => {
+            if(token.startsWith(q)) {
+              item.rank = rankOffset + (i + 1) / 10;
               match.add(q);
               return;
             }
@@ -499,6 +500,8 @@ export default {
         return false;
       }
 
+      const rankedSort = (a, b) => a.rank - b.rank;
+
       const containers = 
         await this.$store.state.db.containers
           .where("tokens")
@@ -506,10 +509,10 @@ export default {
           .or("tags")
           .startsWith(query[0])
           .filter(cont => !cont.name.endsWith("_segments"))
-          .filter(multipleQueryWords)
+          .filter(multipleQueryWordsAndRank)
           .and(cont => cont.projectID === this.active.id)
           .toArray();
-      this.searchResults = containers;
+      this.searchResults = containers.sort(rankedSort);
 
       const containerIDs = new Set(await this.$store.state.db.containers
         .where({projectID: this.active.id})
@@ -522,10 +525,11 @@ export default {
           .startsWith(query[0])
           .or("tags")
           .startsWith(query[0])
-          .filter(multipleQueryWords)
+          .filter(multipleQueryWordsAndRank)
           .and(obj => containerIDs.has(obj.containerID))
           .toArray();
-      this.searchResults = containers.concat(objects);
+
+      this.searchResults = this.searchResults.concat(objects).sort(rankedSort);
       this.isSearching = false;
     },
     getSearchRoute: function(item) {
