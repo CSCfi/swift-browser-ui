@@ -240,7 +240,7 @@ export function filterSegments(objects) {
     o.name.match(SEGMENT_REGEX) === null);
 }
 
-export const tokenizerRE = "[^\\p{L}\\d']";
+export const tokenizerRE = "[^\\p{L}\\d]";
 
 export function tokenize(text, ignoreSmallerThan=2) {
   // splits with non-word and non-digit chars
