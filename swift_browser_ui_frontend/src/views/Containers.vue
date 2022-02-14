@@ -52,7 +52,7 @@
         rounded
         icon="magnify"
         clearable
-        :placeholder="$t('message.searchBy')"
+        :placeholder="$t('message.search.searchBy')"
         :data="searchResults"
         field="name"
         :open-on-focus="true"
@@ -65,12 +65,13 @@
         <template slot-scope="props">
           <SearchResultItem 
             :item="props.option"
+            :search-array="searchArray"
             :route="getSearchRoute"
           />
         </template>
         <template #empty>
           <div
-            v-if="searchQuery.length > 0"
+            v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
             <b-loading
@@ -360,6 +361,7 @@ export default {
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
+      searchArray: [],
       currentPage: 1,
       shareModalIsActive: false,
       showTags: true,
@@ -375,14 +377,25 @@ export default {
     },
   },
   watch: {
-    searchQuery: function () {
+    searchQuery: function (previousSearchQuery, newSearchQuery) {
+      this.debounceSearch.cancel();
+      // request parameter should be sanitized first
+      const safeQuery = escapeRegExp(this.searchQuery);
+      const query = safeQuery.trim();
+      const newSearchArray = tokenize(query, 0);
       // Run debounced search every time the search box input changes
-      if (this.searchQuery.length) {
-        this.isSearching = true;
-        this.debounceSearch();
+      if (newSearchArray.length > 0 && newSearchArray[0].length > 1) {
+        if (previousSearchQuery.trim() !== newSearchQuery.trim()) {
+          this.isSearching = true;
+          this.searchArray = newSearchArray;
+          this.debounceSearch();
+        } else {
+          this.isSearching = false;
+        }
       } else {
         this.isSearching = false;
         this.searchResults = [];
+        this.searchArray = [];
       }
     },
     active: function () {
@@ -453,32 +466,31 @@ export default {
       return getHumanReadableSize(size);
     },
     search: async function() {
-      if(this.searchQuery.length === 0) {
+      if(this.searchArray.length === 0) {
         return;
       }
-      // request parameter should be sanitized first
-      const safeQuery = escapeRegExp(this.searchQuery);
-      const query = tokenize(safeQuery.trim(), 0);
+      const query = [...this.searchArray];
 
-      function multipleQueryWords(item) {
+      function multipleQueryWordsAndRank(item) {
         // Narrows down search results when there are more than
-        // one query words
-        if (query.length === 1) {
-          return true;
-        }
+        // Ranks results as such:
+        // Items with tag match have highest rank
+        // Ranks based on array index they match
+        const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
         query.map(q => {
-          item.tokens.map(i => {
-            if(i.startsWith(q)) {
-              match.add(q);
-              return;
-            }
-          });
-          if (item.tags === undefined) {
-            return;
+          if(item.tags !== undefined) {
+            item.tags.forEach((tag, i) => {
+              if(tag.startsWith(q)) {
+                item.rank = 0.0 + (i + 1) / 10;
+                match.add(q);
+                return;
+              }
+            });
           }
-          item.tags.map(i => {
-            if(i.startsWith(q)) {
+          item.tokens.forEach((token, i) => {
+            if(token.startsWith(q)) {
+              item.rank = rankOffset + (i + 1) / 10;
               match.add(q);
               return;
             }
@@ -490,30 +502,40 @@ export default {
         return false;
       }
 
+      const rankedSort = (a, b) => a.rank - b.rank;
+
       const containers = 
         await this.$store.state.db.containers
           .where("tokens")
-          .startsWithAnyOf(query)
+          .startsWith(query[0])
           .or("tags")
-          .startsWithAnyOfIgnoreCase(query)
-          .filter(multipleQueryWords)
+          .startsWith(query[0])
+          .filter(cont => !cont.name.endsWith("_segments"))
+          .filter(multipleQueryWordsAndRank)
           .and(cont => cont.projectID === this.active.id)
+          .limit(1000)
           .toArray();
-      this.searchResults = containers;
+      this.searchResults = containers.sort(rankedSort).slice(0, 100);
 
       const containerIDs = new Set(await this.$store.state.db.containers
-        .where({projectID: this.active.id}).primaryKeys());
+        .where({projectID: this.active.id})
+        .filter(cont => !cont.name.endsWith("_segments"))
+        .primaryKeys());
 
       const objects = 
         await this.$store.state.db.objects
           .where("tokens")
-          .startsWithAnyOf(query)
+          .startsWith(query[0])
           .or("tags")
-          .startsWithAnyOfIgnoreCase(query)
-          .filter(multipleQueryWords)
+          .startsWith(query[0])
+          .filter(multipleQueryWordsAndRank)
           .and(obj => containerIDs.has(obj.containerID))
+          .limit(1000)
           .toArray();
-      this.searchResults = containers.concat(objects);
+
+      this.searchResults = this.searchResults.concat(
+        objects.sort(rankedSort).slice(0, 100),
+      );
       this.isSearching = false;
     },
     getSearchRoute: function(item) {

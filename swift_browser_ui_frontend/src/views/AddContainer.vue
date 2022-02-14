@@ -59,6 +59,7 @@ import {
 import {
   taginputConfirmKeys,
   getTagsForContainer,
+  tokenize,
 } from "@/common/conv";
 
 export default {
@@ -88,6 +89,7 @@ export default {
         this.$store.state.db.containers.add({
           projectID: projectID,
           name: this.container,
+          tokens: tokenize(this.container),
           tags: this.tags,
           count: 0,
           bytes: 0,

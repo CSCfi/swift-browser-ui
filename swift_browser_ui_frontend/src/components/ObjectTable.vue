@@ -52,7 +52,7 @@
       <b-field class="control searchBox">
         <b-input
           v-model="searchQuery"
-          :placeholder="$t('message.searchBy')"
+          :placeholder="$t('message.objects.filterBy')"
         />
       </b-field>
       <div class="field has-addons uploadGroup">
