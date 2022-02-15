@@ -65,21 +65,20 @@ def test_token(
     if "token" in formdata:
         unscoped = str(formdata["token"])
         log.debug(
-            f"Got OS token in formdata ::{str(unscoped)}:: "
-            f"from address {request.remote} :: {time.ctime()}"
+            f"Got OS token in formdata from address {request.remote} :: {time.ctime()}"
         )
     # Try getting the token id from form
     if "token" in request.query and unscoped is None:
         unscoped = request.query["token"]
         log.debug(
-            f"Got OS token in query string ::{unscoped}:: "
+            "Got OS token in query string "
             f"from address {request.remote} :: {time.ctime()}"
         )
     # Try getting the token id from headers
     if "X-Auth-Token" in request.headers and unscoped is None:
         unscoped = request.headers["X-Auth-Token"]
         log.debug(
-            f"Got OS token in http header ::{unscoped}:: "
+            "Got OS token in http header "
             f"from address {request.remote} :: {time.ctime()}"
         )
     if unscoped is None:
@@ -113,8 +112,6 @@ async def credentials_login_end(
         password = str(form["password"])
     except KeyError:
         raise aiohttp.web.HTTPBadRequest(reason="Username or password not provided")
-
-    log.debug(f"username: {username}, password: {password}")
 
     # Get an unscoped token with credentials
     async with client.post(
@@ -155,7 +152,7 @@ async def credentials_login_end(
             raise aiohttp.web.HTTPUnauthorized
 
         unscoped = resp.headers["X-Subject-Token"]
-        log.debug(f"got token {unscoped} in password auth")
+        log.debug("Got token in password auth")
         return await login_with_token(request, unscoped)
 
 
@@ -163,9 +160,7 @@ async def sso_query_end(
     request: aiohttp.web.Request,
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Handle the login procedure return from SSO or user from POST."""
-    log = request.app["Log"]
     formdata = await request.post()
-    log.debug(f"Got {formdata} in form.")
     # Declare the unscoped token
     unscoped = test_token(formdata, request)
 
