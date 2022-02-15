@@ -18,9 +18,11 @@ async def browse(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
         session["projects"]
         session["token"]
         if session["at"] + 28800 < time.time():
+            request.app["Log"].info("A session was invalidated due to an expired token.")
             session.invalidate()
             raise aiohttp.web.HTTPUnauthorized(reason="Token expired")
-    except KeyError:
+    except KeyError as e:
+        request.app["Log"].info(f"A session was invalidated due to invalid token. {e}")
         raise aiohttp.web.HTTPUnauthorized(reason="No valid session.")
     response = aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/browse.html",

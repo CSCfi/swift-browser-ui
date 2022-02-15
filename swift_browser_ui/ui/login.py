@@ -176,7 +176,7 @@ async def login_with_token(
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     response = aiohttp.web.Response(
         status=303,
-        body="",
+        body=None,
     )
     client = request.app["api_client"]
     session = await aiohttp_session.new_session(request)
@@ -212,6 +212,16 @@ async def login_with_token(
             if resp.status == 403:
                 raise aiohttp.web.HTTPForbidden(reason="No access to service with token.")
             ret = await resp.json()
+
+            request.app["Log"].debug(f"token output: {ret}")
+
+            obj_role = False
+            request.app["Log"].debug(f'roles: {ret["token"]["roles"]}')
+            for role in ret["token"]["roles"]:
+                if role["name"] == "object_store_user":
+                    obj_role = True
+            if not obj_role:
+                continue
 
             scoped = resp.headers["X-Subject-Token"]
             # Use the first available public endpoint
