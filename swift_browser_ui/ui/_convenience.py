@@ -119,7 +119,7 @@ async def get_availability_from_token(token: str, client: aiohttp.ClientSession)
     # get a 401 response when we do initiate_os_service
     filtered_projects = list(
         filter(
-            lambda d: d.get("enabled") is not False,
+            lambda d: d["enabled"] if "enabled" in d else False,
             output_projects["projects"],  # type: ignore
         )
     )

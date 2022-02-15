@@ -218,6 +218,11 @@ class LoginTestClass(tests.common.mockups.APITestBase):
                 "user": {
                     "name": "test-user",
                 },
+                "roles": [
+                    {
+                        "name": "object_store_user",
+                    },
+                ],
                 "catalog": [
                     {
                         "type": "object-store",
