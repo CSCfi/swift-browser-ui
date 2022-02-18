@@ -5,8 +5,6 @@ jobs:
   cypress-e2e-headless:
     name: Cypress e2e
     runs-on: ubuntu-latest
-    permissions:
-      packages: read 
     strategy:
       matrix:
         node: ["16"]
@@ -27,7 +25,7 @@ jobs:
         image: ghcr.io/cscfi/keystone-swift:latest
         credentials:
           username: ${{ github.actor }}
-          password: ${{ secrets.github_token }}
+          password: ${{ secrets.GHCR_TOKEN }}
         ports:
           - 5000:5000
           - 8080:8080
