@@ -2,6 +2,7 @@
 
 # Generic imports
 import logging
+import os
 import sys
 import asyncio
 import ssl
@@ -15,7 +16,9 @@ import uvloop
 import aiohttp.web
 
 import aiohttp_session
-import aiohttp_session.cookie_storage
+import aiohttp_session.redis_storage
+
+import aioredis
 
 from swift_browser_ui.ui.front import index, browse, loginpassword
 from swift_browser_ui.ui.login import (
@@ -82,12 +85,24 @@ async def servinit(
     app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
     # Initialize aiohttp_session
+    redis_creds = ""
+    redis_user = str(os.environ.get("SWIFT_UI_REDIS_USER", ""))
+    redis_password = str(os.environ.get("SWIFT_UI_REDIS_PASSWORD", ""))
+    if redis_user and redis_password:
+        redis_creds = f"{redis_user}:{redis_password}@"
+    redis_port = str(os.environ.get("SWIFT_UI_REDIS_PORT", ""))
+    if redis_port:
+        redis_port = f":{redis_port}"
+    redis_host = str(os.environ.get("SWIFT_UI_REDIS_HOST", "localhost"))
+    redis = aioredis.from_url(f"redis://{redis_creds}{redis_host}{redis_port}")
+    storage = aiohttp_session.redis_storage.RedisStorage(
+        redis,
+        cookie_name="SWIFT_UI_SESSION",
+    )
     app["seckey"] = base64.urlsafe_b64decode(cryptography.fernet.Fernet.generate_key())
     aiohttp_session.setup(
         app,
-        aiohttp_session.cookie_storage.EncryptedCookieStorage(
-            app["seckey"],
-        ),
+        storage,
     )
 
     # Create a signature salt to prevent editing the signature on the client
