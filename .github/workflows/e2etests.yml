@@ -22,10 +22,10 @@ jobs:
         volumes:
           - ${{ github.workspace }}/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
       keystone-swift:
-        image: ghcr.io/cscfi/keystone-swift:latest
+        image: ghcr.io/cscfi/docker-keystone-swift:latest
         credentials:
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
         ports:
           - 5000:5000
           - 8080:8080
