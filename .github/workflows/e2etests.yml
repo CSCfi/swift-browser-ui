@@ -25,7 +25,7 @@ jobs:
         image: ghcr.io/cscfi/keystone-swift:latest
         credentials:
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.github_token }}
         ports:
           - 5000:5000
           - 8080:8080
