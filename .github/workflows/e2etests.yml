@@ -43,7 +43,7 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install honcho
-          honcho start -f Procfile-test --env .env.test
+          honcho start -f Procfile-test --env .env.test &
       - name: Populate swift
         run: |
           pip install requests
