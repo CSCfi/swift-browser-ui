@@ -46,7 +46,7 @@ jobs:
           honcho start -f Procfile-test --env .env.test &
       - name: Populate swift
         run: |
-          pip install requests
+          pip install requests python-lorem
           python3 generate-data.py --keystone --username swift --password veryfast
       - run: npm i cypress
       - uses: cypress-io/github-action@v2
