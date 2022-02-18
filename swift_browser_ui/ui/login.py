@@ -218,7 +218,7 @@ async def login_with_token(
             obj_role = False
             request.app["Log"].debug(f'roles: {ret["token"]["roles"]}')
             for role in ret["token"]["roles"]:
-                if role["name"] == "object_store_user":
+                if role["name"] in {"object_store_user", "admin"}:
                     obj_role = True
             if not obj_role:
                 continue

@@ -8,7 +8,8 @@ jobs:
     strategy:
       matrix:
         node: ["16"]
-        browser: ["firefox", "chrome"]
+        browser: ["chrome"]
+        # browser: ["firefox", "chrome"]
     steps:
       - uses: actions/checkout@v2
       - name: Build Frontend
@@ -16,17 +17,25 @@ jobs:
           pushd swift_browser_ui_frontend
           npm install
           npm run build
+      # - name: Start keystone-swift backend
+      #   run: |
+      #     docker run --init -d -p 5000:5000 -p 8080:8080 --name keystone-swift ghcr.io/cscfi/keystone-swift
       - name: Setup and Run backend
         run: |
           pip install -r requirements.txt
-          python -m tests.ui_unit.mock_server &
+          pip install honcho
+          honcho start -f Procfile-test
+      - name: Populate swift
+        run: |
+          pip install requests
+          python3 generate-data.py --keystone --username swift --password veryfast
       - run: npm i cypress
       - uses: cypress-io/github-action@v2
         with:
           install: false
           browser: ${{ matrix.browser }}
           headless: true
-          env: port=8080
+          env: port=8000
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
