@@ -5,6 +5,8 @@ jobs:
   cypress-e2e-headless:
     name: Cypress e2e
     runs-on: ubuntu-latest
+    permissions:
+      packages: read 
     strategy:
       matrix:
         node: ["16"]
