@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **BREAKING** move to aiohttp_session with Redis as session store replacing own implementation
 - **BREAKING** use own client for Openstack Swift and Keystone APIs to remove synchronous parts of codebase
+- **BREAKING** update API documentation updating UI API to v2.0.0
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
 - Redirect to front page when the session has expired. (GH #461)
