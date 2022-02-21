@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING** move to aiohttp_session with Redis as session store replacing own implementation
+- **BREAKING** use own client for Openstack Swift and Keystone APIs to remove synchronous parts of codebase
 - **BREAKING** Rename code occurrences of *bucket* to *container* (GH #471)
 - Updated dependencies in front-end as well as node.js base image to `node:14.18.3-alpine3.15`
 - Redirect to front page when the session has expired. (GH #461)
@@ -69,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- **BREAKING** session handling without redis as session backend
 - The possibility to share containers with write-only (file drop) permissions (GH #475)
 - GH (GH #493) redesign upload UI 
     - removed vue-material-design-icons 

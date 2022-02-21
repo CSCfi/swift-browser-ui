@@ -22,6 +22,7 @@ setuptools.setup(
         "uvloop==0.16.0",
         "certifi==2021.10.8",
         "asyncpg==0.25.0",
+        "aioredis==2.0.1",
     ],
     extras_require={
         "test": [
