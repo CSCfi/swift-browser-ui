@@ -311,7 +311,7 @@ const store = new Vuex.Store({
 
       for (let i = 0; i < objects.length; i++) {
         // Object names end up in the URL, which has hard length limits.
-        // The aiohttp backend has a limit of 8192. The maximum size
+        // The aiohttp complains at 8190. The maximum size
         // for object name is 1024. Set it to a safe enough amount.
         // We split the requests to prevent reaching said limits.
         objectList.push(objects[i].name);
@@ -322,7 +322,11 @@ const store = new Vuex.Store({
         );
         if (
           i === objects.length - 1
-          || url.href.length > 8192
+          || makeGetObjectsMetaURL(
+            projectID,
+            container.name,
+            [...objectList, objects[i+1].name],
+          ).href.length >= 8190
         ) {
           let tags = await getTagsForObjects(
             projectID,
