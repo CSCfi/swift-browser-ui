@@ -533,9 +533,9 @@ export default {
           .limit(1000)
           .toArray();
 
-      this.searchResults = this.searchResults.concat(
-        objects.sort(rankedSort).slice(0, 100),
-      );
+      this.searchResults = this.searchResults
+        .concat(objects.sort(rankedSort).slice(0, 100))
+        .sort(rankedSort);
       this.isSearching = false;
     },
     getSearchRoute: function(item) {
