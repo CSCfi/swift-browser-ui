@@ -1,9 +1,11 @@
 """Middlewares for the swift-browser-ui."""
 
 
+import time
 import typing
 
 from aiohttp import web
+import aiohttp_session
 
 from swift_browser_ui.ui.settings import setd
 
@@ -25,6 +27,21 @@ def return_error_response(error_code: int) -> web.Response:
                 "Expires": "0",
             },
         )
+
+
+@web.middleware
+async def check_session_at(
+    request: web.Request,
+    handler: AiohttpHandler,
+) -> web.Response:
+    """Raise on expired sessions."""
+    session = await aiohttp_session.get_session(request)
+    if "at" in session:
+        if session["at"] + 28800 < time.time():
+            session.invalidate()
+            if not ("login" in request.path or request.path == "/"):
+                raise web.HTTPUnauthorized(reason="Token expired.")
+    return await handler(request)
 
 
 @web.middleware

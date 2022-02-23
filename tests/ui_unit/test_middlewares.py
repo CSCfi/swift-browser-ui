@@ -7,8 +7,10 @@ import os
 from aiohttp.web import HTTPUnauthorized, HTTPForbidden, HTTPNotFound
 from aiohttp.web import Response, HTTPClientError, FileResponse
 
-from swift_browser_ui.ui.middlewares import error_middleware
+import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui.front import index
+
+import tests.common.mockups
 
 
 async def return_401_handler(with_exception):
@@ -39,8 +41,51 @@ async def return_400_handler(with_exception):
     return Response(status=400)
 
 
-class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
+async def return_200_handler(_):
+    """Return a successful response."""
+    return Response(status=200, body=b"OK")
+
+
+class MiddlewareTestClass(tests.common.mockups.APITestBase):
     """Testing the error middleware."""
+
+    def setUp(self):
+        """."""
+        super().setUp()
+        self.p_get_sess = unittest.mock.patch(
+            "swift_browser_ui.ui.middlewares.aiohttp_session.get_session",
+            self.aiohttp_session_get_session_mock,
+        )
+
+    async def test_check_session_at(self):
+        """Test session expiration middleware."""
+        with self.p_get_sess:
+            ret = await swift_browser_ui.ui.middlewares.check_session_at(
+                self.mock_request,
+                return_200_handler,
+            )
+        self.assertEqual(ret.status, 200)
+
+    async def test_check_session_fail_expired(self):
+        """Test session expiration middleware with expired session."""
+        self.mock_request.path = "/api/test-projct/test-container"
+        self.session_return["at"] = 0
+
+        with self.p_get_sess, self.assertRaises(HTTPUnauthorized):
+            await swift_browser_ui.ui.middlewares.check_session_at(
+                self.mock_request,
+                return_200_handler,
+            )
+
+    async def test_check_session_fail_no_raise(self):
+        """Test session expiration middleware with route that shouldn't fail."""
+        self.mock_request.path = "/login"
+        with self.p_get_sess:
+            ret = await swift_browser_ui.ui.middlewares.check_session_at(
+                self.mock_request,
+                return_200_handler,
+            )
+        self.assertEqual(ret.status, 200)
 
     async def test_401_return(self):
         """Test 401 middleware when the 401 status is returned."""
@@ -49,7 +94,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(None, return_401_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_401_handler
+            )
             self.assertEqual(resp.status, 401)
             self.assertIsInstance(resp, Response)
 
@@ -60,7 +107,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(True, return_401_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_401_handler
+            )
             self.assertEqual(resp.status, 401)
             self.assertIsInstance(resp, Response)
 
@@ -71,7 +120,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(None, return_403_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_403_handler
+            )
             self.assertEqual(resp.status, 403)
             self.assertIsInstance(resp, Response)
 
@@ -82,7 +133,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(True, return_403_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_403_handler
+            )
             self.assertEqual(resp.status, 403)
             self.assertIsInstance(resp, Response)
 
@@ -93,7 +146,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(None, return_404_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_404_handler
+            )
             self.assertEqual(resp.status, 404)
             self.assertIsInstance(resp, Response)
 
@@ -104,7 +159,9 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(True, return_404_handler)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_404_handler
+            )
             self.assertEqual(resp.status, 404)
             self.assertIsInstance(resp, Response)
 
@@ -115,7 +172,7 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with patch_setd:
-            resp = await error_middleware(None, index)
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(None, index)
             self.assertEqual(resp.status, 200)
             self.assertIsInstance(resp, FileResponse)
 
@@ -126,4 +183,6 @@ class MiddlewareTestClass(unittest.IsolatedAsyncioTestCase):
             new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
         with self.assertRaises(HTTPClientError), patch_setd:
-            await error_middleware(True, return_400_handler)
+            await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_400_handler
+            )

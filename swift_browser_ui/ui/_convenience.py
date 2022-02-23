@@ -8,10 +8,10 @@ API, cache manipulation, cookies etc.
 
 import secrets
 import logging
-import aiohttp_session
-import requests
 import typing
 
+import requests
+import aiohttp_session
 import aiohttp
 import aiohttp.web
 
