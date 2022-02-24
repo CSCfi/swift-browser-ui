@@ -110,7 +110,7 @@ export default {
       ];
       updateObjectMeta(
         this.$route.params.project,
-        this.container,
+        this.container.name,
         objectMeta,
       ).then(async () => {
         if(this.$route.name === "EditObjectView") {
