@@ -16,9 +16,9 @@ AiohttpHandler = typing.Callable[
 
 def return_error_response(error_code: int) -> web.Response:
     """Return the correct error page with correct status code."""
-    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as resp:
-        return web.Response(
-            body="".join(resp.readlines()),
+    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as f:
+        resp = web.Response(
+            body="".join(f.readlines()),
             status=error_code,
             content_type="text/html",
             headers={
@@ -27,6 +27,9 @@ def return_error_response(error_code: int) -> web.Response:
                 "Expires": "0",
             },
         )
+    if error_code == 401:
+        resp.headers["WWW-Authenticate"] = 'Bearer realm="/", charset="UTF-8"'
+    return resp
 
 
 @web.middleware
