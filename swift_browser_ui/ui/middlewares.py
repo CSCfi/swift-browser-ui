@@ -1,9 +1,11 @@
 """Middlewares for the swift-browser-ui."""
 
 
+import time
 import typing
 
 from aiohttp import web
+import aiohttp_session
 
 from swift_browser_ui.ui.settings import setd
 
@@ -14,9 +16,9 @@ AiohttpHandler = typing.Callable[
 
 def return_error_response(error_code: int) -> web.Response:
     """Return the correct error page with correct status code."""
-    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as resp:
-        return web.Response(
-            body="".join(resp.readlines()),
+    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as f:
+        resp = web.Response(
+            body="".join(f.readlines()),
             status=error_code,
             content_type="text/html",
             headers={
@@ -25,6 +27,23 @@ def return_error_response(error_code: int) -> web.Response:
                 "Expires": "0",
             },
         )
+    if error_code == 401:
+        resp.headers["WWW-Authenticate"] = 'Bearer realm="/", charset="UTF-8"'
+    return resp
+
+
+@web.middleware
+async def check_session_at(
+    request: web.Request,
+    handler: AiohttpHandler,
+) -> web.Response:
+    """Raise on expired sessions."""
+    session = await aiohttp_session.get_session(request)
+    if "at" in session and session["at"] + 28800 < time.time():
+        session.invalidate()
+        if not ("login" in request.path or request.path == "/"):
+            raise web.HTTPUnauthorized(reason="Token expired.")
+    return await handler(request)
 
 
 @web.middleware

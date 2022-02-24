@@ -51,7 +51,7 @@ from swift_browser_ui.ui.api import (
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
-from swift_browser_ui.ui.middlewares import error_middleware
+import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.signature import (
     handle_signature_request,
@@ -79,10 +79,13 @@ async def servinit(
     inject_middleware: typing.List[typing.Any] = [],
 ) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
-    middlewares = [error_middleware]
+    middlewares = [
+        swift_browser_ui.ui.middlewares.error_middleware,
+        swift_browser_ui.ui.middlewares.check_session_at,
+    ]
     if inject_middleware:
         middlewares = middlewares + inject_middleware
-    app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
+    app = aiohttp.web.Application()  # type: ignore
 
     # Initialize aiohttp_session
     redis_creds = ""
@@ -104,6 +107,9 @@ async def servinit(
         app,
         storage,
     )
+
+    # Add the rest of the middlewares
+    [app.middlewares.append(i) for i in middlewares]  # type: ignore
 
     # Create a signature salt to prevent editing the signature on the client
     # side. Hash function doesn't need to be cryptographically secure, it's

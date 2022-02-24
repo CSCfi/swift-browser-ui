@@ -184,6 +184,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                         "host": "https://localhost",
                     }
                 ),
+                "path": "/",
             }
         )
         super().setUp()

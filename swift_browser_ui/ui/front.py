@@ -1,7 +1,6 @@
 """Web frontend functions for stand-alone running."""
 
 import typing
-import time
 
 import aiohttp.web
 import aiohttp_session
@@ -11,20 +10,9 @@ from cryptography.fernet import InvalidToken
 from swift_browser_ui.ui.settings import setd
 
 
-async def browse(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+async def browse(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve the browser SPA when running without a proxy."""
-    session = await aiohttp_session.get_session(request)
-    try:
-        session["projects"]
-        session["token"]
-        if session["at"] + 28800 < time.time():
-            request.app["Log"].info("A session was invalidated due to an expired token.")
-            session.invalidate()
-            raise aiohttp.web.HTTPUnauthorized(reason="Token expired")
-    except KeyError as e:
-        request.app["Log"].info(f"A session was invalidated due to invalid token. {e}")
-        raise aiohttp.web.HTTPUnauthorized(reason="No valid session.")
-    response = aiohttp.web.FileResponse(
+    return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/browse.html",
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -32,7 +20,6 @@ async def browse(request: aiohttp.web.Request) -> aiohttp.web.FileResponse:
             "Expires": "0",
         },
     )
-    return response
 
 
 async def index(
@@ -44,9 +31,6 @@ async def index(
             session = await aiohttp_session.get_session(request)
             session["projects"]
             session["token"]
-            if session["at"] + 28800 < time.time():
-                session.invalidate()
-                raise aiohttp.web.HTTPUnauthorized(reason="Token expired")
             request.app["Log"].info("Redirecting an existing session to app")
             return aiohttp.web.Response(
                 status=303,
@@ -69,9 +53,6 @@ async def loginpassword(
             session = await aiohttp_session.get_session(request)
             session["projects"]
             session["token"]
-            if session["at"] + 28800 < time.time():
-                session.invalidate()
-                raise aiohttp.web.HTTPUnauthorized(reason="Token expired.")
             request.app["Log"].info("Redirecting an existing session to app")
             return aiohttp.web.Response(
                 status=303,
