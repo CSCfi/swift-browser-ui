@@ -36,11 +36,10 @@ async def check_session_at(
 ) -> web.Response:
     """Raise on expired sessions."""
     session = await aiohttp_session.get_session(request)
-    if "at" in session:
-        if session["at"] + 28800 < time.time():
-            session.invalidate()
-            if not ("login" in request.path or request.path == "/"):
-                raise web.HTTPUnauthorized(reason="Token expired.")
+    if "at" in session and session["at"] + 28800 < time.time():
+        session.invalidate()
+        if not ("login" in request.path or request.path == "/"):
+            raise web.HTTPUnauthorized(reason="Token expired.")
     return await handler(request)
 
 
