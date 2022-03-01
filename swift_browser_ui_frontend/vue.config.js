@@ -17,6 +17,13 @@ module.exports = {  // eslint-disable-line
       title: "Swift browser UI",
       chunks: ["chunk-vendors", "chunk-common", "index"],
     },
+    select: {
+      entry: "src/entries/select.js",
+      template: "public/select.html",
+      filename: "select.html",
+      title: "Select a project to isolate",
+      chunks: ["chunk-vendors", "chunk-common", "select"],
+    },
     badrequest: {
       entry: "src/entries/badrequest.js",
       template: "public/index.html",
