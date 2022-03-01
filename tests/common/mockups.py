@@ -32,12 +32,14 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                 "name": "test-name-0",
                 "token": "test-token-0",
                 "endpoint": "https://test-endpoint-0/v1/AUTH_test-id-0",
+                "tainted": False,
             },
             "test-id-1": {
                 "id": "test-id-1",
                 "name": "test-name-1",
                 "token": "test-token-1",
                 "endpoint": "https://test-endpoint-1/v1/AUTH_test-id-1",
+                "tainted": False,
             },
         }
         self.aiohttp_session_get_session_mock = unittest.mock.AsyncMock()

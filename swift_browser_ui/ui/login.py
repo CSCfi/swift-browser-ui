@@ -186,6 +186,8 @@ async def login_with_token(
     session["referer"] = request.url.host
     uname = ""
 
+    taint = True if setd["force_restricted_mode"] else False
+
     # Check token availability
     avail = await get_availability_from_token(token, client)
     session["projects"] = {}
@@ -242,12 +244,23 @@ async def login_with_token(
                 "name": project["name"],
                 "endpoint": endpoint["url"],
                 "token": scoped,
+                "tainted": True if setd["force_restricted_mode"] else False,
             }
 
     session["token"] = token
     session["uname"] = uname
 
+    if taint:
+        session["taint"] = True
+    else:
+        session["taint"] = False
+
     session.changed()
+
+    if taint:
+        response.headers["Location"] = "/select"
+        return response
+
     # Redirect to the browse page
     if "NAV_TO" in request.cookies.keys():
         response.headers["Location"] = request.cookies["NAV_TO"]
@@ -256,6 +269,50 @@ async def login_with_token(
         response.headers["Location"] = "/browse"
 
     return response
+
+
+async def handle_project_lock(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Lock down to a specific project."""
+    log = request.app["Log"]
+    log.info("Call for locking down the project.")
+
+    session = await aiohttp_session.get_session(request)
+
+    project = request.match_info["project"]
+
+    # Ditch all projects that aren't the one specified if project is defined
+    if project in session["projects"]:
+        session["projects"] = {
+            k: v
+            for k, v in filter(
+                lambda val: val[0] == project,
+                session["projects"].items(),
+            )
+        }
+    # If the project doesn't exist, allow all untainted projects
+    else:
+        session["projects"] = {
+            k: v
+            for k, v in filter(
+                lambda val: not val[1]["tainted"], session["projects"].items()
+            )
+        }
+
+    if not session["projects"]:
+        session.invalidate()
+        raise aiohttp.web.HTTPForbidden(reason="No untainted projects available.")
+
+    # The session is no longer tainted if it's been locked
+    session["taint"] = False
+
+    session.changed()
+    return aiohttp.web.Response(
+        status=303,
+        body=None,
+        headers={
+            "Location": "/browse",
+        },
+    )
 
 
 async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:

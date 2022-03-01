@@ -37,7 +37,14 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
     )
     # Filter out the tokens contained in session token
     return aiohttp.web.json_response(
-        [{"name": v["name"], "id": v["id"]} for _, v in session["projects"].items()]
+        [
+            {
+                "name": v["name"],
+                "id": v["id"],
+                "tainted": v["tainted"],
+            }
+            for _, v in session["projects"].items()
+        ]
     )
 
 
