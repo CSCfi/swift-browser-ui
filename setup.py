@@ -27,7 +27,7 @@ setuptools.setup(
     extras_require={
         "test": [
             "tox==3.24.5",
-            "pytest==7.0.0",
+            "pytest==7.0.1",
             "pytest-cov==3.0.0",
             "coverage==6.3.2",
             "flake8==4.0.1",
@@ -36,7 +36,7 @@ setuptools.setup(
             "black== 22.1.0",
         ],
         "docs": ["sphinx==4.4.0", "sphinx_rtd_theme==1.0.0"],
-        "ui_test": ["pytest==7.0.0", "pytest-timeout==2.1.0"],
+        "ui_test": ["pytest==7.0.1", "pytest-timeout==2.1.0"],
     },
     packages=setuptools.find_packages(),
     package_data={
