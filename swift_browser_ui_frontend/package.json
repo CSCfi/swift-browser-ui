@@ -10,7 +10,7 @@
     "build-devel": "vue-cli-service build --mode development"
   },
   "dependencies": {
-    "@vue/cli-service": "^5.0.0-rc.3",
+    "@vue/cli-service": "^5.0.1",
     "@vue/composition-api": "^1.4.9",
     "@vueuse/rxjs": "^7.7.0",
     "buefy": "^0.9.17",
