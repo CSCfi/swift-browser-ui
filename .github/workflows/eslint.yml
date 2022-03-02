@@ -8,18 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['14']
+        node: ['16']
     name: Node ${{ matrix.node }} eslint check
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
       - name: Install dependencies
         run: |
           pushd swift_browser_ui_frontend
-          sudo npm install -g npm@8.3.0
+          npm install
           npm ci
       - name: Run eslint
         run: |

@@ -13,10 +13,8 @@ from aiohttp.test_utils import AioHTTPTestCase
 import aiohttp
 
 from swift_browser_ui.ui.server import servinit, run_server_insecure
-from swift_browser_ui.ui.server import kill_sess_on_shutdown, run_server_secure
+from swift_browser_ui.ui.server import run_server_secure
 from swift_browser_ui.ui.settings import setd
-
-from tests.ui_unit.creation import get_request_with_mock_openstack
 
 
 # Set static folder in settings so it can be tested
@@ -32,18 +30,6 @@ class TestServinitMethod(unittest.IsolatedAsyncioTestCase):
         # executes to the end all is fine.
         app = await servinit()
         self.assertTrue(app is not None)
-
-
-class TestServerShutdownHandler(unittest.IsolatedAsyncioTestCase):
-    """Test case for the server graceful shutdown handler."""
-
-    async def test_kill_sess_on_shutdown(self):
-        """Test kill_sess_on_shutdown function."""
-        session, req = get_request_with_mock_openstack()
-
-        await kill_sess_on_shutdown(req.app)
-
-        self.assertNotIn(session, req.app["Sessions"])
 
 
 class TestRunServerFunctions(unittest.TestCase):
@@ -131,22 +117,30 @@ class AppTestCase(AioHTTPTestCase):
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/login/front")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/login/rescope")
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/buckets")
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/bucket/objects")
-            self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/object/dload")
+            response = await self.client.request("GET", "/loginpassword")
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/api/username")
             self.assertNotEqual(response.status, 404)
             response = await self.client.request("GET", "/api/projects")
             self.assertNotEqual(response.status, 404)
-            response = await self.client.request("GET", "/api/bucket/meta")
+            response = await self.client.request("GET", "/api/test-project")
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", "/api/test-project/acl")
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", "/api/test-project/address")
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request("GET", "/api/test-project/test-bucket")
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET", "/api/test-project/test-bucket/test-object"
+            )
+            self.assertNotEqual(response.status, 404)
+            response = await self.client.request(
+                "GET", "/api/meta/test-project/test-bucket"
+            )
             self.assertNotEqual(response.status, 404)
             response = await self.client.request(
                 "GET",
-                "/api/project/meta",
+                "/api/meta/test-project",
             )
             self.assertNotEqual(response.status, 404)

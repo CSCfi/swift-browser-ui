@@ -3,7 +3,6 @@
     <div class="tokenContents">
       <b-field grouped>
         <b-field
-          horizontal
           :label="$t('message.tokens.identLabel')"
           :message="$t('message.tokens.identMessage')"
           expanded
@@ -13,8 +12,7 @@
             name="newIdentifier"
             expanded
           />
-        </b-field>
-        <b-field>
+        
           <p
             id="submitButton"
             class="control"
@@ -131,18 +129,29 @@ export default {
       latest: undefined,
     };
   },
+  computed: {
+    active () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getTokens();
   },
   methods: {
     getTokens: function () {
-      listTokens().then((ret) => {this.tokens = ret;});
+      listTokens(this.project).then((ret) => {this.tokens = ret;});
     },
     removeToken: function (identifier) {
-      removeToken(identifier).then(() => {this.getTokens();});
+      removeToken(
+        this.project,
+        identifier,
+      ).then(() => {this.getTokens();});
     },
     addToken: function (identifier) {
-      createExtToken(identifier).then((ret) => {
+      createExtToken(
+        this.project,
+        identifier,
+      ).then((ret) => {
         this.latest = ret;
         this.$buefy.notification.open({
           message: this.$t("message.tokens.copyToken"),

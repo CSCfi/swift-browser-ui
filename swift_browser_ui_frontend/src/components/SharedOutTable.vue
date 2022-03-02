@@ -7,7 +7,7 @@
       <p class="control">
         <b-select
           v-model="perPage"
-          data-testid="bucketsPerPage"
+          data-testid="containersPerPage"
         >
           <option value="5">
             5 {{ $t('message.table.pageNb') }}
@@ -59,9 +59,6 @@
       :per-page="perPage"
       :pagination-simple="true"
       :default-sort-direction="defaultSortDirection"
-      @dblclick="(row) => $router.push(getConAddr(row))"
-      @keyup.native.enter="$router.push(getConAddr(selected))"
-      @keyup.native.space="$router.push(getConAddr(selected))"
     >
       <b-table-column
         sortable
@@ -144,6 +141,11 @@ export default {
       currentPage: 1,
     };
   },
+  computed: {
+    project () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getSharedContainers();
   },
@@ -161,10 +163,13 @@ export default {
       }
     },
     deleteContainerShare: function (container) {
-      removeAccessControlMeta(container).then(
+      removeAccessControlMeta(
+        this.project,
+        container,
+      ).then(
         () => {
           this.$store.state.client.shareContainerDeleteAccess(
-            this.$route.params.project,
+            this.project,
             container,
           ).then(() => {
             this.$buefy.toast.open({

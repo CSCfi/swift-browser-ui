@@ -14,20 +14,16 @@
       {{ $t('message.container_ops.norename') }}
     </b-message>
     <b-field
-      horizontal
       :label="$t('message.container_ops.containerName')"
-      :message="$t('message.container_ops.containerMessage')"
     >
       <b-input 
         v-model="container"
         name="container"
-        expanded
         aria-required="true"
         :disabled="!create"
       />
     </b-field>
     <b-field
-      horizontal
       :label="$t('message.tagName')"
       :message="$t('message.tagMessage')"
     >
@@ -44,18 +40,13 @@
       />
     </b-field>
 
-    <b-field
-      horizontal
-    >
-      <p class="control">
-        <b-button
-          type="is-primary"
-          class="addcontainerbutton"
-          @click="create ? createContainer () : updateContainer ()"
-        >
-          {{ create ? $t('message.create') : $t('message.save') }}
-        </b-button>
-      </p>
+    <b-field>
+      <b-button
+        type="is-primary"
+        @click="create ? createContainer () : updateContainer ()"
+      >
+        {{ create ? $t('message.create') : $t('message.save') }}
+      </b-button>
     </b-field>
   </div>
 </template>
@@ -63,11 +54,12 @@
 <script>
 import {
   swiftCreateContainer, 
-  updateBucketMeta,
+  updateContainerMeta,
 } from "@/common/api";
 import {
   taginputConfirmKeys,
   getTagsForContainer,
+  tokenize,
 } from "@/common/conv";
 
 export default {
@@ -88,10 +80,22 @@ export default {
   },
   methods: {
     createContainer: function () {
-      swiftCreateContainer(this.container, this.tags.join(";")).then(() => {
+      let projectID = this.$route.params.project;
+      swiftCreateContainer(
+        projectID,
+        this.container,
+        this.tags.join(";"),
+      ).then(() => {
+        this.$store.state.db.containers.add({
+          projectID: projectID,
+          name: this.container,
+          tokens: tokenize(this.container),
+          tags: this.tags,
+          count: 0,
+          bytes: 0,
+        });
         this.$router.go(-1);
       }).catch((err) => {
-        console.log(err);
         if (err.message.match("Container name already in use")) {
           this.$buefy.toast.open({
             message: this.$t("message.error.inUse"),
@@ -116,18 +120,33 @@ export default {
       const containerName = this.$route.params.container;
       this.container = containerName;
 
-      const tags = this.$store.state.containerTagsCache[containerName];
-      if (!tags) {
-        this.tags = await getTagsForContainer(containerName);
+      const container = await this.$store.state.db.containers.get({
+        projectID: this.$store.state.active.id,
+        name: this.container,
+      });
+      if (!container.tags) {
+        this.tags = await getTagsForContainer(
+          this.$route.params.project,
+          containerName,
+        );
       } else {
-        this.tags = tags;
+        this.tags = container.tags;
       }
     },
     updateContainer: function () {
       let meta = {
         usertags: this.tags.join(";"),
       };
-      updateBucketMeta(this.container, meta).then(() => {
+      updateContainerMeta(
+        this.$route.params.project,
+        this.container,
+        meta,
+      ).then(async () => {
+        await this.$store.state.db.containers
+          .where({
+            projectID: this.$route.params.project,
+            name: this.container,
+          }).modify({tags: this.tags});
         this.$router.go(-1);
       });
     },
@@ -144,7 +163,5 @@ export default {
   .addcontainerhead {
     margin: 1% 1% 1% 0;
   }
-  .addcontainerbutton {
-    margin: 1%;
-  }
+
 </style>

@@ -30,6 +30,7 @@ new Vue({
     notfound: false,
     uidown: true,
     langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
+    idb: true,
   },
   created() {
     document.title = this.$t("message.program_name");

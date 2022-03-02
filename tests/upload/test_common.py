@@ -39,9 +39,10 @@ class CommonTestClass(unittest.IsolatedAsyncioTestCase):
 
     async def test_get_download_host(self):
         """Test get_download_host function."""
-        auth = tests.common.mockups.Mock_Session()
-
-        ret = swift_browser_ui.upload.common.get_download_host(auth, "AUTH_testproject")
+        ret = swift_browser_ui.upload.common.get_download_host(
+            "https://test-endpoint:443/v1/AUTH_notwhatwewant",
+            "AUTH_testproject",
+        )
 
         self.assertIn("AUTH_testproject", ret)
 
@@ -82,7 +83,6 @@ class CommonTestClass(unittest.IsolatedAsyncioTestCase):
         req.app["client"] = None
         req.app["test-session"] = {}
         req.app["test-session"]["uploads"] = {}
-        req.app["test-session"]["auth"] = tests.common.mockups.Mock_Session()
         req.set_query({"session": "test-session"})
 
         query = {

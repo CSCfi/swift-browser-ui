@@ -49,11 +49,29 @@ export default {
           to_remove.push(object.name);
         }
       }
+      if(this.$route.name !== "SharedObjects") {
+        const objIDs = this.$props.objects.reduce(
+          (prev, obj) => [...prev, obj.id], [],
+        );
+        this.$store.state.db.objects.bulkDelete(objIDs);
+      }
       swiftDeleteObjects(
+        this.$route.params.project,
         this.$route.params.container,
         to_remove,
-      ).then(() => {
-        this.$store.dispatch("updateObjects", {route: this.$route});
+      ).then(async () => {
+        if (this.$route.name === "SharedObjects") {
+          await this.$store.dispatch(
+            "updateSharedObjects",
+            {
+              project: this.$route.params.project,
+              container: {
+                name: this.$route.params.container,
+                id: 0,
+              },
+            },
+          );
+        }
       });
     },
   },

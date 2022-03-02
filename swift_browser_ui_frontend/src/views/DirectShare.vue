@@ -72,7 +72,6 @@
 <script>
 import delay from "lodash/delay";
 import {
-  changeProjectApi,
   addAccessControlMeta,
   swiftCreateContainer,
   getSharedContainerAddress,
@@ -95,6 +94,18 @@ export default {
     },
     active () {
       return this.$store.state.active;
+    },
+  },
+  watch: {
+    read: function () {
+      if(!this.read) {
+        this.write = false;
+      }
+    },
+    write: function () {
+      if(this.write) {
+        this.read = true;
+      }
     },
   },
   beforeMount () {
@@ -130,13 +141,13 @@ export default {
           type: "is-danger",
         });
       }
-      // ensure correct project for creation
-      if (this.project != this.$store.state.active) {
-        await changeProjectApi(this.project);
-      }
       // create the container
-      await swiftCreateContainer(this.container);
+      await swiftCreateContainer(
+        this.projects,
+        this.container,
+      );
       await addAccessControlMeta(
+        this.project,
         this.container,
         rights,
         this.tags,
@@ -146,7 +157,7 @@ export default {
         this.container,
         this.tags,
         rights,
-        await getSharedContainerAddress(),
+        await getSharedContainerAddress(this.project),
       );
       return true;
     },

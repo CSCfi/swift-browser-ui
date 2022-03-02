@@ -15,12 +15,12 @@ def logout(l_instance):
 
 def api_containers(l_instance):
     """Get container listing."""
-    l_instance.client.get("/api/buckets")
+    l_instance.client.get("/api/containers")
 
 
 def api_objects(l_instance):
     """Get object listing."""
-    l_instance.client.get("/api/bucket/objects?bucket=test-container-0")
+    l_instance.client.get("/api/container/objects?container=test-container-0")
 
 
 def api_active(l_instance):

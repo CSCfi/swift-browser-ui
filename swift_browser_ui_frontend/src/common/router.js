@@ -47,6 +47,11 @@ export default new Router({
       component: CreateContainer,
     },
     {
+      path: "/browse/:user/:project/tokens",
+      name: "TokensView",
+      component: TokensView,
+    },
+    {
       path: "/browse/:user/:project/:container/edit",
       name: "EditContainer",
       component: CreateContainer,
@@ -72,14 +77,14 @@ export default new Router({
       component: SharedObjects,
     },
     {
+      path: "/browse/:user/:project/:container/shared/:owner/:object/edit",
+      name: "EditSharedObjectView",
+      component: EditObjectView,
+    },
+    {
       path: "/browse/:user/:project/:container/replicate",
       name: "ReplicateContainer",
       component: ReplicationView,
-    },
-    {
-      path: "/browse/:user/:project/tokens",
-      name: "TokensView",
-      component: TokensView,
     },
     {
       path: "/browse/:user",

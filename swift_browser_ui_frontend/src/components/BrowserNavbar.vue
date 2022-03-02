@@ -33,7 +33,7 @@
                 v-for="item in projects"
                 :key="item.id"
                 class="navbar-item"
-                :href="getProjectChangeURL ( item.id )"
+                @click="changeActive(item)"
               ><span>{{ item.name }}</span></a>
             </div>
           </div>
@@ -48,7 +48,7 @@
         </div>
         <div class="navbar-end">
           <div
-            v-if="$t('message.helplink')"
+            v-if="$te('message.helplink')"
             class="navbar-item"
           >
             <div class="buttons">
@@ -75,7 +75,7 @@
             <div class="buttons">
               <router-link
                 :to="{name: 'ContainersView',
-                      params: {user: uname, project: active.name}}"
+                      params: {user: uname, project: active.id}}"
                 :class="!($route.name == 'ContainersView'
                   || $route.name == 'ObjectsView') ? 
                   'button is-primary is-outlined' : 
@@ -91,7 +91,10 @@
           >
             <div class="buttons">
               <router-link
-                :to="{name: 'SharedTo', params: {project: active.id}}"
+                :to="{name: 'SharedTo', params: {
+                  user: uname,
+                  project: active.id
+                }}"
                 :class="
                   !($route.name == 'SharedTo' ||
                     $route.name == 'SharedFrom' || 
@@ -159,6 +162,19 @@ export default {
         this.$i18n.locale +
         "; path=/; expires="
         + expiryDate.toUTCString();
+    },
+    changeActive (item) {
+      this.$store.commit("setActive", item);
+      let newParams = Object.fromEntries(Object.entries(
+        this.$route.params,
+      ));
+      if (newParams.project != undefined) {
+        newParams.project = item.id;
+      }
+      this.$router.push({
+        name: this.$route.name,
+        params: newParams,
+      });
     },
     getProjectChangeURL ( newProject ) {
       let rescopeURL = new URL(

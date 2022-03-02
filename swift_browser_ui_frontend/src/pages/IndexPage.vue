@@ -64,6 +64,14 @@
         >
           {{ $t('message.error.UIdown_text') }}
         </b-message>
+        <b-message
+          v-if="!idb"
+          :title="$t('message.error.idb')"
+          type="is-warning"
+          has-icon
+        >
+          {{ $t('message.error.idb_text') }}
+        </b-message>
       </div>
       <div
         v-if="!forbid"
@@ -79,6 +87,7 @@
             tag="a"
             type="is-primary"
             :href="item.href"
+            :disabled="!idb"
           >
             {{ item.msg }}
           </b-button>
@@ -93,6 +102,7 @@
           tag="a"
           type="is-primary"
           href="/"
+          :disabled="!idb"
         >
           {{ $t("message.error.frontPage") }}
         </b-button>
@@ -126,6 +136,16 @@
     </div>
   </div>
 </template>
+
+<script>
+import checkIDB from "@/common/idb_support";
+
+export default {
+  mounted: function() {
+    checkIDB().then(result => this.idb = result);
+  },
+};
+</script>
 
 <style>
 html, body {

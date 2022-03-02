@@ -1,6 +1,6 @@
 
 import {
-  getBucketMeta,
+  getContainerMeta,
   getAccessControlMeta,
   getObjectsMeta,
 } from "./api";
@@ -57,7 +57,7 @@ function check_stale(detail, access) {
 }
 
 export async function syncContainerACLs(client, project) {
-  let acl = await getAccessControlMeta();
+  let acl = await getAccessControlMeta(project);
 
   let amount = 0;
   let aclmeta = acl.access;
@@ -155,35 +155,52 @@ export function getHumanReadableSize(val) {
   return ret;
 }
 
+export async function computeSHA256 ( keyContent ) {
+  const msgUint8 = new TextEncoder().encode(keyContent);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashHex;
+}
+
 function extractTags(meta) {
+  if ("Usertags" in meta[1]) {
+    return meta[1]["Usertags"].split(";");
+  }
   if ("usertags" in meta[1]) {
     return meta[1]["usertags"].split(";");
   }
   return [];
 }
 
-export async function getTagsForContainer(containerName, signal) {
-  let meta = await getBucketMeta(containerName, signal);
+export async function getTagsForContainer(project, containerName, signal) {
+  let meta = await getContainerMeta(project, containerName, signal);
   return extractTags(meta);
 }
 
 export async function getTagsForObjects(
+  project,
   containerName, 
   objectList, 
   url, 
   signal,
 ) {
-  let meta = await getObjectsMeta(containerName, objectList, url, signal);
+  let meta = await getObjectsMeta(
+    project, containerName, objectList, url, signal,
+  );
   meta.map(item => item[1] = extractTags(item));
   return meta;
 }
 
-export function makeGetObjectsMetaURL(container, objects) {
+export function makeGetObjectsMetaURL(project, container, objects) {
   return new URL(  
-    "/api/bucket/object/meta?container="
-      .concat(encodeURI(container))
-      .concat("&object=")
-      .concat(encodeURI(objects.join(","))),
+    "/api/meta/".concat(
+      encodeURI(project),
+      "/",
+      encodeURI(container),
+      "?objects=",
+      encodeURI(objects.join(",")),
+    ),
     document.location.origin,
   );
 }
@@ -222,3 +239,19 @@ export function filterSegments(objects) {
   return objects.filter(o =>
     o.name.match(SEGMENT_REGEX) === null);
 }
+
+export const tokenizerRE = "[^\\p{L}\\d]";
+
+export function tokenize(text, ignoreSmallerThan=2) {
+  // splits with non-word and non-digit chars
+  const re = new RegExp(tokenizerRE, "u");
+  const split = text.toLowerCase().split(re);
+
+  // filters out small words and duplicates
+  const result = split.filter((item, index) => 
+    item.length >= ignoreSmallerThan && split.indexOf(item) === index,
+  );
+  return result;
+}
+
+export const DEV = process.env.NODE_ENV === "development";

@@ -11,7 +11,6 @@ import click
 from swift_browser_ui.__init__ import __version__
 from swift_browser_ui.ui.settings import setd, set_key, FORMAT
 from swift_browser_ui.ui.server import servinit, run_server_insecure, run_server_secure
-from swift_browser_ui.ui._convenience import setup_logging as conv_setup_logging
 
 
 @click.group()
@@ -46,7 +45,6 @@ def cli(verbose: bool, debug: bool, logfile: str) -> None:
         logging.info(
             f"Save log information to the file {logfile} – Reason: got option --logfile"
         )
-    conv_setup_logging()
 
 
 @cli.command()

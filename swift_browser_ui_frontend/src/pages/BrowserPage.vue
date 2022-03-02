@@ -7,15 +7,23 @@
   >
     <div
       v-if="itemdrop"
-      class="upload-draggable is-full-page"
-      style="width: 100%;height: 100%;margin: auto;"
+      id="dropArea"
+      class="upload-draggable is-full-page
+            is-align-items-center is-flex is-justify-content-center"
+      style="width: 100%; height: 100%;margin: auto;"
       @dragenter="dragHandler"
       @dragover="dragHandler"
       @dragleave="dragLeaveHandler"
       @drop="navUpload"
     >
-      <p class="has-text-centered">
-        {{ $t('message.dropFiles') }}
+      <p>
+        <b-icon
+          icon="upload-multiple"
+          size="is-large"
+        />
+      </p>
+      <p>
+        {{ $t('message.dropFiles') }}     
       </p>
     </div>
     <div
@@ -129,7 +137,22 @@ html, body {
     margin-right: 5%;
 }
 
+#dropArea:before{
+  content:"";
+  width: 98%;
+  height:98%;
+  position:absolute;
+  border:2px dashed #b5b5b5;
+  margin: 0 1%;
+  padding: 0;
+  border-radius: 6px;
+}
+
 .footer {
   flex-shrink: 0;
+}
+
+#footer {
+  margin-top: 15px;
 }
 </style>

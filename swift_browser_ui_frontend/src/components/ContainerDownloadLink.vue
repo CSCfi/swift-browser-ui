@@ -48,6 +48,9 @@ export default {
     container: function () {
       this.createDownloadLink();
     },
+    active: function () {
+      this.createDownloadLink();
+    },
   },
   beforeMount () {
     this.createDownloadLink();

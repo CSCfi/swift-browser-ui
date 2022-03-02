@@ -2,16 +2,23 @@
 
 # Generic imports
 import logging
-import time
+import os
 import sys
 import asyncio
 import ssl
 import typing
 import secrets
+import base64
+
+import cryptography.fernet
 
 import uvloop
-import cryptography.fernet
 import aiohttp.web
+
+import aiohttp_session
+import aiohttp_session.redis_storage
+
+import aioredis
 
 from swift_browser_ui.ui.front import index, browse, loginpassword
 from swift_browser_ui.ui.login import (
@@ -20,21 +27,16 @@ from swift_browser_ui.ui.login import (
     sso_query_begin,
     sso_query_end,
     credentials_login_end,
-    token_rescope,
 )
 from swift_browser_ui.ui.api import (
-    swift_list_buckets,
+    swift_get_metadata_container,
+    swift_list_containers,
     swift_list_objects,
     swift_download_object,
     swift_download_shared_object,
     swift_download_container,
     os_list_projects,
     get_os_user,
-    get_os_active_project,
-    get_metadata_object,
-    get_metadata_bucket,
-    get_project_metadata,
-    swift_list_shared_objects,
     get_access_control_metadata,
     remove_container_acl,
     add_project_container_acl,
@@ -42,13 +44,14 @@ from swift_browser_ui.ui.api import (
     swift_create_container,
     swift_delete_container,
     swift_replicate_container,
-    update_metadata_bucket,
-    update_metadata_object,
+    swift_update_container_metadata,
+    swift_get_project_metadata,
+    remove_project_container_acl,
     get_upload_session,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
-from swift_browser_ui.ui.middlewares import error_middleware
+import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.signature import (
     handle_signature_request,
@@ -57,37 +60,9 @@ from swift_browser_ui.ui.signature import (
     handle_ext_token_remove,
 )
 from swift_browser_ui.ui.misc_handlers import handle_bounce_direct_access_request
-from swift_browser_ui.ui._convenience import clear_session_info
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
-
-async def startup(app: aiohttp.web.Application) -> None:
-    """Add startup web server state configuration."""
-    # Mutable_map handles cookie storage, also stores the object that provides
-    # the encryption we use
-    app["Crypt"] = cryptography.fernet.Fernet(cryptography.fernet.Fernet.generate_key())
-    # Create a signature salt to prevent editing the signature on the client
-    # side. Hash function doesn't need to be cryptographically secure, it's
-    # just a convenient way of getting ascii output from byte values.
-    app["Salt"] = secrets.token_hex(64)
-    # Set application specific logging
-    app["Log"] = logging.getLogger("swift-browser-ui")
-    app["Log"].info("Set up logging for the swift-browser-ui application")
-    # Cookie keyed dict for storing session data
-    app["Sessions"] = {}
-
-
-async def kill_sess_on_shutdown(app: aiohttp.web.Application) -> None:
-    """Kill all open sessions and purge their data when killed."""
-    logging.info(f"Gracefully shutting down the program at {time.ctime()}")
-    while app["Sessions"].keys():
-        key = list(app["Sessions"].keys())[0]
-        logging.info(f"Purging session for {key}")
-        clear_session_info(app["Sessions"][key])
-        app["Sessions"].pop(key)
-        logging.debug(f"Purged session information for {key} :: {time.ctime()}")
 
 
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
@@ -100,9 +75,49 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
     await app["api_client"].close()
 
 
-async def servinit() -> aiohttp.web.Application:
+async def servinit(
+    inject_middleware: typing.List[typing.Any] = [],
+) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
-    app = aiohttp.web.Application(middlewares=[error_middleware])  # type: ignore
+    middlewares = [
+        swift_browser_ui.ui.middlewares.error_middleware,
+        swift_browser_ui.ui.middlewares.check_session_at,
+    ]
+    if inject_middleware:
+        middlewares = middlewares + inject_middleware
+    app = aiohttp.web.Application()  # type: ignore
+
+    # Initialize aiohttp_session
+    redis_creds = ""
+    redis_user = str(os.environ.get("SWIFT_UI_REDIS_USER", ""))
+    redis_password = str(os.environ.get("SWIFT_UI_REDIS_PASSWORD", ""))
+    if redis_user and redis_password:
+        redis_creds = f"{redis_user}:{redis_password}@"
+    redis_port = str(os.environ.get("SWIFT_UI_REDIS_PORT", ""))
+    if redis_port:
+        redis_port = f":{redis_port}"
+    redis_host = str(os.environ.get("SWIFT_UI_REDIS_HOST", "localhost"))
+    redis = aioredis.from_url(f"redis://{redis_creds}{redis_host}{redis_port}")
+    storage = aiohttp_session.redis_storage.RedisStorage(
+        redis,
+        cookie_name="SWIFT_UI_SESSION",
+    )
+    app["seckey"] = base64.urlsafe_b64decode(cryptography.fernet.Fernet.generate_key())
+    aiohttp_session.setup(
+        app,
+        storage,
+    )
+
+    # Add the rest of the middlewares
+    [app.middlewares.append(i) for i in middlewares]  # type: ignore
+
+    # Create a signature salt to prevent editing the signature on the client
+    # side. Hash function doesn't need to be cryptographically secure, it's
+    # just a convenient way of getting ascii output from byte values.
+    app["Salt"] = secrets.token_hex(64)
+    # Set application specific logging
+    app["Log"] = logging.getLogger("swift-browser-ui")
+    app["Log"].info("Set up logging for the swift-browser-ui application")
 
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:
@@ -133,7 +148,6 @@ async def servinit() -> aiohttp.web.Application:
             aiohttp.web.post("/login/return", sso_query_end),
             aiohttp.web.post("/login/websso", sso_query_end),
             aiohttp.web.post("/login/credentials", credentials_login_end),
-            aiohttp.web.get("/login/rescope", token_rescope),
         ]
     )
 
@@ -143,33 +157,41 @@ async def servinit() -> aiohttp.web.Application:
     # Add token functionality
     app.add_routes(
         [
-            aiohttp.web.get("/token/{id}", handle_ext_token_create),
-            aiohttp.web.delete("/token/{id}", handle_ext_token_remove),
-            aiohttp.web.get("/token", handle_ext_token_list),
+            aiohttp.web.get("/token/{project}/{id}", handle_ext_token_create),
+            aiohttp.web.delete("/token/{project}/{id}", handle_ext_token_remove),
+            aiohttp.web.get("/token/{project}", handle_ext_token_list),
         ]
     )
 
     # Add api routes
     app.add_routes(
         [
-            aiohttp.web.get("/api/buckets", swift_list_buckets),
-            aiohttp.web.put("/api/containers/{container}", swift_create_container),
-            aiohttp.web.delete("/api/containers/{container}", swift_delete_container),
-            aiohttp.web.get("/api/bucket/objects", swift_list_objects),
-            aiohttp.web.get("/api/object/dload", swift_download_object),
-            aiohttp.web.get("/api/shared/objects", swift_list_shared_objects),
             aiohttp.web.get("/api/username", get_os_user),
             aiohttp.web.get("/api/projects", os_list_projects),
-            aiohttp.web.get("/api/project/active", get_os_active_project),
-            aiohttp.web.get("/api/bucket/meta", get_metadata_bucket),
-            aiohttp.web.post("/api/bucket/meta", update_metadata_bucket),
-            aiohttp.web.get("/api/bucket/object/meta", get_metadata_object),
-            aiohttp.web.post("/api/bucket/object/meta", update_metadata_object),
-            aiohttp.web.get("/api/project/meta", get_project_metadata),
-            aiohttp.web.get("/api/project/acl", get_access_control_metadata),
-            aiohttp.web.post("/api/access/{container}", add_project_container_acl),
-            aiohttp.web.delete("/api/access/{container}", remove_container_acl),
-            aiohttp.web.get("/api/project/address", get_shared_container_address),
+            aiohttp.web.post(
+                "/api/access/{project}/{container}", add_project_container_acl
+            ),
+            aiohttp.web.delete("/api/access/{project}/{container}", remove_container_acl),
+            aiohttp.web.delete(
+                "/api/access/{project}/{container}/{receiver}",
+                remove_project_container_acl,
+            ),
+            aiohttp.web.get("/api/meta/{project}", swift_get_project_metadata),
+            aiohttp.web.get(
+                "/api/meta/{project}/{container}", swift_get_metadata_container
+            ),
+            aiohttp.web.get("/api/{project}", swift_list_containers),
+            aiohttp.web.get("/api/{project}/acl", get_access_control_metadata),
+            aiohttp.web.get("/api/{project}/address", get_shared_container_address),
+            aiohttp.web.put("/api/{project}/{container}", swift_create_container),
+            aiohttp.web.delete("/api/{project}/{container}", swift_delete_container),
+            aiohttp.web.get("/api/{project}/{container}", swift_list_objects),
+            aiohttp.web.get(
+                "/api/{project}/{container}/{object:.*}", swift_download_object
+            ),
+            aiohttp.web.post(
+                "/api/{project}/{container}", swift_update_container_metadata
+            ),
         ]
     )
 
@@ -215,11 +237,9 @@ async def servinit() -> aiohttp.web.Application:
         ]
     )
 
-    app.on_startup.append(startup)
     app.on_startup.append(open_client_to_app)
 
     # Add graceful shutdown handler
-    app.on_shutdown.append(kill_sess_on_shutdown)
     app.on_shutdown.append(kill_dload_client)
 
     return app

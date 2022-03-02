@@ -4,7 +4,6 @@
 import typing
 
 import aiohttp.web
-import keystoneauth1.session
 
 from swift_browser_ui.upload import upload
 
@@ -27,13 +26,11 @@ def generate_download_url(
     return f"{host}/{container}/{object_name}"
 
 
-def get_download_host(auth: keystoneauth1.session.Session, project: str) -> str:
+def get_download_host(endpoint, project: str) -> str:
     """Get the actual download host with shared container support."""
-    ret = auth.get_endpoint(service_type="object-store")
-
+    ret = endpoint
     if project not in ret:
-        ret = ret.replace(ret.split("/")[-1], project)
-
+        ret = ret.replace(ret.split("/")[-1], f"AUTH_{project}")
     return ret
 
 
@@ -46,11 +43,6 @@ def get_session_id(request: aiohttp.web.Request) -> str:
             return request.query["session"]
         except KeyError:
             raise aiohttp.web.HTTPUnauthorized(reason="Missing runner session ID")
-
-
-def get_auth_instance(request: aiohttp.web.Request) -> keystoneauth1.session.Session:
-    """Return the session specific keystone auth instance."""
-    return request.app[get_session_id(request)]["auth"]
 
 
 async def parse_multipart_in(
@@ -106,9 +98,8 @@ async def get_upload_instance(
     try:
         upload_session = request.app[session]["uploads"][pro][cont][ident]
     except KeyError:
-        auth = get_auth_instance(request)
         upload_session = upload.ResumableFileUploadProxy(
-            auth, query, request.match_info, request.app["client"]
+            request.app[session], query, request.match_info, request.app["client"]
         )
         await upload_session.a_check_container()
         request.app[session]["uploads"][pro][cont][ident] = upload_session

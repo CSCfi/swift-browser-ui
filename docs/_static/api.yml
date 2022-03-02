@@ -2,7 +2,7 @@ openapi: "3.0.3"
 info:
   title: "Swift Browser UI"
   description: "API for querying Openstack Swift as well as working with Openstack Swift ACLs in order to enable sharing action."
-  version: "1.1.0"
+  version: "2.0.0"
   license:
     name: MIT
 tags:
@@ -13,7 +13,7 @@ tags:
   - name: Sharing Account 
     description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL information"
   - name: Upload/Download 
-    description: Endpoints for uploading and downloading buckets/objects
+    description: Endpoints for uploading and downloading containers/objects
   
 paths:
   /health:
@@ -581,7 +581,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Username'
-        403:
+        401:
           description: Unauthorized
   /api/projects:
     get:
@@ -595,27 +595,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Projects'
-        403:
+        401:
           description: Unauthorized
-  /api/project/active:
-    get:
-      tags:
-        - Frontend 
-      summary: Get the project that the user currently has active.
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
-        403:
-          description: Unauthorized
-  /api/project/acl:
+  /api/{project}/acl:
     get:
       tags:
         - Frontend 
       summary: Fetch a compilation of ACL information for sharing discovery.
+      parameters:
+        - name: project
+          in: path
+          description: The project for which the ACL information is queried for
+          required: true
+          schema:
+            type: string
+            example: test-project-1
       responses:
         200:
           description: OK
@@ -623,14 +617,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectAcl'
-        403:
+        401:
           description: Unauthorized
-          
-  /api/project/address:
+  /api/{project}/address:
     get:
       tags:
         - Frontend 
       summary: Get the project specific object storage address.
+      parameters:
+        - name: project
+          in: path
+          description: The project for which the address is queried for
+          required: true
+          schema:
+            type: string
+            example: test-project-1
       responses:
         200:
           description: OK
@@ -639,13 +640,21 @@ paths:
               schema:
                 type: string
                 example: http://endpoint
-        403:
+        401:
           description: Unauthorized
-  /api/project/meta:
+  /api/meta/{project}:
     get:
       tags:
         - Frontend 
       summary: Get the filtered project metadata for the currently active project.
+      parameters:
+        - name: project
+          in: path
+          description: The project for which the metadata is queried for
+          required: true
+          schema:
+            type: string
+            example: test-project-1
       responses:
         200:
           description: OK
@@ -653,13 +662,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectMeta'
-        403:
+        401:
           description: Unauthorized
-  /api/buckets:
+        403:
+          description: Forbidden
+  /api/{project}:
     get:
       tags:
         - Frontend 
-      summary: Get the listing for containers in the currently active project.
+      summary: Get the listing for containers for specified project
+      parameters:
+        - name: project
+          in: path
+          description: The project for which the containers are queried for
+          required: true
+          schema:
+            type: string
+            example: test-project-1
+        - name: marker
+          in: query
+          description: The marker from which to continue paging the container listing
+          required: false
+          schema:
+            type: string
+            example: test-container
       responses:
         200:
           description: OK
@@ -667,22 +693,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Containers'
-        403:
+        401:
           description: Unauthorized
+        403:
+          description: Forbidden
         404:
           description: Not Found
-  /api/bucket/objects:
+  /api/{project}/{container}:
     get:
       tags:
         - Frontend 
       summary: Get the listing for objects in a given container.
       parameters:
-      - name: bucket
-        in: query
-        description: The container that is to be queried.
-        schema:
-          type: string
-          example: test-container-1
+        - name: project
+          in: path
+          description: The project for which the ACL information is queried for
+          required: true
+          schema:
+            type: string
+            example: test-project-1
+        - name: container
+          in: path
+          description: The container for which objects are to be queried
+          required: true
+          schema:
+            type: string
+            example: test-container
+        - name: marker
+          in: query
+          description: The marker from which to continue paging the object listing
+          required: false
+          schema:
+            type: string
+            example: test-object
       responses:
         200:
           description: OK
@@ -690,23 +733,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Objects'
-        403:
+        401:
           description: Unauthorized
+        403:
+          description: Forbidden
         404:
           description: Not Found
-          
-  /api/bucket/meta:
+    put:
+      tags:
+        - Frontend
+      summary: Create a container to the specified project
+      parameters:
+        - name: project
+          in: path
+          description: The project in which to create the container
+          required: true
+          schema:
+            type: string
+            example: test-project
+        - name: container
+          in: path
+          description: The container to create
+          required: true
+          schema:
+            type: string
+            example: test-container
+      responses:
+        201:
+          description: Created
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        409:
+          description: Conflict
+    delete:
+      tags:
+        - Frontend
+      summary: Delete an empty container from the project
+      parameters:
+      - name: project
+        in: path
+        description: The project in which to remove the container
+        required: true
+        schema:
+          type: string
+          example: test-project
+      - name: container
+        in: path
+        description: The container to remove
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: objects
+        in: query
+        description: Toggle object deletion
+        required: false
+        schema:
+          type: boolean
+          example: true
+      requestBody:
+        description: A list of the objects to delete
+        required: false
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                example: test-object
+      responses:
+        204:
+          description: No Content
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+  /api/meta/{project}/{container}:
     get:
       tags:
         - Frontend 
       summary: Get container metadata.
       parameters:
-      - name: container
-        in: query
-        description: The container the metadata of which is to be queried.
+      - name: project
+        in: path
+        description: The project for which to query the metadata
+        required: true
         schema:
           type: string
-          example: test-container-1
+          example: test-project
+      - name: container
+        in: path
+        description: The container to query
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: objects
+        in: query
+        description: Toggle for fetching object metadata
+        required: false
+        schema:
+          type: boolean
+          example: true
       responses:
         200:
           description: OK
@@ -714,24 +846,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Meta'
-        403:
+        401:
           description: Unauthorized
+        403:
+          description: Forbidden
         404:
           description: Not Found
     post:
       tags:
         - Frontend
-      summary: Update user created container metadata.
+      summary: Update container metadata.
       parameters:
-        - name: container
-          in: query
-          description: The container which metadata will be updated.
-          schema:
-            type: string
-            example: test-container-1
-          required: true
+      - name: project
+        in: path
+        description: The project for which to update the metadata
+        required: true
+        schema:
+          type: string
+          example: test-project
+      - name: container
+        in: path
+        description: The container to update
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: objects
+        in: query
+        description: Toggle for updating object metadata
+        required: false
+        schema:
+          type: boolean
+          example: true
       requestBody:
-        description: Bucket metadata as a key-value object. Updates must include all the metadata for the bucket. Omitted keys are removed by the swift backend.
+        description: Container metadata as a key-value object. Updates must include all the metadata for the container. Omitted keys are removed by the swift backend.
         required: true
         content:
           application/json:
@@ -745,177 +893,95 @@ paths:
       responses:
         204:
           description: Container metadata was updated. No Content.
-        403:
+        401:
           description: Unauthorized
+        403:
+          description: Forbidden
         404:
           description: Container was not found
-  /api/bucket/object/meta:
-    get:
-      tags:
-        - Frontend 
-      summary: Get object(s) metadata.
-      parameters:
-      - name: container
-        in: query
-        description: The container in which the queried objects are.
-        schema:
-          type: string
-          example: test-container-1
-      - name: object
-        in: query
-        description: The comma separated list of objects, the metadata of which is to be queried. (if querying metadata)
-        schema:
-          type: string
-          example: test-object-1,test-object-2,test-object-3
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Meta'
-        403:
-          description: Unauthorized
-        404:
-          description: Not Found
-    post:
-      tags:
-        - Frontend
-      summary: Update user created object metadata.
-      parameters:
-        - name: container
-          in: query
-          description: The container which contains the objects to be updated.
-          schema:
-            type: string
-            example: test-container-1
-          required: true
-      requestBody:
-        description: Object metadata as an array of tuples with the object name and a key-value object. Updates must include all the metadata for the object. Omitted keys are removed by the swift backend.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              example:
-                - - object-name
-                  - key: value
-              items:
-                type: array
-                items:
-                  oneOf:
-                    - type: string
-                    - type: object
-                minItems: 2
-                maxItems: 2
-                example:
-                  - object-name
-                  - key: value
-            example:
-              - - object-name
-                - key: value
-      responses:
-        204:
-          description: Object metadata was updated. No Content.
-        400:
-          description: Payload malformed. Bad request.
-        403:
-          description: Unauthorized.
-        404:
-          description: At least one object was not found.
-  /api/shared/objects:
-    get:
-      tags:
-        - Frontend 
-      summary: Get the listing for objects in a known shared container.
-      parameters:
-      - name: container
-        in: query
-        description: The container that is to be queried.
-        schema:
-          type: string
-          example: test-container-1
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Objects"
-        403:
-          description: Unauthorized
-        404:
-          description: Not Found
-  /api/object/dload:
+  /api/{project}/{container}/{object}:
     get:
       tags:
         - Frontend 
       summary: Download the object specified in the download link.
       parameters:
-      - name: bucket
-        in: query
-        description: The container from which to download
+      - name: project
+        in: path
+        description: The project from which to download the object
+        required: true
         schema:
           type: string
-          example: test-container-1
-      - name: objkey
-        in: query
-        description: The object key that is to be queried.
+          example: test-project
+      - name: container
+        in: path
+        description: The container to download from
+        required: true
         schema:
           type: string
-          example: example-object-name
+          example: test-container
+      - name: object
+        in: path
+        description: The object to download
+        required: true
+        schema:
+          type: string
+          example: test-object
       responses:
         302:
           description: OK
-        403:
+        401:
           description: Unauthorized
+        403:
+          description: Forbidden
         404:
           description: Not Found
-  
-  /api/containers/{container}:
-    put:
-      tags:
-        - Frontend
-      summary: Create a new container according to the name specified.
-      parameters:
-      - name: container
-        in: path
-        description: The container that is to be created.
-        required: true
-        schema:
-          type: string
-          example: test-container-1
-      responses:
-        201:
-          description: Created
-        400:
-          description: Invalid container name
-        409:
-          description: Container name in use
+  /api/access/{project}/{container}/{receiver}:
     delete:
       tags:
         - Frontend
-      summary: Delete an empty container.
+      summary: Remove access from a project in container acl.
       parameters:
-      - name: container
+      - name: project
         in: path
-        description: The container that is to be deleted.
+        description: The project that owns the container
         required: true
         schema:
           type: string
-          example: test-container-1
+          example: test-project
+      - name: container
+        in: path
+        description: The container where access is to be removed from.
+        required: true
+        schema:
+          type: string
+          example: test-container
+      - name: receiver
+        in: path
+        description: The project which the access is to be revoked from
+        required: true
+        schema:
+          type: string
+          example: test-project-1
       responses:
-        204:
-          description: No Content
-        500:
-          description: Container deletion failure
-          
-  /api/access/{container}:
+        200:
+          description: OK
+        401:
+          description: Unauthorized
+        404:
+          description: NotFound
+  /api/access/{project}/{container}:
     post:
       tags:
         - Frontend
       summary: Add access for a project in container acl.
       parameters:
+      - name: project
+        in: path
+        description: The project owning the container
+        required: true
+        schema:
+          type: string
+          example: test-project
       - name: container
         in: path
         description: The container that is to be added acls to.
@@ -923,15 +989,39 @@ paths:
         schema:
           type: string
           example: test-container-1
+      - name: projects
+        in: query
+        description: The projects that are to be added to the acls
+        required: true
+        schema:
+          type: string
+          example: test-project-1,test-project-2,test-project-3
+      - name: rights
+        in: query
+        description: The rights to be added to the projects
+        required: true
+        schema:
+          type: string
+          example: rw
       responses:
         201:
           description: Created
-          
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
     delete:
       tags:
         - Frontend
       summary: Remove all allowed projects from container acl.
       parameters:
+      - name: project
+        in: path
+        description: The project that owns the container
+        required: true
+        schema:
+          type: string
+          example: test-project
       - name: container
         in: path
         description: The container that is to be deleted.
@@ -942,14 +1032,24 @@ paths:
       responses:
         200:
           description: OK
-          
-  /token/{id}:
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+  /token/{project}/{token_id}:
     get:
       tags:
         - Frontend
       summary: Handle call for an API token create.
       parameters:
-      - name: id
+      - name: project
+        in: path
+        description: The project that will own the token
+        required: true
+        schema:
+          type: string
+          example: test-project
+      - name: token_id
         in: path
         description: The id of the token to be created.
         required: true
@@ -964,12 +1064,21 @@ paths:
               schema:
                 type: string
                 example: 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+        401:
+          description: Unauthorized
     delete:
       tags:
         - Frontend
       summary: Handle call for an API token delete.
       parameters:
-      - name: id
+      - name: project
+        in: path
+        description: The project that owns the token
+        required: true
+        schema:
+          type: string
+          example: test-project
+      - name: token_id
         in: path
         description: The id that is to be deleted.
         required: true
@@ -979,12 +1088,22 @@ paths:
       responses:
         204:
           description: No Content
+        401:
+          description: Unauthorized
 
-  /token:
+  /token/{project_id}:
     get:
       tags:
         - Frontend
       summary: Handle call for listing API tokens.
+      parameters:
+      - name: project_id
+        in: path
+        description: The project the tokens of which are to be queried
+        required: true
+        schema:
+          type: string
+          example: test-project
       responses:
         201:
           description: Created
@@ -995,6 +1114,8 @@ paths:
                 items:
                   type: string
                 example: ['11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111']
+        401:
+          description: Unauthorized
 
 
   /{project}/{container}/{object_name}:
@@ -1041,14 +1162,14 @@ paths:
       parameters:
       - name: project
         in: path
-        description: The container that is to be added acls to.
+        description: The project which is uploading.
         required: true
         schema:
           type: string
           example: test-project-1
       - name: container
         in: path
-        description: The container that is to be added acls to.
+        description: The container to upload to.
         required: true
         schema:
           type: string
@@ -1065,14 +1186,14 @@ paths:
       parameters:
       - name: project
         in: path
-        description: The container that is to be added acls to.
+        description: The project that owns the container.
         required: true
         schema:
           type: string
           example: test-project-1
       - name: container
         in: path
-        description: The container that is to be added acls to.
+        description: The container to download.
         required: true
         schema:
           type: string
@@ -1092,14 +1213,14 @@ paths:
       parameters:
       - name: project
         in: path
-        description: The container that is to be added acls to.
+        description: The project that owns the container.
         required: true
         schema:
           type: string
           example: test-project-1
       - name: container
         in: path
-        description: The container that is to be added acls to.
+        description: The container being queried.
         required: true
         schema:
           type: string

@@ -2,32 +2,29 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
-import { getBuckets } from "@/common/api";
-import {
-  getObjects,
-  getSharedObjects,
-} from "./api";
+import { getContainers } from "@/common/api";
+import { getObjects } from "@/common/api";
 import {
   getTagsForContainer,
   getTagsForObjects,
   makeGetObjectsMetaURL,
   filterSegments,
+  tokenize,
 } from "./conv";
 
+import { initDB } from "@/common/db";
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
+    db: initDB(),
     projects: [],
     active: {},
     uname: "",
     multipleProjects: false,
     isLoading: false,
     isFullPage: true,
-    objectCache: [],
-    objectTagsCache: {}, // {"objectName": ["tag1", "tag2"]}
-    containerCache: [],
-    containerTagsCache: {}, // {"containerName": ["tag1", "tag2"]}
+    objectCache: {}, // Only for shared objects
     langs: [
       {ph: "In English", value: "en"},
       {ph: "Suomeksi", value: "fi"},
@@ -41,34 +38,17 @@ const store = new Vuex.Store({
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
+    pubkey: [],
     currentPrefix: "",
+    dropFiles:[],
   },
   mutations: {
     loading(state, payload) {
       state.isLoading = payload;
     },
-    updateContainers (state, payload) {
-      // Update container cache with the new container listing.
-      state.containerCache = payload;
-    },
-    updateContainerTags(state, payload) {
-      state.containerTagsCache = { 
-        ...state.containerTagsCache, 
-        [payload.containerName]: payload.tags,
-      };
-    },
-    updateObjects (
-      state,
-      payload,
-    ) {
+    updateObjects (state,objects) {
       // Update object cache with the new object listing.
-      state.objectCache = payload;
-    },
-    updateObjectTags (state, payload) {
-      state.objectTagsCache = { 
-        ...state.objectTagsCache, 
-        [payload.objectName]: payload.tags,
-      };
+      state.objectCache = [...objects];
     },
     eraseObjects(state) {
       state.objectCache = [];
@@ -138,6 +118,33 @@ const store = new Vuex.Store({
     eraseTransfer (state) {
       state.transfer = [];
     },
+    appendDropFiles (state, file) {
+      if (state.dropFiles.find(({ relativePath }) => 
+        relativePath === String(file.relativePath)) === undefined 
+        && state.dropFiles.find(({ name }) => 
+          name === String(file.name)) === undefined) {
+        state.dropFiles.push(file);
+      } else {
+        // we remove and push the file again to get new size
+        // and if the file exists to referesh dropFiles var
+        state.dropFiles = state.dropFiles.filter(v => {
+          return (v.relativePath !== file.relativePath && v.name !== file.name);
+        });
+        state.dropFiles.push(file);
+      }
+    },
+    eraseDropFile (state, file) {
+      state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
+    },
+    eraseDropFiles (state) {
+      state.dropFiles = [];
+    },
+    appendPubKey (state, key) {
+      state.pubkey.push(key);
+    },
+    erasePubKey (state) {
+      state.pubkey = [];
+    },
     setPrefix (state, prefix) {
       state.currentPrefix = prefix;
     },
@@ -146,109 +153,235 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    updateContainers: async function ({ commit, dispatch }, signal) {
-      commit("loading", true);
-      let containers = [];
-      await getBuckets().then((ret) => {
-        if (ret.status != 200) {
+    updateContainers: async function (
+      { state, commit, dispatch },
+      { projectID, signal },
+    ) {
+      const existingContainers = await state.db.containers
+        .where({projectID})
+        .toArray();
+      if (existingContainers.length === 0) {
+        commit("loading", true);
+      }
+      let containers;
+      let marker = "";
+      let newContainers = [];
+      do {
+        containers = [];
+        containers = await getContainers(
+          projectID,
+          marker,
+        ).catch(() => {
           commit("loading", false);
+        });
+        commit("loading", false);
+        if(containers.length > 0) {
+          containers.forEach(cont => {
+            cont.tokens = tokenize(cont.name);
+            cont.projectID = projectID;
+          });
+          await state.db.containers.bulkPut(containers).catch(() => {});
+          newContainers = newContainers.concat(containers);
+          marker = containers[containers.length - 1].name;
         }
-        containers = ret;
-        commit("updateContainers", ret);
-        commit("loading", false);
-      }).catch(() => {
-        commit("loading", false);
+      } while (containers.length > 0);
+      dispatch("updateContainerTags", {
+        projectID: projectID,
+        containers: newContainers,
+        signal,
       });
-      dispatch("updateContainerTags", {containers, signal});
-      return containers;
-    },
-    updateContainerTags: function ({ commit }, {containers, signal}) {
-      containers.map(async container => {
-        const tags = await getTagsForContainer(container.name, signal);
-        commit(
-          "updateContainerTags", 
-          {containerName: container.name, tags},
+      const toDelete = [];
+      existingContainers.map(oldCont => {
+        if(!newContainers.find(cont => cont.name == oldCont.name)) {
+          toDelete.push(oldCont.id);
+        }
+      });
+      if (toDelete.length) {
+        await state.db.containers.bulkDelete(toDelete);
+        await state.db.objects.where("containerID").anyOf(toDelete).delete();
+      }
+      const containersFromDB = await state.db.containers
+        .where({projectID}).toArray();
+      for (let i = 0; i < containersFromDB.length; i++) {
+        const container = containersFromDB[i];
+        const oldContainer = existingContainers.find(
+          cont => cont.name === container.name,
         );
+        let updateObjects = true;
+        const dbObjects = await state.db.objects
+          .where({"containerID": container.id}).count();
+        if (
+          oldContainer &&
+          container.count === oldContainer.count &&
+          container.bytes === oldContainer.bytes &&
+          !(dbObjects === 0)
+        ) {
+          updateObjects = false;
+        }
+        if (container.count === 0) {
+          updateObjects = false;
+          await state.db.objects
+            .where({"containerID": container.id}).delete();
+        }
+        if (updateObjects) {
+          dispatch(
+            "updateObjects",
+            {
+              projectID: projectID,
+              container: container,
+              signal: signal,
+            },
+          );
+        }
+      }
+    },
+    updateContainerTags: function (
+      {state},
+      {projectID, containers, signal},
+    ) {
+      containers.map(async container => {
+        const tags = await getTagsForContainer(
+          projectID,
+          container.name,
+          signal,
+        ) || null;
+        await state.db.containers
+          .where({"projectID": container.projectID, "name": container.name})
+          .modify({tags});
       });
     },
     updateObjects: async function (
-      { commit, dispatch, state }, 
-      {route, signal},
+      { state, dispatch },
+      { projectID, container, signal },
     ) {
-      let container = route.params.container;
-      commit("loading", true);
-      if (route.name == "SharedObjects") {
-        await state.client.getAccessDetails(
-          route.params.project,
-          container,
-          route.params.owner,
-        ).then(
-          (ret) => {
-            return getSharedObjects(
-              route.params.owner,
-              container,
-              ret.address,
-            );
-          },
-        ).then(
-          (ret) => {
-            commit("loading", false);
-            commit("updateObjects", filterSegments(ret));
-          },
-        ).catch(() => {
-          commit("updateObjects", []);
-          commit("loading", false);
-        });
-      } else {
-        await getObjects(
+      const isSegmentsContainer= container.name.match("_segments");
+      const existingObjects = await state.db.objects
+        .where({containerID: container.id}).toArray();
+      let newObjects = [];
+      let objects;
+      let marker = "";
+      do {
+        objects = await getObjects(
+          projectID,
+          container.name,
+          marker,
+          signal,
+        );
+        if (objects.length > 0) {
+          objects.forEach(obj => {
+            obj.container = container.name;
+            obj.containerID = container.id;
+            obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
+          });
+          await state.db.objects.bulkPut(objects).catch(() => {});
+          newObjects = newObjects.concat(objects);
+          marker = objects[objects.length -1].name;
+        }
+      } while (objects.length > 0);
+  
+      let toDelete = [];
+      existingObjects.map(oldObj => {
+        if(!newObjects.find(obj => obj.name === oldObj.name)) {
+          toDelete.push(oldObj.id);
+        }
+      });
+      if(toDelete.length) {
+        await state.db.objects.bulkDelete(toDelete);
+      }
+      if (!isSegmentsContainer) {
+        dispatch("updateObjectTags", {
+          projectID,
           container,
           signal,
-        ).then((ret) => {
-          if (ret.status != 200) {
-            commit("loading", false);
-          }
-          commit("updateObjects", filterSegments(ret));
-          commit("loading", false);
-        }).catch(() => {
-          commit("updateObjects", []);
-          commit("loading", false);
         });
       }
-      dispatch("updateObjectTags", {route, signal});
     },
-    updateObjectTags: async function ({ commit, state }, {route, signal}) {
-      if (!state.objectCache.length) {
-        return;
-      }
+    updateObjectTags: async function (
+      { state, commit }, 
+      { projectID, container, signal, sharedObjects=undefined }) {
       let objectList = [];
-      for (let i = 0; i < state.objectCache.length; i++) {
+
+      let objects = [];
+      if (sharedObjects) {
+        objects = sharedObjects;
+      } else {
+        objects = await state.db.objects
+          .where({"containerID": container.id}).toArray();
+      }
+
+      for (let i = 0; i < objects.length; i++) {
         // Object names end up in the URL, which has hard length limits.
-        // The aiohttp backend has a limit of 2048. The maximum size
+        // The aiohttp complains at 8190. The maximum size
         // for object name is 1024. Set it to a safe enough amount.
         // We split the requests to prevent reaching said limits.
-        objectList.push(state.objectCache[i].name);
-        const url = makeGetObjectsMetaURL(route.params.container, objectList);
+        objectList.push(objects[i].name);
+        const url = makeGetObjectsMetaURL(
+          projectID,
+          container.name,
+          objectList,
+        );
         if (
-          i === state.objectCache.length - 1
-          || url.href.length > 2000
+          i === objects.length - 1
+          || makeGetObjectsMetaURL(
+            projectID,
+            container.name,
+            [...objectList, objects[i+1].name],
+          ).href.length >= 8190
         ) {
-          getTagsForObjects(
-            route.params.container, 
-            objectList, 
+          let tags = await getTagsForObjects(
+            projectID,
+            container.name,
+            objectList,
             url,
             signal,
-          )
-            .then(tags => 
-              tags.map(item => {
-                commit(
-                  "updateObjectTags", 
-                  {objectName: item[0], tags: item[1]},
-                );
-              }),
-            );
+          );
+          tags.map(item => {
+            const objectName = item[0];
+            const tags = item[1];
+            if (sharedObjects) {
+              objects.forEach(obj => {
+                if (obj.name === objectName) {
+                  obj.tags = tags;
+                }
+              });
+              commit("updateObjects", objects);
+            } else {
+              state.db.objects.where(
+                {"containerID": container.id, "name": objectName},
+              ).modify({tags});
+            }
+          }),
           objectList = [];
         }
       }
+    },
+    updateSharedObjects: async function (
+      { commit, dispatch }, 
+      { project, container, signal },
+    ) {
+      commit("loading", true);
+      let sharedObjects = [];
+      let marker = "";
+      let objects = [];
+      do {
+        objects = await getObjects(
+          project,
+          container.name,
+          marker,
+          signal,
+        ).catch(() => {
+          commit("loading", false);
+          commit("updateObjects", []);
+        });
+        if (objects.length > 0) {
+          sharedObjects = sharedObjects.concat(objects);
+          marker = objects[objects.length - 1].name;
+        }
+      } while (objects.length > 0);
+      commit("loading", false);
+      sharedObjects = filterSegments(sharedObjects);
+      commit("updateObjects", sharedObjects);
+      dispatch("updateObjectTags", {project, container, signal, sharedObjects});
     },
   },
 });

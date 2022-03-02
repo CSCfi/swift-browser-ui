@@ -7,7 +7,7 @@
     >
       <b-select
         v-model="perPage"
-        data-testid="bucketsPerPage"
+        data-testid="containersPerPage"
       >
         <option value="5">
           5 {{ $t('message.table.pageNb') }}
@@ -113,6 +113,11 @@ export default {
       defaultSortDirection: "asc",
     };
   },
+  computed: {
+    project () {
+      return this.$route.params.project;
+    },
+  },
   beforeMount () {
     this.getShareRequests();
   },
@@ -145,7 +150,7 @@ export default {
     getShareRequests: function () {
       if (this.$store.state.client) {
         this.$store.state.requestClient.listMadeRequests(
-          this.$route.params.project,
+          this.project,
         ).then(
           (ret) => {this.requestedSharesList = ret;},
         );
@@ -159,7 +164,7 @@ export default {
       owner,
     ) {
       this.$store.state.requestClient.shareDeleteAccess(
-        this.$route.params.project,
+        this.project,
         container,
         owner,
       ).then(() => {

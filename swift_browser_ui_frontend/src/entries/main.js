@@ -13,15 +13,14 @@ import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
 import { getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
-import getActiveProject from "@/common/api";
-import { changeProjectApi } from "@/common/api";
 
 // Import SharingView and Request API
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { syncContainerACLs } from "@/common/conv";
+import { syncContainerACLs, DEV } from "@/common/conv";
+import checkIDB from "@/common/idb_support";
 
 // Import project state
 import store from "@/common/store";
@@ -38,7 +37,36 @@ import ProgressBar from "@/components/UploadProgressBar";
 // Import delay
 import delay from "lodash/delay";
 
+
+checkIDB().then(result => {
+  if (!result) {
+    window.location.pathname = "/";
+  }
+});
+
+window.onerror = function(error) { 
+  if(DEV) console.log("Global error", error);
+  error.preventDefault();
+  error.stopPropagation();
+};
+window.addEventListener("unhandledrejection", function(event) {
+  if(DEV) console.log("unhandledrejection", event);
+  event.preventDefault();
+  event.stopPropagation();
+});
+window.addEventListener("rejectionhandled", function(event) {
+  if(DEV) console.log("rejectionhandled", event);
+  event.preventDefault();
+  event.stopPropagation();
+});
+
 Vue.config.productionTip = false;
+Vue.config.errorHandler = function(err, vm, info) { 
+  if(DEV) console.log("Vue error: ", err, vm, info);
+};
+Vue.config.warnHandler = function(msg, vm, info) { 
+  if(DEV) console.log("Vue warning: ", msg, vm, info);
+};
 
 Vue.use(Buefy);
 Vue.use(VueI18n);
@@ -75,6 +103,9 @@ new Vue({
     active () {
       return this.$store.state.active;
     },
+    user () {
+      return this.$store.state.uname;
+    },
     isFullPage () {
       return this.$store.state.isFullPage;
     },
@@ -103,32 +134,74 @@ new Vue({
   created() {
     document.title = this.$t("message.program_name");
     this.createUploadInstance();
-    getUser().then(( value ) => {
-      this.$store.commit("setUname", value);
-    });
-    getProjects().then((value) => {
-      this.$store.commit("setProjects", value);
-      
-      getActiveProject().then((value) => {
-        this.$store.commit("setActive", value);
-        if (this.$route.params.user != undefined) {
-          if (
-            value.name != this.$route.params.project &&
-            this.$route.params.project != undefined
-          ) {
-            this.changeProject(this.$route.params.project);
-          }
-        }
-        if (document.location.pathname == "/browse") {
-          this.$router.push(
-            "/browse/".concat(
-              this.$store.state.uname,
-              "/",
-              value.name,
-            ),
-          );
+    let initialize = async () => {
+      let active;
+      let user = await getUser();
+      let projects = await getProjects();
+      this.$store.commit("setUname", user);
+      this.$store.commit("setProjects", projects);
+
+      const existingProjects = await this.$store.state.db.projects
+        .toCollection()
+        .primaryKeys();
+      await this.$store.state.db.projects.bulkPut(projects);
+      const toDelete = [];
+      existingProjects.map(async oldProj => {
+        if(!projects.find(proj => proj.id === oldProj)) {
+          toDelete.push(oldProj);
         }
       });
+      if (toDelete.length) {
+        await this.$store.state.db.projects.bulkDelete(toDelete);
+        const containersCollection = this.$store.state.db.containers
+          .where("projectID").anyOf(toDelete);
+        const containers = await containersCollection.primaryKeys();
+        await containersCollection.delete();
+        await this.$store.state.db.objects
+          .where("containerID").anyOf(containers)
+          .delete();
+      }
+
+      let last_active;
+      if(document.cookie.match("LAST_ACTIVE")) {
+        last_active = document.cookie
+          .split("; ")
+          .find(row => row.startsWith("LAST_ACTIVE"))
+          .split("=")[1];
+      }
+      if (last_active) {
+        active = projects[
+          projects.indexOf(projects.find(e => e.id == last_active))
+        ];
+      } else if (
+        !(this.$route.params.user === undefined)
+      ) {
+        if (
+          !(this.$route.params.project === undefined)
+        ) {
+          active = projects[
+            projects.indexOf(
+              projects.find(e => e.id == this.$route.params.project),
+            )
+          ];
+        }
+      } else {
+        active = projects[0];
+      }
+      this.$store.commit("setActive", active);
+
+      if (document.location.pathname == "/browse") {
+        this.$router.push({
+          name: "ContainersView",
+          params: {
+            project: active.id,
+            user: user,
+          },
+        });
+      }
+    };
+    initialize().then(() => {
+      return;
     });
     fetch("/discover")
       .then((resp) => {
@@ -155,8 +228,22 @@ new Vue({
       });
     delay(
       this.containerSyncWrapper,
-      5000,
+      10000,
     );
+    if (this.$te("message.keys")) {
+      for (let item of Object.entries(this.$t("message.keys"))) {
+        fetch(
+          "/download/"
+            + item[1]["project"] + "/"
+            + item[1]["container"] + "/"
+            + item[1]["object"],
+        ).then(resp => {
+          return resp.text();
+        }).then(resp => {
+          this.$store.commit("appendPubKey", resp);
+        });
+      }
+    }
   },
   methods: {
     dragHandler: function (e) {
@@ -187,17 +274,19 @@ new Vue({
           this.$store.commit("appendFileTransfer", file);
         }
       }
-      this.$router.push({
-        name: "UploadView",
-        params: {
-          project: this.$route.params.project,
-          container: (
-            this.$route.params.container ?
-              this.$route.params.container :
-              "upload-".concat(Date.now().toString())
-          ),
-        },
-      });
+      if (this.$route.name != "UploadView") {
+        this.$router.push({
+          name: "UploadView",
+          params: {
+            project: this.$route.params.project,
+            container: (
+              this.$route.params.container ?
+                this.$route.params.container :
+                "upload-".concat(Date.now().toString())
+            ),
+          },
+        });
+      }
       this.itemdrop = false;
     },
     containerSyncWrapper: function () {
@@ -236,8 +325,6 @@ new Vue({
       // Bake upload runner information to the resumable url parameters.
       let retUrl = new URL(this.uploadInfo.url);
 
-      console.log(this.uploadInfo.url);
-
       for (const param of params) {
         let newParam = param.split("=");
         // check if we should move the file under a pseudofolder
@@ -263,7 +350,6 @@ new Vue({
       retUrl.searchParams.append(
         "signature", this.uploadInfo.signature.signature,
       );
-      console.log(retUrl);
       return retUrl;
     },
     startUpload: function () {
@@ -361,26 +447,6 @@ new Vue({
       }
 
       return retl;
-    },
-    changeProject: function (newProject) {
-      // Re-scope login to project given as a parameter.
-      changeProjectApi(newProject).then((ret) => {
-        if (ret) {
-          getActiveProject().then((value) => {
-            this.$store.commit("setActive", value);
-            this.$store.commit("updateContainers", undefined);
-            this.$store.commit("eraseObjects");
-            this.$router.push(
-              "/browse/" +
-              this.$store.state.uname + "/" +
-              this.$store.state.active["name"],
-            );
-            this.$router.go(0);
-          });
-        } else{
-          this.$router.push("/browse/" + this.$store.state.uname);
-        }
-      });
     },
   },
   ...App,

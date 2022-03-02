@@ -1,11 +1,13 @@
 aiohttp==3.8.1
-python-swiftclient==3.13.0
+aiohttp_session==2.11.0
+python-swiftclient==3.13.1
 cryptography==36.0.1
 keystoneauth1==4.4.0
-click==8.0.3
-sphinx==4.3.2
+click==8.0.4
+sphinx==4.4.0
 sphinx_rtd_theme==1.0.0
 uvloop==0.16.0
 gunicorn>=20.0.1
 certifi==2021.10.8
 asyncpg==0.25.0
+aioredis==2.0.1
