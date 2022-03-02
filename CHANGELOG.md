@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.0]
+
 ### Added
 
 - (GH #493) redesign upload UI
@@ -77,4 +79,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GH (GH #493) redesign upload UI 
     - removed vue-material-design-icons 
 
-[Unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...devel
+[Unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/2.0.0...devel
+[v2.0.0]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...2.0.0
