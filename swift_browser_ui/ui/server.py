@@ -20,13 +20,14 @@ import aiohttp_session.redis_storage
 
 import aioredis
 
-from swift_browser_ui.ui.front import index, browse, loginpassword
+from swift_browser_ui.ui.front import index, browse, loginpassword, select
 from swift_browser_ui.ui.login import (
     handle_login,
     handle_logout,
     sso_query_begin,
     sso_query_end,
     credentials_login_end,
+    handle_project_lock,
 )
 from swift_browser_ui.ui.api import (
     swift_get_metadata_container,
@@ -82,6 +83,7 @@ async def servinit(
     middlewares = [
         swift_browser_ui.ui.middlewares.error_middleware,
         swift_browser_ui.ui.middlewares.check_session_at,
+        swift_browser_ui.ui.middlewares.check_session_taintness,
     ]
     if inject_middleware:
         middlewares = middlewares + inject_middleware
@@ -136,6 +138,14 @@ async def servinit(
             # Route all URLs prefixed by /browse to the browser page, as this is
             # an spa
             aiohttp.web.get("/browse/{tail:.*}", browse),
+            aiohttp.web.get("/select", select),
+        ]
+    )
+
+    # Add lock routes
+    app.add_routes(
+        [
+            aiohttp.web.get("/lock/{project}", handle_project_lock),
         ]
     )
 

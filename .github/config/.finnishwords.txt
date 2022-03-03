@@ -1,5 +1,7 @@
+
 ajaksi
 alapuolisesta
+alla
 aloitettiin
 annetut
 apin
@@ -24,6 +26,7 @@ erillinen
 erissä
 esimerkiksi
 esitetty
+estetty
 etsi
 etsittyä
 että
@@ -32,6 +35,7 @@ etusivun
 hakea
 haku
 hakuindeksi
+haluat
 haluatko
 halutako
 haluttu
@@ -65,9 +69,11 @@ johtaa
 johtua
 jonka
 jos
+jota
 julkinen
 julkiset
 julkisia
+kaikki
 kansio
 kansioille
 kansioina
@@ -86,6 +92,7 @@ käyttäjän
 käyttäjänimestä
 käyttöä
 käyttöliittymä
+käyttöliittymän
 käyttörajoista
 kehittänyt
 kelpaa
@@ -96,6 +103,8 @@ keskus
 kestää
 kiellettyä
 kirjaudu
+kirjautuaksesi
+kirjautumalla
 kirjautumisen
 kirjoitus
 kirjoitusoikeus
@@ -162,6 +171,7 @@ mikä
 mikäli
 minuutin
 mitätöi
+muiden
 muita
 mukaan
 muokataan
@@ -172,7 +182,9 @@ muussa
 muutaman
 muuttaa
 muuttaaksesi
+näkyvissä
 nämä
+nappia
 navigointia
 näytä
 näytetään
@@ -205,6 +217,7 @@ omistavan
 ongelmiin
 onnistui
 onnistunut
+onnistuu
 operaatio
 operaation
 osoite
@@ -237,13 +250,18 @@ polku
 postamista
 poudan
 projekteihin
+projekteja
 projekti
+projektia
+projektien
+projektien
 projektilla
 projektille
 projektilta
 projektin
 projektissa
 projektista
+projektit
 projektitunnisteet
 projektitunnisteille
 pudota
@@ -253,6 +271,13 @@ pyydetty
 pyydetyn
 pyyntö
 rajan
+rajattu
+rajatun
+rajoitettua
+rajoitettuihin
+rajoittamattomat
+rajoittamattomia
+rajoittamattomien
 rajoitteiden
 resurssienkäyttö
 resurssit
@@ -274,8 +299,12 @@ salausratkaisun
 salli
 sallittu
 selaamiseen
+selailla
+selailu
 selain
 selainta
+selatessa
+siirto
 sisään
 sisäänkirjauksen
 sisällön
@@ -336,6 +365,7 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiseen
 toteuttaa
 tueta
 tuettu
@@ -358,8 +388,10 @@ uusi
 uusia
 vaatii
 vähintään
+vaihto
 väliaikaiseen
 valikossa
+valinnan
 valinnat
 valitse
 valittu
