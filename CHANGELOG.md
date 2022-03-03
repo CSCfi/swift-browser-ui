@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- (GH #468) add support for project isolation for projects marked as restricted
+    - discovery for restricted projects pending, implemented logic only for now
+    - foced restricted mode can be configured on
+
+
 ## [v2.0.0]
 
 ### Added
