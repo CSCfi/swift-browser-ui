@@ -17,6 +17,7 @@
         name="object"
         expanded
         aria-required="true"
+        data-testid="object-name"
         disabled
       />
     </b-field>
