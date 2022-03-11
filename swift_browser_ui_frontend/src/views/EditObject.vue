@@ -81,7 +81,7 @@ export default {
         });
       } else {
         this.container = await this.$store.state.db.containers.get({
-          projectID: this.$store.state.active.id,
+          projectID: this.$route.params.project,
           name: this.$route.params.container,
         });
         this.object = await this.$store.state.db.objects.get({
