@@ -363,7 +363,7 @@ async def swift_batch_update_object_metadata(
     ]
     batch = await asyncio.gather(*batch, return_exceptions=False)
     for ret in batch:
-        if ret != 204:
+        if ret not in {202, 204}:
             raise aiohttp.web.HTTPNotFound
     return aiohttp.web.HTTPNoContent()
 
