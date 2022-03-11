@@ -199,6 +199,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         self.setd_mock["history_lifetime"] = 2592000
         self.setd_mock["force_restricted_mode"] = False
         self.setd_mock["swift_endpoint_url"] = ("http://obj.exampleosep.com:443/v1",)
+        self.setd_mock["os_accepted_roles"] = "object_store_user"
         patch1 = unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
