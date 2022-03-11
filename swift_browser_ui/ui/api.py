@@ -383,7 +383,7 @@ async def swift_update_container_metadata(
     project = request.match_info["project"]
     container = request.match_info["container"]
     meta = await request.json()
-    meta = {f"X-Container-Meta-{k}": v for k, v in meta}
+    meta = {f"X-Container-Meta-{k}": v for k, v in meta.items()}
     headers = {
         "X-Auth-Token": session["projects"][project]["token"],
     }
