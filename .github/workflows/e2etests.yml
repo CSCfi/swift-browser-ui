@@ -1,5 +1,5 @@
 name: End-to-end tests
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   cypress-e2e-headless:
