@@ -27,7 +27,7 @@ async function fetchWithCookie({method, url, body, signal}) {
     })
     .catch(error => {
       if(DEV) console.log("Fetch error. Might be a networking issue", error);
-      return error;
+      throw new Error(error);
     });
 }
 export async function GET(url, signal) {
@@ -84,9 +84,7 @@ export async function getContainers(
   if (marker) {
     getBucketsUrl.searchParams.append("marker", marker);
   }
-  let ret = await GET(getBucketsUrl).catch(() => {
-    return [];
-  });
+  let ret = await GET(getBucketsUrl);
   if (ret.status == 200) {
     return await ret.json();
   } else {
@@ -141,9 +139,7 @@ export async function getObjects(
   if (marker) {
     objUrl.searchParams.append("marker", marker);
   }
-  let objects = await GET(objUrl, signal).catch(() => {
-    return [];
-  });
+  let objects = await GET(objUrl, signal);
   if (objects.status == 200) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
