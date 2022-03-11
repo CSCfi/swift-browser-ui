@@ -10,5 +10,6 @@
       "runMode": 3,
       "openMode": 0
     },
-    "videoCompression": false
+    "videoCompression": false,
+    "defaultCommandTimeout": 10000
 }
