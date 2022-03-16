@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #502) Items being removed from IndexedDB on network errors.
 - (GH #514) Fixed container and metadata updates
 
+## [v2.0.1]
+- Fix routing issues from trailing slash when adding project to container ACL.
+
 ## [v2.0.0]
 
 ### Added
