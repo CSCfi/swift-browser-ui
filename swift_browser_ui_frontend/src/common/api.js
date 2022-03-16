@@ -255,7 +255,7 @@ export async function addAccessControlMeta(
   let aclURL = new URL(
     "/api/access/".concat(
       encodeURI(project), "/",
-      encodeURI(container), "/",
+      encodeURI(container),
     ),
     document.location.origin,
   );
