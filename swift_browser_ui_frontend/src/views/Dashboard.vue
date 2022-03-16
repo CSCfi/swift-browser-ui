@@ -161,6 +161,12 @@ export default {
       return this.$store.state.active;
     },
   },
+  watch: {
+    active () {
+      this.fetchMeta();
+      this.disable();
+    },
+  },
   beforeMount(){
     // Fetch relevant things upon initializing the class instance
     this.fetchMeta();

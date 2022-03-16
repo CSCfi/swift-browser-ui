@@ -87,7 +87,7 @@ export default new Router({
       component: ReplicationView,
     },
     {
-      path: "/browse/:user",
+      path: "/browse/:user/:project/info",
       name: "DashboardView",
       component: DashboardView,
     },

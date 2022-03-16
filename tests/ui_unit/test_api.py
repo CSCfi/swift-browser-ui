@@ -346,10 +346,10 @@ class APITestClass(tests.common.mockups.APITestBase):
     async def test_swift_update_container_metadata(self):
         """Test container metadata update with Openstack."""
         self.mock_request.json = unittest.mock.AsyncMock(
-            return_value=[
-                ("meta0", "test-data"),
-                ("meta1", "more-test-data"),
-            ],
+            return_value={
+                "meta0": "test-data",
+                "meta1": "more-test-data",
+            },
         )
         with self.p_get_sess:
             resp = await swift_browser_ui.ui.api.swift_update_container_metadata(

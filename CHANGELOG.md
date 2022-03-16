@@ -11,7 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #468) add support for project isolation for projects marked as restricted
     - discovery for restricted projects pending, implemented logic only for now
     - foced restricted mode can be configured on
+- (GH #514) Make user roles configurable.
 
+### Changed
+
+- (GH #514) Cypress integration tests run against keystone-swift container from https://github.com/CSCfi/docker-keystone-swift.
+
+### Fixed
+
+- (GH #502) Items being removed from IndexedDB on network errors.
+- (GH #514) Fixed container and metadata updates
 
 ## [v2.0.0]
 

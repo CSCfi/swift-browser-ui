@@ -9,8 +9,37 @@ jobs:
       matrix:
         node: ["16"]
         browser: ["firefox", "chrome"]
+    
+    # https://docs.github.com/en/actions/using-containerized-services/about-service-containers
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_PASSWORD: pass
+        ports:
+          - 5432:5432
+        volumes:
+          - ${{ github.workspace }}/.github/config/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+      keystone-swift:
+        image: ghcr.io/cscfi/docker-keystone-swift:main
+        ports:
+          - 5000:5000
+          - 8080:8080
+        options: >-
+          --name keystone-swift
+          --init
     steps:
+      - name: fix-permissions
+        run: sudo chown -R $USER:$USER ${{ github.workspace }}
       - uses: actions/checkout@v3
+      - name: Populate swift
+        run: |
+          docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --containers 15
+          docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --project "swift-project"
       - name: Build Frontend
         run: |
           pushd swift_browser_ui_frontend
@@ -19,14 +48,15 @@ jobs:
       - name: Setup and Run backend
         run: |
           pip install -r requirements.txt
-          python -m tests.ui_unit.mock_server &
+          pip install honcho
+          honcho start -f ${{ github.workspace }}/.github/config/Procfile --env ${{ github.workspace }}/.github/config/.env.test &
       - run: npm i cypress
       - uses: cypress-io/github-action@v2
         with:
           install: false
           browser: ${{ matrix.browser }}
           headless: true
-          env: port=8080
+          env: port=8000
       - uses: actions/upload-artifact@v2
         if: failure()
         with:

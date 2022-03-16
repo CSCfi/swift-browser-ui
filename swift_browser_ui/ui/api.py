@@ -363,7 +363,7 @@ async def swift_batch_update_object_metadata(
     ]
     batch = await asyncio.gather(*batch, return_exceptions=False)
     for ret in batch:
-        if ret != 204:
+        if ret not in {202, 204}:
             raise aiohttp.web.HTTPNotFound
     return aiohttp.web.HTTPNoContent()
 
@@ -383,7 +383,7 @@ async def swift_update_container_metadata(
     project = request.match_info["project"]
     container = request.match_info["container"]
     meta = await request.json()
-    meta = {f"X-Container-Meta-{k}": v for k, v in meta}
+    meta = {f"X-Container-Meta-{k}": v for k, v in meta.items()}
     headers = {
         "X-Auth-Token": session["projects"][project]["token"],
     }
