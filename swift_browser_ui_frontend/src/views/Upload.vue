@@ -525,6 +525,7 @@ export default {
     aBeginUpload: async function (files) {
       // Upload files to the active container
       let uploadInfo = await getUploadEndpoint(
+        this.active.id,
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
         this.$route.params.container,
       );

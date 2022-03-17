@@ -199,9 +199,26 @@ new Vue({
           },
         });
       }
+      return active;
     };
-    initialize().then(() => {
-      return;
+    initialize().then((ret) => {
+      if (this.$te("message.keys")) {
+        for (let item of Object.entries(this.$t("message.keys"))) {
+          let keyURL = new URL(
+            "/download/"
+            + item[1]["project"] + "/"
+            + item[1]["container"] + "/"
+            + item[1]["object"],
+            document.location.origin,
+          );
+          keyURL.searchParams.append("project", ret.id);
+          fetch(keyURL).then(resp => {
+            return resp.text();
+          }).then(resp => {
+            this.$store.commit("appendPubKey", resp);
+          });
+        }
+      }
     });
     fetch("/discover")
       .then((resp) => {
@@ -230,20 +247,6 @@ new Vue({
       this.containerSyncWrapper,
       10000,
     );
-    if (this.$te("message.keys")) {
-      for (let item of Object.entries(this.$t("message.keys"))) {
-        fetch(
-          "/download/"
-            + item[1]["project"] + "/"
-            + item[1]["container"] + "/"
-            + item[1]["object"],
-        ).then(resp => {
-          return resp.text();
-        }).then(resp => {
-          this.$store.commit("appendPubKey", resp);
-        });
-      }
-    }
   },
   methods: {
     dragHandler: function (e) {
