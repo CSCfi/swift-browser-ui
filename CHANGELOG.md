@@ -23,7 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #514) Fixed container and metadata updates
 
 ## [v2.0.1]
+
+### Fixed
+
 - Fix routing issues from trailing slash when adding project to container ACL.
+- Fix incorrect session fetch in backend when accessing objects owned by foreign projects
 
 ## [v2.0.0]
 
