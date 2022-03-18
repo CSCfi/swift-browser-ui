@@ -255,7 +255,7 @@ export async function addAccessControlMeta(
   let aclURL = new URL(
     "/api/access/".concat(
       encodeURI(project), "/",
-      encodeURI(container), "/",
+      encodeURI(container),
     ),
     document.location.origin,
   );
@@ -421,16 +421,18 @@ export async function removeToken(
 
 export async function getUploadEndpoint(
   project,
+  owner,
   container,
 ) {
   // Fetch upload endpoint, session and signature information
   let fetchURL = new URL("/upload/".concat(
-    encodeURI(project),
+    encodeURI(owner),
     "/",
     encodeURI(container),
   ),
   document.location.origin,
   );
+  fetchURL.searchParams.append("project", project);
   let ret = await GET(fetchURL);
 
   if (ret.status != 200) {
