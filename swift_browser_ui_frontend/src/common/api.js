@@ -127,6 +127,7 @@ export async function getObjects(
   container,
   marker = "",
   signal,
+  shared = false,
 ) {
   // Fetch object listing for a container.
   let objUrl = new URL(
@@ -143,13 +144,23 @@ export async function getObjects(
   if (objects.status == 200) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
-      objects[i]["url"] = "/api/".concat(
-        encodeURI(project),
-        "/",
-        encodeURI(container),
-        "/",
-        encodeURI(objects[i]["name"]),
-      );
+      if (shared) {
+        objects[i]["url"] = "/download/".concat(
+          encodeURI(project),
+          "/",
+          encodeURI(container),
+          "/",
+          encodeURI(objects[i]["name"]),
+        );
+      } else {
+        objects[i]["url"] = "/api/".concat(
+          encodeURI(project),
+          "/",
+          encodeURI(container),
+          "/",
+          encodeURI(objects[i]["name"]),
+        );
+      }
     }
     return objects;
   } else {
