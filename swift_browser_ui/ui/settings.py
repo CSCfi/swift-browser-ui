@@ -81,6 +81,11 @@ setd: Dict[str, Union[str, int, None]] = {
     "static_directory": __file__.replace("settings.py", "static"),
     "session_lifetime": 28800,
     "history_lifetime": 2592000,
+    "oidc_enabled": bool(environ.get("OIDC_ENABLED", False)),
+    "oidc_url": environ.get("OIDC_URL", None),
+    "oidc_client_id": environ.get("OIDC_CLIENT_ID", None),
+    "oidc_client_secret": environ.get("OIDC_CLIENT_SECRET", None),
+    "oidc_redirect_uris": environ.get("OIDC_REDIRECT_URIS", ""),
 }
 
 

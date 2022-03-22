@@ -20,8 +20,12 @@ import aiohttp_session.redis_storage
 
 import aioredis
 
+from oidcrp.rp_handler import RPHandler
+
 from swift_browser_ui.ui.front import index, browse, loginpassword, select
 from swift_browser_ui.ui.login import (
+    oidc_start,
+    oidc_end,
     handle_login,
     handle_logout,
     sso_query_begin,
@@ -121,6 +125,22 @@ async def servinit(
     app["Log"] = logging.getLogger("swift-browser-ui")
     app["Log"].info("Set up logging for the swift-browser-ui application")
 
+    if setd["oidc_enabled"]:
+        oidc_url = "{}/.well-known/openid-configuration".format(setd["oidc_url"])
+        oidc_conf = {
+            "oidc": {
+                "issuer": setd["oidc_url"],
+                "client_id": setd["oidc_client_id"],
+                "client_secret": setd["oidc_client_secret"],
+                "redirect_uris": str(setd["oidc_redirect_uris"]).split(" "),
+                "behaviour": {
+                    "response_types": ["code"],
+                    "scope": ["openid", "profile", "email"],
+                },
+            },
+        }
+        app["oidc_client"] = RPHandler(oidc_url, client_configs=oidc_conf)
+
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:
         app.router.add_static(
@@ -160,6 +180,13 @@ async def servinit(
             aiohttp.web.post("/login/credentials", credentials_login_end),
         ]
     )
+    if setd["oidc_enabled"]:
+        app.add_routes(
+            [
+                aiohttp.web.get("/login/oidc", oidc_start),
+                aiohttp.web.get("/login/oidc-redirect", oidc_end),
+            ]
+        )
 
     # Add signature endpoint
     app.add_routes([aiohttp.web.get("/sign/{valid}", handle_signature_request)])

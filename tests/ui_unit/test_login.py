@@ -28,6 +28,30 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             self.aiohttp_session_get_session_mock,
         )
 
+    async def test_oidc_start(self):
+        """Test oidc initial request."""
+        self.setd_mock["oidc_enabled"] = True
+        with unittest.mock.patch(
+            "swift_browser_ui.ui.login.setd",
+            self.setd_mock,
+        ):
+            resp = await swift_browser_ui.ui.login.oidc_start(self.mock_request)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers["Location"], "/should_be_oidc_provider")
+
+    async def test_oidc_end(self):
+        """Test oidc initial request."""
+        self.setd_mock["oidc_enabled"] = True
+        with unittest.mock.patch(
+            "swift_browser_ui.ui.login.setd",
+            self.setd_mock,
+        ), self.p_new_sess:
+            self.mock_request.query["code"] = "code"
+            self.mock_request.query["state"] = "state"
+            resp = await swift_browser_ui.ui.login.oidc_end(self.mock_request)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers["Location"], "/login")
+
     async def test_handle_login(self):
         """Test initial login handler."""
         self.mock_request.query["navto"] = "http://example"
@@ -35,6 +59,22 @@ class LoginTestClass(tests.common.mockups.APITestBase):
 
         self.assertEqual(resp.headers["Location"], "/login/front")
         self.assertEqual(resp.status, 302)
+
+    async def test_handle_login_oidc_enabled(self):
+        """Test login handler with OIDC enabled."""
+        self.setd_mock["oidc_enabled"] = True
+        with unittest.mock.patch(
+            "swift_browser_ui.ui.login.setd",
+            self.setd_mock,
+        ):
+            with self.p_get_sess:
+                resp = await swift_browser_ui.ui.login.handle_login(self.mock_request)
+                self.assertEqual(resp.status, 302)
+                self.assertEqual(resp.headers["Location"], "/")
+
+            with self.p_get_sess_oidc:
+                resp = await swift_browser_ui.ui.login.handle_login(self.mock_request)
+                self.assertEqual(resp.status, 200)
 
     async def test_sso_query_begin_with_trust(self):
         """Test sso query begin function."""
@@ -50,6 +90,15 @@ class LoginTestClass(tests.common.mockups.APITestBase):
                 "?origin=https://localhost/login/websso",
             )
 
+        self.setd_mock["oidc_enabled"] = True
+        with unittest.mock.patch(
+            "swift_browser_ui.ui.login.setd",
+            self.setd_mock,
+        ), self.p_get_sess:
+            resp = await swift_browser_ui.ui.login.handle_login(self.mock_request)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers["Location"], "/")
+
     async def test_sso_query_begin_without_trust(self):
         """Test sso query begin without trust."""
         self.setd_mock["has_trust"] = False
@@ -59,6 +108,17 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         ):
             resp = await swift_browser_ui.ui.login.sso_query_begin(None)
             self.assertEqual(resp.status, 200)
+
+    async def test_sso_query_begin_oidc_enabled(self):
+        """Test sso query begin with OIDC enabled."""
+        self.setd_mock["oidc_enabled"] = True
+        with unittest.mock.patch(
+            "swift_browser_ui.ui.login.setd",
+            self.setd_mock,
+        ), self.p_get_sess:
+            resp = await swift_browser_ui.ui.login.sso_query_begin(self.mock_request)
+            self.assertEqual(resp.status, 302)
+            self.assertEqual(resp.headers["Location"], "/")
 
     async def test_test_token(self):
         """Test the token validity checks."""
@@ -296,6 +356,16 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             )
 
         self.assertEqual(resp.headers["Location"], "/test-nav")
+
+        self.setd_mock["oidc_enabled"] = True
+        with patch1, patch2, self.p_get_sess:
+            resp = await swift_browser_ui.ui.login.login_with_token(
+                self.mock_request,
+                token,
+            )
+            self.assertEqual(resp.status, 303)
+            self.assertEqual(resp.headers["Location"], "/test-nav")
+        self.setd_mock["oidc_enabled"] = False
 
         self.mock_client_response.status = 401
         with self.assertRaises(

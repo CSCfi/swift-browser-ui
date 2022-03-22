@@ -40,7 +40,7 @@ async def check_session_at(
 ) -> web.Response:
     """Raise on expired sessions."""
     session = await aiohttp_session.get_session(request)
-    if "at" in session and session["at"] + 28800 < time.time():
+    if "at" in session and session["at"] + setd["session_lifetime"] < time.time():
         session.invalidate()
         if not ("login" in request.path or request.path == "/"):
             raise web.HTTPUnauthorized(reason="Token expired.")
@@ -99,7 +99,7 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
         if ex.status == 409:
             raise ex
         if ex.status > 404 and ex.status < 500:
-            # we forbid all dubios and unauthorized requests
+            # we forbid all dubious and unauthorized requests
             return return_error_response(403)
         if ex.status > 500:
             return return_error_response(503)

@@ -1,6 +1,7 @@
 const proxyTo = `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`;
+const oidcEnabled = process.env.OIDC_ENABLED === "True";
 
-module.exports = {  // eslint-disable-line
+let vueConfig = {
   publicPath: "/static",
   devServer: {
     proxy: {
@@ -95,3 +96,21 @@ module.exports = {  // eslint-disable-line
     },
   },
 };
+if(oidcEnabled) {
+  vueConfig["pages"]["index"] = {
+    entry: "src/entries/index_oidc.js",
+    template: "public/index.html",
+    filename: "index.html",
+    title: "Swift browser UI - Login",
+    chunks: ["chunk-vendors", "chunk-common", "index"],
+  };
+  vueConfig["pages"]["login2step"] = {
+    entry: "src/entries/index.js",
+    template: "public/index.html",
+    filename: "login2step.html",
+    title: "Swift browser UI - Login",
+    chunks: ["chunk-vendors", "chunk-common", "login2step"],
+  };
+}
+
+module.exports = vueConfig; // eslint-disable-line

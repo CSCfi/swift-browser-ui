@@ -89,6 +89,8 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
 # Build UI with encryption
 FROM node:16.14.0-alpine3.15 as FRONTEND
 
+ARG OIDC_ENABLED
+
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git\
     && rm -rf /var/cache/apk/*
@@ -98,7 +100,7 @@ COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && npm install
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm run build-devel
+    && OIDC_ENABLED=$OIDC_ENABLED npm run build-devel
 
 FROM python:3.8-alpine3.15 as BACKEND
 
@@ -117,6 +119,9 @@ COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_fr
 RUN pip install --upgrade pip && \
     pip install -r /root/swift_ui/requirements.txt
 RUN pip install /root/swift_ui
+
+COPY dockerfiles/geant-ca /root/swift_ui/
+RUN cat /root/swift_ui/geant-ca >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem
 
 FROM python:3.8-alpine3.15
 
@@ -140,7 +145,9 @@ COPY ./deploy/app.sh /app/app.sh
 
 RUN chmod +x /app/app.sh
 
-RUN adduser --disabled-password --no-create-home swiftui
+RUN adduser --disabled-password --no-create-home swiftui && \
+    chown -R swiftui:swiftui /app
+
 USER swiftui
 
 ENTRYPOINT ["/bin/sh", "-c", "/app/app.sh"]

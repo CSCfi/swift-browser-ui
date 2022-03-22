@@ -54,6 +54,7 @@ nodeport
 npm
 npx
 num
+oidc
 openapi
 openrc
 openshift

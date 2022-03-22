@@ -22,6 +22,7 @@
           {{ $t("message.program_name") }}
         </h2>
         <p>{{ $t("message.program_description") }}</p>
+        <p>{{ $t("message.program_description_step_2") }}</p>
       </div>
       <div class="block">
         <b-message
