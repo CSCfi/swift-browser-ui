@@ -82,7 +82,7 @@ export default new Router({
       component: EditObjectView,
     },
     {
-      path: "/browse/:user/:project/:container/replicate",
+      path: "/browse/:user/:project/:container/replicate/:from",
       name: "ReplicateContainer",
       component: ReplicationView,
     },
