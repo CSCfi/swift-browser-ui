@@ -76,7 +76,7 @@ export default {
       swiftCopyContainer(
         this.active.id,
         this.destination,
-        this.$route.params.project,
+        this.$route.params.from,
         this.$route.params.container,
       ).then(() => {
         this.$buefy.toast.open({

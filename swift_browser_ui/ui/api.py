@@ -731,8 +731,8 @@ async def swift_replicate_container(
         "API call for replication endpoint from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    runner_id = open_upload_runner_session(request)
-    path = f"{request.match_info['project']}/" + f"{request.match_info['container']}"
+    runner_id = await open_upload_runner_session(request)
+    path = f"/{request.match_info['project']}/{request.match_info['container']}"
     signature = await sign(3600, path)
     path += (
         f"?session={runner_id}"
@@ -744,7 +744,7 @@ async def swift_replicate_container(
     return aiohttp.web.Response(
         status=307,
         headers={
-            "Location": f"{setd['upload_external_endpoint']}/{path}",
+            "Location": f"{setd['upload_external_endpoint']}{path}",
         },
     )
 

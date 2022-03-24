@@ -64,7 +64,7 @@ export default {
             "/",
             this.$route.params.container,
             "?project=",
-            this.$active.id,
+            this.active.id,
           );
         }
         else {
@@ -82,7 +82,7 @@ export default {
             "/",
             this.$props.container,
             "?project=",
-            this.$active.id,
+            this.active.id,
           );
         }
         else {
