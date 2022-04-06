@@ -264,6 +264,7 @@
         v-else
         id="uploadButton"
         type="is-success"
+        :disabled="noUpload"
         icon-left="upload-lock"
         @click="beginUpload"
       >
@@ -370,6 +371,9 @@ export default {
       this.checkUploadSize();
     },
     ephemeral: function () {
+      this.refreshNoUpload();
+    },
+    useEncryption: function () {
       this.refreshNoUpload();
     },
   },
@@ -608,6 +612,9 @@ export default {
           || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
         );
+      }
+      if (!this.useEncryption) {
+        this.noUpload = this.dropFiles.length === 0;
       }
     },
     checkUploadSize() {
