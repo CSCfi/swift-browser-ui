@@ -177,15 +177,6 @@ export default {
         params: newParams,
       });
     },
-    getProjectChangeURL ( newProject ) {
-      let rescopeURL = new URL(
-        "/login/rescope",
-        document.location.origin,
-      );
-      rescopeURL.searchParams.append( "project", newProject );
-      return rescopeURL.toString();        
-    },
-
   },
 };
 </script>
