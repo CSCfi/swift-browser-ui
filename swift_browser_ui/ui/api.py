@@ -412,7 +412,8 @@ async def swift_get_project_metadata(
             "X-Auth-Token": session["projects"][project]["token"],
         },
     ) as ret:
-        if ret.status != 204:
+        # Empty projects return 200, otherwise 204
+        if ret.status not in {200, 204}:
             raise aiohttp.web.HTTPUnauthorized(
                 reason="Project is not valid for Object Storage"
             )
