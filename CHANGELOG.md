@@ -20,8 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - (GH #502) Items being removed from IndexedDB on network errors.
-- (GH #514) Fixed container and metadata updates
+- (GH #514) Fixed container and metadata updates.
 - (GH #547) Fixed upload button being enabled when there are no files to upload.
+- (GH #549) Fixed changing project keeps loading previous project data.
+- (GH #550) Fixed changing project shows container from previous project.
 
 ## [v2.0.1]
 
