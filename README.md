@@ -181,13 +181,15 @@ docker exec keystone-swift generate_data.py --keystone --username swift --passwo
 
 After following the development steps above, `cypress` should already be installed.
 
+    cd swift_browser_ui_frontend
+
 You can run the tests in headless mode
   
-    npx --prefix swift_browser_ui_frontend cypress run
+    npx cypress run
 
-Or you can use the intearctive version
+Or you can use the inteactive version
 
-    npx --prefix swift_browser_ui_frontend cypress open
+    npx cypress open
 
 
 ### License
