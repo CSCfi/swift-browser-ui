@@ -16,6 +16,7 @@ configs
 containerport
 csc
 cscfi
+devel
 drag'n'drop
 envs
 etag
@@ -57,6 +58,7 @@ png
 postgres
 pouta
 proxying
+py
 quickstart
 saml
 sha
@@ -74,9 +76,12 @@ toctree
 tooltip
 tox
 txt
+Ue
 ui
 untrusted
 url
+venv
+veryfast
 vm
 vue
 webdrivers
