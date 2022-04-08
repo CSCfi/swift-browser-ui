@@ -29,8 +29,8 @@ better upload and download functionality are in their separate files.
 Python 3.8+ required.
 
 - The dependencies mentioned in `requirements.txt`.
-- A suitable storage backend supporting usage via Openstack Object Storage API. (e.g. Ceph RGW, Openstack Swift)
-- PosgreSQL
+- A suitable storage backend supporting usage via OpenStack Object Storage API. (e.g. Ceph RGW, OpenStack Swift)
+- PostgreSQL
 - Redis
 
 ### Usage – UI
@@ -90,9 +90,9 @@ The current frontend can be found at: `127.0.0.1:8080`.
 ### Development
 swift-browser-ui is composed of 4 components: `request`, `sharing`, `ui`, and `upload`.
 All of them must be run to have access to all features.
-They depend on a redis instance for session cache, postgres database for the sharing and 
+They depend on a Redis instance for session cache, Postgres database for the sharing and 
 request functionality, and the object storage backend.
-You will also need docker with buildkit to build the keystone-swift docker image.
+You will also need docker with Buildkit to build the keystone-swift docker image.
 
 To start all required services, you can use the `docker-compose` files from https://github.com/CSCfi/swift-ui-deployment,
 or the provided `Procfile`, as shown bellow.
@@ -140,7 +140,7 @@ Start the servers
 honcho start
 ```
 
-Now you should be able to access the development server at localhost:8081. The login and password are `swift`, and `veryfast`, respectivelly.
+Now you should be able to access the development server at localhost:8081. The login and password are `swift`, and `veryfast`, respectively.
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
@@ -187,7 +187,7 @@ You can run the tests in headless mode
   
     npx cypress run
 
-Or you can use the inteactive version
+Or you can use the interactive version
 
     npx cypress open
 
