@@ -191,6 +191,9 @@ Or you can use the interactive version
 
     npx cypress open
 
+It's possible to set the host to run against by using the environment variable `CYPRESS_BASE_URL`, so that it may run against the development frontend server, for e.g.
+
+    CYPRESS_BASE_URL=http://localhost:8081 npx cypress open
 
 ### License
 
