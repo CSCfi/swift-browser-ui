@@ -29,12 +29,16 @@
             </a>
 
             <div class="navbar-dropdown">
-              <a
+              <router-link
                 v-for="item in projects"
                 :key="item.id"
+                :to="{
+                  name: 'ContainersView', 
+                  params: {user: uname, project: item.id}
+                }"
                 class="navbar-item"
-                @click="changeActive(item)"
-              ><span>{{ item.name }}</span></a>
+                @click.native.stop="changeActive(item)"
+              >{{ item.name }}</router-link>
             </div>
           </div>
           <div
@@ -62,7 +66,10 @@
           <div class="navbar-item">
             <div class="buttons">
               <router-link
-                :to="{name: 'DashboardView', params: {user: uname}}"
+                :to="{
+                  name: 'DashboardView', 
+                  params: {user: uname, project: active.id}
+                }"
                 :class="!($route.name == 'DashboardView') ? 
                   'button is-primary is-outlined' : 
                   'button is-primary has-text-light'"
@@ -165,27 +172,13 @@ export default {
         + expiryDate.toUTCString();
     },
     changeActive (item) {
-      this.$store.commit("setActive", item);
-      let newParams = Object.fromEntries(Object.entries(
-        this.$route.params,
-      ));
-      if (newParams.project != undefined) {
-        newParams.project = item.id;
+      if (item.id !== this.active.id){
+        this.$router.go({
+          name: "ContainersView", 
+          params: {user: this.uname, project: item.id},
+        });
       }
-      this.$router.push({
-        name: this.$route.name,
-        params: newParams,
-      });
     },
-    getProjectChangeURL ( newProject ) {
-      let rescopeURL = new URL(
-        "/login/rescope",
-        document.location.origin,
-      );
-      rescopeURL.searchParams.append( "project", newProject );
-      return rescopeURL.toString();        
-    },
-
   },
 };
 </script>

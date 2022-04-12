@@ -169,8 +169,10 @@ export default {
   },
   beforeMount(){
     // Fetch relevant things upon initializing the class instance
-    this.fetchMeta();
-    this.disable();
+    if (this.active.id) {
+      this.fetchMeta();
+      this.disable();
+    }
   },
   methods: {
     fetchMeta: function () {

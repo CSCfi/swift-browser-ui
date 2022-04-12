@@ -35,20 +35,23 @@ describe("Retrieve User information", function () {
 
     it("should login the user and switch to user infomation and retrieve correct data", () => {
         cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
+        cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
+            .should('have.css', 'display', 'block')
+        cy.contains('service').click()
+        cy.contains('User information').invoke("attr", 'href').should("match", /browse\/swift\/[0-9a-f]{32}\/info/)
         cy.contains('User information').click()
         cy.location("pathname").should("match", /browse\/swift/)
         cy.contains('Buckets: 15')
     })
 
     it("should login to switch project and browser and view different information", () => {
-        cy.wait(1000)
-        cy.contains('User information').click()
+        cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
         cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
             .should('have.css', 'display', 'block')
         cy.contains('swift-project').click()
+        cy.contains('User information').invoke("attr", 'href').should("match", /browse\/swift\/[0-9a-f]{32}\/info/)
+        cy.contains('User information').click()
         cy.contains('Buckets: 10')
-        cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
-            .should('have.css', 'display', 'block')
         cy.location("pathname").should("match", /browse\/swift/)
         cy.contains('.buttons > .button','Browser').click()
         cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)

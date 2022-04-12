@@ -46,8 +46,6 @@ checkIDB().then(result => {
 
 window.onerror = function(error) { 
   if(DEV) console.log("Global error", error);
-  error.preventDefault();
-  error.stopPropagation();
 };
 window.addEventListener("unhandledrejection", function(event) {
   if(DEV) console.log("unhandledrejection", event);
