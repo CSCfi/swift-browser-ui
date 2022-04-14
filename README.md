@@ -111,7 +111,7 @@ npm --prefix swift_browser_ui_frontend install
 npm --prefix swift_browser_ui_frontend run build
 ```
 
-Install python dependencies, optionally in a virtual environemnt.
+Install python dependencies, optionally in a virtual environment.
 
 ```bash
 python3 -m venv venv --prompt swiftui  # Optional step, creates python virtual environment
