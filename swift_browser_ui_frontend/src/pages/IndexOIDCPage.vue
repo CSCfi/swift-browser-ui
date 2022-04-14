@@ -8,27 +8,33 @@
     <c-row>
       <c-flex>
         <c-container class="padding">
-          <c-card>
-            <c-card-content>
-              <h2>{{ $t('message.program_name') }}</h2>
-              <p>{{ $t('message.program_description') }}</p>
-            </c-card-content>
-            <c-card-actions>
-              <c-button
-                size="large"
-                :loading="loading"
-                :disabled="!idb"
-                @click="loginButtonClick"
-              >
-                {{ $t('message.indexOIDC.logIn') }}
-              </c-button>
-            </c-card-actions>
-            <c-card-content v-if="!idb">
-              <p>
-                <strong>{{ $t('message.error.idb') }}</strong>
-              </p>
-            </c-card-content>
-          </c-card>
+          <form>
+            <c-login-card
+              :src="require('@/assets/banner_login.png')"
+            >
+              <c-login-card-title>
+                {{ $t('message.program_name') }}
+              </c-login-card-title>
+              <c-login-card-content>
+                <p>{{ $t('message.program_description') }}</p>
+              </c-login-card-content>
+              <c-login-card-actions>
+                <c-button
+                  size="large"
+                  :loading="loading"
+                  :disabled="!idb"
+                  @click="loginButtonClick"
+                >
+                  {{ $t('message.indexOIDC.logIn') }}
+                </c-button>
+              </c-login-card-actions>
+              <c-login-card-content v-if="!idb">
+                <p>
+                  <strong>{{ $t('message.error.idb') }}</strong>
+                </p>
+              </c-login-card-content>
+            </c-login-card>
+          </form>
         </c-container>
       </c-flex>
     </c-row>
@@ -53,25 +59,10 @@
 </template>
 
 <style>
-c-card {
+c-login-card { 
   margin: 2rem auto;
-  padding: 7rem 5rem 5rem;
   max-width: 55rem;
-  height: 35rem;
-  background-image: url(@/assets/banner_login.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-color: var(--white);
-}
-c-card-content h2 {
-  color: var(--csc-primary);
-  font-weight: 700;
-  font-size: 1.5rem;
-  text-transform: uppercase;
-}
-c-card-content p {
-  color: var(--csc-dark-grey);
-  font-weight: 300;
+  height: 35rem; 
 }
 c-button {
   margin-top: 2rem;
