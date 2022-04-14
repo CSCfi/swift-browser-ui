@@ -144,12 +144,6 @@ Now you should be able to access the development server at localhost:8081. The l
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
-The `keystone-swift` image comes with a script to generate data in the object storage server. You can use like this:
-```bash
-docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --containers 15
-docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --project "swift-project"
-```
-
 ### Testing
 
 #### Backend
@@ -171,7 +165,29 @@ tox
 ```
 
 #### Frontend
-The frontend tests are run with `cypress`, and you will need the full backend running, as shown above, as well as using a specific command for generating data.
+The frontend tests are run with `cypress`, and you will need
+
+1. Full backend running, as shown above
+2. Building the `wasm` code for encryption support
+3. using a specific command for generating data
+
+The encryption requires an additional build step: you'll need to build the `wasm` code. It can be built with one of the docker images, and you can copy the files from there.
+
+Build the image
+
+    docker buildx build -f dockerfiles/Dockerfile-build-crypt-devel -t swift-browser-ui:cryptfiles .
+
+Start a container
+
+    docker run --rm -it --name cryptfiles swift-browser-ui:cryptfiles
+
+From another terminal, copy the files from the container
+
+    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.js swift_browser_ui_frontend/dist/js
+    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.wasm swift_browser_ui_frontend/dist/js
+
+When you run `npm run build`, it removes the folder where you copied those files into, so you'll need to copy them every time you rebuild.
+
 
 The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
 ```bash
