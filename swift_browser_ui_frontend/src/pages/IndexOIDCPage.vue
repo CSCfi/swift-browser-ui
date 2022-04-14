@@ -59,6 +59,10 @@
 </template>
 
 <style>
+c-main { 
+  height: unset; 
+  min-height: 100vh 
+}
 c-login-card { 
   margin: 2rem auto;
   max-width: 55rem;
