@@ -28,9 +28,6 @@ RUN pip install --upgrade pip && \
     pip install -r /root/swift_ui/requirements.txt && \
     pip install /root/swift_ui
 
-COPY dockerfiles/geant-ca /root/swift_ui/
-RUN cat /root/swift_ui/geant-ca >> /usr/local/lib/python3.8/site-packages/certifi/cacert.pem
-
 FROM python:3.8-alpine3.15
 
 RUN apk add --no-cache --update bash
@@ -54,8 +51,7 @@ COPY ./deploy/app.sh /app/app.sh
 RUN chmod +x /app/app.sh
 
 RUN addgroup -g 1001 swiftui && \
-    adduser -D -u 1001 --disabled-password --no-create-home -G swiftui swiftui && \
-    chown -R swiftui:swiftui /app
+    adduser -D -u 1001 --disabled-password --no-create-home -G swiftui swiftui
 
 USER swiftui
 
