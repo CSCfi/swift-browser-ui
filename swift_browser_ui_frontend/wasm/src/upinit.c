@@ -111,7 +111,7 @@ finalReadRecv:
 Read in the keys for upload encryption
 */
 int read_in_keys(
-    char *passphrase,
+    const char *passphrase,
     struct ENCRYPT_SESSION *sess)
 {
     // Read in the private key
