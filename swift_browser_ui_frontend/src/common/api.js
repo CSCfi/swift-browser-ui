@@ -452,3 +452,29 @@ export async function getUploadEndpoint(
 
   return ret.json();
 }
+
+export async function getUploadCryptedEndpoint(
+  project,
+  owner,
+  container,
+  object,
+) {
+  // Fetch upload endpoint information for encrypted upload
+  let fetchURL = new URL("/upload/".concat(
+    encodeURI(owner),
+    "/",
+    encodeURI(container),
+    "/",
+    encodeURI(object),
+  ),
+  document.location.origin,
+  );
+  fetchURL.searchParams.append("project", project);
+  let ret = await GET(fetchURL);
+
+  if (ret.status != 200) {
+    throw new Error("Failed to get upload session information.");
+  }
+
+  return ret.json();
+}

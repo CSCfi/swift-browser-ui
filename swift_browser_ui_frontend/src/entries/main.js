@@ -52,8 +52,23 @@ checkIDB().then(result => {
   }
 });
 
-window.onerror = function (error) {
-  if (DEV) console.log("Global error", error);
+if ("serviceWorker" in navigator) {
+  let workerUrl = new URL(
+    "/libupload.js",
+    document.location.origin,
+  );
+  navigator.serviceWorker.register(workerUrl).then(reg => {
+    reg.update();
+  }).catch((err) => {
+    console.log("Failed to register service worker.");
+    console.log(err);
+  });
+} else {
+  console.log("Did not register Service Worker.");
+}
+
+window.onerror = function(error) { 
+  if(DEV) console.log("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
   if (DEV) console.log("unhandledrejection", event);
