@@ -1,10 +1,17 @@
 """API handlers for swift-upload-runner."""
 
 
+import logging
+import typing
 import aiohttp.web
 import asyncio
+import base64
+import json
+import os
+
 
 from swift_browser_ui.upload.common import (
+    get_encrypted_upload_instance,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
@@ -14,6 +21,10 @@ from swift_browser_ui.upload.download import (
     ContainerArchiveDownloadProxy,
 )
 from swift_browser_ui.upload.replicate import ObjectReplicationProxy
+
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 
 async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
@@ -144,6 +155,91 @@ async def handle_post_object_options(
     return resp
 
 
+async def handle_upload_encrypted_object_options(
+    _: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Handle options for uploading an encrypted object."""
+    resp = aiohttp.web.Response(
+        headers={
+            "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
+            "Access-Control-Max-Age": "84600",
+        }
+    )
+    return resp
+
+
+async def handle_upload_encrypted_object(
+    request: aiohttp.web.Request
+) -> aiohttp.web.Response:
+    """Handle uploading an object spliced into segments."""
+    upload_session = await get_encrypted_upload_instance(request)
+    return await upload_session.add_header(request)
+
+
+async def handle_upload_encrypted_object_ws(
+    request: aiohttp.web.Request
+) -> aiohttp.web.WebSocketResponse:
+    """Handle uploading object data as a websocket."""
+    upload_session = await get_encrypted_upload_instance(request)
+
+    socket_tasks: typing.List[asyncio.Task] = []
+    slicer_tasks: typing.List[asyncio.Task] = []
+    upload_tasks: typing.List[asyncio.Task] = []
+
+    ws = aiohttp.web.WebSocketResponse()
+    await ws.prepare(request)
+
+    LOGGER.info(f"Upload websocket opened for {request.url.path}")
+
+    async for msg in ws:
+        if msg.type == "close":
+            LOGGER.info("Finishing upload")
+            await asyncio.gather(*(
+                socket_tasks
+                + slicer_tasks
+                + upload_tasks
+            ))
+            LOGGER.info("Closing the websocket")
+            await ws.close()
+        if msg.data == "startPull":
+            # Pull 256 chunks initially
+            LOGGER.info("Starting upload content pull through websocket.")
+            socket_tasks = [
+                asyncio.create_task(ws.send_str("nextChunk")) for _ in range(0, 96)
+            ]
+            LOGGER.info("Starting slicer tasks.")
+            slicer_tasks = [
+                asyncio.create_task(
+                    upload_session.slice_into_queue(i, upload_session.get_segment_queue(i))
+                )
+                for i in range(0, upload_session.return_total_segments())
+            ]
+            LOGGER.info("Successfully started the slicer tasks")
+            LOGGER.info("Starting the upload tasks")
+            upload_tasks = [
+                asyncio.create_task(
+                    upload_session.upload_segment(i)
+                )
+                for i in range(0, upload_session.return_total_segments())
+            ]
+            LOGGER.info("Successfully started the upload tasks")
+        else:
+            m = json.loads(msg.data)
+            i = m["iter"]
+            # LOGGER.info(f"Adding chunk number {i}")
+            c = base64.b64decode(m["chunk"])
+            # upload_session.add_to_chunks((i, c))
+            await upload_session.add_to_chunks(
+                i,
+                c,
+                ws,
+            )
+
+    LOGGER.info("Upload finished – pushing manifest.")
+    await upload_session.add_manifest()
+    return ws
+
+
 async def handle_get_container(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.StreamResponse:
@@ -178,7 +274,7 @@ async def handle_get_container(
     return resp
 
 
-async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def handle_health_check(_: aiohttp.web.Request) -> aiohttp.web.Response:
     """Answer a service health check."""
     # Case degraded
 
