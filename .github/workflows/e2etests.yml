@@ -53,6 +53,7 @@ jobs:
       - run: npm i cypress
       - uses: cypress-io/github-action@v2
         with:
+          project: ./swift_browser_ui_frontend
           install: false
           browser: ${{ matrix.browser }}
           headless: true

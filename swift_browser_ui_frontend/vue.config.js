@@ -1,12 +1,25 @@
+const proxyTo = `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`;
+
 module.exports = {  // eslint-disable-line
   publicPath: "/static",
   devServer: {
-    // eslint-disable-next-line
-    proxy: `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`,
-    hot: "only",
+    proxy: {
+      "/static":              {target: proxyTo},
+      "/api":                 {target: proxyTo},
+      "/discover":            {target: proxyTo},
+      "/login":               {target: proxyTo},
+      "/login/oidc":          {target: proxyTo},
+      "/login/oidc-redirect": {target: proxyTo},
+      "/login/credentials":   {target: proxyTo},
+      "/login/return":        {target: proxyTo},
+      "/login/rescope":       {target: proxyTo},
+      "/upload":              {target: proxyTo},
+      "/download":            {target: proxyTo},
+      "/sign":                {target: proxyTo},
+      "/replicate":           {target: proxyTo},
+    },
     client: {
-      // eslint-disable-next-line
-      webSocketURL: `ws://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}/ws`,
+      webSocketURL: `ws://localhost:${process.env.PORT}/ws`,
     },
   },
   pages: {

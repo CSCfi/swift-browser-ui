@@ -129,3 +129,5 @@ tests/ui_front/swift-browser-ui
 
 # ignore pyspelling
 dictionary.dic
+
+swift_browser_ui_frontend/cypress

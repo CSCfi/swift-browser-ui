@@ -28,8 +28,10 @@ better upload and download functionality are in their separate files.
 
 Python 3.8+ required.
 
-The dependencies mentioned in `requirements.txt` and a suitable storage backend
-supporting usage via Openstack Object Storage API. (e.g. Ceph RGW, Openstack Swift)
+- The dependencies mentioned in `requirements.txt`.
+- A suitable storage backend supporting usage via OpenStack Object Storage API. (e.g. Ceph RGW, OpenStack Swift)
+- PostgreSQL
+- Redis
 
 ### Usage – UI
 
@@ -48,7 +50,7 @@ export BROWSER_START_PORT="8080"'\
 Getting started:
 ```
 git clone git@github.com:CSCfi/swift-browser-ui.git
-cd swift_browser_ui
+cd swift-browser-ui
 cd swift_browser_ui_frontend
 npm install
 npm run build
@@ -84,6 +86,130 @@ swift-browser-ui start --help
 ```
 
 The current frontend can be found at: `127.0.0.1:8080`.
+
+### Development
+swift-browser-ui is composed of 4 components: `request`, `sharing`, `ui`, and `upload`.
+All of them must be run to have access to all features.
+They depend on a Redis instance for session cache, Postgres database for the sharing and 
+request functionality, and the object storage backend.
+You will also need docker with Buildkit to build the keystone-swift docker image.
+
+To start all required services, you can use the `docker-compose` files from https://github.com/CSCfi/swift-ui-deployment,
+or the provided `Procfile`, as shown bellow.
+
+Please, read and adhere to the [CONTRIBUTING guidelines](CONTRIBUTING.md) for submitting changes.
+
+#### Getting started:
+```bash
+git clone -b devel git@github.com:CSCfi/swift-browser-ui.git
+cd swift-browser-ui
+```
+Install frontend dependencies, and build (without encryption or OIDC enabled).
+
+```bash
+npm --prefix swift_browser_ui_frontend install
+npm --prefix swift_browser_ui_frontend run build
+```
+
+Install python dependencies, optionally in a virtual environment.
+
+```bash
+python3 -m venv venv --prompt swiftui  # Optional step, creates python virtual environment
+source venv/bin/activate  # activates virtual environment
+pip install -Ue .
+pip install honcho  # to run the Procfile
+```
+
+Set up the environment variables
+
+```bash
+cp .github/config/.env.test .env  # Make any changes you need to the file
+```
+
+Open another terminal, and build the `keystone-swift` image
+
+```bash
+git clone git@github.com:CSCfi/docker-keystone-swift.git
+cd docker-keystone-swift
+docker buildx build -t keystone-swift .
+```
+
+Start the servers
+
+```bash
+honcho start
+```
+
+Now you should be able to access the development server at localhost:8081. The login and password are `swift`, and `veryfast`, respectively.
+
+This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
+
+### Testing
+
+#### Backend
+The backend `python` tests can be run with `tox`. Start the mock server in one terminal, and run tox in another.
+
+```bash
+cd swift-browser-ui
+source venv/bin/activate
+python tests/ui_unit/mock_server.py
+```
+
+and in another terminal
+
+```bash
+cd swift-browser-ui
+source venv/bin/activate
+pip install tox
+tox
+```
+
+#### Frontend
+The frontend tests are run with `cypress`, and you will need
+
+1. Full backend running, as shown above
+2. Building the `wasm` code for encryption support
+3. using a specific command for generating data
+
+The encryption requires an additional build step: you'll need to build the `wasm` code. It can be built with one of the docker images, and you can copy the files from there.
+
+Build the image
+
+    docker buildx build -f dockerfiles/Dockerfile-build-crypt-devel -t swift-browser-ui:cryptfiles .
+
+Start a container
+
+    docker run --rm -it --name cryptfiles swift-browser-ui:cryptfiles
+
+From another terminal, copy the files from the container
+
+    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.js swift_browser_ui_frontend/dist/js
+    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.wasm swift_browser_ui_frontend/dist/js
+
+When you run `npm run build`, it removes the folder where you copied those files into, so you'll need to copy them every time you rebuild.
+
+
+The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
+```bash
+docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --containers 15
+docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --project "swift-project"
+```
+
+After following the development steps above, `cypress` should already be installed.
+
+    cd swift_browser_ui_frontend
+
+You can run the tests in headless mode
+  
+    npx cypress run
+
+Or you can use the interactive version
+
+    npx cypress open
+
+It's possible to set the host to run against by using the environment variable `CYPRESS_BASE_URL`, so that it may run against the development frontend server, for e.g.
+
+    CYPRESS_BASE_URL=http://localhost:8081 npx cypress open
 
 ### License
 
