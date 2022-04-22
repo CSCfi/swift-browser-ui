@@ -144,6 +144,23 @@ Now you should be able to access the development server at localhost:8081. The l
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
+##### OIDC login provider
+
+To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
+
+    OIDC_ENABLED=True npm --prefix swift_browser_ui_frontend run build
+
+CSC OIDC provider's certificate should be added to `certifi`'s certificate store:
+```bash
+cd swift-browser-ui
+source venv/bin/activate
+
+curl -sLo oidc-cert.pem https://crt.sh/?d=2475254782
+cert_path=$(python -c "import certifi;print(certifi.where())")
+cat oidc-cert.pem >> ${cert_path}
+rm oidc-cert.pem
+```
+
 ### Testing
 
 #### Backend
