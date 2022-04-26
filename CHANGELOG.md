@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - discovery for restricted projects pending, implemented logic only for now
     - foced restricted mode can be configured on
 - (GH #514) Make user roles configurable.
+- (GH #546) Optional two-step login with OpenID Connect (OIDC) as the first step.
+  - When OIDC is enabled, the index page is replaced with a new one, that uses CSCfi/csc-ui components.
 
 ### Changed
 

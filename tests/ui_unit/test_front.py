@@ -68,7 +68,10 @@ class FrontendTestCase(
         )
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.front.setd",
-            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
+            new={
+                "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist",
+                "oidc_enabled": True,
+            },
         )
         with patch_setd, p_get_sess:
             response = await self.client.request("GET", "/")
@@ -93,7 +96,10 @@ class FrontendTestCase(
         )
         patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.front.setd",
-            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
+            new={
+                "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist",
+                "oidc_enabled": True,
+            },
         )
         with patch_setd, p_get_sess:
             response = await self.client.request("GET", "/loginpassword")

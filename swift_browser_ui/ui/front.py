@@ -38,9 +38,12 @@ async def index(
     request: typing.Optional[aiohttp.web.Request],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the index page when running without a proxy."""
+
     try:
         if request is not None:
             session = await aiohttp_session.get_session(request)
+            if setd["oidc_enabled"]:
+                session["oidc"]
             session["projects"]
             session["token"]
             request.app["Log"].info("Redirecting an existing session to app")
@@ -53,6 +56,15 @@ async def index(
         else:
             raise AttributeError
     except (AttributeError, InvalidToken, KeyError, aiohttp.web.HTTPUnauthorized):
+        if request is not None:
+            session = await aiohttp_session.get_session(request)
+            if "oidc" in session:
+                return aiohttp.web.Response(
+                    status=302,
+                    headers={
+                        "Location": "/login",
+                    },
+                )
         return aiohttp.web.FileResponse(str(setd["static_directory"]) + "/index.html")
 
 
@@ -63,6 +75,8 @@ async def loginpassword(
     try:
         if request is not None:
             session = await aiohttp_session.get_session(request)
+            if setd["oidc_enabled"]:
+                session["oidc"]
             session["projects"]
             session["token"]
             request.app["Log"].info("Redirecting an existing session to app")

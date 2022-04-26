@@ -5,13 +5,17 @@ import lang_overrides from "@/assets/lang_overrides";
 let default_translations = {
   en: {
     message: {
+      indexOIDC: {
+        logIn: "Login",
+        href: "/login/oidc",
+      },
       index: {
         formName: "Openstack Account",
         logIn: "Log In",
         loginmethods: [
           {
             msg: "Log In with SSO",
-            href: "/login",
+            href: "/login/front",
           },
         ],
       },
@@ -49,6 +53,7 @@ let default_translations = {
       program_name: "Object Browser",
       program_description: "Web UI for browsing contents in Swift object " +
                            "storage systems.",
+      program_description_step_2: "",
       currentProj: "Current project",
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",

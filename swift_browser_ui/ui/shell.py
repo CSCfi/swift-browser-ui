@@ -112,7 +112,6 @@ def start(
     ssl_cert_key: str,
 ) -> None:
     """Start the browser backend and server."""
-    logging.debug(f"Current settings dictionary: {str(setd)}")
     set_key("port", port, "Set running port as %s")
     set_key("auth_endpoint_url", auth_endpoint_url, "Set auth endpoint url to %s")
     set_key(
@@ -129,7 +128,6 @@ def start(
         set_session_devmode,
         "Disabled logouts for development purposes. %s",
     )
-    logging.debug(f"Running settings directory: {str(setd)}")
     if not dry_run and not secure:
         run_server_insecure(servinit())
     if not dry_run and secure:

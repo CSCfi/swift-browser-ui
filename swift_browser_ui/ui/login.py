@@ -10,6 +10,7 @@ import binascii
 import aiohttp.web
 import aiohttp_session
 from multidict import MultiDictProxy
+from oidcrp.exception import OidcServiceError
 
 import typing
 
@@ -20,25 +21,108 @@ from swift_browser_ui.ui._convenience import (
 from swift_browser_ui.ui.settings import setd
 
 
-async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Redirect to OpenID Connect provider."""
+    try:
+        oidc = request.app["oidc_client"].begin("oidc")
+    except Exception as e:
+        # This can be caused if config is improperly configured, and
+        # oidcrp is unable to fetch oidc configuration from the given URL
+        request.app["Log"].error(f"OIDC authorization request failed: {e}")
+        raise aiohttp.web.HTTPInternalServerError(
+            reason="OIDC authorization request failed."
+        )
+
+    response = aiohttp.web.Response(status=302, reason="Redirection to login")
+    response.headers["Location"] = oidc["url"]
+    return response
+
+
+async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    # Response from AAI must have the query params `state` and `code`
+    if "state" in request.query and "code" in request.query:
+        request.app["Log"].debug("AAI response contained the correct params.")
+        params = {"state": request.query["state"], "code": request.query["code"]}
+    else:
+        reason = f"AAI response is missing mandatory params, received: {request.query}"
+        raise aiohttp.web.HTTPBadRequest(reason=reason)
+
+    # Verify oidc_state and retrieve auth session
+    try:
+        oidc_session = request.app["oidc_client"].get_session_information(params["state"])
+    except KeyError as e:
+        # This exception is raised if the RPHandler doesn't have the supplied "state"
+        request.app["Log"].error(f"OIDC not initialised: {e}")
+        raise aiohttp.web.HTTPForbidden(reason="Bad OIDC session.")
+
+    oidc_session["auth_request"]["code"] = params["code"]
+    # finalize requests id_token and access_token with code, validates them and requests userinfo data
+    try:
+        oidc_result = request.app["oidc_client"].finalize(
+            oidc_session["iss"], oidc_session["auth_request"]
+        )
+    except KeyError as e:
+        request.app["Log"].error(f"Issuer {oidc_session['iss']} not found: {e}.")
+        raise aiohttp.web.HTTPBadRequest(reason="Token issuer not found.")
+    except OidcServiceError as e:
+        # This exception is raised if RPHandler encounters an error due to:
+        # 1. "code" is wrong, so token request failed
+        # 2. token validation failed
+        # 3. userinfo request failed
+        request.app["Log"].error(f"OIDC Callback failed with: {e}")
+        raise aiohttp.web.HTTPBadRequest(reason="Invalid OIDC callback.")
+
+    session = await aiohttp_session.new_session(request)
+    session["at"] = time.time()
+    session["referer"] = request.url.host
+    session["oidc"] = {
+        "userinfo": oidc_result["userinfo"].to_dict(),
+        "state": oidc_result["state"],
+        "access_token": oidc_result["token"],
+    }
+
+    return aiohttp.web.Response(
+        status=302, headers={"Location": "/login"}, reason="Redirection to login"
+    )
+
+
+async def handle_login(
+    request: aiohttp.web.Request,
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Create new session cookie for the user."""
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
     response = aiohttp.web.Response(status=302, reason="Redirection to login")
 
     # Add a cookie for navigating
     if "navto" in request.query.keys():
         response.set_cookie("NAV_TO", request.query["navto"], expires=str(3600))
 
-    response.headers["Location"] = "/login/front"
+    if setd["oidc_enabled"]:
+        session = await aiohttp_session.get_session(request)
+        if "oidc" in session:
+            response = aiohttp.web.FileResponse(
+                str(setd["static_directory"]) + "/login2step.html"
+            )
+        else:
+            response.headers["Location"] = "/"
+
+    else:
+        response.headers["Location"] = "/login/front"
 
     return response
 
 
 async def sso_query_begin(
-    _: typing.Union[aiohttp.web.Request, None]
+    request: typing.Union[aiohttp.web.Request, None]
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+
+    if request and setd["oidc_enabled"]:
+        session = await aiohttp_session.get_session(request)
+        if "oidc" not in session:
+            return aiohttp.web.Response(status=302, headers={"Location": "/"})
     if not setd["has_trust"]:
         response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
         return disable_cache(response)
@@ -179,8 +263,10 @@ async def login_with_token(
         body=None,
     )
     client = request.app["api_client"]
-    session = await aiohttp_session.new_session(request)
-
+    if setd["oidc_enabled"]:
+        session = await aiohttp_session.get_session(request)
+    else:
+        session = await aiohttp_session.new_session(request)
     session["at"] = time.time()
 
     session["referer"] = request.url.host

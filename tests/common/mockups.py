@@ -1,6 +1,5 @@
 """Mock-up classes and functions for testing swift_browser_ui."""
 
-
 import json
 import yarl
 import unittest
@@ -53,12 +52,26 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
             "swift_browser_ui.ui.login.aiohttp_session.new_session",
             self.aiohttp_session_new_session_mock,
         )
+        self.aiohttp_session_get_session_oidc_mock = unittest.mock.AsyncMock()
+        self.aiohttp_session_get_session_oidc_mock.return_value = {
+            **self.session_return,
+            "oidc": {
+                "userinfo": {},
+                "state": "",
+                "access_token": "",
+            },
+        }
+        self.p_get_sess_oidc = unittest.mock.patch(
+            "swift_browser_ui.ui.api.aiohttp_session.get_session",
+            self.aiohttp_session_get_session_oidc_mock,
+        )
 
         self.setd_mock = {
             "auth_endpoint_url": "https://example.os.com:5001/v3",
             "set_origin_address": "https://localhost/login/websso",
             "has_trust": True,
             "upload_external_endpoint": "http://test-endpoint:9092/",
+            "oidc_enabled": False,
         }
         self.patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.api.setd", self.setd_mock
@@ -159,6 +172,33 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                 ),
             }
         )
+        self.mock_oidc_userinfo = types.SimpleNamespace(
+            **{
+                "to_dict": unittest.mock.Mock(return_value={}),
+            }
+        )
+        self.mock_oidc_client = types.SimpleNamespace(
+            **{
+                "begin": unittest.mock.Mock(
+                    return_value={
+                        "url": "/should_be_oidc_provider",
+                    }
+                ),
+                "get_session_information": unittest.mock.Mock(
+                    return_value={
+                        "auth_request": {},
+                        "iss": "",
+                    }
+                ),
+                "finalize": unittest.mock.Mock(
+                    return_value={
+                        "userinfo": self.mock_oidc_userinfo,
+                        "state": "",
+                        "token": "",
+                    }
+                ),
+            }
+        )
 
         self.mock_request = types.SimpleNamespace(
             **{
@@ -180,6 +220,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                     "client": self.mock_client,
                     "Log": unittest.mock.MagicMock(logging.Logger),
                     "test-id": "placeholder",
+                    "oidc_client": self.mock_oidc_client,
                 },
                 "url": types.SimpleNamespace(
                     **{
@@ -239,9 +280,7 @@ mock_token_project_avail: dict = {
     ],
 }
 
-
 mock_token_domain_avail: dict = {"domains": []}
-
 
 mock_token_output = {
     "projects": [

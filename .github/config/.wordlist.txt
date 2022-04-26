@@ -11,6 +11,7 @@ backend
 backends
 buildx
 cd
+certifi
 chmod
 cli
 configs
@@ -54,11 +55,13 @@ nodeport
 npm
 npx
 num
+oidc
 openapi
 openrc
 openshift
 openstack
 palletsprojects
+pem
 plaintext
 png
 postgres
@@ -68,6 +71,7 @@ py
 quickstart
 saml
 sha
+sLo
 ssl
 sso
 subcommands

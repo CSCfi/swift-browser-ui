@@ -23,6 +23,7 @@ setuptools.setup(
         "certifi==2021.10.8",
         "asyncpg==0.25.0",
         "aioredis==2.0.1",
+        "oidcrp==2.1.4",
     ],
     extras_require={
         "test": [

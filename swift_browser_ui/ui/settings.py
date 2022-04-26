@@ -52,7 +52,7 @@ logging.root.setLevel(environ.get("LOG_LEVEL", "INFO"))
 
 # The following is the variable containing the default settings, which will be
 # overloaded as necessary.
-setd: Dict[str, Union[str, int, None]] = {
+setd: Dict[str, Union[str, int, bool, None]] = {
     "auth_endpoint_url": environ.get(
         "BROWSER_START_AUTH_ENDPOINT_URL", environ.get("OS_AUTH_URL", "")
     ),
@@ -81,6 +81,11 @@ setd: Dict[str, Union[str, int, None]] = {
     "static_directory": __file__.replace("settings.py", "static"),
     "session_lifetime": 28800,
     "history_lifetime": 2592000,
+    "oidc_enabled": environ.get("OIDC_ENABLED", "False") == "True",
+    "oidc_url": environ.get("OIDC_URL", None),
+    "oidc_client_id": environ.get("OIDC_CLIENT_ID", None),
+    "oidc_client_secret": environ.get("OIDC_CLIENT_SECRET", None),
+    "oidc_redirect_uris": environ.get("OIDC_REDIRECT_URIS", ""),
 }
 
 
