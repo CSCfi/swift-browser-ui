@@ -58,13 +58,13 @@ jobs:
           browser: ${{ matrix.browser }}
           headless: true
           env: port=8000
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
           retention-days: 5
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-videos
