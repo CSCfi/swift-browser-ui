@@ -27,7 +27,7 @@ setuptools.setup(
     ],
     extras_require={
         "test": [
-            "tox==3.24.5",
+            "tox==3.25.0",
             "pytest==7.1.1",
             "pytest-cov==3.0.0",
             "coverage==6.3.2",
