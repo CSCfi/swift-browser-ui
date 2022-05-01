@@ -15,7 +15,7 @@
     "@vueuse/rxjs": "^8.2.4",
     "buefy": "^0.9.17",
     "core-js": "^3.21.1",
-    "dexie": "^3.2.1",
+    "dexie": "^3.2.2",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
     "node-sass": "^7.0.1",
