@@ -105,9 +105,11 @@ class ObjectReplicationProxy:
             segments_str = await resp.text()
             segments_list = segments_str.lstrip().rstrip().split("\n")
             LOGGER.debug(f"Segments before filtering: {segments_list}")
-            segments = list(
-                filter(lambda x, pref=prefix: pref in x, segments_list)  # type: ignore
-            )
+
+            def filter_with_prefix(segment):
+                return prefix in segment
+
+            segments = list(filter(filter_with_prefix, segments_list))
 
         LOGGER.debug(f"Got following segments: {segments}")
 

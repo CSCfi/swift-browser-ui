@@ -117,12 +117,12 @@ async def get_availability_from_token(token: str, client: aiohttp.ClientSession)
     # we need to take the projects that have been enabled for the
     # user, otherwise if the first project is disabled we will
     # get a 401 response when we do initiate_os_service
-    filtered_projects = list(
-        filter(
-            lambda d: d["enabled"] if "enabled" in d else False,
-            output_projects["projects"],  # type: ignore
-        )
-    )
+    def filter_enabled(project) -> bool:
+        if "enabled" in project:
+            return project["enabled"]
+        return False
+
+    filtered_projects = list(filter(filter_enabled, output_projects["projects"]))  # type: ignore
     filtered_domains = output_domains["domains"]  # type: ignore
 
     if len(filtered_projects) == 0:
