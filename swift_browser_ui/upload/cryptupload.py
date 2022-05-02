@@ -201,7 +201,9 @@ class EncryptedUploadProxy:
         n_chunk = segment * SEGMENT_CHUNKS
 
         LOGGER.debug(f"Beginning from chunk {n_chunk}")
-        LOGGER.debug(f"Continuing until chunk {segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS}")
+        LOGGER.debug(
+            f"Continuing until chunk {segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS}"
+        )
         LOGGER.debug(f"Waiting for first chunk in segment {segment} to be available")
 
         while (segment * SEGMENT_CHUNKS) not in self.chunk_cache:
