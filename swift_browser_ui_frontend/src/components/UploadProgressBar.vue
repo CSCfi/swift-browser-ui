@@ -15,6 +15,22 @@
       {{ $t('message.uploading') }} {{ (progress * 100).toFixed(1) }}%
     </b-progress>
     <b-progress
+      v-if="isUploading && fileProgress != undefined"
+      type="is-primary"
+      :value="fileProgress * 100"
+      show-value
+    >
+      Uploading {{ encryptedFile }}
+    </b-progress>
+    <b-progress
+      v-if="isUploading && encryptedProgress != undefined"
+      type="is-primary"
+      :value="encryptedProgress * 100"
+      show-value
+    >
+      Uploading encrypted data
+    </b-progress>
+    <b-progress
       v-else-if="isUploading"
       type="is-primary"
     >
@@ -35,6 +51,15 @@ export default {
     },
     progress () {
       return this.$store.state.uploadProgress;
+    },
+    encryptedProgress () {
+      return this.$store.state.encryptedProgress;
+    },
+    encryptedFile () {
+      return this.$store.state.encryptedFile;
+    },
+    fileProgress () {
+      return this.$store.state.encryptedFileProgress;
     },
   },
 };

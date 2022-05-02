@@ -169,7 +169,7 @@ async def handle_upload_encrypted_object_options(
 
 
 async def handle_upload_encrypted_object(
-    request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle uploading an object spliced into segments."""
     upload_session = await get_encrypted_upload_instance(request)
@@ -177,12 +177,12 @@ async def handle_upload_encrypted_object(
 
 
 async def handle_upload_encrypted_object_ws(
-    request: aiohttp.web.Request
+    request: aiohttp.web.Request,
 ) -> aiohttp.web.WebSocketResponse:
     """Handle uploading object data as a websocket."""
     upload_session = await get_encrypted_upload_instance(request)
 
-    socket_tasks: typing.List[asyncio.Task] = []
+    getter_tasks: typing.List[asyncio.Task] = []
     slicer_tasks: typing.List[asyncio.Task] = []
     upload_tasks: typing.List[asyncio.Task] = []
 
@@ -191,38 +191,32 @@ async def handle_upload_encrypted_object_ws(
 
     LOGGER.info(f"Upload websocket opened for {request.url.path}")
 
+    await upload_session.set_ws(ws)
+
     async for msg in ws:
         if msg.type == "close":
-            LOGGER.info("Finishing upload")
-            await asyncio.gather(*(
-                socket_tasks
-                + slicer_tasks
-                + upload_tasks
-            ))
-            LOGGER.info("Closing the websocket")
+            await asyncio.gather(*(getter_tasks + slicer_tasks + upload_tasks))
+            LOGGER.info(f"Closing the websocket for {request.url.path}")
             await ws.close()
         if msg.data == "startPull":
             # Pull 256 chunks initially
-            LOGGER.info("Starting upload content pull through websocket.")
-            socket_tasks = [
-                asyncio.create_task(ws.send_str("nextChunk")) for _ in range(0, 96)
+            LOGGER.debug("Starting upload content pull through websocket.")
+            getter_tasks = [
+                asyncio.create_task(upload_session.get_next_chunk(ws))
+                for _ in range(0, 96)
             ]
-            LOGGER.info("Starting slicer tasks.")
             slicer_tasks = [
                 asyncio.create_task(
-                    upload_session.slice_into_queue(i, upload_session.get_segment_queue(i))
+                    upload_session.slice_into_queue(
+                        i, upload_session.get_segment_queue(i)
+                    )
                 )
                 for i in range(0, upload_session.return_total_segments())
             ]
-            LOGGER.info("Successfully started the slicer tasks")
-            LOGGER.info("Starting the upload tasks")
             upload_tasks = [
-                asyncio.create_task(
-                    upload_session.upload_segment(i)
-                )
+                asyncio.create_task(upload_session.upload_segment(i))
                 for i in range(0, upload_session.return_total_segments())
             ]
-            LOGGER.info("Successfully started the upload tasks")
         else:
             m = json.loads(msg.data)
             i = m["iter"]
@@ -235,7 +229,7 @@ async def handle_upload_encrypted_object_ws(
                 ws,
             )
 
-    LOGGER.info("Upload finished – pushing manifest.")
+    LOGGER.info(f"Upload finished for {request.url.path} – pushing manifest.")
     await upload_session.add_manifest()
     return ws
 

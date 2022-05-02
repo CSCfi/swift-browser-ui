@@ -1,8 +1,6 @@
 // Wait until calledRun is done
 var waitAsm = async () => {
-  console.log("Wait asm called.");
   if (calledRun) {
-    console.log("Wait asm finished.");
     return true;
   } else {
     return new Promise(() => {
@@ -11,39 +9,19 @@ var waitAsm = async () => {
   }
 }
 
+// Normal required listeners for starting the service worker
 self.addEventListener("install", (event) => {
-  console.log("Install called");
   event.waitUntil(self.skipWaiting());
-  console.log("Install finished");
 });
 self.addEventListener("activate", (event) => {
-  console.log("Activate called.");
   event.waitUntil(self.clients.claim());
-  console.log("Activate finished.");
 });
 
-let streamController, sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray;
-
-self.addEventListener("fetch", (e) => {
-  if (e.request.url.includes("encrypted")) {
-    const stream = new ReadableStream({
-      start(controller) {
-        streamController = controller;
-      },
-    });
-    const response = new Response(stream);
-    response.headers.append(
-      "Content-Disposition",
-      'attachment; filename="' + fileName + '"'
-    );
-    e.respondWith(response);
-  }
-});
+let sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray;
 
 self.addEventListener("message", (e) => {
   switch(e.data.cmd) {
     case "initFileSystem":
-      console.log("Received call to initialize filesystem.");
       FS.mkdir("/keys");
       FS.mkdir("/keys/recv_keys");
       FS.mkdir("/data");
@@ -53,7 +31,6 @@ self.addEventListener("message", (e) => {
       });
       break;
     case "appendPubkey":
-      console.log("Received call to add a public key.");
       FS.writeFile(
         "/keys/recv_keys/pubkey_" + e.data.keyname.toString(),
         e.data.pubkey,
@@ -65,7 +42,6 @@ self.addEventListener("message", (e) => {
       });
       break;
     case "addPrivKey":
-      console.log("Received call to add a private key.");
       FS.writeFile(
         "/keys/pk.key",
         e.data.privkey,
@@ -76,7 +52,6 @@ self.addEventListener("message", (e) => {
       })
       break;
     case "initEphemeral":
-      console.log("Initiating ephemeral encryption.");
       sessionPtr = Module.ccall(
         "open_session_eph",
         "number",
@@ -90,7 +65,6 @@ self.addEventListener("message", (e) => {
       });
       break;
     case "initNormal":
-      console.log("initializing a normal encryption session.");
       sessionPtr = Module.ccall(
         "open_session",
         "number",
@@ -104,7 +78,6 @@ self.addEventListener("message", (e) => {
       });
       break;
     case "createHeader":
-      console.log("Creating a header.");
       header = Module.ccall(
         "wrap_crypt4gh_header",
         "number",
@@ -170,18 +143,23 @@ self.addEventListener("message", (e) => {
       )
       break;
     case "cleanUp":
-      console.log("Serviceworker cleaning up.");
-      if (streamController != undefined) {
-        streamController.close();
+      try {
+        Module.ccall(
+          "clean_session",
+          undefined,
+          ["number"],
+          [sessionPtr],
+        );
+        FS.rmdir("/keys/recv_keys")
+        FS.rmdir("/keys");
+        FS.rmdir("/data");
+      } catch (e) {
+        console.log("FS ignoring error on remove ", e);
+      } finally {
+        e.source.postMessage({
+          eventType: "cleanUpDone",
+        });
       }
-      Module.ccall(
-        "clean_session",
-        undefined,
-        ["number"],
-        [sessionPtr],
-      );
-      e.source.postMessage({
-        eventType: "cleanUpDone",
-      });
+      break;
   }
 });

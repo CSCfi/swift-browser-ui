@@ -125,7 +125,9 @@ async def get_encrypted_upload_instance(
     object_name = request.match_info["object_name"]
 
     try:
-        upload_session = request.app[session]["enuploads"][project][container][object_name]
+        upload_session = request.app[session]["enuploads"][project][container][
+            object_name
+        ]
         LOGGER.info("Returning an existing upload session.")
     except KeyError:
         LOGGER.info("Creating a new upload session.")
@@ -139,7 +141,9 @@ async def get_encrypted_upload_instance(
                 request.app[session],
                 request.app["client"],
             )
-            request.app[session]["enuploads"][project][container][object_name] = upload_session
+            request.app[session]["enuploads"][project][container][
+                object_name
+            ] = upload_session
     LOGGER.info(f"Session object id: {id(upload_session)}")
     return upload_session
 

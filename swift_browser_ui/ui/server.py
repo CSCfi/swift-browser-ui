@@ -258,7 +258,10 @@ async def servinit(
     app.add_routes(
         [
             aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
-            aiohttp.web.get("/upload/{project}/{container}/{object_name:.*}", get_crypted_upload_session),
+            aiohttp.web.get(
+                "/upload/{project}/{container}/{object_name:.*}",
+                get_crypted_upload_session,
+            ),
         ]
     )
 

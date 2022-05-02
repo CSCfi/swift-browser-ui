@@ -28,6 +28,7 @@ UPL_TIMEOUT = 32768
 
 # Size constants for upload data are derived from encryption schema, crypt4gh
 SEGMENT_SIZE = 5368708140
+SEGMENT_CHUNKS = 81885
 CHUNK_SIZE = 65564
 
 
@@ -60,6 +61,7 @@ class EncryptedUploadProxy:
         self.total_chunks = 0
         self.remainder_segment = 0
         self.remainder_chunk = 0
+        self.remainder_chunks = 0
 
         self.endpoint: str = session["endpoint"]
         self.token: str = session["token"]
@@ -69,8 +71,15 @@ class EncryptedUploadProxy:
             self.project,
         )
 
-        self.chunk_cache: typing.Dict[int, typing.Tuple[bytes, aiohttp.web.WebSocketResponse]] = {}
+        self.next_iter = 0
+        self.have_closed = False
+
+        self.chunk_cache: typing.Dict[
+            int, typing.Tuple[bytes, aiohttp.web.WebSocketResponse]
+        ] = {}
         self.q_cache: typing.List[asyncio.Queue] = []
+
+        self.ws: aiohttp.web.WebSocketResponse
 
     def check_header(
         self,
@@ -92,14 +101,13 @@ class EncryptedUploadProxy:
         self.remainder_segment = self.total % SEGMENT_SIZE
         self.total_chunks = -(self.total // -CHUNK_SIZE)
         self.remainder_chunk = self.total % CHUNK_SIZE
+        self.remainder_chunks = -(self.remainder_segment // -CHUNK_SIZE)
 
-        LOGGER.info(f"total: {self.total}")
-        LOGGER.info(f"segments: {self.total_segments}")
-        LOGGER.info(f"chunks: {self.total_chunks}")
+        LOGGER.debug(f"total: {self.total}")
+        LOGGER.debug(f"segments: {self.total_segments}")
+        LOGGER.debug(f"chunks: {self.total_chunks}")
 
-        self.q_cache = [
-            asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)
-        ]
+        self.q_cache = [asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)]
 
         header = await request.content.read()
 
@@ -107,7 +115,7 @@ class EncryptedUploadProxy:
             common.generate_download_url(
                 self.host,
                 container=self.container,
-                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{0:08d}"
+                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{0:08d}",
             ),
             data=header,
             headers={
@@ -145,9 +153,17 @@ class EncryptedUploadProxy:
             },
             ssl=ssl_context,
         ) as resp:
-            return aiohttp.web.Response(
-                status=resp.status
-            )
+            return aiohttp.web.Response(status=resp.status)
+
+    async def get_next_chunk(
+        self,
+        ws: aiohttp.web.WebSocketResponse,
+    ) -> None:
+        """Schedule fetching of the next chunk in order."""
+        if self.next_iter >= self.total_chunks:
+            return
+        await ws.send_json({"cmd": "nextChunk", "iter": self.next_iter * 65536})
+        self.next_iter += 1
 
     async def add_to_chunks(
         self,
@@ -157,10 +173,16 @@ class EncryptedUploadProxy:
     ):
         """Add a chunk to cache."""
         if order in self.done_chunks or order in self.chunk_cache:
-            LOGGER.info(f"Skipping ready chunk {order}.")
-            await ws.send_str("nextChunk")
+            try:
+                await self.get_next_chunk(ws)
+            except ConnectionResetError:
+                pass
             return
         self.chunk_cache[order] = (data, ws)
+
+    async def set_ws(self, ws: aiohttp.web.WebSocketResponse):
+        """Add instance WebSocket."""
+        self.ws = ws
 
     def return_total_segments(self) -> int:
         """Get total segment amount."""
@@ -176,32 +198,40 @@ class EncryptedUploadProxy:
         q: asyncio.Queue,
     ):
         """Slice an almost 5GiB segment from queue (short by 980 bytes)."""
-        n_chunk = segment * 81885
+        n_chunk = segment * SEGMENT_CHUNKS
 
-        LOGGER.info(f"Beginning from chunk {n_chunk}")
-        LOGGER.info(f"Continuing until chunk {segment * 81885 + 81885}")
+        LOGGER.debug(f"Beginning from chunk {n_chunk}")
+        LOGGER.debug(f"Continuing until chunk {segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS}")
+        LOGGER.debug(f"Waiting for first chunk in segment {segment} to be available")
 
-        LOGGER.info(f"Waiting for first chunk in segment {segment} to be available")
-        while (segment * 81885) not in self.chunk_cache:
+        while (segment * SEGMENT_CHUNKS) not in self.chunk_cache:
             await asyncio.sleep(0.05)
-        LOGGER.info(f"First segment in {segment} found")
+        LOGGER.debug(f"First segment in {segment} found")
 
         # Start the upload
         await q.put("BEGIN")
 
-        for i in range(
-            segment * 81885,
-            segment * 81885 + 81885
-        ):
+        seg_start = segment * SEGMENT_CHUNKS
+        seg_end = segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS
+        if segment == self.total_segments - 1 and self.remainder_chunks:
+            LOGGER.debug(f"Using {self.remainder_chunks} as chunk amount for last chunk.")
+            seg_end = segment * SEGMENT_CHUNKS + self.remainder_chunks
+
+        LOGGER.debug(f"Pushing chunks from {seg_start} until {seg_end} to queue.")
+
+        for i in range(seg_start, seg_end):
             while i not in self.chunk_cache:
-                LOGGER.info(f"Waiting 1 sec for chunk {i}")
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.05)
             self.done_chunks.add(i)
             chunk, ws = self.chunk_cache.pop(i)
-            LOGGER.info(f"Queuing chunk {i} with length of {len(chunk)}")
-            LOGGER.info(f"Asking for next chunk after consuming chunk {i}.")
-            await ws.send_str("nextChunk")
             await q.put(chunk)
+            LOGGER.info(f"Put chunk {i} to the queue.")
+            try:
+                await self.get_next_chunk(ws)
+            except ConnectionResetError:
+                pass
+
+        LOGGER.debug(f"Pushging eof for {self.object_name}.")
 
         await q.put("EOF")
 
@@ -213,7 +243,6 @@ class EncryptedUploadProxy:
         LOGGER.info("Starting consumption of the queue.")
         chunk = await q.get()
         while chunk != "EOF":
-            LOGGER.info("Yielding next chunk.")
             yield chunk
             chunk = await q.get()
 
@@ -227,19 +256,14 @@ class EncryptedUploadProxy:
         headers = {
             "X-Auth-Token": self.token,
             "Content-Type": "application/swiftclient-segment",
-            "Content-Length": "5368708140",
         }
-        if order == self.total_segments - 1 and self.remainder_segment:
-            headers["Content-Length"] = str(self.remainder_segment)
-
         # Wait until queue starts – first item isn't part of the data
-        LOGGER.info(f"Waiting for queue to start filling for segment {order}")
-        cmd = await q.get()
-        LOGGER.info(f"{cmd}")
+        LOGGER.debug(f"Waiting for queue to start filling for segment {order}")
+        await q.get()
 
-        LOGGER.info(f"Queue for segment {order} has been started, starting upload")
+        LOGGER.debug(f"Queue for segment {order} has been started, starting upload")
 
-        resp = await self.client.put(
+        async with self.client.put(
             common.generate_download_url(
                 self.host,
                 container=self.container,
@@ -249,6 +273,13 @@ class EncryptedUploadProxy:
             headers=headers,
             timeout=UPL_TIMEOUT,
             ssl=ssl_context,
-        )
-        LOGGER.info(f"Segment {order} finished with status {resp.status}")
+        ) as resp:
+            LOGGER.info(f"Segment {order} finished with status {resp.status}")
+
+        if self.total_segments - 1 == order:
+            LOGGER.info("Closing websocket after finishing last segment.")
+            self.have_closed = True
+            if self.ws is not None:
+                await self.ws.send_json({"cmd": "canClose"})
+
         return resp.status

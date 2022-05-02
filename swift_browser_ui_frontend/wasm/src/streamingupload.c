@@ -8,7 +8,7 @@ Upload service worker handlers
 #include <stdint.h>
 #include <errno.h>
 #include <ftw.h>
-#include <stdio.h>
+#include <unistd.h>
 
 #include <crypt4gh/header.h>
 #include <crypt4gh/segment.h>
@@ -29,8 +29,9 @@ int nftwremove(
     int flag,
     struct FTW *ftws)
 {
-    if (flag == FTW_F || flag == FTW_D) {
-        return remove(path);
+    if (flag == FTW_F) {
+        printf("Removing file: %s\n", path);
+        return unlink(path);
     }
     return 0;
 }
@@ -38,12 +39,20 @@ int nftwremove(
 Wipe the keys stored in FS
 */
 int rmrf() {
-    return nftw(
-        ".",
+    int ret;
+    ret = nftw(
+        "/keys",
         &nftwremove,
         5, // use at most 5 file descriptors
-        FTW_PHYS | FTW_DEPTH
+        0
     );
+    ret = nftw(
+        "/data",
+        &nftwremove,
+        5, // use at most 5 file descriptors
+        0
+    );
+    return ret;
 }
 
 
@@ -52,13 +61,11 @@ Key init function, copied over from libcrypt4gh
 */
 static uint8_t* crypt4gh_session_key_new(void){
     if (sodium_init() == -1) {
-        // E("Could not initialize libsodium");
         return NULL;
     }
     uint8_t* key = (uint8_t*)sodium_malloc(CRYPT4GH_SESSION_KEY_SIZE * sizeof(uint8_t));
 
     if(key == NULL || errno == ENOMEM){
-        // D1("Could not allocate the key");
         return NULL;
     }
 
@@ -67,9 +74,6 @@ static uint8_t* crypt4gh_session_key_new(void){
 
     /* Mark it read-only */
     sodium_mprotect_readonly(key);
-
-    //   H1("Session key", key, CRYPT4GH_SESSION_KEY_SIZE);
-
     return key;
 }
 

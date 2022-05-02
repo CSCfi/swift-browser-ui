@@ -806,7 +806,9 @@ async def get_crypted_upload_session(
         {
             "id": runner_id,
             "url": f"{setd['upload_external_endpoint']}{path}",
-            "wsurl": f"{setd['upload_external_endpoint']}{ws_path}".replace("https", "wss"),
+            "wsurl": f"{setd['upload_external_endpoint']}{ws_path}".replace(
+                "https", "wss"
+            ),
             "host": setd["upload_external_endpoint"],
             "signature": signature,
             "wssignature": ws_signature,

@@ -63,9 +63,18 @@ async def servinit() -> aiohttp.web.Application:
     # Add api routes
     app.add_routes(
         [
-            aiohttp.web.options("/cryptic/{project}/{container}/{object_name:.*}", handle_upload_encrypted_object_options,),
-            aiohttp.web.put("/cryptic/{project}/{container}/{object_name:.*}", handle_upload_encrypted_object,),
-            aiohttp.web.get("/cryptic/{project}/{container}/{object_name:.*}", handle_upload_encrypted_object_ws,),
+            aiohttp.web.options(
+                "/cryptic/{project}/{container}/{object_name:.*}",
+                handle_upload_encrypted_object_options,
+            ),
+            aiohttp.web.put(
+                "/cryptic/{project}/{container}/{object_name:.*}",
+                handle_upload_encrypted_object,
+            ),
+            aiohttp.web.get(
+                "/cryptic/{project}/{container}/{object_name:.*}",
+                handle_upload_encrypted_object_ws,
+            ),
         ]
     )
 

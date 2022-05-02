@@ -19,7 +19,7 @@ async def swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
             "Pragma": "no-cache",
             "Expires": "0",
             "Service-Worker-Allowed": "/",
-        }
+        },
     )
 
 
@@ -32,7 +32,7 @@ async def swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
             "Pragma": "no-cache",
             "Expires": "0",
             "Service-Worker-Allowed": "/",
-        }
+        },
     )
 
 
