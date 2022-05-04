@@ -794,7 +794,7 @@ async def get_crypted_upload_session(
     )
     signature = await sign(3600, path)
     ws_path = (
-        f"/cryptic/ws/{request.match_info['project']}/{request.match_info['container']}"
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
         + f"/{request.match_info['object_name']}"
     )
     ws_sign_path = (

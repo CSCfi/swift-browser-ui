@@ -165,6 +165,7 @@ async def handle_upload_encrypted_object_options(
         headers={
             "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
             "Access-Control-Max-Age": "84600",
+            "Access-Control-Allow-Headers": "Content-Type",
         }
     )
     return resp
