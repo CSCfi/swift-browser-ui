@@ -131,3 +131,7 @@ tests/ui_front/swift-browser-ui
 dictionary.dic
 
 swift_browser_ui_frontend/cypress
+
+# Node files
+**/node_modules/
+**/.node_modules/
