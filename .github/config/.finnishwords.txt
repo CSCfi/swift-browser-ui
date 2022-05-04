@@ -16,6 +16,7 @@ avaimia
 avain
 avainta
 avainten
+dataa
 edellinen
 edistyneitä
 ei
@@ -183,6 +184,7 @@ lisätty
 lisättyjä
 loppuminen
 löydetty
+löydy
 löytää
 löytävät
 löytynyt
@@ -247,6 +249,7 @@ oletusarvojen
 olevia
 olla
 omaa
+ominaisuutta
 omistavan
 ongelmiin
 onnistui
@@ -335,6 +338,7 @@ salaaminen
 salasana
 salasanasta
 salataan
+salattua
 salaus
 salausohjelman
 salausratkaisun
@@ -345,6 +349,8 @@ se
 selaamiseen
 selailla
 selailu
+selaimestasi
+selaimet
 selain
 selainta
 selatessa
@@ -366,6 +372,7 @@ sivupyynnössä
 sivutus
 sopimus
 suodata
+suositellut
 suuren
 suuret
 suuri

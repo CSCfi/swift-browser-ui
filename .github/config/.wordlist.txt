@@ -71,6 +71,7 @@ proxying
 py
 quickstart
 saml
+serviceworker
 sha
 sLo
 ssl
