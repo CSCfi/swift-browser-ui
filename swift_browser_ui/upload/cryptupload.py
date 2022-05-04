@@ -227,7 +227,7 @@ class EncryptedUploadProxy:
             self.done_chunks.add(i)
             chunk, ws = self.chunk_cache.pop(i)
             await q.put(chunk)
-            LOGGER.info(f"Put chunk {i} to the queue.")
+            LOGGER.debug(f"Put chunk {i} to the queue.")
             try:
                 await self.get_next_chunk(ws)
             except ConnectionResetError:
@@ -242,7 +242,7 @@ class EncryptedUploadProxy:
         q: asyncio.Queue,
     ):
         """Consume the upload queue."""
-        LOGGER.info("Starting consumption of the queue.")
+        LOGGER.debug("Starting consumption of the queue.")
         chunk = await q.get()
         while chunk != "EOF":
             yield chunk

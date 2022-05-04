@@ -220,9 +220,7 @@ async def handle_upload_encrypted_object_ws(
         else:
             m = json.loads(msg.data)
             i = m["iter"]
-            # LOGGER.info(f"Adding chunk number {i}")
             c = base64.b64decode(m["chunk"])
-            # upload_session.add_to_chunks((i, c))
             await upload_session.add_to_chunks(
                 i,
                 c,
