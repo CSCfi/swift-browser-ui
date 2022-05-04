@@ -460,7 +460,7 @@ export async function getUploadCryptedEndpoint(
   object,
 ) {
   // Fetch upload endpoint information for encrypted upload
-  let fetchURL = new URL("/upload/".concat(
+  let fetchURL = new URL("/enupload/".concat(
     encodeURI(owner),
     "/",
     encodeURI(container),

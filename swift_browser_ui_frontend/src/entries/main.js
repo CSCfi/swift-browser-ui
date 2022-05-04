@@ -64,7 +64,7 @@ if ("serviceWorker" in navigator) {
     console.log(err);
   });
 } else {
-  console.log("Did not register Service Worker.");
+  if(DEV) console.log("Did not register Service Worker.");
 }
 
 window.onerror = function(error) { 

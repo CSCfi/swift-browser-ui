@@ -26,6 +26,8 @@ from swift_browser_ui.upload.replicate import ObjectReplicationProxy
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
+CRYPTUPLOAD_Q_DEPTH = int(os.environ.get("SWIFTUI_UPLOAD_RUNNER_Q_DEPTH", 96))
+
 
 async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
     """Handle a request for getting object content."""
@@ -199,11 +201,11 @@ async def handle_upload_encrypted_object_ws(
             LOGGER.info(f"Closing the websocket for {request.url.path}")
             await ws.close()
         if msg.data == "startPull":
-            # Pull 256 chunks initially
+            # Pull Q_DEPTH chunks initially
             LOGGER.debug("Starting upload content pull through websocket.")
             getter_tasks = [
                 asyncio.create_task(upload_session.get_next_chunk(ws))
-                for _ in range(0, 96)
+                for _ in range(0, CRYPTUPLOAD_Q_DEPTH)
             ]
             slicer_tasks = [
                 asyncio.create_task(

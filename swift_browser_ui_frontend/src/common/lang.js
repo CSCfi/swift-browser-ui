@@ -247,6 +247,7 @@ let default_translations = {
       uploadfolder: " Upload Folder",
       chunking: "Chunking",
       uploading: "Uploading ",
+      enuploading: "Uploading encrypted data.",
       cancelupload: " Cancel uploading",
       addfiles: "File / Files scheduled for uploading",
       upfinish: "Finished uploading ",
@@ -331,6 +332,8 @@ let default_translations = {
           "megabytes, which can lead to a failure in encryption. " +
           "Try uploading files in smaller batches, or encrypt " +
           "them before uploading normally.",
+        enNotAvail: "ServiceWorker function not available in this browser. " +
+                    "Recommended browsers are Firefox and Chrome.",
         enFiles: "Encrypt files before upload",
         fsWriteFail:
           "Failed to copy files into temporary file system. " +
@@ -650,6 +653,7 @@ let default_translations = {
       uploadfolder: " Lähetä kansio",
       chunking: "Paloitellaan ",
       uploading: "Lähetetään ",
+      enuploading: "Lähetetään salattua dataa.",
       cancelupload: " Peru lähetys",
       addfiles: "Lisättiin tiedosto / tiedostoja lähetettäväksi",
       upfinish: "Lähetettiin tiedosto ",
@@ -729,6 +733,8 @@ let default_translations = {
           "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
           "pienemmissä erissä tai salaa ne ennen lähettämistä " +
           "tavallisesti.",
+        enNotAvail: "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
+                    "Suositellut selaimet ovat Chrome ja Firefox.",
         enFiles: "Salaa tiedostot ennen lähetystä",
         fsWriteFail:
           "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +

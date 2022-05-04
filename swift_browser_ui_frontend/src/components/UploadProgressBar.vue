@@ -20,7 +20,7 @@
       :value="fileProgress * 100"
       show-value
     >
-      Uploading {{ encryptedFile }}
+      {{ $t('message.uploading') }} {{ encryptedFile }}
     </b-progress>
     <b-progress
       v-if="isUploading && encryptedProgress != undefined"
@@ -28,7 +28,7 @@
       :value="encryptedProgress * 100"
       show-value
     >
-      Uploading encrypted data
+      {{ $t('message.enuploading') }}
     </b-progress>
     <b-progress
       v-else-if="isUploading"

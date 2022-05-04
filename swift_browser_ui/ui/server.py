@@ -259,7 +259,7 @@ async def servinit(
         [
             aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
             aiohttp.web.get(
-                "/upload/{project}/{container}/{object_name:.*}",
+                "/enupload/{project}/{container}/{object_name:.*}",
                 get_crypted_upload_session,
             ),
         ]
