@@ -28,7 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #514) Make user roles configurable.
 - (GH #546) Optional two-step login with OpenID Connect (OIDC) as the first step.
   - When OIDC is enabled, the index page is replaced with a new one, that uses CSCfi/csc-ui components.
-  - (GH #565) Skip second login button click when first authentication used Haka.
+- (GH #565) Skip second login button click when first authentication used Haka.
+- (GH #599) Add support for streaming uploads allowing > 1GiB files encrypted uploads
+  - Also fixes some bugs related to encrypted upload engine and repeatability
 
 ### Changed
 
