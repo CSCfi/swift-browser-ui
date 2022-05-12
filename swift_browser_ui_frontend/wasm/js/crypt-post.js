@@ -1,17 +1,6 @@
-// Wait until calledRun is done
-var waitAsm = async () => {
-  if (calledRun) {
-    return true;
-  } else {
-    return new Promise(() => {
-      setTimeout(waitAsm, 2500);
-    });
-  }
-}
-
 // Normal required listeners for starting the service worker
 self.addEventListener("install", (event) => {
-  event.waitUntil(self.skipWaiting());
+  event.waitUntil(waitAsm());  // defined in crypt-pre.js
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
