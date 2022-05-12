@@ -30,7 +30,6 @@ int nftwremove(
     struct FTW *ftws)
 {
     if (flag == FTW_F) {
-        printf("Removing file: %s\n", path);
         return unlink(path);
     }
     return 0;
