@@ -1,6 +1,6 @@
 // Normal required listeners for starting the service worker
 self.addEventListener("install", (event) => {
-  event.waitUntil(waitAsm());  // defined in crypt-pre.js
+  event.waitUntil(new Promise(waitAsm));  // defined in crypt-pre.js
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());

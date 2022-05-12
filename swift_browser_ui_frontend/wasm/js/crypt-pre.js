@@ -2,18 +2,15 @@ var moduleStartComplete = false;
 
 var Module = {
   onRuntimeInitialized: () => {
-    console.log("WASM runtime has been initialized.");
     moduleStartComplete = true;
   },
 };
 
-var waitAsm = () => {
+var waitAsm = (resolve, reject) => {
   if (moduleStartComplete) {
-    console.log("WASM runtime has been initialized.");
-    return true;
+    resolve(true);
+    return;
   } else {
-    return new Promise(() => {
-      setTimeout(waitAsm, 250);
-    });
+    setTimeout(waitAsm, 250, resolve, reject);
   }
 }
