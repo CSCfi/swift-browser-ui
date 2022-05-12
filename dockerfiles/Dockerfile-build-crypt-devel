@@ -116,8 +116,8 @@ COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist /root/swift_u
 COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/sw/libupload.js
 COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/sw/libupload.wasm
 
-RUN pip install --upgrade pip && \
-    pip install -r /root/swift_ui/requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r /root/swift_ui/requirements.txt
 RUN pip install /root/swift_ui
 
 FROM python:3.8-alpine3.15
