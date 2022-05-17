@@ -21,6 +21,12 @@ from swift_browser_ui.ui._convenience import (
 from swift_browser_ui.ui.settings import setd
 
 
+HAKA_ENDPOINT = (
+    "{endpoint}/auth/OS-FEDERATION/identity_providers"
+    "/haka/protocols/saml2/websso?origin={origin}"
+).format
+
+
 async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Redirect to OpenID Connect provider."""
     try:
@@ -80,10 +86,19 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
         "state": oidc_result["state"],
         "access_token": oidc_result["token"],
     }
+    request.app["Log"].info(session["oidc"])
 
-    return aiohttp.web.Response(
+    response = aiohttp.web.Response(
         status=302, headers={"Location": "/login"}, reason="Redirection to login"
     )
+
+    if session["oidc"]["userinfo"].get("homeFederation", "") == "Haka":
+        response.headers["Location"] = HAKA_ENDPOINT(
+            endpoint=str(setd["auth_endpoint_url"]),
+            origin=str(setd["set_origin_address"]),
+        )
+
+    return response
 
 
 async def handle_login(
@@ -131,9 +146,8 @@ async def sso_query_begin(
         status=302,
     )
 
-    response.headers["Location"] = (
-        f"{str(setd['auth_endpoint_url'])}/auth/OS-FEDERATION/identity_providers"
-        f"/haka/protocols/saml2/websso?origin={str(setd['set_origin_address'])}"
+    response.headers["Location"] = HAKA_ENDPOINT(
+        endpoint=str(setd["auth_endpoint_url"]), origin=str(setd["set_origin_address"])
     )
 
     return response
