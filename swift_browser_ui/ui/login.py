@@ -86,7 +86,7 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
         "state": oidc_result["state"],
         "access_token": oidc_result["token"],
     }
-    request.app["Log"].info(session["oidc"])
+    request.app["Log"].debug(session["oidc"])
 
     response = aiohttp.web.Response(
         status=302, headers={"Location": "/login"}, reason="Redirection to login"
