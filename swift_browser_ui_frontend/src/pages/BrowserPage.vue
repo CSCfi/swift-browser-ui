@@ -30,8 +30,10 @@
       v-else
       id="subContainer"
     >
-      <BrowserNavbar
+      <BrowserMainNavbar
         :langs="langs"
+      />
+      <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
         :projects="projects"
       />
