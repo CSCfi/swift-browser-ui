@@ -1,141 +1,115 @@
-<!-- Using the index page as a template for all the error pages as well, to -->
-<!-- reduce the need to write things again unnecessarily. Could have made -->
-<!-- things into components, but that would break the language support and -->
-<!-- make index page development more difficult. -->
 <template>
-  <div class="indexpage">
-    <div>
-      <div class="block has-text-centered">
-        <a 
-          href="#"
-          class="center"
-        >
-          <img
-            src="@/assets/logo.svg"
-            class="csc-logo"
-            :alt="$t('message.cscOrg')"
-          >
-        </a>
-      </div>
-      <div class="content has-text-centered">
-        <h2 class="title is-4 is-csc-secondary">
-          {{ $t("message.program_name") }}
-        </h2>
-        <p>{{ $t("message.program_description") }}</p>
-        <p>{{ $t("message.program_description_step_2") }}</p>
-      </div>
-      <div class="block">
-        <b-message
-          v-if="badrequest"
-          :title="$t('message.error.BadRequest')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.BadRequest_text') }}
-        </b-message>
-        <b-message
-          v-if="unauth"
-          :title="$t('message.error.Unauthorized')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.Unauthorized_text') }}
-        </b-message>
-        <b-message
-          v-if="forbid"
-          :title="$t('message.error.Forbidden')"
-          type="is-danger"
-          has-icon
-        >
-          {{ $t('message.error.Forbidden_text') }}
-        </b-message>
-        <b-message
-          v-if="notfound"
-          :title="$t('message.error.Notfound')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.Notfound_text') }}
-        </b-message>
-        <b-message
-          v-if="uidown"
-          :title="$t('message.error.UIdown')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.UIdown_text') }}
-        </b-message>
-        <b-message
-          v-if="!idb"
-          :title="$t('message.error.idb')"
-          type="is-warning"
-          has-icon
-        >
-          {{ $t('message.error.idb_text') }}
-        </b-message>
-      </div>
-      <div
-        v-if="!forbid"
-        class="block"
-      >
-        <div 
-          v-for="item in $t('message.index.loginmethods')"
-          :key="item.msg"
-          class="block buttons has-text-centered"
-        >
-          <b-button
-            class="center"
-            tag="a"
-            type="is-primary"
-            :href="item.href"
-            :disabled="!idb"
-          >
-            {{ item.msg }}
-          </b-button>
-        </div>
-      </div>
-      <div
-        v-if="notindex"
-        class="buttons block has-text-centered"
-      >
-        <b-button
-          class="center"
-          tag="a"
-          type="is-primary"
-          href="/"
-          :disabled="!idb"
-        >
-          {{ $t("message.error.frontPage") }}
-        </b-button>
-      </div>
-      <b-field class="locale-changer block center">
-        <b-select
-          v-model="$i18n.locale"
-          placeholder="Language"
-          icon="earth"
-          expanded
-          @input="setCookieLang ()"
-        >
-          <option
-            v-for="lang in langs"
-            :key="lang.value"
-            :value="lang.value"
-          >
-            {{ lang.ph }}
-          </option>
-        </b-select>
-      </b-field>
-      <div class="block has-text-centered">
-        <p>
-          {{ $t("message.devel") }}
-          <a
-            href="https://csc.fi"
-            :alt="$t('message.cscOrg')"
-          >{{ $t("message.cscOrg") }}</a>
-        </p>              
-      </div>
-    </div>
-  </div>
+  <c-main>
+    <c-toolbar class="relative">
+      <c-csc-logo />
+      {{ $t('message.program_name') }}
+      <c-spacer />
+      <LanguageSelector />
+    </c-toolbar>
+    <c-row v-if="!notindex && idb">
+      <c-flex>
+        <c-container class="padding">
+          <form>
+            <c-login-card
+              :src="require('@/assets/banner_login.png')"
+            >
+              <c-login-card-title>
+                {{ $t('message.program_name') }}
+              </c-login-card-title>
+              <c-login-card-content>
+                <p>{{ $t('message.program_description') }}</p>
+              </c-login-card-content>
+              <c-spacer />
+              <c-login-card-actions>
+                <c-button
+                  v-for="item in $t('message.index.loginmethods')"
+                  :key="item.msg"
+                  :disabled="!idb"
+                  :href="item.href"
+                  target="_self"
+                >
+                  <i
+                    slot="icon"
+                    class="mdi mdi-login"
+                  />
+                  {{ item.msg }}
+                </c-button>
+              </c-login-card-actions>
+            </c-login-card>
+          </form>
+        </c-container>
+      </c-flex>
+    </c-row>
+    <c-row v-else>
+      <c-flex>
+        <c-container>
+          <c-card>
+            <c-card-title v-if="!idb">
+              {{ $t('message.error.idb') }}
+            </c-card-title>
+            <c-card-title v-else-if="badrequest">
+              {{ $t('message.error.BadRequest') }}
+            </c-card-title>
+            <c-card-title v-else-if="unauth">
+              {{ $t('message.error.Unauthorized') }}
+            </c-card-title>
+            <c-card-title v-else-if="forbid">
+              {{ $t('message.error.Forbidden') }}
+            </c-card-title>
+            <c-card-title v-else-if="notfound">
+              {{ $t('message.error.Notfound') }}
+            </c-card-title>
+            <c-card-title v-else-if="uidown">
+              {{ $t('message.error.UIdown') }}
+            </c-card-title>
+            <c-card-content v-if="!idb">
+              {{ $t('message.error.idb_text') }}
+            </c-card-content>
+            <c-card-content v-else-if="badrequest">
+              {{ $t('message.error.BadRequest_text') }}
+            </c-card-content>
+            <c-card-content v-else-if="unauth">
+              {{ $t('message.error.Unauthorized_text') }}
+            </c-card-content>
+            <c-card-content v-else-if="forbid">
+              {{ $t('message.error.Forbidden_text') }}
+            </c-card-content>
+            <c-card-content v-else-if="notfound">
+              {{ $t('message.error.Notfound_text') }}
+            </c-card-content>
+            <c-card-content v-else-if="uidown">
+              {{ $t('message.error.UIdown_text') }}
+            </c-card-content>
+            <c-card-actions>
+              <c-button
+                href="/"
+                target="_self"
+              >
+                {{ $t('message.error.frontPage') }}
+              </c-button>
+            </c-card-actions>
+          </c-card>
+        </c-container>
+      </c-flex>
+    </c-row>
+    <footer>
+      <c-container>
+        <c-flex>
+          <div>
+            <h5>CSC - IT Center for Science Ltd.</h5>
+            <p>P.O. Box 405 FI-02101 Espoo, Finland</p>
+            <p>+358 9 457 2001</p>
+          </div>
+          <div>
+            <h5>Service Desk</h5>
+            <p>Open Monday to Friday from 8.30 a.m. to 4 p.m.</p>
+            <p>+358 9 457 2821</p>
+            <p>servicedesk@csc.fi</p>
+          </div>
+        </c-flex>
+      </c-container>
+    </footer>
+  </c-main>
 </template>
 
 <script>
@@ -149,23 +123,45 @@ export default {
 </script>
 
 <style>
-html, body {
-  height: 100%;
+c-main { 
+  height: unset; 
+  min-height: 100vh 
 }
-.indexpage {
-  width: 40%;
-  height: 100%;
+
+c-card {
+  margin: 2rem auto;
+  max-width: 55rem;
+  height: 35rem;
+}
+
+c-login-card {
+  margin: 2rem auto;
+  max-width: 55rem;
+  height: 35rem;
+}
+
+c-button {
+  margin-top: 2rem;
+}
+footer {
+  background-color: var(--csc-light-grey);
+  color: var(--csc-dark-grey);
+  padding: 1rem 0 1rem;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+footer h5 {
+  font-weight: bold;
+}
+footer p {
+  font-size: 0.875rem;
+  line-height: 1rem;
+}
+footer c-flex {
   display: flex;
-  flex-direction: column;
-  margin: auto;
-  align-content: center;
-  justify-content: center;
-}
-.center {
-  width: 50%;
-  margin: auto;
-}
-.csc-logo {
-  justify-content: center;
+  justify-content: space-around;
+  text-align: center;
 }
 </style>

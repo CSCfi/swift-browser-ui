@@ -1,18 +1,31 @@
 import Vue from "vue";
 import App from "@/pages/IndexPage.vue";
-import Buefy from "buefy";
 import VueI18n from "vue-i18n";
 
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
+
+import cModel from "@/common/csc-ui.js";
+
+import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
+import { vControlV2 } from "csc-ui-vue-directive";
+
+import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 // Import project css
 import "@/css/prod.scss";
 
 Vue.config.productiontip = true;
 
-Vue.use(Buefy);
+Vue.config.ignoredElements = [/c-\w*/];
+
+applyPolyfills().then(() => {
+  defineCustomElements();
+});
+
 Vue.use(VueI18n);
+Vue.directive("control", vControlV2);
+Vue.directive("csc-model", cModel);
 
 const i18n = new VueI18n({
   locale: getLangCookie(),
@@ -22,6 +35,9 @@ const i18n = new VueI18n({
 new Vue({
   name: "ForbiddenPage",
   i18n,
+  components: {
+    LanguageSelector,
+  },
   data: {
     notindex: true,
     badrequest: false,
