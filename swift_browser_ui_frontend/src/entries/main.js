@@ -8,6 +8,12 @@ import VueI18n from "vue-i18n";
 // Project Vue components
 import BrowserNavbar from "@/components/BrowserNavbar.vue";
 
+// CSC UI things
+import cModel from "@/common/csc-ui.js";
+
+import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
+import { vControlV2 } from "csc-ui-vue-directive";
+
 // Project JS functions
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
@@ -68,6 +74,15 @@ Vue.config.warnHandler = function(msg, vm, info) {
 
 Vue.use(Buefy);
 Vue.use(VueI18n);
+
+// Configure csc-ui
+Vue.config.ignoredElements = [/c-\w*/];
+applyPolyfills().then(() => {
+  defineCustomElements();
+});
+
+Vue.directive("control", vControlV2);
+Vue.directive("csc-model", cModel);
 
 const i18n = new VueI18n({
   locale: getLangCookie(),
