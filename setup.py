@@ -20,7 +20,7 @@ setuptools.setup(
         "click==8.1.2",
         "gunicorn>=20.0.1",
         "uvloop==0.16.0",
-        "certifi==2021.10.8",
+        "certifi==2022.5.18.1",
         "asyncpg==0.25.0",
         "aioredis==2.0.1",
         "oidcrp==2.1.4",
