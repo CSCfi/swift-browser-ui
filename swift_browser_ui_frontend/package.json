@@ -13,7 +13,7 @@
     "@vue/cli-service": "^5.0.1",
     "@vue/composition-api": "^1.4.9",
     "@vueuse/rxjs": "^8.2.4",
-    "buefy": "^0.9.17",
+    "buefy": "^0.9.21",
     "core-js": "^3.21.1",
     "dexie": "^3.2.1",
     "lodash": "^4.17.21",
