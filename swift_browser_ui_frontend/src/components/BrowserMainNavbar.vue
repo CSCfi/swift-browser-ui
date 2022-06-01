@@ -1,7 +1,7 @@
 <template>
   <div
-    id="navbar"
-    class="navbar has-shadow"
+    id="main-navbar"
+    class="navbar"
   >
     <div class="container is-fluid">
       <div class="navbar-brand">
@@ -19,37 +19,6 @@
         <div class="navbar-start">
           <div class="navbar-item">
             <b>{{ $t("message.program_name") }}</b>
-          </div>
-          <div 
-            v-if="multipleProjects"
-            class="navbar-item is-hoverable"
-          >
-            {{ $t("message.currentProj") }}: <a class="navbar-link">
-              <span>{{ active.name }}</span>
-            </a>
-
-            <div class="navbar-dropdown">
-              <router-link
-                v-for="item in projects"
-                :key="item.id"
-                :to="{
-                  name: 'ContainersView', 
-                  params: {user: uname, project: item.id}
-                }"
-                class="navbar-item"
-                @click.native.stop="changeActive(item)"
-              >
-                {{ item.name }}
-              </router-link>
-            </div>
-          </div>
-          <div
-            v-if="!multipleProjects"
-            class="navbar-item"
-          >
-            {{ $t("message.currentProj") }}: &nbsp;<span>
-              {{ active.name }}
-            </span>
           </div>
         </div>
         <div class="navbar-end">
@@ -150,11 +119,9 @@
 
 <script>
 export default {
-  name: "BrowserNavbar",
+  name: "BrowserMainNavbar",
   props: [
     "langs",
-    "multipleProjects",
-    "projects",
   ],
   computed: {
     active () {
@@ -173,14 +140,13 @@ export default {
         "; path=/; expires="
         + expiryDate.toUTCString();
     },
-    changeActive (item) {
-      if (item.id !== this.active.id){
-        this.$router.go({
-          name: "ContainersView", 
-          params: {user: this.uname, project: item.id},
-        });
-      }
-    },
   },
 };
 </script>
+
+<style lang="scss">
+#main-navbar {
+  box-shadow: 2px 4px 8px 0px #00000040;
+  z-index: 31;
+}
+</style>

@@ -6,7 +6,8 @@ import router from "@/common/router";
 import VueI18n from "vue-i18n";
 
 // Project Vue components
-import BrowserNavbar from "@/components/BrowserNavbar.vue";
+import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
+import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -94,7 +95,8 @@ new Vue({
   router,
   store,
   components: {
-    BrowserNavbar,
+    BrowserMainNavbar,
+    BrowserSecondaryNavbar,
     ProgressBar,
   },
   data: function () {
