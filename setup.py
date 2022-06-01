@@ -14,7 +14,7 @@ setuptools.setup(
     install_requires=[
         "aiohttp==3.8.1",
         "aiohttp_session==2.11.0",
-        "python-swiftclient==3.13.1",
+        "python-swiftclient==4.0.0",
         "cryptography==36.0.2",
         "keystoneauth1==4.5.0",
         "click==8.1.2",
