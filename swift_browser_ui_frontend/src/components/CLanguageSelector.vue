@@ -28,7 +28,10 @@ export default {
       for (let lang of this.langs) {
         this.langItems.push({
           name: lang.ph,
-          action: () => {this.$i18n.locale = lang.value;},
+          action: () => {
+            this.$i18n.locale = lang.value;
+            this.setCookieLang();
+          },
         });
       }
       this.setCookieLang();
