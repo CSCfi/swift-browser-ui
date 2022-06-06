@@ -8,26 +8,19 @@
         <div class="navbar-start">
           <div 
             v-if="multipleProjects"
-            class="navbar-item is-hoverable"
+            class="navbar-item"
           >
-            {{ $t("message.currentProj") }}: <a class="navbar-link">
-              <span>{{ active.name }}</span>
-            </a>
-
-            <div class="navbar-dropdown">
-              <router-link
-                v-for="item in projects"
-                :key="item.id"
-                :to="{
-                  name: 'ContainersView', 
-                  params: {user: uname, project: item.id}
-                }"
-                class="navbar-item"
-                @click.native.stop="changeActive(item)"
-              >
-                {{ item.name }}
-              </router-link>
-            </div>
+            <c-select
+              v-bind="active"
+              c-control
+              :items.prop="mappedProjects"
+              :label="$t('message.selectProj')"
+              placeholder="Select project"
+              return-value
+              hide-details
+              class="select-project"
+              @changeValue="changeActive($event)"
+            />
           </div>
           <div
             v-if="!multipleProjects"
@@ -36,6 +29,18 @@
             {{ $t("message.currentProj") }}: &nbsp;<span>
               {{ active.name }}
             </span>
+          </div>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <c-button>
+              Create folder
+            </c-button>
+          </div>
+          <div class="navbar-item">
+            <c-button outlined>
+              Upload
+            </c-button>
           </div>
         </div>
       </div>
@@ -52,27 +57,50 @@ export default {
   ],
   computed: {
     active () {
-      return this.$store.state.active;
+      const activeObject = this.$store.state.active;
+      return {...activeObject, value: activeObject.id};
     },
     uname () {
       return this.$store.state.uname;
     },
+    // C-select component handles options by name and value props
+    // Append value-prop to projects
+    mappedProjects () {
+      return this.projects.map(project => ({...project, value: project.id}));
+    },
   },
   methods: {
-    changeActive (item) {
+    changeActive (event) {
+      const item = event.target.value;
       if (item.id !== this.active.id){
-        this.$router.go({
+        const navigationParams = {
           name: "ContainersView", 
           params: {user: this.uname, project: item.id},
-        });
+        };
+
+        // Pushing to router before ´go´ method
+        // enables navigation with updated item id
+        this.$router.push(navigationParams);
+        this.$router.go(navigationParams);
       }
     },
   },
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+@import "@/css/prod.scss";
+
 #secondary-navbar {
- border-bottom: 6px solid #C2DBDF
+ border-bottom: 6px solid $csc-primary-ghost-hover;
+ min-height: 5rem;
+}
+
+.navbar-item:first-of-type {
+  padding-left: 0;
+}
+
+.select-project {
+  padding: 0.5rem 0;
 }
 </style>

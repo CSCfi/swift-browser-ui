@@ -55,6 +55,7 @@ let default_translations = {
                            "storage systems.",
       program_description_step_2: "",
       currentProj: "Current project",
+      selectProj: "Select project",
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
       devel: "Developed by",
@@ -370,6 +371,7 @@ let default_translations = {
       program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
                            "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Nykyinen projekti",
+      selectProj: "Valitse projekti",
       logOut: "Kirjaudu ulos",
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
       devel: "kehittänyt",
