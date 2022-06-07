@@ -105,7 +105,7 @@ export default {
 @import "@/css/prod.scss";
 
 #secondary-navbar {
- border-bottom: 6px solid $csc-primary-lighter;
+ border-bottom: 6px solid $csc-primary-light;
  min-height: 5rem;
 }
 

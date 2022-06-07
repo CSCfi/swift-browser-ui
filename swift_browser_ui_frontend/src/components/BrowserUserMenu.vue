@@ -1,5 +1,9 @@
 <template>
   <c-menu :items.prop="menuItems">
+    <font-awesome-icon
+      icon="fas fa-user"
+      class="pr-3 user-menu-icon"
+    />
     {{ uname }}
   </c-menu>
 </template>
@@ -83,3 +87,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+@import "@/css/prod.scss";
+
+.user-menu-icon {
+  color: $csc-primary
+}
+
+
+</style>
