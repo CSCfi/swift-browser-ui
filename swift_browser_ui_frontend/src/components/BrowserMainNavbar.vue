@@ -22,6 +22,9 @@
           </div>
         </div>
         <div class="navbar-end">
+          <div class="navbar-item">
+            <LanguageSelector />
+          </div>
           <div
             v-if="$te('message.helplink')"
             class="navbar-item"
@@ -35,81 +38,7 @@
             </div>
           </div>
           <div class="navbar-item">
-            <div class="buttons">
-              <router-link
-                :to="{
-                  name: 'DashboardView', 
-                  params: {user: uname, project: active.id}
-                }"
-                :class="!($route.name == 'DashboardView') ? 
-                  'button is-primary is-outlined' : 
-                  'button is-primary has-text-light'"
-              >
-                {{ $t("message.dashboard.dashboard") }}
-              </router-link>
-            </div>
-          </div>
-          <div class="navbar-item">
-            <div class="buttons">
-              <router-link
-                :to="{name: 'ContainersView',
-                      params: {user: uname, project: active.id}}"
-                :class="!($route.name == 'ContainersView'
-                  || $route.name == 'ObjectsView') ? 
-                  'button is-primary is-outlined' : 
-                  'button is-primary has-text-light'"
-              >
-                {{ $t("message.dashboard.browser") }}
-              </router-link>
-            </div>
-          </div>
-          <div
-            v-if="$store.state.client"
-            class="navbar-item"
-          >
-            <div class="buttons">
-              <router-link
-                :to="{name: 'SharedTo', params: {
-                  user: uname,
-                  project: active.id
-                }}"
-                :class="
-                  !($route.name == 'SharedTo' ||
-                    $route.name == 'SharedFrom' || 
-                    $route.name == 'ShareRequests') ? 
-                    'button is-primary is-outlined' : 
-                    'button is-primary has-text-light'"
-              >
-                {{ $t("message.share.shared") }}
-              </router-link>
-            </div>
-          </div>
-          <div class="navbar-item">
-            <b-field class="locale-changer">
-              <b-select
-                v-model="$i18n.locale"
-                placeholder="Language"
-                icon="earth"
-                @input="setCookieLang ()"
-              >
-                <option 
-                  v-for="lang in langs"
-                  :key="lang.value"
-                  :value="lang.value"
-                >
-                  {{ lang.ph }}
-                </option>
-              </b-select>
-            </b-field>
-          </div>
-          <div class="navbar-item">
-            <div class="buttons">
-              <a
-                data-testid="logout"
-                class="button is-primary is-outlined"
-                href="/login/kill"
-              >{{ $t("message.logOut") }}</a>
-            </div>
+            <BrowserUserMenu />
           </div>
         </div>
       </div>
@@ -118,8 +47,15 @@
 </template>
 
 <script>
+import LanguageSelector from "@/components/CLanguageSelector.vue";
+import BrowserUserMenu from "@/components/BrowserUserMenu.vue";
+
 export default {
   name: "BrowserMainNavbar",
+  components: {
+    LanguageSelector,
+    BrowserUserMenu,
+  },
   props: [
     "langs",
   ],
@@ -129,16 +65,6 @@ export default {
     },
     uname () {
       return this.$store.state.uname;
-    },
-  },
-  methods: {
-    setCookieLang: function() {
-      const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-      document.cookie = "OBJ_UI_LANG=" +
-        this.$i18n.locale +
-        "; path=/; expires="
-        + expiryDate.toUTCString();
     },
   },
 };
