@@ -50,12 +50,13 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 
 /* import specific icons */
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 /* add icons to the library */
-library.add(faUser);
+library.add(faUser, faCircleQuestion);
 
 /* add font awesome icon component */
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
