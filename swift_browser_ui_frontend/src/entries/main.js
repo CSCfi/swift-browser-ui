@@ -44,6 +44,22 @@ import ProgressBar from "@/components/UploadProgressBar";
 // Import delay
 import delay from "lodash/delay";
 
+// Fontawesome icons
+/* import the fontawesome core */
+import { library } from "@fortawesome/fontawesome-svg-core";
+
+/* import specific icons */
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+
+/* import font awesome icon component */
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+/* add icons to the library */
+library.add(faUser);
+
+/* add font awesome icon component */
+Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+
 
 checkIDB().then(result => {
   if (!result) {
