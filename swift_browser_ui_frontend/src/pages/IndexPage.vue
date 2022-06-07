@@ -26,7 +26,7 @@
                   :key="item.msg"
                   :disabled="!idb"
                   :href="item.href"
-                  target="_self"
+                  type="button"
                 >
                   <i
                     slot="icon"
