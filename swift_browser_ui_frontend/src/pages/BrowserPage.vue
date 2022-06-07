@@ -87,7 +87,9 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "@/css/prod.scss";
+
 html, body {
   height: 100%;
 }
@@ -108,6 +110,11 @@ html, body {
 
 .navbar .container .navbar-brand .navbar-item img {
 	max-height: 2.5rem;
+}
+
+.menu-active {
+  color: $csc-primary;
+  font-weight: 600 !important;
 }
 
 .hero-body #login-center{

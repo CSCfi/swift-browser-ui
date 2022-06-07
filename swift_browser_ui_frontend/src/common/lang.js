@@ -50,6 +50,7 @@ let default_translations = {
       dropFiles: "Drop files to upload.",
       help: "Help",
       helplink: "",
+      support: "Support",
       program_name: "Object Browser",
       program_description: "Web UI for browsing contents in Swift object " +
                            "storage systems.",
@@ -369,6 +370,7 @@ let default_translations = {
       dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",
       helplink: "",
+      support: "Tuki",
       program_name: "Object Browser",
       program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
                            "selaamiseen Swift-objektitietojärjestelmissä.",

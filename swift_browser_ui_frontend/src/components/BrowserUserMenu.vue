@@ -4,7 +4,7 @@
       icon="fas fa-user"
       class="pr-3 user-menu-icon"
     />
-    {{ uname }}
+    <span class="menu-active">{{ uname }}</span>
   </c-menu>
 </template>
 
@@ -92,8 +92,8 @@ export default {
 @import "@/css/prod.scss";
 
 .user-menu-icon {
-  color: $csc-primary
+  color: $csc-primary;
+  height: 1rem;
+  width: auto
 }
-
-
 </style>

@@ -1,8 +1,6 @@
 <template>
-  <c-menu
-    :items.prop="langItems"
-  >
-    {{ current }}
+  <c-menu :items.prop="langItems">
+    <span class="menu-active">{{ current }}</span>
   </c-menu>
 </template>
 

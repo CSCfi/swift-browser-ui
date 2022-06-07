@@ -24,18 +24,24 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <LanguageSelector />
-          </div>
+          </div> 
           <div
             v-if="$te('message.helplink')"
             class="navbar-item"
           >
-            <div class="buttons">
-              <a
-                :href="$t('message.helplink')"
-                target="_blank"
-                class="button is-primary is-outlined"
-              >{{ $t("message.help") }}</a>
-            </div>
+            <a
+              :href="$t('message.helplink')"
+              target="_blank"
+            >
+              <c-button text>
+                <font-awesome-icon 
+                  slot="icon"
+                  icon="fa-regular fa-circle-question"
+                  class="menu-icon"
+                />
+                {{ $t("message.support") }}
+              </c-button>
+            </a>
           </div>
           <div class="navbar-item">
             <BrowserUserMenu />
@@ -70,9 +76,14 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #main-navbar {
   box-shadow: 2px 4px 8px 0px #00000040;
   z-index: 31;
+}
+
+.menu-icon {
+  height: 1.25rem;
+  width: auto
 }
 </style>
