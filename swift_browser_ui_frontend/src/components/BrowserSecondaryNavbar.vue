@@ -1,46 +1,54 @@
 <template>
-  <div
-    id="secondary-navbar"
-    class="navbar"
-  >
-    <div class="container is-fluid">
-      <div class="navbar-menu">
-        <div class="navbar-start">
-          <div 
-            v-if="multipleProjects"
-            class="navbar-item"
-          >
-            <c-select
-              v-bind="active"
-              c-control
-              :items.prop="mappedProjects"
-              :label="$t('message.selectProj')"
-              placeholder="Select project"
-              return-value
-              hide-details
-              class="select-project"
-              @changeValue="changeActive($event)"
-            />
+  <div id="secondary-navbar-wrapper">
+    <div
+      id="secondary-navbar"
+      class="navbar"
+    >
+      <div class="container is-fluid">
+        <div class="navbar-menu">
+          <div class="navbar-start">
+            <div 
+              v-if="multipleProjects"
+              class="navbar-item"
+            >
+              <c-select
+                v-bind="active"
+                c-control
+                :items.prop="mappedProjects"
+                :label="$t('message.selectProj')"
+                placeholder="Select project"
+                return-value
+                hide-details
+                class="select-project"
+                @changeValue="changeActive($event)"
+              />
+            </div>
+            <div
+              v-if="!multipleProjects"
+              class="navbar-item"
+            >
+              {{ $t("message.currentProj") }}: &nbsp;<span>
+                {{ active.name }}
+              </span>
+            </div>
           </div>
-          <div
-            v-if="!multipleProjects"
-            class="navbar-item"
-          >
-            {{ $t("message.currentProj") }}: &nbsp;<span>
-              {{ active.name }}
-            </span>
-          </div>
-        </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <c-button>
-              Create folder
-            </c-button>
-          </div>
-          <div class="navbar-item">
-            <c-button outlined>
-              Upload
-            </c-button>
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <c-button
+                disabled
+                @click="showCreateFolderModal = true"
+              >
+                {{ $t('message.createFolder') }}
+              </c-button>
+            </div>
+            <div class="navbar-item">
+              <c-button
+                outlined
+                disabled
+              >
+                {{ $t('message.uploadSecondaryNav') }}
+              </c-button>
+            </div>
           </div>
         </div>
       </div>
@@ -55,6 +63,11 @@ export default {
     "multipleProjects",
     "projects",
   ],
+  data() {
+    return {
+      showCreateFolderModal: false,
+    };
+  },
   computed: {
     active () {
       const activeObject = this.$store.state.active;
@@ -92,7 +105,7 @@ export default {
 @import "@/css/prod.scss";
 
 #secondary-navbar {
- border-bottom: 6px solid $csc-primary-ghost-hover;
+ border-bottom: 6px solid $csc-primary-lighter;
  min-height: 5rem;
 }
 
