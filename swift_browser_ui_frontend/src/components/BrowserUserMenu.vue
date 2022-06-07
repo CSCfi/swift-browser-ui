@@ -1,8 +1,7 @@
 <template>
   <c-menu :items.prop="menuItems">
-    <font-awesome-icon
-      icon="fas fa-user"
-      class="pr-3 user-menu-icon"
+    <i
+      class="mdi mdi-account pr-3 menu-icon"
     />
     <span class="menu-active">{{ uname }}</span>
   </c-menu>
@@ -87,13 +86,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-@import "@/css/prod.scss";
-
-.user-menu-icon {
-  color: $csc-primary;
-  height: 1rem;
-  width: auto
-}
-</style>

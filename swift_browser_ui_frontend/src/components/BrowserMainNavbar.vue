@@ -34,10 +34,9 @@
               target="_blank"
             >
               <c-button text>
-                <font-awesome-icon 
+                <i
                   slot="icon"
-                  icon="fa-regular fa-circle-question"
-                  class="menu-icon"
+                  class="mdi mdi-help-circle-outline menu-icon"
                 />
                 {{ $t("message.support") }}
               </c-button>
@@ -80,10 +79,5 @@ export default {
 #main-navbar {
   box-shadow: 2px 4px 8px 0px #00000040;
   z-index: 31;
-}
-
-.menu-icon {
-  height: 1.25rem;
-  width: auto
 }
 </style>
