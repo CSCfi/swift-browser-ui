@@ -51,7 +51,7 @@ let default_translations = {
       help: "Help",
       helplink: "",
       support: "Support",
-      program_name: "Object Browser",
+      program_name: "SD Connect",
       program_description: "Web UI for browsing contents in Swift object " +
                            "storage systems.",
       program_description_step_2: "",
@@ -371,7 +371,7 @@ let default_translations = {
       help: "Apua",
       helplink: "",
       support: "Tuki",
-      program_name: "Object Browser",
+      program_name: "SD Connect",
       program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
                            "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Nykyinen projekti",
