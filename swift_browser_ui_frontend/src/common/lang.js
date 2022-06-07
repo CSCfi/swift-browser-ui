@@ -49,7 +49,7 @@ let default_translations = {
       },
       dropFiles: "Drop files to upload.",
       help: "Help",
-      helplink: "",
+      helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Support",
       program_name: "SD Connect",
       program_description: "Web UI for browsing contents in Swift object " +
@@ -369,7 +369,7 @@ let default_translations = {
       },
       dropFiles: "Pudota lähetettävät tiedostot.",
       help: "Apua",
-      helplink: "",
+      helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Tuki",
       program_name: "SD Connect",
       program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +

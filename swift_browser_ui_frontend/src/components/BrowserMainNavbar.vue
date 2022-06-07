@@ -76,8 +76,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "@/css/prod.scss";
+
 #main-navbar {
-  box-shadow: 2px 4px 8px 0px #00000040;
+  box-shadow: 2px 4px 8px 0px $csc-light-grey;
   z-index: 31;
 }
 </style>
