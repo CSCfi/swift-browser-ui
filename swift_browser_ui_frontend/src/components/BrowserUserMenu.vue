@@ -70,15 +70,24 @@ export default {
           route: "/login/kill",
         }];
 
-      for (let item of rawMenuItems) {
+
+      // Menu item can be hidden if it's optional rule doesn't apply
+      for (let item of rawMenuItems.filter(
+        menuItem => menuItem.rule === undefined || menuItem.rule)
+      ) {
         this.menuItems.push({
           name: item.label,
           action: () => {
             // String typed routes navigate out from app and therefore
-            // need to be handled with native browser properties
-            typeof item.route === "string" ? 
-              window.location.href = item.route :
+            // need to be handled with native browser properties.
+            // Navigating to active route is not allowed.
+            const activeRoute = this.$route;
+
+            if (typeof item.route === "string") {
+              window.location.href = item.route;
+            } else if (item.route.name !== activeRoute.name) {
               this.$router.push(item.route);
+            }
           },
         });
       }
