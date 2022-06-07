@@ -113,8 +113,15 @@ html, body {
 }
 
 .menu-active {
-  color: $csc-primary;
   font-weight: 600 !important;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active, .menu-icon {
+  color: $csc-primary;
 }
 
 .hero-body #login-center{
