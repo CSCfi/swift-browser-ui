@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #596) Support link phrasing, icon and destination update in main navigation
+- (GH #577) Updated layout for top navigation
+- (GH #596) Project switcher with CSC Design system select components
 - (GH #468) add support for project isolation for projects marked as restricted
     - discovery for restricted projects pending, implemented logic only for now
     - foced restricted mode can be configured on
