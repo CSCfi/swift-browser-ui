@@ -20,6 +20,7 @@
                 return-value
                 hide-details
                 class="select-project"
+                data-testid="project-selector"
                 @changeValue="changeActive($event)"
               />
             </div>

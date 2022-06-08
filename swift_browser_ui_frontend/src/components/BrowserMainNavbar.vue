@@ -41,7 +41,7 @@
                   slot="icon"
                   class="mdi mdi-help-circle-outline menu-icon"
                 />
-                {{ $t("message.support") }}
+                <span class="menu-active">{{ $t("message.support") }}</span>
               </c-button>
             </a>
           </div>
