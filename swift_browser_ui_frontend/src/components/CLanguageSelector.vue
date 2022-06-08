@@ -1,5 +1,8 @@
 <template>
-  <c-menu :items.prop="langItems">
+  <c-menu
+    :items.prop="langItems"
+    data-testid="language-selector"
+  >
     <span class="menu-active">{{ current }}</span>
   </c-menu>
 </template>

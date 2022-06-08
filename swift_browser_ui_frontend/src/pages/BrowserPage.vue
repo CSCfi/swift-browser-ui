@@ -46,6 +46,7 @@
           :key="item.alias"
           :to="item.address"
           tag="router-link"
+          data-testid="breadcrumb-item"
         >
           {{ item.alias | truncate(100) }}
         </b-breadcrumb-item>
@@ -114,6 +115,7 @@ html, body {
 
 .menu-active {
   font-weight: 600 !important;
+  font-size: 14px;
 }
 
 .menu-icon {

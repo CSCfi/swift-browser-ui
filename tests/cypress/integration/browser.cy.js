@@ -6,15 +6,13 @@ describe("Browse containers and test operations", function () {
   });
 
   afterEach(function () {
-    cy.get('[data-testid="logout"]').click()
+    cy.logout()
   });
 
   it("should be able to filter table, adjust display containers per page and pagination", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
-    cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
-        .should('have.css', 'display', 'block')
-    cy.contains('service').click()
-    
+    cy.selectProject('service')
+
     cy.get('[data-testid="containersPerPage"]').select('5 per page')
     cy.contains('1-5 / 15')
     cy.get('[data-testid="paginationSwitch"]').click()
@@ -67,9 +65,7 @@ describe("Browse containers and test operations", function () {
 
   it("should display, add, remove container tags", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
-    cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
-        .should('have.css', 'display', 'block')
-    cy.contains('service').click()
+    cy.selectProject('service')
 
     // container list loads with tags
     cy.get('tbody .tags .tag').should('have.length', 45)
@@ -102,9 +98,7 @@ describe("Browse containers and test operations", function () {
 
   it("should display, add, remove object tags", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
-    cy.get('.navbar-dropdown').invoke('css', 'display', 'block')
-        .should('have.css', 'display', 'block')
-    cy.contains('service').click()
+    cy.selectProject('service')
 
     cy.get('tbody tr td[data-label=Name]').first().dblclick()
 

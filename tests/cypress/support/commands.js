@@ -33,6 +33,32 @@ Cypress.Commands.add("login", (loginMessage) => {
     cy.get('#classicform [type="submit"]').click()
 })
 
+Cypress.Commands.add("logout", () => {
+    cy.get('[data-testid="user-menu"]').click()
+    .shadow().find('li').contains('Log Out').click()
+})
+
+// CSC Design System renders inside of shadow DOM and therefore needs to be queried
+// with .shadow() method.
+Cypress.Commands.add("changeLang", (locale) => {
+    const locales = [
+        {key: 'en', label: 'In English'},
+        {key: 'fi', label: 'Suomeksi'},
+    ]
+    cy.get('[data-testid="language-selector"]').click()
+    .shadow().find('li').contains(locales.find(item => item.key === locale).label).click()
+})
+
+Cypress.Commands.add("navigateUserMenu", (menuItem) => {
+    cy.get('[data-testid="user-menu"]').click()
+    .shadow().find('li').contains(menuItem).click()
+})
+
+Cypress.Commands.add("selectProject", (projectName) => {
+    cy.get('[data-testid="project-selector"]').click()
+    .shadow().find('li').contains(projectName).click()
+})
+
 Cypress.Commands.add("deleteDB", () => {
     indexedDB.deleteDatabase("sd-connect")
 })

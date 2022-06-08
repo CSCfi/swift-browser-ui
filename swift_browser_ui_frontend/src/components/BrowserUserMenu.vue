@@ -1,5 +1,8 @@
 <template>
-  <c-menu :items.prop="menuItems">
+  <c-menu
+    :items.prop="menuItems"
+    data-testid="user-menu"
+  >
     <i
       class="mdi mdi-account pr-3 menu-icon"
     />
