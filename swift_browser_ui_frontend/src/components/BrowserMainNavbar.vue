@@ -33,7 +33,10 @@
               :href="$t('message.helplink')"
               target="_blank"
             >
-              <c-button text>
+              <c-button
+                text
+                tabindex="-1"
+              >
                 <i
                   slot="icon"
                   class="mdi mdi-help-circle-outline menu-icon"
