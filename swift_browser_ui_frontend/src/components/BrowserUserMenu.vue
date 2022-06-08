@@ -39,30 +39,18 @@ export default {
     setMenu() {
       this.menuItems = [];
 
-      const navigationParams = {
-        user: this.uname, 
-        project: this.active.id,
-      };
-
       const rawMenuItems = [
         {
           label: this.$t("message.dashboard.dashboard"),
-          route: {
-            name: "DashboardView", 
-            params: navigationParams,
-          },
+          route: { name: "DashboardView" },
         },
         {
           label: this.$t("message.dashboard.browser"),
-          route: {
-            name: "ContainersView",
-            params: navigationParams,
-          },
+          route: { name: "ContainersView" },
         },
         {
           label: this.$t("message.share.shared"), 
-          route: {
-            name: "SharedTo", params: navigationParams},
+          route: { name: "SharedTo" },
           rule: this.$store.state.client,
         },
         {
@@ -86,7 +74,9 @@ export default {
             if (typeof item.route === "string") {
               window.location.href = item.route;
             } else if (item.route.name !== activeRoute.name) {
-              this.$router.push(item.route);
+              this.$router.push({...item.route, params: {        
+                user: this.uname, 
+                project: this.active.id}});
             }
           },
         });
