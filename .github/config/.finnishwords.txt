@@ -374,6 +374,7 @@ toteuttaa
 tueta
 tuettu
 tuettua
+tuki
 tulisi
 tuloksia
 tunniste
