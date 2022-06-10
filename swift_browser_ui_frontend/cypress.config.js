@@ -1,0 +1,23 @@
+const { defineConfig } = require('cypress')
+
+module.exports = defineConfig({
+  fixturesFolder: '../tests/cypress/fixtures',
+  viewportWidth: 1280,
+  viewportHeight: 720,
+  retries: {
+    runMode: 3,
+    openMode: 0,
+  },
+  videoCompression: false,
+  defaultCommandTimeout: 10000,
+  e2e: {
+    // We've imported your old cypress plugins here.
+    // You may want to clean this up later by importing these.
+    setupNodeEvents(on, config) {
+      return require('./../tests/cypress/plugins/index.js')(on, config)
+    },
+    baseUrl: 'http://localhost:8000',
+    specPattern: '../tests/cypress/integration/**/*.cy.{js,jsx,ts,tsx}',
+    supportFile: '../tests/cypress/support/index.js',
+  },
+})

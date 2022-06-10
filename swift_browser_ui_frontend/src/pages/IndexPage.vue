@@ -27,6 +27,7 @@
                   :disabled="!idb"
                   :href="item.href"
                   type="button"
+                  target="_self"
                 >
                   <i
                     slot="icon"
