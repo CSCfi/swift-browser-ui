@@ -11,8 +11,9 @@ describe("Login and log out a user", function () {
     })
 
     it("should login user with Finnish to username + password and remember the selection", () => {
-        cy.get("In English").click()
-        cy.get("Suomeksi").click()
+        cy.visit(Cypress.config().baseUrl)
+        cy.contains("In English").click({ position: "top" })
+        cy.contains("Suomeksi").click({ position: "top" })
         cy.login(' Kirjaudu SSO:ta käyttäen ')
         cy.get('.buttons > .router-link-exact-active').should(($browse) => {
             expect($browse).to.have.length(1)
