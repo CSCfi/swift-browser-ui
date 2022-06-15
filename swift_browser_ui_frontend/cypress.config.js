@@ -6,6 +6,7 @@ module.exports = defineConfig({
   fixturesFolder: "../tests/cypress/fixtures",
   viewportWidth: 1280,
   viewportHeight: 720,
+  includeShadowDom: true,
   retries: {
     runMode: 3,
     openMode: 0,
