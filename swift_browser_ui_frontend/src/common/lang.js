@@ -22,30 +22,34 @@ let default_translations = {
       error: {
         frontPage: "To the Front Page",
         BadRequest: "400 - Bad Request",
-        BadRequest_text: "Something was wrong with the request. This can " +
-                         "be for example due to missing password and/or " +
-                         "username.",
+        BadRequest_text:
+          "Something was wrong with the request. This can " +
+          "be for example due to missing password and/or " +
+          "username.",
         UIdown: "503 - Service Unavailable",
         UIdown_text: "Allas User Interface is currently Unavailable",
         Unauthorized: "401 – Not logged in",
-        Unauthorized_text: "The action requested requires logging " +
-                           "in, or the log in credentials were incorrect. " +
-                           "Use the button below to Log in.",
+        Unauthorized_text:
+          "The action requested requires logging " +
+          "in, or the log in credentials were incorrect. " +
+          "Use the button below to Log in.",
         Notfound: "404 – Could not find the page that was requested.",
-        Notfound_text: "The front page, however, can be found – in the link " +
-                       "below.",
+        Notfound_text:
+          "The front page, however, can be found – in the link " + "below.",
         Forbidden: "403 – Wait, that is forbidden!",
-        Forbidden_text: "The previous request could not be fulfilled. " +
-                        "If said operation should be allowed to be " +
-                        "performed, contact the service administrator. " +
-                        "Otherwise head back to the front page from the " +
-                        "button below.",
+        Forbidden_text:
+          "The previous request could not be fulfilled. " +
+          "If said operation should be allowed to be " +
+          "performed, contact the service administrator. " +
+          "Otherwise head back to the front page from the " +
+          "button below.",
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
         idb: "Browser not supported.",
-        idb_text: "This browser is not supported.\n" +
-                  "Please, use a supported browser.",
+        idb_text:
+          "This browser is not supported.\n" +
+          "Please, use a supported browser.",
       },
       dropFiles: "Drop files to upload.",
       help: "Help",
@@ -98,11 +102,12 @@ let default_translations = {
         browser: "Browser",
         tooltip_disable: "Hide tooltip",
         hour: "hour",
-        default_notify: "The information on consumed billing units and the " +
-                        "available quota is derived from the default Pouta " +
-                        "values. If there's a separate pricing contract " +
-                        "with CSC for the project used, the values " +
-                        "specific the project may vary.",
+        default_notify:
+          "The information on consumed billing units and the " +
+          "available quota is derived from the default Pouta " +
+          "values. If there's a separate pricing contract " +
+          "with CSC for the project used, the values " +
+          "specific the project may vary.",
         resources: "Resources",
         tokens: "Sharing API tokens",
         links: [
@@ -150,8 +155,8 @@ let default_translations = {
         revoke: "Revoke bucket access",
         revoke_project: "Revoke access from project",
         success_delete: "Successfully deleted sharing action",
-        request_sync_nocont: "Cannot synchronize access requests without a " +
-                             "bucket",
+        request_sync_nocont:
+          "Cannot synchronize access requests without a " + "bucket",
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
@@ -163,10 +168,11 @@ let default_translations = {
         owner: "Owner Project Identifier",
         owner_message: "Project Identifier of the bucket owner",
         request: "Request",
-        multi_project: "Your account has access to multiple projects. " +
-                       "Please verify that the correct project is set " +
-                       "active in the menu, and submit the request with " +
-                       "the Request button.",
+        multi_project:
+          "Your account has access to multiple projects. " +
+          "Please verify that the correct project is set " +
+          "active in the menu, and submit the request with " +
+          "the Request button.",
         requestHeading: "Request access to a bucket",
       },
       largeFileMessage: "",
@@ -175,15 +181,17 @@ let default_translations = {
       downloadContainer: " Download Bucket",
       downloadAlt: "Download link for",
       downloadAltLarge: "Confirm download large file",
-      largeDownMessage: "No large (> 1GiB) downloads enabled. Click to " +
-                        "enable them for the duration of the session.",
+      largeDownMessage:
+        "No large (> 1GiB) downloads enabled. Click to " +
+        "enable them for the duration of the session.",
       largeDownAction: "Enable",
       emptyContainer: "This bucket is empty.",
-      emptyProject: "The project does not contain any buckets " +
-                    "or their use is not permitted.",
+      emptyProject:
+        "The project does not contain any buckets " +
+        "or their use is not permitted.",
       emptyShared: "No buckets have been shared to the project.",
-      emptyRequested: "No shared buckets have been requested for the " +
-                      "project.",
+      emptyRequested:
+        "No shared buckets have been requested for the " + "project.",
       sharing: "Sharing - ",
       containers: "Buckets - ",
       upload: " Upload",
@@ -205,33 +213,40 @@ let default_translations = {
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
-      tagName: "Tags",
+      tagName: "Tags (optional)",
+      tagPlaceholder: "# Add a tag",
       tagMessage: "Press enter to add.",
       container_ops: {
-        addContainer: "Add a new bucket",
+        addContainer: "Create new folder",
         editContainer: "Editing bucket: ",
-        norename: "It is not possible to rename buckets. " +
-        "However, you can copy them with a new name.",
+        norename:
+          "Please note that folder names cannot be modified" +
+          "after creating a folder.",
+        createdFolder:
+          "Created folder will be shared with all project members in",
+        myResearchProject: "My research project.",
         deleteConfirm: "Delete Bucket",
-        deleteConfirmMessage: "Are you sure you want to delete this " +
-                              "bucket?",
+        deleteConfirmMessage:
+          "Are you sure you want to delete this " + "bucket?",
         deleteSuccess: "Bucket Deleted",
-        containerName: "Bucket",
+        containerName: "Folder name",
         containerMessage: "The name of the new bucket",
-        fullDelete: "Deleting a bucket with contents requires deleting " +
-                    "all objects inside it first.",
+        fullDelete:
+          "Deleting a bucket with contents requires deleting " +
+          "all objects inside it first.",
       },
       objects: {
         objectName: "Object",
         editObject: "Editing object: ",
         filterBy: "Filter by Name or Tag",
-        norename: "It is not possible to rename objects. " +
-        "However, you can copy them with a new name.",
+        norename:
+          "Please note that folder names cannot be modified" +
+          "after creating a folder.",
         deleteConfirm: "Delete Objects",
         deleteObjects: "Delete Object / Objects",
         deleteSuccess: "Objects deleted",
-        deleteObjectsMessage: "Are you sure you want to delete these " +
-                              "objects?",
+        deleteObjectsMessage:
+          "Are you sure you want to delete these " + "objects?",
       },
       replicate: {
         destinationLabel: "Destination bucket",
@@ -246,24 +261,28 @@ let default_translations = {
         identMessage: "Insert new token identifier here",
         createToken: "Create token",
         latestToken: "Latest token: ",
-        copyToken: "The token will be displayed just this once after its " +
-                   "creation, and recovering it will not be possible " +
-                   "afterwards. Please make sure that you have stored " +
-                   "the token somewhere before navigating away from the " +
-                   "token page.",
+        copyToken:
+          "The token will be displayed just this once after its " +
+          "creation, and recovering it will not be possible " +
+          "afterwards. Please make sure that you have stored " +
+          "the token somewhere before navigating away from the " +
+          "token page.",
         tokenCopied: "Token copied.",
       },
       encrypt: {
-        enTooLarge: "The total size of files amounts to more than 1024 " +
-                    "megabytes, which can lead to a failure in encryption. " +
-                    "Try uploading files in smaller batches, or encrypt " +
-                    "them before uploading normally.",
+        enTooLarge:
+          "The total size of files amounts to more than 1024 " +
+          "megabytes, which can lead to a failure in encryption. " +
+          "Try uploading files in smaller batches, or encrypt " +
+          "them before uploading normally.",
         enFiles: "Encrypt files before upload",
-        fsWriteFail: "Failed to copy files into temporary file system. " +
-                     "Try refreshing and uploading in smaller batches.",
-        enFail: "Failed to encrypt files. This might be due to incorrectly " +
-                "loaded encryption engine, or unavailable memory. Try " +
-                "refreshing the page.",
+        fsWriteFail:
+          "Failed to copy files into temporary file system. " +
+          "Try refreshing and uploading in smaller batches.",
+        enFail:
+          "Failed to encrypt files. This might be due to incorrectly " +
+          "loaded encryption engine, or unavailable memory. Try " +
+          "refreshing the page.",
         files: "Files",
         ephemeral: "Use own private key",
         multipleReceivers: "Add other receivers' public keys",
@@ -306,12 +325,14 @@ let default_translations = {
         size: "Size",
         empty: "No results found",
         searchBy: "Search by Name or Tag",
-        buildingIndex: "This project has a large number of objects. Please, " +
-                       "wait while the search index is ready, and try again.",
+        buildingIndex:
+          "This project has a large number of objects. Please, " +
+          "wait while the search index is ready, and try again.",
       },
       select: {
         heading: "Select project for logging in",
-        description: "The user account used for logging in contains " +
+        description:
+          "The user account used for logging in contains " +
           "projects flagged as restricted. The interface scope is limited " +
           "when a restricted project is opened, i.e. only the restricted " +
           "project is visible during a restricted session. This means you " +
@@ -346,21 +367,24 @@ let default_translations = {
       error: {
         frontPage: "Etusivulle",
         BadRequest: "400 - Virheellinen pyyntö",
-        BadRequest_text: "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
-                         "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
+        BadRequest_text:
+          "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
+          "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
-        Unauthorized_text: "Sivun näyttäminen vaatii sisäänkirjauksen, " +
-                           "jonka voi toteuttaa oheisesta painikkeesta.",
+        Unauthorized_text:
+          "Sivun näyttäminen vaatii sisäänkirjauksen, " +
+          "jonka voi toteuttaa oheisesta painikkeesta.",
         Notfound: "404 – Etsittyä sivua ei löydetty.",
         Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
         Forbidden: "403 – Tuo on kiellettyä.",
-        Forbidden_text: "Edellinen operaatio ei ole sallittu. Mikäli " +
-                        "kyseisen operaation tulisi olla sallittu, ota " +
-                        "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
-                        "paluu etusivulle on mahdollista oheisesta " +
-                        "painikkeesta",
+        Forbidden_text:
+          "Edellinen operaatio ei ole sallittu. Mikäli " +
+          "kyseisen operaation tulisi olla sallittu, ota " +
+          "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
+          "paluu etusivulle on mahdollista oheisesta " +
+          "painikkeesta",
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
@@ -417,11 +441,12 @@ let default_translations = {
         browser: "Selain",
         tooltip_disable: "Piilota ohje",
         hour: "tunti",
-        default_notify: "Esitetty tieto laskutusysiköiden kulutuksesta ja " +
-                        "käyttörajoista on laskettu Poudan oletusarvojen " +
-                        "mukaan. Jos käytetylle projektille on erillinen " +
-                        "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
-                        "voivat poiketa näytetyistä.",
+        default_notify:
+          "Esitetty tieto laskutusysiköiden kulutuksesta ja " +
+          "käyttörajoista on laskettu Poudan oletusarvojen " +
+          "mukaan. Jos käytetylle projektille on erillinen " +
+          "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
+          "voivat poiketa näytetyistä.",
         resources: "Resurssit",
         tokens: "Jaetun sisällön APIn avaimet",
         links: [
@@ -434,8 +459,9 @@ let default_translations = {
             href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
           },
           {
-            msg: "Tietoa projektin laskutusyksiköiden määrästä jne." +
-                 " (englanniksi)",
+            msg:
+              "Tietoa projektin laskutusyksiköiden määrästä jne." +
+              " (englanniksi)",
             href: "https://my.csc.fi",
           },
         ],
@@ -462,8 +488,8 @@ let default_translations = {
         shared_details_read: "Lukuoikeus",
         shared_details_write: "Kirjoitusoikeus",
         fail_noperm: "Valitse jaettavat oikeudet!",
-        fail_noid: "Anna vähintään yhden projektin tunniste (Project " +
-                   "Identifier)!",
+        fail_noid:
+          "Anna vähintään yhden projektin tunniste (Project " + "Identifier)!",
         fail_nocont: "Anna jaettava säiliö!",
         fail_duplicate: "Säiliö on jo jaettu projektille!",
         new_share_button: "Jaa säiliö",
@@ -483,10 +509,11 @@ let default_translations = {
         owner: "Omistavan projektin tunniste",
         owner_message: "Halutun säiliön omistavan projektin tunniste",
         request: "Pyydä jakoa",
-        multi_project: "Käyttäjällä on pääsy useisiin projekteihin. " +
-                       "Tarkistathan, että haluttu projekti on valittu " +
-                       "valikossa, ja lisää pyyntö Pyydä jakoa " +
-                       "-painikkeella.",
+        multi_project:
+          "Käyttäjällä on pääsy useisiin projekteihin. " +
+          "Tarkistathan, että haluttu projekti on valittu " +
+          "valikossa, ja lisää pyyntö Pyydä jakoa " +
+          "-painikkeella.",
         requestHeading: "Pyydä oikeuksia säiliöön",
       },
       largeFileMessage: "",
@@ -495,13 +522,14 @@ let default_translations = {
       downloadLink: "Latauslinkki",
       downloadAlt: "Latauslinkki tiedostolle",
       downloadAltLarge: "Hyväksy suuren tiedoston lataus",
-      largeDownMessage: "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
-                        "erikseen. Paina hyväksyäksesi suuret lataukset " +
-                        "nykyisen kirjautumisen ajaksi.",
+      largeDownMessage:
+        "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
+        "erikseen. Paina hyväksyäksesi suuret lataukset " +
+        "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
-      emptyProject: "Projektilla ei ole säiliöitä " +
-                    "tai niiden käyttöä ei ole sallittu.",
+      emptyProject:
+        "Projektilla ei ole säiliöitä " + "tai niiden käyttöä ei ole sallittu.",
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
@@ -526,12 +554,16 @@ let default_translations = {
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
       tagName: "Tägit",
+      tagPlaceholder: "# ",
       tagMessage: "Paina 'enter' lisätäksesi.",
       container_ops: {
         addContainer: "Luo uusi säiliö",
         editContainer: "Muokataan säiliötä: ",
-        norename: "Säiliötä ei voi nimetä uudelleen, " +
-        "mutta sen voi kopioida uudella nimellä.",
+        norename:
+          "Säiliötä ei voi nimetä uudelleen, " +
+          "mutta sen voi kopioida uudella nimellä.",
+        createdFolder: "",
+        myResearchProject: "My research project.",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
@@ -543,8 +575,9 @@ let default_translations = {
         objectName: "Objekti",
         editObject: "Muokataan objekti: ",
         filterBy: "Suodata nimellä tai tägillä",
-        norename: "Objektia ei voi nimetä uudelleen, " +
-        "mutta sen voi kopioida uudella nimellä.",
+        norename:
+          "Objektia ei voi nimetä uudelleen, " +
+          "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista objektit",
         deleteObjects: "Poista objekti / objektit",
         deleteSuccess: "Objektit poistettu",
@@ -563,25 +596,29 @@ let default_translations = {
         identMessage: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",
-        copyToken: "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
-                   "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
-                   "Varmistathan ottaneesi avaimen talteen ennen " +
-                   "navigointia pois sivulta.",
+        copyToken:
+          "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
+          "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
+          "Varmistathan ottaneesi avaimen talteen ennen " +
+          "navigointia pois sivulta.",
         tokenCopied: "Avain kopioitu.",
       },
       encrypt: {
-        enTooLarge: "Tiedostojen yhteenlaskettu koko on yli 1024 " +
-                    "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
-                    "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
-                    "pienemmissä erissä tai salaa ne ennen lähettämistä " +
-                    "tavallisesti.",
+        enTooLarge:
+          "Tiedostojen yhteenlaskettu koko on yli 1024 " +
+          "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
+          "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
+          "pienemmissä erissä tai salaa ne ennen lähettämistä " +
+          "tavallisesti.",
         enFiles: "Salaa tiedostot ennen lähetystä",
-        fsWriteFail: "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
-                     "ei onnistunut. Päivitä sivu ja koita uudelleen, tai " +
-                     "lähetä tiedostot pienemmissä erissä.",
-        enFail: "Tiedostojen salaus epäonnistui. Mahdollisia syitä ovat " +
-                "epäonnistunut salausohjelman lataus tai tilan loppuminen. " +
-                "Päivitä sivu ja kokeile uudelleen.",
+        fsWriteFail:
+          "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
+          "ei onnistunut. Päivitä sivu ja koita uudelleen, tai " +
+          "lähetä tiedostot pienemmissä erissä.",
+        enFail:
+          "Tiedostojen salaus epäonnistui. Mahdollisia syitä ovat " +
+          "epäonnistunut salausohjelman lataus tai tilan loppuminen. " +
+          "Päivitä sivu ja kokeile uudelleen.",
         files: "Tiedostot",
         ephemeral: "Käytä omaa yksityistä avainta",
         multipleReceivers: "Lisää muita vastaanottajien julkisia avaimia",
@@ -624,18 +661,20 @@ let default_translations = {
         size: "Koko",
         empty: "Tuloksia ei löytynyt",
         searchBy: "Etsi nimellä tai tägillä",
-        buildingIndex: "Tässä projektissa on suuri määrä kohteita. Odota, " +
-                       "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
+        buildingIndex:
+          "Tässä projektissa on suuri määrä kohteita. Odota, " +
+          "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
       },
       select: {
         heading: "Valitse projekti kirjautuaksesi sisään",
-        description: "Käyttäjällä on pääsy rajoitettuihin projekteihin. " +
+        description:
+          "Käyttäjällä on pääsy rajoitettuihin projekteihin. " +
           "Selatessa rajoitettua projektia käyttöliittymän pääsy on " +
           "rajattu, eli vain rajatun projektin sisältö on näkyvissä. " +
           "Tiedostojen kopiointi ja siirto projektista toiseen, ja " +
           "muiden projektien sisällön selailu on estetty. Valitse " +
           "projekti, jota haluat käyttää. Valinnan jälkeen projektin " +
-          "vaihto onnistuu vain kirjautumalla ulos. Mikäli haluat " + 
+          "vaihto onnistuu vain kirjautumalla ulos. Mikäli haluat " +
           "selailla vain rajoittamattomia projekteja, paina " +
           "rajoittamattomien projektien nappia alla.",
         unrestricted: "Kaikki rajoittamattomat projektit",
@@ -652,15 +691,14 @@ let default_translations = {
 
 let translations = default_translations;
 
-function nestedJoin (dst, src) {
+function nestedJoin(dst, src) {
   // Join two objects with nested content overriding with the latter
   let to_assign = [];
   for (let [key, value] of Object.entries(src)) {
-    if (typeof(value) == "object") {
+    if (typeof value == "object") {
       if (key in dst) {
         to_assign.push([key, nestedJoin(dst[key], src[key])]);
-      }
-      else {
+      } else {
         to_assign.push([key, src[key]]);
       }
     } else {

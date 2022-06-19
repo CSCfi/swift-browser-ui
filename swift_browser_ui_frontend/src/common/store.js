@@ -26,8 +26,8 @@ const store = new Vuex.Store({
     isFullPage: true,
     objectCache: {}, // Only for shared objects
     langs: [
-      {ph: "In English", value: "en"},
-      {ph: "Suomeksi", value: "fi"},
+      { ph: "In English", value: "en" },
+      { ph: "Suomeksi", value: "fi" },
     ],
     client: undefined,
     requestClient: undefined,
@@ -40,20 +40,21 @@ const store = new Vuex.Store({
     transfer: [],
     pubkey: [],
     currentPrefix: "",
-    dropFiles:[],
+    dropFiles: [],
+    openCreateFolderModal: false,
   },
   mutations: {
     loading(state, payload) {
       state.isLoading = payload;
     },
-    updateObjects (state,objects) {
+    updateObjects(state, objects) {
       // Update object cache with the new object listing.
       state.objectCache = [...objects];
     },
     eraseObjects(state) {
       state.objectCache = [];
     },
-    setProjects (state, newProjects) {
+    setProjects(state, newProjects) {
       // Update the project listing in store
       state.projects = newProjects;
       if (newProjects.length > 1) {
@@ -62,94 +63,100 @@ const store = new Vuex.Store({
         state.multipleProjects = false;
       }
     },
-    setActive (state, newActive) {
+    setActive(state, newActive) {
       // Update the active project in store
       state.active = newActive;
     },
-    setUname (state, newUname) {
+    setUname(state, newUname) {
       // Update the username in store
       state.uname = newUname;
     },
-    setLoading (state, newValue) {
+    setLoading(state, newValue) {
       state.isLoading = newValue;
     },
-    setSharingClient (state, newClient) {
+    setSharingClient(state, newClient) {
       state.client = newClient;
     },
-    setRequestClient (state, newClient) {
+    setRequestClient(state, newClient) {
       state.requestClient = newClient;
     },
-    setResumable (state, newClient) {
+    setResumable(state, newClient) {
       state.resumableClient = newClient;
     },
-    setUploading (state) {
+    setUploading(state) {
       state.isUploading = true;
     },
-    stopUploading (state) {
+    stopUploading(state) {
       state.isUploading = false;
     },
-    setChunking (state) {
+    setChunking(state) {
       state.isChunking = true;
     },
-    stopChunking (state) {
+    stopChunking(state) {
       state.isChunking = false;
     },
-    updateProgress (state, progress) {
+    updateProgress(state, progress) {
       state.uploadProgress = progress;
     },
-    eraseProgress (state) {
+    eraseProgress(state) {
       state.uploadProgress = undefined;
     },
-    setAltContainer (state, altContainer) {
+    setAltContainer(state, altContainer) {
       state.altContainer = altContainer;
     },
-    eraseAltContainer (state) {
+    eraseAltContainer(state) {
       state.altContainer = undefined;
     },
-    setUploadInfo (state, uploadInfo) {
+    setUploadInfo(state, uploadInfo) {
       state.uploadInfo = uploadInfo;
     },
-    eraseUploadInfo (state) {
+    eraseUploadInfo(state) {
       state.uploadInfo = undefined;
     },
-    appendFileTransfer (state, file) {
+    appendFileTransfer(state, file) {
       state.transfer.push(file);
     },
-    eraseTransfer (state) {
+    eraseTransfer(state) {
       state.transfer = [];
     },
-    appendDropFiles (state, file) {
-      if (state.dropFiles.find(({ relativePath }) => 
-        relativePath === String(file.relativePath)) === undefined 
-        && state.dropFiles.find(({ name }) => 
-          name === String(file.name)) === undefined) {
+    appendDropFiles(state, file) {
+      if (
+        state.dropFiles.find(
+          ({ relativePath }) => relativePath === String(file.relativePath),
+        ) === undefined &&
+        state.dropFiles.find(({ name }) => name === String(file.name)) ===
+          undefined
+      ) {
         state.dropFiles.push(file);
       } else {
         // we remove and push the file again to get new size
         // and if the file exists to referesh dropFiles var
-        state.dropFiles = state.dropFiles.filter(v => {
-          return (v.relativePath !== file.relativePath && v.name !== file.name);
+        state.dropFiles = state.dropFiles.filter((v) => {
+          return v.relativePath !== file.relativePath && v.name !== file.name;
         });
         state.dropFiles.push(file);
       }
     },
-    eraseDropFile (state, file) {
+    eraseDropFile(state, file) {
       state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
     },
-    eraseDropFiles (state) {
+    eraseDropFiles(state) {
       state.dropFiles = [];
     },
-    appendPubKey (state, key) {
+    appendPubKey(state, key) {
       state.pubkey.push(key);
     },
-    erasePubKey (state) {
+    erasePubKey(state) {
       state.pubkey = [];
     },
-    setPrefix (state, prefix) {
+    setPrefix(state, prefix) {
       state.currentPrefix = prefix;
     },
-    erasePrefix (state) {
+    erasePrefix(state) {
       state.currentPrefix = "";
+    },
+    toggleCreateFolderModal(state, payload) {
+      state.openCreateFolderModal = payload;
     },
   },
   actions: {
@@ -158,7 +165,7 @@ const store = new Vuex.Store({
       { projectID, signal },
     ) {
       const existingContainers = await state.db.containers
-        .where({projectID})
+        .where({ projectID })
         .toArray();
       if (existingContainers.length === 0) {
         commit("loading", true);
@@ -168,15 +175,12 @@ const store = new Vuex.Store({
       let newContainers = [];
       do {
         containers = [];
-        containers = await getContainers(
-          projectID,
-          marker,
-        ).catch(() => {
+        containers = await getContainers(projectID, marker).catch(() => {
           commit("loading", false);
         });
         commit("loading", false);
-        if(containers.length > 0) {
-          containers.forEach(cont => {
+        if (containers.length > 0) {
+          containers.forEach((cont) => {
             cont.tokens = tokenize(cont.name);
             cont.projectID = projectID;
           });
@@ -191,8 +195,8 @@ const store = new Vuex.Store({
         signal,
       });
       const toDelete = [];
-      existingContainers.map(oldCont => {
-        if(!newContainers.find(cont => cont.name == oldCont.name)) {
+      existingContainers.map((oldCont) => {
+        if (!newContainers.find((cont) => cont.name == oldCont.name)) {
           toDelete.push(oldCont.id);
         }
       });
@@ -201,15 +205,17 @@ const store = new Vuex.Store({
         await state.db.objects.where("containerID").anyOf(toDelete).delete();
       }
       const containersFromDB = await state.db.containers
-        .where({projectID}).toArray();
+        .where({ projectID })
+        .toArray();
       for (let i = 0; i < containersFromDB.length; i++) {
         const container = containersFromDB[i];
         const oldContainer = existingContainers.find(
-          cont => cont.name === container.name,
+          (cont) => cont.name === container.name,
         );
         let updateObjects = true;
         const dbObjects = await state.db.objects
-          .where({"containerID": container.id}).count();
+          .where({ containerID: container.id })
+          .count();
         if (
           oldContainer &&
           container.count === oldContainer.count &&
@@ -220,72 +226,62 @@ const store = new Vuex.Store({
         }
         if (container.count === 0) {
           updateObjects = false;
-          await state.db.objects
-            .where({"containerID": container.id}).delete();
+          await state.db.objects.where({ containerID: container.id }).delete();
         }
         if (updateObjects) {
-          dispatch(
-            "updateObjects",
-            {
-              projectID: projectID,
-              container: container,
-              signal: signal,
-            },
-          );
+          dispatch("updateObjects", {
+            projectID: projectID,
+            container: container,
+            signal: signal,
+          });
         }
       }
     },
     updateContainerTags: function (
-      {state},
-      {projectID, containers, signal},
+      { state },
+      { projectID, containers, signal },
     ) {
-      containers.map(async container => {
-        const tags = await getTagsForContainer(
-          projectID,
-          container.name,
-          signal,
-        ) || null;
+      containers.map(async (container) => {
+        const tags =
+          (await getTagsForContainer(projectID, container.name, signal)) ||
+          null;
         await state.db.containers
-          .where({"projectID": container.projectID, "name": container.name})
-          .modify({tags});
+          .where({ projectID: container.projectID, name: container.name })
+          .modify({ tags });
       });
     },
     updateObjects: async function (
       { state, dispatch },
       { projectID, container, signal },
     ) {
-      const isSegmentsContainer= container.name.match("_segments");
+      const isSegmentsContainer = container.name.match("_segments");
       const existingObjects = await state.db.objects
-        .where({containerID: container.id}).toArray();
+        .where({ containerID: container.id })
+        .toArray();
       let newObjects = [];
       let objects;
       let marker = "";
       do {
-        objects = await getObjects(
-          projectID,
-          container.name,
-          marker,
-          signal,
-        );
+        objects = await getObjects(projectID, container.name, marker, signal);
         if (objects.length > 0) {
-          objects.forEach(obj => {
+          objects.forEach((obj) => {
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
           });
           await state.db.objects.bulkPut(objects).catch(() => {});
           newObjects = newObjects.concat(objects);
-          marker = objects[objects.length -1].name;
+          marker = objects[objects.length - 1].name;
         }
       } while (objects.length > 0);
-  
+
       let toDelete = [];
-      existingObjects.map(oldObj => {
-        if(!newObjects.find(obj => obj.name === oldObj.name)) {
+      existingObjects.map((oldObj) => {
+        if (!newObjects.find((obj) => obj.name === oldObj.name)) {
           toDelete.push(oldObj.id);
         }
       });
-      if(toDelete.length) {
+      if (toDelete.length) {
         await state.db.objects.bulkDelete(toDelete);
       }
       if (!isSegmentsContainer) {
@@ -297,8 +293,9 @@ const store = new Vuex.Store({
       }
     },
     updateObjectTags: async function (
-      { state, commit }, 
-      { projectID, container, signal, sharedObjects=undefined }) {
+      { state, commit },
+      { projectID, container, signal, sharedObjects = undefined },
+    ) {
       let objectList = [];
 
       let objects = [];
@@ -306,7 +303,8 @@ const store = new Vuex.Store({
         objects = sharedObjects;
       } else {
         objects = await state.db.objects
-          .where({"containerID": container.id}).toArray();
+          .where({ containerID: container.id })
+          .toArray();
       }
 
       for (let i = 0; i < objects.length; i++) {
@@ -321,12 +319,11 @@ const store = new Vuex.Store({
           objectList,
         );
         if (
-          i === objects.length - 1
-          || makeGetObjectsMetaURL(
-            projectID,
-            container.name,
-            [...objectList, objects[i+1].name],
-          ).href.length >= 8190
+          i === objects.length - 1 ||
+          makeGetObjectsMetaURL(projectID, container.name, [
+            ...objectList,
+            objects[i + 1].name,
+          ]).href.length >= 8190
         ) {
           let tags = await getTagsForObjects(
             projectID,
@@ -335,28 +332,28 @@ const store = new Vuex.Store({
             url,
             signal,
           );
-          tags.map(item => {
+          tags.map((item) => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {
-              objects.forEach(obj => {
+              objects.forEach((obj) => {
                 if (obj.name === objectName) {
                   obj.tags = tags;
                 }
               });
               commit("updateObjects", objects);
             } else {
-              state.db.objects.where(
-                {"containerID": container.id, "name": objectName},
-              ).modify({tags});
+              state.db.objects
+                .where({ containerID: container.id, name: objectName })
+                .modify({ tags });
             }
           }),
-          objectList = [];
+            (objectList = []);
         }
       }
     },
     updateSharedObjects: async function (
-      { commit, dispatch }, 
+      { commit, dispatch },
       { project, container, signal },
     ) {
       commit("loading", true);
@@ -382,7 +379,12 @@ const store = new Vuex.Store({
       commit("loading", false);
       sharedObjects = filterSegments(sharedObjects);
       commit("updateObjects", sharedObjects);
-      dispatch("updateObjectTags", {project, container, signal, sharedObjects});
+      dispatch("updateObjectTags", {
+        project,
+        container,
+        signal,
+        sharedObjects,
+      });
     },
   },
 });

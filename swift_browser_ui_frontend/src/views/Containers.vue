@@ -1,36 +1,17 @@
 <template>
-  <div
-    id="container-table"
-    class="contents"
-  >
-    <b-field
-      grouped
-      group-multiline
-      class="groupControls"
-    >
+  <div id="container-table" class="contents">
+    <b-field grouped group-multiline class="groupControls">
       <b-select
         v-model="perPage"
         data-testid="containersPerPage"
         :disabled="!isPaginated"
       >
-        <option value="5">
-          5 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="10">
-          10 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="15">
-          15 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="25">
-          25 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="50">
-          50 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="100">
-          100 {{ $t('message.table.pageNb') }}
-        </option>
+        <option value="5">5 {{ $t("message.table.pageNb") }}</option>
+        <option value="10">10 {{ $t("message.table.pageNb") }}</option>
+        <option value="15">15 {{ $t("message.table.pageNb") }}</option>
+        <option value="25">25 {{ $t("message.table.pageNb") }}</option>
+        <option value="50">50 {{ $t("message.table.pageNb") }}</option>
+        <option value="100">100 {{ $t("message.table.pageNb") }}</option>
       </b-select>
       <div class="control is-flex">
         <b-switch
@@ -38,12 +19,10 @@
           v-model="isPaginated"
           data-testid="paginationSwitch"
         >
-          {{ $t('message.table.paginated') }}
+          {{ $t("message.table.paginated") }}
         </b-switch>
-        <b-switch
-          v-model="showTags"
-        >
-          {{ $t('message.table.showTags') }}
+        <b-switch v-model="showTags">
+          {{ $t("message.table.showTags") }}
         </b-switch>
       </div>
       <b-autocomplete
@@ -59,11 +38,11 @@
         :keep-first="true"
         :loading="isSearching"
         max-height="350px"
-        @select="option => $router.push(getSearchRoute(option))"
-        @focus="event => searchGainedFocus()"
+        @select="(option) => $router.push(getSearchRoute(option))"
+        @focus="(event) => searchGainedFocus()"
       >
         <template slot-scope="props">
-          <SearchResultItem 
+          <SearchResultItem
             :item="props.option"
             :search-array="searchArray"
             :route="getSearchRoute"
@@ -74,31 +53,20 @@
             v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
-            <b-loading
-              v-model="isSearching"
-              :is-full-page="false"
-            />
-            <div
-              v-show="!isSearching"
-              class="media-content"
-            >
-              {{ $t('message.search.empty') }}
+            <b-loading v-model="isSearching" :is-full-page="false" />
+            <div v-show="!isSearching" class="media-content">
+              {{ $t("message.search.empty") }}
             </div>
           </div>
         </template>
       </b-autocomplete>
+      <c-button @click="toggleCreateFolderModal">
+        {{ $t("message.createContainerButton") }}
+      </c-button>
+      <c-modal v-control v-csc-model="openCreateFolderModal">
+        <AddContainer />
+      </c-modal>
       <div class="field has-addons uploadGroup">
-        <p class="control">
-          <b-button
-            tag="router-link"
-            :to="{name: 'AddContainer'}"
-            type="is-primary"
-            outlined
-            icon-left="folder-plus"
-          >
-            {{ $t('message.createContainerButton') }}
-          </b-button>
-        </p>
         <p class="control">
           <b-button
             :label="$t('message.upload')"
@@ -106,10 +74,13 @@
             outlined
             icon-left="upload"
             tag="router-link"
-            :to="{name: 'UploadView', params: {
-              project: $route.params.project,
-              container: 'upload-'.concat(Date.now().toString()),
-            }}"
+            :to="{
+              name: 'UploadView',
+              params: {
+                project: $route.params.project,
+                container: 'upload-'.concat(Date.now().toString()),
+              },
+            }"
           />
         </p>
       </div>
@@ -127,20 +98,14 @@
       :per-page="perPage"
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
-      @page-change="(page) => addPageToURL ( page )"
-      @dblclick="(row) => $router.push( getConAddr ( row['name'] ) )"
-      @keyup.native.enter="$router.push( getConAddr ( selected['name'] ))"
-      @keyup.native.space="$router.push( getConAddr ( selected['name'] ))"
+      @page-change="(page) => addPageToURL(page)"
+      @dblclick="(row) => $router.push(getConAddr(row['name']))"
+      @keyup.native.enter="$router.push(getConAddr(selected['name']))"
+      @keyup.native.space="$router.push(getConAddr(selected['name']))"
     >
-      <b-table-column
-        sortable
-        field="name"
-        :label="$t('message.table.name')"
-      >
+      <b-table-column sortable field="name" :label="$t('message.table.name')">
         <template #default="props">
-          <span 
-            :class="props.row.count ? 'has-text-weight-bold' : ''"
-          >
+          <span :class="props.row.count ? 'has-text-weight-bold' : ''">
             <b-icon
               :icon="props.row.count ? 'folder' : 'folder-outline'"
               size="is-small"
@@ -151,7 +116,7 @@
             <b-tag
               v-for="tag in props.row.tags"
               :key="tag"
-              :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
+              :type="selected == props.row ? 'is-primary-invert' : 'is-primary'"
               rounded
               ellipsis
             >
@@ -180,16 +145,12 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </template>
       </b-table-column>
-      <b-table-column
-        field="functions"
-        label=""
-        width="150"
-      >
+      <b-table-column field="functions" label="" width="150">
         <template #default="props">
           <div class="field has-addons">
             <p class="control">
               <ContainerDownloadLink
-                v-if="selected==props.row"
+                v-if="selected == props.row"
                 class="is-small"
                 :inverted="true"
                 :disabled="!props.row.bytes ? true : false"
@@ -202,12 +163,9 @@
                 :container="props.row.name"
               />
             </p>
-            <p
-              v-if="!props.row.bytes"
-              class="control"
-            >
+            <p v-if="!props.row.bytes" class="control">
               <b-button
-                v-if="selected==props.row"
+                v-if="selected == props.row"
                 type="is-primary"
                 outlined
                 size="is-small"
@@ -215,7 +173,7 @@
                 inverted
                 icon-left="share"
               >
-                {{ $t('message.share.share') }}
+                {{ $t("message.share.share") }}
               </b-button>
               <b-button
                 v-else
@@ -225,26 +183,25 @@
                 disabled
                 icon-left="share"
               >
-                {{ $t('message.share.share') }}
+                {{ $t("message.share.share") }}
               </b-button>
             </p>
-            <p
-              v-else
-              class="control"
-            >
+            <p v-else class="control">
               <b-button
-                v-if="selected==props.row"
+                v-if="selected == props.row"
                 type="is-primary"
                 outlined
                 size="is-small"
                 inverted
                 icon-left="share"
-                @click="$router.push({
-                  name: 'SharingView',
-                  query: {container: props.row.name}
-                })"
+                @click="
+                  $router.push({
+                    name: 'SharingView',
+                    query: { container: props.row.name },
+                  })
+                "
               >
-                {{ $t('message.share.share') }}
+                {{ $t("message.share.share") }}
               </b-button>
               <b-button
                 v-else
@@ -252,17 +209,19 @@
                 outlined
                 size="is-small"
                 icon-left="share"
-                @click="$router.push({
-                  name: 'SharingView',
-                  query: {container: props.row.name}
-                })"
+                @click="
+                  $router.push({
+                    name: 'SharingView',
+                    query: { container: props.row.name },
+                  })
+                "
               >
-                {{ $t('message.share.share') }}
+                {{ $t("message.share.share") }}
               </b-button>
             </p>
             <p class="control">
               <ReplicateContainerButton
-                v-if="selected==props.row"
+                v-if="selected == props.row"
                 :project="active.id"
                 :container="props.row.name"
                 :smallsize="true"
@@ -284,26 +243,22 @@
                 outlined
                 size="is-small"
                 icon-left="pencil"
-                :inverted="selected==props.row ? true : false"
+                :inverted="selected == props.row ? true : false"
                 :to="{
                   name: 'EditContainer',
-                  params: {container: props.row.name}
+                  params: { container: props.row.name },
                 }"
               >
-                {{ $t('message.edit') }}
+                {{ $t("message.edit") }}
               </b-button>
             </p>
           </div>
         </template>
       </b-table-column>
-      <b-table-column
-        field="dangerous"
-        label=""
-        width="75"
-      >
+      <b-table-column field="dangerous" label="" width="75">
         <template #default="props">
           <DeleteContainerButton
-            v-if="selected==props.row"
+            v-if="selected == props.row"
             :inverted="true"
             :objects="props.row.count"
             :container="props.row.name"
@@ -319,7 +274,7 @@
 
       <template #empty>
         <p class="emptyTable">
-          {{ $t('message.emptyProject') }}
+          {{ $t("message.emptyProject") }}
         </p>
       </template>
     </b-table>
@@ -327,11 +282,7 @@
 </template>
 
 <script>
-import { 
-  getHumanReadableSize, 
-  truncate, 
-  tokenize,
-} from "@/common/conv";
+import { getHumanReadableSize, truncate, tokenize } from "@/common/conv";
 import debounce from "lodash/debounce";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
@@ -340,6 +291,7 @@ import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
+import AddContainer from "@/views/AddContainer";
 
 export default {
   name: "ContainersView",
@@ -348,8 +300,9 @@ export default {
     ContainerDownloadLink,
     ReplicateContainerButton,
     DeleteContainerButton,
+    AddContainer,
   },
-  filters:{
+  filters: {
     truncate,
   },
   data: function () {
@@ -367,13 +320,16 @@ export default {
       showTags: true,
       abortController: null,
       searchResults: [],
-      containers: {value: []},
+      containers: { value: [] },
       isSearching: false,
     };
   },
   computed: {
-    active () {
+    active() {
       return this.$store.state.active;
+    },
+    openCreateFolderModal() {
+      return this.$store.state.openCreateFolderModal;
     },
   },
   watch: {
@@ -410,35 +366,35 @@ export default {
     // every keypress, thus blocking input
     this.debounceSearch = debounce(this.search, 400);
   },
-  beforeMount () {
+  beforeMount() {
     this.abortController = new AbortController();
     this.getDirectCurrentPage();
   },
   mounted() {
     this.fetchContainers();
   },
-  beforeDestroy () {
+  beforeDestroy() {
     this.abortController.abort();
   },
   methods: {
     fetchContainers: async function () {
       if (
-        this.active.id === undefined
-        && this.$route.params.project === undefined
+        this.active.id === undefined &&
+        this.$route.params.project === undefined
       ) {
         return;
       }
       this.containers = useObservable(
-        liveQuery(() => 
+        liveQuery(() =>
           this.$store.state.db.containers
-            .where({projectID: this.$route.params.project})
+            .where({ projectID: this.$route.params.project })
             .toArray(),
         ),
       );
-      await this.$store.dispatch(
-        "updateContainers", 
-        {projectID: this.$route.params.project, signal: null},
-      );
+      await this.$store.dispatch("updateContainers", {
+        projectID: this.$route.params.project,
+        signal: null,
+      });
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link
@@ -453,9 +409,9 @@ export default {
       return this.$route.params.project + "/" + container;
     },
     getDirectCurrentPage: function () {
-      this.currentPage = this.$route.query.page ?
-        parseInt(this.$route.query.page) :
-        1;
+      this.currentPage = this.$route.query.page
+        ? parseInt(this.$route.query.page)
+        : 1;
     },
     addPageToURL: function (pageNumber) {
       // Add pagination current page number to the URL in query string
@@ -465,8 +421,8 @@ export default {
       // Make getHumanReadableSize usable in instance namespace
       return getHumanReadableSize(size);
     },
-    search: async function() {
-      if(this.searchArray.length === 0) {
+    search: async function () {
+      if (this.searchArray.length === 0) {
         return;
       }
       const query = [...this.searchArray];
@@ -478,10 +434,10 @@ export default {
         // Ranks based on array index they match
         const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
-        query.map(q => {
-          if(item.tags !== undefined) {
+        query.map((q) => {
+          if (item.tags !== undefined) {
             item.tags.forEach((tag, i) => {
-              if(tag.startsWith(q)) {
+              if (tag.startsWith(q)) {
                 item.rank = 0.0 + (i + 1) / 10;
                 match.add(q);
                 return;
@@ -489,7 +445,7 @@ export default {
             });
           }
           item.tokens.forEach((token, i) => {
-            if(token.startsWith(q)) {
+            if (token.startsWith(q)) {
               item.rank = rankOffset + (i + 1) / 10;
               match.add(q);
               return;
@@ -504,41 +460,41 @@ export default {
 
       const rankedSort = (a, b) => a.rank - b.rank;
 
-      const containers = 
-        await this.$store.state.db.containers
-          .where("tokens")
-          .startsWith(query[0])
-          .or("tags")
-          .startsWith(query[0])
-          .filter(cont => !cont.name.endsWith("_segments"))
-          .filter(multipleQueryWordsAndRank)
-          .and(cont => cont.projectID === this.active.id)
-          .limit(1000)
-          .toArray();
+      const containers = await this.$store.state.db.containers
+        .where("tokens")
+        .startsWith(query[0])
+        .or("tags")
+        .startsWith(query[0])
+        .filter((cont) => !cont.name.endsWith("_segments"))
+        .filter(multipleQueryWordsAndRank)
+        .and((cont) => cont.projectID === this.active.id)
+        .limit(1000)
+        .toArray();
       this.searchResults = containers.sort(rankedSort).slice(0, 100);
 
-      const containerIDs = new Set(await this.$store.state.db.containers
-        .where({projectID: this.active.id})
-        .filter(cont => !cont.name.endsWith("_segments"))
-        .primaryKeys());
+      const containerIDs = new Set(
+        await this.$store.state.db.containers
+          .where({ projectID: this.active.id })
+          .filter((cont) => !cont.name.endsWith("_segments"))
+          .primaryKeys(),
+      );
 
-      const objects = 
-        await this.$store.state.db.objects
-          .where("tokens")
-          .startsWith(query[0])
-          .or("tags")
-          .startsWith(query[0])
-          .filter(multipleQueryWordsAndRank)
-          .and(obj => containerIDs.has(obj.containerID))
-          .limit(1000)
-          .toArray();
+      const objects = await this.$store.state.db.objects
+        .where("tokens")
+        .startsWith(query[0])
+        .or("tags")
+        .startsWith(query[0])
+        .filter(multipleQueryWordsAndRank)
+        .and((obj) => containerIDs.has(obj.containerID))
+        .limit(1000)
+        .toArray();
 
       this.searchResults = this.searchResults
         .concat(objects.sort(rankedSort).slice(0, 100))
         .sort(rankedSort);
       this.isSearching = false;
     },
-    getSearchRoute: function(item) {
+    getSearchRoute: function (item) {
       if (!item) {
         return null;
       }
@@ -549,22 +505,24 @@ export default {
         },
       };
       if (item.container) {
-        route["query"] = {selected: item.name};
+        route["query"] = { selected: item.name };
       }
       return route;
     },
-    searchGainedFocus: async function() {
+    searchGainedFocus: async function () {
       const preferences = await this.$store.state.db.preferences.get(1);
 
-      const ojbCount = this.containers.value
-        .reduce((prev, cont) => prev + cont.count, 0);
+      const ojbCount = this.containers.value.reduce(
+        (prev, cont) => prev + cont.count,
+        0,
+      );
 
-      if(
+      if (
         !(
-          this.active.id in preferences 
-          && preferences[this.active.id].largeProjectNotification
-        )
-        && ojbCount >= 10000
+          this.active.id in preferences &&
+          preferences[this.active.id].largeProjectNotification
+        ) &&
+        ojbCount >= 10000
       ) {
         this.$buefy.notification.open({
           message: this.$t("message.search.buildingIndex"),
@@ -574,9 +532,13 @@ export default {
           hasIcon: true,
         });
         this.$store.state.db.preferences
-          .where(":id").equals(1)
-          .modify({[this.active.id]: {largeProjectNotification: true}});
+          .where(":id")
+          .equals(1)
+          .modify({ [this.active.id]: { largeProjectNotification: true } });
       }
+    },
+    toggleCreateFolderModal: function () {
+      this.$store.commit("toggleCreateFolderModal", true);
     },
   },
 };
@@ -599,5 +561,9 @@ export default {
 }
 .empty-search {
   height: 2rem;
+}
+
+.create-folder-modal > div {
+  border: 2px solid blue !important;
 }
 </style>
