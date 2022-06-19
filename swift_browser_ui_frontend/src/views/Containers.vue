@@ -41,8 +41,8 @@
         :keep-first="true"
         :loading="isSearching"
         max-height="350px"
-        @select="option => $router.push(getSearchRoute(option))"
-        @focus="event => searchGainedFocus()"
+        @select="(option) => $router.push(getSearchRoute(option))"
+        @focus="(event) => searchGainedFocus()"
       >
         <template slot-scope="props">
           <SearchResultItem
@@ -539,5 +539,9 @@ export default {
 }
 .empty-search {
   height: 2rem;
+}
+
+.create-folder-modal > div {
+  border: 2px solid blue !important;
 }
 </style>

@@ -109,6 +109,9 @@ export default {
     },
   },
   methods: {
+    handleChangeContainerName: function (e) {
+      this.container = e.target.value;
+    },
     createContainer: function () {
       let projectID = this.$route.params.project;
       swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
