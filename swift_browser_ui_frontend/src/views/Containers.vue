@@ -540,8 +540,4 @@ export default {
 .empty-search {
   height: 2rem;
 }
-
-.create-folder-modal > div {
-  border: 2px solid blue !important;
-}
 </style>

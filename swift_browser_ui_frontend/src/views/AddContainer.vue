@@ -27,6 +27,14 @@
         custom-class="has-text-dark"
         :label="$t('message.tagName')"
       >
+        <b-input
+          v-model="container"
+          name="foldername"
+          aria-required="true"
+          :disabled="!create"
+        />
+      </b-field>
+      <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
         <b-taginput
           v-model="tags"
           ellipsis
@@ -109,9 +117,6 @@ export default {
     },
   },
   methods: {
-    handleChangeContainerName: function (e) {
-      this.container = e.target.value;
-    },
     createContainer: function () {
       let projectID = this.$route.params.project;
       swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
