@@ -60,12 +60,14 @@
           </div>
         </template>
       </b-autocomplete>
-      <c-button @click="toggleCreateFolderModal">
-        {{ $t("message.createContainerButton") }}
-      </c-button>
-      <c-modal v-control v-csc-model="openCreateFolderModal">
-        <AddContainer />
-      </c-modal>
+      <div class="uploadGroup">
+        <c-button @click="toggleCreateFolderModal" outlined>
+          {{ $t("message.createContainerButton") }}
+        </c-button>
+        <c-modal v-control v-csc-model="openCreateFolderModal">
+          <AddContainer />
+        </c-modal>
+      </div>
       <div class="field has-addons uploadGroup">
         <p class="control">
           <b-button
@@ -561,9 +563,5 @@ export default {
 }
 .empty-search {
   height: 2rem;
-}
-
-.create-folder-modal > div {
-  border: 2px solid blue !important;
 }
 </style>

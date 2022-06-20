@@ -1,29 +1,28 @@
 <template>
-  <c-card>
-    <h1 class="title is-3 addcontainerhead">
+  <c-card class="addContainer">
+    <h2 class="title is-3">
       {{
         create
           ? $t("message.container_ops.addContainer")
           : $t("message.container_ops.editContainer") + container
       }}
-    </h1>
+    </h2>
     <c-card-content>
       <p class="info-text is-size-6">
         {{ $t("message.container_ops.norename") }}
       </p>
-      <c-text-field
-        :label="$t('message.container_ops.containerName')"
-        name="foldername"
-        type="text"
-        required
-        :disabled="!create"
-        v-csc-model="container"
-      />
       <b-field
         custom-class="has-text-dark"
-        :label="$t('message.tagName')"
-        :message="$t('message.tagMessage')"
+        :label="$t('message.container_ops.containerName')"
       >
+        <b-input
+          v-model="container"
+          name="foldername"
+          aria-required="true"
+          :disabled="!create"
+        />
+      </b-field>
+      <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
         <b-taginput
           v-model="tags"
           ellipsis
@@ -40,9 +39,13 @@
         {{ $t("message.container_ops.createdFolder") }}
         <b>{{ $t("message.container_ops.myResearchProject") }}</b>
       </p>
-      <c-link href="https://csc.fi" underline target="_blank">
-        Default link
-        <i class="mdi mdi-login" slot="icon" />
+      <c-link
+        :href="`https://my.csc.fi/myProjects/project/${currentProjectID}`"
+        underline
+        target="_blank"
+      >
+        View project members
+        <i class="mdi mdi-open-in-new" />
       </c-link>
     </c-card-content>
     <c-card-actions justify="space-between">
@@ -73,7 +76,11 @@ export default {
       taginputConfirmKeys,
     };
   },
-
+  computed: {
+    currentProjectID() {
+      return this.$route.params.project;
+    },
+  },
   beforeMount() {
     if (this.$route.name === "EditContainer") {
       this.create = false;
@@ -81,9 +88,6 @@ export default {
     }
   },
   methods: {
-    handleChangeContainerName: function (e) {
-      this.container = e.target.value;
-    },
     createContainer: function () {
       let projectID = this.$route.params.project;
       swiftCreateContainer(projectID, this.container, this.tags.join(";"))
@@ -159,14 +163,28 @@ export default {
 };
 </script>
 
-<style scoped>
-#addview {
-  width: auto;
-  margin-left: 5%;
-  margin-right: 5%;
+<style lang="scss" scoped>
+@import "@/css/prod.scss";
+
+.addContainer {
+  width: 54vw;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3rem;
 }
-.addcontainerhead,
-.info-text {
+
+.addContainer > h2 {
+  margin: 0;
   color: var(--csc-dark-grey);
+}
+
+.addContainer > c-card-content {
+  background-color: $csc-primary-lighter;
+  padding: 1.5rem;
+  color: var(--csc-dark-grey);
+}
+
+.addContainer > c-card-actions {
+  padding: 0;
 }
 </style>

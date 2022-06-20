@@ -348,7 +348,7 @@ const store = new Vuex.Store({
                 .modify({ tags });
             }
           }),
-            (objectList = []);
+          (objectList = []);
         }
       }
     },
