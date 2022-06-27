@@ -35,17 +35,17 @@
           </div>
           <div class="navbar-end">
             <div class="navbar-item">
-              <c-button
-                disabled
-                @click="showCreateFolderModal = true"
-              >
+              <c-button @click="$router.push({ name: 'AddContainer'})">
                 {{ $t('message.createFolder') }}
               </c-button>
             </div>
             <div class="navbar-item">
               <c-button
                 outlined
-                disabled
+                @click="$router.push({ name: 'UploadView', params: {
+                  project: $route.params.project,
+                  container: 'upload-'.concat(Date.now().toString()),
+                }})"
               >
                 {{ $t('message.uploadSecondaryNav') }}
               </c-button>
@@ -64,11 +64,6 @@ export default {
     "multipleProjects",
     "projects",
   ],
-  data() {
-    return {
-      showCreateFolderModal: false,
-    };
-  },
   computed: {
     active () {
       const activeObject = this.$store.state.active;
