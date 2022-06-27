@@ -19,6 +19,13 @@ describe("Browse containers and test operations", function () {
     cy.get("#searchbox").type("dolor");
   });
 
+    cy.get('[data-testid="containersPerPage"]').select("5 per page");
+    cy.contains("1-5 / 15");
+    cy.get('[data-testid="paginationSwitch"]').click();
+    cy.get('[data-testid="containersPerPage"]').should("be.disabled");
+    cy.get("#searchbox").type("dolor");
+  });
+
   it("should browse table, check download and delete buttons", () => {
     // we take the first container that is not empty
     cy.get("table")

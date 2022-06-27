@@ -32,6 +32,7 @@
           name="foldername"
           aria-required="true"
           :disabled="!create"
+          data-testid="folder-name"
         />
       </b-field>
       <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
