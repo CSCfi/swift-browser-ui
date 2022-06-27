@@ -20,6 +20,7 @@
           name="foldername"
           aria-required="true"
           :disabled="!create"
+          data-testid="folder-name"
         />
       </b-field>
       <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
@@ -33,6 +34,7 @@
           :placeholder="$t('message.tagPlaceholder')"
           :confirm-keys="taginputConfirmKeys"
           :on-paste-separators="taginputConfirmKeys"
+          data-testid="folder-tag"
         />
       </b-field>
       <p class="info-text is-size-6">
@@ -49,8 +51,14 @@
       </c-link>
     </c-card-content>
     <c-card-actions justify="space-between">
-      <c-button outlined @click="toggleCreateFolderModal">Cancel</c-button>
-      <c-button @click="create ? createContainer() : updateContainer()">
+      <c-button outlined size="large" @click="toggleCreateFolderModal">
+        Cancel
+      </c-button>
+      <c-button
+        size="large"
+        @click="create ? createContainer() : updateContainer()"
+        data-testid="save-folder"
+      >
         {{ $t("message.save") }}
       </c-button>
     </c-card-actions>
@@ -178,13 +186,13 @@ export default {
   color: var(--csc-dark-grey);
 }
 
-.addContainer > c-card-content {
-  background-color: $csc-primary-lighter;
+c-card-content {
+  background-color: $csc-primary-light;
   padding: 1.5rem;
   color: var(--csc-dark-grey);
 }
 
-.addContainer > c-card-actions {
+c-card-actions {
   padding: 0;
 }
 </style>

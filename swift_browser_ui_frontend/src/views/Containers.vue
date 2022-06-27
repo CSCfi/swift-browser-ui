@@ -61,7 +61,11 @@
         </template>
       </b-autocomplete>
       <div class="uploadGroup">
-        <c-button @click="toggleCreateFolderModal" outlined>
+        <c-button
+          @click="toggleCreateFolderModal"
+          outlined
+          data-testid="create-folder"
+        >
           {{ $t("message.createContainerButton") }}
         </c-button>
         <c-modal v-control v-csc-model="openCreateFolderModal">

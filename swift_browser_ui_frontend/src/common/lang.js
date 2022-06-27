@@ -209,7 +209,7 @@ let default_translations = {
       remove: "Remove",
       edit: "Edit",
       save: "Save",
-      createContainerButton: "Create Folder",
+      createContainerButton: "Create folder",
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
@@ -219,7 +219,7 @@ let default_translations = {
         addContainer: "Create new folder",
         editContainer: "Editing bucket: ",
         norename:
-          "Please note that folder names cannot be modified" +
+          "Please note that folder names cannot be modified " +
           "after creating a folder.",
         createdFolder:
           "Created folder will be shared with all project members in",
