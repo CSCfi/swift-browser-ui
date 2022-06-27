@@ -35,7 +35,7 @@
     "cli-highlight": "^2.1.11",
     "csc-ui": "^0.4.11",
     "csc-ui-vue-directive": "^0.0.4",
-    "cypress": "^9.5.3",
+    "cypress": "^10.2.0",
     "eslint": "^8.10.0",
     "eslint-plugin-vue": "^8.5.0",
     "eslint-utils": "^3.0.0",
