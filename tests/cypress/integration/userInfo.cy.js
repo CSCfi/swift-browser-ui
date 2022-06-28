@@ -70,7 +70,7 @@ describe("Switch Languages after login", function () {
 
     it("should login the user with English but switch to Finnish", () => {
         cy.changeLang('fi')
-        cy.get('[data-testid="project-selector"]').shadow().find('label').contains('Valitse projekti')
+        cy.get('[data-testid="project-selector"]').find('label').contains('Valitse projekti')
         cy.get('.input').invoke('attr', 'placeholder').should('contain', 'Etsi nimellä')
     })
 
