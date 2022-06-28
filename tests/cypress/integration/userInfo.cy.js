@@ -11,7 +11,7 @@ describe("Login and log out a user", function () {
     })
 
     it("should login user with Finnish to username + password and remember the selection", () => {
-        cy.visit(Cypress.config().baseUrl)        
+        cy.visit(Cypress.config().baseUrl)
         cy.changeLang('fi')
 
         cy.login(' Kirjaudu SSO:ta käyttäen ')
@@ -28,6 +28,7 @@ describe("Login and log out a user", function () {
 describe("Retrieve User information", function () {
 
     beforeEach(function () {
+        cy.visit(Cypress.config().baseUrl)
         cy.login(' Log In with SSO ')
     });
 
@@ -61,6 +62,7 @@ describe("Retrieve User information", function () {
 describe("Switch Languages after login", function () {
 
     beforeEach(function () {
+        cy.visit(Cypress.config().baseUrl)
         cy.login(' Log In with SSO ')
     });
 
