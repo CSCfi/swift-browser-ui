@@ -83,7 +83,7 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id){
         const navigationParams = {
-          name: "ContainersView", 
+          name: "FoldersView", 
           params: {user: this.uname, project: item.id},
         };
 
