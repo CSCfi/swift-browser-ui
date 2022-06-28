@@ -39,9 +39,10 @@ describe("Retrieve User information", function () {
     it("should login the user and switch to user infomation and retrieve correct data", () => {
         cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
         cy.selectProject('service')
+        cy.contains('service')
         cy.navigateUserMenu('User information')
-        cy.location("pathname").should("match", /browse\/swift/)
         cy.contains('Buckets: 15')
+        cy.location("pathname").should("match", /browse\/swift/)
     })
 
     it("should login to switch project and browser and view different information", () => {
@@ -50,8 +51,6 @@ describe("Retrieve User information", function () {
         cy.contains('swift-project')
         cy.navigateUserMenu('User information')
         cy.contains('Buckets: 10')
-
-
         cy.location("pathname").should("match", /browse\/swift/)
         cy.navigateUserMenu('Browser')
         cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/)
