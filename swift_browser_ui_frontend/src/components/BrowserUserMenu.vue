@@ -49,7 +49,7 @@ export default {
         },
         {
           label: this.$t("message.dashboard.browser"),
-          route: { name: "FoldersView" },
+          route: { name: "AllFolders" },
         },
         {
           label: this.$t("message.share.shared"), 
