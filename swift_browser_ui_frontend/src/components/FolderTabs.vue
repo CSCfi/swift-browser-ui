@@ -2,6 +2,7 @@
   <c-tab-buttons
     :value="findActiveTab()"
     :mandatory="true"
+    data-testid="folder-tabs"
   >
     <c-button
       v-for="tab in tabs"

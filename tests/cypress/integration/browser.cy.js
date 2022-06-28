@@ -129,4 +129,15 @@ describe("Browse containers and test operations", function () {
     cy.get('button').contains('Save').click()
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
   })
+
+  it("should navigate between all and shared folders with tab selectors", () => {
+    const testTabChange = (label, id) => {
+      cy.get('[data-testid="folder-tabs"]').find("c-button").contains(label).click()
+      cy.get(`#${id}`).should("be.visible")
+    }
+
+    testTabChange("Shared from", "shared-table")
+    testTabChange("Shared to", "shared-out-table")
+    testTabChange("All project's folders", "container-table")
+  })
 })
