@@ -28,7 +28,6 @@
                   :href="item.href"
                   target="_self" 
                   type="button"
-                  target="_self"
                 >
                   <i
                     slot="icon"
