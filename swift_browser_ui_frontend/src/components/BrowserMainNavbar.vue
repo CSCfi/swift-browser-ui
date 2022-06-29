@@ -9,10 +9,7 @@
           class="navbar-item csclogo"
           :href="'/browse/'.concat(uname)"
         >
-          <img
-            src="@/assets/logo.svg"
-            :alt="$t('message.cscOrg')"
-          >
+          <c-csc-logo />
         </a>
       </div>
       <div class="navbar-menu">
