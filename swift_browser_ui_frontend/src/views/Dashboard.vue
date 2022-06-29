@@ -1,6 +1,9 @@
 <template>
   <c-flex>
-    <c-loader v-if="loader" />
+    <c-loader
+      v-if="loader"
+      data-testid="dashboard-loading-indicator"
+    />
     <div
       v-else
       class="dashboard contents"

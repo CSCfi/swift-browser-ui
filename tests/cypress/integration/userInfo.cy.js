@@ -42,7 +42,7 @@ describe("Retrieve User information", function () {
         cy.contains('service')
         cy.get('tbody tr').should('have.length', 15)
         cy.navigateUserMenu('User information')
-        cy.get("c-loader").should("not.exist");
+        cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
         cy.contains('Buckets: 15')
         cy.location("pathname").should("match", /browse\/swift/)
     })
@@ -53,7 +53,7 @@ describe("Retrieve User information", function () {
         cy.contains('swift-project')
         cy.get('tbody tr').should('have.length', 10)
         cy.navigateUserMenu('User information')
-        cy.get("c-loader").should("not.exist");
+        cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
         cy.contains('Buckets: 10')
         cy.location("pathname").should("match", /browse\/swift/)
         cy.navigateUserMenu('Browser')
