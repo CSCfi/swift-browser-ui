@@ -5,12 +5,12 @@
   >
     <div class="container is-fluid">
       <div class="navbar-brand">
-        <a
+        <router-link
           class="navbar-item csclogo"
-          :href="'/browse/'.concat(uname)"
+          :to="`/browse/${uname}/${active.id}`"
         >
           <c-csc-logo />
-        </a>
+        </router-link>
       </div>
       <div class="navbar-menu">
         <div class="navbar-start">
