@@ -17,7 +17,7 @@
       </div>
       <div class="navbar-menu">
         <div class="navbar-start">
-          <div class="navbar-item">
+          <div class="navbar-item app-name">
             <b>{{ $t("message.program_name") }}</b>
           </div>
         </div>
@@ -85,4 +85,10 @@ export default {
   box-shadow: 2px 4px 8px 0px $csc-light-grey;
   z-index: 31;
 }
+
+.app-name {
+  color: $csc-grey;
+  font-size: 20px;
+}
+
 </style>
