@@ -37,7 +37,7 @@
     "csc-ui": "^0.4.11",
     "csc-ui-vue-directive": "^0.0.4",
     "eslint": "^8.10.0",
-    "eslint-plugin-vue": "^8.5.0",
+    "eslint-plugin-vue": "^9.1.1",
     "eslint-utils": "^3.0.0",
     "vue-template-compiler": "^2.6.14"
   },
