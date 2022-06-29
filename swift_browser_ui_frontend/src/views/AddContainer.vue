@@ -4,7 +4,7 @@
       {{
         create
           ? $t("message.container_ops.addContainer")
-          : $t("message.container_ops.editContainer") + container
+          : $t("message.container_ops.editContainer") + folderName
       }}
     </h2>
     <c-card-content>
@@ -16,7 +16,7 @@
         :label="$t('message.container_ops.containerName')"
       >
         <b-input
-          v-model="container"
+          v-model="folderName"
           name="foldername"
           aria-required="true"
           :disabled="!create"
@@ -77,10 +77,9 @@ export default {
   name: "CreateContainer",
   data() {
     return {
-      container: "",
-      inputTag: "",
-      tags: [],
       create: true,
+      folderName: "",
+      tags: [],
       taginputConfirmKeys,
     };
   },
@@ -88,27 +87,34 @@ export default {
     currentProjectID() {
       return this.$route.params.project;
     },
+    selectedFolderName() {
+      return this.$store.state.selectedFolderName.length > 0
+        ? this.$store.state.selectedFolderName
+        : "";
+    },
   },
-  beforeMount() {
-    if (this.$route.name === "EditContainer") {
-      this.create = false;
-      this.getContainer();
-    }
+  watch: {
+    selectedFolderName: function () {
+      if (this.selectedFolderName.length > 0) {
+        this.create = false;
+        this.getContainer();
+      }
+    },
   },
   methods: {
     createContainer: function () {
       let projectID = this.$route.params.project;
-      swiftCreateContainer(projectID, this.container, this.tags.join(";"))
+      swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
         .then(() => {
           this.$store.state.db.containers.add({
             projectID: projectID,
-            name: this.container,
-            tokens: tokenize(this.container),
+            name: this.folderName,
+            tokens: tokenize(this.folderName),
             tags: this.tags,
             count: 0,
             bytes: 0,
           });
-          this.$store.commit("toggleCreateFolderModal", false);
+          this.toggleCreateFolderModal();
         })
         .catch((err) => {
           if (err.message.match("Container name already in use")) {
@@ -130,42 +136,46 @@ export default {
         });
     },
     getContainer: async function () {
-      const containerName = this.$route.params.container;
-      this.container = containerName;
-
+      this.folderName = this.$store.state.selectedFolderName;
       const container = await this.$store.state.db.containers.get({
         projectID: this.$store.state.active.id,
-        name: this.container,
+        name: this.folderName,
       });
       if (!container.tags) {
         this.tags = await getTagsForContainer(
           this.$route.params.project,
-          containerName,
+          this.folderName,
         );
       } else {
         this.tags = container.tags;
       }
     },
     updateContainer: function () {
+      const tags = this.tags;
+      const folderName = this.folderName;
       let meta = {
-        usertags: this.tags.join(";"),
+        usertags: tags.join(";"),
       };
-      updateContainerMeta(
-        this.$route.params.project,
-        this.container,
-        meta,
-      ).then(async () => {
-        await this.$store.state.db.containers
-          .where({
-            projectID: this.$route.params.project,
-            name: this.container,
-          })
-          .modify({ tags: this.tags });
-        this.$router.go(-1);
-      });
+      updateContainerMeta(this.$route.params.project, folderName, meta).then(
+        async () => {
+          await this.$store.state.db.containers
+            .where({
+              projectID: this.$route.params.project,
+              name: folderName,
+            })
+            .modify({ tags });
+        },
+      );
+      this.toggleCreateFolderModal();
     },
     toggleCreateFolderModal: function () {
       this.$store.commit("toggleCreateFolderModal", false);
+      this.folderName = "";
+      this.tags = [];
+      this.create = true;
+      if (this.selectedFolderName.length > 0) {
+        this.$store.commit("setFolderName", "");
+      }
     },
   },
 };
@@ -182,7 +192,7 @@ export default {
 }
 
 .addContainer > h2 {
-  margin: 0;
+  margin: 0 !important;
   color: var(--csc-dark-grey);
 }
 

@@ -42,6 +42,7 @@ const store = new Vuex.Store({
     currentPrefix: "",
     dropFiles: [],
     openCreateFolderModal: false,
+    selectedFolderName: "",
   },
   mutations: {
     loading(state, payload) {
@@ -157,6 +158,9 @@ const store = new Vuex.Store({
     },
     toggleCreateFolderModal(state, payload) {
       state.openCreateFolderModal = payload;
+    },
+    setFolderName(state, payload) {
+      state.selectedFolderName = payload;
     },
   },
   actions: {

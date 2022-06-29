@@ -1,4 +1,13 @@
 describe("Login and log out a user", function () {
+  it("should login with username + password and get to /browse route and log out", () => {
+    cy.login(" Log In with SSO ");
+    cy.get(".buttons > .router-link-exact-active").should(($browse) => {
+      expect($browse).to.have.length(1);
+      expect($browse).to.contain("Browse");
+    });
+    cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
+    cy.contains("Log Out").click();
+  });
 
     it("should login with username + password and get to /browse route and log out", () => {
         cy.login(' Log In with SSO ')
@@ -26,6 +35,9 @@ describe("Login and log out a user", function () {
 })
 
 describe("Retrieve User information", function () {
+  beforeEach(function () {
+    cy.login(" Log In with SSO ");
+  });
 
     beforeEach(function () {
         cy.visit(Cypress.config().baseUrl)
@@ -63,6 +75,9 @@ describe("Retrieve User information", function () {
 })
 
 describe("Switch Languages after login", function () {
+  beforeEach(function () {
+    cy.login(" Log In with SSO ");
+  });
 
     beforeEach(function () {
         cy.visit(Cypress.config().baseUrl)

@@ -90,8 +90,10 @@ describe("Browse containers and test operations", function () {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.get("[data-testid='create-folder']").click();
     cy.get("input[data-testid='folder-name']").type("Test folder name");
-    cy.get("input[data-testid='folder-tag']").type("tag1{enter}");
-    cy.get("[data-testid='save-folder']").click();
+    cy.get("input[data-testid='folder-tag']").type(
+      "tag1{enter} tag2{enter} tag3{enter}",
+    );
+    cy.get("[data-testid='save-folder']").should("be.visible").click();
   });
 
   it("should display, add, remove container tags", () => {
@@ -106,14 +108,14 @@ describe("Browse containers and test operations", function () {
     cy.get("tbody tr").contains("Edit").click();
     cy.get("h2").should("contain", "Editing bucket");
     cy.get(".delete").first().click();
-    cy.get("button").contains("Save").click();
+    cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 2);
 
     // add few tags
     cy.get("tbody tr").contains("Edit").click();
     cy.get(".taginput-container").children("span").should("have.length", 2);
     cy.get(".taginput input").type("adding.couple more,");
-    cy.get("button").contains("Save").click();
+    cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 5);
 
     // remove all tags from a container
@@ -123,7 +125,7 @@ describe("Browse containers and test operations", function () {
       cy.get(".delete").first().click();
     });
     cy.get(".taginput-container").children("span").should("have.length", 0);
-    cy.get("button").contains("Save").click();
+    cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 0);
   });
 
@@ -138,7 +140,7 @@ describe("Browse containers and test operations", function () {
 
     // remove one tag
     cy.get("tbody tr").contains("Edit").click();
-    cy.get("h2").should("contain", "Editing object");
+    cy.get("h1").should("contain", "Editing object");
     cy.get(".delete").first().click();
     cy.get("button").contains("Save").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 3);

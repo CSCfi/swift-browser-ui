@@ -244,16 +244,12 @@
             </p>
             <p class="control">
               <b-button
-                tag="router-link"
                 type="is-primary"
                 outlined
                 size="is-small"
                 icon-left="pencil"
                 :inverted="selected == props.row ? true : false"
-                :to="{
-                  name: 'EditContainer',
-                  params: { container: props.row.name },
-                }"
+                @click="toggleCreateFolderModal(props.row.name)"
               >
                 {{ $t("message.edit") }}
               </b-button>
@@ -543,8 +539,11 @@ export default {
           .modify({ [this.active.id]: { largeProjectNotification: true } });
       }
     },
-    toggleCreateFolderModal: function () {
+    toggleCreateFolderModal: function (folderName) {
       this.$store.commit("toggleCreateFolderModal", true);
+      if (folderName) {
+        this.$store.commit("setFolderName", folderName);
+      }
     },
   },
 };
