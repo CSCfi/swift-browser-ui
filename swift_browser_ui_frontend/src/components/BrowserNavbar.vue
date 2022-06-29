@@ -38,7 +38,9 @@
                 }"
                 class="navbar-item"
                 @click.native.stop="changeActive(item)"
-              >{{ item.name }}</router-link>
+              >
+                {{ item.name }}
+              </router-link>
             </div>
           </div>
           <div

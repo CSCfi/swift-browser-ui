@@ -3,117 +3,114 @@
 <!-- things into components, but that would break the language support and -->
 <!-- make index page development more difficult. -->
 <template>
-  <div class="indexpage">
-    <div>
-      <div class="block has-text-centered">
-        <a 
-          href="#"
-          class="center"
-        >
-          <img
-            src="@/assets/logo.svg"
-            class="csc-logo"
-            :alt="$t('message.cscOrg')"
+  <c-main>
+    <c-toolbar class="relative">
+      <c-csc-logo />
+      {{ $t('message.program_name') }}
+      <c-spacer />
+      <LanguageSelector />
+    </c-toolbar>
+    <c-row>
+      <c-flex>
+        <c-container class="padding">
+          <form
+            method="POST"
+            action="/login/credentials"
           >
-        </a>
-      </div>
-      <div class="content has-text-centered">
-        <h2 class="title is-4 is-csc-secondary">
-          {{ $t("message.program_name") }}
-        </h2>
-        <p>{{ $t("message.program_description") }}</p>
-      </div>
-      <div class="content has-text-centered">
-        <h2 class="title is-4 is-csc-secondary">
-          {{ $t("message.index.formName") }}
-        </h2>
-      </div>
-      <div class="block">
-        <form
-          method="POST"
-          action="/login/credentials"
-        >
-          <b-field
-            class="center"
-            label="Username"
-          >
-            <b-input
-              type="text"
-              name="username"
-            />
-          </b-field>
-          <b-field
-            class="center"
-            label="Password"
-          >
-            <b-input
-              name="password"
-              type="password"
-            />
-          </b-field>
-          <b-field
-            class="center"
-          >
-            <input
-              class="button is-primary loginbutton"
-              type="submit"
-              :value="$t('message.index.logIn')"
+            <c-login-card
+              :src="require('@/assets/banner_login.png')"
             >
-          </b-field>
-        </form>
-      </div>
-      <b-field class="block locale-changer center">
-        <b-select
-          v-model="$i18n.locale"
-          placeholder="Language"
-          icon="earth"
-          expanded
-          @input="setCookieLang ()"
-        >
-          <option
-            v-for="lang in langs"
-            :key="lang.value"
-            :value="lang.value"
-          >
-            {{ lang.ph }}
-          </option>
-        </b-select>
-      </b-field>
-      <div id="loginform" />
-      <div class="block has-text-centered">
-        <p>
-          {{ $t("message.devel") }}
-          <a
-            href="https://csc.fi"
-            :alt="$t('message.cscOrg')"
-          >{{ $t("message.cscOrg") }}</a>
-        </p>              
-      </div>
-    </div>
-  </div>
+              <c-login-card-title>
+                {{ $t('message.pwdlogin.header') }}
+              </c-login-card-title>
+              <c-login-card-content>
+                <p>{{ $t('message.pwdlogin.description') }}</p>
+                <c-text-field
+                  v-control
+                  name="username"
+                  :label="$t('message.pwdlogin.uname')"
+                  type="text"
+                />
+                <c-text-field
+                  v-control
+                  name="password"
+                  :label="$t('message.pwdlogin.pwd')"
+                  type="password"
+                />
+              </c-login-card-content>
+              <c-login-card-actions>
+                <c-button
+                  type="submit"
+                >
+                  <i
+                    slot="icon"
+                    class="mdi mdi-login"
+                  />
+                  {{ $t('message.index.logIn') }}
+                </c-button>
+              </c-login-card-actions>
+              <c-login-card-content v-if="!idb">
+                <p>
+                  <strong>{{ $t('message.error.idb') }}</strong>
+                </p>
+              </c-login-card-content>
+            </c-login-card>
+          </form>
+        </c-container>
+      </c-flex>
+    </c-row>
+    <footer>
+      <c-container>
+        <c-flex>
+          <div>
+            <h5>CSC - IT Center for Science Ltd.</h5>
+            <p>P.O. Box 405 FI-02101 Espoo, Finland</p>
+            <p>+358 9 457 2001</p>
+          </div>
+          <div>
+            <h5>Service Desk</h5>
+            <p>Open Monday to Friday from 8.30 a.m. to 4 p.m.</p>
+            <p>+358 9 457 2821</p>
+            <p>servicedesk@csc.fi</p>
+          </div>
+        </c-flex>
+      </c-container>
+    </footer>
+  </c-main>
 </template>
 
 <style>
-html, body {
-  height: 100%;
+c-main { 
+  height: unset; 
+  min-height: 100vh 
 }
-.indexpage {
-  width: 40%;
-  height: 100%;
+c-login-card { 
+  margin: 2rem auto;
+  max-width: 55rem;
+  height: 35rem; 
+}
+c-button {
+  margin-top: 2rem;
+}
+footer {
+  background-color: var(--csc-light-grey);
+  color: var(--csc-dark-grey);
+  padding: 1rem 0 1rem;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+footer h5 {
+  font-weight: bold;
+}
+footer p {
+  font-size: 0.875rem;
+  line-height: 1rem;
+}
+footer c-flex {
   display: flex;
-  flex-direction: column;
-  margin: auto;
-  align-content: center;
-  justify-content: center;
-}
-.center {
-  width: 50%;
-  margin: auto;
-}
-.loginbutton {
-  width: 100%;
-}
-.csc-logo {
-  justify-content: center;
+  justify-content: space-around;
+  text-align: center;
 }
 </style>

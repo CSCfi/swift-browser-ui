@@ -319,6 +319,12 @@ let default_translations = {
           "button below.",
         unrestricted: "All unrestricted projects",
       },
+      pwdlogin: {
+        header: "Credential login",
+        description: "Login with your user credentials.",
+        uname: "Username",
+        pwd: "Password",
+      },
     },
   },
   fi: {
@@ -625,6 +631,12 @@ let default_translations = {
           "selailla vain rajoittamattomia projekteja, paina " +
           "rajoittamattomien projektien nappia alla.",
         unrestricted: "Kaikki rajoittamattomat projektit",
+      },
+      pwdlogin: {
+        header: "Käyttäjätunnuksella kirjautuminen",
+        description: "Kirjaudu käyttäen käyttäjätunnustasi.",
+        uname: "Käyttäjänimi",
+        pwd: "Salasana",
       },
     },
   },

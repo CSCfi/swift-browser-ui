@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (GH #514) Cypress integration tests run against keystone-swift container from https://github.com/CSCfi/docker-keystone-swift.
 - Improved development workflow, and added development and testing instructions.
+- (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
+- (GH #601) Add a language selector to login page menu bar, using `csc-ui`
 
 ### Fixed
 

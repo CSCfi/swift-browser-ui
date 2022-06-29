@@ -90,6 +90,9 @@ käyttäjä
 käyttäjällä
 käyttäjän
 käyttäjänimestä
+käyttäjänimi
+käyttäjätunnuksella
+käyttäjätunnustasi
 käyttöä
 käyttöliittymä
 käyttöliittymän
@@ -105,6 +108,7 @@ kiellettyä
 kirjaudu
 kirjautuaksesi
 kirjautumalla
+kirjautuminen
 kirjautumisen
 kirjoitus
 kirjoitusoikeus

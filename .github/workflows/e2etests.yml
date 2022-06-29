@@ -51,7 +51,7 @@ jobs:
           pip install honcho
           honcho start -f ${{ github.workspace }}/.github/config/Procfile --env ${{ github.workspace }}/.github/config/.env.test &
       - run: npm i cypress
-      - uses: cypress-io/github-action@v2
+      - uses: cypress-io/github-action@v4
         with:
           project: ./swift_browser_ui_frontend
           install: false
