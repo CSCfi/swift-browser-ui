@@ -1,137 +1,143 @@
 <template>
-  <div class="dashboard contents">
-    <div class="tile is-ancestor">
-      <div class="tile is-parent is-horizontal is-4">
-        <div class="tile is-child box">
-          <p class="title is-size-5">
-            {{ $t('message.dashboard.prj_usage') }}
-          </p>
-          <p>
-            <ul>
-              <li>
-                <b>{{ $t('message.dashboard.account') }}:</b> {{ Account }}
-              </li>
-              <li>
-                <b>
-                  {{ $t('message.dashboard.containers') }}:
-                </b> {{ Containers }}
-              </li>
-              <li>
-                <b>{{ $t('message.dashboard.objects') }}:</b> {{ Objects }}
-              </li>
-              <li>
-                <b>{{ $t('message.dashboard.usage') }}:</b> {{ Size }}
-              </li>
-            </ul>
-          </p>
+  <c-flex>
+    <c-loader v-if="loader" />
+    <div
+      v-else
+      class="dashboard contents"
+    >
+      <div class="tile is-ancestor">
+        <div class="tile is-parent is-horizontal is-4">
+          <div class="tile is-child box">
+            <p class="title is-size-5">
+              {{ $t('message.dashboard.prj_usage') }}
+            </p>
+            <p>
+              <ul>
+                <li>
+                  <b>{{ $t('message.dashboard.account') }}:</b> {{ Account }}
+                </li>
+                <li>
+                  <b>
+                    {{ $t('message.dashboard.containers') }}:
+                  </b> {{ Containers }}
+                </li>
+                <li>
+                  <b>{{ $t('message.dashboard.objects') }}:</b> {{ Objects }}
+                </li>
+                <li>
+                  <b>{{ $t('message.dashboard.usage') }}:</b> {{ Size }}
+                </li>
+              </ul>
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="tile is-parent is-horizontal is-8">
-        <div class="tile is-child box">
-          <p class="title is-size-5">
-            {{ $t('message.dashboard.cur_billing') }}
-          </p>
-          <progress
-            v-if="Bytes < (Bytes > 1099511627776 ? Bytes : 1099511627776)"
-            class="progress is-success is-large"
-            :value="Bytes"
-            :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
-          >
-            {{ parseInt(Bytes/1099511627776) }}
-          </progress>
-          <progress
-            v-else
-            class="progress is-danger is-large"
-            :value="Bytes"
-            :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
-          >
-            {{ parseInt(Bytes/1099511627776) }}
-          </progress>
-          <p>
-            <ul>
-              <li>
-                <b>{{ $t('message.dashboard.prj_str_usag') }}: </b>
-                {{ Size }} / {{ ProjectSize }}
-                <b-tooltip
-                  v-if="!DisableTooltip"
-                  size="is-large"
-                  :label="$t('message.dashboard.default_notify')"
-                  position="is-right"
-                  multilined
-                  always
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="information"
-                  />
-                </b-tooltip>
-                <b-tooltip
-                  v-else
-                  size="is-large"
-                  :label="$t('message.dashboard.default_notify')"
-                  position="is-right"
-                  multilined
-                >
-                  <b-icon
-                    size="is-small"
-                    icon="information"
-                  />
-                </b-tooltip>
-              </li>
-              <li>
-                <b>{{ $t('message.dashboard.equals') }}: </b>
-                {{ Billed }} <b>BU / {{ $t('message.dashboard.hour') }} </b>
-              </li>
-            </ul>
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="tile is-ancestor">
-      <div class="tile is-parent is-horizontal is-12">
-        <div class="tile is-child is-12 box">
-          <p class="title is-size-5">
-            {{ $t('message.dashboard.more_info') }}
-          </p>
-          <ul>
-            <li 
-              v-for="item in $t('message.dashboard.links')"
-              :key="item.msg"
+        <div class="tile is-parent is-horizontal is-8">
+          <div class="tile is-child box">
+            <p class="title is-size-5">
+              {{ $t('message.dashboard.cur_billing') }}
+            </p>
+            <progress
+              v-if="Bytes < (Bytes > 1099511627776 ? Bytes : 1099511627776)"
+              class="progress is-success is-large"
+              :value="Bytes"
+              :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
             >
-              <a
-                target="_blank"
-                :href="item.href"
-              >{{ item.msg }}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="tile is-ancestor">
-      <div class="tile is-parent is-horizontal is-12">
-        <div class="tile is-child is-12 box">
-          <p class="title is-size-5">
-            {{ $t('message.dashboard.resources') }}
-          </p>
-          <div class="field has-addons">
-            <p class="control">
-              <router-link
-                :to="{
-                  name: 'TokensView',
-                  params: {
-                    user: $store.state.uname,
-                    project: $store.state.active.id,
-                  }
-                }"
-              >
-                {{ $t('message.dashboard.tokens') }}
-              </router-link>
+              {{ parseInt(Bytes/1099511627776) }}
+            </progress>
+            <progress
+              v-else
+              class="progress is-danger is-large"
+              :value="Bytes"
+              :max="Bytes > 1099511627776 ? Bytes : 1099511627776"
+            >
+              {{ parseInt(Bytes/1099511627776) }}
+            </progress>
+            <p>
+              <ul>
+                <li>
+                  <b>{{ $t('message.dashboard.prj_str_usag') }}: </b>
+                  {{ Size }} / {{ ProjectSize }}
+                  <b-tooltip
+                    v-if="!DisableTooltip"
+                    size="is-large"
+                    :label="$t('message.dashboard.default_notify')"
+                    position="is-right"
+                    multilined
+                    always
+                  >
+                    <b-icon
+                      size="is-small"
+                      icon="information"
+                    />
+                  </b-tooltip>
+                  <b-tooltip
+                    v-else
+                    size="is-large"
+                    :label="$t('message.dashboard.default_notify')"
+                    position="is-right"
+                    multilined
+                  >
+                    <b-icon
+                      size="is-small"
+                      icon="information"
+                    />
+                  </b-tooltip>
+                </li>
+                <li>
+                  <b>{{ $t('message.dashboard.equals') }}: </b>
+                  {{ Billed }} <b>BU / {{ $t('message.dashboard.hour') }} </b>
+                </li>
+              </ul>
             </p>
           </div>
         </div>
       </div>
+      <div class="tile is-ancestor">
+        <div class="tile is-parent is-horizontal is-12">
+          <div class="tile is-child is-12 box">
+            <p class="title is-size-5">
+              {{ $t('message.dashboard.more_info') }}
+            </p>
+            <ul>
+              <li 
+                v-for="item in $t('message.dashboard.links')"
+                :key="item.msg"
+              >
+                <a
+                  target="_blank"
+                  :href="item.href"
+                >{{ item.msg }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="tile is-ancestor">
+        <div class="tile is-parent is-horizontal is-12">
+          <div class="tile is-child is-12 box">
+            <p class="title is-size-5">
+              {{ $t('message.dashboard.resources') }}
+            </p>
+            <div class="field has-addons">
+              <p class="control">
+                <router-link
+                  :to="{
+                    name: 'TokensView',
+                    params: {
+                      user: $store.state.uname,
+                      project: $store.state.active.id,
+                    }
+                  }"
+                >
+                  {{ $t('message.dashboard.tokens') }}
+                </router-link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </c-flex>
 </template>
 
 <script>
@@ -154,6 +160,7 @@ export default {
       Bytes: 0,
       DisableTooltip: false,
       ProjectSize: "10TiB",
+      loader: true,
     };
   },
   computed: {
@@ -186,6 +193,7 @@ export default {
         this.Billed = ret["Billed"];
         this.Bytes = ret["Bytes"];
         this.ProjectSize = ret["ProjectSize"];
+        this.loader = false;
       });
     },
     disable: function() {
