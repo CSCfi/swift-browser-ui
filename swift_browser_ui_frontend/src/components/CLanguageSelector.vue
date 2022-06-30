@@ -1,8 +1,9 @@
 <template>
   <c-menu
     :items.prop="langItems"
+    data-testid="language-selector"
   >
-    {{ current }}
+    <span class="menu-active">{{ current }}</span>
   </c-menu>
 </template>
 

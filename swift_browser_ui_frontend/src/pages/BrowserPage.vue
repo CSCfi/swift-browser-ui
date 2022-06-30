@@ -30,8 +30,10 @@
       v-else
       id="subContainer"
     >
-      <BrowserNavbar
+      <BrowserMainNavbar
         :langs="langs"
+      />
+      <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
         :projects="projects"
       />
@@ -44,11 +46,12 @@
           :key="item.alias"
           :to="item.address"
           tag="router-link"
+          data-testid="breadcrumb-item"
         >
           {{ item.alias | truncate(100) }}
         </b-breadcrumb-item>
       </b-breadcrumb>
-      <router-view />
+      <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"
         :active.sync="isLoading"
@@ -85,13 +88,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "@/css/prod.scss";
+
+$footer-height: 10rem;
+
 html, body {
   height: 100%;
 }
 
 #mainContainer {
-  height: 100%;
+  min-height: 100vh;
+  position: relative;
 }
 
 #subContainer {
@@ -100,12 +108,29 @@ html, body {
   flex-direction: column;
 }
 
+.content-wrapper {
+  padding-bottom: calc(#{$footer-height} + 3rem);
+}
+
 .contents {
   flex: 1 0 auto;
 }
 
 .navbar .container .navbar-brand .navbar-item img {
 	max-height: 2.5rem;
+}
+
+.menu-active {
+  font-weight: 600 !important;
+  font-size: 14px;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active, .menu-icon {
+  color: $csc-primary;
 }
 
 .hero-body #login-center{
@@ -150,6 +175,10 @@ html, body {
 
 .footer {
   flex-shrink: 0;
+  position: absolute;
+  height: $footer-height;
+  width: 100%;
+  bottom: 0;
 }
 
 #footer {

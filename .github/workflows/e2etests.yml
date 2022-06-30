@@ -62,11 +62,11 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: swift_browser_ui_frontend/cypress/screenshots
           retention-days: 5
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-videos
-          path: cypress/videos
+          path: swift_browser_ui_frontend/cypress/videos
           retention-days: 5
