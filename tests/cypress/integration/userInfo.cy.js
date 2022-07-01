@@ -45,6 +45,7 @@ describe("Retrieve User information", function () {
         cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
         cy.contains('Buckets: 15')
         cy.location("pathname").should("match", /browse\/swift/)
+
     })
 
     it("should login to switch project and browser and view different information", () => {
