@@ -76,6 +76,7 @@ julkiset
 julkisia
 kaikki
 kansio
+kansiot
 kansioille
 kansioina
 kanssa
@@ -264,6 +265,7 @@ projektilla
 projektille
 projektilta
 projektin
+projektiin
 projektissa
 projektista
 projektit

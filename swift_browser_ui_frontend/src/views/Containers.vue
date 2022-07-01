@@ -65,7 +65,6 @@
       </b-autocomplete>
     </b-field>
     <b-table
-      class="containerTable"
       focusable
       hoverable
       narrowed
@@ -267,6 +266,7 @@ import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
 import AddContainer from "@/views/AddContainer";
+
 
 export default {
   name: "ContainersView",
@@ -523,11 +523,6 @@ export default {
 </script>
 
 <style scoped>
-.containerTable {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
 .emptyTable {
   text-align: center;
   margin-top: 5%;

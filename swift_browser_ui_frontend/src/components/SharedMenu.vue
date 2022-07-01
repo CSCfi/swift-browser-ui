@@ -5,21 +5,21 @@
         icon="folder-account"
         tag="router-link"
         :label="$t('message.share.to_me')"
-        :to="{name :'SharedTo' ,params: {
+        :to="{name :'SharingTo' ,params: {
           user: user,
           project: project,
         }}"
-        :active="name == 'SharedTo' ? true : false"
+        :active="name == 'SharingTo' ? true : false"
       />
       <b-menu-item
         icon="share"
         tag="router-link"
         :label="$t('message.share.from_me')"
-        :to="{name: 'SharedFrom', params: {
+        :to="{name: 'SharingFrom', params: {
           user: user,
           project: project,
         }}"
-        :active="name == 'SharedFrom' ? true : false"
+        :active="name == 'SharingFrom' ? true : false"
       />
       <b-menu-item
         icon="folder-plus"
