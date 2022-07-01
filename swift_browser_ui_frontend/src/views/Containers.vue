@@ -1,20 +1,42 @@
 <template>
-  <div id="container-table" class="contents">
-    <c-modal v-control v-csc-model="openCreateFolderModal">
+  <div
+    id="container-table"
+    class="contents"
+  >
+    <c-modal
+      v-control
+      v-csc-model="openCreateFolderModal"
+    >
       <AddContainer />
     </c-modal>
-    <b-field grouped group-multiline class="groupControls">
+    <b-field
+      grouped
+      group-multiline
+      class="groupControls"
+    >
       <b-select
         v-model="perPage"
         data-testid="containersPerPage"
         :disabled="!isPaginated"
       >
-        <option value="5">5 {{ $t("message.table.pageNb") }}</option>
-        <option value="10">10 {{ $t("message.table.pageNb") }}</option>
-        <option value="15">15 {{ $t("message.table.pageNb") }}</option>
-        <option value="25">25 {{ $t("message.table.pageNb") }}</option>
-        <option value="50">50 {{ $t("message.table.pageNb") }}</option>
-        <option value="100">100 {{ $t("message.table.pageNb") }}</option>
+        <option value="5">
+          5 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="10">
+          10 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="15">
+          15 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="25">
+          25 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="50">
+          50 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="100">
+          100 {{ $t("message.table.pageNb") }}
+        </option>
       </b-select>
       <div class="control is-flex">
         <b-switch
@@ -56,8 +78,14 @@
             v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
-            <b-loading v-model="isSearching" :is-full-page="false" />
-            <div v-show="!isSearching" class="media-content">
+            <b-loading
+              v-model="isSearching"
+              :is-full-page="false"
+            />
+            <div
+              v-show="!isSearching"
+              class="media-content"
+            >
               {{ $t("message.search.empty") }}
             </div>
           </div>
@@ -77,12 +105,20 @@
       :per-page="perPage"
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
+      @page-change="(page) => addPageToURL(page)"
+      @dblclick="(row) => $router.push(getConAddr(row['name']))"
+      @keyup.native.enter="(event) => viewFolder(event)"
+      @keyup.native.space="(event) => viewFolder(event)"
       @page-change="page => addPageToURL(page)"
       @dblclick="row => $router.push(getConAddr(row['name']))"
       @keyup.native.enter="$router.push(getConAddr(selected['name']))"
       @keyup.native.space="$router.push(getConAddr(selected['name']))"
     >
-      <b-table-column sortable field="name" :label="$t('message.table.name')">
+      <b-table-column
+        sortable
+        field="name"
+        :label="$t('message.table.name')"
+      >
         <template #default="props">
           <span :class="props.row.count ? 'has-text-weight-bold' : ''">
             <b-icon
@@ -124,7 +160,11 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </template>
       </b-table-column>
-      <b-table-column field="functions" label="" width="150">
+      <b-table-column
+        field="functions"
+        label=""
+        width="150"
+      >
         <template #default="props">
           <div class="field has-addons">
             <p class="control">
@@ -142,7 +182,10 @@
                 :container="props.row.name"
               />
             </p>
-            <p v-if="!props.row.bytes" class="control">
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
               <b-button
                 v-if="selected == props.row"
                 type="is-primary"
@@ -165,7 +208,10 @@
                 {{ $t("message.share.share") }}
               </b-button>
             </p>
-            <p v-else class="control">
+            <p
+              v-else
+              class="control"
+            >
               <b-button
                 v-if="selected == props.row"
                 type="is-primary"
@@ -215,34 +261,14 @@
                 :smallsize="true"
               />
             </p>
-            <p class="control">
-              <b-button
-                type="is-primary"
-                outlined
-                size="is-small"
-                icon-left="pencil"
-                :inverted="selected == props.row ? true : false"
-                @click="toggleCreateFolderModal(props.row.name)"
-              >
-                {{ $t("message.edit") }}
-              </b-button>
-            </p>
           </div>
         </template>
       </b-table-column>
-      <b-table-column field="dangerous" label="" width="75">
+      <b-table-column width="75">
         <template #default="props">
-          <DeleteContainerButton
-            v-if="selected == props.row"
-            :inverted="true"
-            :objects="props.row.count"
-            :container="props.row.name"
-          />
-          <DeleteContainerButton
-            v-else
-            :inverted="false"
-            :objects="props.row.count"
-            :container="props.row.name"
+          <FolderOptionsMenu
+            :props="props"
+            :selected="selected == props.row"
           />
         </template>
       </b-table-column>
@@ -265,8 +291,8 @@ import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
-import DeleteContainerButton from "@/components/ContainerDeleteButton";
 import AddContainer from "@/views/AddContainer";
+import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
 export default {
   name: "ContainersView",
@@ -274,8 +300,8 @@ export default {
     SearchResultItem,
     ContainerDownloadLink,
     ReplicateContainerButton,
-    DeleteContainerButton,
     AddContainer,
+    FolderOptionsMenu,
   },
   filters: {
     truncate,
@@ -512,10 +538,11 @@ export default {
           .modify({ [this.active.id]: { largeProjectNotification: true } });
       }
     },
-    toggleCreateFolderModal: function (folderName) {
-      this.$store.commit("toggleCreateFolderModal", true);
-      if (folderName) {
-        this.$store.commit("setFolderName", folderName);
+    viewFolder(event) {
+      // Prevent keyboard navigation from opening folder
+      // when accessing row menu
+      if (event.target.localName !== "c-menu") {
+        this.$router.push(this.getConAddr(this.selected["name"]));
       }
     },
   },

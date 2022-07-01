@@ -1,31 +1,44 @@
 <template>
-  <div class="contents">
-    <b-button
-      type="is-danger"
-      icon-left="delete"
-      outlined
-      size="is-small"
-      :inverted="inverted"
-      @click="confirmDelete ()"
+  <c-menu
+    simple
+    :items.prop="menuItems"
+  >
+    <c-button
+      class="menu-trigger-button"
+      text
+      tabindex="-1"
+      :inverted="selected"
     >
-      {{ $t('message.delete') }}
-    </b-button>
-  </div>
+      ... {{ $t('message.options') }}
+    </c-button>
+  </c-menu>
 </template>
 
 <script>
 import {swiftDeleteContainer} from "@/common/api";
-
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
 export default {
-  name: "DeleteContainerButton",
-  props: [
-    "container",
-    "inverted",
-    "objects",
-  ],
+  name: "FolderOptionsMenu",
+  props: ["props", "selected"],
+  data: function () {
+    return {
+      menuItems: [
+        {
+          name: this.$t("message.edit"), 
+          action: () => toggleCreateFolderModal(this.props.row.name),
+        },
+        {
+          name: this.$t("message.delete"), 
+          action: () => this.confirmDelete(
+            this.props.row.name, this.props.row.count,
+          ),
+        },
+      ],
+    };
+  },
   methods: {
-    confirmDelete: function () {
-      if (this.$props.objects > 0) {
+    confirmDelete: function (container, objects) {
+      if (objects > 0) {
         this.$buefy.notification.open({
           message: "Deleting a container requires deleting all objects first.",
           type: "is-danger",
@@ -36,7 +49,7 @@ export default {
         this.$router.push(
           this.$route.params.project
             + "/"
-            + this.$props.container,
+            + container,
         );
       } else {
         this.$buefy.dialog.confirm({
@@ -45,11 +58,11 @@ export default {
           confirmText: this.$t("message.container_ops.deleteConfirm"),
           type: "is-danger",
           hasIcon: true,
-          onConfirm: () => {this.deleteContainer();},
+          onConfirm: () => {this.deleteContainer(container);},
         });
       }
     },
-    deleteContainer: function() {
+    deleteContainer: function(container) {
       this.$buefy.toast.open({
         message: this.$t("message.container_ops.deleteSuccess"),
         type: "is-success",
@@ -57,12 +70,12 @@ export default {
       const projectID = this.$store.state.active.id;
       swiftDeleteContainer(
         projectID,
-        this.container,
+        container,
       ).then(async () => {
         await this.$store.state.db.containers
           .where({
             projectID,
-            name: this.container,
+            name: container,
           })
           .delete();
       });
@@ -70,3 +83,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Default button click event prevents menu from triggering */
+  .menu-trigger-button {
+    pointer-events: none; 
+  }
+</style>
