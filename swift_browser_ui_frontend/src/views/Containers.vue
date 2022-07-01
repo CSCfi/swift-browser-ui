@@ -6,6 +6,7 @@
     <b-field
       grouped
       group-multiline
+      class="groupControls"
     >
       <b-select
         v-model="perPage"
@@ -114,6 +115,7 @@
       </div>
     </b-field>
     <b-table
+      class="containerTable"
       focusable
       hoverable
       narrowed
@@ -338,7 +340,6 @@ import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
-
 
 export default {
   name: "ContainersView",
@@ -582,6 +583,11 @@ export default {
 </script>
 
 <style scoped>
+.containerTable {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
 .emptyTable {
   text-align: center;
   margin-top: 5%;

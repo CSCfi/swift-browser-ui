@@ -1,6 +1,7 @@
 <template>
   <div 
     id="shared-table"
+    class="column"
   >
     <b-field
       grouped

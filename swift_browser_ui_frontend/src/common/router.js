@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import DashboardView from "@/views/Dashboard.vue";
-import FoldersView from "@/views/Folders.vue";
+import ContainersView from "@/views/Containers.vue";
 import ObjectsView from "@/views/Objects.vue";
 import EditObjectView from "@/views/EditObject.vue";
 import SharedObjects from "@/views/SharedObjects";
@@ -23,12 +23,12 @@ export default new Router({
   routes: [
     {
       path: "/browse/:user/:project/sharing/to",
-      name: "SharingTo",
+      name: "SharedTo",
       component: SharedTo,
     },
     {
       path: "/browse/:user/:project/sharing/from",
-      name: "SharingFrom",
+      name: "SharedFrom",
       component: SharedFrom,
     },
     {
@@ -93,18 +93,8 @@ export default new Router({
     },
     {
       path: "/browse/:user/:project",
-      name: "AllFolders",
-      component: FoldersView,
-    },
-    {
-      path: "/browse/:user/:project/shared/to",
-      name: "SharedTo",
-      component: FoldersView,
-    },
-    {
-      path: "/browse/:user/:project/shared/from",
-      name: "SharedFrom",
-      component: FoldersView,
+      name: "ContainersView",
+      component: ContainersView,
     },
     {
       path: "/browse/:user/:project/:container",

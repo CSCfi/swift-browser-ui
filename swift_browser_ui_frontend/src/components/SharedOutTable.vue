@@ -1,6 +1,7 @@
 <template>
   <div 
     id="shared-out-table"
+    class="column"
   >
     <div class="field is-grouped">
       <p class="control">
