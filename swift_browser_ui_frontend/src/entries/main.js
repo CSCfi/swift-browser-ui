@@ -207,7 +207,7 @@ new Vue({
 
       if (document.location.pathname == "/browse") {
         this.$router.push({
-          name: "AllFolders",
+          name: "ContainersView",
           params: {
             project: active.id,
             user: user,
@@ -452,7 +452,7 @@ new Vue({
           retl.push({
             alias: this.$t("message.containers")
                    + this.$store.state.active.name || "",
-            address: {name: "AllFolders"},
+            address: {name: "ContainersView"},
           });
         }
       }

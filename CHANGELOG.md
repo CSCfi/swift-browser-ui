@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (GH #638) Added tab based folder view in browse-route
 - (GH #596) Support link phrasing, icon and destination update in main navigation
 - (GH #577) Updated layout for top navigation
 - (GH #596) Project switcher with CSC Design system select components
