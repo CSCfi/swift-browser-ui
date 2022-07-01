@@ -49,11 +49,11 @@ export default {
         },
         {
           label: this.$t("message.dashboard.browser"),
-          route: { name: "ContainersView" },
+          route: { name: "AllFolders" },
         },
         {
           label: this.$t("message.share.shared"), 
-          route: { name: "SharedTo" },
+          route: { name: "SharingTo" },
           rule: this.$store.state.client,
         },
         {
