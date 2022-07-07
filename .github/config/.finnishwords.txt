@@ -64,6 +64,7 @@ jakopyyntöjä
 jakopyyntöjen
 jälkeen
 jälkeenpäin
+jäsenet
 jne
 johtaa
 johtua
@@ -285,6 +286,7 @@ rajoittamattomien
 rajoitteiden
 resurssienkäyttö
 resurssit
+rivinvaihtoa
 säiliö
 säiliöitä
 säiliön
@@ -380,6 +382,7 @@ tuloksia
 tunniste
 tunti
 tuo
+tutkimusprojektini
 tyhjä
 tyhjennä
 tyyppi

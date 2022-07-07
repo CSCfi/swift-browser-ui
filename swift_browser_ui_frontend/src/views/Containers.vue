@@ -1,5 +1,8 @@
 <template>
   <div id="container-table" class="contents">
+    <c-modal v-control v-csc-model="openCreateFolderModal">
+      <AddContainer />
+    </c-modal>
     <b-field grouped group-multiline class="groupControls">
       <b-select
         v-model="perPage"
@@ -38,8 +41,8 @@
         :keep-first="true"
         :loading="isSearching"
         max-height="350px"
-        @select="(option) => $router.push(getSearchRoute(option))"
-        @focus="(event) => searchGainedFocus()"
+        @select="option => $router.push(getSearchRoute(option))"
+        @focus="event => searchGainedFocus()"
       >
         <template slot-scope="props">
           <SearchResultItem
@@ -60,36 +63,6 @@
           </div>
         </template>
       </b-autocomplete>
-      <div class="uploadGroup">
-        <c-button
-          @click="toggleCreateFolderModal"
-          outlined
-          data-testid="create-folder"
-        >
-          {{ $t("message.createContainerButton") }}
-        </c-button>
-        <c-modal v-control v-csc-model="openCreateFolderModal">
-          <AddContainer />
-        </c-modal>
-      </div>
-      <div class="field has-addons uploadGroup">
-        <p class="control">
-          <b-button
-            :label="$t('message.upload')"
-            type="is-primary"
-            outlined
-            icon-left="upload"
-            tag="router-link"
-            :to="{
-              name: 'UploadView',
-              params: {
-                project: $route.params.project,
-                container: 'upload-'.concat(Date.now().toString()),
-              },
-            }"
-          />
-        </p>
-      </div>
     </b-field>
     <b-table
       class="containerTable"
@@ -104,8 +77,8 @@
       :per-page="perPage"
       :pagination-simple="isPaginated"
       :default-sort-direction="defaultSortDirection"
-      @page-change="(page) => addPageToURL(page)"
-      @dblclick="(row) => $router.push(getConAddr(row['name']))"
+      @page-change="page => addPageToURL(page)"
+      @dblclick="row => $router.push(getConAddr(row['name']))"
       @keyup.native.enter="$router.push(getConAddr(selected['name']))"
       @keyup.native.space="$router.push(getConAddr(selected['name']))"
     >
@@ -436,7 +409,7 @@ export default {
         // Ranks based on array index they match
         const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
-        query.map((q) => {
+        query.map(q => {
           if (item.tags !== undefined) {
             item.tags.forEach((tag, i) => {
               if (tag.startsWith(q)) {
@@ -467,9 +440,9 @@ export default {
         .startsWith(query[0])
         .or("tags")
         .startsWith(query[0])
-        .filter((cont) => !cont.name.endsWith("_segments"))
+        .filter(cont => !cont.name.endsWith("_segments"))
         .filter(multipleQueryWordsAndRank)
-        .and((cont) => cont.projectID === this.active.id)
+        .and(cont => cont.projectID === this.active.id)
         .limit(1000)
         .toArray();
       this.searchResults = containers.sort(rankedSort).slice(0, 100);
@@ -477,7 +450,7 @@ export default {
       const containerIDs = new Set(
         await this.$store.state.db.containers
           .where({ projectID: this.active.id })
-          .filter((cont) => !cont.name.endsWith("_segments"))
+          .filter(cont => !cont.name.endsWith("_segments"))
           .primaryKeys(),
       );
 
@@ -487,7 +460,7 @@ export default {
         .or("tags")
         .startsWith(query[0])
         .filter(multipleQueryWordsAndRank)
-        .and((obj) => containerIDs.has(obj.containerID))
+        .and(obj => containerIDs.has(obj.containerID))
         .limit(1000)
         .toArray();
 

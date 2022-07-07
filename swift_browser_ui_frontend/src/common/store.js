@@ -132,7 +132,7 @@ const store = new Vuex.Store({
       } else {
         // we remove and push the file again to get new size
         // and if the file exists to referesh dropFiles var
-        state.dropFiles = state.dropFiles.filter((v) => {
+        state.dropFiles = state.dropFiles.filter(v => {
           return v.relativePath !== file.relativePath && v.name !== file.name;
         });
         state.dropFiles.push(file);
@@ -184,7 +184,7 @@ const store = new Vuex.Store({
         });
         commit("loading", false);
         if (containers.length > 0) {
-          containers.forEach((cont) => {
+          containers.forEach(cont => {
             cont.tokens = tokenize(cont.name);
             cont.projectID = projectID;
           });
@@ -199,8 +199,8 @@ const store = new Vuex.Store({
         signal,
       });
       const toDelete = [];
-      existingContainers.map((oldCont) => {
-        if (!newContainers.find((cont) => cont.name == oldCont.name)) {
+      existingContainers.map(oldCont => {
+        if (!newContainers.find(cont => cont.name == oldCont.name)) {
           toDelete.push(oldCont.id);
         }
       });
@@ -214,7 +214,7 @@ const store = new Vuex.Store({
       for (let i = 0; i < containersFromDB.length; i++) {
         const container = containersFromDB[i];
         const oldContainer = existingContainers.find(
-          (cont) => cont.name === container.name,
+          cont => cont.name === container.name,
         );
         let updateObjects = true;
         const dbObjects = await state.db.objects
@@ -245,7 +245,7 @@ const store = new Vuex.Store({
       { state },
       { projectID, containers, signal },
     ) {
-      containers.map(async (container) => {
+      containers.map(async container => {
         const tags =
           (await getTagsForContainer(projectID, container.name, signal)) ||
           null;
@@ -268,7 +268,7 @@ const store = new Vuex.Store({
       do {
         objects = await getObjects(projectID, container.name, marker, signal);
         if (objects.length > 0) {
-          objects.forEach((obj) => {
+          objects.forEach(obj => {
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
@@ -280,8 +280,8 @@ const store = new Vuex.Store({
       } while (objects.length > 0);
 
       let toDelete = [];
-      existingObjects.map((oldObj) => {
-        if (!newObjects.find((obj) => obj.name === oldObj.name)) {
+      existingObjects.map(oldObj => {
+        if (!newObjects.find(obj => obj.name === oldObj.name)) {
           toDelete.push(oldObj.id);
         }
       });
@@ -336,11 +336,11 @@ const store = new Vuex.Store({
             url,
             signal,
           );
-          tags.map((item) => {
+          tags.map(item => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {
-              objects.forEach((obj) => {
+              objects.forEach(obj => {
                 if (obj.name === objectName) {
                   obj.tags = tags;
                 }

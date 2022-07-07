@@ -56,8 +56,8 @@ let default_translations = {
       helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Support",
       program_name: "SD Connect",
-      program_description: "Web UI for browsing contents in Swift object " +
-                           "storage systems.",
+      program_description:
+        "Web UI for browsing contents in Swift object " + "storage systems.",
       program_description_step_2: "",
       currentProj: "Current project",
       selectProj: "Select project",
@@ -224,6 +224,7 @@ let default_translations = {
         createdFolder:
           "Created folder will be shared with all project members in",
         myResearchProject: "My research project.",
+        viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage:
           "Are you sure you want to delete this " + "bucket?",
@@ -395,8 +396,9 @@ let default_translations = {
       helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Tuki",
       program_name: "SD Connect",
-      program_description: "Web-käyttöliittymä tallennettujen tiedostojen " +
-                           "selaamiseen Swift-objektitietojärjestelmissä.",
+      program_description:
+        "Web-käyttöliittymä tallennettujen tiedostojen " +
+        "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Nykyinen projekti",
       selectProj: "Valitse projekti",
       createFolder: "Luo kansio",
@@ -553,7 +555,7 @@ let default_translations = {
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
       tagName: "Tägit",
-      tagPlaceholder: "# Add a tag and press enter",
+      tagPlaceholder: "# Lisää tunniste ja paina rivinvaihtoa",
       container_ops: {
         addContainer: "Luo uusi säiliö",
         editContainer: "Muokataan säiliötä: ",
@@ -561,7 +563,8 @@ let default_translations = {
           "Säiliötä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
         createdFolder: "",
-        myResearchProject: "My research project.",
+        viewProjectMembers: "Näytä projektin jäsenet",
+        myResearchProject: "Tutkimusprojektini",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",

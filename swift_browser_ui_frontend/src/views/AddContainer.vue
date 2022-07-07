@@ -23,7 +23,10 @@
           data-testid="folder-name"
         />
       </b-field>
-      <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
+      <b-field
+        custom-class="has-text-dark"
+        :label="$t('message.tagName')"
+      >
         <b-taginput
           v-model="tags"
           ellipsis
@@ -46,18 +49,22 @@
         underline
         target="_blank"
       >
-        View project members
+        {{ $t("message.container_ops.viewProjectMembers") }}
         <i class="mdi mdi-open-in-new" />
       </c-link>
     </c-card-content>
     <c-card-actions justify="space-between">
-      <c-button outlined size="large" @click="toggleCreateFolderModal">
+      <c-button
+        outlined
+        size="large"
+        @click="toggleCreateFolderModal"
+      >
         Cancel
       </c-button>
       <c-button
         size="large"
-        @click="create ? createContainer() : updateContainer()"
         data-testid="save-folder"
+        @click="create ? createContainer() : updateContainer()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -116,7 +123,7 @@ export default {
           });
           this.toggleCreateFolderModal();
         })
-        .catch((err) => {
+        .catch(err => {
           if (err.message.match("Container name already in use")) {
             this.$buefy.toast.open({
               message: this.$t("message.error.inUse"),
@@ -185,9 +192,9 @@ export default {
 @import "@/css/prod.scss";
 
 .addContainer {
-  width: 54vw;
+  width: 64vw;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   padding: 3rem;
 }
 
@@ -197,12 +204,16 @@ export default {
 }
 
 c-card-content {
-  background-color: $csc-primary-light;
+  background-color: $csc-primary-lighter;
   padding: 1.5rem;
   color: var(--csc-dark-grey);
 }
 
 c-card-actions {
   padding: 0;
+}
+
+c-card-actions > c-button {
+  margin: 0;
 }
 </style>
