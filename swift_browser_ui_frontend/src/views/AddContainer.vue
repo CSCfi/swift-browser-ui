@@ -13,7 +13,7 @@
       </p>
       <b-field
         custom-class="has-text-dark"
-        :label="$t('message.container_ops.containerName')"
+        :label="$t('message.container_ops.folderName')"
       >
         <b-input
           v-model="folderName"
@@ -23,10 +23,7 @@
           data-testid="folder-name"
         />
       </b-field>
-      <b-field
-        custom-class="has-text-dark"
-        :label="$t('message.tagName')"
-      >
+      <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
         <b-taginput
           v-model="tags"
           ellipsis
@@ -54,11 +51,7 @@
       </c-link>
     </c-card-content>
     <c-card-actions justify="space-between">
-      <c-button
-        outlined
-        size="large"
-        @click="toggleCreateFolderModal"
-      >
+      <c-button outlined size="large" @click="toggleCreateFolderModal">
         Cancel
       </c-button>
       <c-button

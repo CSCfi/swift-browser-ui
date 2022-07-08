@@ -46,49 +46,6 @@
           </div>
         </b-field>
         <h6 class="title is-6">2. {{ $t("message.encrypt.upload_step2") }}</h6>
-
-        <div v-if="useEncryption && multipleReceivers" class="columns">
-          <div class="column">
-            <b-field>
-              <b-table
-                v-if="useEncryption"
-                :data="recvHashedKeys"
-                paginated
-                focusable
-                hoverable
-                narrowed
-                default-sort="key"
-                per-page="5"
-                pagination-simple
-              >
-                <b-table-column
-                  v-slot="props"
-                  sortable
-                  field="key"
-                  :label="$t('message.encrypt.pubkeyLabel')"
-                >
-                  {{ props.row }}
-                </b-table-column>
-                <b-table-column v-slot="props" field="delete" width="75">
-                  <b-button
-                    type="is-danger"
-                    icon-left="delete"
-                    outlined
-                    size="is-small"
-                    @click.prevent="removePublicKey(props.row)"
-                  >
-                    {{ $t("message.remove") }}
-                  </b-button>
-                </b-table-column>
-                <template #empty>
-                  <div class="has-text-centered">
-                    {{ $t("message.encrypt.noRecipients") }}
-                  </div>
-                </template>
-              </b-table>
-            </b-field>
-          </div>
-        </div>
         {{ dropFiles }}
         <b-table
           :data="dropFiles"
@@ -154,6 +111,10 @@
             </div>
           </template>
         </b-table>
+        <c-data-table
+          :data.prop="dropFiles"
+          :headers.prop="headers"
+        ></c-data-table>
         <div class="uploadButtonContainer">
           <b-upload v-model="files" multiple accept class="file is-primary">
             <span class="file-cta">
@@ -200,6 +161,23 @@ export default {
       tooLarge: false,
       noUpload: true,
       addRecvkey: "",
+      //data: [
+      //  {
+      //    country: { value: "Denmark" },
+      //    population: { value: 5831404 },
+      //    unemployment: { value: 4.8 },
+      //  },
+      //  {
+      //    country: { value: "Finland" },
+      //    population: { value: 5529543 },
+      //    unemployment: { value: 7.5 },
+      //  },
+      //  {
+      //    country: { value: "Iceland" },
+      //    population: { value: 366463 },
+      //    unemployment: { value: 5.4 },
+      //  },
+      //],
     };
   },
   computed: {
@@ -218,8 +196,54 @@ export default {
     pubkey() {
       return this.$store.state.pubkey;
     },
+    headers() {
+      return [
+        {
+          key: "name",
+          value: this.$t("message.encrypt.table.name"),
+        },
+        {
+          key: "type",
+          value: this.$t("message.encrypt.table.type"),
+        },
+        {
+          key: "size",
+          value: this.$t("message.encrypt.table.size"),
+        },
+        {
+          key: "path",
+          value: this.$t("message.encrypt.table.path"),
+        },
+        {
+          key: "remove",
+          value: null,
+          children: [
+            {
+              value: "Remove",
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: "Remove",
+                },
+              },
+            },
+          ],
+        },
+      ];
+    },
     dropFiles() {
-      return this.$store.state.dropFiles;
+      return this.$store.state.dropFiles.map(file => {
+        return {
+          name: { value: file.name },
+          type: { value: file.type },
+          size: { value: file.size },
+          path: {
+            value: !file.relativePath ? file.name : file.relativePath,
+          },
+        };
+      });
     },
     files: {
       get() {
