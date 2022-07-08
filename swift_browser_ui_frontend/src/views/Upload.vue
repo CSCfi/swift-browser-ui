@@ -1,284 +1,180 @@
 <template>
-  <div
-    id="uploadform"
-    class="contents"
-  > 
-    <b-message
-      v-if="$te('message.keys') && pubkey.length > 0"
-      type="is-info"
-    >
-      {{ $t('message.encrypt.defaultKeysMessage') }}
-    </b-message>
-    <b-message
-      v-if="tooLarge && useEncryption"
-      type="is-danger"
-    >
-      {{ $t('message.encrypt.enTooLarge') }}
-    </b-message>
-    <b-field
-      grouped
-      group-multiline
-    >
-      <div
-        id="destinationBucket"
-        class="control"
-      >
-        <b-field
-          horizontal
-          :label="$t('message.encrypt.container')"
-          :message="$t('message.encrypt.container_hint')"
+  <c-card class="upload-card">
+    <div id="uploadform" class="contents">
+      <h3 class="title is-3">
+        {{ $t("message.encrypt.uploadFiles") }}
+      </h3>
+      <c-card-content>
+        <h6 class="title is-6">1. {{ $t("message.encrypt.upload_step1") }}</h6>
+        <p class="info-text is-size-6">
+          {{ $t("message.container_ops.norename") }}
+        </p>
+        <b-message
+          v-if="$te('message.keys') && pubkey.length > 0"
+          type="is-info"
         >
-          <b-input
-            v-model="container"
-            :placeholder="$t('message.encrypt.container_msg')"
+          {{ $t("message.encrypt.defaultKeysMessage") }}
+        </b-message>
+        <b-message v-if="tooLarge && useEncryption" type="is-danger">
+          {{ $t("message.encrypt.enTooLarge") }}
+        </b-message>
+        <c-text-field
+          :label="$t('message.container_ops.folderName')"
+          name="foldername"
+          type="text"
+          required
+          v-csc-model="folderName"
+        />
+        <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
+          <b-taginput
+            v-model="tags"
+            ellipsis
+            maxlength="20"
+            has-counter
+            rounded
+            type="is-primary"
+            :placeholder="$t('message.tagPlaceholder')"
+            :confirm-keys="taginputConfirmKeys"
+            :on-paste-separators="taginputConfirmKeys"
           />
         </b-field>
-      </div>
-      <div
-        id="encryptionOptions"
-        class="control is-flex"
-      >
-        <b-switch
-          v-model="useEncryption"
-        >
-          {{ $t('message.encrypt.enFiles') }}
-        </b-switch>
-        <b-switch
-          v-model="ownPrivateKey"
-        >
-          {{ $t('message.encrypt.ephemeral') }}
-        </b-switch>
-        <b-switch
-          v-model="multipleReceivers"
-        >
-          {{ $t('message.encrypt.multipleReceivers') }}
-        </b-switch>
-      </div>
-    </b-field>
-    <hr
-      v-if="ownPrivateKey && useEncryption"
-      class="is-medium"
-    >
-    <b-field
-      v-if="ownPrivateKey && useEncryption"
-      grouped
-      group-multiline
-    >
-      <b-field
-        expanded
-        :label="$t('message.encrypt.pk')"
-      >
-        <b-input
-          v-model="privkey"
-          :placeholder="$t('message.encrypt.pk_msg')"
-          type="textarea"
-          maxlength="1024"
-        />
-      </b-field>
-      <b-field
-        expanded
-        :label="$t('message.encrypt.phrase')"
-      >
-        <b-input
-          v-model="passphrase"
-          :placeholder="$t('message.encrypt.phrase_msg')"
-          type="password"
-        />
-      </b-field>
-    </b-field>
-    <hr
-      v-if="useEncryption && multipleReceivers"
-      class="is-medium"
-    >
-    <div
-      v-if="useEncryption && multipleReceivers"
-      class="columns"
-    >
-      <div class="column">
-        <b-field
-          :label="$t('message.encrypt.pubkey')"
-        >
-          <b-input
-            v-model="addRecvkey"
-            :placeholder="$t('message.encrypt.pubkey_msg')"
-            type="textarea"
-            maxlength="1024"
-          />
+        <b-field grouped group-multiline>
+          <div id="encryptionOptions" class="control is-flex">
+            <b-switch v-model="useEncryption">
+              {{ $t("message.encrypt.enFiles") }}
+            </b-switch>
+          </div>
         </b-field>
-        <b-field v-if="useEncryption">
-          <b-button
-            type="is-success"
-            icon-left="lock-plus"
-            @click="appendPublicKey"
-          >
-            {{ $t("message.encrypt.addkey") }}
-          </b-button>
-        </b-field>
-      </div>
-      <div class="column">
-        <b-field>
-          <b-table
-            v-if="useEncryption"
-            :data="recvHashedKeys"
-            paginated
-            focusable
-            hoverable
-            narrowed
-            default-sort="key"
-            per-page="5"
-            pagination-simple
-          >
-            <b-table-column
-              v-slot="props"
-              sortable
-              field="key"
-              :label="$t('message.encrypt.pubkeyLabel')"
-            >
-              {{ props.row }}
-            </b-table-column>
-            <b-table-column
-              v-slot="props"
-              field="delete"
-              width="75"
-            >
-              <b-button
-                type="is-danger"
-                icon-left="delete"
-                outlined
-                size="is-small"
-                @click.prevent="removePublicKey(props.row)"
+        <h6 class="title is-6">2. {{ $t("message.encrypt.upload_step2") }}</h6>
+
+        <div v-if="useEncryption && multipleReceivers" class="columns">
+          <div class="column">
+            <b-field>
+              <b-table
+                v-if="useEncryption"
+                :data="recvHashedKeys"
+                paginated
+                focusable
+                hoverable
+                narrowed
+                default-sort="key"
+                per-page="5"
+                pagination-simple
               >
-                {{ $t('message.remove') }}
-              </b-button>
-            </b-table-column>
-            <template #empty>
-              <div class="has-text-centered">
-                {{ $t('message.encrypt.noRecipients') }}
-              </div>
-            </template>
-          </b-table>
-        </b-field>
-      </div>
-    </div>
-    <hr class="is-medium">
-    <b-table
-      :data="dropFiles"
-      paginated
-      focusable
-      hoverable
-      narrowed
-      default-sort="name"
-      per-page="20"
-      pagination-simple
-    >
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="name"
-        :label="$t('message.encrypt.table.name')"
-      >
-        {{ props.row.name | truncate(100) }}
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="path"
-        :label="$t('message.encrypt.table.path')"
-      >
-        {{ (!props.row.relativePath ? props.row.name : props.row.relativePath)
-          | truncate(100) }}
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="size"
-        width="100"
-        :label="$t('message.encrypt.table.size')"
-      >
-        {{ localHumanReadableSize(props.row.size) }}
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="type"
-        :label="$t('message.encrypt.table.type')"
-      >
-        {{ props.row.type }}
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        field="remove"
-        width="75"
-      >
-        <b-button
-          type="is-danger"
-          icon-left="delete"
-          outlined
-          size="is-small"
-          @click="$store.commit('eraseDropFile', props.row)"
-        >
-          {{ $t('message.remove') }}
-        </b-button>
-      </b-table-column>
-      <template #empty>
-        <div class="has-text-centered">
-          {{ $t('message.encrypt.empty') }}
+                <b-table-column
+                  v-slot="props"
+                  sortable
+                  field="key"
+                  :label="$t('message.encrypt.pubkeyLabel')"
+                >
+                  {{ props.row }}
+                </b-table-column>
+                <b-table-column v-slot="props" field="delete" width="75">
+                  <b-button
+                    type="is-danger"
+                    icon-left="delete"
+                    outlined
+                    size="is-small"
+                    @click.prevent="removePublicKey(props.row)"
+                  >
+                    {{ $t("message.remove") }}
+                  </b-button>
+                </b-table-column>
+                <template #empty>
+                  <div class="has-text-centered">
+                    {{ $t("message.encrypt.noRecipients") }}
+                  </div>
+                </template>
+              </b-table>
+            </b-field>
+          </div>
         </div>
-      </template>
-    </b-table>
-    <div class="uploadButtonContainer">
-      <b-upload
-        v-model="files"
-        multiple
-        accept
-        class="file is-primary"
-      >
-        <span class="file-cta">
-          <b-icon
-            class="file-icon"
-            icon="upload-multiple"
-          />
-          <span class="file-label">
-            {{ $t('message.encrypt.dropMsg') }}
-          </span>
-        </span>
-      </b-upload>
-      <b-button
-        type="is-info is-light"
-        icon-left="cached"
-        @click="clearFiles"
-      >
-        {{ $t('message.encrypt.clearDrop') }}
-      </b-button>
-      <b-button
-        v-if="useEncryption"
-        id="uploadButton"
-        type="is-success"
-        :disabled="noUpload"
-        icon-left="upload-lock"
-        @click="encryptAndUpload"
-      >
-        {{ $t('message.encrypt.enup') }}
-      </b-button>
-      <b-button
-        v-else
-        id="uploadButton"
-        type="is-success"
-        :disabled="noUpload"
-        icon-left="upload-lock"
-        @click="beginUpload"
-      >
-        {{ $t('message.encrypt.normup') }}
-      </b-button>
-      <b-button
-        type="is-light"
-        icon-left="cancel"
-        @click="cancelUpload"
-      >
-        {{ $t('message.encrypt.cancel') }}
-      </b-button>
+        {{ dropFiles }}
+        <b-table
+          :data="dropFiles"
+          paginated
+          focusable
+          hoverable
+          narrowed
+          default-sort="name"
+          per-page="20"
+          pagination-simple
+        >
+          <b-table-column
+            v-slot="props"
+            sortable
+            field="name"
+            :label="$t('message.encrypt.table.name')"
+          >
+            {{ props.row.name | truncate(100) }}
+          </b-table-column>
+          <b-table-column
+            v-slot="props"
+            sortable
+            field="path"
+            :label="$t('message.encrypt.table.path')"
+          >
+            {{
+              (!props.row.relativePath
+                ? props.row.name
+                : props.row.relativePath) | truncate(100)
+            }}
+          </b-table-column>
+          <b-table-column
+            v-slot="props"
+            sortable
+            field="size"
+            width="100"
+            :label="$t('message.encrypt.table.size')"
+          >
+            {{ localHumanReadableSize(props.row.size) }}
+          </b-table-column>
+          <b-table-column
+            v-slot="props"
+            sortable
+            field="type"
+            :label="$t('message.encrypt.table.type')"
+          >
+            {{ props.row.type }}
+          </b-table-column>
+          <b-table-column v-slot="props" field="remove" width="75">
+            <b-button
+              type="is-danger"
+              icon-left="delete"
+              outlined
+              size="is-small"
+              @click="$store.commit('eraseDropFile', props.row)"
+            >
+              {{ $t("message.remove") }}
+            </b-button>
+          </b-table-column>
+          <template #empty>
+            <div class="has-text-centered">
+              {{ $t("message.encrypt.empty") }}
+            </div>
+          </template>
+        </b-table>
+        <div class="uploadButtonContainer">
+          <b-upload v-model="files" multiple accept class="file is-primary">
+            <span class="file-cta">
+              <b-icon class="file-icon" icon="upload-multiple" />
+              <span class="file-label">
+                {{ $t("message.encrypt.dropMsg") }}
+              </span>
+            </span>
+          </b-upload>
+        </div>
+      </c-card-content>
+      <c-card-actions justify="space-between">
+        <c-button outlined size="large" @click="cancelUpload">
+          {{ $t("message.encrypt.cancel") }}
+        </c-button>
+        <c-button size="large" :disabled="noUpload" @click="beginUpload">
+          {{ $t("message.encrypt.normup") }}
+        </c-button>
+      </c-card-actions>
     </div>
-  </div>
+  </c-card>
 </template>
 
 <script>
@@ -313,28 +209,28 @@ export default {
     isUploading() {
       return this.$store.state.isUploading;
     },
-    active () {
+    active() {
       return this.$store.state.active;
     },
-    transfer () {
+    transfer() {
       return this.$store.state.transfer;
     },
-    pubkey () {
+    pubkey() {
       return this.$store.state.pubkey;
     },
-    dropFiles () {
+    dropFiles() {
       return this.$store.state.dropFiles;
     },
     files: {
-      get () {
+      get() {
         return this.$store.state.dropFiles.message;
       },
-      set (value) {
+      set(value) {
+        console.log("value :>> ", value);
         const files = Array.from(value);
         files.forEach(element => {
           this.$store.commit("appendDropFiles", element);
         });
-        
       },
     },
   },
@@ -345,15 +241,15 @@ export default {
         this.$router.replace({
           name: "UploadView",
           params: {
-            "project": this.$route.params.project,
-            "container": this.container,
+            project: this.$route.params.project,
+            container: this.container,
           },
         });
         this.$route.params.container = this.container;
         this.refreshNoUpload();
       }
     },
-    ownPrivateKey: function() {
+    ownPrivateKey: function () {
       this.ephemeral = !this.ephemeral;
       this.refreshNoUpload();
     },
@@ -377,7 +273,7 @@ export default {
       this.refreshNoUpload();
     },
   },
-  created () {
+  created() {
     this.setContainer();
   },
   mounted() {
@@ -406,7 +302,7 @@ export default {
         let allEntries = [];
 
         let readEntries = () => {
-          dirReader.readEntries((entries) => {
+          dirReader.readEntries(entries => {
             if (entries.length) {
               allEntries = allEntries.concat(entries);
               return readEntries();
@@ -418,8 +314,7 @@ export default {
         };
 
         readEntries();
-      }
-      else if ("function" === typeof item.getAsFile) {
+      } else if ("function" === typeof item.getAsFile) {
         item = item.getAsFile();
         if (item instanceof File) {
           item.relativePath = path + item.name;
@@ -437,7 +332,7 @@ export default {
       }
     },
     setContainer: function () {
-      if(this.$route.params.container) {
+      if (this.$route.params.container) {
         this.container = this.$route.params.container;
       }
     },
@@ -454,10 +349,8 @@ export default {
       let keysArray = this.recvkeys.concat(this.pubkey);
       keysArray = [...new Set([...this.recvkeys, ...this.pubkey])];
       for (let i = 0; i < keysArray.length; i++) {
-        FS.writeFile( // eslint-disable-line
-          "/keys/recv_keys/pubkey_" + i.toString(),
-          keysArray[i],
-        );
+        // eslint-disable-next-line
+        FS.writeFile("/keys/recv_keys/pubkey_" + i.toString(), keysArray[i]);
       }
       // Add files to the filesystem
       FS.mkdir("/data"); // eslint-disable-line
@@ -475,7 +368,7 @@ export default {
               let npath = path + "/" + dirs[0];
               try {
                 FS.mkdir(npath); // eslint-disable-line
-              } catch(err) {} // eslint-disable-line
+              } catch (err) {} // eslint-disable-line
               if (dirs.slice(1).length > 0) {
                 createDirs(dirs.slice(1), npath);
               }
@@ -491,7 +384,7 @@ export default {
         }
       }
 
-      if (res != 0 ) {
+      if (res != 0) {
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.fsWriteFail"),
           duration: 15000,
@@ -501,23 +394,19 @@ export default {
       }
 
       res = 0;
-      if(!this.ephemeral) {
-        res = Module.ccall( // eslint-disable-line
+      if (!this.ephemeral) {
+        // eslint-disable-next-line
+        res = Module.ccall(
           "encrypt_folder",
           "number",
           ["string"],
           [this.passphrase],
         );
       } else {
-        res = Module.ccall( // eslint-disable-line
-          "encrypt_folder_ephemeral",
-          "number",
-          [],
-          [],
-        );
+        // eslint-disable-next-line
+        res = Module.ccall("encrypt_folder_ephemeral", "number", [], []);
       }
       if (res != 0) {
-
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.enFail"),
           duration: 15000,
@@ -543,9 +432,8 @@ export default {
           type: "is-success",
         });
         this.$store.commit("eraseDropFiles");
-        this.$router.go(-1);
+        this.$store.commit("toggleUploadModal", false);
       });
-      
     },
     encryptAndUpload: function () {
       this.$buefy.toast.open({
@@ -563,10 +451,7 @@ export default {
         let files = [];
         for (let f of this.dropFiles) {
           let path = f.relativePath ? f.relativePath : f.name;
-          let outname = (
-            "/data/"
-            + path
-            + ".c4gh");
+          let outname = "/data/" + path + ".c4gh";
           let newFile = new Blob(
             [FS.readFile(outname).buffer], // eslint-disable-line
             {
@@ -587,31 +472,29 @@ export default {
       });
     },
     appendPublicKey: async function () {
-      if (!this.recvkeys.includes(this.addRecvkey)){
+      if (!this.recvkeys.includes(this.addRecvkey)) {
         this.recvkeys.push(this.addRecvkey);
         this.recvHashedKeys.push(await computeSHA256(this.addRecvkey));
       }
       this.addRecvkey = "";
     },
-    removePublicKey: function (value){
+    removePublicKey: function (value) {
       this.recvHashedKeys.splice(this.recvkeys.indexOf(value), 1);
       this.recvkeys.splice(this.recvkeys.indexOf(value), 1);
     },
     refreshNoUpload() {
       if (this.ephemeral) {
-        this.noUpload = (
-          (!this.pubkey.length && !this.recvkeys.length)
-          || !this.container
-          || !this.dropFiles.length
-        );
-      } 
+        this.noUpload =
+          (!this.pubkey.length && !this.recvkeys.length) ||
+          !this.container ||
+          !this.dropFiles.length;
+      }
       if (this.ownPrivateKey) {
-        this.noUpload = (
-          (!this.pubkey.length && !this.recvkeys.length)
-          || !this.container
-          || !this.dropFiles.length
-          || (!this.passphrase && !this.privkey)
-        );
+        this.noUpload =
+          (!this.pubkey.length && !this.recvkeys.length) ||
+          !this.container ||
+          !this.dropFiles.length ||
+          (!this.passphrase && !this.privkey);
       }
       if (!this.useEncryption) {
         this.noUpload = this.dropFiles.length === 0;
@@ -626,21 +509,35 @@ export default {
     },
     // Make human readable translation functions available in instance
     // namespace
-    localHumanReadableSize: function ( size ) {
-      return getHumanReadableSize( size );
+    localHumanReadableSize: function (size) {
+      return getHumanReadableSize(size);
     },
     clearFiles() {
       this.$store.commit("eraseDropFiles");
     },
     cancelUpload() {
       this.$store.commit("eraseDropFiles");
-      this.$router.go(-1);
+      this.$store.commit("toggleUploadModal", false);
     },
   },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "@/css/prod.scss";
+
+.upload-card {
+  width: 64vw;
+  padding: 3rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+c-card-content {
+  padding: 1.5rem;
+  color: var(--csc-dark-grey);
+}
+
 #uploadform {
   width: 90%;
   margin: auto;
@@ -671,11 +568,9 @@ export default {
   justify-content: right;
 }
 
-@media screen and ( max-width: 1357px){
+@media screen and (max-width: 1357px) {
   #encryptionOptions {
     margin-top: 0;
   }
-  
 }
-
 </style>

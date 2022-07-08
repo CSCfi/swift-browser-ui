@@ -9,11 +9,10 @@
     >
       <AddContainer />
     </c-modal>
-    <b-field
-      grouped
-      group-multiline
-      class="groupControls"
-    >
+    <c-modal v-control v-csc-model="openUploadModal">
+      <UploadModal />
+    </c-modal>
+    <b-field grouped group-multiline class="groupControls">
       <b-select
         v-model="perPage"
         data-testid="containersPerPage"
@@ -269,6 +268,7 @@ import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import AddContainer from "@/views/AddContainer";
+import UploadModal from "@/views/Upload";
 import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
 
@@ -278,6 +278,7 @@ export default {
     SearchResultItem,
     ContainerDownloadLink,
     AddContainer,
+    UploadModal,
     FolderOptionsMenu,
   },
   filters: {
@@ -308,6 +309,9 @@ export default {
     },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
+    },
+    openUploadModal() {
+      return this.$store.state.openUploadModal;
     },
   },
   watch: {

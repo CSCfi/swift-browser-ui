@@ -44,17 +44,7 @@
               </c-button>
             </div>
             <div class="navbar-item">
-              <c-button
-                @click="
-                  $router.push({
-                    name: 'UploadView',
-                    params: {
-                      project: $route.params.project,
-                      container: 'upload-'.concat(Date.now().toString()),
-                    },
-                  })
-                "
-              >
+              <c-button outlined @click="toggleUploadModal">
                 {{ $t("message.uploadSecondaryNav") }}
               </c-button>
             </div>
@@ -81,10 +71,7 @@ export default {
     // C-select component handles options by name and value props
     // Append value-prop to projects
     mappedProjects() {
-      return this.projects.map(project => ({
-        ...project,
-        value: project.id,
-      }));
+      return this.projects.map(project => ({ ...project, value: project.id }));
     },
   },
   methods: {
@@ -104,6 +91,9 @@ export default {
     },
     toggleCreateFolderModal: function (folderName) {
       toggleCreateFolderModal(folderName);
+    },
+    toggleUploadModal: function () {
+      this.$store.commit("toggleUploadModal", true);
     },
   },
 };
