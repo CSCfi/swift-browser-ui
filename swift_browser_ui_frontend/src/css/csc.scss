@@ -1,13 +1,12 @@
 @charset "utf-8";
 // CSS file for integrating CSC brand colors
 
-
 @import "~bulma/sass/utilities/_all";
 
-
 $csc-primary: #006778;
-$csc-primary-light: #C2DBDF;
-$csc-primary-lighter: #E5E5E5;
+$csc-primary-light: #c2dbdf;
+$csc-primary-lighter: #d8e8ea;
+$csc-primary-lightest: #e5e5e5;
 $csc-secondary: #830051;
 $csc-tertiary: #5e6a71;
 $csc-dark-blue: #002f5f;
@@ -34,7 +33,6 @@ $blue: $csc-blue;
 $purple: $csc-secondary;
 $red: $csc-red;
 
-
 // Set bulma shorthand color pallette
 $primary: $csc-primary;
 $link: $csc-dark-blue;
@@ -45,73 +43,69 @@ $danger: $red;
 $dark: $csc-grey;
 $text: $black;
 
-
 $custom-colors: null !default;
 $custom-shades: null !default;
-
 
 // specific bulma variable overrides
 $menu-item-active-background-color: $csc-primary;
 
-
 $colors: mergeColorMaps(
   (
     "white": (
-        $white,
-        $black,
+      $white,
+      $black,
     ),
     "black": (
-        $black,
-        $white,
+      $black,
+      $white,
     ),
     "light": (
-        $light,
-        $light-invert,
+      $light,
+      $light-invert,
     ),
     "dark": (
-        $dark,
-        $dark-invert,
+      $dark,
+      $dark-invert,
     ),
     "primary": (
-        $primary,
-        $primary-invert,
-        $primary-light,
-        $primary-dark,
+      $primary,
+      $primary-invert,
+      $primary-light,
+      $primary-dark,
     ),
     "link": (
-        $link,
-        $link-invert,
-        $link-light,
-        $link-dark,
+      $link,
+      $link-invert,
+      $link-light,
+      $link-dark,
     ),
     "info": (
-        $info,
-        $info-invert,
-        $info-light,
-        $info-dark,
+      $info,
+      $info-invert,
+      $info-light,
+      $info-dark,
     ),
     "success": (
-        $success,
-        $success-invert,
-        $success-light,
-        $success-dark,
+      $success,
+      $success-invert,
+      $success-light,
+      $success-dark,
     ),
     "warning": (
-        $warning,
-        $warning-invert,
-        $warning-light,
-        $warning-dark,
+      $warning,
+      $warning-invert,
+      $warning-light,
+      $warning-dark,
     ),
     "danger": (
-        $danger,
-        $danger-invert,
-        $danger-light,
-        $danger-dark,
+      $danger,
+      $danger-invert,
+      $danger-light,
+      $danger-dark,
     ),
   ),
   $custom-colors
 );
-
 
 // Links
 $link-invert: $primary-invert;

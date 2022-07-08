@@ -9,7 +9,7 @@ jobs:
       matrix:
         node: ["16"]
         browser: ["firefox", "chrome"]
-    
+
     # https://docs.github.com/en/actions/using-containerized-services/about-service-containers
     services:
       redis:
@@ -56,7 +56,6 @@ jobs:
           project: ./swift_browser_ui_frontend
           install: false
           browser: ${{ matrix.browser }}
-          headless: true
           env: port=8000
       - uses: actions/upload-artifact@v3
         if: failure()

@@ -12,7 +12,6 @@ import SharingView from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
 import TokensView from "@/views/Tokens";
-import CreateContainer from "@/views/AddContainer";
 import DirectShare from "@/views/DirectShare";
 import UploadView from "@/views/Upload";
 
@@ -41,20 +40,11 @@ export default new Router({
       name: "SharingView",
       component: SharingView,
     },
-    {
-      path: "/browse/:user/:project/add",
-      name: "AddContainer",
-      component: CreateContainer,
-    },
+
     {
       path: "/browse/:user/:project/tokens",
       name: "TokensView",
       component: TokensView,
-    },
-    {
-      path: "/browse/:user/:project/:container/edit",
-      name: "EditContainer",
-      component: CreateContainer,
     },
     {
       path: "/browse/:user/:project/sharing/requestdirect",

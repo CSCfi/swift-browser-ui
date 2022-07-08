@@ -1,61 +1,79 @@
 <template>
-  <div 
-    id="addview"
-    class="contents"
-  >
-    <h1 class="title is-3 addcontainerhead">
-      {{ 
-        create 
-          ? $t('message.container_ops.addContainer') 
-          : $t('message.container_ops.editContainer') + container
+  <c-card class="addContainer">
+    <h2 class="title is-3">
+      {{
+        create
+          ? $t("message.container_ops.addContainer")
+          : $t("message.container_ops.editContainer") + folderName
       }}
-    </h1>
-    <b-message type="is-info">
-      {{ $t('message.container_ops.norename') }}
-    </b-message>
-    <b-field
-      :label="$t('message.container_ops.containerName')"
-    >
-      <b-input 
-        v-model="container"
-        name="container"
-        aria-required="true"
-        :disabled="!create"
-      />
-    </b-field>
-    <b-field
-      :label="$t('message.tagName')"
-      :message="$t('message.tagMessage')"
-    >
-      <b-taginput
-        v-model="tags"
-        ellipsis
-        maxlength="20"
-        icon="label"
-        has-counter
-        rounded
-        type="is-primary"
-        :confirm-keys="taginputConfirmKeys"
-        :on-paste-separators="taginputConfirmKeys"
-      />
-    </b-field>
-
-    <b-field>
-      <b-button
-        type="is-primary"
-        @click="create ? createContainer () : updateContainer ()"
+    </h2>
+    <c-card-content>
+      <p class="info-text is-size-6">
+        {{ $t("message.container_ops.norename") }}
+      </p>
+      <b-field
+        custom-class="has-text-dark"
+        :label="$t('message.container_ops.containerName')"
       >
-        {{ create ? $t('message.create') : $t('message.save') }}
-      </b-button>
-    </b-field>
-  </div>
+        <b-input
+          v-model="folderName"
+          name="foldername"
+          aria-required="true"
+          :disabled="!create"
+          data-testid="folder-name"
+        />
+      </b-field>
+      <b-field
+        custom-class="has-text-dark"
+        :label="$t('message.tagName')"
+      >
+        <b-taginput
+          v-model="tags"
+          ellipsis
+          maxlength="20"
+          has-counter
+          rounded
+          type="is-primary"
+          :placeholder="$t('message.tagPlaceholder')"
+          :confirm-keys="taginputConfirmKeys"
+          :on-paste-separators="taginputConfirmKeys"
+          data-testid="folder-tag"
+        />
+      </b-field>
+      <p class="info-text is-size-6">
+        {{ $t("message.container_ops.createdFolder") }}
+        <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+      </p>
+      <c-link
+        :href="`https://my.csc.fi/myProjects/project/${currentProjectID}`"
+        underline
+        target="_blank"
+      >
+        {{ $t("message.container_ops.viewProjectMembers") }}
+        <i class="mdi mdi-open-in-new" />
+      </c-link>
+    </c-card-content>
+    <c-card-actions justify="space-between">
+      <c-button
+        outlined
+        size="large"
+        @click="toggleCreateFolderModal"
+      >
+        Cancel
+      </c-button>
+      <c-button
+        size="large"
+        data-testid="save-folder"
+        @click="create ? createContainer() : updateContainer()"
+      >
+        {{ $t("message.save") }}
+      </c-button>
+    </c-card-actions>
+  </c-card>
 </template>
 
 <script>
-import {
-  swiftCreateContainer, 
-  updateContainerMeta,
-} from "@/common/api";
+import { swiftCreateContainer, updateContainerMeta } from "@/common/api";
 import {
   taginputConfirmKeys,
   getTagsForContainer,
@@ -64,104 +82,138 @@ import {
 
 export default {
   name: "CreateContainer",
-  data () {
+  data() {
     return {
-      container: "",
-      tags: [],
       create: true,
+      folderName: "",
+      tags: [],
       taginputConfirmKeys,
     };
   },
-  beforeMount () {
-    if (this.$route.name === "EditContainer") {
-      this.create = false;
-      this.getContainer();
-    }
+  computed: {
+    currentProjectID() {
+      return this.$route.params.project;
+    },
+    selectedFolderName() {
+      return this.$store.state.selectedFolderName.length > 0
+        ? this.$store.state.selectedFolderName
+        : "";
+    },
+  },
+  watch: {
+    selectedFolderName: function () {
+      if (this.selectedFolderName.length > 0) {
+        this.create = false;
+        this.getContainer();
+      }
+    },
   },
   methods: {
     createContainer: function () {
       let projectID = this.$route.params.project;
-      swiftCreateContainer(
-        projectID,
-        this.container,
-        this.tags.join(";"),
-      ).then(() => {
-        this.$store.state.db.containers.add({
-          projectID: projectID,
-          name: this.container,
-          tokens: tokenize(this.container),
-          tags: this.tags,
-          count: 0,
-          bytes: 0,
+      swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
+        .then(() => {
+          this.$store.state.db.containers.add({
+            projectID: projectID,
+            name: this.folderName,
+            tokens: tokenize(this.folderName),
+            tags: this.tags,
+            count: 0,
+            bytes: 0,
+          });
+          this.toggleCreateFolderModal();
+        })
+        .catch(err => {
+          if (err.message.match("Container name already in use")) {
+            this.$buefy.toast.open({
+              message: this.$t("message.error.inUse"),
+              type: "is-danger",
+            });
+          } else if (err.message.match("Invalid container name")) {
+            this.$buefy.toast.open({
+              message: this.$t("message.error.invalidName"),
+              type: "is-danger",
+            });
+          } else {
+            this.$buefy.toast.open({
+              message: this.$t("message.error.createFail"),
+              type: "is-danger",
+            });
+          }
         });
-        this.$router.go(-1);
-      }).catch((err) => {
-        if (err.message.match("Container name already in use")) {
-          this.$buefy.toast.open({
-            message: this.$t("message.error.inUse"),
-            type: "is-danger",
-          });
-        }
-        else if (err.message.match("Invalid container name")) {
-          this.$buefy.toast.open({
-            message: this.$t("message.error.invalidName"),
-            type: "is-danger",
-          });
-        }
-        else {
-          this.$buefy.toast.open({
-            message: this.$t("message.error.createFail"),
-            type: "is-danger",
-          });
-        }
-      });
     },
     getContainer: async function () {
-      const containerName = this.$route.params.container;
-      this.container = containerName;
-
+      this.folderName = this.$store.state.selectedFolderName;
       const container = await this.$store.state.db.containers.get({
         projectID: this.$store.state.active.id,
-        name: this.container,
+        name: this.folderName,
       });
       if (!container.tags) {
         this.tags = await getTagsForContainer(
           this.$route.params.project,
-          containerName,
+          this.folderName,
         );
       } else {
         this.tags = container.tags;
       }
     },
     updateContainer: function () {
+      const tags = this.tags;
+      const folderName = this.folderName;
       let meta = {
-        usertags: this.tags.join(";"),
+        usertags: tags.join(";"),
       };
-      updateContainerMeta(
-        this.$route.params.project,
-        this.container,
-        meta,
-      ).then(async () => {
-        await this.$store.state.db.containers
-          .where({
-            projectID: this.$route.params.project,
-            name: this.container,
-          }).modify({tags: this.tags});
-        this.$router.go(-1);
-      });
+      updateContainerMeta(this.$route.params.project, folderName, meta).then(
+        async () => {
+          await this.$store.state.db.containers
+            .where({
+              projectID: this.$route.params.project,
+              name: folderName,
+            })
+            .modify({ tags });
+        },
+      );
+      this.toggleCreateFolderModal();
+    },
+    toggleCreateFolderModal: function () {
+      this.$store.commit("toggleCreateFolderModal", false);
+      this.folderName = "";
+      this.tags = [];
+      this.create = true;
+      if (this.selectedFolderName.length > 0) {
+        this.$store.commit("setFolderName", "");
+      }
     },
   },
 };
 </script>
 
-<style scoped>
-  #addview {
-    width: auto;
-    margin-left: 5%;
-    margin-right: 5%;
-  }
-  .addcontainerhead {
-    margin: 1% 1% 1% 0;
-  }
+<style lang="scss" scoped>
+@import "@/css/prod.scss";
 
+.addContainer {
+  width: 64vw;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 3rem;
+}
+
+.addContainer > h2 {
+  margin: 0 !important;
+  color: var(--csc-dark-grey);
+}
+
+c-card-content {
+  background-color: $csc-primary-lighter;
+  padding: 1.5rem;
+  color: var(--csc-dark-grey);
+}
+
+c-card-actions {
+  padding: 0;
+}
+
+c-card-actions > c-button {
+  margin: 0;
+}
 </style>
