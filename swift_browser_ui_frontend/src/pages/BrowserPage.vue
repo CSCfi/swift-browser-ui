@@ -1,11 +1,6 @@
 <template>
-  <div
-    id="mainContainer"
-    @dragenter="itemdrop = true"
-    @dragover="itemdrop = true"
-    @dragleave="itemdrop = false"
-  >
-    <div
+  <div id="mainContainer">
+    <!--<div
       v-if="itemdrop"
       id="dropArea"
       class="upload-draggable is-full-page
@@ -23,26 +18,19 @@
         />
       </p>
       <p>
-        {{ $t('message.dropFiles') }}     
+        {{ $t('message.dropFiles') }}
       </p>
-    </div>
-    <div
-      v-else
-      id="subContainer"
-    >
-      <BrowserMainNavbar
-        :langs="langs"
-      />
+    </div>-->
+    <div id="subContainer">
+      <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
         :projects="projects"
       />
       <ProgressBar v-if="isUploading || isChunking" />
-      <b-breadcrumb
-        style="margin-left:5%;margin-top:1%;font-size:1rem;"
-      >
+      <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
         <b-breadcrumb-item
-          v-for="item in getRouteAsList ()"
+          v-for="item in getRouteAsList()"
           :key="item.alias"
           :to="item.address"
           tag="router-link"
@@ -57,19 +45,16 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <footer
-        id="footer"
-        class="footer"
-      >
+      <footer id="footer" class="footer">
         <div class="content has-text-centered">
           <p>
             <span class="has-text-weight-bold">
               {{ $t("message.program_name") }}
-            </span> {{ $t("message.devel") }}
-            <a 
-              href="https://csc.fi"
-              :alt="$t('message.cscOrg')"
-            >{{ $t("message.cscOrg") }}</a>
+            </span>
+            {{ $t("message.devel") }}
+            <a href="https://csc.fi" :alt="$t('message.cscOrg')">{{
+              $t("message.cscOrg")
+            }}</a>
           </p>
         </div>
       </footer>
@@ -93,7 +78,8 @@ export default {
 
 $footer-height: 10rem;
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -117,7 +103,7 @@ html, body {
 }
 
 .navbar .container .navbar-brand .navbar-item img {
-	max-height: 2.5rem;
+  max-height: 2.5rem;
 }
 
 .menu-active {
@@ -129,7 +115,8 @@ html, body {
   font-size: 1.5rem;
 }
 
-.menu-active, .menu-icon {
+.menu-active,
+.menu-icon {
   color: $csc-primary;
 }
 
@@ -146,15 +133,15 @@ html, body {
 }
 
 .hero-body .footer {
-    margin:15px 0;
-    padding:0;
+  margin: 15px 0;
+  padding: 0;
 }
 
 .searchBox {
-    max-width: 30%;
-    width: auto;
-    margin-right: auto;
-    margin-left: auto;
+  max-width: 30%;
+  width: auto;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .uploadGroup {
@@ -162,16 +149,16 @@ html, body {
 }
 
 .dashboard {
-    margin-left: 5%;
-    margin-right: 5%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
-#dropArea:before{
-  content:"";
+#dropArea:before {
+  content: "";
   width: 98%;
-  height:98%;
-  position:absolute;
-  border:2px dashed #b5b5b5;
+  height: 98%;
+  position: absolute;
+  border: 2px dashed #b5b5b5;
   margin: 0 1%;
   padding: 0;
   border-radius: 6px;

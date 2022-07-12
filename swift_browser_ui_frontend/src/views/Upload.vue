@@ -1,11 +1,13 @@
 <template>
   <c-card class="upload-card">
-    <div id="uploadform" class="contents">
-      <h3 class="title is-3">
+    <div class="upload-form">
+      <h3 class="title is-3 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
       </h3>
       <c-card-content>
-        <h6 class="title is-6">1. {{ $t("message.encrypt.upload_step1") }}</h6>
+        <h6 class="title is-6 has-text-dark">
+          1. {{ $t("message.encrypt.upload_step1") }}
+        </h6>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
@@ -19,112 +21,67 @@
           {{ $t("message.encrypt.enTooLarge") }}
         </b-message>
         <c-text-field
-          :label="$t('message.container_ops.folderName')"
+          v-csc-model="folderName"
+          :placeholder="$t('message.container_ops.folderName')"
           name="foldername"
           type="text"
           required
-          v-csc-model="folderName"
         />
-        <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
+        <b-field
+          custom-class="has-text-dark"
+          :label="$t('message.tagName')"
+          type="is-dark"
+        >
           <b-taginput
             v-model="tags"
+            class="taginput"
             ellipsis
             maxlength="20"
             has-counter
             rounded
-            type="is-primary"
             :placeholder="$t('message.tagPlaceholder')"
             :confirm-keys="taginputConfirmKeys"
             :on-paste-separators="taginputConfirmKeys"
           />
         </b-field>
-        <b-field grouped group-multiline>
-          <div id="encryptionOptions" class="control is-flex">
-            <b-switch v-model="useEncryption">
-              {{ $t("message.encrypt.enFiles") }}
-            </b-switch>
-          </div>
-        </b-field>
-        <h6 class="title is-6">2. {{ $t("message.encrypt.upload_step2") }}</h6>
-        {{ dropFiles }}
-        <b-table
-          :data="dropFiles"
-          paginated
-          focusable
-          hoverable
-          narrowed
-          default-sort="name"
-          per-page="20"
-          pagination-simple
+        <h6 class="title is-6 has-text-dark">
+          2. {{ $t("message.encrypt.upload_step2") }}
+        </h6>
+        <b-upload
+          v-model="files"
+          multiple
+          accept
+          drag-drop
+          expanded
+          class="file is-primary"
         >
-          <b-table-column
-            v-slot="props"
-            sortable
-            field="name"
-            :label="$t('message.encrypt.table.name')"
-          >
-            {{ props.row.name | truncate(100) }}
-          </b-table-column>
-          <b-table-column
-            v-slot="props"
-            sortable
-            field="path"
-            :label="$t('message.encrypt.table.path')"
-          >
-            {{
-              (!props.row.relativePath
-                ? props.row.name
-                : props.row.relativePath) | truncate(100)
-            }}
-          </b-table-column>
-          <b-table-column
-            v-slot="props"
-            sortable
-            field="size"
-            width="100"
-            :label="$t('message.encrypt.table.size')"
-          >
-            {{ localHumanReadableSize(props.row.size) }}
-          </b-table-column>
-          <b-table-column
-            v-slot="props"
-            sortable
-            field="type"
-            :label="$t('message.encrypt.table.type')"
-          >
-            {{ props.row.type }}
-          </b-table-column>
-          <b-table-column v-slot="props" field="remove" width="75">
-            <b-button
-              type="is-danger"
-              icon-left="delete"
-              outlined
-              size="is-small"
-              @click="$store.commit('eraseDropFile', props.row)"
-            >
-              {{ $t("message.remove") }}
-            </b-button>
-          </b-table-column>
-          <template #empty>
-            <div class="has-text-centered">
-              {{ $t("message.encrypt.empty") }}
-            </div>
-          </template>
-        </b-table>
+          <div class="is-flex is-align-items-center is-justify-content-center">
+            <span>{{ $t("message.dropFiles") }}</span>
+            <span class="file-cta">
+              {{ $t("message.encrypt.dropMsg") }}
+            </span>
+          </div>
+        </b-upload>
+
         <c-data-table
           :data.prop="dropFiles"
           :headers.prop="headers"
-        ></c-data-table>
-        <div class="uploadButtonContainer">
-          <b-upload v-model="files" multiple accept class="file is-primary">
-            <span class="file-cta">
-              <b-icon class="file-icon" icon="upload-multiple" />
-              <span class="file-label">
-                {{ $t("message.encrypt.dropMsg") }}
-              </span>
-            </span>
-          </b-upload>
-        </div>
+          :no-data-text="$t('message.encrypt.empty')"
+          :pagination.prop="paginationOptions"
+          :footerOptions.prop="footerOptions"
+        />
+        <p class="info-text is-size-6">
+          {{ $t("message.container_ops.createdFolder") }}
+          <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+        </p>
+        <c-link
+          :href="`https://my.csc.fi/myProjects/project/${currentProjectID}`"
+          underline
+          target="_blank"
+        >
+          {{ $t("message.container_ops.viewProjectMembers") }}
+          <i class="mdi mdi-open-in-new" />
+        </c-link>
       </c-card-content>
       <c-card-actions justify="space-between">
         <c-button outlined size="large" @click="cancelUpload">
@@ -161,23 +118,6 @@ export default {
       tooLarge: false,
       noUpload: true,
       addRecvkey: "",
-      //data: [
-      //  {
-      //    country: { value: "Denmark" },
-      //    population: { value: 5831404 },
-      //    unemployment: { value: 4.8 },
-      //  },
-      //  {
-      //    country: { value: "Finland" },
-      //    population: { value: 5529543 },
-      //    unemployment: { value: 7.5 },
-      //  },
-      //  {
-      //    country: { value: "Iceland" },
-      //    population: { value: 366463 },
-      //    unemployment: { value: 5.4 },
-      //  },
-      //],
     };
   },
   computed: {
@@ -201,31 +141,37 @@ export default {
         {
           key: "name",
           value: this.$t("message.encrypt.table.name"),
+          width: "30%",
         },
         {
           key: "type",
           value: this.$t("message.encrypt.table.type"),
+          width: "15%",
         },
         {
           key: "size",
           value: this.$t("message.encrypt.table.size"),
+          width: "10%",
         },
         {
           key: "path",
           value: this.$t("message.encrypt.table.path"),
+          width: "30%",
         },
         {
           key: "remove",
           value: null,
           children: [
             {
-              value: "Remove",
+              value: this.$t("message.remove"),
               component: {
                 tag: "c-button",
                 params: {
                   text: true,
                   size: "small",
-                  title: "Remove",
+                  title: this.$t("message.remove"),
+                  onClick: ({ data }) =>
+                    this.$store.commit("eraseDropFile", data["id"]),
                 },
               },
             },
@@ -236,11 +182,13 @@ export default {
     dropFiles() {
       return this.$store.state.dropFiles.map(file => {
         return {
-          name: { value: file.name },
+          name: { value: file.name || truncate(100) },
           type: { value: file.type },
-          size: { value: file.size },
+          size: { value: this.localHumanReadableSize(file.size) },
           path: {
-            value: !file.relativePath ? file.name : file.relativePath,
+            value:
+              (!file.relativePath ? file.name : file.relativePath) ||
+              truncate(100),
           },
         };
       });
@@ -250,12 +198,27 @@ export default {
         return this.$store.state.dropFiles.message;
       },
       set(value) {
-        console.log("value :>> ", value);
         const files = Array.from(value);
         files.forEach(element => {
           this.$store.commit("appendDropFiles", element);
         });
       },
+    },
+    paginationOptions() {
+      return {
+        itemCount: this.dropFiles.length,
+        itemsPerPage: 20,
+        currentPage: 1,
+      };
+    },
+    footerOptions() {
+      return {
+        hideDetails: true,
+        sortable: false,
+      };
+    },
+    currentProjectID() {
+      return this.$route.params.project;
     },
   },
   watch: {
@@ -459,42 +422,6 @@ export default {
         this.$store.commit("toggleUploadModal", false);
       });
     },
-    encryptAndUpload: function () {
-      this.$buefy.toast.open({
-        message: this.$t("message.encrypt.enStart"),
-        duration: 10000,
-        type: "is-success",
-      });
-      this.encryptFiles().then(() => {
-        this.$buefy.toast.open({
-          message: this.$t("message.encrypt.enSuccess"),
-          duration: 10000,
-          type: "is-success",
-        });
-        this.$store.commit("setAltContainer", this.$route.params.container);
-        let files = [];
-        for (let f of this.dropFiles) {
-          let path = f.relativePath ? f.relativePath : f.name;
-          let outname = "/data/" + path + ".c4gh";
-          let newFile = new Blob(
-            [FS.readFile(outname).buffer], // eslint-disable-line
-            {
-              type: "binary/octet-stream",
-            },
-          );
-          newFile.relativePath = path + ".c4gh";
-          newFile.name = f.name + ".c4gh";
-          files.push(newFile);
-        }
-        this.aBeginUpload(files).then(() => {
-          this.$buefy.toast.open({
-            message: this.$t("message.encrypt.upStart"),
-            type: "is-success",
-          });
-          this.clearFiles();
-        });
-      });
-    },
     appendPublicKey: async function () {
       if (!this.recvkeys.includes(this.addRecvkey)) {
         this.recvkeys.push(this.addRecvkey);
@@ -554,47 +481,56 @@ export default {
   width: 64vw;
   padding: 3rem;
   left: 50%;
+  margin-top: 50%;
   transform: translate(-50%, -50%);
+  height: 85vh;
+}
+
+.upload-form {
+  overflow-y: scroll;
 }
 
 c-card-content {
-  padding: 1.5rem;
+  padding: 1.5rem 0;
   color: var(--csc-dark-grey);
 }
 
-#uploadform {
-  width: 90%;
-  margin: auto;
+c-text-field {
+  width: 70%;
 }
 
-#destinationBucket {
-  flex-grow: 1;
+.taginput {
+  width: 60%;
 }
 
-.uploadButtonContainer {
-  margin-top: 2%;
-  display: flex;
-  flex-wrap: wrap;
+.title.is-6 {
+  margin: 0 !important;
 }
 
-.uploadButtonContainer .upload + button,
-.uploadButtonContainer #uploadButton + button {
-  margin-left: 1%;
+p.info-text.is-size-6 {
+  margin-bottom: -1rem;
 }
 
-#uploadButton {
-  margin-left: auto;
-}
-
-#encryptionOptions {
-  flex-grow: 1;
-  margin-top: -20px;
-  justify-content: right;
-}
-
-@media screen and (max-width: 1357px) {
-  #encryptionOptions {
-    margin-top: 0;
+.is-flex {
+  padding: 2rem 0;
+  & > span:first-of-type {
+    margin-right: 1rem;
   }
+}
+
+span.file-cta {
+  background-color: transparent !important;
+  border: 2px solid var(--csc-primary) !important;
+  color: var(--csc-primary) !important;
+  font-weight: bold;
+}
+
+c-data-table {
+  margin-top: -24px;
+}
+
+c-card-actions {
+  padding: 0;
+  margin-top: 1rem;
 }
 </style>

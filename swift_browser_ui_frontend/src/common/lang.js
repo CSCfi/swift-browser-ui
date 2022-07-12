@@ -326,6 +326,9 @@ let default_translations = {
           size: "Size",
           type: "Type",
         },
+        uploadedFiles:
+          "Uploaded files will be shared with " +
+          "all project members in My research project.",
       },
       search: {
         container: "Bucket",
@@ -587,7 +590,8 @@ let default_translations = {
         norename:
           "Säiliötä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
-        createdFolder: "",
+        createdFolder:
+          "Created folder will be shared with all project members in",
         viewProjectMembers: "Näytä projektin jäsenet",
         myResearchProject: "Tutkimusprojektini",
         deleteConfirm: "Poista säiliö",
@@ -680,6 +684,9 @@ let default_translations = {
           size: "Koko",
           type: "Tyyppi",
         },
+        uploadedFiles:
+          "Uploaded files will be shared with " +
+          "all project members in My research project.",
       },
       search: {
         container: "Säiliö",
