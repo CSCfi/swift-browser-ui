@@ -15,6 +15,11 @@ wasmReady.then(() => {
   console.log("Adding sw event listeners.");
   self.addEventListener("message", (e) => {
     switch(e.data.cmd) {
+      case "pingWasm":
+        e.source.postMessage({
+          eventType: "wasmReady",
+        });
+        break;
       case "initFileSystem":
         FS.mkdir("/keys");
         FS.mkdir("/keys/recv_keys");

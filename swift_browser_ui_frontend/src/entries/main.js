@@ -57,8 +57,17 @@ if ("serviceWorker" in navigator) {
     "/libupload.js",
     document.location.origin,
   );
+  let ping = (navigator.serviceWorker.controller == null);
   navigator.serviceWorker.register(workerUrl).then(reg => {
     reg.update();
+    if (ping) {
+      console.log("Pinging first serviceWorker.");
+      navigator.serviceWorker.ready.then(reg => {
+        reg.active.postMessage({
+          cmd: "pingWasm",
+        });
+      });
+    }
   }).catch((err) => {
     console.log("Failed to register service worker.");
     console.log(err);
@@ -177,6 +186,24 @@ new Vue({
   },
   created() {
     document.title = this.$t("message.program_name");
+
+    navigator.serviceWorker.addEventListener("message", e => {
+      if (e.data.eventType == "wasmReady") {
+        this.$buefy.snackbar.open({
+          message:
+            "Encryption engine is ready. Hit refresh to refresh the " +
+            "window to enable encryption.",
+          type: "is-success",
+          position: "is-top",
+          actionText: "Refresh",
+          indefinite: true,
+          onAction: () => {
+            location.reload();
+          },
+        });
+      }
+    });
+
     this.createUploadInstance();
     let initialize = async () => {
       let active;
