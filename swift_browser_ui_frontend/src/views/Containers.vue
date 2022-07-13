@@ -9,10 +9,17 @@
     >
       <AddContainer />
     </c-modal>
-    <c-modal v-control v-csc-model="openUploadModal">
+    <c-modal
+      v-control
+      v-csc-model="openUploadModal"
+    >
       <UploadModal />
     </c-modal>
-    <b-field grouped group-multiline class="groupControls">
+    <b-field
+      grouped
+      group-multiline
+      class="groupControls"
+    >
       <b-select
         v-model="perPage"
         data-testid="containersPerPage"
@@ -307,11 +314,17 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    openCreateFolderModal() {
-      return this.$store.state.openCreateFolderModal;
+    openCreateFolderModal: {
+      get() {
+        return this.$store.state.openCreateFolderModal;
+      },
+      set() {},
     },
-    openUploadModal() {
-      return this.$store.state.openUploadModal;
+    openUploadModal: {
+      get() {
+        return this.$store.state.openUploadModal;
+      },
+      set() {},
     },
   },
   watch: {
