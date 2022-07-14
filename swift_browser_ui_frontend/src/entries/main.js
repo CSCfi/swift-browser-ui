@@ -100,7 +100,6 @@ new Vue({
   },
   data: function () {
     return {
-      itemdrop: false,
       files: [],
     };
   },
@@ -263,36 +262,6 @@ new Vue({
     delay(this.containerSyncWrapper, 10000);
   },
   methods: {
-    dragHandler: function (e) {
-      e.preventDefault();
-      let dt = e.dataTransfer;
-      if (dt.types.indexOf("Files") >= 0) {
-        e.stopPropagation();
-        dt.dropEffect = "copy";
-        dt.effectAllowed = "copy";
-        this.itemdrop = true;
-      } else {
-        dt.dropEffect = "none";
-        dt.effectAllowed = "none";
-      }
-    },
-    dragLeaveHandler: function () {
-      this.itemdrop = false;
-    },
-    navUpload: function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.dataTransfer && e.dataTransfer.items) {
-        for (let item of e.dataTransfer.items) {
-          this.$store.commit("appendFileTransfer", item);
-        }
-      } else if (e.dataTransfer && e.dataTransfer.files) {
-        for (let file of e.dataTransfer.files) {
-          this.$store.commit("appendFileTransfer", file);
-        }
-      }
-      this.itemdrop = false;
-    },
     containerSyncWrapper: function () {
       syncContainerACLs(this.$store.state.client, this.$store.state.active.id);
     },

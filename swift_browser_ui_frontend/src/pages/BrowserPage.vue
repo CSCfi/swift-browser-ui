@@ -1,26 +1,5 @@
 <template>
   <div id="mainContainer">
-    <!--<div
-      v-if="itemdrop"
-      id="dropArea"
-      class="upload-draggable is-full-page
-            is-align-items-center is-flex is-justify-content-center"
-      style="width: 100%; height: 100%;margin: auto;"
-      @dragenter="dragHandler"
-      @dragover="dragHandler"
-      @dragleave="dragLeaveHandler"
-      @drop="navUpload"
-    >
-      <p>
-        <b-icon
-          icon="upload-multiple"
-          size="is-large"
-        />
-      </p>
-      <p>
-        {{ $t('message.dropFiles') }}
-      </p>
-    </div>-->
     <div id="subContainer">
       <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
@@ -95,7 +74,7 @@ body {
 }
 
 .content-wrapper {
-  padding-bottom: calc(#{$footer-height} + 3rem);
+  padding-bottom: calc(#{$footer-height} + 3rem)
 }
 
 .contents {
@@ -151,17 +130,6 @@ body {
 .dashboard {
   margin-left: 5%;
   margin-right: 5%;
-}
-
-#dropArea:before {
-  content: "";
-  width: 98%;
-  height: 98%;
-  position: absolute;
-  border: 2px dashed #b5b5b5;
-  margin: 0 1%;
-  padding: 0;
-  border-radius: 6px;
 }
 
 .footer {

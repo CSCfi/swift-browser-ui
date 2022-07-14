@@ -38,22 +38,25 @@
         <h6 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
         </h6>
-        <b-upload
-          v-model="files"
-          multiple
-          accept
-          drag-drop
-          expanded
-          class="file is-primary"
+        <div
+          class="dropArea is-flex
+                is-align-items-center is-justify-content-center"
+          @dragover="dragHandler"
+          @dragleave="dragLeaveHandler"
+          @drop="navUpload"
         >
-          <div class="is-flex is-align-items-center is-justify-content-center">
-            <span>{{ $t("message.dropFiles") }}</span>
+          <span>{{ $t("message.dropFiles") }}</span>
+          <b-upload
+            v-model="files"
+            multiple
+            accept
+            class="file is-primary"
+          >
             <span class="file-cta">
               {{ $t("message.encrypt.dropMsg") }}
             </span>
-          </div>
-        </b-upload>
-
+          </b-upload>
+        </div>
         <c-data-table
           :data.prop="dropFiles"
           :headers.prop="headers"
@@ -154,6 +157,7 @@ export default {
         {
           key: "remove",
           value: null,
+          sortable: false,
           children: [
             {
               value: this.$t("message.remove"),
@@ -191,7 +195,6 @@ export default {
         return this.$store.state.dropFiles.message;
       },
       set(value) {
-        console.log("value :>> ", value);
         const files = Array.from(value);
         files.forEach(element => {
           this.$store.commit("appendDropFiles", element);
@@ -219,7 +222,11 @@ export default {
     dropFiles: function () {
       this.checkUploadSize();
     },
+    transfer: function () {
+      this.setFiles();
+    },
   },
+
   methods: {
     setFile: function (item, path) {
       let entry = undefined;
@@ -263,6 +270,14 @@ export default {
         }
       }
     },
+    setFiles: function () {
+      if (this.transfer) {
+        for (let file of this.transfer) {
+          let entry = file;
+          this.setFile(entry, "");
+        }
+      }
+    },
     aBeginUpload: async function (files) {
       // Upload files to the active folder
       let uploadInfo = await getUploadEndpoint(
@@ -299,6 +314,36 @@ export default {
     cancelUpload() {
       this.$store.commit("eraseDropFiles");
       this.$store.commit("toggleUploadModal", false);
+    },
+    dragHandler: function (e) {
+      e.preventDefault();
+      let dt = e.dataTransfer;
+      if (dt.types.indexOf("Files") >= 0) {
+        e.target.classList.add("over-dropArea");
+        e.stopPropagation();
+        dt.dropEffect = "copy";
+        dt.effectAllowed = "copy";
+      } else {
+        dt.dropEffect = "none";
+        dt.effectAllowed = "none";
+      }
+    },
+    dragLeaveHandler: function (e) {
+      e.target.classList.remove("over-dropArea");
+    },
+    navUpload: function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.items) {
+        for (let item of e.dataTransfer.items) {
+          this.$store.commit("appendFileTransfer", item);
+        }
+      } else if (e.dataTransfer && e.dataTransfer.files) {
+        for (let file of e.dataTransfer.files) {
+          this.$store.commit("appendFileTransfer", file);
+        }
+      }
+      e.target.classList.remove("over-dropArea");
     },
   },
 };
@@ -341,11 +386,16 @@ p.info-text.is-size-6 {
   margin-bottom: -1rem;
 }
 
-.is-flex {
+.dropArea {
+  border: 1px dashed $csc-light-grey;
   padding: 2rem 0;
   & > span:first-of-type {
-    margin-right: 1rem;
+      margin-right: 1rem;
   }
+}
+
+.over-dropArea {
+  border: 2px dashed var(--csc-primary);
 }
 
 span.file-cta {
@@ -353,6 +403,7 @@ span.file-cta {
   border: 2px solid var(--csc-primary) !important;
   color: var(--csc-primary) !important;
   font-weight: bold;
+  cursor: pointer;
 }
 
 c-data-table {
@@ -363,4 +414,6 @@ c-card-actions {
   padding: 0;
   margin-top: 1rem;
 }
+
+
 </style>
