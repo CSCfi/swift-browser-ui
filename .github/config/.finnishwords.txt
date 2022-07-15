@@ -79,6 +79,7 @@ julkiset
 julkisia
 kaikki
 kansio
+kansion
 kansiot
 kansioille
 kansioina
@@ -221,6 +222,7 @@ oikeuksia
 olemassa
 oletusarvoiset
 oletusarvojen
+olevia
 olla
 omaa
 omistavan
@@ -419,6 +421,7 @@ varmistathan
 vastaanottajan
 vastaanottajien
 vastaanottimien
+vedä
 viimeisin
 viimeksi
 virhe
