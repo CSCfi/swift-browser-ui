@@ -1,6 +1,6 @@
 <template>
   <c-tab-buttons
-    :value="findActiveTab()"
+    :value="activeTab"
     :mandatory="true"
     data-testid="folder-tabs"
   >
@@ -20,7 +20,6 @@ export default {
   data: function() {
     return {
       tabs: [],
-      activeTab: 0,
     };
   },
   computed: {
@@ -32,6 +31,10 @@ export default {
     },
     name () {
       return this.$route.name;
+    },
+    activeTab () {
+      const routes = this.tabs.flatMap(tab => tab.route.name);
+      return routes.indexOf(this.name);
     },
   },
   created: function () {
@@ -53,10 +56,6 @@ export default {
           route: { name: "SharedFrom" },
         },
       ];
-    },
-    findActiveTab() {
-      const routes = this.tabs.flatMap(tab => tab.route.name);
-      return routes.indexOf(this.name);
     },
     navigate(routeName) {
       if (this.name !== routeName) {
