@@ -6,10 +6,10 @@
   >
     <c-button
       v-for="tab in tabs"
-      :key="tab.label"
+      :key="tab.key"
       @click="navigate(tab.route.name)"
     >
-      {{ tab.label }}
+      {{ $t(tab.key) }}
     </c-button>
   </c-tab-buttons>
 </template>
@@ -44,22 +44,22 @@ export default {
     setTabs() {
       this.tabs = [
         {
-          label: this.$t("message.folderTabs.all"),
+          key: "message.folderTabs.all",
           route: { name: "AllFolders" },
         },
         {
-          label: this.$t("message.folderTabs.sharedFrom"),
+          key: "message.folderTabs.sharedFrom",
           route: { name: "SharedTo" },
         },
         {
-          label: this.$t("message.folderTabs.sharedTo"), 
+          key: "message.folderTabs.sharedTo",
           route: { name: "SharedFrom" },
         },
       ];
     },
     navigate(routeName) {
       if (this.name !== routeName) {
-        return this.$router.push({name: routeName ,params: {
+        return this.$router.push({name: routeName, params: {
           user: this.user,
           project: this.project,
         }});
