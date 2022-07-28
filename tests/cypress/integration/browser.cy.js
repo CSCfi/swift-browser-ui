@@ -162,8 +162,8 @@ describe("Browse containers and test operations", function () {
       cy.get(`#${id}`).should("be.visible")
     }
 
-    testTabChange("Shared from", "shared-table")
-    testTabChange("Shared to", "shared-out-table")
+    testTabChange("Shared to", "shared-table")
+    testTabChange("Shared from", "shared-out-table")
     testTabChange("All project's folders", "container-table")
   })
 })

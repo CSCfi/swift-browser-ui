@@ -48,11 +48,11 @@ export default {
           route: { name: "AllFolders" },
         },
         {
-          key: "message.folderTabs.sharedFrom",
+          key: "message.folderTabs.sharedTo",
           route: { name: "SharedTo" },
         },
         {
-          key: "message.folderTabs.sharedTo",
+          key: "message.folderTabs.sharedFrom",
           route: { name: "SharedFrom" },
         },
       ];
