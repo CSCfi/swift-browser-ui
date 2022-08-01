@@ -22,7 +22,7 @@ setuptools.setup(
         "gunicorn==20.1.0",
         "keystoneauth1==4.6.0",
         "oidcrp==2.1.4",
-        "python-swiftclient==4.0.0",
+        "python-swiftclient==4.0.1",
         "uvloop==0.16.0",
     ],
     extras_require={
