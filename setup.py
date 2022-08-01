@@ -20,7 +20,7 @@ setuptools.setup(
         "click==8.1.3",
         "cryptography==37.0.3",
         "gunicorn==20.1.0",
-        "keystoneauth1==4.6.0",
+        "keystoneauth1==5.0.0",
         "oidcrp==2.1.4",
         "python-swiftclient==4.0.0",
         "uvloop==0.16.0",
