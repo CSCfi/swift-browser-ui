@@ -14,7 +14,7 @@
     "@vue/composition-api": "^1.6.3",
     "@vueuse/rxjs": "^8.7.5",
     "buefy": "^0.9.21",
-    "core-js": "^3.23.3",
+    "core-js": "^3.24.1",
     "dexie": "^3.2.2",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
