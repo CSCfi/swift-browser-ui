@@ -24,7 +24,7 @@ export default {
     return {
       menuItems: [
         {
-          name: this.$t("message.edit"), 
+          name: this.$t("message.editTags"), 
           action: () => toggleCreateFolderModal(this.props.row.name),
         },
         {
