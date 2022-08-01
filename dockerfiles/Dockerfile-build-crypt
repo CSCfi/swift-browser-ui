@@ -87,7 +87,7 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && emmake make
 
 # Build UI with encryption
-FROM node:16.15.1-alpine3.15 as FRONTEND
+FROM node:16.16.0-alpine3.15 as FRONTEND
 
 ARG OIDC_ENABLED
 
