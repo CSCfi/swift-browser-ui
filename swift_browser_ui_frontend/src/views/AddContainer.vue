@@ -27,15 +27,6 @@
         custom-class="has-text-dark"
         :label="$t('message.tagName')"
       >
-        <b-input
-          v-model="container"
-          name="foldername"
-          aria-required="true"
-          :disabled="!create"
-          data-testid="folder-name"
-        />
-      </b-field>
-      <b-field custom-class="has-text-dark" :label="$t('message.tagName')">
         <b-taginput
           v-model="tags"
           ellipsis
