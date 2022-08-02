@@ -1,7 +1,7 @@
 <template>
   <c-menu
     simple
-    :items.prop="menuItems"
+    :items.prop="menuItems.map(item => ({name: $t(item.key), ...item}))"
   >
     <c-button
       class="menu-trigger-button"
@@ -24,11 +24,11 @@ export default {
     return {
       menuItems: [
         {
-          name: this.$t("message.editTags"), 
+          key: "message.editTags", 
           action: () => toggleCreateFolderModal(this.props.row.name),
         },
         {
-          name: this.$t("message.delete"), 
+          key: "message.delete", 
           action: () => this.confirmDelete(
             this.props.row.name, this.props.row.count,
           ),
