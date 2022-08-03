@@ -1,25 +1,21 @@
 <template>
-  <div id="up-progress">
-    <b-progress
+  <div class="progress-bar">
+    <c-progress-bar
       v-if="isChunking && !isUploading"
-      type="is-primary"
-    >
-      {{ $t('message.chunking') }}
-    </b-progress>
-    <b-progress
+      hide-details
+    />
+
+    <c-progress-bar
       v-else-if="isUploading && progress != undefined"
-      type="is-primary"
-      :value="progress * 100"
-      show-value
-    >
-      {{ $t('message.uploading') }} {{ (progress * 100).toFixed(1) }}%
-    </b-progress>
-    <b-progress
+      :value="(progress * 100).toFixed(1)"
+      single-line
+      :label="$t('message.upload.complete')"
+    />
+
+    <c-progress-bar
       v-else-if="isUploading"
-      type="is-primary"
-    >
-      {{ $t('message.uploading') }}
-    </b-progress>
+      hide-details
+    />
   </div>
 </template>
 
@@ -27,24 +23,24 @@
 export default {
   name: "ProgressBar",
   computed: {
-    isChunking () {
+    isChunking() {
       return this.$store.state.isChunking;
     },
-    isUploading () {
+    isUploading() {
       return this.$store.state.isUploading;
     },
-    progress () {
+    progress() {
       return this.$store.state.uploadProgress;
     },
   },
 };
 </script>
 
-<style scoped>
-#up-progress {
-  margin-left: 5%;
-  margin-right: 5%;
-  margin-top: 1%;
-  margin-bottom: 1%;
+<style scoped lang="scss">
+@import "@/css/prod.scss";
+
+.progress-bar {
+  flex: 1
 }
+
 </style>

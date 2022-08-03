@@ -35,6 +35,7 @@ const store = new Vuex.Store({
     isUploading: false,
     isChunking: false,
     uploadProgress: undefined,
+    uploadNotification: false,
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
@@ -88,15 +89,23 @@ const store = new Vuex.Store({
     },
     setUploading(state) {
       state.isUploading = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopUploading(state) {
       state.isUploading = false;
     },
     setChunking(state) {
       state.isChunking = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopChunking(state) {
       state.isChunking = false;
+    },
+    setUploadNotification(state) {
+      state.uploadNotification = true;
+    },
+    hideUploadNotification(state) {
+      state.uploadNotification = false;
     },
     updateProgress(state, progress) {
       state.uploadProgress = progress;
