@@ -58,7 +58,7 @@
       <div class="field has-addons uploadGroup">
         <p class="control">
           <b-button
-            :label="$t('message.upload')"
+            :label="$t('message.upload.upload')"
             type="is-primary"
             outlined
             icon-left="upload"

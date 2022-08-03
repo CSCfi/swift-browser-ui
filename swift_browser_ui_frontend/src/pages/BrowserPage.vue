@@ -20,6 +20,10 @@
       >
         <UploadModal />
       </c-modal>
+      <UploadNotification
+        v-if="displayUploadNotification"
+        @cancel-upload="onCancel"
+      />
       <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
         <b-breadcrumb-item
           v-for="item in getRouteAsList()"
@@ -56,6 +60,7 @@
           </p>
         </div>
       </footer>
+      <c-toasts id="toasts" />
     </div>
   </div>
 </template>
