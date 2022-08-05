@@ -1,9 +1,9 @@
 <template>
-  <div id="c-containers">
+  <div id="c-objects">
     <c-data-table
       v-if="hideTags"
-      id="contable-no-tags"
-      :data.prop="containers"
+      id="objtable-no-tags"
+      :data.prop="objects"
       :headers.prop="noTagHeaders"
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
@@ -13,8 +13,8 @@
     />
     <c-data-table
       v-else
-      id="contable-tags"
-      :data.prop="containers"
+      id="objtable-tags"
+      :data.prop="objects"
       :headers.prop="extHeaders"
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
@@ -29,9 +29,9 @@
 import { getHumanReadableSize, truncate } from "@/common/conv";
 
 export default {
-  name: "ContainerTable",
+  name: "CObjectTable",
   props: {
-    conts: {
+    objs: {
       type: Array,
       default: () => {return [];},
     },
@@ -43,15 +43,23 @@ export default {
       type: Boolean,
       default: false,
     },
+    renderFolders: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
-      containers: [],
-      direction: "asc",
+      objects: [],
       extHeaders: [
         {
           key: "name",
           value: "Name",
+          sortable: false,
+        },
+        {
+          key: "last_modified",
+          value: "Last Modified",
           sortable: false,
         },
         {
@@ -75,6 +83,11 @@ export default {
         {
           key: "name",
           value: "Name",
+          sortable: false,
+        },
+        {
+          key: "last_modified",
+          value: "Last Modified",
           sortable: false,
         },
         {
@@ -109,15 +122,22 @@ export default {
     hideTags() {
       this.getPage();
     },
-    conts() {
+    renderFolders() {
+      this.getPage();
+    },
+    objs() {
       this.getPage();
     },
   },
   methods: {
+    isFile: function (path) {
+      // Return true if path represents a file in the active prefix context
+      return path.replace(this.getPrefix(), "").match("/") ? false : true;
+    },
     getPage: function () {
       let offset = 0;
-      let limit = this.conts.length;
-      if (!this.disablePagination || this.conts.length > 500) {
+      let limit = this.objs.length;
+      if (!this.disablePagination || this.objs.length > 500) {
         offset =
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
@@ -125,29 +145,30 @@ export default {
         
         limit = this.paginationOptions.itemsPerPage;
       }
-      this.containers = this.conts.slice(offset, offset + limit).reduce((
+      this.objects = this.objs.slice(offset, offset + limit).reduce((
         items,
         item,
       ) => {
         items.push({
           name: {
             value: truncate(item.name),
-            component: {
-              tag: "c-link",
-              params: {
-                onClick: () => {
-                  this.$router.push({
-                    name: "ObjectsView",
-                    params: {
-                      container: item.name,
-                    },
-                  });
+            ...(this.renderFolders ? {
+              component: {
+                tag: "c-link",
+                params: {
+                  onClick: () => {
+                    let e = new Event("changeFolder", {name: item.name});
+                    this.$emit(e);
+                  },
                 },
               },
-            },
+            } : {}),
           },
           size: {
             value: getHumanReadableSize(item.bytes),
+          },
+          last_modified: {
+            value: item.last_modified,
           },
           ...(this.hideTags ? {} : {
             tags: {
@@ -180,28 +201,35 @@ export default {
                     text: true,
                     size: "small",
                     title: "Download",
-                    href: "/download/".concat(
-                      this.$route.params.project,
-                      "/",
-                      item.name,
-                    ),
+                    href: item.url,
                     target: "_blank",
                   },
                 },
               },
               {
-                value: "Share",
+                value: "Edit tags",
+                component: {
+                  tag: "c-button",
+                  params: {
+                    text: true,
+                    size: "small",
+                    title: "Edit tags",
+                    onClick: () => {
+                      console.log("Edit not yet implemented.");
+                    },
+                  },
+                },
+              },
+              {
+                value: "Delete",
                 component: {
                   tag: "c-button",
                   params: {
                     text: true,
                     size: "small",
                     title: "Share",
-                    onClick: (item) => {
-                      this.$router.push({
-                        name: "SharingView",
-                        query: { container: item.name },
-                      });
+                    onClick: () => {
+                      console.log("Delete not yet implemented.");
                     },
                   },
                 },
@@ -214,7 +242,7 @@ export default {
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.conts.length,
+        itemCount: this.objs.length,
       };
     },
   },

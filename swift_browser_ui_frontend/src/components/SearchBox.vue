@@ -1,35 +1,66 @@
-<template>    
-  <c-autocomplete
-    id="searchbox"
-    v-control
-    :label="$t('message.search.searchBy')"
-    shadow
-    :items.prop="searchResults"
-    @changeQuery="searchQuery"
-  >
-    <i
-      slot="pre"
-      class="mdi mdi-magnify"
-    />
-  </c-autocomplete>
+<template>
+  <div @focus="event => searchGainedFocus()" style="min-width:50%;">
+    <b-autocomplete
+      id="searchbox"
+      v-model="searchQuery"
+      icon="magnify"
+      clearable
+      :placeholder="$t('message.search.searchBy')"
+      :data="searchResults"
+      field="name"
+      :open-on-focus="true"
+      :keep-first="true"
+      :loading="isSearching"
+      max-height="350px"
+      @select="option => $router.push(getSearchRoute(option))"
+      @focus="event => searchGainedFocus()"
+    >
+      <template slot-scope="props">
+        <SearchResultItem
+          :item="props.option"
+          :search-array="searchArray"
+          :route="getSearchRoute"
+        />
+      </template>
+      <template #empty>
+        <div
+          v-if="searchArray.length > 0 && searchArray[0].length > 1"
+          class="media empty-search"
+        >
+          <b-loading
+            v-model="isSearching"
+            :is-full-page="false"
+          />
+          <div
+            v-show="!isSearching"
+            class="media-content"
+          >
+            {{ $t("message.search.empty") }}
+          </div>
+        </div>
+      </template>
+    </b-autocomplete>
+  </div>
 </template>
 
 <script>
 import { tokenize } from "@/common/conv";
 import escapeRegExp from "lodash/escapeRegExp";
-// import SearchResultItem from "@/components/SearchResultItem";
+import SearchResultItem from "@/components/SearchResultItem";
 import debounce from "lodash/debounce";
 
 export default {
   name: "SearchBox",
   components: {
-    // SearchResultItem,
+    SearchResultItem,
   },
   data: function () {
     return {
       searchArray: [],
       searchResults: [],
-      debounceSearch: debounce(this.search, 400),
+      searchElements: [],
+      searchQuery: "",
+      refs: [],
       isSearching: false,
     };
   },
@@ -38,11 +69,14 @@ export default {
       return this.$store.state.active;
     },
   },
-  methods: {
-    searchQuery: function (event) {
+  created: function () {
+    this.debounceSearch = debounce(this.search, 400);
+  },
+  watch: {
+    searchQuery() {
       this.debounceSearch.cancel();
       // request parameter should be sanitized first
-      const safeQuery = escapeRegExp(event.detail);
+      const safeQuery = escapeRegExp(this.searchQuery);
       const query = safeQuery.trim();
       const newSearchArray = tokenize(query, 0);
       // Run debounced search every time the search box input changes
@@ -56,6 +90,8 @@ export default {
         this.searchArray = [];
       }
     },
+  },
+  methods: {
     search: async function () {
       if (this.searchArray.length === 0) {
         return;
@@ -175,3 +211,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.empty-search {
+  height: 2rem;
+}
+</style>

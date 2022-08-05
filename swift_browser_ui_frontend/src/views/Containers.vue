@@ -146,3 +146,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#optionsbar {
+  margin: 0.5em;
+  background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+}
+</style>
