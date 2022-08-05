@@ -39,7 +39,6 @@ export default new Router({
       name: "SharingView",
       component: SharingView,
     },
-
     {
       path: "/browse/:user/:project/tokens",
       name: "TokensView",
