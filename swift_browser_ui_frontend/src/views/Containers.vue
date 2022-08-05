@@ -179,20 +179,6 @@ export default {
 </script>
 
 <style scoped>
-
-.containers {
-   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-c-modal {
-  position: relative;
-  margin: 0 auto;
-  display: inline-flex;
-}
-
 #optionsbar {
   margin: 0.5em;
   background: #fff;
