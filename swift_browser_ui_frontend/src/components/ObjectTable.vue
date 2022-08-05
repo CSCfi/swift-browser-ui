@@ -2,334 +2,30 @@
   <div
     id="object-table"
   >
-    <b-field
-      grouped
-      group-multiline
-      class="groupControls"
+    <c-row
+      id="optionsbar"
+      justify="space-between"
     >
-      <b-select
-        v-model="perPage"
-        data-testid="containersPerPage"
-        :disabled="!isPaginated"
+      <c-text-field
+        v-csc-model="searchQuery"
+        :placeholder="$t('message.objects.filterBy')"
+        shadow
       >
-        <option value="5">
-          5 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="10">
-          10 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="15">
-          15 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="25">
-          25 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="50">
-          50 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="100">
-          100 {{ $t('message.table.pageNb') }}
-        </option>
-      </b-select>
-      <div class="control is-flex">
-        <b-switch
-          v-if="oList.value && oList.value.length < 500"
-          v-model="isPaginated"
-        >
-          {{ $t('message.table.paginated') }}
-        </b-switch>
-      </div>
-      <div class="control is-flex">
-        <b-switch v-model="renderFolders">
-          {{ $t('message.renderFolders') }}
-        </b-switch>
-      </div>
-      <div class="control is-flex">
-        <b-switch v-model="showTags">
-          {{ $t('message.table.showTags') }}
-        </b-switch>
-      </div>
-      <b-field class="control searchBox">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.objects.filterBy')"
-        />
-      </b-field>
-      <div class="field has-addons uploadGroup">
-        <p class="control">
-          <b-button
-            :label="$t('message.upload')"
-            type="is-primary"
-            outlined
-            icon-left="upload"
-            @click="toggleUploadModal"
-          />
-        </p>
-        <p class="control">
-          <ContainerDownloadLink />
-        </p>
-        <p class="control">
-          <ReplicateContainerButton />
-        </p>
-        <p class="control">
-          <b-button
-            :label="$t('message.table.clearChecked')"
-            type="is-primary"
-            outlined
-            @click="checkedRows = []"
-          />
-        </p>
-      </div>
-      <div>
-        <DeleteObjectsButton
-          size="is-normal"
-          :inverted="false"
-          :disabled="checkedRows.length == 0 ? true : false"
-          :objects="checkedRows"
-        />
-      </div>
-    </b-field>
-    <b-table
-      class="objectTable"
-      focusable
-      detailed
-      hoverable
-      narrowed
-      header-checkable
-      checkable
-      checkbox-position="right"
-      :checked-rows.sync="checkedRows"
-      :is-row-checkable="isRowCheckable"
-      default-sort="name"
-      :data="oList.value"
-      :selected.sync="selected"
-      :current-page.sync="currentPage"
-      :paginated="isPaginated"
-      :per-page="perPage"
-      :pagination-simple="isPaginated"
-      :default-sort-direction="defaultSortDirection"
-      :row-class="row => !isVisible(row.id) ? 'is-hidden' : ''"
-      @page-change="( page ) => addPageToURL( page )"
-      @dblclick="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-      @keyup.native.enter="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-      @keyup.native.space="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-    >
-      <!-- Alt name column for case pseudo folders enabled  -->
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="name"
-        :label="$t('message.table.name')"
+        <i class="mdi mdi-magnify" />
+      </c-text-field>
+      <c-menu
+        :items.prop="tableOptions"
+        options-testid="table-options-selector"
       >
-        <span v-if="renderFolders && !isFile(props.row.name)">
-          <b-icon
-            icon="folder"
-            size="is-small"
-          /> <b>{{ getFolderName(props.row.name) | truncate(100) }}</b>
-        </span>
-        <span v-else-if="renderFolders">
-          {{ props.row.name.replace(getPrefix(), '') | truncate(100) }}
-        </span>
-        <span v-else>
-          {{ props.row.name | truncate(100) }}
-        </span>
-        <b-taglist v-if="displayTags(props.row.name)">
-          <b-tag
-            v-for="tag in props.row.tags"
-            :key="tag"
-            :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
-            rounded
-            ellipsis
-          >
-            {{ tag }}
-          </b-tag>
-        </b-taglist>
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="last_modified"
-        :label="$t('message.table.modified')"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          {{ getHumanReadableDate(props.row.last_modified) }}
-        </span>
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="bytes"
-        :label="$t('message.table.size')"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          {{ localHumanReadableSize(props.row.bytes) }}
-        </span>
-      </b-table-column>
-      <b-table-column
-        field="functions"
-        label=""
-        width="90"
-      >
-        <template #default="props">
-          <div class="field has-addons">
-            <span v-if="renderFolders && !isFile(props.row.name)" />
-            <p
-              v-else
-              class="control"
-            >
-              <b-button
-                v-if="props.row.bytes < 1073741824"
-                :href="props.row.url"
-                target="_blank"
-                :inverted="props.row == selected ? true : false"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                size="is-small"
-                tag="a"
-                icon-left="download"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-              <b-button
-                v-else-if="allowLargeDownloads"
-                :href="props.row.url"
-                target="_blank"
-                :inverted="props.row == selected ? true : false"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                size="is-small"
-                tag="a"
-                icon-left="download"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-              <b-button
-                v-else
-                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                :inverted="props.row === selected ? true : false"
-                size="is-small"
-                tag="a"
-                icon-left="download"
-                @click="confirmDownload ()"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-            </p>
-            <p
-              v-if="displayTags(props.row.name)"
-              class="control"
-            >
-              <b-button
-                tag="router-link"
-                type="is-primary"
-                outlined
-                size="is-small"
-                icon-left="pencil"
-                :inverted="selected==props.row ? true : false"
-                :to="getEditRoute(container, props.row.name)"
-              >
-                {{ $t('message.edit') }}
-              </b-button>
-            </p>
-          </div>
-        </template>
-      </b-table-column>
-      <b-table-column
-        field="dangerous"
-        label=""
-        width="75"
-      >
-        <template #default="props">
-          <span v-if="renderFolders && !isFile(props.row.name)" />
-          <DeleteObjectsButton
-            v-else
-            size="is-small"
-            :inverted="props.row === selected ? true : false"
-            :disabled="false"
-            :objects="[props.row]"
-          />
-        </template>
-      </b-table-column>
-      <template
-        #detail="props"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)">
-          {{ $t('message.table.folderDetails') }}
-        </span>
-        <span v-else>
-          <ul>
-            <li>
-              <b>{{ $t('message.table.fileHash') }}: </b>{{ props.row.hash }}
-            </li>
-            <li>
-              <b>{{ $t('message.table.fileType') }}: </b>
-              {{ props.row.content_type }}
-            </li>
-            <li>
-              <b>{{ $t('message.table.fileDown') }}: </b>
-              <a
-                v-if="props.row.bytes < 1073741824"
-                :href="props.row.url"
-                target="_blank"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-              <a
-                v-else-if="allowLargeDownloads"
-                :href="props.row.url"
-                target="_blank"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-              <a
-                v-else
-                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-                @click="confirmDownload ()"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-            </li>
-          </ul>
-        </span>
-      </template>
-      <template #empty>
-        <p class="emptyTable">
-          {{ $t('message.emptyContainer') }}
-        </p>
-      </template>
-    </b-table>
+        <span class="menu-active">Display options</span>
+      </c-menu>
+    </c-row>
+    <CObjectTable
+      :objs="oList.value"
+      :disable-pagination="disablePagination"
+      :hide-tags="hideTags"
+      :render-folders="renderFolders"
+    />
   </div>
 </template>
 
@@ -338,18 +34,20 @@ import { getHumanReadableSize, truncate } from "@/common/conv";
 import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
+import CObjectTable from "@/components/CObjectTable";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import ReplicateContainerButton from "@/components/ReplicateContainer";
-import DeleteObjectsButton from "@/components/ObjectDeleteButton";
+// import ContainerDownloadLink from "@/components/ContainerDownloadLink";
+// import ReplicateContainerButton from "@/components/ReplicateContainer";
+// import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
 export default {
   name: "ObjectTable",
   components: {
-    ContainerDownloadLink,
-    ReplicateContainerButton,
-    DeleteObjectsButton,
+    CObjectTable,
+    // ContainerDownloadLink,
+    // ReplicateContainerButton,
+    // DeleteObjectsButton,
   },
   filters: {
     truncate,
@@ -358,9 +56,9 @@ export default {
     return {
       oList: {value: []},
       selected: undefined,
-      isPaginated: true,
-      renderFolders: false,
-      showTags: true,
+      disablePagination: false,
+      renderFolders: true,
+      hideTags: false,
       perPage: 15,
       defaultSortDirection: "asc",
       searchQuery: "",
@@ -389,6 +87,9 @@ export default {
     },
     sharedObjects() {
       return this.$store.state.objectCache;
+    },
+    openCreateFolderModal() {
+      return this.$store.state.openCreateFolderModal;
     },
   },
   watch: {
@@ -441,6 +142,20 @@ export default {
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
     this.$store.commit("erasePrefix");
+    this.tableOptions = [
+      {
+        name: "Render folders",
+        action: () => {this.renderFolders = !(this.renderFolders);},
+      },
+      {
+        name: "Hide tags",
+        action: () => {this.hideTags = !(this.hideTags);},
+      },
+      {
+        name: "Hide pagination",
+        action: () => {this.disablePagination = !(this.disablePagination);},
+      },
+    ];
   },
   beforeMount () {
     this.abortController = new AbortController();
@@ -736,16 +451,10 @@ export default {
 </script>
 
 <style scoped>
-.objectTable {
-  width: 90%;
+.object-table {
   margin-left: 5%;
   margin-right: 5%;
-}
-
-.emptyTable {
-  width: 100%;
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 </style>
