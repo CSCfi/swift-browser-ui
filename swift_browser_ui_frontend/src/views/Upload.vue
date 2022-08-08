@@ -11,12 +11,15 @@
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
-        <c-text-field
-          v-csc-model="folderName"
-          :placeholder="$t('message.container_ops.folderName')"
-          name="foldername"
-          type="text"
+        <c-autocomplete
+          v-control
+          v-csc-model="selectedFolder"
+          :items.prop="filteredItems"
+          :query="queryString"
+          :label="$t('message.container_ops.folderName')"
+          hide-details
           required
+          @changeQuery="onQueryChange"
         />
         <b-field
           custom-class="has-text-dark"
@@ -30,6 +33,7 @@
             maxlength="20"
             has-counter
             rounded
+            type="is-primary"
             :placeholder="$t('message.tagPlaceholder')"
             :confirm-keys="taginputConfirmKeys"
             :on-paste-separators="taginputConfirmKeys"
@@ -112,14 +116,19 @@ export default {
   },
   data() {
     return {
-      folderName: "",
+      queryString: "",
+      selectedFolder: null,
       tags: [],
       taginputConfirmKeys,
       tooLarge: false,
       noUpload: true,
+      filteredItems: [],
     };
   },
   computed: {
+    containers() {
+      return this.$store.state.db.containers;
+    },
     res() {
       return this.$store.state.resumableClient;
     },
@@ -219,6 +228,9 @@ export default {
     },
   },
   watch: {
+    selectedFolder: function() {
+      if(this.selectedFolder !== null) this.getTags();
+    },
     dropFiles: function () {
       this.checkUploadSize();
     },
@@ -226,8 +238,31 @@ export default {
       this.setFiles();
     },
   },
-
   methods: {
+    onQueryChange: function (e) {
+      this.queryString = e.detail;
+      this.getFilteredContainers();
+      if(e.detail.length === 0) {
+        this.tags = [];
+      }
+    },
+    getFilteredContainers: async function() {
+      const result = await this.containers
+        .filter(cont => cont.projectID === this.active.id)
+        .filter(cont => cont.name.toLowerCase()
+          .includes(this.queryString.toLowerCase()))
+        .limit(1000)
+        .toArray();
+      this.filteredItems = result;
+    },
+    getTags: async function () {
+      this.queryString = this.selectedFolder.name;
+      const folder = await this.$store.state.db.containers.get({
+        projectID: this.$store.state.active.id,
+        name: this.selectedFolder.name,
+      });
+      this.tags = folder ? folder.tags : [];
+    },
     setFile: function (item, path) {
       let entry = undefined;
       if (item.isFile) {
@@ -283,7 +318,7 @@ export default {
       let uploadInfo = await getUploadEndpoint(
         this.active.id,
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
-        this.folderName,
+        this.queryString,
       );
       this.$store.commit("setUploadInfo", uploadInfo);
       this.res.addFiles(files, undefined);
@@ -319,7 +354,8 @@ export default {
       e.preventDefault();
       let dt = e.dataTransfer;
       if (dt.types.indexOf("Files") >= 0) {
-        e.target.classList.add("over-dropArea");
+        const el = document.querySelector(".dropArea");
+        el.classList.add("over-dropArea");
         e.stopPropagation();
         dt.dropEffect = "copy";
         dt.effectAllowed = "copy";
@@ -328,8 +364,9 @@ export default {
         dt.effectAllowed = "none";
       }
     },
-    dragLeaveHandler: function (e) {
-      e.target.classList.remove("over-dropArea");
+    dragLeaveHandler: function () {
+      const el = document.querySelector(".dropArea");
+      el.classList.remove("over-dropArea");
     },
     navUpload: function (e) {
       e.stopPropagation();
@@ -343,7 +380,8 @@ export default {
           this.$store.commit("appendFileTransfer", file);
         }
       }
-      e.target.classList.remove("over-dropArea");
+      const el = document.querySelector(".dropArea");
+      el.classList.remove("over-dropArea");
     },
   },
 };
@@ -370,7 +408,7 @@ c-card-content {
   color: var(--csc-dark-grey);
 }
 
-c-text-field {
+c-autocomplete {
   width: 70%;
 }
 
@@ -396,14 +434,6 @@ p.info-text.is-size-6 {
 
 .over-dropArea {
   border: 2px dashed var(--csc-primary);
-}
-
-span.file-cta {
-  background-color: transparent !important;
-  border: 2px solid var(--csc-primary) !important;
-  color: var(--csc-primary) !important;
-  font-weight: bold;
-  cursor: pointer;
 }
 
 c-data-table {
