@@ -171,7 +171,7 @@ import {
 } from "@/common/conv";
 
 export default {
-  name: "UploadView",
+  name: "UploadModal",
   filters: {
     truncate,
   },

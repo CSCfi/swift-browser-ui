@@ -81,7 +81,7 @@ import {
 } from "@/common/conv";
 
 export default {
-  name: "CreateContainer",
+  name: "CreateFolderModal",
   data() {
     return {
       create: true,
