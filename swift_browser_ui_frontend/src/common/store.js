@@ -140,7 +140,10 @@ const store = new Vuex.Store({
       }
     },
     eraseDropFile(state, file) {
-      state.dropFiles.splice(state.dropFiles.indexOf(file), 1);
+      state.dropFiles.splice(state.dropFiles
+        .findIndex(({ name, relativePath}) =>
+          relativePath === file.relativePath.value
+                              && name === file.name.value), 1);
     },
     eraseDropFiles(state) {
       state.dropFiles = [];

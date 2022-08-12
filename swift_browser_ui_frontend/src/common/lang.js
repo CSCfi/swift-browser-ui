@@ -329,6 +329,7 @@ let default_translations = {
         uploadedFiles:
           "Uploaded files will be shared with " +
           "all project members in My research project.",
+        advancedOptions: "Advanced encryption options",
       },
       search: {
         container: "Bucket",
@@ -687,6 +688,7 @@ let default_translations = {
         uploadedFiles:
           "Uploaded files will be shared with " +
           "all project members in My research project.",
+        advancedOptions: "Edistyneitä salausvaihtoehtoja",
       },
       search: {
         container: "Säiliö",

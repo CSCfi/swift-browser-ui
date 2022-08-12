@@ -1,6 +1,6 @@
 <template>
   <c-card class="upload-card">
-    <div class="upload-form">
+    <div class="upload-content">
       <h3 class="title is-3 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
       </h3>
@@ -15,13 +15,13 @@
           v-control
           v-csc-model="selectedFolder"
           :items.prop="filteredItems"
-          :query="queryString"
+          :query="inputFolder"
           :label="$t('message.container_ops.folderName')"
           hide-details
           required
           @changeQuery="onQueryChange"
         />
-        <b-field
+        <!--<b-field
           custom-class="has-text-dark"
           :label="$t('message.tagName')"
           type="is-dark"
@@ -38,7 +38,7 @@
             :confirm-keys="taginputConfirmKeys"
             :on-paste-separators="taginputConfirmKeys"
           />
-        </b-field>
+        </b-field>-->
         <h6 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
         </h6>
@@ -62,11 +62,13 @@
           </b-upload>
         </div>
         <c-data-table
+          v-if="dropFiles.length > 0"
+          class="files-table"
           :data.prop="dropFiles"
-          :headers.prop="headers"
+          :headers.prop="fileHeaders"
           :no-data-text="$t('message.encrypt.empty')"
-          :pagination.prop="paginationOptions"
-          :footer-options.prop="footerOptions"
+          :pagination.prop="filesPagination"
+          :footer-options.prop="footer"
         />
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdFolder") }}
@@ -80,24 +82,82 @@
           {{ $t("message.container_ops.viewProjectMembers") }}
           <i class="mdi mdi-open-in-new" />
         </c-link>
+        <c-accordion :value="$t('message.encrypt.advancedOptions')">
+          <c-accordion-item
+            :heading="$t('message.encrypt.advancedOptions')"
+            :value="$t('message.encrypt.advancedOptions')"
+          >
+            <c-container>
+              <c-switch v-csc-model="ownPrivateKey">
+                {{ $t("message.encrypt.ephemeral") }}
+              </c-switch>
+              <c-flex v-if="ownPrivateKey">
+                <c-text-field
+                  v-csc-model="privkey"
+                  :placeholder="$t('message.encrypt.pk_msg')"
+                  :label="$t('message.encrypt.pk')"
+                  type="text"
+                  max="1024"
+                />
+                <c-text-field
+                  v-csc-model="passphrase"
+                  :placeholder="$t('message.encrypt.phrase_msg')"
+                  :label="$t('message.encrypt.phrase')"
+                  type="text"
+                  max="1024"
+                  rows="5"
+                />
+              </c-flex>
+            </c-container>
+            <c-container>
+              <c-switch v-csc-model="multipleReceivers">
+                {{ $t("message.encrypt.multipleReceivers") }}
+              </c-switch>
+              <c-flex v-if="multipleReceivers">
+                <c-text-field
+                  v-csc-model="addRecvkey"
+                  :placeholder="$t('message.encrypt.pubkey_msg')"
+                  :label="$t('message.encrypt.pubkey')"
+                  type="text"
+                  max="1024"
+                />
+                <c-button
+                  type="is-success"
+                  icon-left="lock-plus"
+                  @click="appendPublicKey"
+                >
+                  {{ $t("message.encrypt.addkey") }}
+                </c-button>
+                <c-data-table
+                  class="publickey-table"
+                  :data.prop="recvHashedKeys"
+                  :headers.prop="publickeyHeaders"
+                  :no-data-text="$t('message.encrypt.noRecipients')"
+                  :pagination.prop="keyPagination"
+                  :footer-options.prop="footer"
+                />
+              </c-flex>
+            </c-container>
+          </c-accordion-item>
+        </c-accordion>
       </c-card-content>
-      <c-card-actions justify="space-between">
-        <c-button
-          outlined
-          size="large"
-          @click="cancelUpload"
-        >
-          {{ $t("message.encrypt.cancel") }}
-        </c-button>
-        <c-button
-          size="large"
-          :disabled="noUpload"
-          @click="beginUpload"
-        >
-          {{ $t("message.encrypt.normup") }}
-        </c-button>
-      </c-card-actions>
     </div>
+    <c-card-actions justify="space-between">
+      <c-button
+        outlined
+        size="large"
+        @click="cancelUpload"
+      >
+        {{ $t("message.encrypt.cancel") }}
+      </c-button>
+      <c-button
+        size="large"
+        :disabled="noUpload"
+        @click="encryptAndUpload"
+      >
+        {{ $t("message.encrypt.normup") }}
+      </c-button>
+    </c-card-actions>
   </c-card>
 </template>
 
@@ -107,6 +167,7 @@ import {
   getHumanReadableSize,
   taginputConfirmKeys,
   truncate,
+  computeSHA256,
 } from "@/common/conv";
 
 export default {
@@ -116,13 +177,21 @@ export default {
   },
   data() {
     return {
-      queryString: "",
+      inputFolder: "",
       selectedFolder: null,
       tags: [],
       taginputConfirmKeys,
-      tooLarge: false,
-      noUpload: true,
       filteredItems: [],
+      tooLarge: false,
+      ownPrivateKey: false,
+      ephemeral: true,
+      privkey: "",
+      passphrase: "",
+      multipleReceivers: false,
+      addRecvkey: "",
+      recvkeys: [],
+      recvHashedKeys: [],
+      noUpload: true,
     };
   },
   computed: {
@@ -141,27 +210,31 @@ export default {
     pubkey() {
       return this.$store.state.pubkey;
     },
-    headers() {
+    fileHeaders() {
       return [
         {
           key: "name",
           value: this.$t("message.encrypt.table.name"),
           width: "30%",
+          sortable: this.dropFiles.length > 1,
         },
         {
           key: "type",
           value: this.$t("message.encrypt.table.type"),
           width: "15%",
+          sortable: this.dropFiles.length > 1,
         },
         {
           key: "size",
           value: this.$t("message.encrypt.table.size"),
           width: "10%",
+          sortable: this.dropFiles.length > 1,
         },
         {
-          key: "path",
+          key: "relativePath",
           value: this.$t("message.encrypt.table.path"),
           width: "30%",
+          sortable: this.dropFiles.length > 1,
         },
         {
           key: "remove",
@@ -177,7 +250,39 @@ export default {
                   size: "small",
                   title: this.$t("message.remove"),
                   onClick: ({ data }) =>
-                    this.$store.commit("eraseDropFile", data["id"]),
+                    this.$store.commit("eraseDropFile", data),
+                },
+              },
+            },
+          ],
+        },
+      ];
+    },
+    publickeyHeaders() {
+      return [
+        {
+          key: "key",
+          value: this.$t("message.encrypt.pubkeyLabel"),
+          width: "70%",
+          sortable: this.recvHashedKeys.length > 1,
+        },
+        {
+          key: "remove",
+          value: null,
+          sortable: false,
+          children: [
+            {
+              value: this.$t("message.remove"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: this.$t("message.remove"),
+                  onClick: ({ index }) =>{
+                    this.recvHashedKeys.splice(index, 1);
+                    this.recvkeys.splice(index, 1);
+                  },
                 },
               },
             },
@@ -191,7 +296,7 @@ export default {
           name: { value: file.name || truncate(100) },
           type: { value: file.type },
           size: { value: this.localHumanReadableSize(file.size) },
-          path: {
+          relativePath: {
             value:
               (!file.relativePath ? file.name : file.relativePath) ||
               truncate(100),
@@ -210,17 +315,23 @@ export default {
         });
       },
     },
-    paginationOptions() {
+    filesPagination() {
       return {
         itemCount: this.dropFiles.length,
         itemsPerPage: 20,
         currentPage: 1,
       };
     },
-    footerOptions() {
+    footer() {
       return {
         hideDetails: true,
-        sortable: false,
+      };
+    },
+    keyPagination() {
+      return {
+        itemCount: this.recvHashedKeys.length,
+        itemsPerPage: 5,
+        currentPage: 1,
       };
     },
     currentProjectID() {
@@ -231,16 +342,35 @@ export default {
     selectedFolder: function() {
       if(this.selectedFolder !== null) this.getTags();
     },
+    inputFolder: function() {
+      this.refreshNoUpload();
+    },
     dropFiles: function () {
       this.checkUploadSize();
     },
     transfer: function () {
       this.setFiles();
     },
+    ownPrivateKey: function() {
+      this.ephemeral = !this.ephemeral;
+      this.refreshNoUpload();
+    },
+    privkey: function () {
+      this.refreshNoUpload();
+    },
+    recvkeys: function () {
+      this.refreshNoUpload();
+    },
+    passphrase: function () {
+      this.refreshNoUpload();
+    },
+    ephemeral: function () {
+      this.refreshNoUpload();
+    },
   },
   methods: {
     onQueryChange: function (e) {
-      this.queryString = e.detail;
+      this.inputFolder = e.detail;
       this.getFilteredContainers();
       if(e.detail.length === 0) {
         this.tags = [];
@@ -250,13 +380,13 @@ export default {
       const result = await this.containers
         .filter(cont => cont.projectID === this.active.id)
         .filter(cont => cont.name.toLowerCase()
-          .includes(this.queryString.toLowerCase()))
+          .includes(this.inputFolder.toLowerCase()))
         .limit(1000)
         .toArray();
       this.filteredItems = result;
     },
     getTags: async function () {
-      this.queryString = this.selectedFolder.name;
+      this.inputFolder = this.selectedFolder.name;
       const folder = await this.$store.state.db.containers.get({
         projectID: this.$store.state.active.id,
         name: this.selectedFolder.name,
@@ -318,7 +448,7 @@ export default {
       let uploadInfo = await getUploadEndpoint(
         this.active.id,
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
-        this.queryString,
+        this.inputFolder,
       );
       this.$store.commit("setUploadInfo", uploadInfo);
       this.res.addFiles(files, undefined);
@@ -346,9 +476,13 @@ export default {
     localHumanReadableSize: function (size) {
       return getHumanReadableSize(size);
     },
+    clearFiles() {
+      this.$store.commit("eraseDropFiles");
+    },
     cancelUpload() {
       this.$store.commit("eraseDropFiles");
       this.$store.commit("toggleUploadModal", false);
+      this.inputFolder = "";
     },
     dragHandler: function (e) {
       e.preventDefault();
@@ -383,6 +517,155 @@ export default {
       const el = document.querySelector(".dropArea");
       el.classList.remove("over-dropArea");
     },
+    appendPublicKey: async function () {
+      if (!this.recvkeys.includes(this.addRecvkey)){
+        this.recvkeys.push(this.addRecvkey);
+        this.recvHashedKeys
+          .push({key: {value: await computeSHA256(this.addRecvkey)}});
+      }
+      this.addRecvkey = "";
+    },
+    refreshNoUpload() {
+      if (this.ephemeral) {
+        this.noUpload = (
+          (!this.pubkey.length && !this.recvkeys.length)
+          || !this.inputFolder
+          || !this.dropFiles.length
+        );
+      }
+      if (this.ownPrivateKey) {
+        this.noUpload = (
+          (!this.pubkey.length && !this.recvkeys.length)
+          || !this.inputFolder
+          || !this.dropFiles.length
+          || (!this.passphrase && !this.privkey)
+        );
+      }
+    },
+    encryptFiles: async function () {
+      let res = 0;
+      // Add keys to the filesystem
+      FS.mkdir("/keys"); // eslint-disable-line
+      FS.mkdir("/keys/recv_keys"); // eslint-disable-line
+      // Only add private key if we're not using ephemeral key upload
+      if (!this.ephemeral) {
+        FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
+      }
+      // we add the fixed set of keys to the ones the user added
+      let keysArray = this.recvkeys.concat(this.pubkey);
+      keysArray = [...new Set([...this.recvkeys, ...this.pubkey])];
+      for (let i = 0; i < keysArray.length; i++) {
+        FS.writeFile( // eslint-disable-line
+          "/keys/recv_keys/pubkey_" + i.toString(),
+          keysArray[i],
+        );
+      }
+      // Add files to the filesystem
+      FS.mkdir("/data"); // eslint-disable-line
+      for (let f of this.dropFiles) {
+        let buf = new Uint8Array(await f.arrayBuffer());
+        handleDirectories: {
+          if (f.relativePath) {
+            if (f.relativePath.split("/").length <= 1) {
+              break handleDirectories;
+            }
+            // Ensure the directories are available for the path
+            let dirs = f.relativePath.split("/");
+            dirs.pop(); // ditch the file name
+            let createDirs = (dirs, path) => {
+              let npath = path + "/" + dirs[0];
+              try {
+                FS.mkdir(npath); // eslint-disable-line
+              } catch(err) {} // eslint-disable-line
+              if (dirs.slice(1).length > 0) {
+                createDirs(dirs.slice(1), npath);
+              }
+            };
+            createDirs(dirs, "/data");
+          }
+        }
+        let outname = "/data/" + (f.relativePath ? f.relativePath : f.name);
+        try {
+          FS.writeFile(outname, buf); // eslint-disable-line
+        } catch (err) {
+          res = 255; // Indicate FS space exhaustion with error 255
+        }
+      }
+
+      if (res != 0 ) {
+        this.$buefy.toast.open({
+          message: this.$t("message.encrypt.fsWriteFail"),
+          duration: 15000,
+          type: "is-danger",
+        });
+        throw "Failed to write files into FS.";
+      }
+
+      res = 0;
+      if(!this.ephemeral) {
+        res = Module.ccall( // eslint-disable-line
+          "encrypt_folder",
+          "number",
+          ["string"],
+          [this.passphrase],
+        );
+      } else {
+        res = Module.ccall( // eslint-disable-line
+          "encrypt_folder_ephemeral",
+          "number",
+          [],
+          [],
+        );
+      }
+      if (res != 0) {
+
+        this.$buefy.toast.open({
+          message: this.$t("message.encrypt.enFail"),
+          duration: 15000,
+          type: "is-danger",
+        });
+        throw "Failed to encrypt files.";
+      }
+    },
+    encryptAndUpload: function () {
+      this.$buefy.toast.open({
+        message: this.$t("message.encrypt.enStart"),
+        duration: 10000,
+        type: "is-success",
+      });
+      this.encryptFiles().then(() => {
+        this.$buefy.toast.open({
+          message: this.$t("message.encrypt.enSuccess"),
+          duration: 10000,
+          type: "is-success",
+        });
+        this.$store.commit("setAltContainer", this.inputFolder);
+        let files = [];
+        for (let f of this.dropFiles) {
+          let path = f.relativePath ? f.relativePath : f.name;
+          let outname = (
+            "/data/"
+            + path
+            + ".c4gh");
+          let newFile = new Blob(
+            [FS.readFile(outname).buffer], // eslint-disable-line
+            {
+              type: "binary/octet-stream",
+            },
+          );
+          newFile.relativePath = path + ".c4gh";
+          newFile.name = f.name + ".c4gh";
+          files.push(newFile);
+        }
+        this.aBeginUpload(files).then(() => {
+          this.$buefy.toast.open({
+            message: this.$t("message.encrypt.upStart"),
+            type: "is-success",
+          });
+          this.clearFiles();
+        });
+      });
+    },
   },
 };
 </script>
@@ -399,12 +682,12 @@ export default {
   height: 85vh;
 }
 
-.upload-form {
+.upload-content {
   overflow-y: scroll;
 }
 
 c-card-content {
-  padding: 1.5rem 0;
+  padding: 1.5rem 0 0 0;
   color: var(--csc-dark-grey);
 }
 
@@ -428,7 +711,7 @@ p.info-text.is-size-6 {
   border: 1px dashed $csc-light-grey;
   padding: 2rem 0;
   & > span:first-of-type {
-      margin-right: 1rem;
+    margin-right: 1rem;
   }
 }
 
@@ -436,12 +719,24 @@ p.info-text.is-size-6 {
   border: 2px dashed var(--csc-primary);
 }
 
-c-data-table {
+c-data-table.files-table {
   margin-top: -24px;
 }
 
 c-card-actions {
-  padding: 0;
+  padding: 1rem 0 0 0;
+  border-top: 1px solid var(--csc-primary);
+}
+
+c-container {
+  margin-top: 1rem;
+}
+
+c-flex {
+  margin-top: 1rem;
+}
+
+c-data-table.publickey-table {
   margin-top: 1rem;
 }
 
