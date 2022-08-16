@@ -43,7 +43,7 @@ export default {
     },
     onCancel() {
       this.$emit("cancel-upload");
-      this.$store.commit("hideUploadNotification");
+      this.$store.commit("toggleUploadNotification", false);
     },
     viewContainer() {
       if (this.$route.params.container !== this.container) {

@@ -40,6 +40,7 @@
       >
         <b-switch
           v-model="useEncryption"
+          :disabled="$t('message.program_name') == 'SD Connect'"
         >
           {{ $t('message.encrypt.enFiles') }}
         </b-switch>
