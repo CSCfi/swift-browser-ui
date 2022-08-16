@@ -324,7 +324,7 @@ new Vue({
         document.querySelector("#upload-toast").removeToast("upload-toast");
       }
       
-      this.$store.commit("hideUploadNotification");
+      this.$store.commit("toggleUploadNotification", false);
     },
     getUploadUrl: function (params) {
       // Bake upload runner information to the resumable url parameters.

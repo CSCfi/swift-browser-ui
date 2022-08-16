@@ -101,11 +101,8 @@ const store = new Vuex.Store({
     stopChunking(state) {
       state.isChunking = false;
     },
-    setUploadNotification(state) {
-      state.uploadNotification = true;
-    },
-    hideUploadNotification(state) {
-      state.uploadNotification = false;
+    toggleUploadNotification(state, payload) {
+      state.uploadNotification = payload;
     },
     updateProgress(state, progress) {
       state.uploadProgress = progress;

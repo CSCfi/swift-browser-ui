@@ -9,6 +9,6 @@
     "jsx": "preserve"
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../tests/jest"],
   "allowSyntheticDefaultImports": true
 }
