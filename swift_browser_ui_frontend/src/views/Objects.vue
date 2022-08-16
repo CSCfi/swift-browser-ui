@@ -1,5 +1,5 @@
 <template>
-  <div class="contents">
+  <div class="contents container-box">
     <ObjectTable />
   </div>
 </template>

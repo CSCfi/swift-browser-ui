@@ -129,6 +129,12 @@ c-modal {
   flex: 1 0 auto;
 }
 
+.container-box {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
 .navbar .container .navbar-brand .navbar-item img {
   max-height: 2.5rem;
 }
