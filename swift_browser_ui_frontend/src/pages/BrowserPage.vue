@@ -57,8 +57,7 @@ export default {
 
 $footer-height: 10rem;
 
-html,
-body {
+html, body {
   height: 100%;
 }
 
@@ -74,7 +73,11 @@ body {
 }
 
 .content-wrapper {
-  padding-bottom: calc(#{$footer-height} + 3rem)
+  margin: 0;
+  padding: 0;
+  padding-bottom: calc(#{$footer-height} + 3rem);
+  display: flex;
+  flex-direction: column;
 }
 
 .contents {

@@ -179,7 +179,6 @@ export default {
     return {
       inputFolder: "",
       selectedFolder: null,
-      tags: [],
       taginputConfirmKeys,
       filteredItems: [],
       tooLarge: false,
@@ -340,7 +339,9 @@ export default {
   },
   watch: {
     selectedFolder: function() {
-      if(this.selectedFolder !== null) this.getTags();
+      if(this.selectedFolder !== null) {
+        this.inputFolder = this.selectedFolder.name;
+      }
     },
     inputFolder: function() {
       this.refreshNoUpload();
@@ -372,9 +373,6 @@ export default {
     onQueryChange: function (e) {
       this.inputFolder = e.detail;
       this.getFilteredContainers();
-      if(e.detail.length === 0) {
-        this.tags = [];
-      }
     },
     getFilteredContainers: async function() {
       const result = await this.containers
@@ -384,14 +382,6 @@ export default {
         .limit(1000)
         .toArray();
       this.filteredItems = result;
-    },
-    getTags: async function () {
-      this.inputFolder = this.selectedFolder.name;
-      const folder = await this.$store.state.db.containers.get({
-        projectID: this.$store.state.active.id,
-        name: this.selectedFolder.name,
-      });
-      this.tags = folder ? folder.tags : [];
     },
     setFile: function (item, path) {
       let entry = undefined;
@@ -674,12 +664,18 @@ export default {
 @import "@/css/prod.scss";
 
 .upload-card {
-  width: 64vw;
   padding: 3rem;
-  left: 50%;
-  margin-top: 50%;
-  transform: translate(-50%, -50%);
-  height: 85vh;
+  position: absolute;
+  top: -8rem;
+  left: 0;
+  right: 0;
+  max-height: 80vh;
+}
+
+@media screen and (max-width: 992px) {
+  .upload-card {
+    max-height: 50vh;
+  }
 }
 
 .upload-content {
