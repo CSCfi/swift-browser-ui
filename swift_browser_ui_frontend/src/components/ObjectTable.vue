@@ -2,6 +2,38 @@
   <div
     id="object-table"
   >
+    <div class="folder-info">
+      <div class="folder-info-heading">
+        <div class="folder-name">
+          <i class="mdi mdi-folder-outline" /> 
+          <span>{{ container }}</span>
+        </div>
+
+        <c-button
+          v-for="button in folderInfoButtons"
+          :key="button.label"
+          inverted
+          text
+          @click="button.action"
+        >
+          <i
+            slot="icon"
+            :class="button.icon"
+            class="mdi"
+          /> {{ button.label }}
+        </c-button>
+      </div>
+
+      <ul class="folder-details">
+        <li>
+          <b>{{ $t("message.share.sharedTo") }}: </b> N/A
+        </li>
+        <li>
+          <b>{{ $t("message.table.created") }}: </b> N/A
+        </li>
+      </ul>
+    </div>
+
     <c-row
       id="optionsbar"
       justify="space-between"
@@ -90,6 +122,32 @@ export default {
     },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
+    },
+    folderInfoButtons() {
+      return [
+        { label: this.$t("message.download"),
+          icon: "mdi-download",
+          action: (() => {
+            const href = "/download/".concat(
+              this.$route.params.project,
+              "/",
+              this.container);
+
+            window.open(href, "_blank");
+          }),
+        },
+        { label: this.$t("message.share.share"),
+          icon: "mdi-share-variant",
+          action: (() => this.$router.push({
+            name: "SharingView",
+            query: { container: this.container },
+          })),
+        },
+        { label: "Options (placeholder)",
+          icon: "mdi-dots-horizontal",
+          action: (() => {}), 
+        },
+      ];
     },
   },
   watch: {
@@ -450,11 +508,57 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/css/prod.scss";
 .object-table {
   margin-left: 5%;
   margin-right: 5%;
   margin-left: 5%;
   margin-right: 5%;
 }
+
+.folder-info {
+  border: 1px solid $csc-primary;
+  margin: 1rem 0rem;
+}
+
+.folder-info-heading, .folder-details {
+  padding: 1rem 2rem; 
+}
+
+.folder-info-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  color: #FFF;
+  font-size: 1rem;
+  font-weight: 700;
+  background: $csc-primary;
+  align-items: center;
+
+  & .folder-name {
+    display: flex;
+    flex: 1;
+    & .mdi {
+      font-size: 1.5rem;
+      padding-right: .5rem
+    }
+    & span {
+      align-self: center;
+      display: inline-block;
+    }
+  }
+  & c-button {
+    flex: 0
+  }
+}
+
+.folder-details {
+  color: $csc-grey;
+
+  & li {
+    padding: .25rem 0;
+  }
+}
+
 </style>
