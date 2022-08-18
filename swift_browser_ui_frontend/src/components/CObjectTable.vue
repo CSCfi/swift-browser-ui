@@ -1,6 +1,8 @@
 <template>
   <div id="c-objects">
     Checked rows: {{ checkedRows.length }}
+    <br>
+
     <c-data-table
       v-if="hideTags"
       id="objtable-no-tags"
@@ -9,10 +11,13 @@
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
+      :sort-by="sortBy" 
+      :sort-direction="sortDirection" 
       external-data
       selectable
       @selection="handleSelection" 
       @paginate="getPage"
+      @sort="onSort"
     />
     <c-data-table
       v-else
@@ -22,17 +27,19 @@
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
+      :sort-by="sortBy" 
+      :sort-direction="sortDirection" 
       external-data
       selectable
-      :selection="checkedRows"
-      @selection="handleSelection" 
+      @selection="handleSelection"
       @paginate="getPage"
+      @sort="onSort"
     />
   </div>
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
 
 export default {
   name: "CObjectTable",
@@ -53,7 +60,9 @@ export default {
       type: Boolean,
       default: true,
     },
-    checkedRows: {default: []},
+    checkedRows: {
+      default: [],
+    },
   },
   data() {
     return {
@@ -62,29 +71,29 @@ export default {
         {
           key: "name",
           value: "Name",
-          sortable: false,
-        },
-        {
-          key: "last_modified",
-          value: "Last Modified",
-          sortable: false,
+          sortable: true,
         },
         {
           key: "size",
           value: "Size",
-          sortable: false,
+          sortable: true,
         },
         {
           key: "tags",
           value: "Tags",
-          sortable: false,
+          sortable: true,
         },
         {
-          key: "actions",
-          align: "end",
-          value: null,
-          sortable: false,
+          key: "last_modified",
+          value: "Last Modified",
+          sortable: true,
         },
+        // {
+        //   key: "actions",
+        //   align: "end",
+        //   value: null,
+        //   sortable: false,
+        // },
       ],
       noTagHeaders: [
         {
@@ -93,21 +102,21 @@ export default {
           sortable: false,
         },
         {
-          key: "last_modified",
-          value: "Last Modified",
-          sortable: false,
-        },
-        {
           key: "size",
           value: "Size",
           sortable: false,
         },
         {
-          key: "actions",
-          align: "end",
-          value: null,
+          key: "last_modified",
+          value: "Last Modified",
           sortable: false,
         },
+        // {
+        //   key: "actions",
+        //   align: "end",
+        //   value: null,
+        //   sortable: false,
+        // },
       ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
@@ -119,7 +128,8 @@ export default {
         startFrom: 0,
         endTo: 9,
       },
-      sortBy: null,
+      sortBy: "name",
+      sortDirection: "asc",
     };
   },
   watch: {
@@ -152,6 +162,7 @@ export default {
         
         limit = this.paginationOptions.itemsPerPage;
       }
+
       this.objects = this.objs.slice(offset, offset + limit).reduce((
         items,
         item,
@@ -251,6 +262,11 @@ export default {
         ...this.paginationOptions,
         itemCount: this.objs.length,
       };
+    },
+    onSort(event) {
+      this.sortBy = event.detail.sortBy;
+      this.sortDirection = event.detail.direction;
+      sortObjects(this.objs, this.sortBy, this.sortDirection);
     },
     handleSelection(event) {
       this.$emit("selected-rows", event.detail);

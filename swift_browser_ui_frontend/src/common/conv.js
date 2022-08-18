@@ -255,3 +255,34 @@ export function tokenize(text, ignoreSmallerThan=2) {
 }
 
 export const DEV = process.env.NODE_ENV === "development";
+
+export function sortObjects(objects, sortBy, sortDirection) {
+  sortBy = sortBy === "size" ? "bytes" : sortBy;
+
+  objects.sort((a, b) => {
+    let valueA = a[sortBy];
+    let valueB = b[sortBy];
+
+    // Handle tags as single string
+    if (Array.isArray(valueA)) {
+      valueA = valueA.join(" ");
+      valueB = valueB.join(" ");
+    }
+
+    if (typeof valueA === "string") {
+      if (sortDirection === "asc") {
+        return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+      }
+
+      return valueB.toLowerCase().localeCompare(valueA.toLowerCase());
+    }
+
+    if (typeof valueA === "number") {
+      if (sortDirection === "asc") {
+        return valueA - valueB;
+      }
+
+      return valueB - valueA;
+    }
+  });
+}

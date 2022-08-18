@@ -8,6 +8,8 @@
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
+      :sort-by="sortBy" 
+      :sort-direction="sortDirection" 
       external-data
       @paginate="getPage"
     />
@@ -19,14 +21,17 @@
       :pagination.prop="disablePagination ? null : paginationOptions"
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
+      :sort-by="sortBy" 
+      :sort-direction="sortDirection" 
       external-data
       @paginate="getPage"
+      @sort="onSort"
     />
   </div>
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
 
 export default {
   name: "ContainerTable",
@@ -52,17 +57,17 @@ export default {
         {
           key: "name",
           value: "Name",
-          sortable: false,
+          sortable: true,
         },
         {
           key: "size",
           value: "Size",
-          sortable: false,
+          sortable: true,
         },
         {
           key: "tags",
           value: "Tags",
-          sortable: false,
+          sortable: true,
         },
         {
           key: "actions",
@@ -99,7 +104,8 @@ export default {
         startFrom: 0,
         endTo: 9,
       },
-      sortBy: null,
+      sortBy: "name",
+      sortDirection: "asc",
     };
   },
   watch: {
@@ -216,6 +222,11 @@ export default {
         ...this.paginationOptions,
         itemCount: this.conts.length,
       };
+    },
+    onSort(event) {
+      this.sortBy = event.detail.sortBy;
+      this.sortDirection = event.detail.direction;
+      sortObjects(this.conts, this.sortBy, this.sortDirection);
     },
   },
 };
