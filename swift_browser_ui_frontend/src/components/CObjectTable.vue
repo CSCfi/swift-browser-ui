@@ -1,5 +1,6 @@
 <template>
   <div id="c-objects">
+    Checked rows: {{ checkedRows.length }}
     <c-data-table
       v-if="hideTags"
       id="objtable-no-tags"
@@ -9,6 +10,8 @@
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
       external-data
+      selectable
+      @selection="handleSelection" 
       @paginate="getPage"
     />
     <c-data-table
@@ -20,6 +23,9 @@
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
       external-data
+      selectable
+      :selection="checkedRows"
+      @selection="handleSelection" 
       @paginate="getPage"
     />
   </div>
@@ -47,6 +53,7 @@ export default {
       type: Boolean,
       default: true,
     },
+    checkedRows: {default: []},
   },
   data() {
     return {
@@ -244,6 +251,9 @@ export default {
         ...this.paginationOptions,
         itemCount: this.objs.length,
       };
+    },
+    handleSelection(event) {
+      this.$emit("selected-rows", event.detail);
     },
   },
 };

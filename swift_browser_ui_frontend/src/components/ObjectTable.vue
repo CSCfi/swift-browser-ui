@@ -52,18 +52,24 @@
         <span class="menu-active">Display options</span>
       </c-menu>
     </c-row>
+
+    <c-button @click="checkedRows = []">
+      Clear checked
+    </c-button>
+
     <CObjectTable
       :objs="oList.value"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
+      :checked-rows="checkedRows"
+      @selected-rows="handleSelection"
     />
   </div>
 </template>
 
 <script>
 import { getHumanReadableSize, truncate } from "@/common/conv";
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -500,9 +506,9 @@ export default {
         },
       };
     },
-    toggleUploadModal: function () {
-      this.$store.commit("toggleUploadModal", true);
-      modifyBrowserPageStyles();
+    handleSelection(selection) {
+      const objects = this.oList.value;
+      this.checkedRows = objects.filter((_obj, i) => selection.indexOf(i) > -1);
     },
   },
 };
