@@ -695,7 +695,7 @@ let default_translations = {
       supportMenu: {
         manual: "Käyttöohje",
         billing: "Hinnoittelulaskuri",
-        sharing: "API tokenien jakaminen",
+        sharing: "API avainten jakaminen",
         about: "Tietoa",
       },
     },
