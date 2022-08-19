@@ -7,10 +7,12 @@
       id="optionsbar"
       justify="space-between"
     >
-      <SearchBox />
-      <c-menu
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
+      <ShareModal />
+    </c-modal>
+    <div class="contents">
+      <c-row
+        id="optionsbar"
+        justify="space-between"
       >
         <span class="menu-active display-options-menu">
           <i class="mdi mdi-tune" />
@@ -31,12 +33,14 @@ import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import ContainerTable from "@/components/ContainerTable";
 import SearchBox from "@/components/SearchBox";
+import ShareModal from "@/views/Sharing";
 
 export default {
   name: "ContainersView",
   components: {
     ContainerTable,
     SearchBox,
+    ShareModal,
   },
   data: function () {
     return {
@@ -140,6 +144,20 @@ export default {
 </script>
 
 <style scoped>
+
+.test {
+   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+c-modal {
+  position: relative;
+  margin: 0 auto;
+  display: inline-flex;
+}
+
 #optionsbar {
   margin: 0.5em;
   background: #fff;

@@ -1,69 +1,83 @@
 <template>
-  <div
-    id="sharingview"
-    class="contents"
-  >
-    <form action="">
-      <div class="contents">
-        <header>
-          <h1 class="title is-3 sharinghead">
-            {{ $t('message.share.share_cont') }}
-          </h1>
-        </header>
-        <section>
-          <b-field grouped>
-            <b-switch
-              v-model="read"
+  <c-card class="share-card">
+    <header>
+      <h2 class="title is-3">
+        {{ $t('message.share.share_title') }}
+        <q>{{ folderName }}</q>
+      </h2>
+      <c-button
+        text
+        @click="toggleShareModal"
+      >
+        <c-icon-button text>
+          <i class="mdi mdi-close" />
+        </c-icon-button>
+        {{ $t("message.share.close") }}
+      </c-button>
+    </header>
+    <c-card-content>
+      <h6 class="subtitle is-6 has-text-dark">
+        {{ $t("message.share.share_subtitle1") }}
+        <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+      </h6>
+      <p class="has-text-dark">
+        {{ $t("message.share.share_subtitle2") }}
+      </p>
+      <c-container>
+        <h3 class="title is-4 has-text-dark">
+          {{ $t("message.share.share_other_projects") }}
+        </h3>
+        <c-alert type="info">
+          <div class="guide-content">
+            <section>
+              <p>
+                {{ $t("message.share.share_guide_heading") }}
+              </p>
+              <div v-show="openShareGuide">
+                <br>
+                <p>
+                  {{ $t("message.share.share_guide_step1") }}
+                </p>
+                <p>
+                  {{ $t("message.share.share_guide_step2") }}
+                </p>
+              </div>
+            </section>
+            <c-link
+              underline
+              @click="toggleShareGuide"
             >
-              {{ $t('message.share.read_perm') }}
-            </b-switch>
-            <b-switch
-              v-model="write"
-            >
-              {{ $t('message.share.write_perm') }}
-            </b-switch>
-            <b-button
-              class="syncbutton"
-              type="is-primary"
-              icon-left="refresh"
-              outlined
-              @click="syncShareRequests()"
-            >
-              {{ $t('message.share.sync_requests') }}
-            </b-button>
-          </b-field>
-          <b-field
-            :label="$t('message.share.field_label')"
+              <span>
+                {{ openShareGuide ? $t("message.share.close")
+                  : $t("message.share.guide")
+                }}
+              </span>
+            </c-link>
+          </div>
+        </c-alert>
+        <b-field custom-class="field" type="is-dark">
+          <b-taginput
+            v-model="tags"
+            :placeholder="$t('message.share.field_placeholder')"
+          />
+        </b-field>
+        <c-flex>
+          <c-menu
+            :items.prop="accessRights"
+            no-hover
           >
-            <b-taginput
-              v-model="tags"
-              :placeholder="$t('message.share.field_placeholder')"
-            />
-          </b-field>
-          <b-field
-            :label="$t('message.share.container_label')"
-          >
-            <b-input v-model="container" />
-          </b-field>
-        </section>
-        <section>
-          <b-button
-            class="is-primary sharingbutton"
+            <c-menu-item>{{ currentAccessRight }}</c-menu-item>
+          </c-menu>
+          <c-button
             :loading="loading"
             @click="shareSubmit()"
           >
             {{ $t('message.share.confirm') }}
-          </b-button>
-          <b-button
-            class="is-light sharingbutton"
-            @click="$router.go(-1)"
-          >
-            {{ $t('message.share.cancel') }}
-          </b-button>
-        </section>
-      </div>
-    </form>
-  </div>
+          </c-button>
+        </c-flex>
+      </c-container>
+    </c-card-content>
+  </c-card>
 </template>
 
 <script>
@@ -77,11 +91,27 @@ export default {
   data () {
     return {
       tags: [],
-      container: "",
+      openShareGuide: false,
       read: false,
       write: false,
       loading: false,
+      currentAccessRight: this.$t("message.share.give_rights"),
+      accessRights: [
+        {
+          name: this.$t("message.share.read_perm"),
+          action: () => this.giveReadAccess(),
+        },
+        {
+          name: this.$t("message.share.write_perm"),
+          action: () => this.giveReadWriteAccess(),
+        },
+      ],
     };
+  },
+  computed: {
+    folderName() {
+      return this.$store.state.selectedFolderName;
+    },
   },
   watch: {
     read: function () {
@@ -95,48 +125,16 @@ export default {
       }
     },
   },
-  beforeMount () {
-    this.checkContainer();
-  },
   methods: {
-    checkContainer: function () {
-      if (this.$route.query.container != undefined) {
-        this.container = this.$route.query.container;
-      }
+    giveReadAccess: function () {
+      this.currentAccessRight = this.$t("message.share.read_perm");
+      this.read = true;
+      this.write = false;
     },
-    syncShareRequests: function () {
-      if (!this.container) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$t("message.share.request_sync_nocont"),
-          type: "is-danger",
-        });
-        return;
-      }
-      this.$store.state.requestClient.listOwnedRequests(
-        this.$store.state.active.id,
-      ).then((ret) => {
-        let requests = ret.filter(req => req.container == this.container);
-        let request_amount = 0;
-        for (let request of requests) {
-          this.tags.push(request.user);
-          request_amount++;
-        }
-        if (request_amount > 0) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: this.$t("message.share.request_synced"),
-            type: "is-success",
-          });
-        }
-        else {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: this.$t("message.share.request_not_synced"),
-            type: "is-success",
-          });
-        }
-      });
+    giveReadWriteAccess: function () {
+      this.currentAccessRight = this.$t("message.share.write_perm");
+      this.read = true;
+      this.write = true;
     },
     shareSubmit: function () {
       this.loading = true;
@@ -178,18 +176,10 @@ export default {
         });
         return false;
       }
-      if (this.container == "") {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$t("message.share.fail_nocont"),
-          type: "is-danger",
-        });
-        return false;
-      }
       try {
         await this.$store.state.client.shareNewAccess(
           this.$store.state.active.id,
-          this.container,
+          this.folderName,
           this.tags,
           rights,
           await getSharedContainerAddress(this.$route.params.project),
@@ -210,36 +200,86 @@ export default {
       }
       await addAccessControlMeta(
         this.$route.params.project,
-        this.container,
+        this.folderName,
         rights,
-        this.tags, 
+        this.tags,
       );
       return true;
+    },
+    toggleShareGuide: function () {
+      this.openShareGuide = !this.openShareGuide;
+    },
+    toggleShareModal: function () {
+      this.$store.commit("toggleShareModal", false);
     },
   },
 };
 </script>
 
-<style scoped>
-  #sharingview {
-    width: auto;
-    margin-left: 5%;
-    margin-right: 5%;
+<style lang="scss" scoped>
+  .share-card {
+    padding: 3rem;
+    position: absolute;
+    top: -8rem;
+    left: 0;
+    right: 0;
+    max-height: 80vh;
   }
 
-  .sharingbutton {
-    margin: 1% 0;
+  header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    & > h2 {
+      color: var(--csc-dark-grey);
+      margin: 0 !important;
+    }
   }
 
-  .sharingbutton + .sharingbutton {
-    margin-left: 1%;
+  c-card-content {
+    padding: 0;
+    & > * {
+      margin: 0 !important;
+    };
+    & > p {
+      margin-top: -1rem !important;
+    }
   }
 
-  .syncbutton {
-    margin-left: 1%;
+  .guide-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    & > section {
+      margin-right: 24px;
+    }
   }
 
-  .sharinghead {
-    margin: 1% 1% 1% 0;
+  c-link > span {
+    font-size: 0.875rem;
   }
+
+  .field {
+    margin: 2rem 0 0 0;
+  }
+
+  c-flex {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  c-menu {
+    border: 1px solid var(--csc-dark-grey);
+  }
+
+  c-menu-item {
+    background-color: transparent;
+  }
+
+
+
 </style>

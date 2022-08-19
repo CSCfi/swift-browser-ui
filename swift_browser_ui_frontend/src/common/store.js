@@ -44,6 +44,7 @@ const store = new Vuex.Store({
     openCreateFolderModal: false,
     selectedFolderName: "",
     openUploadModal: false,
+    openShareModal: false,
   },
   mutations: {
     loading(state, payload) {
@@ -168,6 +169,9 @@ const store = new Vuex.Store({
     },
     toggleUploadModal(state, payload) {
       state.openUploadModal = payload;
+    },
+    toggleShareModal(state, payload) {
+      state.openShareModal = payload;
     },
   },
   actions: {
