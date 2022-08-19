@@ -1,10 +1,11 @@
 <template>
   <c-card class="share-card">
     <header>
-      <h2 class="title is-3">
+      <h3 class="title is-3">
         {{ $t('message.share.share_title') }}
+        <br>
         <q>{{ folderName }}</q>
-      </h2>
+      </h3>
       <c-button
         text
         @click="toggleShareModal"
@@ -24,9 +25,9 @@
         {{ $t("message.share.share_subtitle2") }}
       </p>
       <c-container>
-        <h3 class="title is-4 has-text-dark">
+        <h4 class="title is-4 has-text-dark">
           {{ $t("message.share.share_other_projects") }}
-        </h3>
+        </h4>
         <c-alert type="info">
           <div class="guide-content">
             <section>
@@ -55,9 +56,13 @@
             </c-link>
           </div>
         </c-alert>
-        <b-field custom-class="field" type="is-dark">
+        <b-field
+          custom-class="field"
+          type="is-dark"
+        >
           <b-taginput
             v-model="tags"
+            ellipsis
             :placeholder="$t('message.share.field_placeholder')"
           />
         </b-field>
@@ -223,7 +228,16 @@ export default {
     top: -8rem;
     left: 0;
     right: 0;
-    max-height: 80vh;
+  }
+
+  @media screen and (max-height: 720px) {
+    .share-card {
+      max-height: 70vh;
+      top: -30vh;
+    }
+    c-card-content  {
+      overflow-y: scroll;
+    }
   }
 
   header {
@@ -231,13 +245,18 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    & > h2 {
+    & > h3 {
       color: var(--csc-dark-grey);
       margin: 0 !important;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
   c-card-content {
+    margin-top: 1rem;
     padding: 0;
     & > * {
       margin: 0 !important;
@@ -279,7 +298,5 @@ export default {
   c-menu-item {
     background-color: transparent;
   }
-
-
 
 </style>
