@@ -14,33 +14,19 @@
       </div>
       <div class="navbar-menu">
         <div class="navbar-start">
-          <div class="navbar-item app-name">
+          <router-link
+            class="navbar-item app-name"
+            :to="`/browse/${uname}/${active.id}`"
+          >
             <b>{{ $t("message.program_name") }}</b>
-          </div>
+          </router-link>
         </div>
         <div class="navbar-end">
           <div class="navbar-item">
             <LanguageSelector />
           </div> 
-          <div
-            v-if="$te('message.helplink')"
-            class="navbar-item"
-          >
-            <a
-              :href="$t('message.helplink')"
-              target="_blank"
-            >
-              <c-button
-                text
-                tabindex="-1"
-              >
-                <i
-                  slot="icon"
-                  class="mdi mdi-help-circle-outline menu-icon"
-                />
-                <span class="menu-active">{{ $t("message.support") }}</span>
-              </c-button>
-            </a>
+          <div class="navbar-item">
+            <BrowserSupportMenu />
           </div>
           <div class="navbar-item">
             <BrowserUserMenu />
@@ -53,12 +39,14 @@
 
 <script>
 import LanguageSelector from "@/components/CLanguageSelector.vue";
+import BrowserSupportMenu from "@/components/BrowserSupportMenu.vue";
 import BrowserUserMenu from "@/components/BrowserUserMenu.vue";
 
 export default {
   name: "BrowserMainNavbar",
   components: {
     LanguageSelector,
+    BrowserSupportMenu,
     BrowserUserMenu,
   },
   props: [
