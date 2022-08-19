@@ -24,6 +24,18 @@ export default {
     return {
       menuItems: [
         {
+          key: "message.copy", 
+          action: () => this.$router.push({
+            name: "ReplicateContainer",
+            params: {
+              container: this.getContainer(),
+              project: this.getProject(),
+              from: this.getFrom(),
+            },
+          }),
+          disabled: !this.props.row.bytes ? true : false,
+        },
+        {
           key: "message.editTags", 
           action: () => toggleCreateFolderModal(this.props.row.name),
         },
@@ -35,6 +47,11 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    active () {
+      return this.$store.state.active;
+    },
   },
   methods: {
     confirmDelete: function (container, objects) {
@@ -79,6 +96,23 @@ export default {
           })
           .delete();
       });
+    },
+    getProject: function () {
+      if(this.$route.params.user == undefined) {
+        return this.$props.project ? this.$props.project :
+          this.$route.params.project;
+      }
+      return this.active.id;
+    },
+    getFrom: function() {
+      if (this.$props.from != undefined) {
+        return this.$props.from;
+      }
+      return this.active.id;
+    },
+    getContainer: function () {
+      return this.$props.container ? this.$props.container :
+        this.$route.params.container;
     },
   },
 };

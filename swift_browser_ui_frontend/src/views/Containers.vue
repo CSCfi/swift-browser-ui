@@ -240,23 +240,6 @@
                 {{ $t("message.share.share") }}
               </b-button>
             </p>
-            <p class="control">
-              <ReplicateContainerButton
-                v-if="selected == props.row"
-                :project="active.id"
-                :container="props.row.name"
-                :smallsize="true"
-                :disabled="!props.row.bytes ? true : false"
-                :inverted="true"
-              />
-              <ReplicateContainerButton
-                v-else
-                :project="active.id"
-                :container="props.row.name"
-                :disabled="!props.row.bytes ? true : false"
-                :smallsize="true"
-              />
-            </p>
           </div>
         </template>
       </b-table-column>
@@ -286,7 +269,6 @@ import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import ReplicateContainerButton from "@/components/ReplicateContainer";
 import AddContainer from "@/views/AddContainer";
 import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
@@ -295,7 +277,6 @@ export default {
   components: {
     SearchResultItem,
     ContainerDownloadLink,
-    ReplicateContainerButton,
     AddContainer,
     FolderOptionsMenu,
   },
