@@ -350,12 +350,6 @@ let default_translations = {
         uname: "Username",
         pwd: "Password",
       },
-      supportMenu: {
-        manual: "User manual",
-        billing: "Billing unit calculator",
-        sharing: "Sharing API tokens",
-        about: "About Sensitive Data Services",
-      },
     },
   },
   fi: {
@@ -691,12 +685,6 @@ let default_translations = {
         description: "Kirjaudu käyttäen käyttäjätunnustasi.",
         uname: "Käyttäjänimi",
         pwd: "Salasana",
-      },
-      supportMenu: {
-        manual: "Käyttöohje",
-        billing: "Hinnoittelulaskuri",
-        sharing: "API avainten jakaminen",
-        about: "Tietoa",
       },
     },
   },
