@@ -67,9 +67,9 @@ let default_translations = {
       cscOrg: "CSC - IT Center For Science LTD",
       devel: "Developed by",
       folderTabs: {
-        all: "All project's folders",
-        sharedFrom: "Shared from project",
-        sharedTo: "Shared to project",
+        all: "All folders",
+        sharedFrom: "Folders you have shared",
+        sharedTo: "Folders shared with you",
       },
       table: {
         name: "Name",
@@ -412,9 +412,9 @@ let default_translations = {
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
       devel: "kehittänyt",
       folderTabs: {
-        all: "Kaikki projektin kansiot",
-        sharedFrom: "Projektista jaetut",
-        sharedTo: "Projektiin jaetut",
+        all: "Kaikki kansiot",
+        sharedFrom: "Jakamasi kansiot",
+        sharedTo: "Sinulle jaetut kansiot",
       },
       table: {
         name: "Nimi",

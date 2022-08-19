@@ -7,6 +7,7 @@
     <c-button
       v-for="tab in tabs"
       :key="tab.key"
+      class="tab-button"
       @click="navigate(tab.route.name)"
     >
       {{ $t(tab.key) }}
@@ -48,12 +49,12 @@ export default {
           route: { name: "AllFolders" },
         },
         {
-          key: "message.folderTabs.sharedTo",
-          route: { name: "SharedTo" },
-        },
-        {
           key: "message.folderTabs.sharedFrom",
           route: { name: "SharedFrom" },
+        },
+        {
+          key: "message.folderTabs.sharedTo",
+          route: { name: "SharedTo" },
         },
       ];
     },
@@ -74,5 +75,9 @@ export default {
 c-tab-buttons {
   display: block;
   padding-bottom: 2rem;
+}
+
+.tab-button {
+  flex-basis: 0;
 }
 </style>

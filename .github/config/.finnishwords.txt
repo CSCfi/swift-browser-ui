@@ -55,6 +55,7 @@ jaettuja
 jaetun
 jaetut
 jakamaan
+jakamasi
 jakaminen
 jakamista
 jako
@@ -313,6 +314,7 @@ selain
 selainta
 selatessa
 siirto
+sinulle
 sisään
 sisäänkirjauksen
 sisällön
