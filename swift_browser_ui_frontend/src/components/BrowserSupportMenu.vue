@@ -73,6 +73,7 @@ export default {
             window.open(item.href, "_blank");
           },
           icon: mdiOpenInNew,
+          disabled: item.href === "",
         });
       }
     },
