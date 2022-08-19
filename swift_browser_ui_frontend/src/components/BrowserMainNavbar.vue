@@ -14,9 +14,12 @@
       </div>
       <div class="navbar-menu">
         <div class="navbar-start">
-          <div class="navbar-item app-name">
+          <router-link
+            class="navbar-item app-name"
+            :to="`/browse/${uname}/${active.id}`"
+          >
             <b>{{ $t("message.program_name") }}</b>
-          </div>
+          </router-link>
         </div>
         <div class="navbar-end">
           <div class="navbar-item">
