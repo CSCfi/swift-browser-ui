@@ -153,11 +153,25 @@ let default_translations = {
       share: {
         share: "Share",
         share_id: "Share ID",
+        close: "Close",
+        guide: "Instructions",
         share_cont: "Share the bucket",
-        read_perm: "Grant read permissions",
-        write_perm: "Grant write permissions",
+        share_title: "Share folder ",
+        share_subtitle1: "Shared with members of ",
+        share_subtitle2: "Folders are by default shared with your project " +
+                         "members. This is mandatory.",
+        share_other_projects: "Share with other projects",
+        share_guide_heading: "You need project ID of the project you are " +
+                  "sharing the folder with. ",
+        share_guide_step1: "1. Project members can find project ID from " +
+                          "Project information page. Go to Profile menu " +
+                          "-> Project infomation.",
+        share_guide_step2: "2. Copy project ID and send it via email etc.",
+        give_rights: "Give rights",
+        read_perm: "Read",
+        write_perm: "Read and write",
         field_label: "Project Identifiers to share with",
-        field_placeholder: "Add Project Identifiers here",
+        field_placeholder: "Add Project IDs",
         cancel: "Cancel",
         confirm: "Share",
         to_me: "Shared to the project",
