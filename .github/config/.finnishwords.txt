@@ -13,6 +13,7 @@ avaimet
 avaimia
 avain
 avainta
+avainten
 edellinen
 ei
 eikä
@@ -40,6 +41,7 @@ haluatko
 halutako
 haluttu
 halutun
+hinnoittelulaskuri
 hyväksy
 hyväksyä
 hyväksyäksesi
@@ -131,6 +133,7 @@ kulutuksesta
 kulutus
 kunnes
 kyseisen
+käyttöohje
 ladattavat
 lähetä
 lähetetään
