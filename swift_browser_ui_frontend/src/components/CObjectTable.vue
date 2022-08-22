@@ -40,6 +40,7 @@
 
 <script>
 import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
+import {swiftDeleteObjects} from "@/common/api";
 
 export default {
   name: "CObjectTable",
@@ -88,12 +89,12 @@ export default {
           value: "Last Modified",
           sortable: true,
         },
-        // {
-        //   key: "actions",
-        //   align: "end",
-        //   value: null,
-        //   sortable: false,
-        // },
+        {
+          key: "actions",
+          align: "end",
+          value: null,
+          sortable: false,
+        },
       ],
       noTagHeaders: [
         {
@@ -111,12 +112,12 @@ export default {
           value: "Last Modified",
           sortable: false,
         },
-        // {
-        //   key: "actions",
-        //   align: "end",
-        //   value: null,
-        //   sortable: false,
-        // },
+        {
+          key: "actions",
+          align: "end",
+          value: null,
+          sortable: false,
+        },
       ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
@@ -128,9 +129,15 @@ export default {
         startFrom: 0,
         endTo: 9,
       },
+      deletables: [],
       sortBy: "name",
       sortDirection: "asc",
     };
+  },
+  computed: {
+    container () {
+      return this.$route.params.container;
+    },
   },
   watch: {
     disablePagination() {
@@ -233,7 +240,8 @@ export default {
                     size: "small",
                     title: "Edit tags",
                     onClick: () => {
-                      console.log("Edit not yet implemented.");
+                      this.$router
+                        .push(this.getEditRoute(this.container, item.name));
                     },
                   },
                 },
@@ -245,9 +253,10 @@ export default {
                   params: {
                     text: true,
                     size: "small",
-                    title: "Share",
+                    title: "Delete object",
                     onClick: () => {
-                      console.log("Delete not yet implemented.");
+                      this.deletables = [item];
+                      this.confirmDelete();
                     },
                   },
                 },
@@ -267,6 +276,73 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
       sortObjects(this.objs, this.sortBy, this.sortDirection);
+    },
+    getEditRoute: function(containerName, objectName) {
+      if (this.$route.name == "SharedObjects") {
+        return {
+          name: "EditSharedObjectView",
+          params: {
+            container: containerName, 
+            object: objectName, 
+            owner: this.$route.params.owner,
+          },
+        };
+      }
+      return {
+        name: "EditObjectView",
+        params: {
+          container: containerName, 
+          object: objectName,
+        },
+      };
+    },
+    confirmDelete: function () {
+      this.$buefy.dialog.confirm({
+        title: this.$t("message.objects.deleteObjects"),
+        message: this.$t("message.objects.deleteObjectsMessage"),
+        confirmText: this.$t("message.objects.deleteConfirm"),
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => {this.deleteObjects();},
+      });
+    },
+    deleteObjects: function () {
+      this.$buefy.toast.open({
+        message: this.$t("message.objects.deleteSuccess"),
+        type: "is-success",
+      });
+      let to_remove = new Array;
+      if (typeof(this.deletables) == "string") {
+        to_remove.push(this.deletables);
+      } else {
+        for (let object of this.deletables) {
+          to_remove.push(object.name);
+        }
+      }
+      if(this.$route.name !== "SharedObjects") {
+        const objIDs = this.deletables.reduce(
+          (prev, obj) => [...prev, obj.id], [],
+        );
+        this.$store.state.db.objects.bulkDelete(objIDs);
+      }
+      swiftDeleteObjects(
+        this.$route.params.project,
+        this.$route.params.container,
+        to_remove,
+      ).then(async () => {
+        if (this.$route.name === "SharedObjects") {
+          await this.$store.dispatch(
+            "updateSharedObjects",
+            {
+              project: this.$route.params.project,
+              container: {
+                name: this.$route.params.container,
+                id: 0,
+              },
+            },
+          );
+        }
+      });
     },
     handleSelection(event) {
       this.$emit("selected-rows", event.detail);

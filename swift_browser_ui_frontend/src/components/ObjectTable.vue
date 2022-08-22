@@ -8,20 +8,6 @@
           <i class="mdi mdi-folder-outline" /> 
           <span>{{ container }}</span>
         </div>
-
-        <c-button
-          v-for="button in folderInfoButtons"
-          :key="button.label"
-          inverted
-          text
-          @click="button.action"
-        >
-          <i
-            slot="icon"
-            :class="button.icon"
-            class="mdi"
-          /> {{ button.label }}
-        </c-button>
       </div>
 
       <ul class="folder-details">
@@ -75,17 +61,11 @@ import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-// import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-// import ReplicateContainerButton from "@/components/ReplicateContainer";
-// import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
 export default {
   name: "ObjectTable",
   components: {
     CObjectTable,
-    // ContainerDownloadLink,
-    // ReplicateContainerButton,
-    // DeleteObjectsButton,
   },
   filters: {
     truncate,
@@ -128,32 +108,6 @@ export default {
     },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
-    },
-    folderInfoButtons() {
-      return [
-        { label: this.$t("message.download"),
-          icon: "mdi-download",
-          action: (() => {
-            const href = "/download/".concat(
-              this.$route.params.project,
-              "/",
-              this.container);
-
-            window.open(href, "_blank");
-          }),
-        },
-        { label: this.$t("message.share.share"),
-          icon: "mdi-share-variant",
-          action: (() => this.$router.push({
-            name: "SharingView",
-            query: { container: this.container },
-          })),
-        },
-        { label: "Options (placeholder)",
-          icon: "mdi-dots-horizontal",
-          action: (() => {}), 
-        },
-      ];
     },
   },
   watch: {
