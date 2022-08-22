@@ -4,10 +4,8 @@
   >
     <div class="folder-info">
       <div class="folder-info-heading">
-        <div class="folder-name">
-          <i class="mdi mdi-folder-outline" /> 
-          <span>{{ container }}</span>
-        </div>
+        <i class="mdi mdi-folder-outline" /> 
+        <span>{{ container }}</span>
       </div>
 
       <ul class="folder-details">
@@ -18,6 +16,35 @@
           <b>{{ $t("message.table.created") }}: </b> N/A
         </li>
       </ul>
+    </div>
+
+    <div
+      v-if="checkedRows.length"
+      class="selection-bar"
+    >
+      <div class="info">
+        <i class="mdi mdi-information-outline" />
+        <span>
+          {{ checkedRows.length }} 
+          {{ checkedRows.length === 1 ? "item" : "items" }} selected
+        </span>
+      </div>
+
+      <div class="action-buttons">
+        <c-button
+          v-for="button in selectionActionButtons"
+          :key="button.label"
+          inverted
+          text
+          @click="button.action"
+        >
+          <i
+            slot="icon"
+            :class="button.icon"
+            class="mdi"
+          /> {{ button.label }}
+        </c-button>
+      </div>
     </div>
 
     <c-row
@@ -39,10 +66,6 @@
       </c-menu>
     </c-row>
 
-    <c-button @click="checkedRows = []">
-      Clear checked
-    </c-button>
-
     <CObjectTable
       :objs="oList.value"
       :disable-pagination="disablePagination"
@@ -50,11 +73,13 @@
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
       @selected-rows="handleSelection"
+      @delete-object="confirmDelete([$event])"
     />
   </div>
 </template>
 
 <script>
+import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
@@ -108,6 +133,18 @@ export default {
     },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
+    },
+    selectionActionButtons() {
+      return [
+        { label: "Delete selected items",
+          icon: "mdi-trash-can-outline",
+          action: (() => this.confirmDelete(this.checkedRows)),
+        },
+        { label: "Clear selections",
+          icon: "mdi-refresh",
+          action: (() => this.checkedRows = []), 
+        },
+      ];
     },
   },
   watch: {
@@ -460,6 +497,54 @@ export default {
         },
       };
     },
+    confirmDelete: function (deletables) {
+      this.$buefy.dialog.confirm({
+        title: this.$t("message.objects.deleteObjects"),
+        message: this.$t("message.objects.deleteObjectsMessage"),
+        confirmText: this.$t("message.objects.deleteConfirm"),
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => {this.deleteObjects(deletables);},
+      });
+    },
+    deleteObjects: function (deletables) {
+      this.$buefy.toast.open({
+        message: this.$t("message.objects.deleteSuccess"),
+        type: "is-success",
+      });
+      let to_remove = new Array;
+      if (typeof(deletables) == "string") {
+        to_remove.push(deletables);
+      } else {
+        for (let object of deletables) {
+          to_remove.push(object.name);
+        }
+      }
+      if(this.$route.name !== "SharedObjects") {
+        const objIDs = deletables.reduce(
+          (prev, obj) => [...prev, obj.id], [],
+        );
+        this.$store.state.db.objects.bulkDelete(objIDs);
+      }
+      swiftDeleteObjects(
+        this.$route.params.project,
+        this.$route.params.container,
+        to_remove,
+      ).then(async () => {
+        if (this.$route.name === "SharedObjects") {
+          await this.$store.dispatch(
+            "updateSharedObjects",
+            {
+              project: this.$route.params.project,
+              container: {
+                name: this.$route.params.container,
+                id: 0,
+              },
+            },
+          );
+        }
+      });
+    },
     handleSelection(selection) {
       const objects = this.oList.value;
       this.checkedRows = objects.filter((_obj, i) => selection.indexOf(i) > -1);
@@ -488,17 +573,47 @@ export default {
 
 .folder-info-heading {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: end;
   color: #FFF;
   font-size: 1rem;
   font-weight: 700;
   background: $csc-primary;
   align-items: center;
+  & .mdi {
+    font-size: 1.5rem;
+    padding-right: .5rem
+  }
+  & span {
+    align-self: center;
+    display: inline-block;
+  }
+}
 
-  & .folder-name {
+.folder-details {
+  color: $csc-grey;
+
+  & li {
+    padding: .25rem 0;
+  }
+}
+
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: #FFF;
+  background: $csc-blue;
+  border-radius: .25rem;
+  padding: 0 1rem;
+  margin: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  & .info {
     display: flex;
     flex: 1;
+    min-width: 12rem;
+    padding: 1rem;
     & .mdi {
       font-size: 1.5rem;
       padding-right: .5rem
@@ -508,16 +623,11 @@ export default {
       display: inline-block;
     }
   }
-  & c-button {
-    flex: 0
-  }
-}
 
-.folder-details {
-  color: $csc-grey;
-
-  & li {
-    padding: .25rem 0;
+  & .action-buttons {
+    display: flex;
+    flex: 0;
+    padding: .5rem 0; 
   }
 }
 

@@ -1,8 +1,5 @@
 <template>
   <div id="c-objects">
-    Checked rows: {{ checkedRows.length }}
-    <br>
-
     <c-data-table
       v-if="hideTags"
       id="objtable-no-tags"
@@ -12,7 +9,8 @@
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
       :sort-by="sortBy" 
-      :sort-direction="sortDirection" 
+      :sort-direction="sortDirection"
+      selection-property="name"
       external-data
       selectable
       @selection="handleSelection" 
@@ -28,7 +26,8 @@
       :footer-options.prop="footerOptions"
       :no-data-text="$t('message.emptyProject')"
       :sort-by="sortBy" 
-      :sort-direction="sortDirection" 
+      :sort-direction="sortDirection"
+      selection-property="name"
       external-data
       selectable
       @selection="handleSelection"
@@ -40,7 +39,6 @@
 
 <script>
 import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
-import {swiftDeleteObjects} from "@/common/api";
 
 export default {
   name: "CObjectTable",
@@ -129,7 +127,6 @@ export default {
         startFrom: 0,
         endTo: 9,
       },
-      deletables: [],
       sortBy: "name",
       sortDirection: "asc",
     };
@@ -255,8 +252,8 @@ export default {
                     size: "small",
                     title: "Delete object",
                     onClick: () => {
-                      this.deletables = [item];
-                      this.confirmDelete();
+                      this.$emit("delete-object", item);
+  
                     },
                   },
                 },
@@ -295,54 +292,6 @@ export default {
           object: objectName,
         },
       };
-    },
-    confirmDelete: function () {
-      this.$buefy.dialog.confirm({
-        title: this.$t("message.objects.deleteObjects"),
-        message: this.$t("message.objects.deleteObjectsMessage"),
-        confirmText: this.$t("message.objects.deleteConfirm"),
-        type: "is-danger",
-        hasIcon: true,
-        onConfirm: () => {this.deleteObjects();},
-      });
-    },
-    deleteObjects: function () {
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
-      let to_remove = new Array;
-      if (typeof(this.deletables) == "string") {
-        to_remove.push(this.deletables);
-      } else {
-        for (let object of this.deletables) {
-          to_remove.push(object.name);
-        }
-      }
-      if(this.$route.name !== "SharedObjects") {
-        const objIDs = this.deletables.reduce(
-          (prev, obj) => [...prev, obj.id], [],
-        );
-        this.$store.state.db.objects.bulkDelete(objIDs);
-      }
-      swiftDeleteObjects(
-        this.$route.params.project,
-        this.$route.params.container,
-        to_remove,
-      ).then(async () => {
-        if (this.$route.name === "SharedObjects") {
-          await this.$store.dispatch(
-            "updateSharedObjects",
-            {
-              project: this.$route.params.project,
-              container: {
-                name: this.$route.params.container,
-                id: 0,
-              },
-            },
-          );
-        }
-      });
     },
     handleSelection(event) {
       this.$emit("selected-rows", event.detail);
