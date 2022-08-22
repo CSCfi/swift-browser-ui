@@ -62,7 +62,8 @@
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
-        <span class="menu-active">Display options</span>
+        <span class="menu-active display-options-menu"> 
+          <i class="mdi mdi-tune" />Display options</span>
       </c-menu>
     </c-row>
 
@@ -630,6 +631,15 @@ export default {
     display: flex;
     flex: 0;
     padding: .5rem 0; 
+  }
+}
+
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
   }
 }
 
