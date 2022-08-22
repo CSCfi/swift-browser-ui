@@ -216,6 +216,9 @@ export default {
     },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", false);
+      this.openShareGuide = false;
+      this.tags = [];
+      this.currentAccessRight = this.$t("message.share.give_rights");
     },
   },
 };
@@ -263,6 +266,7 @@ export default {
     };
     & > p {
       margin-top: -1rem !important;
+      font-size: 0.875rem;
     }
   }
 
