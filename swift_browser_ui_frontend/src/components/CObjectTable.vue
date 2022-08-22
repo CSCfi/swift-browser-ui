@@ -64,7 +64,6 @@ export default {
         startFrom: 0,
         endTo: 9,
       },
-      deletables: [],
       sortBy: "name",
       sortDirection: "asc",
       componentKey: 0,
