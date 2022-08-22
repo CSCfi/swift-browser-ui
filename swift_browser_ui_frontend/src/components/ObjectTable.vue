@@ -547,7 +547,9 @@ export default {
     },
     handleSelection(selection) {
       const objects = this.oList.value;
-      this.checkedRows = objects.filter((_obj, i) => selection.indexOf(i) > -1);
+      this.checkedRows = objects.filter(
+        item => selection.indexOf(item.name) > -1,
+      );
     },
   },
 };
