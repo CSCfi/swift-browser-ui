@@ -703,4 +703,13 @@ export default {
   }
 }
 
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
+  }
+}
+
 </style>
