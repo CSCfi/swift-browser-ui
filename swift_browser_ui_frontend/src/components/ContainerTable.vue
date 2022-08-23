@@ -4,7 +4,7 @@
     :key="componentKey"
     :data.prop="containers"
     :headers.prop="hideTags ? 
-      extHeaders.filter(header => header.key !== 'tags'): extHeaders"
+      headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
     :no-data-text="$t('message.emptyProject')"
@@ -39,29 +39,6 @@ export default {
     return {
       containers: [],
       direction: "asc",
-      extHeaders: [
-        {
-          key: "name",
-          value: this.$t("message.table.name"),
-          sortable: true,
-        },
-        {
-          key: "size",
-          value: this.$t("message.table.size"),
-          sortable: true,
-        },
-        {
-          key: "tags",
-          value: this.$t("message.table.tags"),
-          sortable: true,
-        },
-        {
-          key: "actions",
-          align: "end",
-          value: null,
-          sortable: false,
-        },
-      ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
@@ -77,18 +54,30 @@ export default {
       componentKey: 0,
     };
   },
+  computed: {
+    locale () {
+      return this.$i18n.locale;
+    },
+  },
   watch: {
     disablePagination() {
       this.getPage();
     },
     hideTags() {
-      // Fix for tags display toggle
       this.componentKey += 1;
       this.getPage();
     },
     conts() {
       this.getPage();
     },
+    locale() {
+      this.componentKey += 1;
+      this.setHeaders();
+      this.getPage();
+    },
+  },
+  created() {
+    this.setHeaders();
   },
   methods: {
     getPage: function () {
@@ -198,6 +187,31 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
       sortObjects(this.conts, this.sortBy, this.sortDirection);
+    },
+    setHeaders() {
+      this.headers = [
+        {
+          key: "name",
+          value: this.$t("message.table.name"),
+          sortable: true,
+        },
+        {
+          key: "size",
+          value: this.$t("message.table.size"),
+          sortable: true,
+        },
+        {
+          key: "tags",
+          value: this.$t("message.table.tags"),
+          sortable: true,
+        },
+        {
+          key: "actions",
+          align: "end",
+          value: null,
+          sortable: false,
+        },
+      ];
     },
   },
 };

@@ -4,7 +4,7 @@
     :key="componentKey"
     :data.prop="objects"
     :headers.prop="hideTags ? 
-      extHeaders.filter(header => header.key !== 'tags'): extHeaders"
+      headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
     :no-data-text="$t('message.emptyProject')"
@@ -48,34 +48,6 @@ export default {
   data() {
     return {
       objects: [],
-      extHeaders: [
-        {
-          key: "name",
-          value: this.$t("message.table.name"),
-          sortable: true,
-        },
-        {
-          key: "size",
-          value: this.$t("message.table.size"),
-          sortable: true,
-        },
-        {
-          key: "tags",
-          value: this.$t("message.table.tags"),
-          sortable: true,
-        },
-        {
-          key: "last_modified",
-          value: this.$t("message.table.modified"),
-          sortable: true,
-        },
-        {
-          key: "actions",
-          align: "end",
-          value: null,
-          sortable: false,
-        },
-      ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
@@ -95,13 +67,15 @@ export default {
     container () {
       return this.$route.params.container;
     },
+    locale () {
+      return this.$i18n.locale;
+    },
   },
   watch: {
     disablePagination() {
       this.getPage();
     },
     hideTags() {
-      // Fix for tags display toggle
       this.componentKey += 1;
       this.getPage();
     },
@@ -111,6 +85,14 @@ export default {
     objs() {
       this.getPage();
     },
+    locale() {
+      this.componentKey += 1;
+      this.setHeaders();
+      this.getPage();
+    },
+  },
+  created() {
+    this.setHeaders();
   },
   methods: {
     isFile: function (path) {
@@ -257,6 +239,36 @@ export default {
     },
     handleSelection(event) {
       this.$emit("selected-rows", event.detail);
+    },
+    setHeaders() {
+      this.headers = [
+        {
+          key: "name",
+          value: this.$t("message.table.name"),
+          sortable: true,
+        },
+        {
+          key: "size",
+          value: this.$t("message.table.size"),
+          sortable: true,
+        },
+        {
+          key: "tags",
+          value: this.$t("message.table.tags"),
+          sortable: true,
+        },
+        {
+          key: "last_modified",
+          value: this.$t("message.table.modified"),
+          sortable: true,
+        },
+        {
+          key: "actions",
+          align: "end",
+          value: null,
+          sortable: false,
+        },
+      ];
     },
   },
 };
