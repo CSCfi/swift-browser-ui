@@ -135,18 +135,6 @@ export default {
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
     },
-    selectionActionButtons() {
-      return [
-        { label: "Delete selected items",
-          icon: "mdi-trash-can-outline",
-          action: (() => this.confirmDelete(this.checkedRows)),
-        },
-        { label: "Clear selections",
-          icon: "mdi-refresh",
-          action: (() => this.checkedRows = []), 
-        },
-      ];
-    },
   },
   watch: {
     active: function() {
@@ -210,6 +198,18 @@ export default {
       {
         name: "Hide pagination",
         action: () => {this.disablePagination = !(this.disablePagination);},
+      },
+    ];
+    this.selectionActionButtons = [
+      { 
+        label: "Delete selected items",
+        icon: "mdi-trash-can-outline",
+        action: () => this.confirmDelete(this.checkedRows),
+      },
+      { 
+        label: "Clear selections",
+        icon: "mdi-refresh",
+        action: () => this.checkedRows = [], 
       },
     ];
   },
