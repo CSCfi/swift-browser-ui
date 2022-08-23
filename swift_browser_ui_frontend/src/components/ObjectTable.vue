@@ -63,7 +63,9 @@
         options-testid="table-options-selector"
       >
         <span class="menu-active display-options-menu"> 
-          <i class="mdi mdi-tune" />Display options</span>
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
+        </span>
       </c-menu>
     </c-row>
 
@@ -135,6 +137,9 @@ export default {
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
     },
+    locale () {
+      return this.$i18n.locale;
+    },
   },
   watch: {
     active: function() {
@@ -180,26 +185,16 @@ export default {
         }
       }
     },
+    locale () {
+      this.setTableOptionsMenu();
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
     this.$store.commit("erasePrefix");
-    this.tableOptions = [
-      {
-        name: "Render folders",
-        action: () => {this.renderFolders = !(this.renderFolders);},
-      },
-      {
-        name: "Hide tags",
-        action: () => {this.hideTags = !(this.hideTags);},
-      },
-      {
-        name: "Hide pagination",
-        action: () => {this.disablePagination = !(this.disablePagination);},
-      },
-    ];
+    this.setTableOptionsMenu();
     this.selectionActionButtons = [
       { 
         label: "Delete selected items",
@@ -552,6 +547,37 @@ export default {
         item => selection.indexOf(item.name) > -1,
       );
     },
+    setTableOptionsMenu() {
+      this.tableOptions = [
+        {
+          name: this.renderFolders
+            ? this.$t("message.tableOptions.text")
+            : this.$t("message.tableOptions.render"),
+          action: () => {
+            this.renderFolders = !(this.renderFolders);
+            this.setTableOptionsMenu();
+          },
+        },
+        {
+          name: this.hideTags
+            ? this.$t("message.tableOptions.showTags")
+            : this.$t("message.tableOptions.hideTags"),
+          action: () => {
+            this.hideTags = !(this.hideTags);
+            this.setTableOptionsMenu();
+          },
+        },
+        {
+          name: this.disablePagination
+            ? this.$t("message.tableOptions.showPagination")
+            : this.$t("message.tableOptions.hidePagination"),
+          action: () => {
+            this.disablePagination = !(this.disablePagination);
+            this.setTableOptionsMenu();
+          },
+        },
+      ];
+    },
   },
 };
 </script>
@@ -631,15 +657,6 @@ export default {
     display: flex;
     flex: 0;
     padding: .5rem 0; 
-  }
-}
-
-.display-options-menu {
-  display: flex;
-  align-items: center;
-  & .mdi {
-    padding-right: .5rem;
-    font-size: 18px;
   }
 }
 

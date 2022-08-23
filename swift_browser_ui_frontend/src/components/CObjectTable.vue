@@ -51,22 +51,22 @@ export default {
       extHeaders: [
         {
           key: "name",
-          value: "Name",
+          value: this.$t("message.table.name"),
           sortable: true,
         },
         {
           key: "size",
-          value: "Size",
+          value: this.$t("message.table.size"),
           sortable: true,
         },
         {
           key: "tags",
-          value: "Tags",
+          value: this.$t("message.table.tags"),
           sortable: true,
         },
         {
           key: "last_modified",
-          value: "Last Modified",
+          value: this.$t("message.table.modified"),
           sortable: true,
         },
         {
@@ -178,7 +178,7 @@ export default {
             align: "end",
             children: [
               {
-                value: "Download",
+                value: this.$t("message.download"),
                 component: {
                   tag: "c-button",
                   params: {
@@ -191,7 +191,7 @@ export default {
                 },
               },
               {
-                value: "Edit tags",
+                value: this.$t("message.table.editTags"),
                 component: {
                   tag: "c-button",
                   params: {
@@ -206,7 +206,7 @@ export default {
                 },
               },
               {
-                value: "Delete",
+                value: this.$t("message.delete"),
                 component: {
                   tag: "c-button",
                   params: {

@@ -12,7 +12,10 @@
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
-        <span class="menu-active">Display options</span>
+        <span class="menu-active display-options-menu">
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
+        </span>
       </c-menu>
     </c-row>
     <ContainerTable

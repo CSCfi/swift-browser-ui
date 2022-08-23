@@ -186,6 +186,26 @@ c-modal {
   margin-right: 5%;
 }
 
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
+  }
+}
+
+#dropArea:before{
+  content:"";
+  width: 98%;
+  height:98%;
+  position:absolute;
+  border:2px dashed #b5b5b5;
+  margin: 0 1%;
+  padding: 0;
+  border-radius: 6px;
+}
+
 .footer {
   flex-shrink: 0;
   height: 10rem;
