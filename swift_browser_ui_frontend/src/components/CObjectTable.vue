@@ -1,40 +1,22 @@
 <template>
-  <div id="c-objects">
-    <c-data-table
-      v-if="hideTags"
-      id="objtable-no-tags"
-      :data.prop="objects"
-      :headers.prop="noTagHeaders"
-      :pagination.prop="disablePagination ? null : paginationOptions"
-      :footer-options.prop="footerOptions"
-      :no-data-text="$t('message.emptyProject')"
-      :sort-by="sortBy" 
-      :sort-direction="sortDirection"
-      selection-property="name"
-      external-data
-      selectable
-      @selection="handleSelection" 
-      @paginate="getPage"
-      @sort="onSort"
-    />
-    <c-data-table
-      v-else
-      id="objtable-tags"
-      :data.prop="objects"
-      :headers.prop="extHeaders"
-      :pagination.prop="disablePagination ? null : paginationOptions"
-      :footer-options.prop="footerOptions"
-      :no-data-text="$t('message.emptyProject')"
-      :sort-by="sortBy" 
-      :sort-direction="sortDirection"
-      selection-property="name"
-      external-data
-      selectable
-      @selection="handleSelection"
-      @paginate="getPage"
-      @sort="onSort"
-    />
-  </div>
+  <c-data-table
+    id="objtable-tags"
+    :key="componentKey"
+    :data.prop="objects"
+    :headers.prop="hideTags ? 
+      extHeaders.filter(header => header.key !== 'tags'): extHeaders"
+    :pagination.prop="disablePagination ? null : paginationOptions"
+    :footer-options.prop="footerOptions"
+    :no-data-text="$t('message.emptyProject')"
+    :sort-by="sortBy" 
+    :sort-direction="sortDirection"
+    selection-property="name"
+    external-data
+    selectable
+    @selection="handleSelection"
+    @paginate="getPage"
+    @sort="onSort"
+  />
 </template>
 
 <script>
@@ -94,29 +76,6 @@ export default {
           sortable: false,
         },
       ],
-      noTagHeaders: [
-        {
-          key: "name",
-          value: "Name",
-          sortable: false,
-        },
-        {
-          key: "size",
-          value: "Size",
-          sortable: false,
-        },
-        {
-          key: "last_modified",
-          value: "Last Modified",
-          sortable: false,
-        },
-        {
-          key: "actions",
-          align: "end",
-          value: null,
-          sortable: false,
-        },
-      ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
@@ -129,6 +88,7 @@ export default {
       },
       sortBy: "name",
       sortDirection: "asc",
+      componentKey: 0,
     };
   },
   computed: {
@@ -141,6 +101,8 @@ export default {
       this.getPage();
     },
     hideTags() {
+      // Fix for tags display toggle
+      this.componentKey += 1;
       this.getPage();
     },
     renderFolders() {

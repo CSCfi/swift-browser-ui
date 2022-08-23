@@ -1,33 +1,19 @@
 <template>
-  <div id="c-containers">
-    <c-data-table
-      v-if="hideTags"
-      id="contable-no-tags"
-      :data.prop="containers"
-      :headers.prop="noTagHeaders"
-      :pagination.prop="disablePagination ? null : paginationOptions"
-      :footer-options.prop="footerOptions"
-      :no-data-text="$t('message.emptyProject')"
-      :sort-by="sortBy" 
-      :sort-direction="sortDirection" 
-      external-data
-      @paginate="getPage"
-    />
-    <c-data-table
-      v-else
-      id="contable-tags"
-      :data.prop="containers"
-      :headers.prop="extHeaders"
-      :pagination.prop="disablePagination ? null : paginationOptions"
-      :footer-options.prop="footerOptions"
-      :no-data-text="$t('message.emptyProject')"
-      :sort-by="sortBy" 
-      :sort-direction="sortDirection" 
-      external-data
-      @paginate="getPage"
-      @sort="onSort"
-    />
-  </div>
+  <c-data-table
+    id="contable-tags"
+    :key="componentKey"
+    :data.prop="containers"
+    :headers.prop="hideTags ? 
+      extHeaders.filter(header => header.key !== 'tags'): extHeaders"
+    :pagination.prop="disablePagination ? null : paginationOptions"
+    :footer-options.prop="footerOptions"
+    :no-data-text="$t('message.emptyProject')"
+    :sort-by="sortBy" 
+    :sort-direction="sortDirection" 
+    external-data
+    @paginate="getPage"
+    @sort="onSort"
+  />
 </template>
 
 <script>
@@ -76,24 +62,6 @@ export default {
           sortable: false,
         },
       ],
-      noTagHeaders: [
-        {
-          key: "name",
-          value: "Name",
-          sortable: false,
-        },
-        {
-          key: "size",
-          value: "Size",
-          sortable: false,
-        },
-        {
-          key: "actions",
-          align: "end",
-          value: null,
-          sortable: false,
-        },
-      ],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
@@ -106,6 +74,7 @@ export default {
       },
       sortBy: "name",
       sortDirection: "asc",
+      componentKey: 0,
     };
   },
   watch: {
@@ -113,6 +82,8 @@ export default {
       this.getPage();
     },
     hideTags() {
+      // Fix for tags display toggle
+      this.componentKey += 1;
       this.getPage();
     },
     conts() {
