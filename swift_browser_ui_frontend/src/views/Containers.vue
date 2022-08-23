@@ -1,20 +1,42 @@
 <template>
-  <div id="container-table" class="contents">
-    <c-modal v-control v-csc-model="openCreateFolderModal">
+  <div
+    id="container-table"
+    class="contents"
+  >
+    <c-modal
+      v-control
+      v-csc-model="openCreateFolderModal"
+    >
       <AddContainer />
     </c-modal>
-    <b-field grouped group-multiline class="groupControls">
+    <b-field
+      grouped
+      group-multiline
+      class="groupControls"
+    >
       <b-select
         v-model="perPage"
         data-testid="containersPerPage"
         :disabled="!isPaginated"
       >
-        <option value="5">5 {{ $t("message.table.pageNb") }}</option>
-        <option value="10">10 {{ $t("message.table.pageNb") }}</option>
-        <option value="15">15 {{ $t("message.table.pageNb") }}</option>
-        <option value="25">25 {{ $t("message.table.pageNb") }}</option>
-        <option value="50">50 {{ $t("message.table.pageNb") }}</option>
-        <option value="100">100 {{ $t("message.table.pageNb") }}</option>
+        <option value="5">
+          5 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="10">
+          10 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="15">
+          15 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="25">
+          25 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="50">
+          50 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="100">
+          100 {{ $t("message.table.pageNb") }}
+        </option>
       </b-select>
       <div class="control is-flex">
         <b-switch
@@ -56,8 +78,14 @@
             v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
-            <b-loading v-model="isSearching" :is-full-page="false" />
-            <div v-show="!isSearching" class="media-content">
+            <b-loading
+              v-model="isSearching"
+              :is-full-page="false"
+            />
+            <div
+              v-show="!isSearching"
+              class="media-content"
+            >
               {{ $t("message.search.empty") }}
             </div>
           </div>
@@ -65,7 +93,6 @@
       </b-autocomplete>
     </b-field>
     <b-table
-      class="containerTable"
       focusable
       hoverable
       narrowed
@@ -82,7 +109,11 @@
       @keyup.native.enter="$router.push(getConAddr(selected['name']))"
       @keyup.native.space="$router.push(getConAddr(selected['name']))"
     >
-      <b-table-column sortable field="name" :label="$t('message.table.name')">
+      <b-table-column
+        sortable
+        field="name"
+        :label="$t('message.table.name')"
+      >
         <template #default="props">
           <span :class="props.row.count ? 'has-text-weight-bold' : ''">
             <b-icon
@@ -124,7 +155,11 @@
           {{ localHumanReadableSize(props.row.bytes) }}
         </template>
       </b-table-column>
-      <b-table-column field="functions" label="" width="150">
+      <b-table-column
+        field="functions"
+        label=""
+        width="150"
+      >
         <template #default="props">
           <div class="field has-addons">
             <p class="control">
@@ -142,7 +177,10 @@
                 :container="props.row.name"
               />
             </p>
-            <p v-if="!props.row.bytes" class="control">
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
               <b-button
                 v-if="selected == props.row"
                 type="is-primary"
@@ -165,7 +203,10 @@
                 {{ $t("message.share.share") }}
               </b-button>
             </p>
-            <p v-else class="control">
+            <p
+              v-else
+              class="control"
+            >
               <b-button
                 v-if="selected == props.row"
                 type="is-primary"
@@ -230,7 +271,11 @@
           </div>
         </template>
       </b-table-column>
-      <b-table-column field="dangerous" label="" width="75">
+      <b-table-column
+        field="dangerous"
+        label=""
+        width="75"
+      >
         <template #default="props">
           <DeleteContainerButton
             v-if="selected == props.row"
@@ -267,6 +312,7 @@ import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import ReplicateContainerButton from "@/components/ReplicateContainer";
 import DeleteContainerButton from "@/components/ContainerDeleteButton";
 import AddContainer from "@/views/AddContainer";
+
 
 export default {
   name: "ContainersView",
@@ -523,11 +569,6 @@ export default {
 </script>
 
 <style scoped>
-.containerTable {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
 .emptyTable {
   text-align: center;
   margin-top: 5%;

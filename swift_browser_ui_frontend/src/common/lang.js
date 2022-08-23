@@ -66,6 +66,11 @@ let default_translations = {
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
       devel: "Developed by",
+      folderTabs: {
+        all: "All folders",
+        sharedFrom: "Folders you have shared",
+        sharedTo: "Folders shared with you",
+      },
       table: {
         name: "Name",
         objects: "Objects",
@@ -406,6 +411,11 @@ let default_translations = {
       logOut: "Kirjaudu ulos",
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
       devel: "kehittänyt",
+      folderTabs: {
+        all: "Kaikki kansiot",
+        sharedFrom: "Jakamasi kansiot",
+        sharedTo: "Sinulle jaetut kansiot",
+      },
       table: {
         name: "Nimi",
         objects: "Objekteja",
