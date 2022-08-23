@@ -186,6 +186,15 @@ c-modal {
   margin-right: 5%;
 }
 
+#optionsbar {
+  display: block;
+  padding: 1.5rem 0;
+}
+
+.search {
+  min-width: 50%;
+}
+
 .display-options-menu {
   display: flex;
   align-items: center;

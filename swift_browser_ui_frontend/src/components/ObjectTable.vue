@@ -51,13 +51,27 @@
       id="optionsbar"
       justify="space-between"
     >
-      <c-text-field
+      <!-- <c-text-field
         v-csc-model="searchQuery"
         :placeholder="$t('message.objects.filterBy')"
         shadow
       >
-        <i class="mdi mdi-magnify" />
-      </c-text-field>
+        <i
+          slot="pre"
+          class="mdi mdi-magnify"
+        />
+      </c-text-field> -->
+
+      <div class="search">
+        <b-input
+          v-model="searchQuery"
+          :placeholder="$t('message.objects.filterBy')"
+          type="search"
+          icon="magnify"
+        />
+      </div>
+
+
       <c-menu
         :items.prop="tableOptions"
         options-testid="table-options-selector"
@@ -584,16 +598,10 @@ export default {
 
 <style scoped lang="scss">
 @import "@/css/prod.scss";
-.object-table {
-  margin-left: 5%;
-  margin-right: 5%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
 
 .folder-info {
   border: 1px solid $csc-primary;
-  margin: 1rem 0rem;
+  margin: 0rem 0rem;
 }
 
 .folder-info-heading, .folder-details {
@@ -633,7 +641,7 @@ export default {
   background: $csc-blue;
   border-radius: .25rem;
   padding: 0 1rem;
-  margin: 1rem 0;
+  margin: 1.5rem 0 0;
   position: sticky;
   top: 0;
   z-index: 10;

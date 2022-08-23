@@ -1,5 +1,8 @@
 <template>
-  <div @focus="event => searchGainedFocus()" style="min-width:50%;">
+  <div
+    class="search"
+    @focus="event => searchGainedFocus()"
+  >
     <b-autocomplete
       id="searchbox"
       v-model="searchQuery"
@@ -69,9 +72,6 @@ export default {
       return this.$store.state.active;
     },
   },
-  created: function () {
-    this.debounceSearch = debounce(this.search, 400);
-  },
   watch: {
     searchQuery() {
       this.debounceSearch.cancel();
@@ -90,6 +90,9 @@ export default {
         this.searchArray = [];
       }
     },
+  },
+  created: function () {
+    this.debounceSearch = debounce(this.search, 400);
   },
   methods: {
     search: async function () {
