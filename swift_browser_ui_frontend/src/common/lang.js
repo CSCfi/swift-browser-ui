@@ -87,6 +87,10 @@ let default_translations = {
         clearChecked: "Clear checked",
         tags: "Tags",
         editTags: "Edit tags",
+        deleteSelected: "Delete selected items",
+        clearSelected: "Clear selections",
+        itemSelected: "item selected",
+        itemsSelected: "items selected",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -460,6 +464,10 @@ let default_translations = {
         clearChecked: "Poista valinnat",
         tags: "Tunnisteet",
         editTags: "Muokkaa tunnisteita",
+        deleteSelected: "Poista valitut kohteet",
+        clearSelected: "Tyhjennä valinnat",
+        itemSelected: "kohde valittu",
+        itemsSelected: "kohdetta valittu",
       },
       tableOptions: {
         displayOptions: "Asetukset",

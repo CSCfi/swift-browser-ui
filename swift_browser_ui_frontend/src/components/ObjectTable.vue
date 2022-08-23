@@ -26,7 +26,9 @@
         <i class="mdi mdi-information-outline" />
         <span>
           {{ checkedRows.length }} 
-          {{ checkedRows.length === 1 ? "item" : "items" }} selected
+          {{ checkedRows.length === 1 
+            ? $t("message.table.itemSelected") 
+            : $t("message.table.itemsSelected") }}
         </span>
       </div>
 
@@ -51,17 +53,6 @@
       id="optionsbar"
       justify="space-between"
     >
-      <!-- <c-text-field
-        v-csc-model="searchQuery"
-        :placeholder="$t('message.objects.filterBy')"
-        shadow
-      >
-        <i
-          slot="pre"
-          class="mdi mdi-magnify"
-        />
-      </c-text-field> -->
-
       <div class="search">
         <b-input
           v-model="searchQuery"
@@ -200,7 +191,7 @@ export default {
       }
     },
     locale () {
-      this.setTableOptionsMenu();
+      this.setLocalizedContent();
     },
   },
   created: function () {
@@ -208,19 +199,8 @@ export default {
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
     this.$store.commit("erasePrefix");
-    this.setTableOptionsMenu();
-    this.selectionActionButtons = [
-      { 
-        label: "Delete selected items",
-        icon: "mdi-trash-can-outline",
-        action: () => this.confirmDelete(this.checkedRows),
-      },
-      { 
-        label: "Clear selections",
-        icon: "mdi-refresh",
-        action: () => this.checkedRows = [], 
-      },
-    ];
+    this.setLocalizedContent();
+    this.set;
   },
   beforeMount () {
     this.abortController = new AbortController();
@@ -591,6 +571,27 @@ export default {
           },
         },
       ];
+    },
+    setSelectionActionButtons() {
+      this.selectionActionButtons = [
+        { 
+          label: this.$t("message.table.deleteSelected"),
+          icon: "mdi-trash-can-outline",
+          action: () => this.confirmDelete(this.checkedRows),
+        },
+        { 
+          label: this.$t("message.table.clearSelected"),
+          icon: "mdi-refresh",
+          action: () => {
+            const dataTable = document.getElementById("objtable");
+            dataTable.clearSelections();
+          }, 
+        },
+      ];
+    },
+    setLocalizedContent() {
+      this.setTableOptionsMenu();
+      this.setSelectionActionButtons();
     },
   },
 };

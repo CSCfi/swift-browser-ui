@@ -1,6 +1,6 @@
 <template>
   <c-data-table
-    id="objtable-tags"
+    id="objtable"
     :key="componentKey"
     :data.prop="objects"
     :headers.prop="hideTags ? 
