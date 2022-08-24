@@ -74,7 +74,6 @@ export default {
           },
           // Display external link icon for href links
           icon: item.href && mdiOpenInNew,
-          disabled: item.disabled,
         });
       }
     },
