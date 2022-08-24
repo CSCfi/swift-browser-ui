@@ -161,10 +161,6 @@ html, body {
   margin-left: auto;
 }
 
-.groupControls {
-    margin: 0 5%;
-}
-
 .dashboard {
     margin-left: 5%;
     margin-right: 5%;
