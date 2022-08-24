@@ -106,8 +106,8 @@
       :default-sort-direction="defaultSortDirection"
       @page-change="page => addPageToURL(page)"
       @dblclick="row => $router.push(getConAddr(row['name']))"
-      @keyup.native.enter="$router.push(getConAddr(selected['name']))"
-      @keyup.native.space="$router.push(getConAddr(selected['name']))"
+      @keyup.native.enter="viewFolder"
+      @keyup.native.space="viewFolder"
     >
       <b-table-column
         sortable
