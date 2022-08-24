@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - (GH #713) Top navigation support dropdown menu, commented out old user menu items & link to browser view from app name
+- (GH #645) Add menu for folder options in table view
 - (GH #651) Add modal for creating folder and ability to see project members in MyCSC
+- (GH #638) Added tab based folder view in browse-route
 - (GH #596) Support link phrasing, icon and destination update in main navigation
 - (GH #577) Updated layout for top navigation
 - (GH #596) Project switcher with CSC Design system select components

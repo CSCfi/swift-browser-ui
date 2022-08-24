@@ -1,10 +1,16 @@
 <template>
   <div id="secondary-navbar-wrapper">
-    <div id="secondary-navbar" class="navbar">
+    <div
+      id="secondary-navbar"
+      class="navbar"
+    >
       <div class="container is-fluid">
         <div class="navbar-menu">
           <div class="navbar-start">
-            <div v-if="multipleProjects" class="navbar-item">
+            <div
+              v-if="multipleProjects"
+              class="navbar-item"
+            >
               <c-select
                 v-bind="active"
                 c-control
@@ -18,7 +24,10 @@
                 @changeValue="changeActive($event)"
               />
             </div>
-            <div v-if="!multipleProjects" class="navbar-item">
+            <div
+              v-if="!multipleProjects"
+              class="navbar-item"
+            >
               {{ $t("message.currentProj") }}: &nbsp;<span>
                 {{ active.name }}
               </span>
@@ -27,9 +36,9 @@
           <div class="navbar-end">
             <div class="navbar-item">
               <c-button
-                @click="toggleCreateFolderModal"
                 outlined
                 data-testid="create-folder"
+                @click="toggleCreateFolderModal"
               >
                 {{ $t("message.createFolder") }}
               </c-button>
@@ -57,6 +66,7 @@
 </template>
 
 <script>
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
@@ -82,8 +92,8 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: "ContainersView",
-          params: { user: this.uname, project: item.id },
+          name: this.$router.name, 
+          params: {user: this.uname, project: item.id},
         };
 
         // Pushing to router before ´go´ method
@@ -93,10 +103,7 @@ export default {
       }
     },
     toggleCreateFolderModal: function (folderName) {
-      this.$store.commit("toggleCreateFolderModal", true);
-      if (folderName) {
-        this.$store.commit("setFolderName", folderName);
-      }
+      toggleCreateFolderModal(folderName);
     },
   },
 };

@@ -133,6 +133,14 @@ html, body {
   color: $csc-primary;
 }
 
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active, .menu-icon {
+  color: $csc-primary;
+}
+
 .hero-body #login-center{
     padding: 30px 20px 20px 20px;
 }
@@ -151,10 +159,6 @@ html, body {
 
 .uploadGroup {
   margin-left: auto;
-}
-
-.groupControls {
-    margin: 0 5%;
 }
 
 .dashboard {
