@@ -58,7 +58,7 @@
           v-model="searchQuery"
           :placeholder="$t('message.objects.filterBy')"
           type="search"
-          icon="magnify"
+          icon="filter-outline"
         />
       </div>
 
