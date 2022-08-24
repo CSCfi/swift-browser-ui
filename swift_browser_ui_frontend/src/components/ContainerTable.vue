@@ -18,6 +18,7 @@
 
 <script>
 import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
+import { mdiTrayArrowDown, mdiShareVariantOutline } from "@mdi/js";
 
 export default {
   name: "ContainerTable",
@@ -152,6 +153,7 @@ export default {
                       item.name,
                     ),
                     target: "_blank",
+                    path: mdiTrayArrowDown,
                   },
                 },
               },
@@ -163,6 +165,7 @@ export default {
                     text: true,
                     size: "small",
                     title: this.$t("message.share.share"),
+                    path: mdiShareVariantOutline,
                     onClick: (item) => {
                       this.$router.push({
                         name: "SharingView",

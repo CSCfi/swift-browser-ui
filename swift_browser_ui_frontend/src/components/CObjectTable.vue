@@ -26,6 +26,7 @@ import {
   sortObjects,
   parseDateTime, 
 } from "@/common/conv";
+import { mdiTrayArrowDown, mdiPencilOutline, mdiDeleteOutline } from "@mdi/js";
 
 export default {
   name: "CObjectTable",
@@ -174,6 +175,7 @@ export default {
                     title: "Download",
                     href: item.url,
                     target: "_blank",
+                    path: mdiTrayArrowDown,
                   },
                 },
               },
@@ -185,6 +187,7 @@ export default {
                     text: true,
                     size: "small",
                     title: "Edit tags",
+                    path: mdiPencilOutline,
                     onClick: () => {
                       this.$router
                         .push(this.getEditRoute(this.container, item.name));
@@ -200,6 +203,7 @@ export default {
                     text: true,
                     size: "small",
                     title: "Delete object",
+                    path: mdiDeleteOutline,
                     onClick: () => {
                       this.$emit("delete-object", item);
   
