@@ -193,6 +193,29 @@ c-modal {
 
 .search {
   min-width: 50%;
+
+  input, input::placeholder, .icon {
+    color: $csc-grey !important;
+  }
+
+  input::placeholder {
+    opacity: 0.8;
+  }
+
+  input, input:focus {
+    box-shadow:rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+  }
+
+  input {
+    border: none;
+    &:focus {
+      outline: 2px solid $csc-primary;
+
+     & + .icon {
+        color: $csc-primary !important;
+      }
+    }
+  }
 }
 
 .display-options-menu {
