@@ -92,7 +92,7 @@ import {
 } from "@/common/api";
 
 export default {
-  name: "SharingView",
+  name: "ShareModal",
   data () {
     return {
       tags: [],
@@ -216,6 +216,7 @@ export default {
     },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", false);
+      this.$store.commit("setFolderName", "");
       this.openShareGuide = false;
       this.tags = [];
       this.currentAccessRight = this.$t("message.share.give_rights");

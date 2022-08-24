@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     id="shared-out-table"
   >
     <div class="field is-grouped">
@@ -28,7 +28,7 @@
           </option>
         </b-select>
       </p>
-      <div class="field has-addons">
+      <!--<div class="field has-addons">
         <p class="control">
           <b-button
             type="is-primary"
@@ -43,7 +43,7 @@
         <p class="control">
           <ACLDiscoverButton @synced="getSharedContainers()" />
         </p>
-      </div>
+      </div>-->
     </div>
     <b-table
       focusable
@@ -103,7 +103,7 @@
           </b-button>
         </template>
       </b-table-column>
-      <template 
+      <template
         #detail="props"
       >
         <SharedDetails
@@ -121,7 +121,7 @@
 
 <script>
 import SharedDetails from "@/components/SharedDetails";
-import ACLDiscoverButton from "@/components/ACLDiscover";
+//import ACLDiscoverButton from "@/components/ACLDiscover";
 import { removeAccessControlMeta } from "@/common/api";
 import delay from "lodash/delay";
 
@@ -129,7 +129,7 @@ export default {
   name: "SharedOutTable",
   components: {
     SharedDetails,
-    ACLDiscoverButton,
+    //ACLDiscoverButton,
   },
   data: function () {
     return {

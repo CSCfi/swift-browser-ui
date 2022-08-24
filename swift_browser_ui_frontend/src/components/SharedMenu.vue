@@ -21,16 +21,6 @@
         }}"
         :active="name == 'SharingFrom' ? true : false"
       />
-      <b-menu-item
-        icon="folder-plus"
-        tag="router-link"
-        :label="$t('message.share.request_sharing')"
-        :to="{name: 'ShareRequests', params: {
-          user: user,
-          project: project,
-        }}"
-        :active="name == 'ShareRequests' ? true : false"
-      />
     </b-menu-list>
   </b-menu>
 </template>

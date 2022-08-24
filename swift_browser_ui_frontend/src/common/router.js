@@ -5,10 +5,6 @@ import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
 import EditObjectView from "@/views/EditObject.vue";
 import SharedObjects from "@/views/SharedObjects";
-import ShareRequests from "@/views/ShareRequests";
-import SharedTo from "@/views/SharedTo";
-import SharedFrom from "@/views/SharedFrom";
-import SharingView from "@/views/Sharing";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
 import TokensView from "@/views/Tokens";
@@ -19,26 +15,6 @@ Vue.use(Router);
 export default new Router({
   mode: "history",
   routes: [
-    {
-      path: "/browse/:user/:project/sharing/to",
-      name: "SharingTo",
-      component: SharedTo,
-    },
-    {
-      path: "/browse/:user/:project/sharing/from",
-      name: "SharingFrom",
-      component: SharedFrom,
-    },
-    {
-      path: "/browse/:user/:project/sharing/requests",
-      name: "ShareRequests",
-      component: ShareRequests,
-    },
-    {
-      path: "/browse/:user/:project/sharing/share",
-      name: "SharingView",
-      component: SharingView,
-    },
     {
       path: "/browse/:user/:project/tokens",
       name: "TokensView",
