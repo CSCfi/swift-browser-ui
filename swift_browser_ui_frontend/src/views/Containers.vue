@@ -93,7 +93,6 @@
       </b-autocomplete>
     </b-field>
     <b-table
-      class="containerTable"
       focusable
       hoverable
       narrowed
@@ -271,6 +270,7 @@ import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
 import AddContainer from "@/views/AddContainer";
 import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
+
 
 export default {
   name: "ContainersView",
@@ -527,11 +527,6 @@ export default {
 </script>
 
 <style scoped>
-.containerTable {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
 .emptyTable {
   text-align: center;
   margin-top: 5%;

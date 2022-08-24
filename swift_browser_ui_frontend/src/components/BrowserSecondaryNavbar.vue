@@ -92,8 +92,8 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: "ContainersView",
-          params: { user: this.uname, project: item.id },
+          name: this.$router.name, 
+          params: {user: this.uname, project: item.id},
         };
 
         // Pushing to router before ´go´ method

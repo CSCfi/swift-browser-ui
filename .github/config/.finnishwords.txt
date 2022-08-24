@@ -55,6 +55,7 @@ jaettuja
 jaetun
 jaetut
 jakamaan
+jakamasi
 jakaminen
 jakamista
 jako
@@ -76,6 +77,7 @@ julkiset
 julkisia
 kaikki
 kansio
+kansiot
 kansioille
 kansioina
 kanssa
@@ -264,6 +266,7 @@ projektilla
 projektille
 projektilta
 projektin
+projektiin
 projektissa
 projektista
 projektit
@@ -311,6 +314,7 @@ selain
 selainta
 selatessa
 siirto
+sinulle
 sisään
 sisäänkirjauksen
 sisällön
