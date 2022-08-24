@@ -220,6 +220,8 @@ export default {
         return items;
       }, []);
 
+
+
       this.paginationOptions = {
         ...this.paginationOptions,
         itemCount: this.objs.length,
