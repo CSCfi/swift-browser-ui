@@ -286,3 +286,30 @@ export function sortObjects(objects, sortBy, sortDirection) {
     }
   });
 }
+
+// Parse date and time into internationalized format
+export function parseDateTime(locale, value) {
+  let dateLocale;
+  const date = new Date(value);
+
+  switch (locale) {
+    case "fi": {
+      dateLocale = "fi-FI";
+      break;
+    }
+    default: {
+      dateLocale = "en-GB";
+    }
+  }
+
+  const dateTimeFormat = new Intl.DateTimeFormat(
+    dateLocale, { dateStyle: "long", timeStyle: "medium" })
+    .format(date,
+    );
+
+  // Time units are separated with colon
+  const dateArr = dateTimeFormat.split(/(?<=^\S+)\s/);
+  dateArr[1] = dateArr[1].replace(/\./g, ":");
+
+  return dateArr.join(" ");
+}

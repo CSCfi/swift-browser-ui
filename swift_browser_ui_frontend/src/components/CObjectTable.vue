@@ -20,7 +20,12 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
+import { 
+  getHumanReadableSize,
+  truncate,
+  sortObjects,
+  parseDateTime, 
+} from "@/common/conv";
 
 export default {
   name: "CObjectTable",
@@ -134,7 +139,7 @@ export default {
             value: getHumanReadableSize(item.bytes),
           },
           last_modified: {
-            value: item.last_modified,
+            value:  parseDateTime(this.locale, item.last_modified),
           },
           ...(this.hideTags ? {} : {
             tags: {
@@ -207,6 +212,8 @@ export default {
         });
         return items;
       }, []);
+
+
 
       this.paginationOptions = {
         ...this.paginationOptions,
