@@ -75,7 +75,7 @@
     </c-row>
 
     <CObjectTable
-      :objs="oList.value"
+      :objs="filteredObjects.length ? filteredObjects : oList.value"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
@@ -110,8 +110,6 @@ export default {
       disablePagination: false,
       renderFolders: true,
       hideTags: false,
-      perPage: 15,
-      defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
@@ -463,7 +461,11 @@ export default {
         prev.push(element.id);
         return prev;
       }
-      this.filteredObjects = this.oList.value.reduce(search, []);
+
+      const filteredObjectsIds = this.oList.value.reduce(search, []);
+
+      this.filteredObjects = this.oList.value.
+        filter(obj => filteredObjectsIds.indexOf(obj.id) === -1);
     },
     displayTags: function (name) {
       return this.showTags && !(this.renderFolders && !this.isFile(name));
