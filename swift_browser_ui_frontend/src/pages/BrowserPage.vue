@@ -13,24 +13,6 @@
       >
         <CreateFolderModal />
       </c-modal>
-      <c-modal
-        v-control
-        v-csc-model="openUploadModal"
-        width="64vw"
-      >
-        <UploadModal />
-      </c-modal>
-      <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
-        <b-breadcrumb-item
-          v-for="item in getRouteAsList()"
-          :key="item.alias"
-          :to="item.address"
-          tag="router-link"
-          data-testid="breadcrumb-item"
-        >
-          {{ item.alias | truncate(100) }}
-        </b-breadcrumb-item>
-      </b-breadcrumb>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"

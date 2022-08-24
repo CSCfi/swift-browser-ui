@@ -74,7 +74,7 @@ export default {
 <style scroped>
 c-tab-buttons {
   display: block;
-  padding-bottom: 2rem;
+  padding-top: 1rem;
 }
 
 .tab-button {

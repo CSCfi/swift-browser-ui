@@ -2,6 +2,22 @@
   <div
     id="object-table"
   >
+    <c-row>
+      <router-link
+        class="back-link"
+        :to="{
+          name: 'AllFolders',
+          params: {
+            user: $store.state.uname,
+            project: $store.state.active.id,
+          }
+        }"
+      >
+        <i class="mdi mdi-chevron-left" />
+        Back to all folders
+      </router-link>
+    </c-row>
+
     <div class="folder-info">
       <div class="folder-info-heading">
         <i class="mdi mdi-folder-outline" /> 
@@ -58,10 +74,9 @@
           v-model="searchQuery"
           :placeholder="$t('message.objects.filterBy')"
           type="search"
-          icon="filter-outline"
+          icon="filter-variant"
         />
       </div>
-
 
       <c-menu
         :items.prop="tableOptions"
@@ -603,6 +618,18 @@ export default {
 
 <style scoped lang="scss">
 @import "@/css/prod.scss";
+
+.back-link {
+  display: flex;
+  padding-bottom: .5rem;
+  color: $csc-primary;
+  font-weight: 600;
+  align-items: center;
+  
+  & .mdi {
+    font-size: 2rem;
+  }
+}
 
 .folder-info {
   border: 1px solid $csc-primary;
