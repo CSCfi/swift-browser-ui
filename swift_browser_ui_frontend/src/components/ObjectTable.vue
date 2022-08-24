@@ -500,6 +500,7 @@ export default {
       });
     },
     deleteObjects: function (deletables) {
+      this.clearSelections();
       this.$buefy.toast.open({
         message: this.$t("message.objects.deleteSuccess"),
         type: "is-success",
@@ -543,6 +544,10 @@ export default {
         item => selection.indexOf(item.name) > -1,
       );
     },
+    clearSelections() {
+      const dataTable = document.getElementById("objtable");
+      dataTable.clearSelections();
+    },
     setTableOptionsMenu() {
       this.tableOptions = [
         {
@@ -584,10 +589,7 @@ export default {
         { 
           label: this.$t("message.table.clearSelected"),
           icon: "mdi-refresh",
-          action: () => {
-            const dataTable = document.getElementById("objtable");
-            dataTable.clearSelections();
-          }, 
+          action: () => this.clearSelections(), 
         },
       ];
     },
