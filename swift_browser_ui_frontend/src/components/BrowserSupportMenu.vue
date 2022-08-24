@@ -53,23 +53,28 @@ export default {
         },
         {
           label: this.$t("message.supportMenu.sharing"), 
-          href: "",
+          route: {name: "TokensView", params: {        
+            user: this.uname, 
+            project: this.active.id}},
         },
         {
           label: this.$t("message.supportMenu.about"), 
           href: "https://research.csc.fi/sensitive-data",
         }];
       // Menu item can be hidden if it's optional rule doesn't apply
-      for (let item of rawMenuItems.filter(
-        menuItem => menuItem.rule === undefined || menuItem.rule)
-      ) {
+      for (let item of rawMenuItems) {
         this.menuItems.push({
           name: item.label,
           action: () => {
-            window.open(item.href, "_blank");
+            if (item.href) {
+              window.open(item.href, "_blank");
+            } else if (item.route) {
+              this.$router.push(item.route);
+            }
           },
-          icon: mdiOpenInNew,
-          disabled: item.href === "",
+          // Display external link icon for href links
+          icon: item.href && mdiOpenInNew,
+          disabled: item.disabled,
         });
       }
     },
