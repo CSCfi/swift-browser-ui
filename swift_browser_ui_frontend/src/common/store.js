@@ -214,7 +214,7 @@ const store = new Vuex.Store({
       for (let i = 0; i < containersFromDB.length; i++) {
         const container = containersFromDB[i];
         const oldContainer = existingContainers.find(
-          cont => cont.name === container.name,
+          (cont) => cont.name === container.name,
         );
         let updateObjects = true;
         const dbObjects = await state.db.objects
@@ -268,7 +268,7 @@ const store = new Vuex.Store({
       do {
         objects = await getObjects(projectID, container.name, marker, signal);
         if (objects.length > 0) {
-          objects.forEach(obj => {
+          objects.forEach((obj) => {
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
@@ -336,11 +336,11 @@ const store = new Vuex.Store({
             url,
             signal,
           );
-          tags.map(item => {
+          tags.map((item) => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {
-              objects.forEach(obj => {
+              objects.forEach((obj) => {
                 if (obj.name === objectName) {
                   obj.tags = tags;
                 }

@@ -61,7 +61,6 @@ export default {
           route: "/login/kill",
         }];
 
-
       // Menu item can be hidden if it's optional rule doesn't apply
       for (let item of rawMenuItems.filter(
         menuItem => menuItem.rule === undefined || menuItem.rule)

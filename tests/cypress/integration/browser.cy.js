@@ -98,21 +98,21 @@ describe("Browse containers and test operations", function () {
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 3);
 
     // remove one tag
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get("h2").should("contain", "Editing bucket");
     cy.get(".delete").first().click();
     cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 2);
 
     // add few tags
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get(".taginput-container").children("span").should("have.length", 2);
     cy.get(".taginput input").type("adding.couple more,");
     cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 5);
 
     // remove all tags from a container
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get(".taginput-container").children("span").should("have.length", 5);
     cy.get(".delete").each(el => {
       cy.get(".delete").first().click();
@@ -130,6 +130,7 @@ describe("Browse containers and test operations", function () {
 
     // object list loads with tags
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 4);
+    cy.get("tbody tr .tags").first().children(".tag");
 
     // remove one tag
     cy.get("tbody tr").contains("Edit").click();
@@ -151,8 +152,19 @@ describe("Browse containers and test operations", function () {
     cy.get(".delete").each(el => {
       cy.get(".delete").first().click();
     });
-    cy.get(".taginput-container").children("span").should("have.length", 0);
-    cy.get("button").contains("Save").click();
-    cy.get("tbody tr .tags").first().children(".tag").should("have.length", 0);
-  });
-});
+    cy.get('.taginput-container').children('span').should('have.length', 0)
+    cy.get('button').contains('Save').click()
+    cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
+  })
+
+  it("should navigate between all and shared folders with tab selectors", () => {
+    const testTabChange = (label, id) => {
+      cy.get('[data-testid="folder-tabs"]').find("c-button").contains(label).click()
+      cy.get(`#${id}`).should("be.visible")
+    }
+
+    testTabChange("Folders shared with you", "shared-table")
+    testTabChange("Folders you have shared", "shared-out-table")
+    testTabChange("All folders", "container-table")
+  })
+})

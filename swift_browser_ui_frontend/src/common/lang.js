@@ -66,6 +66,11 @@ let default_translations = {
       logOut: "Log Out",
       cscOrg: "CSC - IT Center For Science LTD",
       devel: "Developed by",
+      folderTabs: {
+        all: "All folders",
+        sharedFrom: "Folders you have shared",
+        sharedTo: "Folders shared with you",
+      },
       table: {
         name: "Name",
         objects: "Objects",
@@ -208,7 +213,9 @@ let default_translations = {
       delete: "Delete",
       remove: "Remove",
       edit: "Edit",
+      editTags: "Edit tags",
       save: "Save",
+      options: "Options",
       createContainerButton: "Create folder",
       copysuccess: "Started copying the bucket in the background",
       copyfail: "Failed to copy the bucket",
@@ -412,6 +419,11 @@ let default_translations = {
       logOut: "Kirjaudu ulos",
       cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
       devel: "kehittänyt",
+      folderTabs: {
+        all: "Kaikki kansiot",
+        sharedFrom: "Jakamasi kansiot",
+        sharedTo: "Sinulle jaetut kansiot",
+      },
       table: {
         name: "Nimi",
         objects: "Objekteja",
@@ -555,7 +567,9 @@ let default_translations = {
       delete: "Poista",
       remove: "Poista",
       edit: "Muokkaa",
+      editTags: "Muokkaa tägejä",
       save: "Tallenna",
+      options: "Valinnat",
       createContainerButton: "Luo säiliö",
       copysuccess: "Aloitettiin säiliön kopiointi taustalla",
       copyfail: "Säiliön kopiointi epäonnistui",
