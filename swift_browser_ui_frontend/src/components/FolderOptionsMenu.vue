@@ -9,7 +9,7 @@
       tabindex="-1"
       :inverted="selected"
     >
-      ... {{ $t('message.options') }}
+      <i class="mdi mdi-dots-horizontal" /> {{ $t('message.options') }}
     </c-button>
   </c-menu>
 </template>
@@ -122,5 +122,9 @@ export default {
 /* Default button click event prevents menu from triggering */
   .menu-trigger-button {
     pointer-events: none; 
+  }
+
+ .mdi:before {
+    margin-top: 0.5rem;
   }
 </style>
