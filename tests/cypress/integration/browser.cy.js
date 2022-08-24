@@ -98,21 +98,21 @@ describe("Browse containers and test operations", function () {
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 3);
 
     // remove one tag
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get("h2").should("contain", "Editing bucket");
     cy.get(".delete").first().click();
     cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 2);
 
     // add few tags
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get(".taginput-container").children("span").should("have.length", 2);
     cy.get(".taginput input").type("adding.couple more,");
     cy.get("[data-testid='save-folder']").should("be.visible").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 5);
 
     // remove all tags from a container
-    cy.get("tbody tr").contains("Edit").click();
+    cy.navigateTableRowMenu(0, "Edit")
     cy.get(".taginput-container").children("span").should("have.length", 5);
     cy.get(".delete").each(el => {
       cy.get(".delete").first().click();
@@ -130,6 +130,7 @@ describe("Browse containers and test operations", function () {
 
     // object list loads with tags
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 4);
+    cy.get("tbody tr .tags").first().children(".tag");
 
     // remove one tag
     cy.get("tbody tr").contains("Edit").click();

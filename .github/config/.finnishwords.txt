@@ -339,6 +339,7 @@ synkronoitiin
 syötä
 tägillä
 tägit
+tägejä
 tähän
 tai
 tällä

@@ -63,8 +63,8 @@
         :keep-first="true"
         :loading="isSearching"
         max-height="350px"
-        @select="option => $router.push(getSearchRoute(option))"
-        @focus="event => searchGainedFocus()"
+        @select="(option) => $router.push(getSearchRoute(option))"
+        @focus="(event) => searchGainedFocus()"
       >
         <template slot-scope="props">
           <SearchResultItem
@@ -106,8 +106,8 @@
       :default-sort-direction="defaultSortDirection"
       @page-change="page => addPageToURL(page)"
       @dblclick="row => $router.push(getConAddr(row['name']))"
-      @keyup.native.enter="$router.push(getConAddr(selected['name']))"
-      @keyup.native.space="$router.push(getConAddr(selected['name']))"
+      @keyup.native.enter="viewFolder"
+      @keyup.native.space="viewFolder"
     >
       <b-table-column
         sortable
@@ -239,55 +239,14 @@
                 {{ $t("message.share.share") }}
               </b-button>
             </p>
-            <p class="control">
-              <ReplicateContainerButton
-                v-if="selected == props.row"
-                :project="active.id"
-                :container="props.row.name"
-                :smallsize="true"
-                :disabled="!props.row.bytes ? true : false"
-                :inverted="true"
-              />
-              <ReplicateContainerButton
-                v-else
-                :project="active.id"
-                :container="props.row.name"
-                :disabled="!props.row.bytes ? true : false"
-                :smallsize="true"
-              />
-            </p>
-            <p class="control">
-              <b-button
-                type="is-primary"
-                outlined
-                size="is-small"
-                icon-left="pencil"
-                :inverted="selected == props.row ? true : false"
-                @click="toggleCreateFolderModal(props.row.name)"
-              >
-                {{ $t("message.edit") }}
-              </b-button>
-            </p>
           </div>
         </template>
       </b-table-column>
-      <b-table-column
-        field="dangerous"
-        label=""
-        width="75"
-      >
+      <b-table-column width="75">
         <template #default="props">
-          <DeleteContainerButton
-            v-if="selected == props.row"
-            :inverted="true"
-            :objects="props.row.count"
-            :container="props.row.name"
-          />
-          <DeleteContainerButton
-            v-else
-            :inverted="false"
-            :objects="props.row.count"
-            :container="props.row.name"
+          <FolderOptionsMenu
+            :props="props"
+            :selected="selected == props.row"
           />
         </template>
       </b-table-column>
@@ -309,9 +268,8 @@ import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import ReplicateContainerButton from "@/components/ReplicateContainer";
-import DeleteContainerButton from "@/components/ContainerDeleteButton";
 import AddContainer from "@/views/AddContainer";
+import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
 
 export default {
@@ -319,9 +277,8 @@ export default {
   components: {
     SearchResultItem,
     ContainerDownloadLink,
-    ReplicateContainerButton,
-    DeleteContainerButton,
     AddContainer,
+    FolderOptionsMenu,
   },
   filters: {
     truncate,
@@ -558,10 +515,11 @@ export default {
           .modify({ [this.active.id]: { largeProjectNotification: true } });
       }
     },
-    toggleCreateFolderModal: function (folderName) {
-      this.$store.commit("toggleCreateFolderModal", true);
-      if (folderName) {
-        this.$store.commit("setFolderName", folderName);
+    viewFolder(event) {
+      // Prevent keyboard navigation from opening folder
+      // when accessing row menu
+      if (event.target.localName !== "c-menu") {
+        this.$router.push(this.getConAddr(this.selected["name"]));
       }
     },
   },

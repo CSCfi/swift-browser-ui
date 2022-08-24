@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
@@ -102,10 +103,7 @@ export default {
       }
     },
     toggleCreateFolderModal: function (folderName) {
-      this.$store.commit("toggleCreateFolderModal", true);
-      if (folderName) {
-        this.$store.commit("setFolderName", folderName);
-      }
+      toggleCreateFolderModal(folderName);
     },
   },
 };

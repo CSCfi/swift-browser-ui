@@ -67,3 +67,10 @@ Cypress.Commands.add("deleteDB", () => {
 Cypress.on("uncaught:exception", () => {
     return false
 })
+
+Cypress.Commands.add("navigateTableRowMenu", (index, menuItem) => {
+    cy.get("tbody tr").eq(index).within(() => {
+        cy.get("c-menu").click()
+        cy.get("c-menu").find("li").contains(menuItem).click()
+      })
+})
