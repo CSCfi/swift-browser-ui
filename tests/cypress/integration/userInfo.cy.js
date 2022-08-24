@@ -3,7 +3,7 @@ describe("Login and log out a user", function () {
     cy.login(" Log In with SSO ");
 
     cy.selectProject("service");
-    cy.navigateUserMenu("Browser");
+    // cy.navigateUserMenu("Browser");
 
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.logout();
@@ -16,47 +16,47 @@ describe("Login and log out a user", function () {
     cy.login(" Kirjaudu SSO:ta käyttäen ");
 
     cy.selectProject("service");
-    cy.navigateUserMenu("Selain");
+    // cy.navigateUserMenu("Selain");
 
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.navigateUserMenu("Kirjaudu ulos");
   });
 });
 
-describe("Retrieve User information", function () {
-  beforeEach(function () {
-    cy.visit(Cypress.config().baseUrl);
-    cy.login(" Log In with SSO ");
-  });
+// describe("Retrieve User information", function () {
+//   beforeEach(function () {
+//     cy.visit(Cypress.config().baseUrl);
+//     cy.login(" Log In with SSO ");
+//   });
 
-  afterEach(function () {
-    cy.logout();
-  });
+//   afterEach(function () {
+//     cy.logout();
+//   });
 
-  it("should login the user and switch to user infomation and retrieve correct data", () => {
-    cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
-    cy.selectProject("service");
-    cy.contains("service");
-    cy.get("tbody tr").should("have.length", 15);
-    cy.navigateUserMenu("User information");
-    cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
-    cy.contains("Buckets: 15");
-    cy.location("pathname").should("match", /browse\/swift/);
-  });
+//   it("should login the user and switch to user infomation and retrieve correct data", () => {
+//     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
+//     cy.selectProject("service");
+//     cy.contains("service");
+//     cy.get("tbody tr").should("have.length", 15);
+//     cy.navigateUserMenu("User information");
+//     cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
+//     cy.contains("Buckets: 15");
+//     cy.location("pathname").should("match", /browse\/swift/);
+//   });
 
-  it("should login to switch project and browser and view different information", () => {
-    cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
-    cy.selectProject("swift-project");
-    cy.contains("swift-project");
-    cy.get("tbody tr").should("have.length", 11);
-    cy.navigateUserMenu("User information");
-    cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
-    cy.contains("Buckets: 11");
-    cy.location("pathname").should("match", /browse\/swift/);
-    cy.navigateUserMenu("Browser");
-    cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
-  });
-});
+//   it("should login to switch project and browser and view different information", () => {
+//     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
+//     cy.selectProject("swift-project");
+//     cy.contains("swift-project");
+//     cy.get("tbody tr").should("have.length", 11);
+//     cy.navigateUserMenu("User information");
+//     cy.get('[data-testid="dashboard-loading-indicator"]').should("not.exist");
+//     cy.contains("Buckets: 11");
+//     cy.location("pathname").should("match", /browse\/swift/);
+//     cy.navigateUserMenu("Browser");
+//     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
+//   });
+// });
 
 describe("Switch Languages after login", function () {
   beforeEach(function () {

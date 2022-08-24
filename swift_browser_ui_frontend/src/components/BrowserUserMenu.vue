@@ -43,24 +43,23 @@ export default {
       this.menuItems = [];
 
       const rawMenuItems = [
-        {
-          label: this.$t("message.dashboard.dashboard"),
-          route: { name: "DashboardView" },
-        },
-        {
-          label: this.$t("message.dashboard.browser"),
-          route: { name: "AllFolders" },
-        },
-        {
-          label: this.$t("message.share.shared"), 
-          route: { name: "SharingTo" },
-          rule: this.$store.state.client,
-        },
+        // {
+        //   label: this.$t("message.dashboard.dashboard"),
+        //   route: { name: "DashboardView" },
+        // },
+        // {
+        //   label: this.$t("message.dashboard.browser"),
+        //   route: { name: "ContainersView" },
+        // },
+        // {
+        //   label: this.$t("message.share.shared"), 
+        //   route: { name: "SharedTo" },
+        //   rule: this.$store.state.client,
+        // },
         {
           label: this.$t("message.logOut"), 
           route: "/login/kill",
         }];
-
 
       // Menu item can be hidden if it's optional rule doesn't apply
       for (let item of rawMenuItems.filter(
