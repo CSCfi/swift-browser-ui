@@ -100,25 +100,27 @@ export default {
       read: false,
       write: false,
       loading: false,
+      menuTitle: "message.share.give_rights",
+      accessRights: [],
       currentAccessRight: this.$t("message.share.give_rights"),
-      accessRights: [
-        {
-          name: this.$t("message.share.read_perm"),
-          action: () => this.giveReadAccess(),
-        },
-        {
-          name: this.$t("message.share.write_perm"),
-          action: () => this.giveReadWriteAccess(),
-        },
-      ],
     };
   },
   computed: {
     folderName() {
       return this.$store.state.selectedFolderName;
     },
+    locale () {
+      return this.$i18n.locale;
+    },
+  },
+  created: function () {
+    this.setAccessRights();
   },
   watch: {
+    locale: function () {
+      this.setAccessRights();
+      this.currentAccessRight = this.$t(this.menuTitle);
+    },
     read: function () {
       if(!this.read) {
         this.write = false;
@@ -131,13 +133,25 @@ export default {
     },
   },
   methods: {
+    setAccessRights: function () {
+      this.accessRights = [
+        {
+          name: this.$t("message.share.read_perm"),
+          action: () => this.giveReadAccess(),
+        },
+        {
+          name: this.$t("message.share.write_perm"),
+          action: () => this.giveReadWriteAccess(),
+        },
+      ];
+    },
     giveReadAccess: function () {
-      this.currentAccessRight = this.$t("message.share.read_perm");
+      this.currentAccessRight = this.accessRights[0].name;
       this.read = true;
       this.write = false;
     },
     giveReadWriteAccess: function () {
-      this.currentAccessRight = this.$t("message.share.write_perm");
+      this.currentAccessRight = this.accessRights[1].name;
       this.read = true;
       this.write = true;
     },
@@ -219,7 +233,7 @@ export default {
       this.$store.commit("setFolderName", "");
       this.openShareGuide = false;
       this.tags = [];
-      this.currentAccessRight = this.$t("message.share.give_rights");
+      this.currentAccessRight = this.$t(this.menuTitle);
     },
   },
 };
