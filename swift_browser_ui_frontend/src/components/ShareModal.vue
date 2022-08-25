@@ -144,6 +144,9 @@ export default {
       return this.$i18n.locale;
     },
   },
+  created: function () {
+    this.setAccessRights();
+  },
   watch: {
     locale: function () {
       this.setAccessRights();
