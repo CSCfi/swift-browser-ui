@@ -105,6 +105,7 @@ let default_translations = {
         more_info: "More information",
         dashboard: "User information",
         browser: "Browser",
+        project_info: "Project information",
         tooltip_disable: "Hide tooltip",
         hour: "hour",
         default_notify:
@@ -458,6 +459,7 @@ let default_translations = {
         more_info: "Lisätietoja",
         dashboard: "Käyttäjän tiedot",
         browser: "Selain",
+        project_info: "Projektin tiedot",
         tooltip_disable: "Piilota ohje",
         hour: "tunti",
         default_notify:

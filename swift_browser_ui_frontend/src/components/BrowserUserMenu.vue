@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { mdiOpenInNew } from "@mdi/js";
 export default {
   name: "BrowserUserMenu",
   data: function() {
@@ -52,12 +53,16 @@ export default {
         //   route: { name: "ContainersView" },
         // },
         // {
-        //   label: this.$t("message.share.shared"), 
+        //   label: this.$t("message.share.shared"),
         //   route: { name: "SharedTo" },
         //   rule: this.$store.state.client,
         // },
         {
-          label: this.$t("message.logOut"), 
+          label: this.$t("message.dashboard.project_info"),
+          href: `https://my.csc.fi/myProjects/project/${this.active.id}`,
+        },
+        {
+          label: this.$t("message.logOut"),
           route: "/login/kill",
         }];
 
@@ -75,12 +80,15 @@ export default {
 
             if (typeof item.route === "string") {
               window.location.href = item.route;
-            } else if (item.route.name !== activeRoute.name) {
-              this.$router.push({...item.route, params: {        
-                user: this.uname, 
+            } else if (item.route && item.route.name !== activeRoute.name) {
+              this.$router.push({...item.route, params: {
+                user: this.uname,
                 project: this.active.id}});
+            } else if (item.href) {
+              window.open(item.href, "_blank");
             }
           },
+          icon: item.href && mdiOpenInNew,
         });
       }
     },
