@@ -91,6 +91,7 @@ let default_translations = {
         clearSelected: "Clear selections",
         itemSelected: "item selected",
         itemsSelected: "items selected",
+        items: "Items",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -468,6 +469,7 @@ let default_translations = {
         clearSelected: "Tyhjennä valinnat",
         itemSelected: "kohde valittu",
         itemsSelected: "kohdetta valittu",
+        items: "Kohteet",
       },
       tableOptions: {
         displayOptions: "Asetukset",

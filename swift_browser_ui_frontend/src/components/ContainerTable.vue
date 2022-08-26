@@ -113,6 +113,9 @@ export default {
               },
             },
           },
+          items: {
+            value: item.count,
+          },
           size: {
             value: getHumanReadableSize(item.bytes),
           },
@@ -196,6 +199,11 @@ export default {
         {
           key: "name",
           value: this.$t("message.table.name"),
+          sortable: true,
+        },
+        {
+          key: "items",
+          value: this.$t("message.table.items"),
           sortable: true,
         },
         {
