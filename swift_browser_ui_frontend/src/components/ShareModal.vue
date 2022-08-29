@@ -144,9 +144,6 @@ export default {
       return this.$i18n.locale;
     },
   },
-  created: function () {
-    this.setAccessRights();
-  },
   watch: {
     locale: function () {
       this.setAccessRights();
@@ -408,5 +405,15 @@ export default {
   c-toasts {
     width: fit-content;
   }
+
+  c-alert[type="success"] {
+    align-items: center;
+    & > .shared-notification {
+      color: var(--csc-dark-grey);
+    };
+    margin-bottom: 1.5rem;
+    box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
+  }
+
 
 </style>
