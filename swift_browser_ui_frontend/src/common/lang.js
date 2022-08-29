@@ -655,7 +655,6 @@ let default_translations = {
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
-
       upload: {
         upload: " Lähetä",
         uploadfolder: " Lähetä kansio",
