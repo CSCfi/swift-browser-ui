@@ -3,8 +3,7 @@
     <header>
       <h3 class="title is-3">
         {{ $t('message.share.share_title') }}
-        <br>
-        <q>{{ folderName }}</q>
+        {{ folderName }}
       </h3>
       <c-button
         text
@@ -81,6 +80,28 @@
           </c-button>
         </c-flex>
       </c-container>
+      <c-container v-show="sharedDetails.length > 0">
+        <c-alert type="success" v-show="isShared">
+          <div class="shared-notification">
+            {{ $t('message.share.shared_successfully') }}
+            <c-button
+              text
+              size="small"
+              @click="closeSharedNotification()"
+            >
+              <c-icon-button text>
+                <i class="mdi mdi-close" />
+              </c-icon-button>
+              {{ $t("message.share.close") }}
+            </c-button>
+          </div>
+        </c-alert>
+        <ShareModalTable
+          :sharedDetails="sharedDetails"
+          :folderName="folderName"
+          :removeSharedFolder="removeSharedFolder"
+        />
+      </c-container>
     </c-card-content>
   </c-card>
 </template>
@@ -90,9 +111,11 @@ import {
   addAccessControlMeta,
   getSharedContainerAddress,
 } from "@/common/api";
+import ShareModalTable from "@/components/ShareModalTable";
 
 export default {
   name: "ShareModal",
+  components: { ShareModalTable },
   data () {
     return {
       tags: [],
@@ -100,9 +123,11 @@ export default {
       read: false,
       write: false,
       loading: false,
-      menuTitle: "message.share.give_rights",
+      menuTitle: "message.share.permissions",
       accessRights: [],
-      currentAccessRight: this.$t("message.share.give_rights"),
+      currentAccessRight: this.$t("message.share.permissions"),
+      isShared: false,
+      sharedDetails: [],
     };
   },
   computed: {
@@ -113,13 +138,13 @@ export default {
       return this.$i18n.locale;
     },
   },
-  created: function () {
-    this.setAccessRights();
-  },
   watch: {
     locale: function () {
       this.setAccessRights();
       this.currentAccessRight = this.$t(this.menuTitle);
+    },
+    folderName: function () {
+      if (this.folderName)  this.getSharedDetails();
     },
     read: function () {
       if(!this.read) {
@@ -131,6 +156,9 @@ export default {
         this.read = true;
       }
     },
+  },
+  created: function () {
+    this.setAccessRights();
   },
   methods: {
     setAccessRights: function () {
@@ -161,12 +189,8 @@ export default {
         (ret) => {
           this.loading = false;
           if (ret) {
-            this.$router.push({
-              name: "SharedFrom",
-              params: {
-                project: this.$store.state.active.id,
-              },
-            });
+            this.isShared = true;
+            this.getSharedDetails();
           }
         },
       );
@@ -234,6 +258,26 @@ export default {
       this.openShareGuide = false;
       this.tags = [];
       this.currentAccessRight = this.$t(this.menuTitle);
+      this.isShared = false;
+    },
+    closeSharedNotification: function () {
+      this.isShared = false;
+    },
+    getSharedDetails: function () {
+      console.log(this.$route.params.projectect);
+      this.$store.state.client.getShareDetails(
+        this.$route.params.project,
+        this.folderName,
+      ).then((ret) => {
+        this.sharedDetails = ret;
+        this.tags = [];
+      });
+    },
+    removeSharedFolder: function (folderData) {
+      this.sharedDetails = this.sharedDetails.filter(
+        item => {
+          return item.sharedTo !== folderData.projectId.value;
+        });
     },
   },
 };
@@ -241,11 +285,12 @@ export default {
 
 <style lang="scss" scoped>
   .share-card {
-    padding: 3rem;
+    padding: 3rem 3rem 1rem 3rem;
     position: absolute;
     top: -8rem;
     left: 0;
     right: 0;
+    max-height: 75vh;
   }
 
   @media screen and (max-height: 720px) {
@@ -253,8 +298,33 @@ export default {
       max-height: 70vh;
       top: -30vh;
     }
-    c-card-content  {
-      overflow-y: scroll;
+  }
+
+  c-card-content  {
+    overflow-y: scroll;
+    scrollbar-width: 0.5rem;
+    margin-top: 1rem;
+    padding: 0;
+    padding-bottom: 5rem;
+    padding-right: 0.5rem;
+
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--csc-mid-grey);
+      border-radius: 10px;
+      &:hover {
+        background: var(--csc-dark-grey);
+      }
+    }
+
+    & > * {
+      margin: 0 !important;
+    };
+    & > p {
+      margin-top: -1rem !important;
+      font-size: 0.875rem;
     }
   }
 
@@ -270,18 +340,6 @@ export default {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-  }
-
-  c-card-content {
-    margin-top: 1rem;
-    padding: 0;
-    & > * {
-      margin: 0 !important;
-    };
-    & > p {
-      margin-top: -1rem !important;
-      font-size: 0.875rem;
     }
   }
 
@@ -303,7 +361,7 @@ export default {
     margin: 2rem 0 0 0;
   }
 
-  c-flex {
+  c-flex, .shared-notification {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -317,5 +375,15 @@ export default {
   c-menu-item {
     background-color: transparent;
   }
+
+  c-alert[type="success"] {
+    align-items: center;
+    & > .shared-notification {
+      color: var(--csc-dark-grey);
+    };
+    margin-bottom: 1.5rem;
+    box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
+  }
+
 
 </style>

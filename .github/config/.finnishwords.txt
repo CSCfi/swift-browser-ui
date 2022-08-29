@@ -56,6 +56,7 @@ jaetaan
 jaettava
 jaettavaksi
 jaettavat
+jaettiin
 jaettu
 jaettua
 jaettuja
@@ -115,6 +116,7 @@ käyttäjätunnustasi
 käyttöä
 käyttöliittymä
 käyttöliittymän
+käyttöoikeudet
 käyttörajoista
 kehittänyt
 kelpaa
