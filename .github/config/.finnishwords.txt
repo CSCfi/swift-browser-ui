@@ -3,6 +3,7 @@ ajaksi
 alapuolisesta
 alla
 aloitettiin
+aloitettu
 annetut
 apin
 apua
@@ -88,6 +89,8 @@ kansiot
 kansioille
 kansioina
 kanssa
+kohdekansio
+käynnissä
 käytä
 käytä
 käytettävissä
@@ -187,6 +190,7 @@ megatavun
 mikä
 mikäli
 minuutin
+minuutteja
 mitätöi
 muiden
 muita
@@ -197,6 +201,7 @@ muokkaa
 mutta
 muussa
 muutaman
+muutamia
 muuttaa
 muuttaaksesi
 näkyvissä
@@ -247,6 +252,7 @@ pääsy
 paina
 painikkeella
 painikkeesta
+peruutettu
 päivitä
 palautus
 paloitellaan
@@ -255,6 +261,7 @@ palvelu
 palvelun
 peruuta
 pienemmissä
+pienennä
 piilota
 poiketa
 pois
@@ -341,6 +348,7 @@ sivutus
 sopimus
 suodata
 suuren
+suurenna
 suuret
 suuri
 suurten
@@ -388,6 +396,7 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiminto
 toiseen
 toteuttaa
 tueta
