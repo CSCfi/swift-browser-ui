@@ -1,27 +1,39 @@
 <template>
-  <div>
-    <c-modal
-      v-control
-      v-csc-model="openCreateFolderModal"
+  <div class="contents">
+    <b-field
+      grouped
+      group-multiline
+      class="groupControls"
     >
-      <CreateFolderModal />
-    </c-modal>
-    <c-modal
-      v-control
-      v-csc-model="openUploadModal"
-    >
-      <UploadModal />
-    </c-modal>
-    <div class="contents">
-      <b-field
-        grouped
-        group-multiline
-        class="groupControls"
+      <b-select
+        v-model="perPage"
+        data-testid="containersPerPage"
+        :disabled="!isPaginated"
       >
-        <b-select
-          v-model="perPage"
-          data-testid="containersPerPage"
-          :disabled="!isPaginated"
+        <option value="5">
+          5 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="10">
+          10 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="15">
+          15 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="25">
+          25 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="50">
+          50 {{ $t("message.table.pageNb") }}
+        </option>
+        <option value="100">
+          100 {{ $t("message.table.pageNb") }}
+        </option>
+      </b-select>
+      <div class="control is-flex">
+        <b-switch
+          v-if="(containers.value || []).length < 500"
+          v-model="isPaginated"
+          data-testid="paginationSwitch"
         >
           {{ $t("message.table.paginated") }}
         </b-switch>
@@ -57,50 +69,15 @@
             v-if="searchArray.length > 0 && searchArray[0].length > 1"
             class="media empty-search"
           >
-            {{ $t("message.table.paginated") }}
-          </b-switch>
-          <b-switch v-model="showTags">
-            {{ $t("message.table.showTags") }}
-          </b-switch>
-        </div>
-        <b-autocomplete
-          id="searchbox"
-          v-model="searchQuery"
-          rounded
-          icon="magnify"
-          clearable
-          :placeholder="$t('message.search.searchBy')"
-          :data="searchResults"
-          field="name"
-          :open-on-focus="true"
-          :keep-first="true"
-          :loading="isSearching"
-          max-height="350px"
-          @select="option => $router.push(getSearchRoute(option))"
-          @focus="event => searchGainedFocus()"
-        >
-          <template slot-scope="props">
-            <SearchResultItem
-              :item="props.option"
-              :search-array="searchArray"
-              :route="getSearchRoute"
+            <b-loading
+              v-model="isSearching"
+              :is-full-page="false"
             />
-          </template>
-          <template #empty>
             <div
-              v-if="searchArray.length > 0 && searchArray[0].length > 1"
-              class="media empty-search"
+              v-show="!isSearching"
+              class="media-content"
             >
-              <b-loading
-                v-model="isSearching"
-                :is-full-page="false"
-              />
-              <div
-                v-show="!isSearching"
-                class="media-content"
-              >
-                {{ $t("message.search.empty") }}
-              </div>
+              {{ $t("message.search.empty") }}
             </div>
           </div>
         </template>
@@ -128,185 +105,100 @@
         field="name"
         :label="$t('message.table.name')"
       >
-        <b-table-column
-          sortable
-          field="name"
-          :label="$t('message.table.name')"
-        >
-          <template #default="props">
-            <span
-              :class="props.row.count ?
-                'title is-6' : ''"
-            >
-              <b-icon
-                :icon="props.row.count ? 'folder' : 'folder-outline'"
-                size="is-small"
-              />
-              {{ props.row.name | truncate(100) }}
-            </span>
-            <b-taglist v-if="showTags">
-              <b-tag
-                v-for="tag in props.row.tags"
-                :key="tag"
-                :type="selected == props.row ?
-                        'is-primary-invert' : 'is-primary'"
-                rounded
-                ellipsis
-              >
-                {{ tag }}
-              </b-tag>
-            </b-taglist>
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="count"
-          :label="$t('message.table.objects')"
-          width="120"
-          sortable
-        >
-          <template #default="props">
-            {{ props.row.count }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="bytes"
-          :label="$t('message.table.size')"
-          width="120"
-          sortable
-        >
-          <template #default="props">
-            {{ localHumanReadableSize(props.row.bytes) }}
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="functions"
-          label=""
-          width="150"
-        >
-          <template #default="props">
-            <div class="field has-addons">
-              <p class="control">
-                <ContainerDownloadLink
-                  v-if="selected == props.row"
-                  class="is-small"
-                  :inverted="true"
-                  :disabled="!props.row.bytes ? true : false"
-                  :container="props.row.name"
-                />
-                <ContainerDownloadLink
-                  v-else
-                  class="is-small"
-                  :disabled="!props.row.bytes ? true : false"
-                  :container="props.row.name"
-                />
-              </p>
-              <p
-                v-if="!props.row.bytes"
-                class="control"
-              >
-                <b-button
-                  v-if="selected == props.row"
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  disabled
-                  inverted
-                  icon-left="share"
-                >
-                  {{ $t("message.share.share") }}
-                </b-button>
-                <b-button
-                  v-else
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  disabled
-                  icon-left="share"
-                >
-                  {{ $t("message.share.share") }}
-                </b-button>
-              </p>
-              <p
-                v-else
-                class="control"
-              >
-                <b-button
-                  v-if="selected == props.row"
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  inverted
-                  icon-left="share"
-                  @click="
-                    $router.push({
-                      name: 'SharingView',
-                      query: { container: props.row.name },
-                    })
-                  "
-                >
-                  {{ $t("message.share.share") }}
-                </b-button>
-                <b-button
-                  v-else
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  icon-left="share"
-                  @click="
-                    $router.push({
-                      name: 'SharingView',
-                      query: { container: props.row.name },
-                    })
-                  "
-                >
-                  {{ $t("message.share.share") }}
-                </b-button>
-              </p>
-              <p class="control">
-                <ReplicateContainerButton
-                  v-if="selected == props.row"
-                  :project="active.id"
-                  :container="props.row.name"
-                  :smallsize="true"
-                  :disabled="!props.row.bytes ? true : false"
-                  :inverted="true"
-                />
-                <ReplicateContainerButton
-                  v-else
-                  :project="active.id"
-                  :container="props.row.name"
-                  :disabled="!props.row.bytes ? true : false"
-                  :smallsize="true"
-                />
-              </p>
-              <p class="control">
-                <b-button
-                  type="is-primary"
-                  outlined
-                  size="is-small"
-                  icon-left="pencil"
-                  :inverted="selected == props.row ? true : false"
-                  @click="toggleCreateFolderModal(props.row.name)"
-                >
-                  {{ $t("message.edit") }}
-                </b-button>
-              </p>
-            </div>
-          </template>
-        </b-table-column>
-        <b-table-column
-          field="dangerous"
-          label=""
-          width="75"
-        >
-          <template #default="props">
-            <DeleteContainerButton
-              v-if="selected == props.row"
-              :inverted="true"
-              :objects="props.row.count"
-              :container="props.row.name"
+        <template #default="props">
+          <span
+            :class="props.row.count ?
+              'title is-6' : ''"
+          >
+            <b-icon
+              :icon="props.row.count ? 'folder' : 'folder-outline'"
+              size="is-small"
             />
-            <DeleteContainerButton
+            {{ props.row.name | truncate(100) }}
+          </span>
+          <b-taglist v-if="showTags">
+            <b-tag
+              v-for="tag in props.row.tags"
+              :key="tag"
+              :type="selected == props.row ?
+                'is-primary-invert' : 'is-primary'"
+              rounded
+              ellipsis
+            >
+              {{ tag }}
+            </b-tag>
+          </b-taglist>
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="count"
+        :label="$t('message.table.objects')"
+        width="120"
+        sortable
+      >
+        <template #default="props">
+          {{ props.row.count }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="bytes"
+        :label="$t('message.table.size')"
+        width="120"
+        sortable
+      >
+        <template #default="props">
+          {{ localHumanReadableSize(props.row.bytes) }}
+        </template>
+      </b-table-column>
+      <b-table-column
+        field="functions"
+        label=""
+        width="150"
+      >
+        <template #default="props">
+          <div class="field has-addons">
+            <p class="control">
+              <ContainerDownloadLink
+                v-if="selected == props.row"
+                class="is-small"
+                :inverted="true"
+                :disabled="!props.row.bytes ? true : false"
+                :container="props.row.name"
+              />
+              <ContainerDownloadLink
+                v-else
+                class="is-small"
+                :disabled="!props.row.bytes ? true : false"
+                :container="props.row.name"
+              />
+            </p>
+            <p
+              v-if="!props.row.bytes"
+              class="control"
+            >
+              <b-button
+                v-if="selected == props.row"
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+                inverted
+                icon-left="share"
+              >
+                {{ $t("message.share.share") }}
+              </b-button>
+              <b-button
+                v-else
+                type="is-primary"
+                outlined
+                size="is-small"
+                disabled
+                icon-left="share"
+              >
+                {{ $t("message.share.share") }}
+              </b-button>
+            </p>
+            <p
               v-else
               class="control"
             >
@@ -371,8 +263,6 @@ import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import CreateFolderModal from "@/components/CreateFolderModal";
-import UploadModal from "@/components/UploadModal";
 import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
 
@@ -381,8 +271,6 @@ export default {
   components: {
     SearchResultItem,
     ContainerDownloadLink,
-    CreateFolderModal,
-    UploadModal,
     FolderOptionsMenu,
   },
   filters: {
@@ -410,18 +298,6 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
-    },
-    openCreateFolderModal: {
-      get() {
-        return this.$store.state.openCreateFolderModal;
-      },
-      set() {},
-    },
-    openUploadModal: {
-      get() {
-        return this.$store.state.openUploadModal;
-      },
-      set() {},
     },
   },
   watch: {
@@ -641,11 +517,6 @@ export default {
 </script>
 
 <style scoped>
-c-modal {
-  position: relative;
-  margin: 0 auto;
-  display: inline-flex;
-}
 
 .containerTable {
   width: 90%;

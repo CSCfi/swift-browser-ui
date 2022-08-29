@@ -8,6 +8,8 @@ import VueI18n from "vue-i18n";
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
+import CreateFolderModal from "@/components/CreateFolderModal";
+import UploadModal from "@/components/UploadModal";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -96,6 +98,8 @@ new Vue({
   components: {
     BrowserMainNavbar,
     BrowserSecondaryNavbar,
+    CreateFolderModal,
+    UploadModal,
     ProgressBar,
   },
   data: function () {
@@ -142,6 +146,18 @@ new Vue({
     },
     prefix() {
       return this.$store.state.currentPrefix;
+    },
+    openCreateFolderModal: {
+      get() {
+        return this.$store.state.openCreateFolderModal;
+      },
+      set(newState) { return newState; },
+    },
+    openUploadModal: {
+      get() {
+        return this.$store.state.openUploadModal;
+      },
+      set(newState) {return newState; },
     },
   },
   created() {

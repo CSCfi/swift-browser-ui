@@ -7,6 +7,19 @@
         :projects="projects"
       />
       <ProgressBar v-if="isUploading || isChunking" />
+      <c-modal
+        v-control
+        v-csc-model="openCreateFolderModal"
+      >
+        <CreateFolderModal />
+      </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openUploadModal"
+        width="64vw"
+      >
+        <UploadModal />
+      </c-modal>
       <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
         <b-breadcrumb-item
           v-for="item in getRouteAsList()"
@@ -24,14 +37,20 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <footer id="footer" class="footer">
+      <footer
+        id="footer"
+        class="footer"
+      >
         <div class="content has-text-centered">
           <p>
             <span class="has-text-weight-bold">
               {{ $t("message.program_name") }}
             </span>
             {{ $t("message.devel") }}
-            <a href="https://csc.fi" :alt="$t('message.cscOrg')">{{
+            <a
+              href="https://csc.fi"
+              :alt="$t('message.cscOrg')"
+            >{{
               $t("message.cscOrg")
             }}</a>
           </p>
@@ -70,6 +89,29 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+c-modal {
+  position: relative;
+  margin: 0 auto;
+  display: inline-flex;
+}
+
+.modal-content-wrapper {
+  overflow-y: scroll;
+  scrollbar-width: 0.5rem;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--csc-mid-grey);
+    border-radius: 10px;
+    &:hover {
+      background: var(--csc-dark-grey);
+    }
+  }
 }
 
 .content-wrapper {

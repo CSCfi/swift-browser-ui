@@ -1,6 +1,6 @@
 <template>
   <c-card class="upload-card">
-    <div class="upload-content">
+    <div class="modal-content-wrapper">
       <h3 class="title is-3 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
       </h3>
@@ -21,24 +21,6 @@
           required
           @changeQuery="onQueryChange"
         />
-        <!--<b-field
-          custom-class="has-text-dark"
-          :label="$t('message.tagName')"
-          type="is-dark"
-        >
-          <b-taginput
-            v-model="tags"
-            class="taginput"
-            ellipsis
-            maxlength="20"
-            has-counter
-            rounded
-            type="is-primary"
-            :placeholder="$t('message.tagPlaceholder')"
-            :confirm-keys="taginputConfirmKeys"
-            :on-paste-separators="taginputConfirmKeys"
-          />
-        </b-field>-->
         <h6 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
         </h6>
@@ -443,17 +425,6 @@ export default {
       this.$store.commit("setUploadInfo", uploadInfo);
       this.res.addFiles(files, undefined);
     },
-    beginUpload: function () {
-      this.aBeginUpload(this.dropFiles).then(() => {
-        this.$buefy.toast.open({
-          message: this.$t("message.encrypt.upStart"),
-          type: "is-success",
-        });
-        this.$store.commit("eraseDropFiles");
-        this.$store.commit("toggleUploadModal", false);
-      });
-    },
-
     checkUploadSize() {
       let size = 0;
       for (let file of this.dropFiles) {
@@ -623,6 +594,7 @@ export default {
         duration: 10000,
         type: "is-success",
       });
+      this.$store.commit("toggleUploadModal", false);
       this.encryptFiles().then(() => {
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.enSuccess"),
@@ -666,7 +638,7 @@ export default {
 .upload-card {
   padding: 3rem;
   position: absolute;
-  top: -8rem;
+  top: -5rem;
   left: 0;
   right: 0;
   max-height: 80vh;
@@ -676,10 +648,6 @@ export default {
   .upload-card {
     max-height: 50vh;
   }
-}
-
-.upload-content {
-  overflow-y: scroll;
 }
 
 c-card-content {

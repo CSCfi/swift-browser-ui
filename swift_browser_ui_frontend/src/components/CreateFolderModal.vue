@@ -1,13 +1,13 @@
 <template>
-  <c-card class="addFolder">
-    <div class="addFolderContent">
-      <h2 class="title is-3">
+  <c-card class="add-folder">
+    <div class="modal-content-wrapper">
+      <h3 class="title is-3 has-text-dark">
         {{
           create
             ? $t("message.container_ops.addContainer")
             : $t("message.container_ops.editContainer") + folderName
         }}
-      </h2>
+      </h3>
       <c-card-content>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
@@ -193,28 +193,19 @@ export default {
 <style lang="scss" scoped>
 @import "@/css/prod.scss";
 
-.addFolder {
+.add-folder {
   padding: 3rem;
   position: absolute;
-  top: -8rem;
+  top: -1rem;
   left: 0;
   right: 0;
-  max-height: 70vh;
+  max-height: 75vh;
 }
 
-@media screen and (max-width: 992px) {
-  .addFolder {
+@media screen and (max-height: 720px), (max-width: 992px ) {
+  .add-folder {
     max-height: 50vh;
   }
-}
-
-.addFolderContent {
-  overflow-y: scroll;
-}
-
-.addFolderContent > h2 {
-  margin: 0 !important;
-  color: var(--csc-dark-grey);
 }
 
 c-card-content {

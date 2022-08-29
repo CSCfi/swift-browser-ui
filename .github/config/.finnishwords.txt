@@ -15,6 +15,7 @@ avain
 avainta
 avainten
 edellinen
+edistyneitä
 ei
 eikä
 englanniksi
@@ -310,6 +311,7 @@ salataan
 salaus
 salausohjelman
 salausratkaisun
+salausvaihtoehtoja
 salli
 sallittu
 selaamiseen
