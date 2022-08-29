@@ -7,6 +7,7 @@ annetut
 apin
 apua
 arvot
+asetukset
 avaimelle
 avaimen
 avaimet
@@ -88,6 +89,9 @@ kansiot
 kansioille
 kansioina
 kanssa
+kohde
+kohdetta
+kohteet
 käytä
 käytä
 käytettävissä
@@ -372,6 +376,7 @@ tätä
 taustalla
 tavallisesti
 täytyy
+tekstinä
 tiedosto
 tiedostoa
 tiedostoja
@@ -398,6 +403,8 @@ tulisi
 tuloksia
 tunniste
 tunnus
+tunnisteet
+tunnisteita
 tunti
 tuo
 tyhjä
@@ -420,6 +427,7 @@ valinnan
 valinnat
 valitse
 valittu
+valitut
 valittuja
 valittuna
 valmis
