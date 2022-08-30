@@ -82,6 +82,8 @@ import {
   tokenize,
 } from "@/common/conv";
 
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+
 export default {
   name: "CreateFolderModal",
   data() {
@@ -104,7 +106,7 @@ export default {
   },
   watch: {
     selectedFolderName: function () {
-      if (this.selectedFolderName.length > 0) {
+      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
         this.create = false;
         this.getContainer();
       }
@@ -182,9 +184,10 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.create = true;
-      if (this.selectedFolderName.length > 0) {
+      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
         this.$store.commit("setFolderName", "");
       }
+      modifyBrowserPageStyles();
     },
   },
 };

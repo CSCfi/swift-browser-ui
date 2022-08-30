@@ -56,7 +56,10 @@
 </template>
 
 <script>
-import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import {
+  toggleCreateFolderModal,
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
@@ -79,7 +82,7 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: this.$router.name, 
+          name: this.$router.name,
           params: {user: this.uname, project: item.id},
         };
 
@@ -91,9 +94,11 @@ export default {
     },
     toggleCreateFolderModal: function (folderName) {
       toggleCreateFolderModal(folderName);
+      modifyBrowserPageStyles();
     },
     toggleUploadModal: function () {
       this.$store.commit("toggleUploadModal", true);
+      modifyBrowserPageStyles();
     },
   },
 };

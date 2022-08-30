@@ -152,6 +152,8 @@ import {
   computeSHA256,
 } from "@/common/conv";
 
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+
 export default {
   name: "UploadModal",
   filters: {
@@ -444,6 +446,7 @@ export default {
       this.$store.commit("eraseDropFiles");
       this.$store.commit("toggleUploadModal", false);
       this.inputFolder = "";
+      modifyBrowserPageStyles();
     },
     dragHandler: function (e) {
       e.preventDefault();
@@ -595,6 +598,7 @@ export default {
         type: "is-success",
       });
       this.$store.commit("toggleUploadModal", false);
+      modifyBrowserPageStyles();
       this.encryptFiles().then(() => {
         this.$buefy.toast.open({
           message: this.$t("message.encrypt.enSuccess"),

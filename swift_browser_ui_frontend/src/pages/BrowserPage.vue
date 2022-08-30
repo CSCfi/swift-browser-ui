@@ -74,8 +74,6 @@ export default {
 <style lang="scss">
 @import "@/css/prod.scss";
 
-$footer-height: 10rem;
-
 html, body {
   height: 100%;
 }
@@ -89,6 +87,11 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.subContainer-additionalStyles {
+  position: fixed;
+  width: 100%;
 }
 
 c-modal {
@@ -117,7 +120,7 @@ c-modal {
 .content-wrapper {
   margin: 0;
   padding: 0;
-  padding-bottom: calc(#{$footer-height} + 3rem);
+  padding-bottom: 3rem;
   display: flex;
   flex-direction: column;
 }
@@ -179,10 +182,8 @@ c-modal {
 
 .footer {
   flex-shrink: 0;
-  position: absolute;
-  height: $footer-height;
+  height: 10rem;
   width: 100%;
-  bottom: 0;
 }
 
 #footer {

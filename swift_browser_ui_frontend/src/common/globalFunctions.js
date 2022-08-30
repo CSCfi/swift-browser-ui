@@ -5,4 +5,9 @@ export function toggleCreateFolderModal(folderName) {
   if (folderName) {
     store.commit("setFolderName", folderName);
   }
-} 
+}
+
+export function modifyBrowserPageStyles() {
+  const element = document.getElementById("subContainer");
+  element.classList.toggle("subContainer-additionalStyles");
+}
