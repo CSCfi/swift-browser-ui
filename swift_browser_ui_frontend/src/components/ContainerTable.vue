@@ -102,6 +102,7 @@ export default {
             component: {
               tag: "c-link",
               params: {
+                href: "javascript:void(0)",
                 onClick: () => {
                   this.$router.push({
                     name: "ObjectsView",
