@@ -18,7 +18,13 @@
 
 <script>
 import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
-import { mdiTrayArrowDown, mdiShareVariantOutline } from "@mdi/js";
+import { 
+  mdiTrayArrowDown,
+  mdiShareVariantOutline,
+  mdiDotsHorizontal ,
+} from "@mdi/js";
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import {swiftDeleteContainer} from "@/common/api";
 
 export default {
   name: "ContainerTable",
@@ -179,6 +185,54 @@ export default {
                   },
                 },
               },
+              {
+                value: null,
+                component: {
+                  tag: "c-menu",
+                  params: {
+                    items: [
+                      {
+                        name: this.$t("message.copy"),
+                        action: (() => {
+                          this.$router.push({
+                            name: "ReplicateContainer",
+                            params: {
+                              container: item.name,
+                              project: item.projectID,
+                              from: item.from ? item.from : item.projectID,
+                            },
+                          });
+                        }),
+                        disabled: !item.bytes ? true : false,
+                      },
+                      {
+                        name: this.$t("message.editTags"),
+                        action: () => toggleCreateFolderModal(item.name),
+                      },
+                      {
+                        name: this.$t("message.delete"),
+                        action: () => this.confirmDelete(
+                          item.name, item.count,
+                        ),
+                      },
+                    ],
+                    customTrigger: {
+                      value: this.$t("message.options"),
+                      component: {
+                        tag: "c-button",
+                        params: {
+                          text: true,
+                          path: mdiDotsHorizontal,
+                          title: "Menu with custom trigger",
+                          size: "small",
+                        },
+                      },
+                    },
+                    path: mdiDotsHorizontal,
+
+                  },
+                },
+              },
             ],
           },
         });
@@ -224,6 +278,49 @@ export default {
           sortable: false,
         },
       ];
+    },
+    confirmDelete: function (container, objects) {
+      if (objects > 0) {
+        this.$buefy.notification.open({
+          message: "Deleting a container requires deleting all objects first.",
+          type: "is-danger",
+          position: "is-top-right",
+          duration: 30000,
+          hasIcon: true,
+        });
+        this.$router.push(
+          this.$route.params.project
+            + "/"
+            + container,
+        );
+      } else {
+        this.$buefy.dialog.confirm({
+          title: this.$t("message.container_ops.deleteConfirm"),
+          message: this.$t("message.container_ops.deleteConfirmMessage"),
+          confirmText: this.$t("message.container_ops.deleteConfirm"),
+          type: "is-danger",
+          hasIcon: true,
+          onConfirm: () => {this.deleteContainer(container);},
+        });
+      }
+    },
+    deleteContainer: function(container) {
+      this.$buefy.toast.open({
+        message: this.$t("message.container_ops.deleteSuccess"),
+        type: "is-success",
+      });
+      const projectID = this.$store.state.active.id;
+      swiftDeleteContainer(
+        projectID,
+        container,
+      ).then(async () => {
+        await this.$store.state.db.containers
+          .where({
+            projectID,
+            name: container,
+          })
+          .delete();
+      });
     },
   },
 };
