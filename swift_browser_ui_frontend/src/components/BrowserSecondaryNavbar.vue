@@ -32,6 +32,21 @@
                 {{ active.name }}
               </span>
             </div>
+            <c-button
+              ghost
+              class="navbar-item"
+              @click="copyProjectId"
+            >
+              <i
+                slot="icon"
+                class="mdi mdi-content-copy"
+              />
+              {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
+            </c-button>
+            <c-toasts
+              id="copy-toasts"
+              vertical="center"
+            />
           </div>
           <div class="navbar-end">
             <div class="navbar-item">
@@ -63,6 +78,11 @@ import {
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
+  data: function () {
+    return {
+      copy: false,
+    };
+  },
   computed: {
     active() {
       const activeObject = this.$store.state.active;
@@ -100,6 +120,33 @@ export default {
       this.$store.commit("toggleUploadModal", true);
       modifyBrowserPageStyles();
     },
+    copyProjectId: function () {
+      const toastMessage = {
+        duration: 3000,
+        persistent: false,
+        progress: false,
+      };
+      if (!this.copy) {
+        navigator.clipboard.writeText(this.active.id).then(() => {
+          this.copy = true;
+          document.querySelector("#copy-toasts").addToast(
+            { ...toastMessage,
+              type: "success",
+              message: this.$t("message.copied")},
+          );
+          // avoid multiple clicks of copy button
+          // that can stack up the toasts
+          // by setting the value for 'copy'
+          setTimeout(() => { this.copy = false; }, 3000);
+        },() => {
+          document.querySelector("#copy-toasts").addToast(
+            { ...toastMessage,
+              type: "error",
+              message: this.$t("message.copy_failed")},
+          );
+        });
+      }
+    },
   },
 };
 </script>
@@ -118,5 +165,9 @@ export default {
 
 .select-project {
   padding: 0.5rem 0;
+}
+
+c-toasts {
+  width: fit-content;
 }
 </style>

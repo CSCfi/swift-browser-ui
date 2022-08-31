@@ -133,6 +133,7 @@ let default_translations = {
       },
       share: {
         share: "Share",
+        share_id: "Share ID",
         share_cont: "Share the bucket",
         read_perm: "Grant read permissions",
         write_perm: "Grant write permissions",
@@ -210,6 +211,8 @@ let default_translations = {
       upfail: "Failed uploading ",
       upnotsupported: "Uploading is not supported on your browser",
       copy: " Copy",
+      copied: "Copied!",
+      copy_failed: "Copy failed!",
       create: "Create",
       delete: "Delete",
       remove: "Remove",
@@ -494,6 +497,7 @@ let default_translations = {
       },
       share: {
         share: "Jaa",
+        share_id: "Jaa tunnus",
         share_cont: "Jaa säiliö",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
@@ -570,6 +574,8 @@ let default_translations = {
       upfail: "Epäonnistuttiin lähettäessä tiedosto ",
       upnotsupported: "Selain ei tue tiedostojen lähettämistä",
       copy: " Kopioi",
+      copied: "Kopioitu!",
+      copy_failed: "Kopiointi epäonnistui!",
       create: "Luo",
       delete: "Poista",
       remove: "Poista",
