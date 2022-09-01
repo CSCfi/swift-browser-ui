@@ -27,7 +27,7 @@ setuptools.setup(
     ],
     extras_require={
         "test": [
-            "black==22.3.0",
+            "black==22.8.0",
             "coverage==6.4.0",
             "flake8==4.0.1",
             "flake8-docstrings==1.6.0",
