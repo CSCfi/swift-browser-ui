@@ -158,7 +158,7 @@ describe("Browse containers and test operations", function () {
     cy.get('.taginput-container').children('span').should('have.length', 0)
     cy.get('button').contains('Save').click()
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
-  })
+  });
 
   it("should navigate between all and shared folders with tab selectors", () => {
     const testTabChange = (label, id) => {
@@ -169,5 +169,21 @@ describe("Browse containers and test operations", function () {
     testTabChange("Folders shared with you", "shared-table")
     testTabChange("Folders you have shared", "shared-out-table")
     testTabChange("All folders", "container-table")
-  })
+  });
+
+  it("should copy the current project Id successfully ", () => {
+    cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
+    cy.changeLang("en");
+    cy.get("[data-testid='copy-projectId']").click();
+    cy.get("[data-testid='copy-toasts']").should("be.visible");
+    cy.contains("Copied!");
+    // The copied text is read from clipboard
+    cy.window().then(win => {
+       win.navigator.clipboard.readText().then(text => {
+        expect(text).to.exist;
+       });
+    });
+  });
 })
+
+

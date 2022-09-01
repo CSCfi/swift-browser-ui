@@ -36,6 +36,7 @@
               ghost
               class="navbar-item"
               @click="copyProjectId"
+              data-testid="copy-projectId"
             >
               <i
                 slot="icon"
@@ -46,6 +47,7 @@
             <c-toasts
               id="copy-toasts"
               vertical="center"
+              data-testid="copy-toasts"
             />
           </div>
           <div class="navbar-end">
