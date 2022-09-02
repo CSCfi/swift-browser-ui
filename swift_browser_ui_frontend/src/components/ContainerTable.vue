@@ -126,6 +126,8 @@ export default {
       const sharingContainers = await this.getSharingContainers();
       const sharedContainers = await this.getSharedContainers();
 
+      sharedContainers && console.log("sharedConts: ", sharedContainers);
+
       const getSharingStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {
           return this.$t("message.share.sharing_status");
