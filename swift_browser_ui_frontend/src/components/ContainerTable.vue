@@ -65,6 +65,12 @@ export default {
     locale () {
       return this.$i18n.locale;
     },
+    active() {
+      return this.$store.state.active;
+    },
+    sharingClient() {
+      return this.$store.state.client;
+    },
   },
   watch: {
     disablePagination() {
@@ -87,7 +93,12 @@ export default {
     this.setHeaders();
   },
   methods: {
-    getPage: function () {
+    async getSharingContainers() {
+      return this.sharingClient 
+        ? this.sharingClient.getShare(this.active.id)
+        : [];
+    },
+    async getPage () {
       let offset = 0;
       let limit = this.conts.length;
       if (!this.disablePagination || this.conts.length > 500) {
@@ -98,6 +109,14 @@ export default {
         
         limit = this.paginationOptions.itemsPerPage;
       }
+      const sharingContainers = await this.getSharingContainers();
+
+      const getSharingStatus = (folderName) => {
+        if (sharingContainers.indexOf(folderName) > -1) {
+          return "You have shared";
+        } else return "-";
+      };
+
       this.containers = this.conts.slice(offset, offset + limit).reduce((
         items,
         item,
@@ -144,6 +163,9 @@ export default {
               ],
             },
           }),
+          sharing: {
+            value: getSharingStatus(item.name),
+          },
           actions: {
             value: null,
             sortable: null,
@@ -269,6 +291,11 @@ export default {
         {
           key: "tags",
           value: this.$t("message.table.tags"),
+          sortable: true,
+        },
+        {
+          key: "sharing",
+          value: "Share status",
           sortable: true,
         },
         {
