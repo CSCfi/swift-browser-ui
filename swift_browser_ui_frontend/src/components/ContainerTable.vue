@@ -25,6 +25,7 @@ import {
 } from "@mdi/js";
 import { toggleCreateFolderModal } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
+import delay from "lodash/delay";
 
 export default {
   name: "ContainerTable",
@@ -98,6 +99,16 @@ export default {
         ? this.sharingClient.getShare(this.active.id)
         : [];
     },
+    async getSharedContainers () {
+      if (this.$store.state.client) {
+        return this.$store.state.client.getAccess(
+          this.$route.params.project,
+        );
+      }
+      else {
+        delay(this.getSharedContainers, 100);
+      }
+    },
     async getPage () {
       let offset = 0;
       let limit = this.conts.length;
@@ -110,6 +121,9 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
       const sharingContainers = await this.getSharingContainers();
+      const sharedContainers = await this.getSharedContainers();
+
+      sharedContainers && console.log("sharedConts: ", sharedContainers);
 
       const getSharingStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {
