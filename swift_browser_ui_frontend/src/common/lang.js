@@ -230,8 +230,7 @@ let default_translations = {
           "Please note that folder names cannot be modified " +
           "after creating a folder.",
         createdFolder:
-          "Created folder will be shared with all project members in",
-        myResearchProject: "My research project.",
+          "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage:
@@ -327,8 +326,7 @@ let default_translations = {
           type: "Type",
         },
         uploadedFiles:
-          "Uploaded files will be shared with " +
-          "all project members in My research project.",
+          "Uploaded files will be shared with all project members in ",
         advancedOptions: "Advanced encryption options",
       },
       search: {
@@ -591,10 +589,8 @@ let default_translations = {
         norename:
           "Säiliötä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
-        createdFolder:
-          "Created folder will be shared with all project members in",
+        createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        myResearchProject: "Tutkimusprojektini",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
@@ -686,8 +682,7 @@ let default_translations = {
           type: "Tyyppi",
         },
         uploadedFiles:
-          "Uploaded files will be shared with " +
-          "all project members in My research project.",
+          "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
       },
       search: {

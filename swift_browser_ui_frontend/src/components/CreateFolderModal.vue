@@ -43,10 +43,10 @@
         </b-field>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdFolder") }}
-          <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+          <b>{{ active.name }}</b>.
         </p>
         <c-link
-          :href="`https://my.csc.fi/myProjects/project/${currentProjectID}`"
+          :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
           underline
           target="_blank"
         >
@@ -82,7 +82,10 @@ import {
   tokenize,
 } from "@/common/conv";
 
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+import {
+  modifyBrowserPageStyles,
+  getProjectNumber,
+} from "@/common/globalFunctions";
 
 export default {
   name: "CreateFolderModal",
@@ -92,11 +95,12 @@ export default {
       folderName: "",
       tags: [],
       taginputConfirmKeys,
+      projectNumber: "",
     };
   },
   computed: {
-    currentProjectID() {
-      return this.$route.params.project;
+    active() {
+      return this.$store.state.active;
     },
     selectedFolderName() {
       return this.$store.state.selectedFolderName.length > 0
@@ -110,6 +114,9 @@ export default {
         this.create = false;
         this.getContainer();
       }
+    },
+    active: function () {
+      this.projectNumber = getProjectNumber(this.active);
     },
   },
   methods: {

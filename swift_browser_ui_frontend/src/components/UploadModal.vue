@@ -53,11 +53,11 @@
           :footer-options.prop="footer"
         />
         <p class="info-text is-size-6">
-          {{ $t("message.container_ops.createdFolder") }}
-          <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+          {{ $t("message.encrypt.uploadedFiles") }}
+          <b>{{ active.name }}</b>.
         </p>
         <c-link
-          :href="`https://my.csc.fi/myProjects/project/${currentProjectID}`"
+          :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
           underline
           target="_blank"
         >
@@ -152,7 +152,10 @@ import {
   computeSHA256,
 } from "@/common/conv";
 
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+import {
+  modifyBrowserPageStyles,
+  getProjectNumber,
+} from "@/common/globalFunctions";
 
 export default {
   name: "UploadModal",
@@ -175,6 +178,7 @@ export default {
       recvkeys: [],
       recvHashedKeys: [],
       noUpload: true,
+      projectNumber: "",
     };
   },
   computed: {
@@ -351,6 +355,9 @@ export default {
     },
     ephemeral: function () {
       this.refreshNoUpload();
+    },
+    active: function () {
+      this.projectNumber = getProjectNumber(this.active);
     },
   },
   methods: {

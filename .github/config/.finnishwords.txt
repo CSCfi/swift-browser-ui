@@ -49,6 +49,7 @@ hyväksyäksesi
 ilman
 ja
 jaa
+jaetaan
 jaettava
 jaettavaksi
 jaettavat
@@ -69,6 +70,7 @@ jakopyyntöjen
 jälkeen
 jälkeenpäin
 jäsenet
+jäsenille
 jne
 johtaa
 johtua
@@ -78,6 +80,7 @@ jota
 julkinen
 julkiset
 julkisia
+kaikille
 kaikki
 kansio
 kansion
@@ -149,6 +152,7 @@ lähettäjän
 lähettämistä
 lähetys
 lähetystä
+lähetetyt
 laskettu
 laskutuksesta
 laskutusyksiköiden
@@ -394,7 +398,6 @@ tuloksia
 tunniste
 tunti
 tuo
-tutkimusprojektini
 tyhjä
 tyhjennä
 tyyppi

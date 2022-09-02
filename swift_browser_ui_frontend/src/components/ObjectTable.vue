@@ -62,12 +62,7 @@
             type="is-primary"
             outlined
             icon-left="upload"
-            tag="router-link"
-            :to="{name: 'UploadModal', params: {
-              project: ($route.params.owner ? $route.params.owner
-                : $route.params.project),
-              container: $route.params.container,
-            }}"
+            @click="toggleUploadModal"
           />
         </p>
         <p class="control">
@@ -340,6 +335,7 @@
 
 <script>
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import debounce from "lodash/debounce";
@@ -730,6 +726,10 @@ export default {
           object: objectName,
         },
       };
+    },
+    toggleUploadModal: function () {
+      this.$store.commit("toggleUploadModal", true);
+      modifyBrowserPageStyles();
     },
   },
 };
