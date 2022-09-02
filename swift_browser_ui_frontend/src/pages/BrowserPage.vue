@@ -174,7 +174,7 @@ c-modal {
 }
 
 .search {
-  min-width: 50%;
+  flex: 0.4;
 
   input, input::placeholder, .icon {
     color: $csc-grey !important;
