@@ -144,6 +144,31 @@ Now you should be able to access the development server at localhost:8081. The l
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
+##### Trusted TLS
+Additionally, when testing with the encrypted upload features, browser
+features are used that **require** a trusted TLS connection. This can
+be achieved by using a development proxy server that can be built from
+files in the `devproxy` folder. The folder has it's own `README.md` file.
+
+Additional setup is required. You'll need to configure the following keys
+to point to whatever hostname will be used to access the service.
+Additionally you should allow all hosts, assuming your machine is in a
+secure network when developing. (recommended, a virtual machine behind
+NAT)
+```
+SWIFT_UI_FRONTEND_ALLOW_HOSTS=all
+SWIFT_UI_TLS_PORT=8443
+SWIFT_UI_TLS_HOST=hostname
+```
+
+After this, comment out the commands to run without trusted TLS in the
+`Procfile`, and uncomment the commands to run with trusted TLS.
+
+You should now be able to run the service with trusted TLS by running
+```bash
+honcho start
+```
+
 ##### OIDC login provider
 
 To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
