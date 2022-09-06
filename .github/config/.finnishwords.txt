@@ -15,6 +15,7 @@ avain
 avainta
 avainten
 edellinen
+edistyneitä
 ei
 eikä
 englanniksi
@@ -48,6 +49,7 @@ hyväksyäksesi
 ilman
 ja
 jaa
+jaetaan
 jaettava
 jaettavaksi
 jaettavat
@@ -68,6 +70,7 @@ jakopyyntöjen
 jälkeen
 jälkeenpäin
 jäsenet
+jäsenille
 jne
 johtaa
 johtua
@@ -77,8 +80,10 @@ jota
 julkinen
 julkiset
 julkisia
+kaikille
 kaikki
 kansio
+kansion
 kansiot
 kansioille
 kansioina
@@ -147,6 +152,7 @@ lähettäjän
 lähettämistä
 lähetys
 lähetystä
+lähetetyt
 laskettu
 laskutuksesta
 laskutusyksiköiden
@@ -221,6 +227,7 @@ oikeuksia
 olemassa
 oletusarvoiset
 oletusarvojen
+olevia
 olla
 omaa
 omistavan
@@ -308,6 +315,7 @@ salataan
 salaus
 salausohjelman
 salausratkaisun
+salausvaihtoehtoja
 salli
 sallittu
 selaamiseen
@@ -390,7 +398,6 @@ tuloksia
 tunniste
 tunti
 tuo
-tutkimusprojektini
 tyhjä
 tyhjennä
 tyyppi
@@ -419,6 +426,7 @@ varmistathan
 vastaanottajan
 vastaanottajien
 vastaanottimien
+vedä
 viimeisin
 viimeksi
 virhe

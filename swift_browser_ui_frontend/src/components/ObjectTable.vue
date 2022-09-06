@@ -62,12 +62,7 @@
             type="is-primary"
             outlined
             icon-left="upload"
-            tag="router-link"
-            :to="{name: 'UploadView', params: {
-              project: ($route.params.owner ? $route.params.owner
-                : $route.params.project),
-              container: $route.params.container,
-            }}"
+            @click="toggleUploadModal"
           />
         </p>
         <p class="control">
@@ -242,10 +237,10 @@
               </b-button>
             </p>
             <p
-              v-if="displayTags(props.row.name)" 
+              v-if="displayTags(props.row.name)"
               class="control"
             >
-              <b-button 
+              <b-button
                 tag="router-link"
                 type="is-primary"
                 outlined
@@ -268,7 +263,7 @@
         <template #default="props">
           <span v-if="renderFolders && !isFile(props.row.name)" />
           <DeleteObjectsButton
-            v-else 
+            v-else
             size="is-small"
             :inverted="props.row === selected ? true : false"
             :disabled="false"
@@ -289,7 +284,7 @@
             </li>
             <li>
               <b>{{ $t('message.table.fileType') }}: </b>
-              {{ props.row.content_type }} 
+              {{ props.row.content_type }}
             </li>
             <li>
               <b>{{ $t('message.table.fileDown') }}: </b>
@@ -340,6 +335,7 @@
 
 <script>
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import debounce from "lodash/debounce";
@@ -397,7 +393,7 @@ export default {
   },
   watch: {
     active: function() {
-      this.updateObjects(); 
+      this.updateObjects();
     },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -460,7 +456,7 @@ export default {
   methods: {
     updateObjects: async function () {
       if (
-        this.container === undefined 
+        this.container === undefined
         || (
           this.active.id === undefined
           && this.$route.params.project
@@ -471,7 +467,7 @@ export default {
 
       if(this.$route.name === "SharedObjects") {
         await this.$store.dispatch(
-          "updateSharedObjects", 
+          "updateSharedObjects",
           {
             project: this.$route.params.project,
             owner: this.$route.params.owner,
@@ -487,7 +483,7 @@ export default {
 
       const container = await this.$store.state.db.containers
         .get({
-          projectID: this.$route.params.project, 
+          projectID: this.$route.params.project,
           name: this.container,
         });
       this.oList = useObservable(
@@ -498,7 +494,7 @@ export default {
         ),
       );
       this.$store.dispatch(
-        "updateObjects", 
+        "updateObjects",
         {
           projectID: this.$route.params.project,
           container: container,
@@ -622,7 +618,7 @@ export default {
         folders.add(folderName);
         idList.push(element.id);
       });
-      
+
       return idList;
     },
     getPrefix: function () {
@@ -676,7 +672,7 @@ export default {
     isVisible: function(id) {
       let visible = true;
       if (
-        this.renderFolders 
+        this.renderFolders
         && !this.inCurrentFolder.includes(id)
       ) {
         visible = false;
@@ -696,9 +692,9 @@ export default {
       var name_re = new RegExp(safeKey, "i");
       function search (prev, element) {
         if (
-          element.name.match(name_re) || 
+          element.name.match(name_re) ||
           (
-            element.tags && 
+            element.tags &&
             element.tags.join("\n").match(name_re)
           )
         ) {
@@ -717,8 +713,8 @@ export default {
         return {
           name: "EditSharedObjectView",
           params: {
-            container: containerName, 
-            object: objectName, 
+            container: containerName,
+            object: objectName,
             owner: this.$route.params.owner,
           },
         };
@@ -726,10 +722,14 @@ export default {
       return {
         name: "EditObjectView",
         params: {
-          container: containerName, 
+          container: containerName,
           object: objectName,
         },
       };
+    },
+    toggleUploadModal: function () {
+      this.$store.commit("toggleUploadModal", true);
+      modifyBrowserPageStyles();
     },
   },
 };

@@ -1,48 +1,28 @@
 <template>
-  <div
-    id="mainContainer"
-    @dragenter="itemdrop = true"
-    @dragover="itemdrop = true"
-    @dragleave="itemdrop = false"
-  >
-    <div
-      v-if="itemdrop"
-      id="dropArea"
-      class="upload-draggable is-full-page
-            is-align-items-center is-flex is-justify-content-center"
-      style="width: 100%; height: 100%;margin: auto;"
-      @dragenter="dragHandler"
-      @dragover="dragHandler"
-      @dragleave="dragLeaveHandler"
-      @drop="navUpload"
-    >
-      <p>
-        <b-icon
-          icon="upload-multiple"
-          size="is-large"
-        />
-      </p>
-      <p>
-        {{ $t('message.dropFiles') }}     
-      </p>
-    </div>
-    <div
-      v-else
-      id="subContainer"
-    >
-      <BrowserMainNavbar
-        :langs="langs"
-      />
+  <div id="mainContainer">
+    <div id="subContainer">
+      <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
         :projects="projects"
       />
       <ProgressBar v-if="isUploading || isChunking" />
-      <b-breadcrumb
-        style="margin-left:5%;margin-top:1%;font-size:1rem;"
+      <c-modal
+        v-control
+        v-csc-model="openCreateFolderModal"
       >
+        <CreateFolderModal />
+      </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openUploadModal"
+        width="64vw"
+      >
+        <UploadModal />
+      </c-modal>
+      <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
         <b-breadcrumb-item
-          v-for="item in getRouteAsList ()"
+          v-for="item in getRouteAsList()"
           :key="item.alias"
           :to="item.address"
           tag="router-link"
@@ -65,11 +45,14 @@
           <p>
             <span class="has-text-weight-bold">
               {{ $t("message.program_name") }}
-            </span> {{ $t("message.devel") }}
-            <a 
+            </span>
+            {{ $t("message.devel") }}
+            <a
               href="https://csc.fi"
               :alt="$t('message.cscOrg')"
-            >{{ $t("message.cscOrg") }}</a>
+            >{{
+              $t("message.cscOrg")
+            }}</a>
           </p>
         </div>
       </footer>
@@ -91,8 +74,6 @@ export default {
 <style lang="scss">
 @import "@/css/prod.scss";
 
-$footer-height: 10rem;
-
 html, body {
   height: 100%;
 }
@@ -108,8 +89,40 @@ html, body {
   flex-direction: column;
 }
 
+.subContainer-additionalStyles {
+  position: fixed;
+  width: 100%;
+}
+
+c-modal {
+  position: relative;
+  margin: 0 auto;
+  display: inline-flex;
+}
+
+.modal-content-wrapper {
+  overflow-y: scroll;
+  scrollbar-width: 0.5rem;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--csc-mid-grey);
+    border-radius: 10px;
+    &:hover {
+      background: var(--csc-dark-grey);
+    }
+  }
+}
+
 .content-wrapper {
-  padding-bottom: calc(#{$footer-height} + 3rem);
+  margin: 0;
+  padding: 0;
+  padding-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .contents {
@@ -117,7 +130,7 @@ html, body {
 }
 
 .navbar .container .navbar-brand .navbar-item img {
-	max-height: 2.5rem;
+  max-height: 2.5rem;
 }
 
 .menu-active {
@@ -129,7 +142,8 @@ html, body {
   font-size: 1.5rem;
 }
 
-.menu-active, .menu-icon {
+.menu-active,
+.menu-icon {
   color: $csc-primary;
 }
 
@@ -146,15 +160,15 @@ html, body {
 }
 
 .hero-body .footer {
-    margin:15px 0;
-    padding:0;
+  margin: 15px 0;
+  padding: 0;
 }
 
 .searchBox {
-    max-width: 30%;
-    width: auto;
-    margin-right: auto;
-    margin-left: auto;
+  max-width: 30%;
+  width: auto;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .uploadGroup {
@@ -162,27 +176,14 @@ html, body {
 }
 
 .dashboard {
-    margin-left: 5%;
-    margin-right: 5%;
-}
-
-#dropArea:before{
-  content:"";
-  width: 98%;
-  height:98%;
-  position:absolute;
-  border:2px dashed #b5b5b5;
-  margin: 0 1%;
-  padding: 0;
-  border-radius: 6px;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .footer {
   flex-shrink: 0;
-  position: absolute;
-  height: $footer-height;
+  height: 10rem;
   width: 100%;
-  bottom: 0;
 }
 
 #footer {

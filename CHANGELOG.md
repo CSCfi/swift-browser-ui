@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #674) Add modal for uploading files
 - (GH #723) Add Project information as an option under User menu
 - (GH #713) Top navigation support dropdown menu, commented out old user menu items & link to browser view from app name
 - (GH #645) Add menu for folder options in table view

@@ -8,6 +8,8 @@ import VueI18n from "vue-i18n";
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
+import CreateFolderModal from "@/components/CreateFolderModal";
+import UploadModal from "@/components/UploadModal";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -44,33 +46,32 @@ import ProgressBar from "@/components/UploadProgressBar";
 // Import delay
 import delay from "lodash/delay";
 
-
 checkIDB().then(result => {
   if (!result) {
     window.location.pathname = "/";
   }
 });
 
-window.onerror = function(error) { 
-  if(DEV) console.log("Global error", error);
+window.onerror = function (error) {
+  if (DEV) console.log("Global error", error);
 };
-window.addEventListener("unhandledrejection", function(event) {
-  if(DEV) console.log("unhandledrejection", event);
+window.addEventListener("unhandledrejection", function (event) {
+  if (DEV) console.log("unhandledrejection", event);
   event.preventDefault();
   event.stopPropagation();
 });
-window.addEventListener("rejectionhandled", function(event) {
-  if(DEV) console.log("rejectionhandled", event);
+window.addEventListener("rejectionhandled", function (event) {
+  if (DEV) console.log("rejectionhandled", event);
   event.preventDefault();
   event.stopPropagation();
 });
 
 Vue.config.productionTip = false;
-Vue.config.errorHandler = function(err, vm, info) { 
-  if(DEV) console.log("Vue error: ", err, vm, info);
+Vue.config.errorHandler = function (err, vm, info) {
+  if (DEV) console.log("Vue error: ", err, vm, info);
 };
-Vue.config.warnHandler = function(msg, vm, info) { 
-  if(DEV) console.log("Vue warning: ", msg, vm, info);
+Vue.config.warnHandler = function (msg, vm, info) {
+  if (DEV) console.log("Vue warning: ", msg, vm, info);
 };
 
 Vue.use(Buefy);
@@ -97,53 +98,66 @@ new Vue({
   components: {
     BrowserMainNavbar,
     BrowserSecondaryNavbar,
+    CreateFolderModal,
+    UploadModal,
     ProgressBar,
   },
   data: function () {
     return {
-      itemdrop: false,
       files: [],
     };
   },
   computed: {
-    projects () {
+    projects() {
       return this.$store.state.projects;
     },
-    multipleProjects () {
+    multipleProjects() {
       return this.$store.state.multipleProjects;
     },
-    langs () {
+    langs() {
       return this.$store.state.langs;
     },
-    active () {
+    active() {
       return this.$store.state.active;
     },
-    user () {
+    user() {
       return this.$store.state.uname;
     },
-    isFullPage () {
+    isFullPage() {
       return this.$store.state.isFullPage;
     },
-    isLoading () {
+    isLoading() {
       return this.$store.state.isLoading;
     },
-    isChunking () {
+    isChunking() {
       return this.$store.state.isChunking;
     },
-    isUploading () {
+    isUploading() {
       return this.$store.state.isUploading;
     },
-    resumableClient () {
+    resumableClient() {
       return this.$store.state.resumableClient;
     },
-    altContainer () {
+    altContainer() {
       return this.$store.state.altContainer;
     },
-    uploadInfo () {
+    uploadInfo() {
       return this.$store.state.uploadInfo;
     },
-    prefix () {
+    prefix() {
       return this.$store.state.currentPrefix;
+    },
+    openCreateFolderModal: {
+      get() {
+        return this.$store.state.openCreateFolderModal;
+      },
+      set(newState) { return newState; },
+    },
+    openUploadModal: {
+      get() {
+        return this.$store.state.openUploadModal;
+      },
+      set(newState) {return newState; },
     },
   },
   created() {
@@ -162,43 +176,41 @@ new Vue({
       await this.$store.state.db.projects.bulkPut(projects);
       const toDelete = [];
       existingProjects.map(async oldProj => {
-        if(!projects.find(proj => proj.id === oldProj)) {
+        if (!projects.find(proj => proj.id === oldProj)) {
           toDelete.push(oldProj);
         }
       });
       if (toDelete.length) {
         await this.$store.state.db.projects.bulkDelete(toDelete);
         const containersCollection = this.$store.state.db.containers
-          .where("projectID").anyOf(toDelete);
+          .where("projectID")
+          .anyOf(toDelete);
         const containers = await containersCollection.primaryKeys();
         await containersCollection.delete();
         await this.$store.state.db.objects
-          .where("containerID").anyOf(containers)
+          .where("containerID")
+          .anyOf(containers)
           .delete();
       }
 
       let last_active;
-      if(document.cookie.match("LAST_ACTIVE")) {
+      if (document.cookie.match("LAST_ACTIVE")) {
         last_active = document.cookie
           .split("; ")
           .find(row => row.startsWith("LAST_ACTIVE"))
           .split("=")[1];
       }
       if (last_active) {
-        active = projects[
-          projects.indexOf(projects.find(e => e.id == last_active))
-        ];
-      } else if (
-        !(this.$route.params.user === undefined)
-      ) {
-        if (
-          !(this.$route.params.project === undefined)
-        ) {
-          active = projects[
-            projects.indexOf(
-              projects.find(e => e.id == this.$route.params.project),
-            )
-          ];
+        active =
+          projects[projects.indexOf(projects.find(e => e.id == last_active))];
+      } else if (!(this.$route.params.user === undefined)) {
+        if (!(this.$route.params.project === undefined)) {
+          active =
+            projects[
+              projects.indexOf(
+                projects.find(e => e.id == this.$route.params.project),
+              )
+            ];
         }
       } else {
         active = projects[0];
@@ -216,29 +228,34 @@ new Vue({
       }
       return active;
     };
-    initialize().then((ret) => {
+    initialize().then(ret => {
       if (this.$te("message.keys")) {
         for (let item of Object.entries(this.$t("message.keys"))) {
           let keyURL = new URL(
-            "/download/"
-            + item[1]["project"] + "/"
-            + item[1]["container"] + "/"
-            + item[1]["object"],
+            "/download/" +
+              item[1]["project"] +
+              "/" +
+              item[1]["container"] +
+              "/" +
+              item[1]["object"],
             document.location.origin,
           );
           keyURL.searchParams.append("project", ret.id);
-          fetch(keyURL).then(resp => {
-            return resp.text();
-          }).then(resp => {
-            this.$store.commit("appendPubKey", resp);
-          });
+          fetch(keyURL)
+            .then(resp => {
+              return resp.text();
+            })
+            .then(resp => {
+              this.$store.commit("appendPubKey", resp);
+            });
         }
       }
     });
     fetch("/discover")
-      .then((resp) => {
+      .then(resp => {
         return resp.json();
-      }).then((ret) => {
+      })
+      .then(ret => {
         if (ret.sharing_endpoint) {
           this.$store.commit(
             "setSharingClient",
@@ -258,60 +275,11 @@ new Vue({
           );
         }
       });
-    delay(
-      this.containerSyncWrapper,
-      10000,
-    );
+    delay(this.containerSyncWrapper, 10000);
   },
   methods: {
-    dragHandler: function (e) {
-      e.preventDefault();
-      let dt = e.dataTransfer;
-      if (dt.types.indexOf("Files") >= 0) {
-        e.stopPropagation();
-        dt.dropEffect = "copy";
-        dt.effectAllowed = "copy";
-        this.itemdrop = true;
-      } else {
-        dt.dropEffect = "none";
-        dt.effectAllowed = "none";
-      }
-    },
-    dragLeaveHandler: function () {
-      this.itemdrop = false;
-    },
-    navUpload: function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (e.dataTransfer && e.dataTransfer.items) {
-        for (let item of e.dataTransfer.items) {
-          this.$store.commit("appendFileTransfer", item);
-        }
-      } else if (e.dataTransfer && e.dataTransfer.files) {
-        for (let file of e.dataTransfer.files) {
-          this.$store.commit("appendFileTransfer", file);
-        }
-      }
-      if (this.$route.name != "UploadView") {
-        this.$router.push({
-          name: "UploadView",
-          params: {
-            project: this.$route.params.project,
-            container: (
-              this.$route.params.container ?
-                this.$route.params.container :
-                "upload-".concat(Date.now().toString())
-            ),
-          },
-        });
-      }
-      this.itemdrop = false;
-    },
     containerSyncWrapper: function () {
-      syncContainerACLs(
-        this.$store.state.client,
-        this.$store.state.active.id,
-      );
+      syncContainerACLs(this.$store.state.client, this.$store.state.active.id);
     },
     // Following are the methods used for resumablejs, as the methods
     // need to have access to the vue instance.
@@ -320,7 +288,7 @@ new Vue({
         message: "File / files scheduled for upload.",
         type: "is-success",
       });
-      if(!this.isUploading) {
+      if (!this.isUploading) {
         this.resumableClient.upload();
       }
     },
@@ -330,7 +298,7 @@ new Vue({
         type: "is-success",
       });
       if (this.$route.params.container != undefined) {
-        this.$store.dispatch("updateObjects", {route: this.$route});
+        this.$store.dispatch("updateObjects", { route: this.$route });
       }
     },
     fileFailureToast: function (file) {
@@ -348,31 +316,27 @@ new Vue({
         // check if we should move the file under a pseudofolder
         // using the current prefix defined in state for the url
         if (
-          newParam[0].match("resumableRelativePath")
-          && this.prefix != undefined
+          newParam[0].match("resumableRelativePath") &&
+          this.prefix != undefined
         ) {
-          retUrl.searchParams.append(
-            newParam[0],
-            this.prefix + newParam[1],
-          );
+          retUrl.searchParams.append(newParam[0], this.prefix + newParam[1]);
         } else {
           retUrl.searchParams.append(newParam[0], newParam[1]);
         }
       }
+      retUrl.searchParams.append("session", this.uploadInfo.id);
+      retUrl.searchParams.append("valid", this.uploadInfo.signature.valid);
       retUrl.searchParams.append(
-        "session", this.uploadInfo.id,
-      );
-      retUrl.searchParams.append(
-        "valid", this.uploadInfo.signature.valid,
-      );
-      retUrl.searchParams.append(
-        "signature", this.uploadInfo.signature.signature,
+        "signature",
+        this.uploadInfo.signature.signature,
       );
       return retUrl;
     },
     startUpload: function () {
       this.$store.commit("setUploading");
-      window.onbeforeunload = function () {return "";};
+      window.onbeforeunload = function () {
+        return "";
+      };
     },
     endUpload: function () {
       this.$store.commit("eraseAltContainer");
@@ -395,11 +359,8 @@ new Vue({
     onCancel: function () {
       this.onComplete();
     },
-    updateProgress () {
-      this.$store.commit(
-        "updateProgress",
-        this.resumableClient.progress(),
-      );
+    updateProgress() {
+      this.$store.commit("updateProgress", this.resumableClient.progress());
     },
     createUploadInstance: function () {
       let res = new Resumable({
@@ -435,20 +396,19 @@ new Vue({
       // Create a list representation of the current application route
       // to be used in the initialization of the breadcrumb component
       let retl = [];
-      
+
       retl.push({
         alias: this.$store.state.uname,
-        address: {name: "DashboardView"},
+        address: { name: "DashboardView" },
       });
 
       if (this.$route.params.project != undefined) {
         if (this.$route.path.match("sharing") != null) {
           retl.push({
             alias: this.$t("message.sharing") + this.$store.state.active.name,
-            address: {name: "SharedTo"},
+            address: { name: "SharedTo" },
           });
-        }
-        else {
+        } else {
           retl.push({
             alias: this.$t("message.containers")
                    + this.$store.state.active.name || "",
@@ -460,7 +420,7 @@ new Vue({
       if (this.$route.params.container != undefined) {
         retl.push({
           alias: this.$route.params.container,
-          address: {name: "ObjectsView"},
+          address: { name: "ObjectsView" },
         });
       }
 

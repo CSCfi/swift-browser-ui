@@ -1,14 +1,5 @@
 <template>
-  <div
-    id="container-table"
-    class="contents"
-  >
-    <c-modal
-      v-control
-      v-csc-model="openCreateFolderModal"
-    >
-      <AddContainer />
-    </c-modal>
+  <div class="contents">
     <b-field
       grouped
       group-multiline
@@ -115,7 +106,10 @@
         :label="$t('message.table.name')"
       >
         <template #default="props">
-          <span :class="props.row.count ? 'has-text-weight-bold' : ''">
+          <span
+            :class="props.row.count ?
+              'title is-6' : ''"
+          >
             <b-icon
               :icon="props.row.count ? 'folder' : 'folder-outline'"
               size="is-small"
@@ -126,7 +120,8 @@
             <b-tag
               v-for="tag in props.row.tags"
               :key="tag"
-              :type="selected == props.row ? 'is-primary-invert' : 'is-primary'"
+              :type="selected == props.row ?
+                'is-primary-invert' : 'is-primary'"
               rounded
               ellipsis
             >
@@ -268,7 +263,6 @@ import { useObservable } from "@vueuse/rxjs";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem";
 import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import AddContainer from "@/views/AddContainer";
 import FolderOptionsMenu from "../components/FolderOptionsMenu.vue";
 
 
@@ -277,7 +271,6 @@ export default {
   components: {
     SearchResultItem,
     ContainerDownloadLink,
-    AddContainer,
     FolderOptionsMenu,
   },
   filters: {
@@ -305,9 +298,6 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
-    },
-    openCreateFolderModal() {
-      return this.$store.state.openCreateFolderModal;
     },
   },
   watch: {
@@ -527,6 +517,12 @@ export default {
 </script>
 
 <style scoped>
+
+.containerTable {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
 .emptyTable {
   text-align: center;
   margin-top: 5%;
@@ -539,4 +535,5 @@ export default {
 .empty-search {
   height: 2rem;
 }
+
 </style>

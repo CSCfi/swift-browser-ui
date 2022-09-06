@@ -94,8 +94,11 @@ describe("Browse containers and test operations", function () {
     cy.selectProject("service");
 
     // container list loads with tags
-    cy.get("tbody .tags .tag").should("have.length", 45);
-    cy.get("tbody tr .tags").first().children(".tag").should("have.length", 3);
+    cy.get("tbody .tags .tag", { timeout: 30000 }).should("have.length", 45);
+    cy.get("tbody tr .tags", { timeout: 10000 })
+      .first()
+      .children(".tag")
+      .should("have.length", 3);
 
     // remove one tag
     cy.navigateTableRowMenu(0, "Edit")
@@ -133,21 +136,21 @@ describe("Browse containers and test operations", function () {
     cy.get("tbody tr .tags").first().children(".tag");
 
     // remove one tag
-    cy.get("tbody tr").contains("Edit").click();
+    cy.get("span").contains("Edit").first().click();
     cy.get("h1").should("contain", "Editing object");
     cy.get(".delete").first().click();
     cy.get("button").contains("Save").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 3);
 
     // add few tags
-    cy.get("tbody tr").contains("Edit").click();
+   cy.get("span").contains("Edit").first().click();
     cy.get(".taginput-container").children("span").should("have.length", 3);
     cy.get(".taginput input").type("adding.couple more,");
     cy.get("button").contains("Save").click();
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 6);
 
     // remove all tags from an object
-    cy.get("tbody tr").contains("Edit").click();
+    cy.get("span").contains("Edit").first().click();
     cy.get(".taginput-container").children("span").should("have.length", 6);
     cy.get(".delete").each(el => {
       cy.get(".delete").first().click();

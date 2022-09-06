@@ -51,7 +51,7 @@ let default_translations = {
           "This browser is not supported.\n" +
           "Please, use a supported browser.",
       },
-      dropFiles: "Drop files to upload.",
+      dropFiles: "Drag and drop folders here or ",
       help: "Help",
       helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Support",
@@ -230,14 +230,13 @@ let default_translations = {
           "Please note that folder names cannot be modified " +
           "after creating a folder.",
         createdFolder:
-          "Created folder will be shared with all project members in",
-        myResearchProject: "My research project.",
+          "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
         deleteConfirmMessage:
           "Are you sure you want to delete this " + "bucket?",
         deleteSuccess: "Bucket Deleted",
-        containerName: "Folder name",
+        folderName: "Folder name",
         containerMessage: "The name of the new bucket",
         fullDelete:
           "Deleting a bucket with contents requires deleting " +
@@ -278,6 +277,9 @@ let default_translations = {
         tokenCopied: "Token copied.",
       },
       encrypt: {
+        uploadFiles: "Upload files",
+        upload_step1: "Create a new folder or use existing ones.",
+        upload_step2: "Files to be uploaded",
         enTooLarge:
           "The total size of files amounts to more than 1024 " +
           "megabytes, which can lead to a failure in encryption. " +
@@ -307,7 +309,7 @@ let default_translations = {
         container: "Destination bucket",
         container_msg: "Upload destination bucket",
         container_hint: "Use this field to change the name of the bucket",
-        dropMsg: "Select Files for Upload",
+        dropMsg: "Select files",
         enup: "Encrypt and Upload",
         normup: "Upload",
         upStart: "Started uploading.",
@@ -316,13 +318,16 @@ let default_translations = {
         empty: "No files selected",
         defaultKeysMessage: "Default public keys added.",
         clearDrop: "Clear Files",
-        cancel: "Cancel Upload",
+        cancel: "Cancel",
         table: {
           name: "Name",
           path: "Path",
           size: "Size",
           type: "Type",
         },
+        uploadedFiles:
+          "Uploaded files will be shared with all project members in ",
+        advancedOptions: "Advanced encryption options",
       },
       search: {
         container: "Bucket",
@@ -405,7 +410,7 @@ let default_translations = {
         idb: "Selain ei tuettu.",
         idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
       },
-      dropFiles: "Pudota lähetettävät tiedostot.",
+      dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",
       helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Tuki",
@@ -584,13 +589,12 @@ let default_translations = {
         norename:
           "Säiliötä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
-        createdFolder: "",
+        createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        myResearchProject: "Tutkimusprojektini",
         deleteConfirm: "Poista säiliö",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
-        containerName: "Säiliö",
+        folderName: "Kansion nimi",
         containerMessage: "Uuden säiliön nimi",
         fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
       },
@@ -627,6 +631,9 @@ let default_translations = {
         tokenCopied: "Avain kopioitu.",
       },
       encrypt: {
+        uploadFiles: "Lataa tiedostoja",
+        upload_step1: "Luo uusi kansio tai käytä olemassa olevia.",
+        upload_step2: "Ladattavat tiedostot",
         enTooLarge:
           "Tiedostojen yhteenlaskettu koko on yli 1024 " +
           "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
@@ -658,7 +665,7 @@ let default_translations = {
         container: "Kohdesäiliö",
         container_msg: "Kohdesäiliö",
         container_hint: "Voit muuttaa säiliön nimeä tällä kentällä",
-        dropMsg: "Valitse Ladattavat tiedostot ",
+        dropMsg: "Valitse tiedostot",
         enup: "Salaa ja lähetä",
         normup: "Lähetä",
         upStart: "Aloitettiin tiedostojen lähetys.",
@@ -667,13 +674,16 @@ let default_translations = {
         empty: "Ei valittuja tiedostoja",
         defaultKeysMessage: "Oletusarvoiset julkiset avaimet lisätty.",
         clearDrop: "Tyhjennä tiedostot",
-        cancel: "Peruuta lataus",
+        cancel: "Peruuta",
         table: {
           name: "Nimi",
           path: "Polku",
           size: "Koko",
           type: "Tyyppi",
         },
+        uploadedFiles:
+          "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
+        advancedOptions: "Edistyneitä salausvaihtoehtoja",
       },
       search: {
         container: "Säiliö",
