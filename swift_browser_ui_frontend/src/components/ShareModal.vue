@@ -24,37 +24,32 @@
         {{ $t("message.share.share_subtitle2") }}
       </p>
       <c-container>
-        <h4 class="title is-4 has-text-dark">
-          {{ $t("message.share.share_other_projects") }}
-        </h4>
-        <c-alert type="info">
-          <div class="guide-content">
-            <section>
-              <p>
-                {{ $t("message.share.share_guide_heading") }}
-              </p>
-              <div v-show="openShareGuide">
-                <br>
-                <p>
-                  {{ $t("message.share.share_guide_step1") }}
-                </p>
-                <p>
-                  {{ $t("message.share.share_guide_step2") }}
-                </p>
-              </div>
-            </section>
-            <c-link
-              underline
-              @click="toggleShareGuide"
-            >
-              <span>
-                {{ openShareGuide ? $t("message.share.close")
-                  : $t("message.share.guide")
-                }}
-              </span>
+        <c-row justify="space-between" align="center">
+          <h4 class="title is-4 has-text-dark">
+            {{ $t("message.share.share_other_projects") }}
+          </h4>
+          <c-flex
+            class="toggle-instructions"
+            @click="toggleShareGuide"
+          >
+            <c-icon-button text v-show="!openShareGuide">
+              <i class="mdi mdi-information-outline" />
+            </c-icon-button>
+            <c-link underline>
+              {{ openShareGuide ? $t("message.share.close_instructions")
+                                : $t("message.share.instructions")
+              }}
             </c-link>
-          </div>
-        </c-alert>
+          </c-flex>
+        </c-row>
+        <div class="guide-content" v-show="openShareGuide">
+          <p>
+            {{ $t("message.share.share_guide_step1") }}
+          </p>
+          <p>
+            {{ $t("message.share.share_guide_step2") }}
+          </p>
+        </div>
         <b-field
           custom-class="field"
           type="is-dark"
@@ -81,7 +76,10 @@
         </c-flex>
       </c-container>
       <c-container v-show="sharedDetails.length > 0">
-        <c-alert type="success" v-show="isShared">
+        <c-alert
+          v-show="isShared"
+          type="success"
+        >
           <div class="shared-notification">
             {{ $t('message.share.shared_successfully') }}
             <c-button
@@ -97,9 +95,9 @@
           </div>
         </c-alert>
         <ShareModalTable
-          :sharedDetails="sharedDetails"
-          :folderName="folderName"
-          :removeSharedFolder="removeSharedFolder"
+          :shared-details="sharedDetails"
+          :folder-name="folderName"
+          :remove-shared-folder="removeSharedFolder"
         />
       </c-container>
     </c-card-content>
@@ -284,14 +282,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .share-card {
-    padding: 3rem 3rem 1rem 3rem;
-    position: absolute;
-    top: -8rem;
-    left: 0;
-    right: 0;
-    max-height: 75vh;
-  }
+@import "@/css/prod.scss";
+
+.share-card {
+  padding: 3rem 3rem 1rem 3rem;
+  position: absolute;
+  top: -8rem;
+  left: 0;
+  right: 0;
+  max-height: 75vh;
+}
 
   @media screen and (max-height: 720px) {
     .share-card {
@@ -343,14 +343,19 @@ export default {
     }
   }
 
+  .toggle-instructions {
+    justify-content: flex-end;
+  }
+
   .guide-content {
-    display: flex;
-    flex-direction: row;
+    margin-top: 1rem;
+    background-color: $csc-primary-lighter;
     justify-content: space-between;
-    font-size: 0.875rem;
-    & > section {
-      margin-right: 24px;
-    }
+    padding: 1rem;
+  }
+
+  h4 {
+    margin: 0 !important;
   }
 
   c-link > span {
