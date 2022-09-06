@@ -154,7 +154,8 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         close: "Close",
-        guide: "Instructions",
+        instructions: "Share ID instructions",
+        close_instructions: "Close instructions",
         share_cont: "Share the bucket",
         share_title: "Share folder ",
         share_subtitle1: "Shared with members of ",
@@ -162,18 +163,18 @@ let default_translations = {
           "Folders are by default shared with your project " +
           "members. This is mandatory.",
         share_other_projects: "Share with other projects",
-        share_guide_heading:
-          "You need project ID of the project you are " +
-          "sharing the folder with.",
         share_guide_step1:
-          "1. Project members can find project ID from " +
-          "Project information page. Go to Profile menu " +
-          "-> Project information.",
-        share_guide_step2: "2. Copy project ID and send it via email etc.",
+          "1. Ask recipient project’s member to select " +
+          "Copy Share ID button next to Select project dropdown when " +
+          "correct project is selected.",
+        share_guide_step2:
+          "2. Recipient’s Share ID is copied in the cache memory " +
+          "and recipient project’s member can paste it to email etc. " +
+          "and send it to you.",
         permissions: "Permissions",
         read_perm: "Read",
         write_perm: "Read and write",
-        shared_successfully: "Folder was shared with ",
+        shared_successfully: "Folder was shared successfully!",
         project_id: "Project ID",
         field_label: "Project Identifiers to share with",
         field_placeholder: "Add Project IDs",
@@ -559,7 +560,8 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jaa tunnus",
         close: "Kiinni",
-        guide: "Ohjeet",
+        instructions: "Jaa tunnus ohjeet",
+        close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio",
         share_subtitle1: "Shared with members of ",
@@ -567,8 +569,6 @@ let default_translations = {
           "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
           "kanssa. Tämä on pakollista.",
         share_other_projects: "Jaa toisen projektin kanssa",
-        share_guide_heading:
-          "Tarvitset sen projektin tunnuksen, " + "jonka kanssa jaat kansion.",
         share_guide_step1:
           "1. Projektin jäsenet löytävät projektitunnuksen projektin " +
           "tietosivulta. Siirry Profiili valikkoon -> Projektin tiedot.",
@@ -577,7 +577,7 @@ let default_translations = {
         permissions: "Käyttöoikeudet",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
-        shared_successfully: "Kansio jaettiin ",
+        shared_successfully: "Kansion jakaminen onnistui!",
         project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
         field_placeholder: "Lisää projektitunnukset",

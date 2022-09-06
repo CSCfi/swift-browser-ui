@@ -370,6 +370,7 @@ suuren
 suuret
 suuri
 suurten
+sulje
 syitä
 synkronoi
 synkronoitavaksi
