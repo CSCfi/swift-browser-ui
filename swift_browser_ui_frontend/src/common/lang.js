@@ -92,6 +92,10 @@ let default_translations = {
         itemSelected: "item selected",
         itemsSelected: "items selected",
         items: "Items",
+        itemsPerPage: "Items per page: ",
+        nextPage: "Next page",
+        prevPage: "Previous Page",
+        page: "Page",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -470,6 +474,10 @@ let default_translations = {
         itemSelected: "kohde valittu",
         itemsSelected: "kohdetta valittu",
         items: "Kohteet",
+        itemsPerPage: "Kohteita sivulla: ",
+        nextPage: "Seuraava sivu",
+        prevPage: "Edellinen sivu",
+        page: "Sivu",
       },
       tableOptions: {
         displayOptions: "Asetukset",

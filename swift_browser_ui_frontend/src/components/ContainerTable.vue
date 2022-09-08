@@ -61,6 +61,16 @@ export default {
       sortBy: "name",
       sortDirection: "asc",
       componentKey: 0,
+      paginationTextOverrides: {
+        itemsPerPageText: this.$t("message.table.itemsPerPage"),
+        nextPage: this.$t("message.table.nextPage"),
+        prevPage: this.$t("message.table.prevPage"),
+        pageText: 
+          ({ start, end, count }) => start + " - " + end + " / " + count + "",
+        pageOfText: 
+          ({ pageNumber, count }) => 
+            this.$t("message.table.page") + pageNumber + " / " + count + "",
+      },
     };
   },
   computed: {
@@ -88,11 +98,13 @@ export default {
     locale() {
       this.componentKey += 1;
       this.setHeaders();
+      this.handlePaginationText();
       this.getPage();
     },
   },
   created() {
     this.setHeaders();
+    this.handlePaginationText();
   },
   methods: {
     async getSharingContainers() {
@@ -122,9 +134,7 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
       const sharingContainers = await this.getSharingContainers();
-      const sharedContainers = await this.getSharedContainers();
-
-      sharedContainers && console.log("sharedConts: ", sharedContainers);
+      // const sharedContainers = await this.getSharedContainers();
 
       const getSharingStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {
@@ -369,6 +379,11 @@ export default {
           })
           .delete();
       });
+    },
+    handlePaginationText() {
+      this.paginationOptions.textOverrides = this.locale === "fi" 
+        ? this.paginationTextOverrides 
+        : {};
     },
   },
 };
