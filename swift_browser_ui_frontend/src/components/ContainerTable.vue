@@ -21,7 +21,8 @@ import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
 import { 
   mdiTrayArrowDown,
   mdiShareVariantOutline,
-  mdiDotsHorizontal ,
+  mdiDotsHorizontal,
+  mdiFolder,
 } from "@mdi/js";
 import { toggleCreateFolderModal } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
@@ -142,6 +143,12 @@ export default {
               tag: "c-link",
               params: {
                 href: "javascript:void(0)",
+                color: "dark-grey",
+                path: mdiFolder,
+                iconFill: "primary",
+                iconStyle: {
+                  marginRight: "1rem",
+                },
                 onClick: () => {
                   this.$router.push({
                     name: "ObjectsView",
