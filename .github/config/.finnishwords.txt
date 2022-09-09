@@ -329,6 +329,7 @@ selailu
 selain
 selainta
 selatessa
+seuraava
 siirto
 sinulle
 sisään
