@@ -1,7 +1,7 @@
 <template>
   <c-card class="share-card">
     <header>
-      <h3 class="title is-3">
+      <h3 class="title is-3 has-text-dark">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
       </h3>
@@ -52,7 +52,7 @@
         </div>
         <b-field
           custom-class="field"
-          type="is-dark"
+          type="is-black"
         >
           <b-taginput
             v-model="tags"
@@ -61,12 +61,14 @@
           />
         </b-field>
         <c-flex>
-          <c-menu
+          <c-select
+            v-control
+            v-csc-model="sharedAccessRight"
+            :label="$t('message.share.permissions')"
             :items.prop="accessRights"
-            no-hover
-          >
-            <c-menu-item>{{ currentAccessRight }}</c-menu-item>
-          </c-menu>
+            placeholder="Select permission"
+            @changeValue="onSelectPermission($event)"
+          />
           <c-button
             :loading="loading"
             @click="shareSubmit()"
@@ -97,7 +99,8 @@
         <ShareModalTable
           :shared-details="sharedDetails"
           :folder-name="folderName"
-          :remove-shared-folder="removeSharedFolder"
+          :accessRights="accessRights"
+          @removeSharedFolder="removeSharedFolder"
         />
       </c-container>
     </c-card-content>
@@ -121,9 +124,8 @@ export default {
       read: false,
       write: false,
       loading: false,
-      menuTitle: "message.share.permissions",
       accessRights: [],
-      currentAccessRight: this.$t("message.share.permissions"),
+      sharedAccessRight: null,
       isShared: false,
       sharedDetails: [],
     };
@@ -139,7 +141,6 @@ export default {
   watch: {
     locale: function () {
       this.setAccessRights();
-      this.currentAccessRight = this.$t(this.menuTitle);
     },
     folderName: function () {
       if (this.folderName)  this.getSharedDetails();
@@ -159,25 +160,28 @@ export default {
     this.setAccessRights();
   },
   methods: {
+    onSelectPermission: function(e) {
+      const val = e.target.value.value;
+      if (val === "read") this.giveReadAccess();
+      else this.giveReadWriteAccess();
+    },
     setAccessRights: function () {
       this.accessRights = [
         {
           name: this.$t("message.share.read_perm"),
-          action: () => this.giveReadAccess(),
+          value: "read",
         },
         {
           name: this.$t("message.share.write_perm"),
-          action: () => this.giveReadWriteAccess(),
+          value: "read and write",
         },
       ];
     },
     giveReadAccess: function () {
-      this.currentAccessRight = this.accessRights[0].name;
       this.read = true;
       this.write = false;
     },
     giveReadWriteAccess: function () {
-      this.currentAccessRight = this.accessRights[1].name;
       this.read = true;
       this.write = true;
     },
@@ -255,14 +259,12 @@ export default {
       this.$store.commit("setFolderName", "");
       this.openShareGuide = false;
       this.tags = [];
-      this.currentAccessRight = this.$t(this.menuTitle);
       this.isShared = false;
     },
     closeSharedNotification: function () {
       this.isShared = false;
     },
     getSharedDetails: function () {
-      console.log(this.$route.params.projectect);
       this.$store.state.client.getShareDetails(
         this.$route.params.project,
         this.folderName,
@@ -334,7 +336,6 @@ export default {
     justify-content: space-between;
     align-items: center;
     & > h3 {
-      color: var(--csc-dark-grey);
       margin: 0 !important;
       width: 100%;
       white-space: nowrap;
@@ -370,15 +371,6 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-  }
-
-  c-menu {
-    border: 1px solid var(--csc-dark-grey);
-  }
-
-  c-menu-item {
-    background-color: transparent;
   }
 
   c-alert[type="success"] {

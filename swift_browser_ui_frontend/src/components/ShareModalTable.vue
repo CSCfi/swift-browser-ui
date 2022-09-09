@@ -14,7 +14,7 @@ import { removeAccessControlMeta } from "@/common/api";
 
 export default {
   name: "ShareModalTable",
-  props: ["sharedDetails", "folderName", "removeSharedFolder"],
+  props: ["sharedDetails", "folderName", "accessRights"],
 
   data: function () {
     return {
@@ -28,13 +28,13 @@ export default {
   },
   computed: {
     projectId () {
-      return this.$route.params.project;
+      return this.$store.state.active.id;
     },
     headers () {
       return [
         {
           key: "projectId",
-          value: this.$t("message.share.permissions"),
+          value: this.$t("message.share.project_id"),
           width: "50%",
           sortable: true,
           align: "start",
@@ -43,24 +43,15 @@ export default {
             params: {
               style: {
                 fontSize: "0.875rem",
-
               },
             },
           },
         },
         {
           key: "permissions",
-          value: this.$t("message.share.project_id"),
+          value: this.$t("message.share.permissions"),
           width: "30%",
           sortable: false,
-          component: {
-            tag: "div",
-            params: {
-              style: {
-                fontSize: "0.875rem",
-              },
-            },
-          },
         },
         {
           key: "remove",
@@ -76,7 +67,7 @@ export default {
                   size: "small",
                   title: this.$t("message.remove"),
                   onClick: ({ data }) => {
-                    this.removeSharedFolder(data);
+                    this.$emit("removeSharedFolder", data);
                     this.deleteFolderShare();
                   },
                 },
@@ -104,10 +95,38 @@ export default {
       this.tableData = this.sharedDetails.map(item => ({
         projectId: {value: item.sharedTo},
         permissions: {
-          value: item.access.length > 1 ?
-            this.$t("message.share.write_perm")
-            : this.$t("message.share.write_perm")},
+          value: null,
+          children: [
+            {
+              component: {
+                tag: "c-select",
+                params: {
+                  style: {
+                    fontSize: "0.875rem",
+                  },
+                  items: this.accessRights,
+                  value: item.access.length > 1 ? this.accessRights[1]
+                    : this.accessRights[0],
+                  onChangeValue: (e) => this.editAccessRight(e, item.sharedTo),
+                },
+              },
+            },
+          ],
+        },
       }));
+    },
+    editAccessRight: async function (e, sharedProjectId) {
+      const rights = [];
+      const val = e.detail.value;
+      if (val === "read") rights.push("r");
+      else rights.push("r", "w");
+
+      await this.$store.state.client.shareEditAccess(
+        this.projectId,
+        this.folderName,
+        [sharedProjectId],
+        rights,
+      );
     },
     deleteFolderShare: function () {
       removeAccessControlMeta(
