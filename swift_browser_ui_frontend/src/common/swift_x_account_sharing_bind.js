@@ -1,6 +1,6 @@
 // Swift cross account container sharing API JavaScript bindings module.
 
-import { 
+import {
   GET,
 } from "@/common/api";
 
