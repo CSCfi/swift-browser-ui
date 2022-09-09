@@ -13,6 +13,13 @@
       >
         <CreateFolderModal />
       </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openUploadModal"
+        width="64vw"
+      >
+        <UploadModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"

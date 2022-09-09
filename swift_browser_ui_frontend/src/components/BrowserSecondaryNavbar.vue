@@ -35,8 +35,8 @@
             <c-button
               ghost
               class="navbar-item"
-              @click="copyProjectId"
               data-testid="copy-projectId"
+              @click="copyProjectId"
             >
               <i
                 slot="icon"
