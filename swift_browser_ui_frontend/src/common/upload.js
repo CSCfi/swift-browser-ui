@@ -87,6 +87,8 @@ export default class EncryptedUploadSession {
     this.socket = undefined;
     this.headUrl = undefined;
     this.ingestUrl = undefined;
+
+    this.abortController = new AbortController();
   }
 
   encryptChunk(i) {
@@ -260,6 +262,22 @@ export default class EncryptedUploadSession {
             "updateEncryptedProgress",
             (this.totalFiles - this.files.length) / this.totalFiles,
           );
+
+          // Cache the succeeded file metadata to IndexedDB
+          this.abortController.abort();
+          delete this.abortController;
+          this.abortController = new AbortController();
+          this.$store.state.db.containers.get({
+            projectID: this.project,
+            name: this.container,
+          }).then(async container => {
+            await this.$store.dispatch("updateObjects", {
+              projectID: this.project,
+              container: container,
+              signal: this.abortController.signal,
+            });
+          }).catch(() => {});
+
           if (this.files.length > 0) {
             this.currentFile = undefined;
             this.initFileSystem();
