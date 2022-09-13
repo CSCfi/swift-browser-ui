@@ -530,6 +530,9 @@ export default {
       modifyBrowserPageStyles();
     },
     beginEncryptedUpload() {
+      if (this.pubkey.length > 0) {
+        this.recvkeys = this.recvkeys.concat(this.pubkey);
+      }
       let upload = new EncryptedUploadSession(
         this.active,
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
