@@ -7,7 +7,7 @@
       v-if="destinationExists"
       type="is-danger"
     >
-      {{ $t('message.replicate.destinationExists') }}
+      {{ $t("message.replicate.destinationExists") }}
     </b-message>
     <b-field grouped>
       <b-field
@@ -26,14 +26,14 @@
             class="button is-primary"
             disabled
           >
-            {{ $t('message.copy') }}
+            {{ $t("message.copy") }}
           </button>
           <button
             v-else
             class="button is-primary"
-            @click="replicateContainer ()"
+            @click="replicateContainer()"
           >
-            {{ $t('message.copy') }}
+            {{ $t("message.copy") }}
           </button>
         </p>
       </b-field>
@@ -44,6 +44,8 @@
 <script>
 import {swiftCopyContainer} from "@/common/api";
 import escapeRegExp from "lodash/escapeRegExp";
+import { useObservable } from "@vueuse/rxjs";
+import { liveQuery } from "dexie";
 
 export default {
   name: "ReplicationView",
@@ -52,14 +54,12 @@ export default {
       destination: this.$route.params.container,
       project: this.$route.params.project,
       destinationExists: false,
+      containers: { value: [] },
     };
   },
   computed: {
     active () {
       return this.$store.state.active;
-    },
-    containerCache () {
-      return this.$store.state.containerCache;
     },
   },
   watch: {
@@ -67,10 +67,29 @@ export default {
       this.checkDestination();
     },
   },
-  mounted () {
-    this.checkDestination();
+  created () {
+    this.fetchContainers().then(() => this.checkDestination());
   },
   methods: {
+    fetchContainers: async function () {
+      if (
+        this.active.id === undefined &&
+        this.$route.params.project === undefined
+      ) {
+        return;
+      }
+      this.containers = useObservable(
+        liveQuery(() => 
+          this.$store.state.db.containers
+            .where({ projectID: this.$route.params.project })
+            .toArray(),
+        ),
+      );
+      await this.$store.dispatch("updateContainers", {
+        projectID: this.$route.params.project,
+        signal: null,
+      });
+    },
     replicateContainer: function () {
       // Initiate the container replication operation
       swiftCopyContainer(
@@ -96,11 +115,15 @@ export default {
       // request parameter should be sanitized first
       var safeKey = escapeRegExp(this.destination);
       let re = new RegExp("^".concat(safeKey, "$"));
-      for (let cont of this.containerCache) {
+      for (let cont of this.containers.value) {
         if (cont.name.match(re)) {
           this.destinationExists = true;
           return;
         }
+      }
+      if (this.$route.params.container.match(re)) {
+        this.destinationExists = true;
+        return;
       }
       this.destinationExists = false;
     },
