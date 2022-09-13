@@ -111,7 +111,7 @@ export default {
       return this.active.id;
     },
     getContainer: function () {
-      return this.$props.container ? this.$props.container :
+      return this.props.row.name ? this.props.row.name :
         this.$route.params.container;
     },
   },
