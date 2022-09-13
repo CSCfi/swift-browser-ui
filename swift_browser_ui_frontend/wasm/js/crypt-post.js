@@ -14,6 +14,7 @@ console.log(FS);
 wasmReady.then(() => {
   console.log("Adding sw event listeners.");
   self.addEventListener("message", (e) => {
+    e.stopImmediatePropagation();
     switch(e.data.cmd) {
       case "pingWasm":
         e.source.postMessage({

@@ -48,6 +48,7 @@ const store = new Vuex.Store({
     selectedFolderName: "",
     openUploadModal: false,
     openShareModal: false,
+    currentUpload: undefined,
   },
   mutations: {
     loading(state, payload) {
@@ -193,6 +194,13 @@ const store = new Vuex.Store({
     },
     toggleShareModal(state, payload) {
       state.openShareModal = payload;
+    },
+    setCurrentUpload(state, cur) {
+      state.currentUpload = cur;
+    },
+    eraseCurrentUpload(state) {
+      delete state.currentUpload;
+      state.currentUpload = undefined;
     },
   },
   actions: {
