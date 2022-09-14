@@ -103,6 +103,7 @@ export default {
                 params: {
                   style: {
                     fontSize: "0.875rem",
+                    marginTop: "1rem",
                   },
                   items: this.accessRights,
                   value: item.access.length > 1 ? this.accessRights[1]
@@ -154,6 +155,7 @@ export default {
 <style lang="scss" scoped>
 c-data-table {
   color: var(--csc-dark-grey);
+  margin-top: 1rem;
 }
 
 </style>

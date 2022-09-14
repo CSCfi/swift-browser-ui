@@ -1,30 +1,37 @@
 <template>
   <div
-    id="container-table"
-    class="contents"
+    class="containers"
   >
-    <c-row
-      id="optionsbar"
-      justify="space-between"
+    <c-modal
+      v-control
+      v-csc-model="openShareModal"
+      width="50vw"
     >
       <ShareModal />
     </c-modal>
+
     <div class="contents">
       <c-row
         id="optionsbar"
         justify="space-between"
       >
-        <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
-    </c-row>
-    <ContainerTable
-      :conts="containers.value"
-      :disable-pagination="disablePagination"
-      :hide-tags="hideTags"
-    />
+        <SearchBox />
+        <c-menu
+          :items.prop="tableOptions"
+          options-testid="table-options-selector"
+        >
+          <span class="menu-active display-options-menu">
+            <i class="mdi mdi-tune" />
+            {{ $t("message.tableOptions.displayOptions") }}
+          </span>
+        </c-menu>
+      </c-row>
+      <ContainerTable
+        :conts="containers.value"
+        :disable-pagination="disablePagination"
+        :hide-tags="hideTags"
+      />
+    </div>
   </div>
 </template>
 
@@ -60,6 +67,12 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
+    },
+    openShareModal: {
+      get() {
+        return this.$store.state.openShareModal;
+      },
+      set() {},
     },
   },
   watch: {

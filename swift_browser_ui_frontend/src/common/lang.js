@@ -157,7 +157,7 @@ let default_translations = {
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
         share_cont: "Share the bucket",
-        share_title: "Share folder ",
+        share_title: "Share folder: ",
         share_subtitle1: "Shared with members of ",
         share_subtitle2:
           "Folders are by default shared with your project " +
@@ -563,7 +563,7 @@ let default_translations = {
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
-        share_title: "Jaa kansio",
+        share_title: "Jaa kansio: ",
         share_subtitle1: "Shared with members of ",
         share_subtitle2:
           "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
