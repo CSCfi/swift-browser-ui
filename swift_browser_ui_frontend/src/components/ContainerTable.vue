@@ -102,8 +102,8 @@ export default {
     this.handlePaginationText();
   },
   methods: {
-    getSharingContainers() {
-      return this.sharingClient && this.active
+    async getSharingContainers() {
+      return this.sharingClient
         ? this.sharingClient.getShare(this.active.id)
         : [];
     },
@@ -126,7 +126,7 @@ export default {
       const sharingContainers = await this.getSharingContainers();
       const sharedContainers = await this.getSharedContainers();
 
-      sharedContainers && console.log("sharedConts: ", sharedContainers);
+      // console.log("sharedConts: ", sharedContainers);
 
       const getSharingStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {

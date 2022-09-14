@@ -181,7 +181,7 @@ export default {
       addRecvkey: "",
       recvkeys: [],
       recvHashedKeys: [],
-      noUpload: true,
+      noUpload: false,
       projectNumber: "",
     };
   },

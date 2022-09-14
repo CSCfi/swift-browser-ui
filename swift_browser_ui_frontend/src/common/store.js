@@ -50,6 +50,8 @@ const store = new Vuex.Store({
     openUploadModal: false,
     openShareModal: false,
     currentUpload: undefined,
+    openEditTagsModal: false,
+    selectedObjectName: "",
   },
   mutations: {
     loading(state, payload) {
@@ -208,6 +210,12 @@ const store = new Vuex.Store({
       delete state.currentUpload;
       state.currentUpload = undefined;
       state.uploadNotification = false;
+    },
+    toggleEditTagsModal(state, payload) {
+      state.openEditTagsModal = payload;
+    },
+    setObjectName(state, payload) {
+      state.selectedObjectName = payload;
     },
   },
   actions: {

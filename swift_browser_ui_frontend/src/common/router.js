@@ -3,7 +3,6 @@ import Router from "vue-router";
 import DashboardView from "@/views/Dashboard.vue";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
-import EditObjectView from "@/views/EditObject.vue";
 import SharedObjects from "@/views/SharedObjects";
 import DirectRequest from "@/views/DirectRequest";
 import ReplicationView from "@/views/Replicate";
@@ -36,11 +35,6 @@ export default new Router({
       component: SharedObjects,
     },
     {
-      path: "/browse/:user/:project/:container/shared/:owner/:object/edit",
-      name: "EditSharedObjectView",
-      component: EditObjectView,
-    },
-    {
       path: "/browse/:user/:project/:container/replicate/:from",
       name: "ReplicateContainer",
       component: ReplicationView,
@@ -69,11 +63,6 @@ export default new Router({
       path: "/browse/:user/:project/:container",
       name: "ObjectsView",
       component: ObjectsView,
-    },
-    {
-      path: "/browse/:user/:project/:container/:object/edit",
-      name: "EditObjectView",
-      component: EditObjectView,
     },
   ],
 });

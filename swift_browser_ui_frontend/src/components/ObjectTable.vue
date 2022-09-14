@@ -20,7 +20,7 @@
 
     <div class="folder-info">
       <div class="folder-info-heading">
-        <i class="mdi mdi-folder-outline" /> 
+        <i class="mdi mdi-folder-outline" />
         <span>{{ container }}</span>
       </div>
 
@@ -41,9 +41,9 @@
       <div class="info">
         <i class="mdi mdi-information-outline" />
         <span>
-          {{ checkedRows.length }} 
-          {{ checkedRows.length === 1 
-            ? $t("message.table.itemSelected") 
+          {{ checkedRows.length }}
+          {{ checkedRows.length === 1
+            ? $t("message.table.itemSelected")
             : $t("message.table.itemsSelected") }}
         </span>
       </div>
@@ -83,7 +83,7 @@
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
-        <span class="menu-active display-options-menu"> 
+        <span class="menu-active display-options-menu">
           <i class="mdi mdi-tune" />
           {{ $t("message.tableOptions.displayOptions") }}
         </span>
@@ -487,25 +487,6 @@ export default {
     displayTags: function (name) {
       return this.showTags && !(this.renderFolders && !this.isFile(name));
     },
-    getEditRoute: function(containerName, objectName) {
-      if (this.$route.name == "SharedObjects") {
-        return {
-          name: "EditSharedObjectView",
-          params: {
-            container: containerName,
-            object: objectName,
-            owner: this.$route.params.owner,
-          },
-        };
-      }
-      return {
-        name: "EditObjectView",
-        params: {
-          container: containerName,
-          object: objectName,
-        },
-      };
-    },
     confirmDelete: function (deletables) {
       this.$buefy.dialog.confirm({
         title: this.$t("message.objects.deleteObjects"),
@@ -599,15 +580,15 @@ export default {
     },
     setSelectionActionButtons() {
       this.selectionActionButtons = [
-        { 
+        {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
           action: () => this.confirmDelete(this.checkedRows),
         },
-        { 
+        {
           label: this.$t("message.table.clearSelected"),
           icon: "mdi-refresh",
-          action: () => this.clearSelections(), 
+          action: () => this.clearSelections(),
         },
       ];
     },
@@ -628,7 +609,7 @@ export default {
   color: $csc-primary;
   font-weight: 600;
   align-items: center;
-  
+
   & .mdi {
     font-size: 2rem;
   }
@@ -640,7 +621,7 @@ export default {
 }
 
 .folder-info-heading, .folder-details {
-  padding: 1rem 2rem; 
+  padding: 1rem 2rem;
 }
 
 .folder-info-heading {
@@ -699,7 +680,7 @@ export default {
   & .action-buttons {
     display: flex;
     flex: 0;
-    padding: .5rem 0; 
+    padding: .5rem 0;
   }
 }
 
