@@ -52,7 +52,7 @@
         </div>
         <b-field
           custom-class="field"
-          type="is-black"
+          type="is-dark"
         >
           <b-taginput
             v-model="tags"
