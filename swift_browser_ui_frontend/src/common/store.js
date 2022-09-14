@@ -34,6 +34,9 @@ const store = new Vuex.Store({
     resumableClient: undefined,
     isUploading: false,
     isChunking: false,
+    encryptedFile: "",
+    encryptedFileProgress: undefined,
+    encryptedProgress: undefined,
     uploadProgress: undefined,
     altContainer: undefined,
     uploadInfo: undefined,
@@ -41,6 +44,7 @@ const store = new Vuex.Store({
     pubkey: [],
     currentPrefix: "",
     dropFiles:[],
+    currentUpload: undefined,
   },
   mutations: {
     loading(state, payload) {
@@ -93,6 +97,24 @@ const store = new Vuex.Store({
     },
     stopChunking (state) {
       state.isChunking = false;
+    },
+    updateEncryptedProgress(state, progress) {
+      state.encryptedProgress = progress;
+    },
+    eraseEncryptedProgress(state) {
+      state.encryptedProgress = undefined;
+    },
+    setEncryptedFile(state, file) {
+      state.encryptedFile = file;
+    },
+    eraseEncryptedFile(state) {
+      state.encryptedFile = "";
+    },
+    updateEncryptedFileProgress(state, progress) {
+      state.encryptedFileProgress = progress;
+    },
+    eraseEncryptedFileProgress(state) {
+      state.encryptedFileProgress = undefined;
     },
     updateProgress (state, progress) {
       state.uploadProgress = progress;
@@ -150,6 +172,13 @@ const store = new Vuex.Store({
     },
     erasePrefix (state) {
       state.currentPrefix = "";
+    },
+    setCurrentUpload(state, cur) {
+      state.currentUpload = cur;
+    },
+    eraseCurrentUpload(state) {
+      delete state.currentUpload;
+      state.currentUpload = undefined;
     },
   },
   actions: {

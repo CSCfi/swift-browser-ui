@@ -769,6 +769,48 @@ async def get_upload_session(
         {
             "id": runner_id,
             "url": f"{setd['upload_external_endpoint']}{path}",
+            "host": setd["upload_external_endpoint"],
             "signature": signature,
+        }
+    )
+
+
+async def get_crypted_upload_session(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Return a pre-signed upload runner session for upload target."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for object upload runner info request from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+    runner_id = await open_upload_runner_session(request, project=project)
+    path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    signature = await sign(3600, path)
+    ws_path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    ws_sign_path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    ws_signature = await sign(3600, ws_sign_path)
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "url": f"{setd['upload_external_endpoint']}{path}",
+            "wsurl": f"{setd['upload_external_endpoint']}{ws_path}".replace(
+                "https", "wss"
+            ),
+            "host": setd["upload_external_endpoint"],
+            "signature": signature,
+            "wssignature": ws_signature,
         }
     )
