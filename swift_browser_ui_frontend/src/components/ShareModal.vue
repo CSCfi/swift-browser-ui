@@ -52,7 +52,7 @@
         </div>
         <b-field
           custom-class="field"
-          type="is-black"
+          type="is-dark"
         >
           <b-taginput
             v-model="tags"
@@ -64,6 +64,7 @@
           <c-select
             v-control
             v-csc-model="sharedAccessRight"
+            shadow="false"
             :label="$t('message.share.permissions')"
             :items.prop="accessRights"
             placeholder="Select permission"
@@ -104,6 +105,11 @@
         />
       </c-container>
     </c-card-content>
+    <c-toasts
+      id="shareModal-toasts"
+      vertical="top"
+      data-testid="shareModal-toasts"
+    />
   </c-card>
 </template>
 
@@ -206,19 +212,27 @@ export default {
         rights.push("w");
       }
       if (rights.length < 1) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$t("message.share.fail_noperm"),
-          type: "is-danger",
-        });
+        document.querySelector("#shareModal-toasts").addToast(
+          {
+            type: "error",
+            duration: 5000,
+            persistent: false,
+            progress: false,
+            message: this.$t("message.share.fail_noperm"),
+          },
+        );
         return false;
       }
       if (this.tags.length < 1) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$t("message.share.fail_noid"),
-          type: "is-danger",
-        });
+        document.querySelector("#shareModal-toasts").addToast(
+          {
+            type: "error",
+            duration: 5000,
+            persistent: false,
+            progress: false,
+            message: this.$t("message.share.fail_noid"),
+          },
+        );
         return false;
       }
       try {
@@ -232,11 +246,15 @@ export default {
       }
       catch(error) {
         if (error instanceof TypeError) {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: this.$t("message.share.fail_duplicate"),
-            type: "is-danger",
-          });
+          document.querySelector("#shareModal-toasts").addToast(
+            {
+              type: "error",
+              duration: 5000,
+              persistent: false,
+              progress: false,
+              message: this.$t("message.share.fail_duplicate"),
+            },
+          );
           return false;
         }
         else {
@@ -287,7 +305,7 @@ export default {
 @import "@/css/prod.scss";
 
 .share-card {
-  padding: 3rem 3rem 1rem 3rem;
+  padding: 3rem 2rem 0 2rem;
   position: absolute;
   top: -8rem;
   left: 0;
@@ -305,11 +323,7 @@ export default {
   c-card-content  {
     overflow-y: scroll;
     scrollbar-width: 0.5rem;
-    margin-top: 1rem;
-    padding: 0;
-    padding-bottom: 5rem;
-    padding-right: 0.5rem;
-
+    padding: 1rem 1rem 6rem 1rem;
     &::-webkit-scrollbar {
       width: 0.5rem;
     }
@@ -335,6 +349,7 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: 0 1rem;
     & > h3 {
       margin: 0 !important;
       width: 100%;
@@ -346,6 +361,11 @@ export default {
 
   .toggle-instructions {
     justify-content: flex-end;
+    align-items: center;
+  }
+
+  h4 {
+    margin: 0 !important;
   }
 
   .guide-content {
@@ -355,8 +375,8 @@ export default {
     padding: 1rem;
   }
 
-  h4 {
-    margin: 0 !important;
+  c-select {
+    color: var(--csc-dark-grey);
   }
 
   c-link > span {
@@ -382,5 +402,8 @@ export default {
     box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
   }
 
+  c-toasts {
+    width: fit-content;
+  }
 
 </style>
