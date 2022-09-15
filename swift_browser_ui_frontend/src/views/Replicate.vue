@@ -97,12 +97,15 @@ export default {
         this.destination,
         this.$route.params.from,
         this.$route.params.container,
-      ).then(() => {
+      ).then(async () => {
         this.$buefy.toast.open({
           message: this.$t("message.copysuccess"),
           type: "is-success",
         });
-        this.$store.dispatch("updateContainers");
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.$route.params.project,
+          signal: null,
+        });
         this.$router.go(-1);
       }).catch(() => {
         this.$buefy.toast.open({
