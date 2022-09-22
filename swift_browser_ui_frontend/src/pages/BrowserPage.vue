@@ -38,6 +38,13 @@
       >
         <ShareModal />
       </c-modal>
+       <c-modal
+        v-control
+        v-csc-model="openCopyFolderModal"
+        width="64vw"
+      >
+        <CopyFolderModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"
@@ -64,6 +71,20 @@
         </div>
       </footer>
       <c-toasts id="toasts" />
+      <!-- TODO: Move folder toast to programmatical modal -->
+      <c-toasts
+        id="copyFolder-toasts"
+        vertical="top"
+      >
+        <div class="toasts-wrapper">
+          <h5 class="title is-5 has-text-dark">
+            {{ this.$t("message.copysuccess") }}
+          </h5>
+          <p class="has-text-weight-semibold has-text-dark">
+            {{ this.$t("message.copytime") }}
+          </p>
+        </div>
+      </c-toasts>
     </div>
   </div>
 </template>
@@ -254,5 +275,14 @@ c-modal {
 
 #footer {
   margin-top: 15px;
+}
+
+#copyFolder-toasts {
+  position: sticky;
+  bottom: 30vh;
+}
+
+.toasts-wrapper {
+  padding: 1rem;
 }
 </style>

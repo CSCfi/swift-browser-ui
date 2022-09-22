@@ -54,6 +54,8 @@ const store = new Vuex.Store({
     currentUpload: undefined,
     openEditTagsModal: false,
     selectedObjectName: "",
+    openCopyFolderModal: false,
+    isFolderCopied: false,
   },
   mutations: {
     loading(state, payload) {
@@ -218,6 +220,12 @@ const store = new Vuex.Store({
     },
     setObjectName(state, payload) {
       state.selectedObjectName = payload;
+    },
+    toggleCopyFolderModal(state, payload) {
+      state.openCopyFolderModal = payload;
+    },
+    setFolderCopiedStatus(state, payload) {
+      state.isFolderCopied = payload;
     },
   },
   actions: {

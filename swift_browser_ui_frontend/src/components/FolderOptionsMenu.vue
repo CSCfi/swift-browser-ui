@@ -16,7 +16,11 @@
 
 <script>
 import {swiftDeleteContainer} from "@/common/api";
-import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import {
+  toggleCreateFolderModal,
+  toggleCopyFolderModal,
+} from "@/common/globalFunctions";
+
 export default {
   name: "FolderOptionsMenu",
   props: ["props", "selected"],
@@ -24,23 +28,16 @@ export default {
     return {
       menuItems: [
         {
-          key: "message.copy", 
-          action: () => this.$router.push({
-            name: "ReplicateContainer",
-            params: {
-              container: this.getContainer(),
-              project: this.getProject(),
-              from: this.getFrom(),
-            },
-          }),
+          key: "message.copy",
+          action: () => toggleCopyFolderModal(this.props.row.name),
           disabled: !this.props.row.bytes ? true : false,
         },
         {
-          key: "message.editTags", 
+          key: "message.editTags",
           action: () => toggleCreateFolderModal(this.props.row.name),
         },
         {
-          key: "message.delete", 
+          key: "message.delete",
           action: () => this.confirmDelete(
             this.props.row.name, this.props.row.count,
           ),
@@ -121,7 +118,7 @@ export default {
 <style scoped>
 /* Default button click event prevents menu from triggering */
   .menu-trigger-button {
-    pointer-events: none; 
+    pointer-events: none;
   }
 
  .mdi:before {

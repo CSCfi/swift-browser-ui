@@ -5,7 +5,6 @@ import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects";
 import DirectRequest from "@/views/DirectRequest";
-import ReplicationView from "@/views/Replicate";
 import TokensView from "@/views/Tokens";
 import DirectShare from "@/views/DirectShare";
 
@@ -33,11 +32,6 @@ export default new Router({
       path: "/browse/:user/:project/:container/shared/:owner",
       name: "SharedObjects",
       component: SharedObjects,
-    },
-    {
-      path: "/browse/:user/:project/:container/replicate/:from",
-      name: "ReplicateContainer",
-      component: ReplicationView,
     },
     {
       path: "/browse/:user/:project/info",
