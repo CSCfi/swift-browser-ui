@@ -333,7 +333,7 @@ let default_translations = {
       replicate: {
         destinationLabel: "Destination bucket",
         destinationMessage: "Insert copy destination bucket here",
-        destinationExists: " Destination already exists",
+        destinationExists: "Folder already exists",
         copy_folder: "Copy folder: ",
         name_newFolder: "Name new folder",
       },
@@ -764,7 +764,7 @@ let default_translations = {
       replicate: {
         destinationLabel: "Kohdesäiliö",
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
-        destinationExists: " Kohdesäiliö on jo olemassa",
+        destinationExists: "Kansio on jo olemassa",
         copy_folder: "Kopioi kansio: ",
         name_newFolder: "Nimeä uusi kansio",
       },

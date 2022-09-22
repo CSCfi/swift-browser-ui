@@ -89,6 +89,9 @@ export default {
         ? this.$store.state.selectedFolderName
         : "";
     },
+    sourceProjectId() {
+      return this.$store.state.sourceProjectId;
+    },
   },
   watch: {
     selectedFolderName: function () {
@@ -148,7 +151,7 @@ export default {
       swiftCopyContainer(
         this.active.id,
         this.folderName,
-        this.active.id,
+        this.sourceProjectId ? this.sourceProjectId : this.active.id,
         this.selectedFolderName,
       ).then(async () => {
         await this.$store.dispatch("updateContainers", {

@@ -15,10 +15,13 @@ export function toggleEditTagsModal(object) {
   }
 }
 
-export function toggleCopyFolderModal(folderName) {
+export function toggleCopyFolderModal(folderName, sourceProjectId) {
   store.commit("toggleCopyFolderModal", true);
   if (folderName) {
     store.commit("setFolderName", folderName);
+  }
+  if(sourceProjectId) {
+    store.commit("setSourceProjectId", sourceProjectId);
   }
 }
 

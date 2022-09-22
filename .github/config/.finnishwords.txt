@@ -97,8 +97,11 @@ kansio
 kansioille
 kansioina
 kansion
+kansion
 kansiossa
 kansiot
+kansiot
+kansiota
 kansiota
 kanssa
 kanssasi
@@ -155,6 +158,7 @@ koko
 kontteja
 kopioi
 kopioida
+kopioidaan
 kopioinnin
 kopiointi
 kopioitu
@@ -366,6 +370,7 @@ salausvaihtoehtoja
 salli
 sallittu
 se
+sekunnin
 selaamiseen
 selailla
 selailu
