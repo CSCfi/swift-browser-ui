@@ -9,7 +9,10 @@ assignees: ''
 
 #### Describe the user story
 <!-- A description of the user story. -->
-List of tasks needed for this user story. Technical description is in the tasks. Additional information, for example a protype, Figma files, pictures are linked here. 
+List of tasks needed for this user story. Technical description is in the tasks. Additional information, for example a prototype, Figma files, pictures are linked here. 
+
+#### Tasks:
+- [ ] 
 
 
 #### Testing 
