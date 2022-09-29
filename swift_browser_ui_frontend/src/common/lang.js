@@ -17,6 +17,10 @@ let default_translations = {
             msg: "Log In with SSO",
             href: "/login/front",
           },
+          {
+            msg: "Log In with OIDC",
+            href: "/login/oidc_front",
+          },
         ],
       },
       error: {
@@ -383,6 +387,10 @@ let default_translations = {
           {
             msg: "Kirjaudu SSO:ta käyttäen",
             href: "/login",
+          },
+          {
+            msg: "Log In with OIDC",
+            href: "/login/oidc_front",
           },
         ],
       },
