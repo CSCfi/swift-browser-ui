@@ -21,6 +21,13 @@ address.
 $ docker build -f Dockerfile-nginx -t swiftui-dev-proxy .
 ```
 
+### Wasm dependency install
+A dockerfile for building an emsdk container with required dependencies
+is provided in `Dockerfile-emsdk-deps`. It can be used by
+```
+$ docker buildx build -f Dockerfile-emsdk-deps -t wasmbuilder .
+```
+
 ### Usage
 The development proxy is mainly used via honcho and the `Procfile`
 provided for development.

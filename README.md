@@ -217,19 +217,20 @@ The encryption requires an additional build step: you'll need to build the `wasm
 
 Build the image
 
-    docker buildx build -f dockerfiles/Dockerfile-build-crypt-devel -t swift-browser-ui:cryptfiles .
+    docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
 
-Start a container
+Build the wasm files with provided container, which acts in practise
+like the make command in the specified folder. Available targets can be
+found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
+targets can be achieved with:
 
-    docker run --rm -it --name cryptfiles swift-browser-ui:cryptfiles
+    docker run --rm -it --name build-encryption-module --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
 
-From another terminal, copy the files from the container
+Copy these files into the static JS files built with the frontend.
 
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.js swift_browser_ui_frontend/dist/js
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.wasm swift_browser_ui_frontend/dist/js
+    cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
 
-When you run `npm run build`, it removes the folder where you copied those files into, so you'll need to copy them every time you rebuild.
-
+These files will be integrated into the root folder of the built frontend.
 
 The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
 ```bash
