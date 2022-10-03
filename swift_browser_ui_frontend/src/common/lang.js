@@ -187,6 +187,8 @@ let default_translations = {
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
+        sharing_status: "You have shared",
+        shared_status: "Shared with you",
       },
       request: {
         project: "Project",
@@ -571,6 +573,8 @@ let default_translations = {
         request_synced: "Säiliön jakopyyntöjen haku onnistui",
         request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
         sync_requests: "Synkronoi säiliön jakopyynnöt",
+        sharing_status: "Olet jakanut",
+        shared_status: "Jaettu kanssasi",
       },
       request: {
         project: "Projekti",

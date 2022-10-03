@@ -1,15 +1,14 @@
 <template>
   <c-data-table
     id="contable-tags"
-    :key="componentKey"
     :data.prop="containers"
-    :headers.prop="hideTags ? 
+    :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
     :no-data-text="$t('message.emptyProject')"
-    :sort-by="sortBy" 
-    :sort-direction="sortDirection" 
+    :sort-by="sortBy"
+    :sort-direction="sortDirection"
     external-data
     @paginate="getPage"
     @sort="onSort"
@@ -18,7 +17,7 @@
 
 <script>
 import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
-import { 
+import {
   mdiTrayArrowDown,
   mdiShareVariantOutline,
   mdiDotsHorizontal,
@@ -26,7 +25,6 @@ import {
 } from "@mdi/js";
 import { toggleCreateFolderModal } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
-import delay from "lodash/delay";
 
 export default {
   name: "ContainerTable",
@@ -60,15 +58,14 @@ export default {
       },
       sortBy: "name",
       sortDirection: "asc",
-      componentKey: 0,
       paginationTextOverrides: {
         itemsPerPageText: this.$t("message.table.itemsPerPage"),
         nextPage: this.$t("message.table.nextPage"),
         prevPage: this.$t("message.table.prevPage"),
-        pageText: 
+        pageText:
           ({ start, end, count }) => start + " - " + end + " / " + count + "",
-        pageOfText: 
-          ({ pageNumber, count }) => 
+        pageOfText:
+          ({ pageNumber, count }) =>
             this.$t("message.table.page") + pageNumber + " / " + count + "",
       },
     };
@@ -89,14 +86,12 @@ export default {
       this.getPage();
     },
     hideTags() {
-      this.componentKey += 1;
       this.getPage();
     },
     conts() {
       this.getPage();
     },
     locale() {
-      this.componentKey += 1;
       this.setHeaders();
       this.handlePaginationText();
       this.getPage();
@@ -107,20 +102,15 @@ export default {
     this.handlePaginationText();
   },
   methods: {
-    async getSharingContainers() {
-      return this.sharingClient 
+    getSharingContainers() {
+      return this.sharingClient && this.active
         ? this.sharingClient.getShare(this.active.id)
         : [];
     },
-    async getSharedContainers () {
-      if (this.$store.state.client) {
-        return this.$store.state.client.getAccess(
-          this.$route.params.project,
-        );
-      }
-      else {
-        delay(this.getSharedContainers, 100);
-      }
+    getSharedContainers () {
+      return this.sharingClient
+        ? this.sharingClient.getAccess(this.$route.params.project)
+        : [];
     },
     async getPage () {
       let offset = 0;
@@ -130,16 +120,20 @@ export default {
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
           - this.paginationOptions.itemsPerPage;
-        
+
         limit = this.paginationOptions.itemsPerPage;
       }
       const sharingContainers = await this.getSharingContainers();
-      // const sharedContainers = await this.getSharedContainers();
+      const sharedContainers = await this.getSharedContainers();
 
       const getSharingStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {
-          return "You have shared";
-        } else return "-";
+          return this.$t("message.share.sharing_status");
+        } else if (sharedContainers.findIndex(
+          cont => cont.container === folderName) > -1) {
+          return this.$t("message.share.shared_status");
+        }
+        return "";
       };
 
       this.containers = this.conts.slice(offset, offset + limit).reduce((
@@ -381,8 +375,8 @@ export default {
       });
     },
     handlePaginationText() {
-      this.paginationOptions.textOverrides = this.locale === "fi" 
-        ? this.paginationTextOverrides 
+      this.paginationOptions.textOverrides = this.locale === "fi"
+        ? this.paginationTextOverrides
         : {};
     },
   },

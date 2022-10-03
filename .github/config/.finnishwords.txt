@@ -63,6 +63,7 @@ jakamaan
 jakamasi
 jakaminen
 jakamista
+jakanut
 jako
 jakoa
 jakopyynnöt
@@ -89,6 +90,7 @@ kansiot
 kansioille
 kansioina
 kanssa
+kanssasi
 kohde
 kohdetta
 kohteet
@@ -230,6 +232,7 @@ oikeuden
 oikeudet
 oikeuksia
 olemassa
+olet
 oletusarvoiset
 oletusarvojen
 olevia

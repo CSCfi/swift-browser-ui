@@ -3,12 +3,12 @@
     id="objtable"
     :key="componentKey"
     :data.prop="objects"
-    :headers.prop="hideTags ? 
+    :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
     :no-data-text="$t('message.emptyProject')"
-    :sort-by="sortBy" 
+    :sort-by="sortBy"
     :sort-direction="sortDirection"
     selection-property="name"
     external-data
@@ -20,11 +20,11 @@
 </template>
 
 <script>
-import { 
+import {
   getHumanReadableSize,
   truncate,
   sortObjects,
-  parseDateTime, 
+  parseDateTime,
 } from "@/common/conv";
 import { mdiTrayArrowDown, mdiPencilOutline, mdiDeleteOutline } from "@mdi/js";
 
@@ -113,7 +113,7 @@ export default {
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
           - this.paginationOptions.itemsPerPage;
-        
+
         limit = this.paginationOptions.itemsPerPage;
       }
 
@@ -158,7 +158,8 @@ export default {
                     },
                   },
                 })),
-                ...(!item.tags.length ? [{ key: "no_tags", value: "-" }] : []),
+                ...(item.tags && !item.tags.length ?
+                  [{ key: "no_tags", value: "-" }] : []),
               ],
             },
           }),
@@ -208,7 +209,7 @@ export default {
                     path: mdiDeleteOutline,
                     onClick: () => {
                       this.$emit("delete-object", item);
-  
+
                     },
                   },
                 },
@@ -234,8 +235,8 @@ export default {
         return {
           name: "EditSharedObjectView",
           params: {
-            container: containerName, 
-            object: objectName, 
+            container: containerName,
+            object: objectName,
             owner: this.$route.params.owner,
           },
         };
@@ -243,7 +244,7 @@ export default {
       return {
         name: "EditObjectView",
         params: {
-          container: containerName, 
+          container: containerName,
           object: objectName,
         },
       };
