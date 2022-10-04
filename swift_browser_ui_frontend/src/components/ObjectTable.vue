@@ -20,17 +20,22 @@
 
     <div class="folder-info">
       <div class="folder-info-heading">
-        <i class="mdi mdi-folder-outline" /> 
+        <i class="mdi mdi-folder-outline" />
         <span>{{ container }}</span>
       </div>
 
       <ul class="folder-details">
         <li>
-          <b>{{ $t("message.share.sharedTo") }}: </b> N/A
+          <b>{{ $t("message.table.shared_status") }}: </b>
+          {{ sharedStatus }}
+
         </li>
-        <li>
+        <!--<li>
           <b>{{ $t("message.table.created") }}: </b> N/A
-        </li>
+        </li>-->
+        <!--<li>
+          <b>{{ $t("message.table.source_project_id") }}: </b> N/A
+        </li>-->
       </ul>
     </div>
 
@@ -41,9 +46,9 @@
       <div class="info">
         <i class="mdi mdi-information-outline" />
         <span>
-          {{ checkedRows.length }} 
-          {{ checkedRows.length === 1 
-            ? $t("message.table.itemSelected") 
+          {{ checkedRows.length }}
+          {{ checkedRows.length === 1
+            ? $t("message.table.itemSelected")
             : $t("message.table.itemsSelected") }}
         </span>
       </div>
@@ -82,7 +87,7 @@
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
-        <span class="menu-active display-options-menu"> 
+        <span class="menu-active display-options-menu">
           <i class="mdi mdi-tune" />
           {{ $t("message.tableOptions.displayOptions") }}
         </span>
@@ -104,6 +109,10 @@
 <script>
 import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import {
+  getSharingContainers,
+  getSharedContainers,
+} from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -120,6 +129,8 @@ export default {
   },
   data: function () {
     return {
+      sharingContainers: [],
+      sharedContainers: [],
       oList: {value: []},
       selected: undefined,
       disablePagination: false,
@@ -145,6 +156,15 @@ export default {
     },
     container () {
       return this.$route.params.container;
+    },
+    sharedStatus () {
+      if (this.sharingContainers.indexOf(this.container) > -1) {
+        return this.$t("message.folderDetails.sharing_with_others");
+      } else if (this.sharedContainers.findIndex(
+        cont => cont.container === this.container) > -1) {
+        return this.$t("message.folderDetails.shared_with_read");
+      }
+      return this.$t("message.folderDetails.notShared");
     },
     active () {
       return this.$store.state.active;
@@ -207,7 +227,9 @@ export default {
       this.setLocalizedContent();
     },
   },
-  created: function () {
+  created: async function () {
+    this.sharingContainers = await getSharingContainers(this.active.id);
+    this.sharedContainers = await getSharedContainers(this.active.id);
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
@@ -227,6 +249,7 @@ export default {
     this.abortController.abort();
   },
   methods: {
+
     updateObjects: async function () {
       if (
         this.container === undefined
@@ -259,6 +282,7 @@ export default {
           projectID: this.$route.params.project,
           name: this.container,
         });
+      console.log("container", container);
       this.oList = useObservable(
         liveQuery(() =>
           this.$store.state.db.objects
@@ -266,6 +290,7 @@ export default {
             .toArray(),
         ),
       );
+
       this.$store.dispatch(
         "updateObjects",
         {
@@ -596,15 +621,15 @@ export default {
     },
     setSelectionActionButtons() {
       this.selectionActionButtons = [
-        { 
+        {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
           action: () => this.confirmDelete(this.checkedRows),
         },
-        { 
+        {
           label: this.$t("message.table.clearSelected"),
           icon: "mdi-refresh",
-          action: () => this.clearSelections(), 
+          action: () => this.clearSelections(),
         },
       ];
     },
@@ -625,7 +650,7 @@ export default {
   color: $csc-primary;
   font-weight: 600;
   align-items: center;
-  
+
   & .mdi {
     font-size: 2rem;
   }
@@ -637,7 +662,7 @@ export default {
 }
 
 .folder-info-heading, .folder-details {
-  padding: 1rem 2rem; 
+  padding: 1rem 2rem;
 }
 
 .folder-info-heading {
@@ -696,7 +721,7 @@ export default {
   & .action-buttons {
     display: flex;
     flex: 0;
-    padding: .5rem 0; 
+    padding: .5rem 0;
   }
 }
 

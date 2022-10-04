@@ -20,3 +20,18 @@ export function getProjectNumber(project) {
     return "";
   }
 }
+
+export async function getSharingContainers (projectId) {
+  return store.state.client && projectId
+    ? await store.state.client.getShare(projectId)
+    : [];
+}
+
+export async function getSharedContainers (projectId) {
+  return store.state.client
+    ? await store.state.client.getAccess(projectId)
+    : [];
+}
+
+
+

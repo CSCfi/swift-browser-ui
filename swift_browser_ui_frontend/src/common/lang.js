@@ -71,6 +71,16 @@ let default_translations = {
         sharedFrom: "Folders you have shared",
         sharedTo: "Folders shared with you",
       },
+      folderDetails: {
+        notShared: "This folder isn't shared to any projects.",
+        sharing_with_others: "This folder is shared to other project(s).",
+        shared_with_read:
+          "This folder is shared with you. You can view" +
+          " and download files in this folder (Read access).",
+        shared_with_read_write:
+          "This folder is shared with you. You can view, download, upload" +
+          " and edit tags in this folder (Read and write access).",
+      },
       table: {
         name: "Name",
         objects: "Objects",
@@ -96,6 +106,10 @@ let default_translations = {
         nextPage: "Next page",
         prevPage: "Previous Page",
         page: "Page",
+        shared_status: "Shared status",
+        sharing: "You have shared",
+        shared: "Shared with you",
+        source_project_id: "Share ID of this folder",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -153,11 +167,31 @@ let default_translations = {
       share: {
         share: "Share",
         share_id: "Share ID",
+        close: "Close",
+        instructions: "Share ID instructions",
+        close_instructions: "Close instructions",
         share_cont: "Share the bucket",
-        read_perm: "Grant read permissions",
-        write_perm: "Grant write permissions",
+        share_title: "Share folder: ",
+        share_subtitle1: "Shared with members of ",
+        share_subtitle2:
+          "Folders are by default shared with your project " +
+          "members. This is mandatory.",
+        share_other_projects: "Share with other projects",
+        share_guide_step1:
+          "1. Ask recipient project’s member to select " +
+          "Copy Share ID button next to Select project dropdown when " +
+          "correct project is selected.",
+        share_guide_step2:
+          "2. Recipient’s Share ID is copied in the cache memory " +
+          "and recipient project’s member can paste it to email etc. " +
+          "and send it to you.",
+        permissions: "Permissions",
+        read_perm: "Read",
+        write_perm: "Read and write",
+        shared_successfully: "Folder was shared successfully!",
+        project_id: "Project ID",
         field_label: "Project Identifiers to share with",
-        field_placeholder: "Add Project Identifiers here",
+        field_placeholder: "Add Project IDs",
         cancel: "Cancel",
         confirm: "Share",
         to_me: "Shared to the project",
@@ -187,8 +221,6 @@ let default_translations = {
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
-        sharing_status: "You have shared",
-        shared_status: "Shared with you",
       },
       request: {
         project: "Project",
@@ -455,6 +487,17 @@ let default_translations = {
         sharedFrom: "Jakamasi kansiot",
         sharedTo: "Sinulle jaetut kansiot",
       },
+      folderDetails: {
+        notShared: "Tätä kansiota ei ole jaettu millekään projektille.",
+        sharing_with_others: "Tämä kansio on jaettu muille projekteille.",
+        shared_with_read:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella ja ladata" +
+          " tiedostoja tässä kansiossa (Read access).",
+        shared_with_read_write:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella, ladata," +
+          " ladata ja muokata tunnisteita tässä kansiossa" +
+          " (Read and write access).",
+      },
       table: {
         name: "Nimi",
         objects: "Objekteja",
@@ -480,6 +523,10 @@ let default_translations = {
         nextPage: "Seuraava sivu",
         prevPage: "Edellinen sivu",
         page: "Sivu",
+        shared_status: "Jaettu tila",
+        sharing: "Olet jakanut",
+        shared: "Jaettu kanssasi",
+        source_project_id: "Jaa tämän kansion tunnus",
       },
       tableOptions: {
         displayOptions: "Asetukset",
@@ -539,11 +586,28 @@ let default_translations = {
       share: {
         share: "Jaa",
         share_id: "Jaa tunnus",
+        close: "Kiinni",
+        instructions: "Jaa tunnus ohjeet",
+        close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
+        share_title: "Jaa kansio: ",
+        share_subtitle1: "Shared with members of ",
+        share_subtitle2:
+          "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
+          "kanssa. Tämä on pakollista.",
+        share_other_projects: "Jaa toisen projektin kanssa",
+        share_guide_step1:
+          "1. Projektin jäsenet löytävät projektitunnuksen projektin " +
+          "tietosivulta. Siirry Profiili valikkoon -> Projektin tiedot.",
+        share_guide_step2:
+          "2. Kopioi projektin tunnus ja lähetä se sähköpostitse jne.",
+        permissions: "Käyttöoikeudet",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
+        shared_successfully: "Kansion jakaminen onnistui!",
+        project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
-        field_placeholder: "Lisää projektitunnisteet",
+        field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
         confirm: "Jaa",
         to_me: "Jaettu projektille",
@@ -573,8 +637,6 @@ let default_translations = {
         request_synced: "Säiliön jakopyyntöjen haku onnistui",
         request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
         sync_requests: "Synkronoi säiliön jakopyynnöt",
-        sharing_status: "Olet jakanut",
-        shared_status: "Jaettu kanssasi",
       },
       request: {
         project: "Projekti",
