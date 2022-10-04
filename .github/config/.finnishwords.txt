@@ -3,6 +3,7 @@ ajaksi
 alapuolisesta
 alla
 aloitettiin
+anna
 annetut
 apin
 apua
@@ -50,10 +51,12 @@ hyväksyäksesi
 ilman
 ja
 jaa
+jaat
 jaetaan
 jaettava
 jaettavaksi
 jaettavat
+jaettiin
 jaettu
 jaettua
 jaettuja
@@ -73,6 +76,7 @@ jälkeen
 jälkeenpäin
 jäsenet
 jäsenille
+jäsenten
 jne
 johtaa
 johtua
@@ -112,6 +116,7 @@ käyttäjätunnustasi
 käyttöä
 käyttöliittymä
 käyttöliittymän
+käyttöoikeudet
 käyttörajoista
 kehittänyt
 kelpaa
@@ -121,6 +126,7 @@ kerran
 keskus
 kestää
 kiellettyä
+kiinni
 kirjaudu
 kirjautuaksesi
 kirjautumalla
@@ -178,6 +184,7 @@ lisättyjä
 loppuminen
 löydetty
 löytää
+löytävät
 löytynyt
 luku
 lukuoikeus
@@ -228,11 +235,13 @@ objektitietojärjestelmissä
 odota
 oheisesta
 ohje
+ohjeet
 oikeuden
 oikeudet
 oikeuksia
 olemassa
 olet
+oletusarvoisesti
 oletusarvoiset
 oletusarvojen
 olevia
@@ -254,6 +263,7 @@ pääsy
 paina
 painikkeella
 painikkeesta
+pakollista
 päivitä
 palautus
 paloitellaan
@@ -274,6 +284,7 @@ poistettu
 polku
 postamista
 poudan
+profiili
 projekteihin
 projekteja
 projekti
@@ -283,13 +294,16 @@ projektien
 projektilla
 projektille
 projektilta
-projektin
 projektiin
+projektin
+projektisi
 projektissa
 projektista
 projektit
 projektitunnisteet
 projektitunnisteille
+projektitunnuksen
+projektitunnukset
 pudota
 puuttuvasta
 pyydä
@@ -308,6 +322,7 @@ rajoitteiden
 resurssienkäyttö
 resurssit
 rivinvaihtoa
+sähköpostitse
 säiliö
 säiliöitä
 säiliön
@@ -326,14 +341,17 @@ salausratkaisun
 salausvaihtoehtoja
 salli
 sallittu
+se
 selaamiseen
 selailla
 selailu
 selain
 selainta
 selatessa
+sen
 seuraava
 siirto
+siirry
 sinulle
 sisään
 sisäänkirjauksen
@@ -352,6 +370,7 @@ suuren
 suuret
 suuri
 suurten
+sulje
 syitä
 synkronoi
 synkronoitavaksi
@@ -374,6 +393,7 @@ tarkat
 tarkistathan
 tarkistussumma
 tarkoittaen
+tarvitset
 tässä
 tätä
 tätä
@@ -392,12 +412,14 @@ tiedot
 tieteen
 tieto
 tietoa
+tietosivulta
 tietotekniikan
 tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
 toiseen
+toisen
 toteuttaa
 tueta
 tuettu
@@ -406,9 +428,10 @@ tuki
 tulisi
 tuloksia
 tunniste
-tunnus
 tunnisteet
 tunnisteita
+tunnuksen
+tunnus
 tunti
 tuo
 tyhjä
@@ -426,6 +449,7 @@ vaatii
 vähintään
 vaihto
 väliaikaiseen
+valikkoon
 valikossa
 valinnan
 valinnat
