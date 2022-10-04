@@ -26,11 +26,16 @@
 
       <ul class="folder-details">
         <li>
-          <b>{{ $t("message.share.sharedTo") }}: </b> N/A
+          <b>{{ $t("message.table.shared_status") }}: </b>
+          {{ sharedStatus }}
+
         </li>
-        <li>
+        <!--<li>
           <b>{{ $t("message.table.created") }}: </b> N/A
-        </li>
+        </li>-->
+        <!--<li>
+          <b>{{ $t("message.table.source_project_id") }}: </b> N/A
+        </li>-->
       </ul>
     </div>
 
@@ -105,6 +110,10 @@
 <script>
 import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import {
+  getSharingContainers,
+  getSharedContainers,
+} from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -121,6 +130,8 @@ export default {
   },
   data: function () {
     return {
+      sharingContainers: [],
+      sharedContainers: [],
       oList: {value: []},
       selected: undefined,
       disablePagination: false,
@@ -147,6 +158,15 @@ export default {
     },
     container () {
       return this.$route.params.container;
+    },
+    sharedStatus () {
+      if (this.sharingContainers.indexOf(this.container) > -1) {
+        return this.$t("message.folderDetails.sharing_with_others");
+      } else if (this.sharedContainers.findIndex(
+        cont => cont.container === this.container) > -1) {
+        return this.$t("message.folderDetails.shared_with_read");
+      }
+      return this.$t("message.folderDetails.notShared");
     },
     active () {
       return this.$store.state.active;
@@ -209,7 +229,9 @@ export default {
       this.setLocalizedContent();
     },
   },
-  created: function () {
+  created: async function () {
+    this.sharingContainers = await getSharingContainers(this.active.id);
+    this.sharedContainers = await getSharedContainers(this.active.id);
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
@@ -229,6 +251,7 @@ export default {
     this.abortController.abort();
   },
   methods: {
+
     updateObjects: async function () {
       if (
         this.container === undefined
@@ -261,6 +284,7 @@ export default {
           projectID: this.$route.params.project,
           name: this.container,
         });
+      console.log("container", container);
       this.oList = useObservable(
         liveQuery(() =>
           this.$store.state.db.objects
@@ -268,6 +292,7 @@ export default {
             .toArray(),
         ),
       );
+
       this.$store.dispatch(
         "updateObjects",
         {

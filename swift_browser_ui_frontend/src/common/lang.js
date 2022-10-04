@@ -71,6 +71,16 @@ let default_translations = {
         sharedFrom: "Folders you have shared",
         sharedTo: "Folders shared with you",
       },
+      folderDetails: {
+        notShared: "This folder isn't shared to any projects.",
+        sharing_with_others: "This folder is shared to other project(s).",
+        shared_with_read:
+          "This folder is shared with you. You can view" +
+          " and download files in this folder (Read access).",
+        shared_with_read_write:
+          "This folder is shared with you. You can view, download, upload" +
+          " and edit tags in this folder (Read and write access).",
+      },
       table: {
         name: "Name",
         objects: "Objects",
@@ -96,6 +106,10 @@ let default_translations = {
         nextPage: "Next page",
         prevPage: "Previous Page",
         page: "Page",
+        shared_status: "Shared status",
+        sharing: "You have shared",
+        shared: "Shared with you",
+        source_project_id: "Share ID of this folder",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -207,8 +221,6 @@ let default_translations = {
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
-        sharing_status: "You have shared",
-        shared_status: "Shared with you",
       },
       request: {
         project: "Project",
@@ -489,6 +501,17 @@ let default_translations = {
         sharedFrom: "Jakamasi kansiot",
         sharedTo: "Sinulle jaetut kansiot",
       },
+      folderDetails: {
+        notShared: "Tätä kansiota ei ole jaettu millekään projektille.",
+        sharing_with_others: "Tämä kansio on jaettu muille projekteille.",
+        shared_with_read:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella ja ladata" +
+          " tiedostoja tässä kansiossa (Read access).",
+        shared_with_read_write:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella, ladata," +
+          " ladata ja muokata tunnisteita tässä kansiossa" +
+          " (Read and write access).",
+      },
       table: {
         name: "Nimi",
         objects: "Objekteja",
@@ -514,6 +537,10 @@ let default_translations = {
         nextPage: "Seuraava sivu",
         prevPage: "Edellinen sivu",
         page: "Sivu",
+        shared_status: "Jaettu tila",
+        sharing: "Olet jakanut",
+        shared: "Jaettu kanssasi",
+        source_project_id: "Jaa tämän kansion tunnus",
       },
       tableOptions: {
         displayOptions: "Asetukset",
@@ -624,8 +651,6 @@ let default_translations = {
         request_synced: "Säiliön jakopyyntöjen haku onnistui",
         request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
         sync_requests: "Synkronoi säiliön jakopyynnöt",
-        sharing_status: "Olet jakanut",
-        shared_status: "Jaettu kanssasi",
       },
       request: {
         project: "Projekti",
