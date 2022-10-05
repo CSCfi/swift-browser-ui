@@ -413,7 +413,7 @@ const store = new Vuex.Store({
     },
     updateSharedObjects: async function (
       { commit, dispatch },
-      { project, container, signal },
+      { project, owner, container, signal },
     ) {
       commit("loading", true);
       let sharedObjects = [];
@@ -426,6 +426,7 @@ const store = new Vuex.Store({
           marker,
           signal,
           true,
+          owner,
         ).catch(() => {
           commit("loading", false);
           commit("updateObjects", []);

@@ -175,6 +175,10 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     client = request.app["api_client"]
     project = request.match_info["project"]
     container = request.match_info["container"]
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
 
     request.app["Log"].info(
         "API call for list objects from "
@@ -184,9 +188,11 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     query = request.query.copy()
     query["format"] = "json"
 
+    endpoint = session["projects"][project]["endpoint"]
+
     # TODO: MOVE UNICODE NULL HANDLING TO FRONTEND
     async with client.get(
-        f"{session['projects'][project]['endpoint']}/{container}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
