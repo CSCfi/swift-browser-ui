@@ -28,7 +28,12 @@
         <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}
-
+          <c-link
+            underline
+            @click="toggleShareModal"
+          >
+            Edit sharing
+          </c-link>
         </li>
         <!--<li>
           <b>{{ $t("message.table.created") }}: </b> N/A
@@ -251,7 +256,10 @@ export default {
     this.abortController.abort();
   },
   methods: {
-
+    toggleShareModal: function () {
+      this.$store.commit("toggleShareModal", true);
+      this.$store.commit("setFolderName", this.container);
+    },
     updateObjects: async function () {
       if (
         this.container === undefined
@@ -284,7 +292,7 @@ export default {
           projectID: this.$route.params.project,
           name: this.container,
         });
-      console.log("container", container);
+
       this.oList = useObservable(
         liveQuery(() =>
           this.$store.state.db.objects

@@ -31,6 +31,13 @@
       >
         <EditTagsModal />
       </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openShareModal"
+        width="50vw"
+      >
+        <ShareModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"

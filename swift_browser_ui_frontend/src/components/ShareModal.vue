@@ -17,12 +17,8 @@
     </header>
     <c-card-content>
       <h6 class="subtitle is-6 has-text-dark">
-        {{ $t("message.share.share_subtitle1") }}
-        <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+        {{ $t("message.share.share_subtitle") }}
       </h6>
-      <p class="has-text-dark">
-        {{ $t("message.share.share_subtitle2") }}
-      </p>
       <c-container>
         <c-row justify="space-between" align="center">
           <h4 class="title is-4 has-text-dark">
@@ -307,7 +303,7 @@ export default {
 .share-card {
   padding: 3rem 2rem 0 2rem;
   position: absolute;
-  top: -8rem;
+  top: 0;
   left: 0;
   right: 0;
   max-height: 75vh;
