@@ -1,37 +1,25 @@
 <template>
-  <div
-    class="containers"
-  >
-    <c-modal
-      v-control
-      v-csc-model="openShareModal"
-      width="50vw"
+  <div class="contents">
+    <c-row
+      id="optionsbar"
+      justify="space-between"
     >
-      <ShareModal />
-    </c-modal>
-
-    <div class="contents">
-      <c-row
-        id="optionsbar"
-        justify="space-between"
+      <SearchBox />
+      <c-menu
+        :items.prop="tableOptions"
+        options-testid="table-options-selector"
       >
-        <SearchBox />
-        <c-menu
-          :items.prop="tableOptions"
-          options-testid="table-options-selector"
-        >
-          <span class="menu-active display-options-menu">
-            <i class="mdi mdi-tune" />
-            {{ $t("message.tableOptions.displayOptions") }}
-          </span>
-        </c-menu>
-      </c-row>
-      <ContainerTable
-        :conts="containers.value"
-        :disable-pagination="disablePagination"
-        :hide-tags="hideTags"
-      />
-    </div>
+        <span class="menu-active display-options-menu">
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
+        </span>
+      </c-menu>
+    </c-row>
+    <ContainerTable
+      :conts="containers.value"
+      :disable-pagination="disablePagination"
+      :hide-tags="hideTags"
+    />
   </div>
 </template>
 
@@ -40,14 +28,12 @@ import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import ContainerTable from "@/components/ContainerTable";
 import SearchBox from "@/components/SearchBox";
-import ShareModal from "@/components/ShareModal";
 
 export default {
   name: "ContainersView",
   components: {
     ContainerTable,
     SearchBox,
-    ShareModal,
   },
   data: function () {
     return {
@@ -58,7 +44,6 @@ export default {
       perPage: 15,
       direction: "asc",
       currentPage: 1,
-      shareModalIsActive: false,
       showTags: true,
       abortController: null,
       containers: { value: [] },
@@ -67,12 +52,6 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
-    },
-    openShareModal: {
-      get() {
-        return this.$store.state.openShareModal;
-      },
-      set() {},
     },
   },
   watch: {
@@ -158,22 +137,8 @@ export default {
 
 <style scoped>
 
-.containers {
-   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-c-modal {
-  position: relative;
-  margin: 0 auto;
-  display: inline-flex;
-}
-
 #optionsbar {
-  margin: 0.5em;
+  margin: 0.5em 0;
   background: #fff;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 </style>

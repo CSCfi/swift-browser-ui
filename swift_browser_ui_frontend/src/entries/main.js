@@ -10,6 +10,7 @@ import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
 import CreateFolderModal from "@/components/CreateFolderModal";
 import UploadModal from "@/components/UploadModal";
+import ShareModal from "@/components/ShareModal";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -100,6 +101,7 @@ new Vue({
     BrowserSecondaryNavbar,
     CreateFolderModal,
     UploadModal,
+    ShareModal,
     ProgressBar,
   },
   data: function () {
@@ -151,13 +153,23 @@ new Vue({
       get() {
         return this.$store.state.openCreateFolderModal;
       },
-      set(newState) { return newState; },
+      set(newState) {
+        return newState;
+      },
     },
     openUploadModal: {
       get() {
         return this.$store.state.openUploadModal;
       },
-      set(newState) {return newState; },
+      set(newState) {
+        return newState;
+      },
+    },
+    openShareModal: {
+      get() {
+        return this.$store.state.openShareModal;
+      },
+      set() {},
     },
   },
   created() {
@@ -410,9 +422,10 @@ new Vue({
           });
         } else {
           retl.push({
-            alias: this.$t("message.containers")
-                   + this.$store.state.active.name || "",
-            address: {name: "AllFolders"},
+            alias:
+              this.$t("message.containers") + this.$store.state.active.name ||
+              "",
+            address: { name: "AllFolders" },
           });
         }
       }

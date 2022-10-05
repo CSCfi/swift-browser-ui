@@ -172,10 +172,9 @@ let default_translations = {
         close_instructions: "Close instructions",
         share_cont: "Share the bucket",
         share_title: "Share folder: ",
-        share_subtitle1: "Shared with members of ",
-        share_subtitle2:
-          "Folders are by default shared with your project " +
-          "members. This is mandatory.",
+        share_subtitle:
+          "This folder is already accessible to all the members" +
+          " of this project.",
         share_other_projects: "Share with other projects",
         share_guide_step1:
           "1. Ask recipient project’s member to select " +
@@ -591,10 +590,8 @@ let default_translations = {
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio: ",
-        share_subtitle1: "Shared with members of ",
-        share_subtitle2:
-          "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
-          "kanssa. Tämä on pakollista.",
+        share_subtitle:
+          "Tämä kansio on jo kaikkien tämän projektin jäsenten käytettävissä.",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_step1:
           "1. Projektin jäsenet löytävät projektitunnuksen projektin " +

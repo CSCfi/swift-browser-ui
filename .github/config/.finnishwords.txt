@@ -78,6 +78,7 @@ jäsenet
 jäsenille
 jäsenten
 jne
+jo
 johtaa
 johtua
 jonka
@@ -88,6 +89,7 @@ julkiset
 julkisia
 kaikille
 kaikki
+kaikkien
 kansio
 kansion
 kansiot
@@ -248,6 +250,7 @@ olevia
 olla
 omaa
 omistavan
+on
 ongelmiin
 onnistui
 onnistunut
