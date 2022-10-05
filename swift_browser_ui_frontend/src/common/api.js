@@ -128,6 +128,7 @@ export async function getObjects(
   marker = "",
   signal,
   shared = false,
+  owner = "",
 ) {
   // Fetch object listing for a container.
   let objUrl = new URL(
@@ -139,6 +140,9 @@ export async function getObjects(
   );
   if (marker) {
     objUrl.searchParams.append("marker", marker);
+  }
+  if (shared && (owner != "")) {
+    objUrl.searchParams.append("owner", owner);
   }
   let objects = await GET(objUrl, signal);
   if (objects.status == 200) {
