@@ -73,7 +73,8 @@ let default_translations = {
       },
       folderDetails: {
         notShared: "This folder isn't shared to any projects.",
-        sharing_with_others: "This folder is shared to other project(s).",
+        sharing_to_one_project: "This folder is shared to one project.",
+        sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
           "This folder is shared with you. You can view" +
           " and download files in this folder (Read access).",
@@ -502,7 +503,8 @@ let default_translations = {
       },
       folderDetails: {
         notShared: "Tätä kansiota ei ole jaettu millekään projektille.",
-        sharing_with_others: "Tämä kansio on jaettu muille projekteille.",
+        sharing_to_one_project: "This folder is shared to one project.",
+        sharing_to_many_projects: "Tämä kansio on jaettu useille projekteille.",
         shared_with_read:
           "Tämä kansio on jaettu kanssasi. Voit tarkastella ja ladata" +
           " tiedostoja tässä kansiossa (Read access).",

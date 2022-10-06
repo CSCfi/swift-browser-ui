@@ -29,15 +29,17 @@
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}
           <c-link
+            v-show="!sharedStatus"
             underline
             @click="toggleShareModal"
           >
             Edit sharing
           </c-link>
         </li>
-        <!--<li>
-          <b>{{ $t("message.table.created") }}: </b> N/A
-        </li>-->
+        <li v-show="isSharedFolder">
+          <b>{{ $t("message.table.created") }}: </b>
+          {{ ownerProject }}
+        </li>
         <!--<li>
           <b>{{ $t("message.table.source_project_id") }}: </b> N/A
         </li>-->
@@ -115,10 +117,7 @@
 <script>
 import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
-import {
-  getSharingContainers,
-  getSharedContainers,
-} from "@/common/globalFunctions";
+import { getSharedContainers } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -135,8 +134,10 @@ export default {
   },
   data: function () {
     return {
-      sharingContainers: [],
+      isSharedFolder: false,
+      sharedStatus: "",
       sharedContainers: [],
+      ownerProject: "",
       oList: {value: []},
       selected: undefined,
       disablePagination: false,
@@ -149,6 +150,7 @@ export default {
       abortController: null,
       filteredObjects: [],
       inCurrentFolder: [],
+      tableOptions: [],
     };
   },
   computed: {
@@ -164,14 +166,8 @@ export default {
     container () {
       return this.$route.params.container;
     },
-    sharedStatus () {
-      if (this.sharingContainers.indexOf(this.container) > -1) {
-        return this.$t("message.folderDetails.sharing_with_others");
-      } else if (this.sharedContainers.findIndex(
-        cont => cont.container === this.container) > -1) {
-        return this.$t("message.folderDetails.shared_with_read");
-      }
-      return this.$t("message.folderDetails.notShared");
+    client () {
+      return this.$store.state.client;
     },
     active () {
       return this.$store.state.active;
@@ -187,7 +183,9 @@ export default {
     },
   },
   watch: {
-    active: function() {
+    active: async function() {
+      this.getSharedContainers();
+      this.getFolderSharedStatus();
       this.updateObjects();
     },
     searchQuery: function () {
@@ -234,9 +232,7 @@ export default {
       this.setLocalizedContent();
     },
   },
-  created: async function () {
-    this.sharingContainers = await getSharingContainers(this.active.id);
-    this.sharedContainers = await getSharedContainers(this.active.id);
+  created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
@@ -249,13 +245,58 @@ export default {
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
-  mounted () {
+  async mounted () {
+    await this.getSharedContainers();
+    await this.getFolderSharedStatus();
     this.updateObjects();
   },
   beforeDestroy () {
     this.abortController.abort();
   },
   methods: {
+    getSharedContainers: async function () {
+      this.sharedContainers = await getSharedContainers(this.active.id);
+    },
+    getFolderSharedStatus: async function() {
+      await this.$store.state.client.getShareDetails(
+        this.project,
+        this.container,
+      ).then(
+        async (ret) => {
+          if (ret.length > 0) {
+            ret.length === 1
+              ? this.sharedStatus
+                = this.$t("message.folderDetails.sharing_to_one_project")
+              : this.sharedStatus
+                = this.$t("message.folderDetails.sharing_to_many_projects");
+          }
+          else if (ret.length === 0) {
+            if (this.sharedContainers.findIndex(
+              cont => cont.container === this.container) > -1) {
+              this.isSharedFolder = true;
+              const sharedDetails
+                = await this.$store.state.client.getAccessDetails(
+                  this.project,
+                  this.container,
+                  this.$route.params.owner,
+                );
+              const accessRights = sharedDetails.access;
+              if (accessRights.length === 1) {
+                this.sharedStatus
+                  = this.$t("message.folderDetails.shared_with_read");
+              }
+              else if (accessRights.length > 1) {
+                this.sharedStatus
+                  = this.$t("message.folderDetails.shared_with_read_write");
+              }
+              this.ownerProject = sharedDetails.owner;
+            }
+            else this.sharedStatus
+              = this.$t("message.folderDetails.notShared");
+          }
+        },
+      );
+    },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit("setFolderName", this.container);

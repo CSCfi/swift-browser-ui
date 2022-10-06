@@ -377,6 +377,7 @@ const store = new Vuex.Store({
           container.name,
           objectList,
         );
+
         if (
           i === objects.length - 1 ||
           makeGetObjectsMetaURL(projectID, container.name, [
@@ -431,6 +432,7 @@ const store = new Vuex.Store({
           commit("loading", false);
           commit("updateObjects", []);
         });
+
         if (objects.length > 0) {
           sharedObjects = sharedObjects.concat(objects);
           marker = objects[objects.length - 1].name;
@@ -440,7 +442,7 @@ const store = new Vuex.Store({
       sharedObjects = filterSegments(sharedObjects);
       commit("updateObjects", sharedObjects);
       dispatch("updateObjectTags", {
-        project,
+        projectID: project,
         container,
         signal,
         sharedObjects,

@@ -20,7 +20,10 @@
         {{ $t("message.share.share_subtitle") }}
       </h6>
       <c-container>
-        <c-row justify="space-between" align="center">
+        <c-row
+          justify="space-between"
+          align="center"
+        >
           <h4 class="title is-4 has-text-dark">
             {{ $t("message.share.share_other_projects") }}
           </h4>
@@ -28,17 +31,23 @@
             class="toggle-instructions"
             @click="toggleShareGuide"
           >
-            <c-icon-button text v-show="!openShareGuide">
+            <c-icon-button
+              v-show="!openShareGuide"
+              text
+            >
               <i class="mdi mdi-information-outline" />
             </c-icon-button>
             <c-link underline>
               {{ openShareGuide ? $t("message.share.close_instructions")
-                                : $t("message.share.instructions")
+                : $t("message.share.instructions")
               }}
             </c-link>
           </c-flex>
         </c-row>
-        <div class="guide-content" v-show="openShareGuide">
+        <div
+          v-show="openShareGuide"
+          class="guide-content"
+        >
           <p>
             {{ $t("message.share.share_guide_step1") }}
           </p>
@@ -96,7 +105,7 @@
         <ShareModalTable
           :shared-details="sharedDetails"
           :folder-name="folderName"
-          :accessRights="accessRights"
+          :access-rights="accessRights"
           @removeSharedFolder="removeSharedFolder"
         />
       </c-container>
