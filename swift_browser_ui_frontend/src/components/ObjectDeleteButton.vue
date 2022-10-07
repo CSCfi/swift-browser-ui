@@ -1,16 +1,13 @@
 <template>
   <div class="contents">
-    <b-button
-      type="is-danger"
-      icon-left="delete"
-      outlined
-      :size="size"
-      :inverted="inverted"
-      :disabled="disabled"
+    <c-button
+      text
+      size="small"
+      title="Delete"
       @click="confirmDelete ()"
     >
       {{ $t('message.delete') }}
-    </b-button>
+    </c-button>
   </div>
 </template>
 

@@ -20,17 +20,6 @@
       >
         <UploadModal />
       </c-modal>
-      <b-breadcrumb style="margin-left: 5%; margin-top: 1%; font-size: 1rem">
-        <b-breadcrumb-item
-          v-for="item in getRouteAsList()"
-          :key="item.alias"
-          :to="item.address"
-          tag="router-link"
-          data-testid="breadcrumb-item"
-        >
-          {{ item.alias | truncate(100) }}
-        </b-breadcrumb-item>
-      </b-breadcrumb>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"
@@ -129,6 +118,12 @@ c-modal {
   flex: 1 0 auto;
 }
 
+.container-box {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
 .navbar .container .navbar-brand .navbar-item img {
   max-height: 2.5rem;
 }
@@ -178,6 +173,58 @@ c-modal {
 .dashboard {
   margin-left: 5%;
   margin-right: 5%;
+}
+
+#optionsbar {
+  display: block;
+  padding: 1.5rem 0;
+}
+
+.search {
+  flex: 0.4;
+
+  input, input::placeholder, .icon {
+    color: $csc-grey !important;
+  }
+
+  input::placeholder {
+    opacity: 0.8;
+  }
+
+  input, input:focus {
+    box-shadow:rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+  }
+
+  input {
+    border: none;
+    &:focus {
+      outline: 2px solid $csc-primary;
+
+     & + .icon {
+        color: $csc-primary !important;
+      }
+    }
+  }
+}
+
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
+  }
+}
+
+#dropArea:before{
+  content:"";
+  width: 98%;
+  height:98%;
+  position:absolute;
+  border:2px dashed #b5b5b5;
+  margin: 0 1%;
+  padding: 0;
+  border-radius: 6px;
 }
 
 .footer {

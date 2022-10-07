@@ -1,14 +1,9 @@
-
-import {
-  getContainerMeta,
-  getAccessControlMeta,
-  getObjectsMeta,
-} from "./api";
+import { getContainerMeta, getAccessControlMeta, getObjectsMeta } from "./api";
 
 export default function getLangCookie() {
-  let matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)",
-  ));
+  let matches = document.cookie.match(
+    new RegExp("(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)"),
+  );
   return matches ? decodeURIComponent(matches[1]) : "en";
 }
 
@@ -33,14 +28,15 @@ function check_duplicate(container, share, currentdetails) {
     if (detail.container == container && detail.sharedTo == share) {
       return true;
     }
-  } return false;
+  }
+  return false;
 }
 
 function check_acl_mismatch(acl_cur, acl_sharing) {
   // Check if the ACLs mismatch
   if (
-    !(("read" in acl_sharing) && acl_cur.access.includes("r"))
-    || !(("write" in acl_sharing) && acl_cur.access.includes("w"))
+    !("read" in acl_sharing && acl_cur.access.includes("r")) ||
+    !("write" in acl_sharing && acl_cur.access.includes("w"))
   ) {
     return true;
   }
@@ -65,11 +61,8 @@ export async function syncContainerACLs(client, project) {
 
   // Delete stale shared container access entries from the database
   for (let container of currentsharing) {
-    if (!(Object.keys(aclmeta).includes(container))) {
-      await client.shareContainerDeleteAccess(
-        project,
-        container,
-      );
+    if (!Object.keys(aclmeta).includes(container)) {
+      await client.shareContainerDeleteAccess(project, container);
     }
   }
 
@@ -79,12 +72,8 @@ export async function syncContainerACLs(client, project) {
   for (let container of currentsharing) {
     let containerDetails = await client.getShareDetails(project, container);
     for (let detail of containerDetails) {
-      if(check_stale(detail, aclmeta[container])) {
-        await client.shareDeleteAccess(
-          project,
-          container,
-          [detail.sharedTo],
-        );
+      if (check_stale(detail, aclmeta[container])) {
+        await client.shareDeleteAccess(project, container, [detail.sharedTo]);
       }
     }
   }
@@ -95,10 +84,7 @@ export async function syncContainerACLs(client, project) {
   for (let container of Object.keys(aclmeta)) {
     let currentdetails = [];
     if (currentsharing.includes(container)) {
-      currentdetails = await client.getShareDetails(
-        project,
-        container,
-      );
+      currentdetails = await client.getShareDetails(project, container);
     }
     for (let share of Object.keys(aclmeta[container])) {
       if (check_duplicate(container, share, currentdetails)) {
@@ -155,11 +141,13 @@ export function getHumanReadableSize(val) {
   return ret;
 }
 
-export async function computeSHA256 ( keyContent ) {
+export async function computeSHA256(keyContent) {
   const msgUint8 = new TextEncoder().encode(keyContent);
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
   return hashHex;
 }
 
@@ -180,20 +168,24 @@ export async function getTagsForContainer(project, containerName, signal) {
 
 export async function getTagsForObjects(
   project,
-  containerName, 
-  objectList, 
-  url, 
+  containerName,
+  objectList,
+  url,
   signal,
 ) {
   let meta = await getObjectsMeta(
-    project, containerName, objectList, url, signal,
+    project,
+    containerName,
+    objectList,
+    url,
+    signal,
   );
-  meta.map(item => item[1] = extractTags(item));
+  meta.map((item) => (item[1] = extractTags(item)));
   return meta;
 }
 
 export function makeGetObjectsMetaURL(project, container, objects) {
-  return new URL(  
+  return new URL(
     "/api/meta/".concat(
       encodeURI(project),
       "/",
@@ -236,22 +228,88 @@ export function filterSegments(objects) {
     }
     segmentedObjSizes[nameFromSegment[1]] += obj.bytes;
   });
-  return objects.filter(o =>
-    o.name.match(SEGMENT_REGEX) === null);
+  return objects.filter((o) => o.name.match(SEGMENT_REGEX) === null);
 }
 
 export const tokenizerRE = "[^\\p{L}\\d]";
 
-export function tokenize(text, ignoreSmallerThan=2) {
+export function tokenize(text, ignoreSmallerThan = 2) {
   // splits with non-word and non-digit chars
   const re = new RegExp(tokenizerRE, "u");
   const split = text.toLowerCase().split(re);
 
   // filters out small words and duplicates
-  const result = split.filter((item, index) => 
-    item.length >= ignoreSmallerThan && split.indexOf(item) === index,
+  const result = split.filter(
+    (item, index) =>
+      item.length >= ignoreSmallerThan && split.indexOf(item) === index,
   );
   return result;
 }
 
 export const DEV = process.env.NODE_ENV === "development";
+
+export function sortObjects(objects, sortBy, sortDirection) {
+  sortBy = sortBy === "size" ? "bytes" : sortBy;
+
+  objects.sort((a, b) => {
+    let valueA = a[sortBy];
+    let valueB = b[sortBy];
+
+    // Handle tags as single string
+    if (Array.isArray(valueA)) {
+      valueA = valueA.join(" ");
+      valueB = valueB.join(" ");
+    }
+
+    if (typeof valueA === "string") {
+      if (sortDirection === "asc") {
+        return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+      }
+
+      return valueB.toLowerCase().localeCompare(valueA.toLowerCase());
+    }
+
+    if (typeof valueA === "number") {
+      if (sortDirection === "asc") {
+        return valueA - valueB;
+      }
+
+      return valueB - valueA;
+    }
+  });
+}
+
+// Parse date and time into internationalized format
+export function parseDateTime(locale, value) {
+  let dateLocale;
+  const date = new Date(value);
+
+  switch (locale) {
+    case "fi": {
+      dateLocale = "fi-FI";
+      break;
+    }
+    default: {
+      dateLocale = "en-GB";
+    }
+  }
+
+  const dateOptions = {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  const dateTimeFormat = new Intl.DateTimeFormat(
+    dateLocale,
+    dateOptions,
+  ).format(date);
+
+  // Replace Finnish "at" time indicator with comma
+  // English version defaults to comma 
+  return dateTimeFormat.replace(" klo", ", ");
+}

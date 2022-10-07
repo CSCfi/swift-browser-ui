@@ -50,11 +50,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.container-box {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-</style>

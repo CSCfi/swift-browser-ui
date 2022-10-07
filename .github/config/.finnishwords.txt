@@ -7,6 +7,7 @@ annetut
 apin
 apua
 arvot
+asetukset
 avaimelle
 avaimen
 avaimet
@@ -62,6 +63,7 @@ jakamaan
 jakamasi
 jakaminen
 jakamista
+jakanut
 jako
 jakoa
 jakopyynnöt
@@ -88,6 +90,10 @@ kansiot
 kansioille
 kansioina
 kanssa
+kanssasi
+kohde
+kohdetta
+kohteet
 käytä
 käytä
 käytettävissä
@@ -226,6 +232,7 @@ oikeuden
 oikeudet
 oikeuksia
 olemassa
+olet
 oletusarvoiset
 oletusarvojen
 olevia
@@ -325,6 +332,7 @@ selailu
 selain
 selainta
 selatessa
+seuraava
 siirto
 sinulle
 sisään
@@ -372,6 +380,7 @@ tätä
 taustalla
 tavallisesti
 täytyy
+tekstinä
 tiedosto
 tiedostoa
 tiedostoja
@@ -398,6 +407,8 @@ tulisi
 tuloksia
 tunniste
 tunnus
+tunnisteet
+tunnisteita
 tunti
 tuo
 tyhjä
@@ -420,6 +431,7 @@ valinnan
 valinnat
 valitse
 valittu
+valitut
 valittuja
 valittuna
 valmis

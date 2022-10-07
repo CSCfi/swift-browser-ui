@@ -2,354 +2,118 @@
   <div
     id="object-table"
   >
-    <b-field
-      grouped
-      group-multiline
-      class="groupControls"
-    >
-      <b-select
-        v-model="perPage"
-        data-testid="containersPerPage"
-        :disabled="!isPaginated"
+    <c-row>
+      <router-link
+        class="back-link"
+        :to="{
+          name: 'AllFolders',
+          params: {
+            user: $store.state.uname,
+            project: $store.state.active.id,
+          }
+        }"
       >
-        <option value="5">
-          5 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="10">
-          10 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="15">
-          15 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="25">
-          25 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="50">
-          50 {{ $t('message.table.pageNb') }}
-        </option>
-        <option value="100">
-          100 {{ $t('message.table.pageNb') }}
-        </option>
-      </b-select>
-      <div class="control is-flex">
-        <b-switch
-          v-if="oList.value && oList.value.length < 500"
-          v-model="isPaginated"
+        <i class="mdi mdi-chevron-left" />
+        Back to all folders
+      </router-link>
+    </c-row>
+
+    <div class="folder-info">
+      <div class="folder-info-heading">
+        <i class="mdi mdi-folder-outline" /> 
+        <span>{{ container }}</span>
+      </div>
+
+      <ul class="folder-details">
+        <li>
+          <b>{{ $t("message.share.sharedTo") }}: </b> N/A
+        </li>
+        <li>
+          <b>{{ $t("message.table.created") }}: </b> N/A
+        </li>
+      </ul>
+    </div>
+
+    <div
+      v-if="checkedRows.length"
+      class="selection-bar"
+    >
+      <div class="info">
+        <i class="mdi mdi-information-outline" />
+        <span>
+          {{ checkedRows.length }} 
+          {{ checkedRows.length === 1 
+            ? $t("message.table.itemSelected") 
+            : $t("message.table.itemsSelected") }}
+        </span>
+      </div>
+
+      <div class="action-buttons">
+        <c-button
+          v-for="button in selectionActionButtons"
+          :key="button.label"
+          inverted
+          text
+          @click="button.action"
         >
-          {{ $t('message.table.paginated') }}
-        </b-switch>
+          <i
+            slot="icon"
+            :class="button.icon"
+            class="mdi"
+          /> {{ button.label }}
+        </c-button>
       </div>
-      <div class="control is-flex">
-        <b-switch v-model="renderFolders">
-          {{ $t('message.renderFolders') }}
-        </b-switch>
-      </div>
-      <div class="control is-flex">
-        <b-switch v-model="showTags">
-          {{ $t('message.table.showTags') }}
-        </b-switch>
-      </div>
-      <b-field class="control searchBox">
+    </div>
+
+    <c-row
+      id="optionsbar"
+      justify="space-between"
+    >
+      <div class="search">
         <b-input
           v-model="searchQuery"
           :placeholder="$t('message.objects.filterBy')"
-        />
-      </b-field>
-      <div class="field has-addons uploadGroup">
-        <p class="control">
-          <b-button
-            :label="$t('message.upload')"
-            type="is-primary"
-            outlined
-            icon-left="upload"
-            @click="toggleUploadModal"
-          />
-        </p>
-        <p class="control">
-          <ContainerDownloadLink />
-        </p>
-        <p class="control">
-          <ReplicateContainerButton />
-        </p>
-        <p class="control">
-          <b-button
-            :label="$t('message.table.clearChecked')"
-            type="is-primary"
-            outlined
-            @click="checkedRows = []"
-          />
-        </p>
-      </div>
-      <div>
-        <DeleteObjectsButton
-          size="is-normal"
-          :inverted="false"
-          :disabled="checkedRows.length == 0 ? true : false"
-          :objects="checkedRows"
+          type="search"
+          icon="filter-variant"
         />
       </div>
-    </b-field>
-    <b-table
-      class="objectTable"
-      focusable
-      detailed
-      hoverable
-      narrowed
-      header-checkable
-      checkable
-      checkbox-position="right"
-      :checked-rows.sync="checkedRows"
-      :is-row-checkable="isRowCheckable"
-      default-sort="name"
-      :data="oList.value"
-      :selected.sync="selected"
-      :current-page.sync="currentPage"
-      :paginated="isPaginated"
-      :per-page="perPage"
-      :pagination-simple="isPaginated"
-      :default-sort-direction="defaultSortDirection"
-      :row-class="row => !isVisible(row.id) ? 'is-hidden' : ''"
-      @page-change="( page ) => addPageToURL( page )"
-      @dblclick="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-      @keyup.native.enter="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-      @keyup.native.space="(row) => {if (
-        renderFolders &&
-        !isFile(row.name)
-      ) {changeFolder(
-        getFolderName(row.name)
-      )}}"
-    >
-      <!-- Alt name column for case pseudo folders enabled  -->
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="name"
-        :label="$t('message.table.name')"
+
+      <c-menu
+        :items.prop="tableOptions"
+        options-testid="table-options-selector"
       >
-        <span v-if="renderFolders && !isFile(props.row.name)">
-          <b-icon
-            icon="folder"
-            size="is-small"
-          /> <b>{{ getFolderName(props.row.name) | truncate(100) }}</b>
+        <span class="menu-active display-options-menu"> 
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
         </span>
-        <span v-else-if="renderFolders">
-          {{ props.row.name.replace(getPrefix(), '') | truncate(100) }}
-        </span>
-        <span v-else>
-          {{ props.row.name | truncate(100) }}
-        </span>
-        <b-taglist v-if="displayTags(props.row.name)">
-          <b-tag
-            v-for="tag in props.row.tags"
-            :key="tag"
-            :type="selected==props.row ? 'is-primary-invert' : 'is-primary'"
-            rounded
-            ellipsis
-          >
-            {{ tag }}
-          </b-tag>
-        </b-taglist>
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="last_modified"
-        :label="$t('message.table.modified')"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          {{ getHumanReadableDate(props.row.last_modified) }}
-        </span>
-      </b-table-column>
-      <b-table-column
-        v-slot="props"
-        sortable
-        field="bytes"
-        :label="$t('message.table.size')"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)" />
-        <span v-else>
-          {{ localHumanReadableSize(props.row.bytes) }}
-        </span>
-      </b-table-column>
-      <b-table-column
-        field="functions"
-        label=""
-        width="90"
-      >
-        <template #default="props">
-          <div class="field has-addons">
-            <span v-if="renderFolders && !isFile(props.row.name)" />
-            <p
-              v-else
-              class="control"
-            >
-              <b-button
-                v-if="props.row.bytes < 1073741824"
-                :href="props.row.url"
-                target="_blank"
-                :inverted="props.row == selected ? true : false"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                size="is-small"
-                tag="a"
-                icon-left="download"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-              <b-button
-                v-else-if="allowLargeDownloads"
-                :href="props.row.url"
-                target="_blank"
-                :inverted="props.row == selected ? true : false"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                size="is-small"
-                tag="a"
-                icon-left="download"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-              <b-button
-                v-else
-                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-                type="is-primary"
-                outlined
-                :inverted="props.row === selected ? true : false"
-                size="is-small"
-                tag="a"
-                icon-left="download"
-                @click="confirmDownload ()"
-              >
-                {{ $t('message.download') }}
-              </b-button>
-            </p>
-            <p
-              v-if="displayTags(props.row.name)"
-              class="control"
-            >
-              <b-button
-                tag="router-link"
-                type="is-primary"
-                outlined
-                size="is-small"
-                icon-left="pencil"
-                :inverted="selected==props.row ? true : false"
-                :to="getEditRoute(container, props.row.name)"
-              >
-                {{ $t('message.edit') }}
-              </b-button>
-            </p>
-          </div>
-        </template>
-      </b-table-column>
-      <b-table-column
-        field="dangerous"
-        label=""
-        width="75"
-      >
-        <template #default="props">
-          <span v-if="renderFolders && !isFile(props.row.name)" />
-          <DeleteObjectsButton
-            v-else
-            size="is-small"
-            :inverted="props.row === selected ? true : false"
-            :disabled="false"
-            :objects="[props.row]"
-          />
-        </template>
-      </b-table-column>
-      <template
-        #detail="props"
-      >
-        <span v-if="renderFolders && !isFile(props.row.name)">
-          {{ $t('message.table.folderDetails') }}
-        </span>
-        <span v-else>
-          <ul>
-            <li>
-              <b>{{ $t('message.table.fileHash') }}: </b>{{ props.row.hash }}
-            </li>
-            <li>
-              <b>{{ $t('message.table.fileType') }}: </b>
-              {{ props.row.content_type }}
-            </li>
-            <li>
-              <b>{{ $t('message.table.fileDown') }}: </b>
-              <a
-                v-if="props.row.bytes < 1073741824"
-                :href="props.row.url"
-                target="_blank"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-              <a
-                v-else-if="allowLargeDownloads"
-                :href="props.row.url"
-                target="_blank"
-                :alt="$t('message.downloadAlt') + ' ' + props.row.name"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-              <a
-                v-else
-                :alt="$t('message.downloadAltLarge') + ' ' + props.row.name"
-                @click="confirmDownload ()"
-              >
-                <b-icon
-                  icon="download"
-                  size="is-small"
-                /> {{ $t('message.downloadLink') }}
-              </a>
-            </li>
-          </ul>
-        </span>
-      </template>
-      <template #empty>
-        <p class="emptyTable">
-          {{ $t('message.emptyContainer') }}
-        </p>
-      </template>
-    </b-table>
+      </c-menu>
+    </c-row>
+
+    <CObjectTable
+      :objs="filteredObjects.length ? filteredObjects : oList.value"
+      :disable-pagination="disablePagination"
+      :hide-tags="hideTags"
+      :render-folders="renderFolders"
+      :checked-rows="checkedRows"
+      @selected-rows="handleSelection"
+      @delete-object="confirmDelete([$event])"
+    />
   </div>
 </template>
 
 <script>
+import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
+import CObjectTable from "@/components/CObjectTable";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-import ContainerDownloadLink from "@/components/ContainerDownloadLink";
-import ReplicateContainerButton from "@/components/ReplicateContainer";
-import DeleteObjectsButton from "@/components/ObjectDeleteButton";
 
 export default {
   name: "ObjectTable",
   components: {
-    ContainerDownloadLink,
-    ReplicateContainerButton,
-    DeleteObjectsButton,
+    CObjectTable,
   },
   filters: {
     truncate,
@@ -358,11 +122,9 @@ export default {
     return {
       oList: {value: []},
       selected: undefined,
-      isPaginated: true,
-      renderFolders: false,
-      showTags: true,
-      perPage: 15,
-      defaultSortDirection: "asc",
+      disablePagination: false,
+      renderFolders: true,
+      hideTags: false,
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
@@ -389,6 +151,12 @@ export default {
     },
     sharedObjects() {
       return this.$store.state.objectCache;
+    },
+    openCreateFolderModal() {
+      return this.$store.state.openCreateFolderModal;
+    },
+    locale () {
+      return this.$i18n.locale;
     },
   },
   watch: {
@@ -435,12 +203,17 @@ export default {
         }
       }
     },
+    locale () {
+      this.setLocalizedContent();
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
     this.$store.commit("erasePrefix");
+    this.setLocalizedContent();
+    this.set;
   },
   beforeMount () {
     this.abortController = new AbortController();
@@ -703,7 +476,11 @@ export default {
         prev.push(element.id);
         return prev;
       }
-      this.filteredObjects = this.oList.value.reduce(search, []);
+
+      const filteredObjectsIds = this.oList.value.reduce(search, []);
+
+      this.filteredObjects = this.oList.value.
+        filter(obj => filteredObjectsIds.indexOf(obj.id) === -1);
     },
     displayTags: function (name) {
       return this.showTags && !(this.renderFolders && !this.isFile(name));
@@ -727,25 +504,200 @@ export default {
         },
       };
     },
-    toggleUploadModal: function () {
-      this.$store.commit("toggleUploadModal", true);
-      modifyBrowserPageStyles();
+    confirmDelete: function (deletables) {
+      this.$buefy.dialog.confirm({
+        title: this.$t("message.objects.deleteObjects"),
+        message: this.$t("message.objects.deleteObjectsMessage"),
+        confirmText: this.$t("message.objects.deleteConfirm"),
+        type: "is-danger",
+        hasIcon: true,
+        onConfirm: () => {this.deleteObjects(deletables);},
+      });
+    },
+    deleteObjects: function (deletables) {
+      this.clearSelections();
+      this.$buefy.toast.open({
+        message: this.$t("message.objects.deleteSuccess"),
+        type: "is-success",
+      });
+      let to_remove = new Array;
+      if (typeof(deletables) == "string") {
+        to_remove.push(deletables);
+      } else {
+        for (let object of deletables) {
+          to_remove.push(object.name);
+        }
+      }
+      if(this.$route.name !== "SharedObjects") {
+        const objIDs = deletables.reduce(
+          (prev, obj) => [...prev, obj.id], [],
+        );
+        this.$store.state.db.objects.bulkDelete(objIDs);
+      }
+      swiftDeleteObjects(
+        this.$route.params.project,
+        this.$route.params.container,
+        to_remove,
+      ).then(async () => {
+        if (this.$route.name === "SharedObjects") {
+          await this.$store.dispatch(
+            "updateSharedObjects",
+            {
+              project: this.$route.params.project,
+              container: {
+                name: this.$route.params.container,
+                id: 0,
+              },
+            },
+          );
+        }
+      });
+    },
+    handleSelection(selection) {
+      const objects = this.oList.value;
+      this.checkedRows = objects.filter(
+        item => selection.indexOf(item.name) > -1,
+      );
+    },
+    clearSelections() {
+      const dataTable = document.getElementById("objtable");
+      dataTable.clearSelections();
+    },
+    setTableOptionsMenu() {
+      this.tableOptions = [
+        {
+          name: this.renderFolders
+            ? this.$t("message.tableOptions.text")
+            : this.$t("message.tableOptions.render"),
+          action: () => {
+            this.renderFolders = !(this.renderFolders);
+            this.setTableOptionsMenu();
+          },
+        },
+        {
+          name: this.hideTags
+            ? this.$t("message.tableOptions.showTags")
+            : this.$t("message.tableOptions.hideTags"),
+          action: () => {
+            this.hideTags = !(this.hideTags);
+            this.setTableOptionsMenu();
+          },
+        },
+        {
+          name: this.disablePagination
+            ? this.$t("message.tableOptions.showPagination")
+            : this.$t("message.tableOptions.hidePagination"),
+          action: () => {
+            this.disablePagination = !(this.disablePagination);
+            this.setTableOptionsMenu();
+          },
+        },
+      ];
+    },
+    setSelectionActionButtons() {
+      this.selectionActionButtons = [
+        { 
+          label: this.$t("message.table.deleteSelected"),
+          icon: "mdi-trash-can-outline",
+          action: () => this.confirmDelete(this.checkedRows),
+        },
+        { 
+          label: this.$t("message.table.clearSelected"),
+          icon: "mdi-refresh",
+          action: () => this.clearSelections(), 
+        },
+      ];
+    },
+    setLocalizedContent() {
+      this.setTableOptionsMenu();
+      this.setSelectionActionButtons();
     },
   },
 };
 </script>
 
-<style scoped>
-.objectTable {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
+<style scoped lang="scss">
+@import "@/css/prod.scss";
+
+.back-link {
+  display: flex;
+  padding-bottom: .5rem;
+  color: $csc-primary;
+  font-weight: 600;
+  align-items: center;
+  
+  & .mdi {
+    font-size: 2rem;
+  }
 }
 
-.emptyTable {
-  width: 100%;
-  text-align: center;
-  margin-top: 5%;
-  margin-bottom: 5%;
+.folder-info {
+  border: 1px solid $csc-primary;
+  margin: 0rem 0rem;
 }
+
+.folder-info-heading, .folder-details {
+  padding: 1rem 2rem; 
+}
+
+.folder-info-heading {
+  display: flex;
+  color: #FFF;
+  font-size: 1rem;
+  font-weight: 700;
+  background: $csc-primary;
+  align-items: center;
+  & .mdi {
+    font-size: 1.5rem;
+    padding-right: .5rem
+  }
+  & span {
+    align-self: center;
+    display: inline-block;
+  }
+}
+
+.folder-details {
+  color: $csc-grey;
+
+  & li {
+    padding: .25rem 0;
+  }
+}
+
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: #FFF;
+  background: $csc-blue;
+  border-radius: .25rem;
+  padding: 0 1rem;
+  margin: 1.5rem 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  & .info {
+    display: flex;
+    flex: 1;
+    min-width: 12rem;
+    padding: 1rem;
+    & .mdi {
+      font-size: 1.5rem;
+      padding-right: .5rem
+    }
+    & span {
+      align-self: center;
+      display: inline-block;
+    }
+  }
+
+  & .action-buttons {
+    display: flex;
+    flex: 0;
+    padding: .5rem 0; 
+  }
+}
+
 </style>
