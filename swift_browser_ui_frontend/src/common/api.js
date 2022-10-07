@@ -1,7 +1,7 @@
 // API fetch functions.
 
-import { 
-  getHumanReadableSize, 
+import {
+  getHumanReadableSize,
   makeGetObjectsMetaURL,
   DEV,
 } from "@/common/conv";
@@ -22,7 +22,7 @@ async function fetchWithCookie({method, url, body, signal}) {
         case 500:
           break;
       }
-      
+
       return response;
     })
     .catch(error => {
@@ -176,7 +176,7 @@ export async function getObjectsMeta (
   signal,
 ){
   // Batch get metadata for a list of objects
-  if (url === undefined) {  
+  if (url === undefined) {
     url = makeGetObjectsMetaURL(project, container, objects);
   }
 

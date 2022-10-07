@@ -1,28 +1,37 @@
 <template>
   <div
-    id="container-table"
-    class="contents"
+    class="containers"
   >
-    <c-row
-      id="optionsbar"
-      justify="space-between"
+    <c-modal
+      v-control
+      v-csc-model="openShareModal"
+      width="50vw"
     >
-      <SearchBox />
-      <c-menu
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
+      <ShareModal />
+    </c-modal>
+
+    <div class="contents">
+      <c-row
+        id="optionsbar"
+        justify="space-between"
       >
-        <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
-    </c-row>
-    <ContainerTable
-      :conts="containers.value"
-      :disable-pagination="disablePagination"
-      :hide-tags="hideTags"
-    />
+        <SearchBox />
+        <c-menu
+          :items.prop="tableOptions"
+          options-testid="table-options-selector"
+        >
+          <span class="menu-active display-options-menu">
+            <i class="mdi mdi-tune" />
+            {{ $t("message.tableOptions.displayOptions") }}
+          </span>
+        </c-menu>
+      </c-row>
+      <ContainerTable
+        :conts="containers.value"
+        :disable-pagination="disablePagination"
+        :hide-tags="hideTags"
+      />
+    </div>
   </div>
 </template>
 
@@ -31,12 +40,14 @@ import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import ContainerTable from "@/components/ContainerTable";
 import SearchBox from "@/components/SearchBox";
+import ShareModal from "@/components/ShareModal";
 
 export default {
   name: "ContainersView",
   components: {
     ContainerTable,
     SearchBox,
+    ShareModal,
   },
   data: function () {
     return {
@@ -56,6 +67,12 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
+    },
+    openShareModal: {
+      get() {
+        return this.$store.state.openShareModal;
+      },
+      set() {},
     },
   },
   watch: {
@@ -138,3 +155,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+
+.containers {
+   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+c-modal {
+  position: relative;
+  margin: 0 auto;
+  display: inline-flex;
+}
+
+#optionsbar {
+  margin: 0.5em;
+  background: #fff;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+}
+</style>

@@ -24,6 +24,7 @@ devel
 Dockerfile
 dockerfiles
 drag'n'drop
+dropdown
 envs
 etag
 fi

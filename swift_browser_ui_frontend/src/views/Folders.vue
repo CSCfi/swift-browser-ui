@@ -30,11 +30,11 @@ export default {
       activeRouteName: "",
       folderComponents: [
         {type: ContainersView, name: "AllFolders"},
-        {type: SharedOutTable, name: "SharedFrom"},
         {type: SharedTable, name: "SharedTo"},
+        {type: SharedOutTable, name: "SharedFrom"},
       ],
     };
-  }, 
+  },
   computed: {
     name () {
       return this.$route.name;

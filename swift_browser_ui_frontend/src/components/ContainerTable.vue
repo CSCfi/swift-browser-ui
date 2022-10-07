@@ -224,10 +224,8 @@ export default {
                     title: this.$t("message.share.share"),
                     path: mdiShareVariantOutline,
                     onClick: (item) => {
-                      this.$router.push({
-                        name: "SharingView",
-                        query: { container: item.name },
-                      });
+                      this.$store.commit("toggleShareModal", true);
+                      this.$store.commit("setFolderName", item.data.name.value);
                     },
                   },
                 },

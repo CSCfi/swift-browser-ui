@@ -153,11 +153,31 @@ let default_translations = {
       share: {
         share: "Share",
         share_id: "Share ID",
+        close: "Close",
+        instructions: "Share ID instructions",
+        close_instructions: "Close instructions",
         share_cont: "Share the bucket",
-        read_perm: "Grant read permissions",
-        write_perm: "Grant write permissions",
+        share_title: "Share folder: ",
+        share_subtitle1: "Shared with members of ",
+        share_subtitle2:
+          "Folders are by default shared with your project " +
+          "members. This is mandatory.",
+        share_other_projects: "Share with other projects",
+        share_guide_step1:
+          "1. Ask recipient project’s member to select " +
+          "Copy Share ID button next to Select project dropdown when " +
+          "correct project is selected.",
+        share_guide_step2:
+          "2. Recipient’s Share ID is copied in the cache memory " +
+          "and recipient project’s member can paste it to email etc. " +
+          "and send it to you.",
+        permissions: "Permissions",
+        read_perm: "Read",
+        write_perm: "Read and write",
+        shared_successfully: "Folder was shared successfully!",
+        project_id: "Project ID",
         field_label: "Project Identifiers to share with",
-        field_placeholder: "Add Project Identifiers here",
+        field_placeholder: "Add Project IDs",
         cancel: "Cancel",
         confirm: "Share",
         to_me: "Shared to the project",
@@ -539,11 +559,28 @@ let default_translations = {
       share: {
         share: "Jaa",
         share_id: "Jaa tunnus",
+        close: "Kiinni",
+        instructions: "Jaa tunnus ohjeet",
+        close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
+        share_title: "Jaa kansio: ",
+        share_subtitle1: "Shared with members of ",
+        share_subtitle2:
+          "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
+          "kanssa. Tämä on pakollista.",
+        share_other_projects: "Jaa toisen projektin kanssa",
+        share_guide_step1:
+          "1. Projektin jäsenet löytävät projektitunnuksen projektin " +
+          "tietosivulta. Siirry Profiili valikkoon -> Projektin tiedot.",
+        share_guide_step2:
+          "2. Kopioi projektin tunnus ja lähetä se sähköpostitse jne.",
+        permissions: "Käyttöoikeudet",
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
+        shared_successfully: "Kansion jakaminen onnistui!",
+        project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
-        field_placeholder: "Lisää projektitunnisteet",
+        field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
         confirm: "Jaa",
         to_me: "Jaettu projektille",

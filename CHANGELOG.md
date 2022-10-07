@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (GH #746) Move container and object listings to csc-ui components
 - (GH #746) Migrate buefy search to CSC styling, csc-ui component for search not an option
+- (GH #714) Add modal for sharing folder with other projects
 - (GH #730) Add a button to copy Project Id
 - (GH #674) Add modal for uploading files
 - (GH #723) Add Project information as an option under User menu
