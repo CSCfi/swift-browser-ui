@@ -38,6 +38,7 @@ const store = new Vuex.Store({
     encryptedFileProgress: undefined,
     encryptedProgress: undefined,
     uploadProgress: undefined,
+    uploadNotification: false,
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
@@ -92,12 +93,14 @@ const store = new Vuex.Store({
     },
     setUploading(state) {
       state.isUploading = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopUploading(state) {
       state.isUploading = false;
     },
     setChunking(state) {
       state.isChunking = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopChunking(state) {
       state.isChunking = false;
@@ -120,7 +123,10 @@ const store = new Vuex.Store({
     eraseEncryptedFileProgress(state) {
       state.encryptedFileProgress = undefined;
     },
-    updateProgress (state, progress) {
+    toggleUploadNotification(state, payload) {
+      state.uploadNotification = payload;
+    },
+    updateProgress(state, progress) {
       state.uploadProgress = progress;
     },
     eraseProgress(state) {

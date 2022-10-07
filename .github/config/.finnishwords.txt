@@ -4,6 +4,7 @@ alapuolisesta
 alla
 aloitettiin
 anna
+aloitettu
 annetut
 apin
 apua
@@ -99,6 +100,8 @@ kanssasi
 kohde
 kohdetta
 kohteet
+kohdekansio
+käynnissä
 käytä
 käytä
 käytettävissä
@@ -202,6 +205,7 @@ megatavun
 mikä
 mikäli
 minuutin
+minuutteja
 mitätöi
 muiden
 muita
@@ -212,6 +216,7 @@ muokkaa
 mutta
 muussa
 muutaman
+muutamia
 muuttaa
 muuttaaksesi
 näkyvissä
@@ -267,6 +272,7 @@ paina
 painikkeella
 painikkeesta
 pakollista
+peruutettu
 päivitä
 palautus
 paloitellaan
@@ -275,6 +281,7 @@ palvelu
 palvelun
 peruuta
 pienemmissä
+pienennä
 piilota
 poiketa
 pois
@@ -374,6 +381,7 @@ sopimus
 suodata
 suositellut
 suuren
+suurenna
 suuret
 suuri
 suurten
@@ -425,6 +433,7 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiminto
 toiseen
 toisen
 toteuttaa

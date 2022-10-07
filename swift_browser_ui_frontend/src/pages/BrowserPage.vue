@@ -20,6 +20,10 @@
       >
         <UploadModal />
       </c-modal>
+      <UploadNotification
+        v-if="displayUploadNotification"
+        @cancel-upload="onCancel"
+      />
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"
@@ -45,6 +49,7 @@
           </p>
         </div>
       </footer>
+      <c-toasts id="toasts" />
     </div>
   </div>
 </template>

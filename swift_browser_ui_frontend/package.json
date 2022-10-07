@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode development",
-    "serve-prod": "vue-cli-service serve --mode production",
     "build": "vue-cli-service build --mode production",
+    "test": "vue-cli-service test:unit --config=jest.config.js",
     "lint": "vue-cli-service lint --mode production",
-    "build-devel": "vue-cli-service build --mode development"
+    "build-devel": "vue-cli-service build --mode development",
+    "serve-prod": "vue-cli-service serve --mode production"
   },
   "dependencies": {
     "@vue/cli-service": "^5.0.6",
@@ -29,9 +30,20 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "@testing-library/dom": "^8.17.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
+    "@testing-library/vue": "^5.8.3",
     "@vue/cli-plugin-babel": "^5.0.6",
     "@vue/cli-plugin-eslint": "^5.0.6",
+    "@vue/cli-plugin-unit-jest": "~5.0.0",
+    "@vue/test-utils": "^1.3.0",
+    "@vue/vue2-jest": "^27.0.0-alpha.2",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
+    "babel-jest": "^27.5.1",
     "cli-highlight": "^2.1.11",
     "csc-ui": "^0.4.44",
     "csc-ui-vue-directive": "^0.0.4",
@@ -39,6 +51,8 @@
     "eslint": "^8.18.0",
     "eslint-plugin-vue": "^9.1.1",
     "eslint-utils": "^3.0.0",
+    "jest": "^27.0.5",
+    "vue-jest": "^3.0.7",
     "vue-template-compiler": "^2.6.14"
   },
   "eslintConfig": {
@@ -53,7 +67,18 @@
     "rules": {},
     "parserOptions": {
       "parser": "babel-eslint"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/__tests__/*.{j,t}s?(x)",
+          "**/*.spec.{j,t}s?(x)"
+        ],
+        "env": {
+          "jest": true
+        }
+      }
+    ]
   },
   "postcss": {
     "plugins": {
