@@ -207,6 +207,7 @@ const store = new Vuex.Store({
     eraseCurrentUpload(state) {
       delete state.currentUpload;
       state.currentUpload = undefined;
+      state.uploadNotification = false;
     },
   },
   actions: {

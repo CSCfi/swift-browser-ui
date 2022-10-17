@@ -102,6 +102,7 @@
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
                   max="1024"
+                  rows="3"
                 />
                 <c-button
                   type="is-success"
@@ -157,6 +158,8 @@ import {
   modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
+
+import delay from "lodash/delay";
 
 export default {
   name: "UploadModal",
@@ -544,10 +547,15 @@ export default {
         this.passphrase,
         this.ephemeral,
         this.$store,
+        this.$el,
       );
+      this.$buefy.toast.open({
+        message: this.$t("message.upload.isStarting"),
+        type: "is-success",
+      });
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
-      upload.cleanUp();
+      delay(upload.cleanUp, 1500);
       this.toggleUploadModal();
     },
   },

@@ -7,7 +7,7 @@
             {{ $t("message.upload.hasStarted") }}
           </h3>
           <h3 v-else>
-            {{ $t("message.upload.inProgress") }}
+            {{ $t("message.upload.longProgress") }}{{ currentFile }}
           </h3>
         </div>
         <div class="col">
@@ -60,6 +60,11 @@ export default {
     ProgressBar,
   },
   props: ["notificationToggled"],
+  computed: {
+    currentFile() {
+      return this.$store.state.encryptedFile;
+    },
+  },
   mounted() {
     this.openNotification();
   },

@@ -22,7 +22,7 @@
       </c-modal>
       <UploadNotification
         v-if="displayUploadNotification"
-        @cancel-upload="onCancel"
+        @cancel-upload="currentUpload.cancelUpload()"
       />
       <router-view class="content-wrapper" />
       <b-loading

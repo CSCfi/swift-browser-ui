@@ -54,7 +54,7 @@ checkIDB().then(result => {
 
 if ("serviceWorker" in navigator) {
   let workerUrl = new URL(
-    "/libupload.js",
+    "/static/libupload.js",
     document.location.origin,
   );
   let ping = (navigator.serviceWorker.controller == null);
@@ -124,7 +124,6 @@ new Vue({
     BrowserSecondaryNavbar,
     CreateFolderModal,
     UploadModal,
-    ProgressBar,
     UploadNotification,
   },
   data: function () {
@@ -135,6 +134,9 @@ new Vue({
   computed: {
     projects() {
       return this.$store.state.projects;
+    },
+    currentUpload() {
+      return this.$store.state.currentUpload;
     },
     multipleProjects() {
       return this.$store.state.multipleProjects;
@@ -322,6 +324,15 @@ new Vue({
         }
       });
     delay(this.containerSyncWrapper, 10000);
+  },
+  mounted() {
+    document.getElementById("mainContainer")
+      .addEventListener("uploadComplete", () => {
+        this.$buefy.toast.open({
+          message: this.$t("message.upload.complete"),
+          type: "is-success",
+        });
+      });
   },
   methods: {
     containerSyncWrapper: function () {

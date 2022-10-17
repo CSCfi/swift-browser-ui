@@ -66,6 +66,7 @@ export default class EncryptedUploadSession {
     passphrase = "",
     ephemeral = true,
     store,
+    el,
   ) {
     this.active = active;
     this.project = project;
@@ -73,6 +74,7 @@ export default class EncryptedUploadSession {
     this.container = container;
     this.prefix = prefix;
     this.$store = store;
+    this.$el = el;
     this.ephemeral = ephemeral;
     this.receivers = receivers;
     this.pkey = pkey;
@@ -87,6 +89,12 @@ export default class EncryptedUploadSession {
     this.socket = undefined;
     this.headUrl = undefined;
     this.ingestUrl = undefined;
+
+    this.totalBytes = 0;
+    for (let f of this.files) {
+      this.totalBytes += f.size;
+    }
+    this.totalUploaded = 0;
 
     this.abortController = new AbortController();
   }
@@ -105,6 +113,7 @@ export default class EncryptedUploadSession {
           },
         );
         this.currentByte += 65536;
+        this.totalUploaded += 65536;
       });
     });
   }
@@ -150,7 +159,9 @@ export default class EncryptedUploadSession {
     });
   }
 
-  cancel() {
+  cancelUpload() {
+    this.finished = true;
+    this.files = [];
     this.socket.close();
     this.cleanUp();
   }
@@ -250,6 +261,10 @@ export default class EncryptedUploadSession {
             "updateEncryptedFileProgress",
             this.currentByte / this.currentTotalBytes,
           );
+          this.$store.commit(
+            "updateProgress",
+            this.totalUploaded / this.totalBytes,
+          );
           // Simplest way found for JS array -> binary conversion
           this.socket.send(JSON.stringify({
             iter: e.data.iter,
@@ -288,10 +303,8 @@ export default class EncryptedUploadSession {
             this.$store.commit("eraseEncryptedFileProgress");
             this.$store.commit("stopUploading");
             this.$store.commit("stopChunking");
-            this.$buefy.toast.open({
-              message: this.$t("message.upfinish"),
-              type: "is-success",
-            });
+            document.getElementById("subContainer")
+              .dispatchEvent(new Event("uploadComplete"));
             // Try if purging the upload session from inside the upload
             // session doesn't break anything
             this.$store.commit("eraseCurrentUpload");
