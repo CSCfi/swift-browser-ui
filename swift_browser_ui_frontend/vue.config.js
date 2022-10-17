@@ -4,6 +4,7 @@ const oidcEnabled = process.env.OIDC_ENABLED === "True";
 let vueConfig = {
   publicPath: "/static",
   devServer: {
+    allowedHosts: `${process.env.ALLOWED_HOSTS}`,
     proxy: {
       "/static":              {target: proxyTo},
       "/api":                 {target: proxyTo},
@@ -20,7 +21,7 @@ let vueConfig = {
       "/replicate":           {target: proxyTo},
     },
     client: {
-      webSocketURL: `ws://localhost:${process.env.PORT}/ws`,
+      webSocketURL: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,
     },
   },
   pages: {

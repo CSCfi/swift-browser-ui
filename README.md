@@ -144,6 +144,31 @@ Now you should be able to access the development server at localhost:8081. The l
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
+##### Trusted TLS
+Additionally, when testing with the encrypted upload features, browser
+features are used that **require** a trusted TLS connection. This can
+be achieved by using a development proxy server that can be built from
+files in the `devproxy` folder. The folder has it's own `README.md` file.
+
+Additional setup is required. You'll need to configure the following keys
+to point to whatever hostname will be used to access the service.
+Additionally you should allow all hosts, assuming your machine is in a
+secure network when developing. (recommended, a virtual machine behind
+NAT)
+```
+SWIFT_UI_FRONTEND_ALLOW_HOSTS=all
+SWIFT_UI_TLS_PORT=8443
+SWIFT_UI_TLS_HOST=hostname
+```
+
+After this, comment out the commands to run without trusted TLS in the
+`Procfile`, and uncomment the commands to run with trusted TLS.
+
+You should now be able to run the service with trusted TLS by running
+```bash
+honcho start
+```
+
 ##### OIDC login provider
 
 To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
@@ -192,19 +217,29 @@ The encryption requires an additional build step: you'll need to build the `wasm
 
 Build the image
 
-    docker buildx build -f dockerfiles/Dockerfile-build-crypt-devel -t swift-browser-ui:cryptfiles .
+```bash
+docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
+```
 
-Start a container
+Build the wasm files with provided container, which acts in practise
+like the make command in the specified folder. Available targets can be
+found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
+targets can be achieved with:
 
-    docker run --rm -it --name cryptfiles swift-browser-ui:cryptfiles
+```bash
+docker run --rm -it --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
+```
 
-From another terminal, copy the files from the container
+Copy these files into the static JS files built with the frontend.
 
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.js swift_browser_ui_frontend/dist/js
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.wasm swift_browser_ui_frontend/dist/js
+```bash
+cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
+```
 
-When you run `npm run build`, it removes the folder where you copied those files into, so you'll need to copy them every time you rebuild.
+These files will be integrated into the root folder of the built frontend.
 
+> NOTE: Remember that the encrypted upload features cannot be used without
+> having trusted TLS set up on all backend services.
 
 The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
 ```bash
