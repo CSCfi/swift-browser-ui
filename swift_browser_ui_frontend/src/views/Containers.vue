@@ -17,6 +17,7 @@
       >
         <SearchBox />
         <c-menu
+          :key="optionsKey"
           :items.prop="tableOptions"
           options-testid="table-options-selector"
         >
@@ -60,6 +61,7 @@ export default {
       currentPage: 1,
       shareModalIsActive: false,
       showTags: true,
+      optionsKey: 1,
       abortController: null,
       containers: { value: [] },
     };
@@ -74,6 +76,9 @@ export default {
       },
       set() {},
     },
+    locale() {
+      return this.$i18n.locale;
+    },
   },
   watch: {
     active: function () {
@@ -82,18 +87,12 @@ export default {
     project: function () {
       this.fetchContainers();
     },
+    locale: function () {
+      this.updateTableOptions();
+    },
   },
   created() {
-    this.tableOptions = [
-      {
-        name: "Hide tags",
-        action: () => {this.hideTags = !(this.hideTags);},
-      },
-      {
-        name: "Hide pagination",
-        action: () => {this.disablePagination = !(this.disablePagination);},
-      },
-    ];
+    this.updateTableOptions();
   },
   beforeMount() {
     this.abortController = new AbortController();
@@ -106,6 +105,29 @@ export default {
     this.abortController.abort();
   },
   methods: {
+    updateTableOptions: function () {
+      this.tableOptions = [
+        {
+          name: this.hideTags
+            ? this.$t("message.tableOptions.showTags")
+            : this.$t("message.tableOptions.hideTags"),
+          action: () => {
+            this.hideTags = !(this.hideTags);
+            this.updateTableOptions();
+          },
+        },
+        {
+          name: this.disablePagination
+            ? this.$t("message.tableOptions.showPagination")
+            : this.$t("message.tableOptions.hidePagination"),
+          action: () => {
+            this.hideTags = !(this.hideTags);
+            this.updateTableOptions();
+          },
+        },
+      ];
+      this.optionsKey++;
+    },
     fetchContainers: async function () {
       if (
         this.active.id === undefined &&
