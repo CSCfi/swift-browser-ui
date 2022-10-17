@@ -17,7 +17,7 @@
       </c-menu>
     </c-row>
     <ContainerTable
-      :conts="containers.value"
+      :conts="renderingContainers"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
     />
@@ -27,6 +27,7 @@
 <script>
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
+import { getSharingContainers } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable";
 import SearchBox from "@/components/SearchBox";
 
@@ -49,6 +50,7 @@ export default {
       optionsKey: 1,
       abortController: null,
       containers: { value: [] },
+      renderingContainers: [],
     };
   },
   computed: {
@@ -120,17 +122,38 @@ export default {
       ) {
         return;
       }
-      this.containers = useObservable(
+
+      const containers = useObservable(
         liveQuery(() =>
           this.$store.state.db.containers
             .where({ projectID: this.$route.params.project })
             .toArray(),
         ),
       );
+
+
       await this.$store.dispatch("updateContainers", {
         projectID: this.$route.params.project,
         signal: null,
       });
+
+      if (this.$route.name === "SharedFrom") {
+        const sharingContainers
+          = await getSharingContainers(this.$route.params.project);
+        this.renderingContainers = containers.value.filter(
+          cont => sharingContainers.some(item =>
+            item === cont.name,
+          ),
+        );
+      }
+
+      else if (this.$route.name === "SharedTo") {
+        this.renderingContainers = containers.value.filter(cont =>
+          cont.owner,
+        );
+      } else {
+        this.renderingContainers = containers.value;
+      }
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link

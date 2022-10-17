@@ -161,9 +161,36 @@ function extractTags(meta) {
   return [];
 }
 
-export async function getTagsForContainer(project, containerName, signal) {
-  let meta = await getContainerMeta(project, containerName, signal);
+export async function getTagsForContainer(
+  project, containerName, signal, owner) {
+  let meta = await getContainerMeta(project, containerName, signal, owner);
   return extractTags(meta);
+}
+
+function extractBytes(meta) {
+  if ("X-Container-Bytes-Used" in meta[1]) {
+    return meta[1]["X-Container-Bytes-Used"];
+  }
+  return "";
+}
+
+function extractObjectCount(meta) {
+  if ("X-Container-Object-Count" in meta[1]) {
+    return meta[1]["X-Container-Object-Count"];
+  }
+  return "";
+}
+
+export async function getMetadataForSharedContainer(
+  project,
+  containerName,
+  signal,
+  owner,
+) {
+  let meta = await getContainerMeta(project, containerName, signal, owner);
+  const bytes = extractBytes(meta);
+  const count = extractObjectCount(meta);
+  return { bytes: Number(bytes), count: Number(count) };
 }
 
 export async function getTagsForObjects(
@@ -172,6 +199,7 @@ export async function getTagsForObjects(
   objectList,
   url,
   signal,
+  owner,
 ) {
   let meta = await getObjectsMeta(
     project,
@@ -179,7 +207,9 @@ export async function getTagsForObjects(
     objectList,
     url,
     signal,
+    owner,
   );
+
   meta.map((item) => (item[1] = extractTags(item)));
   return meta;
 }
@@ -310,6 +340,6 @@ export function parseDateTime(locale, value) {
   ).format(date);
 
   // Replace Finnish "at" time indicator with comma
-  // English version defaults to comma 
+  // English version defaults to comma
   return dateTimeFormat.replace(" klo", ", ");
 }

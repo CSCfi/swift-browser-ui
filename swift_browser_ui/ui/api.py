@@ -260,8 +260,15 @@ async def _swift_get_object_metadata_wrapper(
     client = request.app["api_client"]
     project = request.match_info["project"]
     container = request.match_info["container"]
+
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
+
+    endpoint = session["projects"][project]["endpoint"]
     async with client.head(
-        f"{session['projects'][project]['endpoint']}/{container}/{obj}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}/{obj}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
@@ -307,13 +314,19 @@ async def swift_get_metadata_container(
     )
     project = request.match_info["project"]
     container = request.match_info["container"]
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
+
+    endpoint = session["projects"][project]["endpoint"]
     async with client.head(
-        f"{session['projects'][project]['endpoint']}/{container}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
     ) as ret:
-        headers = dict(filter(lambda i: "X-Container-Meta" in i[0], ret.headers.items()))
+        headers = ret.headers
     return aiohttp.web.json_response(
         [
             container,

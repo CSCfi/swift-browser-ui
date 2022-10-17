@@ -96,6 +96,7 @@ export async function getContainerMeta(
   project,
   container,
   signal,
+  owner = "",
 ) {
   // Get metadata for a given bucket, owned by a given project.
   let url = new URL(
@@ -104,6 +105,10 @@ export async function getContainerMeta(
       encodeURI(container)),
     document.location.origin,
   );
+  if (owner !== "") {
+    url.searchParams.append("owner", owner);
+  }
+
   let ret = await GET(url, signal);
   return await ret.json();
 }
@@ -145,6 +150,7 @@ export async function getObjects(
     objUrl.searchParams.append("owner", owner);
   }
   let objects = await GET(objUrl, signal);
+
   if (objects.status == 200) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
@@ -178,10 +184,15 @@ export async function getObjectsMeta (
   objects,
   url,
   signal,
+  owner = "",
 ){
   // Batch get metadata for a list of objects
   if (url === undefined) {
     url = makeGetObjectsMetaURL(project, container, objects);
+  }
+
+  if (owner !== "") {
+    url.searchParams.append("owner", owner);
   }
 
   let ret = await GET(url, signal);

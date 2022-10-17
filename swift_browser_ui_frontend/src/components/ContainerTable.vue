@@ -155,12 +155,22 @@ export default {
                   marginRight: "1rem",
                 },
                 onClick: () => {
-                  this.$router.push({
-                    name: "ObjectsView",
-                    params: {
-                      container: item.name,
-                    },
-                  });
+                  if(item.owner) {
+                    this.$router.push({
+                      name: "SharedObjects",
+                      params: {
+                        container: item.name,
+                        owner: item.owner,
+                      },
+                    });
+                  } else {
+                    this.$router.push({
+                      name: "ObjectsView",
+                      params: {
+                        container: item.name,
+                      },
+                    });
+                  }
                 },
               },
             },

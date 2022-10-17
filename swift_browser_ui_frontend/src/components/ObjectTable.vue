@@ -184,9 +184,9 @@ export default {
   },
   watch: {
     active: async function() {
-      this.getSharedContainers();
-      this.getFolderSharedStatus();
-      this.updateObjects();
+      await this.getSharedContainers();
+      await this.getFolderSharedStatus();
+      await this.updateObjects();
     },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -258,44 +258,46 @@ export default {
       this.sharedContainers = await getSharedContainers(this.active.id);
     },
     getFolderSharedStatus: async function() {
-      await this.$store.state.client.getShareDetails(
-        this.project,
-        this.container,
-      ).then(
-        async (ret) => {
-          if (ret.length > 0) {
-            ret.length === 1
-              ? this.sharedStatus
-                = this.$t("message.folderDetails.sharing_to_one_project")
-              : this.sharedStatus
-                = this.$t("message.folderDetails.sharing_to_many_projects");
-          }
-          else if (ret.length === 0) {
-            if (this.sharedContainers.findIndex(
-              cont => cont.container === this.container) > -1) {
-              this.isSharedFolder = true;
-              const sharedDetails
-                = await this.$store.state.client.getAccessDetails(
-                  this.project,
-                  this.container,
-                  this.$route.params.owner,
-                );
-              const accessRights = sharedDetails.access;
-              if (accessRights.length === 1) {
-                this.sharedStatus
-                  = this.$t("message.folderDetails.shared_with_read");
-              }
-              else if (accessRights.length > 1) {
-                this.sharedStatus
-                  = this.$t("message.folderDetails.shared_with_read_write");
-              }
-              this.ownerProject = sharedDetails.owner;
+      if (this.client) {
+        await this.client.getShareDetails(
+          this.project,
+          this.container,
+        ).then(
+          async (ret) => {
+            if (ret.length > 0) {
+              ret.length === 1
+                ? this.sharedStatus
+                  = this.$t("message.folderDetails.sharing_to_one_project")
+                : this.sharedStatus
+                  = this.$t("message.folderDetails.sharing_to_many_projects");
             }
-            else this.sharedStatus
-              = this.$t("message.folderDetails.notShared");
-          }
-        },
-      );
+            else if (ret.length === 0) {
+              if (this.sharedContainers.findIndex(
+                cont => cont.container === this.container) > -1) {
+                this.isSharedFolder = true;
+                const sharedDetails
+                  = await this.client.getAccessDetails(
+                    this.project,
+                    this.container,
+                    this.$route.params.owner,
+                  );
+                const accessRights = sharedDetails.access;
+                if (accessRights.length === 1) {
+                  this.sharedStatus
+                    = this.$t("message.folderDetails.shared_with_read");
+                }
+                else if (accessRights.length > 1) {
+                  this.sharedStatus
+                    = this.$t("message.folderDetails.shared_with_read_write");
+                }
+                this.ownerProject = sharedDetails.owner;
+              }
+              else this.sharedStatus
+                = this.$t("message.folderDetails.notShared");
+            }
+          },
+        );
+      }
     },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", true);

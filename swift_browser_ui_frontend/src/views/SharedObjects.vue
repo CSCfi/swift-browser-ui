@@ -1,5 +1,5 @@
 <template>
-  <div class="contents">
+  <div class="contents container-box">
     <ObjectTable />
   </div>
 </template>
@@ -9,6 +9,6 @@ import ObjectTable from "@/components/ObjectTable";
 
 export default {
   name: "SharedObjects",
-  components: {ObjectTable},
+  components: { ObjectTable },
 };
 </script>
