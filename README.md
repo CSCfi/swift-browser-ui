@@ -217,20 +217,29 @@ The encryption requires an additional build step: you'll need to build the `wasm
 
 Build the image
 
-    docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
+```bash
+docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
+```
 
 Build the wasm files with provided container, which acts in practise
 like the make command in the specified folder. Available targets can be
 found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
 targets can be achieved with:
 
-    docker run --rm -it --name build-encryption-module --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
+```bash
+docker run --rm -it --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
+```
 
 Copy these files into the static JS files built with the frontend.
 
-    cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
+```bash
+cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
+```
 
 These files will be integrated into the root folder of the built frontend.
+
+> NOTE: Remember that the encrypted upload features cannot be used without
+> having trusted TLS set up on all backend services.
 
 The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
 ```bash
