@@ -16,6 +16,7 @@ let vueConfig = {
       "/login/return":        {target: proxyTo},
       "/login/rescope":       {target: proxyTo},
       "/upload":              {target: proxyTo},
+      "/enupload":            {target: proxyTo},
       "/download":            {target: proxyTo},
       "/sign":                {target: proxyTo},
       "/replicate":           {target: proxyTo},
@@ -85,7 +86,7 @@ let vueConfig = {
       entry: "src/entries/login.js",
       template: "public/index.html",
       filename: "login.html",
-      title: "Swift browser UI – Login",
+      title: "Swift browser UI – Login",
       chunks: ["chunk-vendors", "chunk-common", "login"],
     },
     loginpassword: {

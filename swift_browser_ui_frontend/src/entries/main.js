@@ -54,7 +54,7 @@ checkIDB().then(result => {
 
 if ("serviceWorker" in navigator) {
   let workerUrl = new URL(
-    "/static/libupload.js",
+    "/libupload.js",
     document.location.origin,
   );
   let ping = (navigator.serviceWorker.controller == null);

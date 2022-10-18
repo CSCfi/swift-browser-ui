@@ -17,15 +17,16 @@ long as it has been added to whatever browser you're testing with.
 Change localhost in `nginx.conf` if you want to e.g. specify an IP
 address.
 
-```
-$ docker build -f Dockerfile-nginx -t swiftui-dev-proxy .
+```bash
+docker build -f Dockerfile-nginx -t swift-browser-ui:swiftui-dev-proxy .
 ```
 
 ### Wasm dependency install
-A dockerfile for building an emsdk container with required dependencies
+A dockerfile for building an `emsdk` container with required dependencies
 is provided in `Dockerfile-emsdk-deps`. It can be used by
-```
-$ docker buildx build -f Dockerfile-emsdk-deps -t wasmbuilder .
+
+```bash
+docker buildx build -f Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder .
 ```
 
 ### Usage

@@ -21,6 +21,7 @@ cryptfiles
 csc
 cscfi
 devel
+devenv
 Dockerfile
 dockerfiles
 drag'n'drop

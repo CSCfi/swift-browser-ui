@@ -148,17 +148,42 @@ This configuration has both frontend and backend servers running with code reloa
 Additionally, when testing with the encrypted upload features, browser
 features are used that **require** a trusted TLS connection. This can
 be achieved by using a development proxy server that can be built from
-files in the `devproxy` folder. The folder has it's own `README.md` file.
+files in the `devproxy` folder. [The proxy has it's own instructions for building.](devproxy/README.md)
 
-Additional setup is required. You'll need to configure the following keys
-to point to whatever hostname will be used to access the service.
-Additionally you should allow all hosts, assuming your machine is in a
-secure network when developing. (recommended, a virtual machine behind
-NAT)
+This guide assumes you're using `devenv` as the domain name. Replace this
+with the domain you're certificate sings, and if necessary, add it to
+`/etc/hosts` so it's resolvable both in docker, and locally.
+
+Additional setup is required in your environment file. You'll need to 
+configure the following keys to point to whatever hostname will be used
+to access the service. Additionally you should allow all hosts, assuming
+your machine is in a secure network when developing. In case you trust
+your network and want as easy of a setup as possible, you can use all to
+greenlight all hosts for access.
+
 ```
-SWIFT_UI_FRONTEND_ALLOW_HOSTS=all
+SWIFT_UI_FRONTEND_ALLOW_HOSTS=devenv
 SWIFT_UI_TLS_PORT=8443
 SWIFT_UI_TLS_HOST=hostname
+```
+
+Additionally you'll need to configure the endpoints to be correct, so that
+the backend APIs work as intended.
+```
+BROWSER_START_SHARING_ENDPOINT_URL=https://devenv:8443/sharing
+BROWSER_START_SHARING_INT_ENDPOINT_URL=http://localhost:9090
+BROWSER_START_REQUEST_ENDPOINT_URL=https://devenv:8443/request
+BROWSER_START_REQUEST_INT_ENDPOINT_URL=http://localhost:9091
+BROWSER_START_RUNNER_ENDPOINT=http://localhost:9092
+BROWSER_START_RUNNER_EXT_ENDPOINT=https://devenv:8443/runner
+```
+
+If your Docker network does not match the default, you'll need to change the
+network configuration to make the proxy aware of the backend services. The
+environment network defaults to the default Docker network, which is:
+```
+DOCKER_NETWORK_SEGMENT=172.17.0.0/24
+DOCKER_NETWORK_GATEWAY=172.17.0.1
 ```
 
 After this, comment out the commands to run without trusted TLS in the
