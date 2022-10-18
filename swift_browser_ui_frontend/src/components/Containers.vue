@@ -4,7 +4,7 @@
       id="optionsbar"
       justify="space-between"
     >
-      <SearchBox />
+      <SearchBox :containers="renderingContainers"/>
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
@@ -130,7 +130,6 @@ export default {
             .toArray(),
         ),
       );
-
 
       await this.$store.dispatch("updateContainers", {
         projectID: this.$route.params.project,

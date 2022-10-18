@@ -116,6 +116,7 @@ export default {
     async getPage () {
       let offset = 0;
       let limit = this.conts.length;
+
       if (!this.disablePagination || this.conts.length > 500) {
         offset =
           this.paginationOptions.currentPage
@@ -141,6 +142,21 @@ export default {
         items,
         item,
       ) => {
+        // Copy button inside Options
+        const copyButton = {
+          name: this.$t("message.copy"),
+          action: (() => {
+            this.$router.push({
+              name: "ReplicateContainer",
+              params: {
+                container: item.name,
+                project: item.projectID,
+                from: item.from ? item.from : item.projectID,
+              },
+            });
+          }),
+          disabled: !item.bytes ? true : false,
+        };
         items.push({
           name: {
             value: truncate(item.name),
@@ -227,42 +243,43 @@ export default {
                   },
                 },
               },
-              {
-                value: this.$t("message.share.share"),
-                component: {
-                  tag: "c-button",
-                  params: {
-                    text: true,
-                    size: "small",
-                    title: this.$t("message.share.share"),
-                    path: mdiShareVariantOutline,
-                    onClick: (item) => {
-                      this.$store.commit("toggleShareModal", true);
-                      this.$store.commit("setFolderName", item.data.name.value);
+              // Share button is disabled for Shared (with you) Folders
+              item.owner ?
+                {
+                  value: null,
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      disabled: true,
+                    },
+                  },
+                } :
+                {
+                  value: this.$t("message.share.share"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.share.share"),
+                      path: mdiShareVariantOutline,
+                      onClick: (item) => {
+                        this.$store.commit("toggleShareModal", true);
+                        this.$store.commit(
+                          "setFolderName", item.data.name.value);
+                      },
                     },
                   },
                 },
-              },
               {
                 value: null,
                 component: {
                   tag: "c-menu",
                   params: {
-                    items: [
-                      {
-                        name: this.$t("message.copy"),
-                        action: (() => {
-                          this.$router.push({
-                            name: "ReplicateContainer",
-                            params: {
-                              container: item.name,
-                              project: item.projectID,
-                              from: item.from ? item.from : item.projectID,
-                            },
-                          });
-                        }),
-                        disabled: !item.bytes ? true : false,
-                      },
+                    items: item.owner ? [ copyButton ] : [
+                      copyButton,
                       {
                         name: this.$t("message.editTags"),
                         action: () => toggleCreateFolderModal(item.name),

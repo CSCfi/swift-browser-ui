@@ -5,16 +5,13 @@
     <c-row>
       <router-link
         class="back-link"
-        :to="{
-          name: 'AllFolders',
-          params: {
-            user: $store.state.uname,
-            project: $store.state.active.id,
-          }
-        }"
+        :to="getRedirectRoutes()"
       >
         <i class="mdi mdi-chevron-left" />
-        Back to all folders
+        {{ isSharingFolder ? $t("message.table.back_to_sharing_folders")
+            : isSharedFolder ? $t("message.table.back_to_shared_folders")
+                           : $t("message.table.back_to_all_folders")
+        }}
       </router-link>
     </c-row>
 
@@ -23,26 +20,26 @@
         <i class="mdi mdi-folder-outline" />
         <span>{{ container }}</span>
       </div>
-
       <ul class="folder-details">
         <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
-          {{ sharedStatus }}
+          {{ $t(sharedStatus) }}&nbsp;
           <c-link
-            v-show="!sharedStatus"
+            v-show="!isSharedFolder"
             underline
             @click="toggleShareModal"
           >
-            Edit sharing
+           {{ $t("message.table.edit_sharing") }}
           </c-link>
         </li>
         <li v-show="isSharedFolder">
-          <b>{{ $t("message.table.created") }}: </b>
+          <b>{{ $t("message.table.source_project_id") }}: </b>
           {{ ownerProject }}
         </li>
-        <!--<li>
-          <b>{{ $t("message.table.source_project_id") }}: </b> N/A
-        </li>-->
+        <li v-show="isSharedFolder">
+          <b>{{ $t("message.table.date_of_sharing") }}: </b>
+          {{ dateOfSharing }}
+        </li>
       </ul>
     </div>
 
@@ -101,13 +98,13 @@
         </span>
       </c-menu>
     </c-row>
-
     <CObjectTable
       :objs="filteredObjects.length ? filteredObjects : oList.value"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
+      @change-folder="changeFolder"
       @selected-rows="handleSelection"
       @delete-object="confirmDelete([$event])"
     />
@@ -134,10 +131,12 @@ export default {
   },
   data: function () {
     return {
+      isSharingFolder: false,
       isSharedFolder: false,
       sharedStatus: "",
       sharedContainers: [],
       ownerProject: "",
+      dateOfSharing: "",
       oList: {value: []},
       selected: undefined,
       disablePagination: false,
@@ -254,6 +253,26 @@ export default {
     this.abortController.abort();
   },
   methods: {
+    getRedirectRoutes: function () {
+      if (this.isSharingFolder) {
+        return {
+          name: "SharedFrom",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+      else if (this.isSharedFolder) {
+        return {
+          name: "SharedTo",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+      else {
+        return {
+          name: "AllFolders",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+    },
     getSharedContainers: async function () {
       this.sharedContainers = await getSharedContainers(this.active.id);
     },
@@ -265,11 +284,12 @@ export default {
         ).then(
           async (ret) => {
             if (ret.length > 0) {
+              this.isSharingFolder = true;
               ret.length === 1
                 ? this.sharedStatus
-                  = this.$t("message.folderDetails.sharing_to_one_project")
+                  = "message.folderDetails.sharing_to_one_project"
                 : this.sharedStatus
-                  = this.$t("message.folderDetails.sharing_to_many_projects");
+                  = "message.folderDetails.sharing_to_many_projects";
             }
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
@@ -281,19 +301,21 @@ export default {
                     this.container,
                     this.$route.params.owner,
                   );
+
                 const accessRights = sharedDetails.access;
                 if (accessRights.length === 1) {
                   this.sharedStatus
-                    = this.$t("message.folderDetails.shared_with_read");
+                    = "message.folderDetails.shared_with_read";
                 }
                 else if (accessRights.length > 1) {
                   this.sharedStatus
-                    = this.$t("message.folderDetails.shared_with_read_write");
+                    = "message.folderDetails.shared_with_read_write";
                 }
                 this.ownerProject = sharedDetails.owner;
+                this.dateOfSharing = sharedDetails.sharingDate;
               }
               else this.sharedStatus
-                = this.$t("message.folderDetails.notShared");
+                = "message.folderDetails.notShared";
             }
           },
         );
