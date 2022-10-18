@@ -43,6 +43,9 @@ import Resumable from "resumablejs";
 // Upload progress button
 import ProgressBar from "@/components/UploadProgressBar";
 
+//Custom footer element
+import CFooter from "@/components/CFooter";
+
 // Import delay
 import delay from "lodash/delay";
 
@@ -101,6 +104,7 @@ new Vue({
     CreateFolderModal,
     UploadModal,
     ProgressBar,
+    CFooter,
   },
   data: function () {
     return {

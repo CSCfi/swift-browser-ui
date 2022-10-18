@@ -59,23 +59,7 @@
         </c-container>
       </c-flex>
     </c-row>
-    <footer>
-      <c-container>
-        <c-flex>
-          <div>
-            <h5>CSC - IT Center for Science Ltd.</h5>
-            <p>P.O. Box 405 FI-02101 Espoo, Finland</p>
-            <p>+358 9 457 2001</p>
-          </div>
-          <div>
-            <h5>Service Desk</h5>
-            <p>Open Monday to Friday from 8.30 a.m. to 4 p.m.</p>
-            <p>+358 9 457 2821</p>
-            <p>servicedesk@csc.fi</p>
-          </div>
-        </c-flex>
-      </c-container>
-    </footer>
+   
   </c-main>
 </template>
 
