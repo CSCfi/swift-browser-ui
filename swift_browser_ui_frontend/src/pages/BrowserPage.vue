@@ -51,25 +51,6 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <footer
-        id="footer"
-        class="footer"
-      >
-        <div class="content has-text-centered">
-          <p>
-            <span class="has-text-weight-bold">
-              {{ $t("message.program_name") }}
-            </span>
-            {{ $t("message.devel") }}
-            <a
-              href="https://csc.fi"
-              :alt="$t('message.cscOrg')"
-            >{{
-              $t("message.cscOrg")
-            }}</a>
-          </p>
-        </div>
-      </footer>
       <c-toasts id="toasts" />
       <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts
@@ -85,6 +66,7 @@
           </p>
         </div>
       </c-toasts>
+      <CFooter/>
     </div>
   </div>
 </template>
@@ -92,11 +74,13 @@
 <script>
 import { truncate } from "@/common/conv";
 
+
 export default {
   name: "BrowserPage",
   filters: {
     truncate,
   },
+  
 };
 </script>
 
@@ -267,15 +251,6 @@ c-modal {
   border-radius: 6px;
 }
 
-.footer {
-  flex-shrink: 0;
-  height: 10rem;
-  width: 100%;
-}
-
-#footer {
-  margin-top: 15px;
-}
 
 #copyFolder-toasts {
   position: sticky;

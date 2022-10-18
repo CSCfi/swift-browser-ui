@@ -451,6 +451,12 @@ let default_translations = {
         sharing: "Sharing API tokens",
         about: "About Sensitive Data Services",
       },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Service-SD Connect",
+        csc:"Powered by CSC -IT Center for Science Ltd",
+        servicedescription: "Service Description",
+        accessibility:"Accessibility",
+      },
     },
   },
   fi: {
