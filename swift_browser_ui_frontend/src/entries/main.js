@@ -49,6 +49,9 @@ import UploadNotification from "@/components/UploadNotification";
 //Custom footer element
 import CFooter from "@/components/CFooter";
 
+//Custom footer element
+import CFooter from "@/components/CFooter";
+
 // Import delay
 import delay from "lodash/delay";
 

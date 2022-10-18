@@ -1,40 +1,30 @@
 <template>
-  <div id="c-footer">
+    <div id="c-footer">
     <div class="">
-      <div class="navbar-menu">
-        <div class="navbar-start">
-          <div class="col-3">
-            <div class="row">
-              <span class="largetext">
+          <p>
+            <span class="leftmenu">
               {{ $t("message.footerMenu.groupandprogram") }}
             </span>
-            </div>
-            <div class=" row smalltext">
-              <a class="linktext"
+            {{ $t("message.devel") }}
+            </p>
+            <p>
+            <a
               href="https://csc.fi"
               :alt="$t('message.footerMenu.csc')"
             >{{
               $t("message.footerMenu.csc")
             }}</a>
-            </div>
-          </div>        
+          </p>
         </div>
-        <div class="navbar-end" id="rightmenu">
-            <div class="navbar-item smalltext">
-                <a class="linktext"
-              href="https://research.csc.fi/-/sd-connect"
-              :alt="$t('message.footerMenu.servicedescription')"
-            >{{
-              $t("message.footerMenu.servicedescription")
-            }}</a>
-          </div> 
-          <div class="navbar-item smalltext">
-            <p>{{ $t("message.footerMenu.accessibility") }}</p> 
-          </div>
+        <div>
+          <p>
+            <span class="rightmenu">
+              {{ $t("message.footerMenu.servicedescription") }}
+            </span>
+          </p>
+          <p>{{ $t("message.footerMenu.accessibility") }}</p>
         </div>
         </div>
-      </div>
-    </div>
 </template>
 
 <script>
@@ -49,39 +39,19 @@ export default {
 
 #c-footer{
   flex-shrink: 0;
-  height:  8rem;
+  height: 130px;
   width: 100%;
-  padding:40px 60px;
+  padding:40px 60px 40px ;
   background-color:#DFE1E3;
-  z-index: 2;
-}
-.largetext{
-  font-family: var(--csc-font-family);
-  font-style: normal;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 19px;
+  margin-top:40px;
   color: #595959;
+  font: Museo Sans;
+  
 }
-.smalltext{
-  font-family:  var(--csc-font-family);;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 18px;
-  color: #595959;
+.leftmenu{
+  text-align:left;
 }
-.linktext {
-  color: #595959; 
-  font-weight: 400;
+.rightmenu{
+  text-align: right;
 }
-a:hover {
-  background-color: #CCF4F0;
-  text-decoration: underline;     
-}
-
-#rightmenu{
-  margin-top: 15px;
-}
-
 </style>
