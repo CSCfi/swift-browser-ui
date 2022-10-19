@@ -26,8 +26,10 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <CFooter/>
     </div>
+    <div id="footer">
+      <CFooter/>
+    </div> 
   </div>
 </template>
 
@@ -209,6 +211,12 @@ c-modal {
   margin: 0 1%;
   padding: 0;
   border-radius: 6px;
+}
+
+#footer{
+  position:absolute;
+  bottom:0;
+  width: 100%;
 }
 
 </style>
