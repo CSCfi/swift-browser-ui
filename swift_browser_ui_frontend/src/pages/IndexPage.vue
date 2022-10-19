@@ -93,32 +93,22 @@
         </c-container>
       </c-flex>
     </c-row>
-    <footer>
-      <c-container>
-        <c-flex>
-          <div>
-            <h5>CSC - IT Center for Science Ltd.</h5>
-            <p>P.O. Box 405 FI-02101 Espoo, Finland</p>
-            <p>+358 9 457 2001</p>
-          </div>
-          <div>
-            <h5>Service Desk</h5>
-            <p>Open Monday to Friday from 8.30 a.m. to 4 p.m.</p>
-            <p>+358 9 457 2821</p>
-            <p>servicedesk@csc.fi</p>
-          </div>
-        </c-flex>
-      </c-container>
-    </footer>
-  </c-main>
+    <div id="footer">
+      <CFooter/>
+    </div>
+ </c-main>
 </template>
 
 <script>
 import checkIDB from "@/common/idb_support";
+import CFooter from "@/components/CFooter.vue";
 
 export default {
-  mounted: function() {
+  mounted: function () {
     checkIDB().then(result => this.idb = result);
+  },
+  components:{
+    CFooter,
   },
 };
 </script>
@@ -144,25 +134,11 @@ c-login-card {
 c-button {
   margin-top: 2rem;
 }
-footer {
-  background-color: var(--csc-light-grey);
-  color: var(--csc-dark-grey);
-  padding: 1rem 0 1rem;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+
+#footer{
+  position:absolute;
+  bottom:0;
+  width:100%;
 }
-footer h5 {
-  font-weight: bold;
-}
-footer p {
-  font-size: 0.875rem;
-  line-height: 1rem;
-}
-footer c-flex {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
-}
+
 </style>

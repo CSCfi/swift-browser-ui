@@ -59,7 +59,7 @@
         </c-container>
       </c-flex>
     </c-row>
-   
+    <CFooter/>
   </c-main>
 </template>
 
@@ -75,26 +75,5 @@ c-login-card {
 }
 c-button {
   margin-top: 2rem;
-}
-footer {
-  background-color: var(--csc-light-grey);
-  color: var(--csc-dark-grey);
-  padding: 1rem 0 1rem;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-footer h5 {
-  font-weight: bold;
-}
-footer p {
-  font-size: 0.875rem;
-  line-height: 1rem;
-}
-footer c-flex {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
 }
 </style>

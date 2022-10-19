@@ -68,6 +68,9 @@
       </c-toasts>
       <CFooter/>
     </div>
+    <div id="footer">
+      <CFooter/>
+    </div> 
   </div>
 </template>
 
@@ -251,7 +254,6 @@ c-modal {
   border-radius: 6px;
 }
 
-
 #copyFolder-toasts {
   position: sticky;
   bottom: 30vh;
@@ -260,4 +262,11 @@ c-modal {
 .toasts-wrapper {
   padding: 1rem;
 }
+
+#footer{
+  position:absolute;
+  bottom:0;
+  width: 100%;
+}
+
 </style>
