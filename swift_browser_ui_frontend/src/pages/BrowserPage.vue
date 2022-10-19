@@ -265,4 +265,11 @@ c-modal {
 .toasts-wrapper {
   padding: 1rem;
 }
+
+#footer{
+  position:absolute;
+  bottom:0;
+  width: 100%;
+}
+
 </style>

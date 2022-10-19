@@ -136,10 +136,9 @@ c-button {
 }
 
 #footer{
-  position:fixed;
+  position:absolute;
   bottom:0;
   width:100%;
-  z-index: 2;
 }
 
 </style>
