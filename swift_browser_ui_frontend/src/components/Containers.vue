@@ -74,8 +74,10 @@ export default {
     project: function () {
       this.fetchContainers();
     },
-    locale: function () {
-      this.updateTableOptions();
+    openShareModal: function () {
+      if(!this.openShareModal) {
+        this.fetchContainers();
+      }
     },
   },
   created() {
