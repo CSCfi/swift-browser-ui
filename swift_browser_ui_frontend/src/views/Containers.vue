@@ -121,7 +121,7 @@ export default {
             ? this.$t("message.tableOptions.showPagination")
             : this.$t("message.tableOptions.hidePagination"),
           action: () => {
-            this.hideTags = !(this.hideTags);
+            this.disablePagination = !(this.disablePagination);
             this.updateTableOptions();
           },
         },
