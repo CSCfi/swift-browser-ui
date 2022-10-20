@@ -27,6 +27,7 @@ import {
   toggleCreateFolderModal,
   getSharingContainers,
   getSharedContainers,
+  toggleCopyFolderModal,
 } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
 
@@ -278,8 +279,12 @@ export default {
                 component: {
                   tag: "c-menu",
                   params: {
-                    items: item.owner ? [ copyButton ] : [
-                      copyButton,
+                    items: [
+                      {
+                        name: this.$t("message.copy"),
+                        action: (() => toggleCopyFolderModal(item.name)),
+                        disabled: !item.bytes ? true : false,
+                      },
                       {
                         name: this.$t("message.editTags"),
                         action: () => toggleCreateFolderModal(item.name),
