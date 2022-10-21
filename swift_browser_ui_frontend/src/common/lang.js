@@ -891,6 +891,12 @@ let default_translations = {
         sharing: "API avainten jakaminen",
         about: "Tietoa",
       },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Service-SD Connect",
+        csc:"Powered by CSC -Tieteen Tietotekniikkakeskus Oy",
+        servicedescription: "Palvelun Kuvaus",
+        accessibility:"Saavutettavuus",
+      },
     },
   },
 };
