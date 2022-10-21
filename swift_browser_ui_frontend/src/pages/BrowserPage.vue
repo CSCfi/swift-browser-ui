@@ -69,9 +69,11 @@
       <CFooter/>
     </div>
     <div id="footer">
+   </div>
+   <div id="footer">
       <CFooter/>
-    </div> 
-  </div>
+  </div> 
+</div>
 </template>
 
 <script>
@@ -264,7 +266,7 @@ c-modal {
 }
 
 #footer{
-  position:absolute;
+  position:fixed;
   bottom:0;
   width: 100%;
 }
