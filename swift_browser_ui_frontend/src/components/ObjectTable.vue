@@ -79,6 +79,7 @@
       </div>
 
       <c-menu
+        :key="optionsKey"
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
@@ -128,6 +129,7 @@ export default {
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
+      optionsKey: 1,
       abortController: null,
       filteredObjects: [],
       inCurrentFolder: [],
@@ -593,6 +595,7 @@ export default {
           },
         },
       ];
+      this.optionsKey++;
     },
     setSelectionActionButtons() {
       this.selectionActionButtons = [
