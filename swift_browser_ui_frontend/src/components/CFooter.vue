@@ -10,7 +10,6 @@
             </span>
             </div>
             <div class=" row smalltext">
-              {{ $t("message.devel") }}
               <a class="linktext"
               href="https://csc.fi"
               :alt="$t('message.footerMenu.csc')"
