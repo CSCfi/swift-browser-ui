@@ -20,9 +20,9 @@
             </div>
           </div>        
         </div>
-        <div class="navbar-end">
-          <div class="navbar-item smalltext">
-            <a class="linktext"
+        <div class="navbar-end" id="rightmenu">
+            <div class="navbar-item smalltext">
+                <a class="linktext"
               href="https://research.csc.fi/-/sd-connect"
               :alt="$t('message.footerMenu.servicedescription')"
             >{{
@@ -33,9 +33,9 @@
             <p>{{ $t("message.footerMenu.accessibility") }}</p> 
           </div>
         </div>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -74,6 +74,10 @@ export default {
 }
 .linktext {
   color: #595959; 
+}
+
+#rightmenu{
+  margin-top: 15px;
 }
 
 </style>
