@@ -893,7 +893,7 @@ let default_translations = {
       },
       footerMenu:{
         groupandprogram:"Sensitive Data Service-SD Connect",
-        csc:"Powered by CSC -Tieteen Tietotekniikkakeskus Oy",
+        csc:"Palvelun tuottaa CSC -Tieteen Tietotekniikkakeskus Oy",
         servicedescription: "Palvelun Kuvaus",
         accessibility:"Saavutettavuus",
       },
