@@ -270,6 +270,9 @@ c-modal {
   position:fixed;
   bottom:0;
   width: 100%;
+  flex-shrink: 0;
+  margin-top: 15px;
+  z-index: 2;
 }
 
 </style>
