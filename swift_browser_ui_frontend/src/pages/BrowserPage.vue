@@ -62,6 +62,7 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .subContainer-additionalStyles {
@@ -217,6 +218,9 @@ c-modal {
   position:fixed;
   bottom:0;
   width: 100%;
+  flex-shrink: 0;
+  margin-top: 15px;
+  z-index: 2;
 }
 
 </style>

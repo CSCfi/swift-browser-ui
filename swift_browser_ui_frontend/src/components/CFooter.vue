@@ -49,11 +49,11 @@ export default {
 
 #c-footer{
   flex-shrink: 0;
-  height: 130px;
+  height:  10rem;
   width: 100%;
   padding:40px 60px;
   background-color:#DFE1E3;
-  margin-top:40px; 
+  z-index: 2;
 }
 .largetext{
   font-family: 'Museo Sans';
