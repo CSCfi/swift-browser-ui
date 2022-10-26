@@ -24,6 +24,13 @@
         v-if="displayUploadNotification"
         @cancel-upload="currentUpload.cancelUpload()"
       />
+      <c-modal
+        v-control
+        v-csc-model="openEditTagsModal"
+        width="64vw"
+      >
+        <EditTagsModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"

@@ -102,8 +102,8 @@ export default {
     this.handlePaginationText();
   },
   methods: {
-    getSharingContainers() {
-      return this.sharingClient && this.active
+    async getSharingContainers() {
+      return this.sharingClient
         ? this.sharingClient.getShare(this.active.id)
         : [];
     },

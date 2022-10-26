@@ -7,6 +7,14 @@ export function toggleCreateFolderModal(folderName) {
   }
 }
 
+export function toggleEditTagsModal(object) {
+  store.commit("toggleEditTagsModal", true);
+  const objectName = object.name.value;
+  if (objectName) {
+    store.commit("setObjectName", objectName);
+  }
+}
+
 export function modifyBrowserPageStyles() {
   const element = document.getElementById("subContainer");
   element.classList.toggle("subContainer-additionalStyles");

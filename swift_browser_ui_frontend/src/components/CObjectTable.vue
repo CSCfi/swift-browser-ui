@@ -26,6 +26,11 @@ import {
   sortObjects,
   parseDateTime,
 } from "@/common/conv";
+
+import {
+  toggleEditTagsModal,
+} from "@/common/globalFunctions";
+
 import { mdiTrayArrowDown, mdiPencilOutline, mdiDeleteOutline } from "@mdi/js";
 
 export default {
@@ -191,10 +196,7 @@ export default {
                     size: "small",
                     title: "Edit tags",
                     path: mdiPencilOutline,
-                    onClick: () => {
-                      this.$router
-                        .push(this.getEditRoute(this.container, item.name));
-                    },
+                    onClick: ({ data }) => toggleEditTagsModal(data),
                   },
                 },
               },
