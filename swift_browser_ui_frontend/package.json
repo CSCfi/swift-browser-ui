@@ -48,7 +48,7 @@
     "csc-ui": "^0.4.44",
     "csc-ui-vue-directive": "^0.0.4",
     "cypress": "^10.3.0",
-    "eslint": "^8.18.0",
+    "eslint": "^8.26.0",
     "eslint-plugin-vue": "^9.1.1",
     "eslint-utils": "^3.0.0",
     "jest": "^27.0.5",
