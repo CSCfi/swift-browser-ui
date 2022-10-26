@@ -4,6 +4,7 @@ const oidcEnabled = process.env.OIDC_ENABLED === "True";
 let vueConfig = {
   publicPath: "/static",
   devServer: {
+    allowedHosts: `${process.env.ALLOWED_HOSTS}`,
     proxy: {
       "/static":              {target: proxyTo},
       "/api":                 {target: proxyTo},
@@ -15,12 +16,13 @@ let vueConfig = {
       "/login/return":        {target: proxyTo},
       "/login/rescope":       {target: proxyTo},
       "/upload":              {target: proxyTo},
+      "/enupload":            {target: proxyTo},
       "/download":            {target: proxyTo},
       "/sign":                {target: proxyTo},
       "/replicate":           {target: proxyTo},
     },
     client: {
-      webSocketURL: `ws://localhost:${process.env.PORT}/ws`,
+      webSocketURL: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,
     },
   },
   pages: {
@@ -84,7 +86,7 @@ let vueConfig = {
       entry: "src/entries/login.js",
       template: "public/index.html",
       filename: "login.html",
-      title: "Swift browser UI – Login",
+      title: "Swift browser UI – Login",
       chunks: ["chunk-vendors", "chunk-common", "login"],
     },
     loginpassword: {

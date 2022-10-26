@@ -40,8 +40,8 @@ import "@/css/prod.scss";
 // Import resumable
 import Resumable from "resumablejs";
 
-// Upload progress button
-import ProgressBar from "@/components/UploadProgressBar";
+// Upload notification handler
+import UploadNotification from "@/components/UploadNotification";
 
 // Import delay
 import delay from "lodash/delay";
@@ -52,8 +52,32 @@ checkIDB().then(result => {
   }
 });
 
-window.onerror = function (error) {
-  if (DEV) console.log("Global error", error);
+if ("serviceWorker" in navigator) {
+  let workerUrl = new URL(
+    "/libupload.js",
+    document.location.origin,
+  );
+  let ping = (navigator.serviceWorker.controller == null);
+  navigator.serviceWorker.register(workerUrl).then(reg => {
+    reg.update();
+    if (ping) {
+      console.log("Pinging first serviceWorker.");
+      navigator.serviceWorker.ready.then(reg => {
+        reg.active.postMessage({
+          cmd: "pingWasm",
+        });
+      });
+    }
+  }).catch((err) => {
+    console.log("Failed to register service worker.");
+    console.log(err);
+  });
+} else {
+  if(DEV) console.log("Did not register Service Worker.");
+}
+
+window.onerror = function(error) { 
+  if(DEV) console.log("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
   if (DEV) console.log("unhandledrejection", event);
@@ -100,7 +124,7 @@ new Vue({
     BrowserSecondaryNavbar,
     CreateFolderModal,
     UploadModal,
-    ProgressBar,
+    UploadNotification,
   },
   data: function () {
     return {
@@ -110,6 +134,9 @@ new Vue({
   computed: {
     projects() {
       return this.$store.state.projects;
+    },
+    currentUpload() {
+      return this.$store.state.currentUpload;
     },
     multipleProjects() {
       return this.$store.state.multipleProjects;
@@ -135,7 +162,10 @@ new Vue({
     isUploading() {
       return this.$store.state.isUploading;
     },
-    resumableClient() {
+    displayUploadNotification () {
+      return this.$store.state.uploadNotification;
+    },
+    resumableClient () {
       return this.$store.state.resumableClient;
     },
     altContainer() {
@@ -162,6 +192,24 @@ new Vue({
   },
   created() {
     document.title = this.$t("message.program_name");
+
+    navigator.serviceWorker.addEventListener("message", e => {
+      if (e.data.eventType == "wasmReady") {
+        this.$buefy.snackbar.open({
+          message:
+            "Encryption engine is ready. Hit refresh to refresh the " +
+            "window to enable encryption.",
+          type: "is-success",
+          position: "is-top",
+          actionText: "Refresh",
+          indefinite: true,
+          onAction: () => {
+            location.reload();
+          },
+        });
+      }
+    });
+
     this.createUploadInstance();
     let initialize = async () => {
       let active;
@@ -277,35 +325,59 @@ new Vue({
       });
     delay(this.containerSyncWrapper, 10000);
   },
+  mounted() {
+    document.getElementById("mainContainer")
+      .addEventListener("uploadComplete", () => {
+        this.$buefy.toast.open({
+          message: this.$t("message.upload.complete"),
+          type: "is-success",
+        });
+      });
+  },
   methods: {
     containerSyncWrapper: function () {
       syncContainerACLs(this.$store.state.client, this.$store.state.active.id);
     },
     // Following are the methods used for resumablejs, as the methods
     // need to have access to the vue instance.
-    addFileToast: function () {
-      this.$buefy.toast.open({
-        message: "File / files scheduled for upload.",
-        type: "is-success",
-      });
-      if (!this.isUploading) {
+    addFile: function () {
+      if(!this.isUploading) {
         this.resumableClient.upload();
       }
     },
     fileSuccessToast: function (file) {
-      this.$buefy.toast.open({
-        message: this.$t("message.upfinish").concat(file.fileName),
-        type: "is-success",
+      this.removeUploadToast();
+
+      document.querySelector("#toasts").addToast({
+        id: "file-success",
+        type: "success",
+        progress: false,
+        horizontal: "center",
+        message: this.$t("message.upload.upfinish").concat(file.fileName),
       });
+
       if (this.$route.params.container != undefined) {
         this.$store.dispatch("updateObjects", { route: this.$route });
       }
     },
     fileFailureToast: function (file) {
-      this.$buefy.toast.open({
-        message: this.$t("message.upfail").concat(file.fileName),
-        type: "is-danger",
+      this.removeUploadToast();
+
+      document.querySelector("#toasts").addToast({
+        id: "file-failure",
+        type: "error",
+        progress: false,
+        horizontal: "center",
+        message: this.$t("message.upload.upfail").concat(file.fileName),
       });
+    },
+    removeUploadToast () {
+      const uploadToast = document.querySelector("#upload-toast");
+      if (uploadToast) {
+        document.querySelector("#upload-toast").removeToast("upload-toast");
+      }
+      
+      this.$store.commit("toggleUploadNotification", false);
     },
     getUploadUrl: function (params) {
       // Bake upload runner information to the resumable url parameters.
@@ -354,9 +426,18 @@ new Vue({
     onComplete: function () {
       this.endUpload();
       this.stopChunking();
+      this.createUploadInstance(); // Allows new uploads
       this.$store.commit("eraseProgress");
     },
     onCancel: function () {
+      document.querySelector("#toasts").addToast({
+        id: "upload-cancel",
+        type: "info",
+        progress: false,
+        horizontal: "center",
+        message: this.$t("message.upload.cancelled"),
+      });
+
       this.onComplete();
     },
     updateProgress() {
@@ -373,7 +454,7 @@ new Vue({
 
       if (!res.support) {
         this.$buefy.toast.open({
-          message: this.$("message.upnotsupported"),
+          message: this.$("message.upload.upnotsupported"),
           type: "is-danger",
         });
         return;
@@ -383,7 +464,7 @@ new Vue({
       res.on("uploadStart", this.startUpload);
       res.on("complete", this.onComplete);
       res.on("cancel", this.onCancel);
-      res.on("filesAdded", this.addFileToast);
+      res.on("filesAdded", this.addFile);
       res.on("fileSuccess", this.fileSuccessToast);
       res.on("fileError", this.fileFailureToast);
       res.on("chunkingStart", this.startChunking);
@@ -425,7 +506,7 @@ new Vue({
       }
 
       return retl;
-    },
+    },  
   },
   ...App,
 }).$mount("#app");

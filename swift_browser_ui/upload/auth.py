@@ -25,6 +25,7 @@ async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.StreamRespon
         login_form = await request.post()
         request.app[session_key] = {}
         request.app[session_key]["uploads"] = {}
+        request.app[session_key]["enuploads"] = {}
         request.app[session_key]["token"] = login_form["token"]
 
         async with client.post(

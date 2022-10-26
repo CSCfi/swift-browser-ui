@@ -2,6 +2,7 @@
 Upload process initialization functions.
 */
 
+#include <ftw.h>
 #include "uptypes.h"
 
 #ifndef SWIFT_UI_UPLOAD_UPINIT_INCLUDED
@@ -25,7 +26,7 @@ int read_in_recv_keys(struct ENCRYPT_SESSION *sess);
 Read in the keys for upload encryption
 */
 int read_in_keys(
-    char *passphrase,
+    const char *passphrase,
     struct ENCRYPT_SESSION *sess);
 
 /*

@@ -22,7 +22,14 @@ import aioredis
 
 from oidcrp.rp_handler import RPHandler
 
-from swift_browser_ui.ui.front import index, browse, loginpassword, select
+from swift_browser_ui.ui.front import (
+    index,
+    browse,
+    loginpassword,
+    select,
+    swjs,
+    swasm,
+)
 from swift_browser_ui.ui.login import (
     oidc_start,
     oidc_end,
@@ -34,6 +41,7 @@ from swift_browser_ui.ui.login import (
     handle_project_lock,
 )
 from swift_browser_ui.ui.api import (
+    get_crypted_upload_session,
     swift_get_metadata_container,
     swift_list_containers,
     swift_list_objects,
@@ -153,6 +161,9 @@ async def servinit(
     app.add_routes(
         [
             aiohttp.web.get("/", index),
+            # Worker routes
+            aiohttp.web.get("/libupload.js", swjs),
+            aiohttp.web.get("/libupload.wasm", swasm),
             aiohttp.web.get("/loginpassword", loginpassword),
             aiohttp.web.get("/browse", browse),
             # Route all URLs prefixed by /browse to the browser page, as this is
@@ -247,6 +258,10 @@ async def servinit(
     app.add_routes(
         [
             aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
+            aiohttp.web.get(
+                "/enupload/{project}/{container}/{object_name:.*}",
+                get_crypted_upload_session,
+            ),
         ]
     )
 

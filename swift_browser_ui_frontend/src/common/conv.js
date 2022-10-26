@@ -206,7 +206,7 @@ export function truncate(value, length) {
   return value.length > length ? value.substr(0, length) + "..." : value;
 }
 
-const SEGMENT_REGEX = /^\.segments\/(.*)\/[0-9]{8}$/;
+const SEGMENT_REGEX = /^\.segments(.*)$/;
 const DATA_PREFIX = "data/";
 
 export function filterSegments(objects) {

@@ -34,7 +34,11 @@ const store = new Vuex.Store({
     resumableClient: undefined,
     isUploading: false,
     isChunking: false,
+    encryptedFile: "",
+    encryptedFileProgress: undefined,
+    encryptedProgress: undefined,
     uploadProgress: undefined,
+    uploadNotification: false,
     altContainer: undefined,
     uploadInfo: undefined,
     transfer: [],
@@ -45,6 +49,7 @@ const store = new Vuex.Store({
     selectedFolderName: "",
     openUploadModal: false,
     openShareModal: false,
+    currentUpload: undefined,
   },
   mutations: {
     loading(state, payload) {
@@ -88,15 +93,38 @@ const store = new Vuex.Store({
     },
     setUploading(state) {
       state.isUploading = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopUploading(state) {
       state.isUploading = false;
     },
     setChunking(state) {
       state.isChunking = true;
+      if (!state.uploadNotification) state.uploadNotification = true;
     },
     stopChunking(state) {
       state.isChunking = false;
+    },
+    updateEncryptedProgress(state, progress) {
+      state.encryptedProgress = progress;
+    },
+    eraseEncryptedProgress(state) {
+      state.encryptedProgress = undefined;
+    },
+    setEncryptedFile(state, file) {
+      state.encryptedFile = file;
+    },
+    eraseEncryptedFile(state) {
+      state.encryptedFile = "";
+    },
+    updateEncryptedFileProgress(state, progress) {
+      state.encryptedFileProgress = progress;
+    },
+    eraseEncryptedFileProgress(state) {
+      state.encryptedFileProgress = undefined;
+    },
+    toggleUploadNotification(state, payload) {
+      state.uploadNotification = payload;
     },
     updateProgress(state, progress) {
       state.uploadProgress = progress;
@@ -172,6 +200,14 @@ const store = new Vuex.Store({
     },
     toggleShareModal(state, payload) {
       state.openShareModal = payload;
+    },
+    setCurrentUpload(state, cur) {
+      state.currentUpload = cur;
+    },
+    eraseCurrentUpload(state) {
+      delete state.currentUpload;
+      state.currentUpload = undefined;
+      state.uploadNotification = false;
     },
   },
   actions: {

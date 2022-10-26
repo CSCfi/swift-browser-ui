@@ -1,0 +1,12 @@
+FROM nginx:latest
+COPY nginx.conf /etc/nginx/nginx.conf.template
+
+COPY swiftui-proxy.key /etc/ssl/swiftui-proxy.key
+COPY swiftui-proxy.crt /etc/ssl/swiftui-proxy.crt
+
+RUN chown nginx:nginx /etc/ssl/swiftui-proxy.key
+RUN chown nginx:nginx /etc/ssl/swiftui-proxy.crt
+RUN chmod 400 /etc/ssl/swiftui-proxy.key
+RUN chmod 400 /etc/ssl/swiftui-proxy.crt
+
+ENTRYPOINT ["/bin/bash", "-c", "envsubst '${DOCKER_NETWORK_GATEWAY}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]

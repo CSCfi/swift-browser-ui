@@ -144,6 +144,56 @@ Now you should be able to access the development server at localhost:8081. The l
 
 This configuration has both frontend and backend servers running with code reloading features, meaning that after code changes the servers reload.
 
+##### Trusted TLS
+Additionally, when testing with the encrypted upload features, browser
+features are used that **require** a trusted TLS connection. This can
+be achieved by using a development proxy server that can be built from
+files in the `devproxy` folder. [The proxy has it's own instructions for building.](devproxy/README.md)
+
+This guide assumes you're using `devenv` as the domain name. Replace this
+with the domain you're certificate sings, and if necessary, add it to
+`/etc/hosts` so it's resolvable both in docker, and locally.
+
+Additional setup is required in your environment file. You'll need to 
+configure the following keys to point to whatever hostname will be used
+to access the service. Additionally you should allow all hosts, assuming
+your machine is in a secure network when developing. In case you trust
+your network and want as easy of a setup as possible, you can use all to
+greenlight all hosts for access.
+
+```
+SWIFT_UI_FRONTEND_ALLOW_HOSTS=devenv
+SWIFT_UI_TLS_PORT=8443
+SWIFT_UI_TLS_HOST=hostname
+```
+
+Additionally you'll need to configure the endpoints to be correct, so that
+the backend APIs work as intended.
+```
+BROWSER_START_SHARING_ENDPOINT_URL=https://devenv:8443/sharing
+BROWSER_START_SHARING_INT_ENDPOINT_URL=http://localhost:9090
+BROWSER_START_REQUEST_ENDPOINT_URL=https://devenv:8443/request
+BROWSER_START_REQUEST_INT_ENDPOINT_URL=http://localhost:9091
+BROWSER_START_RUNNER_ENDPOINT=http://localhost:9092
+BROWSER_START_RUNNER_EXT_ENDPOINT=https://devenv:8443/runner
+```
+
+If your Docker network does not match the default, you'll need to change the
+network configuration to make the proxy aware of the backend services. The
+environment network defaults to the default Docker network, which is:
+```
+DOCKER_NETWORK_SEGMENT=172.17.0.0/24
+DOCKER_NETWORK_GATEWAY=172.17.0.1
+```
+
+After this, comment out the commands to run without trusted TLS in the
+`Procfile`, and uncomment the commands to run with trusted TLS.
+
+You should now be able to run the service with trusted TLS by running
+```bash
+honcho start
+```
+
 ##### OIDC login provider
 
 To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
@@ -192,19 +242,29 @@ The encryption requires an additional build step: you'll need to build the `wasm
 
 Build the image
 
-    docker buildx build -f dockerfiles/Dockerfile-build-crypt-devel -t swift-browser-ui:cryptfiles .
+```bash
+docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
+```
 
-Start a container
+Build the wasm files with provided container, which acts in practise
+like the make command in the specified folder. Available targets can be
+found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
+targets can be achieved with:
 
-    docker run --rm -it --name cryptfiles swift-browser-ui:cryptfiles
+```bash
+docker run --rm -it --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
+```
 
-From another terminal, copy the files from the container
+Copy these files into the static JS files built with the frontend.
 
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.js swift_browser_ui_frontend/dist/js
-    docker cp cryptfiles:/usr/local/lib/python3.8/site-packages/swift_browser_ui/ui/static/js/libupload.wasm swift_browser_ui_frontend/dist/js
+```bash
+cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
+```
 
-When you run `npm run build`, it removes the folder where you copied those files into, so you'll need to copy them every time you rebuild.
+These files will be integrated into the root folder of the built frontend.
 
+> NOTE: Remember that the encrypted upload features cannot be used without
+> having trusted TLS set up on all backend services.
 
 The `keystone-swift` image comes with a script to generate data in the object storage server. With the services running, run these commands:
 ```bash
