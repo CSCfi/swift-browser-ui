@@ -11,7 +11,7 @@
     "serve-prod": "vue-cli-service serve --mode production"
   },
   "dependencies": {
-    "@vue/cli-service": "^5.0.6",
+    "@vue/cli-service": "^5.0.8",
     "@vue/composition-api": "^1.6.3",
     "@vueuse/rxjs": "^8.7.5",
     "buefy": "^0.9.21",
