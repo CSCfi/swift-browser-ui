@@ -127,7 +127,6 @@ new Vue({
     UploadModal,
     UploadNotification,
     EditTagsModal,
-    ProgressBar,
   },
   data: function () {
     return {
