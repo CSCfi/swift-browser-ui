@@ -21,6 +21,7 @@ cryptfiles
 csc
 cscfi
 devel
+devenv
 Dockerfile
 dockerfiles
 drag'n'drop
@@ -71,6 +72,7 @@ proxying
 py
 quickstart
 saml
+serviceworker
 sha
 sLo
 ssl

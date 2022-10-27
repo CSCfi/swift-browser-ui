@@ -20,17 +20,58 @@
       >
         <UploadModal />
       </c-modal>
+      <UploadNotification
+        v-if="displayUploadNotification"
+        @cancel-upload="currentUpload.cancelUpload()"
+      />
+      <c-modal
+        v-control
+        v-csc-model="openEditTagsModal"
+        width="64vw"
+      >
+        <EditTagsModal />
+      </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openShareModal"
+        width="50vw"
+      >
+        <ShareModal />
+      </c-modal>
+      <c-modal
+        v-control
+        v-csc-model="openCopyFolderModal"
+        width="64vw"
+      >
+        <CopyFolderModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"
         :active.sync="isLoading"
         :can-cancel="false"
       />
-   </div>
+   <!--New Footer Component-->
    <div id="footer">
       <CFooter/>
   </div> 
-</div>
+      <c-toasts id="toasts" />
+      <!-- TODO: Move folder toast to programmatical modal -->
+      <c-toasts
+        id="copyFolder-toasts"
+        vertical="top"
+      >
+        <div class="toasts-wrapper">
+          <h5 class="title is-5 has-text-dark">
+            {{ $t("message.copysuccess") }}
+          </h5>
+          <p class="has-text-weight-semibold has-text-dark">
+            {{ $t("message.copytime") }}
+          </p>
+        </div>
+      </c-toasts>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -221,6 +262,15 @@ c-modal {
   flex-shrink: 0;
   margin-top: 15px;
   z-index: 2;
+}
+
+#copyFolder-toasts {
+  position: sticky;
+  bottom: 30vh;
+}
+
+.toasts-wrapper {
+  padding: 1rem;
 }
 
 </style>

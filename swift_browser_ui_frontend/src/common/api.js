@@ -96,6 +96,7 @@ export async function getContainerMeta(
   project,
   container,
   signal,
+  owner = "",
 ) {
   // Get metadata for a given bucket, owned by a given project.
   let url = new URL(
@@ -104,6 +105,10 @@ export async function getContainerMeta(
       encodeURI(container)),
     document.location.origin,
   );
+  if (owner !== "") {
+    url.searchParams.append("owner", owner);
+  }
+
   let ret = await GET(url, signal);
   return await ret.json();
 }
@@ -128,6 +133,7 @@ export async function getObjects(
   marker = "",
   signal,
   shared = false,
+  owner = "",
 ) {
   // Fetch object listing for a container.
   let objUrl = new URL(
@@ -140,7 +146,11 @@ export async function getObjects(
   if (marker) {
     objUrl.searchParams.append("marker", marker);
   }
+  if (shared && (owner != "")) {
+    objUrl.searchParams.append("owner", owner);
+  }
   let objects = await GET(objUrl, signal);
+
   if (objects.status == 200) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
@@ -174,10 +184,15 @@ export async function getObjectsMeta (
   objects,
   url,
   signal,
+  owner = "",
 ){
   // Batch get metadata for a list of objects
   if (url === undefined) {
     url = makeGetObjectsMetaURL(project, container, objects);
+  }
+
+  if (owner !== "") {
+    url.searchParams.append("owner", owner);
   }
 
   let ret = await GET(url, signal);
@@ -361,7 +376,6 @@ export async function swiftCopyContainer(
   source_container,
 ) {
   // Replicate the container from a specified source to the location
-
   let fetchURL = new URL("/replicate/".concat(
     encodeURI(project), "/",
     encodeURI(container),
@@ -440,6 +454,32 @@ export async function getUploadEndpoint(
     encodeURI(owner),
     "/",
     encodeURI(container),
+  ),
+  document.location.origin,
+  );
+  fetchURL.searchParams.append("project", project);
+  let ret = await GET(fetchURL);
+
+  if (ret.status != 200) {
+    throw new Error("Failed to get upload session information.");
+  }
+
+  return ret.json();
+}
+
+export async function getUploadCryptedEndpoint(
+  project,
+  owner,
+  container,
+  object,
+) {
+  // Fetch upload endpoint information for encrypted upload
+  let fetchURL = new URL("/enupload/".concat(
+    encodeURI(owner),
+    "/",
+    encodeURI(container),
+    "/",
+    encodeURI(object),
   ),
   document.location.origin,
   );

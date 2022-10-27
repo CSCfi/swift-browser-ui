@@ -102,6 +102,7 @@
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
                   max="1024"
+                  rows="3"
                 />
                 <c-button
                   type="is-success"
@@ -128,14 +129,14 @@
       <c-button
         outlined
         size="large"
-        @click="cancelUpload"
+        @click="toggleUploadModal"
       >
         {{ $t("message.encrypt.cancel") }}
       </c-button>
       <c-button
         size="large"
         :disabled="noUpload"
-        @click="encryptAndUpload"
+        @click="beginEncryptedUpload"
       >
         {{ $t("message.encrypt.normup") }}
       </c-button>
@@ -144,6 +145,7 @@
 </template>
 
 <script>
+import EncryptedUploadSession from "@/common/upload";
 import { getUploadEndpoint } from "@/common/api";
 import {
   getHumanReadableSize,
@@ -156,6 +158,8 @@ import {
   modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
+
+import delay from "lodash/delay";
 
 export default {
   name: "UploadModal",
@@ -196,6 +200,9 @@ export default {
     },
     pubkey() {
       return this.$store.state.pubkey;
+    },
+    currentUpload() {
+      return this.$store.state.uploadState;
     },
     fileHeaders() {
       return [
@@ -356,6 +363,9 @@ export default {
     ephemeral: function () {
       this.refreshNoUpload();
     },
+    currentUpload: function () {
+      this.refreshNoUpload();
+    },
     active: function () {
       this.projectNumber = getProjectNumber(this.active);
     },
@@ -502,6 +512,7 @@ export default {
           (!this.pubkey.length && !this.recvkeys.length)
           || !this.inputFolder
           || !this.dropFiles.length
+          || (this.currentUpload != undefined)
         );
       }
       if (this.ownPrivateKey) {
@@ -510,134 +521,42 @@ export default {
           || !this.inputFolder
           || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
+          || (this.currentUpload != undefined)
         );
       }
     },
-    encryptFiles: async function () {
-      let res = 0;
-      // Add keys to the filesystem
-      FS.mkdir("/keys"); // eslint-disable-line
-      FS.mkdir("/keys/recv_keys"); // eslint-disable-line
-      // Only add private key if we're not using ephemeral key upload
-      if (!this.ephemeral) {
-        FS.writeFile("/keys/pk.key", this.privkey); // eslint-disable-line
-      }
-      // we add the fixed set of keys to the ones the user added
-      let keysArray = this.recvkeys.concat(this.pubkey);
-      keysArray = [...new Set([...this.recvkeys, ...this.pubkey])];
-      for (let i = 0; i < keysArray.length; i++) {
-        FS.writeFile( // eslint-disable-line
-          "/keys/recv_keys/pubkey_" + i.toString(),
-          keysArray[i],
-        );
-      }
-      // Add files to the filesystem
-      FS.mkdir("/data"); // eslint-disable-line
-      for (let f of this.dropFiles) {
-        let buf = new Uint8Array(await f.arrayBuffer());
-        handleDirectories: {
-          if (f.relativePath) {
-            if (f.relativePath.split("/").length <= 1) {
-              break handleDirectories;
-            }
-            // Ensure the directories are available for the path
-            let dirs = f.relativePath.split("/");
-            dirs.pop(); // ditch the file name
-            let createDirs = (dirs, path) => {
-              let npath = path + "/" + dirs[0];
-              try {
-                FS.mkdir(npath); // eslint-disable-line
-              } catch(err) {} // eslint-disable-line
-              if (dirs.slice(1).length > 0) {
-                createDirs(dirs.slice(1), npath);
-              }
-            };
-            createDirs(dirs, "/data");
-          }
-        }
-        let outname = "/data/" + (f.relativePath ? f.relativePath : f.name);
-        try {
-          FS.writeFile(outname, buf); // eslint-disable-line
-        } catch (err) {
-          res = 255; // Indicate FS space exhaustion with error 255
-        }
-      }
-
-      if (res != 0 ) {
-        this.$buefy.toast.open({
-          message: this.$t("message.encrypt.fsWriteFail"),
-          duration: 15000,
-          type: "is-danger",
-        });
-        throw "Failed to write files into FS.";
-      }
-
-      res = 0;
-      if(!this.ephemeral) {
-        res = Module.ccall( // eslint-disable-line
-          "encrypt_folder",
-          "number",
-          ["string"],
-          [this.passphrase],
-        );
-      } else {
-        res = Module.ccall( // eslint-disable-line
-          "encrypt_folder_ephemeral",
-          "number",
-          [],
-          [],
-        );
-      }
-      if (res != 0) {
-
-        this.$buefy.toast.open({
-          message: this.$t("message.encrypt.enFail"),
-          duration: 15000,
-          type: "is-danger",
-        });
-        throw "Failed to encrypt files.";
-      }
+    toggleUploadModal() {
+      this.$store.commit("toggleUploadModal", false);
+      this.folderName = "";
+      this.tags = [];
+      this.ephemeral = true;
+      modifyBrowserPageStyles();
     },
-    encryptAndUpload: function () {
+    beginEncryptedUpload() {
+      if (this.pubkey.length > 0) {
+        this.recvkeys = this.recvkeys.concat(this.pubkey);
+      }
+      let upload = new EncryptedUploadSession(
+        this.active,
+        this.$route.params.owner ? this.$route.params.owner : this.active.id,
+        this.$store.state.dropFiles,
+        this.recvkeys,
+        this.privkey,
+        this.inputFolder,
+        this.$route.query.prefix,
+        this.passphrase,
+        this.ephemeral,
+        this.$store,
+        this.$el,
+      );
       this.$buefy.toast.open({
-        message: this.$t("message.encrypt.enStart"),
-        duration: 10000,
+        message: this.$t("message.upload.isStarting"),
         type: "is-success",
       });
-      this.$store.commit("toggleUploadModal", false);
-      modifyBrowserPageStyles();
-      this.encryptFiles().then(() => {
-        this.$buefy.toast.open({
-          message: this.$t("message.encrypt.enSuccess"),
-          duration: 10000,
-          type: "is-success",
-        });
-        this.$store.commit("setAltContainer", this.inputFolder);
-        let files = [];
-        for (let f of this.dropFiles) {
-          let path = f.relativePath ? f.relativePath : f.name;
-          let outname = (
-            "/data/"
-            + path
-            + ".c4gh");
-          let newFile = new Blob(
-            [FS.readFile(outname).buffer], // eslint-disable-line
-            {
-              type: "binary/octet-stream",
-            },
-          );
-          newFile.relativePath = path + ".c4gh";
-          newFile.name = f.name + ".c4gh";
-          files.push(newFile);
-        }
-        this.aBeginUpload(files).then(() => {
-          this.$buefy.toast.open({
-            message: this.$t("message.encrypt.upStart"),
-            type: "is-success",
-          });
-          this.clearFiles();
-        });
-      });
+      upload.initServiceWorker();
+      this.$store.commit("setCurrentUpload", upload);
+      delay(upload.cleanUp, 1500);
+      this.toggleUploadModal();
     },
   },
 };

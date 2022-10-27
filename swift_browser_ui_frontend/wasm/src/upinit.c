@@ -68,7 +68,6 @@ int add_recv_key(
         }
         else
         {
-            printf("Pubkey read successful for %s\n", path);
             current->recv_key_amount++;
         }
     }
@@ -102,7 +101,6 @@ int read_in_recv_keys(struct ENCRYPT_SESSION *sess) {
         FTW_PHYS
     );
 finalReadRecv:
-    printf("Successfully read in the keys.\n");
     current = NULL;
     return ret;
 }
@@ -111,7 +109,7 @@ finalReadRecv:
 Read in the keys for upload encryption
 */
 int read_in_keys(
-    char *passphrase,
+    const char *passphrase,
     struct ENCRYPT_SESSION *sess)
 {
     // Read in the private key
@@ -119,15 +117,12 @@ int read_in_keys(
     // JS side takes care of that
     int ret = 0;
     strncpy(sess->passphrase, passphrase, 1023);
-    printf("%s\n", sess->passphrase);
-    printf("Reading in the private key.\n");
     crypt4gh_private_key_from_file(
         "keys/pk.key",
         sess->passphrase ? sess->passphrase : "\0",
         sess->seckey,
         sess->pubkey);
     // Read in the receiving keys
-    printf("Reading in the receiver keys.\n");
     current = sess;
     ret = nftw(
         "keys/recv_keys",
@@ -135,7 +130,6 @@ int read_in_keys(
         5, // using at most 5 file descriptors for now
         FTW_PHYS);
 finalReadIn:
-    printf("Successfully read in the keys.\n");
     current = NULL;
     return ret;
 }

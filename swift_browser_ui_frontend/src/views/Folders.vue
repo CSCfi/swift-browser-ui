@@ -15,21 +15,18 @@
 
 <script>
 import FolderTabs from "@/components/FolderTabs.vue";
-import ContainersView from "@/views/Containers.vue";
+import AllFoldersTable from "@/components/AllFoldersTable.vue";
 import SharedOutTable from "@/components/SharedOutTable.vue";
 import SharedTable from "@/components/SharedTable.vue";
 
 export default {
   name: "FoldersView",
-  components: {
-    FolderTabs,
-    ContainersView,
-  },
+  components: { FolderTabs },
   data: function() {
     return {
       activeRouteName: "",
       folderComponents: [
-        {type: ContainersView, name: "AllFolders"},
+        {type: AllFoldersTable, name: "AllFolders"},
         {type: SharedTable, name: "SharedTo"},
         {type: SharedOutTable, name: "SharedFrom"},
       ],

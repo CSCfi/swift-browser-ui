@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #781) Render full details of Folders you have shared and Folders shared with you
+  - Show Folder status including Shared status, source project and date of sharing
+  - Show tags for Folders and Objects inside them
+  - Change routes from Folder view back to the equivalent Folder tab
+- (GH #751) Add modal for copying folder
 - (GH #746) Move container and object listings to csc-ui components
 - (GH #746) Migrate buefy search to CSC styling, csc-ui component for search not an option
 - (GH #714) Add modal for sharing folder with other projects
+- (GH #742) Added responsive navigation
+- (GH #748) Add modal for editing object's tags
 - (GH #730) Add a button to copy Project Id
 - (GH #674) Add modal for uploading files
+- (GH #727) New upload notification
 - (GH #723) Add Project information as an option under User menu
 - (GH #713) Top navigation support dropdown menu, commented out old user menu items & link to browser view from app name
 - (GH #645) Add menu for folder options in table view
@@ -28,7 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #514) Make user roles configurable.
 - (GH #546) Optional two-step login with OpenID Connect (OIDC) as the first step.
   - When OIDC is enabled, the index page is replaced with a new one, that uses CSCfi/csc-ui components.
-  - (GH #565) Skip second login button click when first authentication used Haka.
+- (GH #565) Skip second login button click when first authentication used Haka.
+- (GH #599) Add support for streaming uploads allowing > 1GiB files encrypted uploads
+  - Also fixes some bugs related to encrypted upload engine and repeatability
 
 ### Changed
 

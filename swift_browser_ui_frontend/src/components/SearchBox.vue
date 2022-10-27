@@ -57,6 +57,7 @@ export default {
   components: {
     SearchResultItem,
   },
+  props: ["containers"],
   data: function () {
     return {
       searchArray: [],
@@ -186,7 +187,7 @@ export default {
     searchGainedFocus: async function () {
       const preferences = await this.$store.state.db.preferences.get(1);
 
-      const ojbCount = this.containers.value.reduce(
+      const ojbCount = this.containers.reduce(
         (prev, cont) => prev + cont.count,
         0,
       );

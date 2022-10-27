@@ -131,3 +131,13 @@ tests/ui_front/swift-browser-ui
 dictionary.dic
 
 swift_browser_ui_frontend/cypress
+
+# Node files
+**/node_modules/
+**/.node_modules/
+
+# wasm build files
+swift_browser_ui_frontend/wasm/src/libupload.js
+swift_browser_ui_frontend/wasm/src/libupload.wasm
+swift_browser_ui_frontend/public/libupload.js
+swift_browser_ui_frontend/public/libupload.wasm

@@ -71,6 +71,17 @@ let default_translations = {
         sharedFrom: "Folders you have shared",
         sharedTo: "Folders shared with you",
       },
+      folderDetails: {
+        notShared: "This folder isn't shared to any projects.",
+        sharing_to_one_project: "This folder is shared to one project.",
+        sharing_to_many_projects: "This folder is shared to multiple projects.",
+        shared_with_read:
+          "This folder is shared with you. You can view" +
+          " and download files in this folder (Read access).",
+        shared_with_read_write:
+          "This folder is shared with you. You can view, download, upload" +
+          " and edit tags in this folder (Read and write access).",
+      },
       table: {
         name: "Name",
         objects: "Objects",
@@ -96,6 +107,15 @@ let default_translations = {
         nextPage: "Next page",
         prevPage: "Previous Page",
         page: "Page",
+        shared_status: "Shared status",
+        sharing: "You have shared",
+        shared: "Shared with you",
+        edit_sharing: " Edit sharing",
+        source_project_id: "Share ID of this folder",
+        date_of_sharing: "Date of sharing",
+        back_to_all_folders: "Back to all folders",
+        back_to_sharing_folders: "Back to folders you have shared",
+        back_to_shared_folders: "Back to folders shared with you",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -158,10 +178,9 @@ let default_translations = {
         close_instructions: "Close instructions",
         share_cont: "Share the bucket",
         share_title: "Share folder: ",
-        share_subtitle1: "Shared with members of ",
-        share_subtitle2:
-          "Folders are by default shared with your project " +
-          "members. This is mandatory.",
+        share_subtitle:
+          "This folder is already accessible to all the members" +
+          " of this project.",
         share_other_projects: "Share with other projects",
         share_guide_step1:
           "1. Ask recipient project’s member to select " +
@@ -207,8 +226,6 @@ let default_translations = {
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
-        sharing_status: "You have shared",
-        shared_status: "Shared with you",
       },
       request: {
         project: "Project",
@@ -243,15 +260,27 @@ let default_translations = {
         "No shared buckets have been requested for the " + "project.",
       sharing: "Sharing - ",
       containers: "Buckets - ",
-      upload: " Upload",
-      uploadfolder: " Upload Folder",
-      chunking: "Chunking",
-      uploading: "Uploading ",
-      cancelupload: " Cancel uploading",
-      addfiles: "File / Files scheduled for uploading",
-      upfinish: "Finished uploading ",
-      upfail: "Failed uploading ",
-      upnotsupported: "Uploading is not supported on your browser",
+      upload: {
+        upload: " Upload",
+        uploadfolder: " Upload Folder",
+        chunking: "Chunking",
+        uploading: "Uploading ",
+        cancelupload: " Cancel uploading",
+        addfiles: "File / Files scheduled for uploading",
+        upfinish: "Finished uploading ",
+        upfail: "Failed uploading ",
+        upnotsupported: "Uploading is not supported on your browser",
+        isStarting: "Data upload will start shortly",
+        hasStarted: "Upload has started",
+        inProgress: "Upload in progress",
+        longProgress: "Upload in progress, uploading ",
+        viewDestinationFolder: "View destination folder",
+        maximize: "Maximize",
+        minimize: "Minimize",
+        estimate: "It may take few minutes.",
+        complete: "Uploading completed",
+        cancelled: "Upload cancelled",
+      },
       copy: " Copy",
       copied: "Share ID copied to clipboard!",
       copy_failed: "Copy failed!",
@@ -263,7 +292,8 @@ let default_translations = {
       save: "Save",
       options: "Options",
       createContainerButton: "Create folder",
-      copysuccess: "Started copying the bucket in the background",
+      copysuccess: "The folder is being copied",
+      copytime: "It may take few seconds",
       copyfail: "Failed to copy the bucket",
       renderFolders: "Render as Folders",
       tagName: "Tags (optional)",
@@ -303,7 +333,9 @@ let default_translations = {
       replicate: {
         destinationLabel: "Destination bucket",
         destinationMessage: "Insert copy destination bucket here",
-        destinationExists: " Destination already exists",
+        destinationExists: "Folder already exists",
+        copy_folder: "Copy folder: ",
+        name_newFolder: "Name new folder",
       },
       tokens: {
         empty: "No API tokens created for the project",
@@ -330,6 +362,8 @@ let default_translations = {
           "megabytes, which can lead to a failure in encryption. " +
           "Try uploading files in smaller batches, or encrypt " +
           "them before uploading normally.",
+        enNotAvail: "ServiceWorker function not available in this browser. " +
+                    "Recommended browsers are Firefox and Chrome.",
         enFiles: "Encrypt files before upload",
         fsWriteFail:
           "Failed to copy files into temporary file system. " +
@@ -481,6 +515,18 @@ let default_translations = {
         sharedFrom: "Jakamasi kansiot",
         sharedTo: "Sinulle jaetut kansiot",
       },
+      folderDetails: {
+        notShared: "Tätä kansiota ei ole jaettu millekään projektille.",
+        sharing_to_one_project: "Tämä kansio on jaettu yhdelle projektille.",
+        sharing_to_many_projects: "Tämä kansio on jaettu useille projekteille.",
+        shared_with_read:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella ja ladata" +
+          " tiedostoja tässä kansiossa (Read access).",
+        shared_with_read_write:
+          "Tämä kansio on jaettu kanssasi. Voit tarkastella, ladata," +
+          " ladata ja muokata tunnisteita tässä kansiossa" +
+          " (Read and write access).",
+      },
       table: {
         name: "Nimi",
         objects: "Objekteja",
@@ -506,6 +552,15 @@ let default_translations = {
         nextPage: "Seuraava sivu",
         prevPage: "Edellinen sivu",
         page: "Sivu",
+        shared_status: "Jaettu tila",
+        sharing: "Olet jakanut",
+        shared: "Jaettu kanssasi",
+        edit_sharing: " Muokkaa jakamista",
+        source_project_id: "Jaa tämän kansion tunnus",
+        date_of_sharing: "Jakamispäivämäärä",
+        back_to_all_folders: "Takaisin kaikki kansiot",
+        back_to_sharing_folders: "Takaisin jakamasi kansiot",
+        back_to_shared_folders: "Takaisin sinulle jaetut kansiot",
       },
       tableOptions: {
         displayOptions: "Asetukset",
@@ -570,10 +625,8 @@ let default_translations = {
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio: ",
-        share_subtitle1: "Shared with members of ",
-        share_subtitle2:
-          "Kansiot jaetaan oletusarvoisesti projektisi jäsenten " +
-          "kanssa. Tämä on pakollista.",
+        share_subtitle:
+          "Tämä kansio on jo kaikkien tämän projektin jäsenten käytettävissä.",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_step1:
           "1. Projektin jäsenet löytävät projektitunnuksen projektin " +
@@ -616,8 +669,6 @@ let default_translations = {
         request_synced: "Säiliön jakopyyntöjen haku onnistui",
         request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
         sync_requests: "Synkronoi säiliön jakopyynnöt",
-        sharing_status: "Olet jakanut",
-        shared_status: "Jaettu kanssasi",
       },
       request: {
         project: "Projekti",
@@ -651,15 +702,27 @@ let default_translations = {
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
-      upload: " Lähetä",
-      uploadfolder: " Lähetä kansio",
-      chunking: "Paloitellaan ",
-      uploading: "Lähetetään ",
-      cancelupload: " Peru lähetys",
-      addfiles: "Lisättiin tiedosto / tiedostoja lähetettäväksi",
-      upfinish: "Lähetettiin tiedosto ",
-      upfail: "Epäonnistuttiin lähettäessä tiedosto ",
-      upnotsupported: "Selain ei tue tiedostojen lähettämistä",
+      upload: {
+        upload: " Lähetä",
+        uploadfolder: " Lähetä kansio",
+        chunking: "Paloitellaan ",
+        uploading: "Lähetetään ",
+        cancelupload: " Peru lähetys",
+        addfiles: "Lisättiin tiedosto / tiedostoja lähetettäväksi",
+        upfinish: "Lähetettiin tiedosto ",
+        upfail: "Epäonnistuttiin lähettäessä tiedosto ",
+        upnotsupported: "Selain ei tue tiedostojen lähettämistä",
+        hasStarted: "Lähetys aloitettu",
+        isStarting: "Tiedostojen lähetys käynnistyy pian",
+        inProgress: "Lähetys käynnissä",
+        longProgress: "Lähetys käynnissä, lähetetään tiedostoa ",
+        viewDestinationFolder: "Näytä kohdekansio",
+        maximize: "Suurenna",
+        minimize: "Pienennä",
+        estimate: "Toiminto voi kestää muutamia minuutteja.",
+        complete: "Lähetys on valmis",
+        cancelled: "Lataus peruutettu",
+      },
       copy: " Kopioi",
       copied: "Jaa tunnus kopioitu leikepöydälle!",
       copy_failed: "Kopiointi epäonnistui!",
@@ -671,7 +734,8 @@ let default_translations = {
       save: "Tallenna",
       options: "Valinnat",
       createContainerButton: "Luo säiliö",
-      copysuccess: "Aloitettiin säiliön kopiointi taustalla",
+      copysuccess: "Kansiota kopioidaan",
+      copytime: "Se voi kestää muutaman sekunnin",
       copyfail: "Säiliön kopiointi epäonnistui",
       renderFolders: "Näytä kansioina",
       tagName: "Tägit",
@@ -706,7 +770,9 @@ let default_translations = {
       replicate: {
         destinationLabel: "Kohdesäiliö",
         destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
-        destinationExists: " Kohdesäiliö on jo olemassa",
+        destinationExists: "Kansio on jo olemassa",
+        copy_folder: "Kopioi kansio: ",
+        name_newFolder: "Nimeä uusi kansio",
       },
       tokens: {
         empty: "Projektille ei ole luotu API-avaimia",
@@ -733,6 +799,8 @@ let default_translations = {
           "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
           "pienemmissä erissä tai salaa ne ennen lähettämistä " +
           "tavallisesti.",
+        enNotAvail: "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
+                    "Suositellut selaimet ovat Chrome ja Firefox.",
         enFiles: "Salaa tiedostot ennen lähetystä",
         fsWriteFail:
           "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +

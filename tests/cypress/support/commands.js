@@ -28,8 +28,8 @@ Cypress.Commands.add("login", (loginMessage) => {
     cy.visit(Cypress.config().baseUrl)
     cy.contains(loginMessage).click(10, 10)
 
-    cy.get('#classicform input[name=username]').type('swift')
-    cy.get('#classicform input[name=password]').type('veryfast')
+    cy.get('#classicform input[name=username]').type(Cypress.env('username'))
+    cy.get('#classicform input[name=password]').type(Cypress.env('password'))
     cy.get('#classicform [type="submit"]').click()
 })
 

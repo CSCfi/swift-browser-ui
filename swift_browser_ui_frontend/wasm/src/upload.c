@@ -54,7 +54,6 @@ int encrypt_file(
             sess->pubkey,
             sess->recv_keys,
             sess->recv_key_amount);
-        printf("Successfully encrypted %s\n", fname_out);
     }
 finalEncFile:
     if (fd_in)
@@ -109,7 +108,6 @@ int encrypt_folder(char *passphrase)
         printf("Failure in file encryption – aborting\n");
         goto final_eup;
     }
-    printf("Successfully encrypted the files\n");
 final_eup:
     if (sess)
     {
@@ -138,7 +136,6 @@ int encrypt_folder_ephemeral() {
         printf("Failure in file encryption – aborting\n");
         goto final_eph_eup;
     }
-    printf("Successfully encrypted the files\n");
 final_eph_eup:
     if (sess)
     {

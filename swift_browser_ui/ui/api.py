@@ -175,6 +175,10 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     client = request.app["api_client"]
     project = request.match_info["project"]
     container = request.match_info["container"]
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
 
     request.app["Log"].info(
         "API call for list objects from "
@@ -184,9 +188,11 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     query = request.query.copy()
     query["format"] = "json"
 
+    endpoint = session["projects"][project]["endpoint"]
+
     # TODO: MOVE UNICODE NULL HANDLING TO FRONTEND
     async with client.get(
-        f"{session['projects'][project]['endpoint']}/{container}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
@@ -254,8 +260,15 @@ async def _swift_get_object_metadata_wrapper(
     client = request.app["api_client"]
     project = request.match_info["project"]
     container = request.match_info["container"]
+
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
+
+    endpoint = session["projects"][project]["endpoint"]
     async with client.head(
-        f"{session['projects'][project]['endpoint']}/{container}/{obj}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}/{obj}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
@@ -301,13 +314,19 @@ async def swift_get_metadata_container(
     )
     project = request.match_info["project"]
     container = request.match_info["container"]
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
+
+    endpoint = session["projects"][project]["endpoint"]
     async with client.head(
-        f"{session['projects'][project]['endpoint']}/{container}",
+        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },
     ) as ret:
-        headers = dict(filter(lambda i: "X-Container-Meta" in i[0], ret.headers.items()))
+        headers = ret.headers
     return aiohttp.web.json_response(
         [
             container,
@@ -769,6 +788,48 @@ async def get_upload_session(
         {
             "id": runner_id,
             "url": f"{setd['upload_external_endpoint']}{path}",
+            "host": setd["upload_external_endpoint"],
             "signature": signature,
+        }
+    )
+
+
+async def get_crypted_upload_session(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Return a pre-signed upload runner session for upload target."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for object upload runner info request from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+    runner_id = await open_upload_runner_session(request, project=project)
+    path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    signature = await sign(3600, path)
+    ws_path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    ws_sign_path = (
+        f"/cryptic/{request.match_info['project']}/{request.match_info['container']}"
+        + f"/{request.match_info['object_name']}"
+    )
+    ws_signature = await sign(3600, ws_sign_path)
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "url": f"{setd['upload_external_endpoint']}{path}",
+            "wsurl": f"{setd['upload_external_endpoint']}{ws_path}".replace(
+                "https", "wss"
+            ),
+            "host": setd["upload_external_endpoint"],
+            "signature": signature,
+            "wssignature": ws_signature,
         }
     )

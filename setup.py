@@ -44,6 +44,7 @@ setuptools.setup(
         __name__: [
             "ui/static/*",
             "ui/static/js/*",
+            "ui/static/sw/*",
             "ui/static/css/*",
             "ui/static/img/*",
         ]

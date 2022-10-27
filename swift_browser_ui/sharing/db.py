@@ -214,7 +214,8 @@ class DBConn:
                 recipient,
                 address,
                 r_read,
-                r_write
+                r_write,
+                sharingdate
             FROM Shares
             WHERE
                 container_owner = $1 AND
@@ -240,6 +241,7 @@ class DBConn:
             "sharedTo": query["recipient"],
             "address": query["address"],
             "access": access,
+            "sharingDate": query["sharingdate"].strftime("%d %b %Y"),
         }
 
     async def get_shared_container_details(
