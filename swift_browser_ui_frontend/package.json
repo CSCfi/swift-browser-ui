@@ -21,7 +21,7 @@
     "material-design-icons": "^3.0.1",
     "node-sass": "^7.0.1",
     "resumablejs": "^1.1.0",
-    "rxjs": "^7.5.2",
+    "rxjs": "^7.5.7",
     "sass-loader": "^13.0.2",
     "serve": "^13.0.2",
     "vue": "^2.6.14",
