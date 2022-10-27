@@ -4,7 +4,7 @@
       id="optionsbar"
       justify="space-between"
     >
-      <SearchBox :containers="renderingContainers"/>
+      <SearchBox :containers="renderingContainers" />
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
@@ -79,6 +79,25 @@ export default {
         this.fetchContainers();
       }
     },
+    "containers.value": function() {
+      if (this.$route.name === "SharedFrom") {
+        getSharingContainers(this.$route.params.project)
+          .then(sharingContainers => {
+            this.renderingContainers = this.containers.value.filter(
+              cont => sharingContainers.some(item =>
+                item === cont.name,
+              ),
+            );
+          });
+      }
+      else if (this.$route.name === "SharedTo") {
+        this.renderingContainers = this.containers.value.filter(cont =>
+          cont.owner,
+        );
+      } else {
+        this.renderingContainers = this.containers.value;
+      }
+    },
   },
   created() {
     this.updateTableOptions();
@@ -125,7 +144,7 @@ export default {
         return;
       }
 
-      const containers = useObservable(
+      this.containers = useObservable(
         liveQuery(() =>
           this.$store.state.db.containers
             .where({ projectID: this.$route.params.project })
@@ -137,24 +156,6 @@ export default {
         projectID: this.$route.params.project,
         signal: null,
       });
-
-      if (this.$route.name === "SharedFrom") {
-        const sharingContainers
-          = await getSharingContainers(this.$route.params.project);
-        this.renderingContainers = containers.value.filter(
-          cont => sharingContainers.some(item =>
-            item === cont.name,
-          ),
-        );
-      }
-
-      else if (this.$route.name === "SharedTo") {
-        this.renderingContainers = containers.value.filter(cont =>
-          cont.owner,
-        );
-      } else {
-        this.renderingContainers = containers.value;
-      }
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link

@@ -9,8 +9,8 @@
       >
         <i class="mdi mdi-chevron-left" />
         {{ isSharingFolder ? $t("message.table.back_to_sharing_folders")
-            : isSharedFolder ? $t("message.table.back_to_shared_folders")
-                           : $t("message.table.back_to_all_folders")
+          : isSharedFolder ? $t("message.table.back_to_shared_folders")
+            : $t("message.table.back_to_all_folders")
         }}
       </router-link>
     </c-row>
@@ -29,7 +29,7 @@
             underline
             @click="toggleShareModal"
           >
-           {{ $t("message.table.edit_sharing") }}
+            {{ $t("message.table.edit_sharing") }}
           </c-link>
         </li>
         <li v-show="isSharedFolder">
