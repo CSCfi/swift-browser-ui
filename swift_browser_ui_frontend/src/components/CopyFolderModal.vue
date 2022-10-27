@@ -6,7 +6,10 @@
       }}
     </h3>
     <c-card-content>
-      <c-alert v-show="folderExists" type="warning">
+      <c-alert
+        v-show="folderExists"
+        type="warning"
+      >
         <p class="has-text-dark">
           {{ $t("message.replicate.destinationExists") }}
         </p>

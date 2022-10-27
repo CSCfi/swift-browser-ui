@@ -143,21 +143,6 @@ export default {
         items,
         item,
       ) => {
-        // Copy button inside Options
-        const copyButton = {
-          name: this.$t("message.copy"),
-          action: (() => {
-            this.$router.push({
-              name: "ReplicateContainer",
-              params: {
-                container: item.name,
-                project: item.projectID,
-                from: item.from ? item.from : item.projectID,
-              },
-            });
-          }),
-          disabled: !item.bytes ? true : false,
-        };
         items.push({
           name: {
             value: truncate(item.name),
@@ -282,7 +267,9 @@ export default {
                     items: [
                       {
                         name: this.$t("message.copy"),
-                        action: (() => toggleCopyFolderModal(item.name)),
+                        action: item.owner 
+                          ? () => toggleCopyFolderModal(item.name, item.owner)
+                          : () => toggleCopyFolderModal(item.name),
                         disabled: !item.bytes ? true : false,
                       },
                       {

@@ -38,7 +38,7 @@
       >
         <ShareModal />
       </c-modal>
-       <c-modal
+      <c-modal
         v-control
         v-csc-model="openCopyFolderModal"
         width="64vw"
@@ -78,10 +78,10 @@
       >
         <div class="toasts-wrapper">
           <h5 class="title is-5 has-text-dark">
-            {{ this.$t("message.copysuccess") }}
+            {{ $t("message.copysuccess") }}
           </h5>
           <p class="has-text-weight-semibold has-text-dark">
-            {{ this.$t("message.copytime") }}
+            {{ $t("message.copytime") }}
           </p>
         </div>
       </c-toasts>
