@@ -6,6 +6,7 @@ import { getContainers } from "@/common/api";
 import { getObjects } from "@/common/api";
 import {
   getTagsForContainer,
+  getMetadataForSharedContainer,
   getTagsForObjects,
   makeGetObjectsMetaURL,
   filterSegments,
@@ -13,6 +14,7 @@ import {
 } from "./conv";
 
 import { initDB } from "@/common/db";
+import {getSharedContainers} from "./globalFunctions";
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -230,6 +232,7 @@ const store = new Vuex.Store({
         commit("loading", true);
       }
       let containers;
+      //let sharedContainers;
       let marker = "";
       let newContainers = [];
       do {
@@ -248,6 +251,27 @@ const store = new Vuex.Store({
           marker = containers[containers.length - 1].name;
         }
       } while (containers.length > 0);
+      const sharedContainers = await getSharedContainers(projectID);
+
+      if (sharedContainers.length > 0) {
+        for (let i in sharedContainers) {
+          let cont = sharedContainers[i];
+          const { bytes, count } = await getMetadataForSharedContainer(
+            projectID,
+            cont.container,
+            signal,
+            cont.owner,
+          );
+          cont.tokens = tokenize(cont.container);
+          cont.projectID = projectID;
+          cont.bytes = bytes;
+          cont.count = count;
+          cont.name = cont.container;
+        }
+        await state.db.containers.bulkPut(sharedContainers).catch(() => {});
+        newContainers = newContainers.concat(sharedContainers);
+      }
+
       dispatch("updateContainerTags", {
         projectID: projectID,
         containers: newContainers,
@@ -259,6 +283,7 @@ const store = new Vuex.Store({
           toDelete.push(oldCont.id);
         }
       });
+
       if (toDelete.length) {
         await state.db.containers.bulkDelete(toDelete);
         await state.db.objects.where("containerID").anyOf(toDelete).delete();
@@ -266,15 +291,18 @@ const store = new Vuex.Store({
       const containersFromDB = await state.db.containers
         .where({ projectID })
         .toArray();
+
       for (let i = 0; i < containersFromDB.length; i++) {
         const container = containersFromDB[i];
         const oldContainer = existingContainers.find(
           (cont) => cont.name === container.name,
         );
+
         let updateObjects = true;
         const dbObjects = await state.db.objects
           .where({ containerID: container.id })
           .count();
+
         if (
           oldContainer &&
           container.count === oldContainer.count &&
@@ -287,7 +315,8 @@ const store = new Vuex.Store({
           updateObjects = false;
           await state.db.objects.where({ containerID: container.id }).delete();
         }
-        if (updateObjects) {
+
+        if (updateObjects && !container.owner) {
           dispatch("updateObjects", {
             projectID: projectID,
             container: container,
@@ -302,13 +331,15 @@ const store = new Vuex.Store({
     ) {
       containers.map(async container => {
         const tags =
-          (await getTagsForContainer(projectID, container.name, signal)) ||
+          (await getTagsForContainer(
+            projectID, container.name, signal, container.owner)) ||
           null;
         await state.db.containers
           .where({ projectID: container.projectID, name: container.name })
           .modify({ tags });
       });
     },
+
     updateObjects: async function (
       { state, dispatch },
       { projectID, container, signal },
@@ -353,7 +384,7 @@ const store = new Vuex.Store({
     },
     updateObjectTags: async function (
       { state, commit },
-      { projectID, container, signal, sharedObjects = undefined },
+      { projectID, container, signal, sharedObjects = undefined, owner },
     ) {
       let objectList = [];
 
@@ -377,6 +408,7 @@ const store = new Vuex.Store({
           container.name,
           objectList,
         );
+
         if (
           i === objects.length - 1 ||
           makeGetObjectsMetaURL(projectID, container.name, [
@@ -390,6 +422,7 @@ const store = new Vuex.Store({
             objectList,
             url,
             signal,
+            owner,
           );
           tags.map((item) => {
             const objectName = item[0];
@@ -413,7 +446,7 @@ const store = new Vuex.Store({
     },
     updateSharedObjects: async function (
       { commit, dispatch },
-      { project, container, signal },
+      { project, owner, container, signal },
     ) {
       commit("loading", true);
       let sharedObjects = [];
@@ -426,10 +459,12 @@ const store = new Vuex.Store({
           marker,
           signal,
           true,
+          owner,
         ).catch(() => {
           commit("loading", false);
           commit("updateObjects", []);
         });
+
         if (objects.length > 0) {
           sharedObjects = sharedObjects.concat(objects);
           marker = objects[objects.length - 1].name;
@@ -439,10 +474,11 @@ const store = new Vuex.Store({
       sharedObjects = filterSegments(sharedObjects);
       commit("updateObjects", sharedObjects);
       dispatch("updateObjectTags", {
-        project,
+        projectID: project,
         container,
         signal,
         sharedObjects,
+        owner,
       });
     },
   },

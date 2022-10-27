@@ -11,6 +11,7 @@ import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
 import CreateFolderModal from "@/components/CreateFolderModal";
 import UploadModal from "@/components/UploadModal";
 import EditTagsModal from "@/components/EditTagsModal";
+import ShareModal from "@/components/ShareModal";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -127,6 +128,7 @@ new Vue({
     UploadModal,
     UploadNotification,
     EditTagsModal,
+    ShareModal,
   },
   data: function () {
     return {
@@ -202,6 +204,12 @@ new Vue({
       set(newState) {
         return newState;
       },
+    },
+    openShareModal: {
+      get() {
+        return this.$store.state.openShareModal;
+      },
+      set() {},
     },
   },
   created() {

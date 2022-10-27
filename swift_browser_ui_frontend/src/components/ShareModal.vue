@@ -17,14 +17,13 @@
     </header>
     <c-card-content>
       <h6 class="subtitle is-6 has-text-dark">
-        {{ $t("message.share.share_subtitle1") }}
-        <b>{{ $t("message.container_ops.myResearchProject") }}</b>
+        {{ $t("message.share.share_subtitle") }}
       </h6>
-      <p class="has-text-dark">
-        {{ $t("message.share.share_subtitle2") }}
-      </p>
       <c-container>
-        <c-row justify="space-between" align="center">
+        <c-row
+          justify="space-between"
+          align="center"
+        >
           <h4 class="title is-4 has-text-dark">
             {{ $t("message.share.share_other_projects") }}
           </h4>
@@ -32,17 +31,23 @@
             class="toggle-instructions"
             @click="toggleShareGuide"
           >
-            <c-icon-button text v-show="!openShareGuide">
+            <c-icon-button
+              v-show="!openShareGuide"
+              text
+            >
               <i class="mdi mdi-information-outline" />
             </c-icon-button>
             <c-link underline>
               {{ openShareGuide ? $t("message.share.close_instructions")
-                                : $t("message.share.instructions")
+                : $t("message.share.instructions")
               }}
             </c-link>
           </c-flex>
         </c-row>
-        <div class="guide-content" v-show="openShareGuide">
+        <div
+          v-show="openShareGuide"
+          class="guide-content"
+        >
           <p>
             {{ $t("message.share.share_guide_step1") }}
           </p>
@@ -100,7 +105,7 @@
         <ShareModalTable
           :shared-details="sharedDetails"
           :folder-name="folderName"
-          :accessRights="accessRights"
+          :access-rights="accessRights"
           @removeSharedFolder="removeSharedFolder"
         />
       </c-container>
@@ -307,7 +312,7 @@ export default {
 .share-card {
   padding: 3rem 2rem 0 2rem;
   position: absolute;
-  top: -8rem;
+  top: 0;
   left: 0;
   right: 0;
   max-height: 75vh;
@@ -405,5 +410,15 @@ export default {
   c-toasts {
     width: fit-content;
   }
+
+  c-alert[type="success"] {
+    align-items: center;
+    & > .shared-notification {
+      color: var(--csc-dark-grey);
+    };
+    margin-bottom: 1.5rem;
+    box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
+  }
+
 
 </style>

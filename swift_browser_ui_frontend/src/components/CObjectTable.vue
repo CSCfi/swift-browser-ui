@@ -135,10 +135,7 @@ export default {
                 params: {
                   href: "javascript:void(0)",
                   color: "dark-grey",
-                  onClick: () => {
-                    let e = new Event("changeFolder", {name: item.name});
-                    this.$emit(e);
-                  },
+                  onClick: () => this.$emit("changeFolder", item.name),
                 },
               },
             } : {}),
@@ -147,7 +144,7 @@ export default {
             value: getHumanReadableSize(item.bytes),
           },
           last_modified: {
-            value:  parseDateTime(this.locale, item.last_modified),
+            value: parseDateTime(this.locale, item.last_modified),
           },
           ...(this.hideTags ? {} : {
             tags: {

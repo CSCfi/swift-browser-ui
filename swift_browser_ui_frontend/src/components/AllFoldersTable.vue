@@ -6,8 +6,7 @@
 import Containers from "@/components/Containers";
 
 export default {
-  name: "SharedOutTable",
+  name: "AllFoldersTable",
   components: { Containers },
 };
 </script>
-

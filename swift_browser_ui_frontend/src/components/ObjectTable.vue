@@ -5,16 +5,13 @@
     <c-row>
       <router-link
         class="back-link"
-        :to="{
-          name: 'AllFolders',
-          params: {
-            user: $store.state.uname,
-            project: $store.state.active.id,
-          }
-        }"
+        :to="getRedirectRoutes()"
       >
         <i class="mdi mdi-chevron-left" />
-        Back to all folders
+        {{ isSharingFolder ? $t("message.table.back_to_sharing_folders")
+          : isSharedFolder ? $t("message.table.back_to_shared_folders")
+            : $t("message.table.back_to_all_folders")
+        }}
       </router-link>
     </c-row>
 
@@ -23,13 +20,25 @@
         <i class="mdi mdi-folder-outline" />
         <span>{{ container }}</span>
       </div>
-
       <ul class="folder-details">
         <li>
-          <b>{{ $t("message.share.sharedTo") }}: </b> N/A
+          <b>{{ $t("message.table.shared_status") }}: </b>
+          {{ $t(sharedStatus) }}&nbsp;
+          <c-link
+            v-show="!isSharedFolder"
+            underline
+            @click="toggleShareModal"
+          >
+            {{ $t("message.table.edit_sharing") }}
+          </c-link>
         </li>
-        <li>
-          <b>{{ $t("message.table.created") }}: </b> N/A
+        <li v-show="isSharedFolder">
+          <b>{{ $t("message.table.source_project_id") }}: </b>
+          {{ ownerProject }}
+        </li>
+        <li v-show="isSharedFolder">
+          <b>{{ $t("message.table.date_of_sharing") }}: </b>
+          {{ dateOfSharing }}
         </li>
       </ul>
     </div>
@@ -89,13 +98,13 @@
         </span>
       </c-menu>
     </c-row>
-
     <CObjectTable
       :objs="filteredObjects.length ? filteredObjects : oList.value"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
+      @change-folder="changeFolder"
       @selected-rows="handleSelection"
       @delete-object="confirmDelete([$event])"
     />
@@ -105,6 +114,7 @@
 <script>
 import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
+import { getSharedContainers } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -121,6 +131,12 @@ export default {
   },
   data: function () {
     return {
+      isSharingFolder: false,
+      isSharedFolder: false,
+      sharedStatus: "",
+      sharedContainers: [],
+      ownerProject: "",
+      dateOfSharing: "",
       oList: {value: []},
       selected: undefined,
       disablePagination: false,
@@ -133,6 +149,7 @@ export default {
       abortController: null,
       filteredObjects: [],
       inCurrentFolder: [],
+      tableOptions: [],
     };
   },
   computed: {
@@ -148,6 +165,9 @@ export default {
     container () {
       return this.$route.params.container;
     },
+    client () {
+      return this.$store.state.client;
+    },
     active () {
       return this.$store.state.active;
     },
@@ -162,8 +182,10 @@ export default {
     },
   },
   watch: {
-    active: function() {
-      this.updateObjects();
+    active: async function() {
+      await this.getSharedContainers();
+      await this.getFolderSharedStatus();
+      await this.updateObjects();
     },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -222,13 +244,87 @@ export default {
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
-  mounted () {
+  async mounted () {
+    await this.getSharedContainers();
+    await this.getFolderSharedStatus();
     this.updateObjects();
   },
   beforeDestroy () {
     this.abortController.abort();
   },
   methods: {
+    getRedirectRoutes: function () {
+      if (this.isSharingFolder) {
+        return {
+          name: "SharedFrom",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+      else if (this.isSharedFolder) {
+        return {
+          name: "SharedTo",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+      else {
+        return {
+          name: "AllFolders",
+          params: { project: this.$store.state.active.id },
+        };
+      }
+    },
+    getSharedContainers: async function () {
+      this.sharedContainers = await getSharedContainers(this.active.id);
+    },
+    getFolderSharedStatus: async function() {
+      if (this.client) {
+        await this.client.getShareDetails(
+          this.project,
+          this.container,
+        ).then(
+          async (ret) => {
+            if (ret.length > 0) {
+              this.isSharingFolder = true;
+              ret.length === 1
+                ? this.sharedStatus
+                  = "message.folderDetails.sharing_to_one_project"
+                : this.sharedStatus
+                  = "message.folderDetails.sharing_to_many_projects";
+            }
+            else if (ret.length === 0) {
+              if (this.sharedContainers.findIndex(
+                cont => cont.container === this.container) > -1) {
+                this.isSharedFolder = true;
+                const sharedDetails
+                  = await this.client.getAccessDetails(
+                    this.project,
+                    this.container,
+                    this.$route.params.owner,
+                  );
+
+                const accessRights = sharedDetails.access;
+                if (accessRights.length === 1) {
+                  this.sharedStatus
+                    = "message.folderDetails.shared_with_read";
+                }
+                else if (accessRights.length > 1) {
+                  this.sharedStatus
+                    = "message.folderDetails.shared_with_read_write";
+                }
+                this.ownerProject = sharedDetails.owner;
+                this.dateOfSharing = sharedDetails.sharingDate;
+              }
+              else this.sharedStatus
+                = "message.folderDetails.notShared";
+            }
+          },
+        );
+      }
+    },
+    toggleShareModal: function () {
+      this.$store.commit("toggleShareModal", true);
+      this.$store.commit("setFolderName", this.container);
+    },
     updateObjects: async function () {
       if (
         this.container === undefined
@@ -261,6 +357,7 @@ export default {
           projectID: this.$route.params.project,
           name: this.container,
         });
+
       this.oList = useObservable(
         liveQuery(() =>
           this.$store.state.db.objects
@@ -268,6 +365,7 @@ export default {
             .toArray(),
         ),
       );
+
       this.$store.dispatch(
         "updateObjects",
         {

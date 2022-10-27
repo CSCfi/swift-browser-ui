@@ -67,6 +67,7 @@ jaetut
 jakamaan
 jakamasi
 jakaminen
+jakamispäivämäärä
 jakamista
 jakanut
 jako
@@ -80,6 +81,7 @@ jäsenet
 jäsenille
 jäsenten
 jne
+jo
 johtaa
 johtua
 jonka
@@ -90,11 +92,14 @@ julkiset
 julkisia
 kaikille
 kaikki
+kaikkien
 kansio
 kansioille
 kansioina
 kansion
+kansiossa
 kansiot
+kansiota
 kanssa
 kanssasi
 käynnissä
@@ -158,12 +163,14 @@ kulutuksesta
 kulutus
 kunnes
 kyseisen
+ladata
 ladattavat
 lähetä
 lähetetään
 lähetettäväksi
 lähetettävät
 lähetettiin
+lähetetyt
 lähetetyt
 lähettäessä
 lähettäjän
@@ -205,12 +212,14 @@ mahdollista
 megatavun
 mikä
 mikäli
+millekään
 minuutin
 minuutteja
 mitätöi
 muiden
 muita
 mukaan
+muokata
 muokataan
 muokattu
 muokkaa
@@ -257,6 +266,7 @@ olla
 omaa
 ominaisuutta
 omistavan
+on
 ongelmiin
 onnistui
 onnistunut
@@ -298,6 +308,7 @@ postamista
 poudan
 profiili
 projekteihin
+projekteille
 projekteja
 projekti
 projektia
@@ -398,6 +409,7 @@ tägillä
 tägit
 tähän
 tai
+takaisin
 tällä
 tallenna
 tallennettujen
@@ -406,6 +418,7 @@ talteen
 tämä
 tämän
 tapauksessa
+tarkastella
 tarkat
 tarkistathan
 tarkistussumma
@@ -431,6 +444,7 @@ tieto
 tietoa
 tietosivulta
 tietotekniikan
+tila
 tilan
 tilankäyttö
 tilapäinen
@@ -456,6 +470,7 @@ tyhjä
 tyhjennä
 tyyppi
 ulos
+useille
 useisiin
 uudella
 uudelle
@@ -492,6 +507,7 @@ voida
 voit
 voivat
 vuoksi
+yhdelle
 yhden
 yhteenlaskettu
 yhteys

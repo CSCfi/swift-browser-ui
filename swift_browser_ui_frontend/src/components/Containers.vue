@@ -1,54 +1,41 @@
 <template>
-  <div
-    class="containers"
-  >
-    <c-modal
-      v-control
-      v-csc-model="openShareModal"
-      width="50vw"
+  <div class="contents">
+    <c-row
+      id="optionsbar"
+      justify="space-between"
     >
-      <ShareModal />
-    </c-modal>
-
-    <div class="contents">
-      <c-row
-        id="optionsbar"
-        justify="space-between"
+      <SearchBox :containers="renderingContainers" />
+      <c-menu
+        :key="optionsKey"
+        :items.prop="tableOptions"
+        options-testid="table-options-selector"
       >
-        <SearchBox />
-        <c-menu
-          :key="optionsKey"
-          :items.prop="tableOptions"
-          options-testid="table-options-selector"
-        >
-          <span class="menu-active display-options-menu">
-            <i class="mdi mdi-tune" />
-            {{ $t("message.tableOptions.displayOptions") }}
-          </span>
-        </c-menu>
-      </c-row>
-      <ContainerTable
-        :conts="containers.value"
-        :disable-pagination="disablePagination"
-        :hide-tags="hideTags"
-      />
-    </div>
+        <span class="menu-active display-options-menu">
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
+        </span>
+      </c-menu>
+    </c-row>
+    <ContainerTable
+      :conts="renderingContainers"
+      :disable-pagination="disablePagination"
+      :hide-tags="hideTags"
+    />
   </div>
 </template>
 
 <script>
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
+import { getSharingContainers } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable";
 import SearchBox from "@/components/SearchBox";
-import ShareModal from "@/components/ShareModal";
 
 export default {
   name: "ContainersView",
   components: {
     ContainerTable,
     SearchBox,
-    ShareModal,
   },
   data: function () {
     return {
@@ -59,11 +46,11 @@ export default {
       perPage: 15,
       direction: "asc",
       currentPage: 1,
-      shareModalIsActive: false,
       showTags: true,
       optionsKey: 1,
       abortController: null,
       containers: { value: [] },
+      renderingContainers: [],
     };
   },
   computed: {
@@ -87,8 +74,29 @@ export default {
     project: function () {
       this.fetchContainers();
     },
-    locale: function () {
-      this.updateTableOptions();
+    openShareModal: function () {
+      if(!this.openShareModal) {
+        this.fetchContainers();
+      }
+    },
+    "containers.value": function() {
+      if (this.$route.name === "SharedFrom") {
+        getSharingContainers(this.$route.params.project)
+          .then(sharingContainers => {
+            this.renderingContainers = this.containers.value.filter(
+              cont => sharingContainers.some(item =>
+                item === cont.name,
+              ),
+            );
+          });
+      }
+      else if (this.$route.name === "SharedTo") {
+        this.renderingContainers = this.containers.value.filter(cont =>
+          cont.owner,
+        );
+      } else {
+        this.renderingContainers = this.containers.value;
+      }
     },
   },
   created() {
@@ -135,6 +143,7 @@ export default {
       ) {
         return;
       }
+
       this.containers = useObservable(
         liveQuery(() =>
           this.$store.state.db.containers
@@ -142,6 +151,7 @@ export default {
             .toArray(),
         ),
       );
+
       await this.$store.dispatch("updateContainers", {
         projectID: this.$route.params.project,
         signal: null,
@@ -180,22 +190,8 @@ export default {
 
 <style scoped>
 
-.containers {
-   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-c-modal {
-  position: relative;
-  margin: 0 auto;
-  display: inline-flex;
-}
-
 #optionsbar {
-  margin: 0.5em;
+  margin: 0.5em 0;
   background: #fff;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 </style>

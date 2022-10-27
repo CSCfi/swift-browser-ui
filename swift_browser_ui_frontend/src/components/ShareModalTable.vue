@@ -21,11 +21,6 @@ export default {
       tableData: [],
     };
   },
-  watch: {
-    sharedDetails: function () {
-      this.getTableData();
-    },
-  },
   computed: {
     projectId () {
       return this.$store.state.active.id;
@@ -88,6 +83,11 @@ export default {
       return {
         hideDetails: true,
       };
+    },
+  },
+  watch: {
+    sharedDetails: function () {
+      this.getTableData();
     },
   },
   methods: {
