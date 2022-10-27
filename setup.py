@@ -18,7 +18,7 @@ setuptools.setup(
         "asyncpg==0.26.0",
         "certifi==2022.9.24",
         "click==8.1.3",
-        "cryptography==37.0.3",
+        "cryptography==38.0.1",
         "gunicorn==20.1.0",
         "keystoneauth1==5.0.0",
         "oidcrp==2.1.4",
