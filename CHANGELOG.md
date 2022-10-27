@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #788) Fix for objects of a copied folder rendering their tags correctly
 - (GH #781) Render full details of Folders you have shared and Folders shared with you
   - Show Folder status including Shared status, source project and date of sharing
   - Show tags for Folders and Objects inside them
