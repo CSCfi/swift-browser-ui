@@ -376,7 +376,6 @@ export async function swiftCopyContainer(
   source_container,
 ) {
   // Replicate the container from a specified source to the location
-
   let fetchURL = new URL("/replicate/".concat(
     encodeURI(project), "/",
     encodeURI(container),

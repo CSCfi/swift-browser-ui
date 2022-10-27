@@ -15,6 +15,16 @@ export function toggleEditTagsModal(object) {
   }
 }
 
+export function toggleCopyFolderModal(folderName, sourceProjectId) {
+  store.commit("toggleCopyFolderModal", true);
+  if (folderName) {
+    store.commit("setFolderName", folderName);
+  }
+  if(sourceProjectId) {
+    store.commit("setSourceProjectId", sourceProjectId);
+  }
+}
+
 export function modifyBrowserPageStyles() {
   const element = document.getElementById("subContainer");
   element.classList.toggle("subContainer-additionalStyles");

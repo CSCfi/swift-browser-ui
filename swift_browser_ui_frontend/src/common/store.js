@@ -54,6 +54,9 @@ const store = new Vuex.Store({
     currentUpload: undefined,
     openEditTagsModal: false,
     selectedObjectName: "",
+    openCopyFolderModal: false,
+    isFolderCopied: false,
+    sourceProjectId: "",
   },
   mutations: {
     loading(state, payload) {
@@ -173,10 +176,14 @@ const store = new Vuex.Store({
       }
     },
     eraseDropFile(state, file) {
-      state.dropFiles.splice(state.dropFiles
-        .findIndex(({ name, relativePath}) =>
-          relativePath === file.relativePath.value
-                              && name === file.name.value), 1);
+      state.dropFiles.splice(
+        state.dropFiles.findIndex(
+          ({ name, relativePath }) =>
+            relativePath === file.relativePath.value &&
+            name === file.name.value,
+        ),
+        1,
+      );
     },
     eraseDropFiles(state) {
       state.dropFiles = [];
@@ -218,6 +225,15 @@ const store = new Vuex.Store({
     },
     setObjectName(state, payload) {
       state.selectedObjectName = payload;
+    },
+    toggleCopyFolderModal(state, payload) {
+      state.openCopyFolderModal = payload;
+    },
+    setFolderCopiedStatus(state, payload) {
+      state.isFolderCopied = payload;
+    },
+    setSourceProjectId(state, payload) {
+      state.sourceProjectId = payload;
     },
   },
   actions: {
@@ -295,7 +311,7 @@ const store = new Vuex.Store({
       for (let i = 0; i < containersFromDB.length; i++) {
         const container = containersFromDB[i];
         const oldContainer = existingContainers.find(
-          (cont) => cont.name === container.name,
+          cont => cont.name === container.name,
         );
 
         let updateObjects = true;
@@ -354,7 +370,7 @@ const store = new Vuex.Store({
       do {
         objects = await getObjects(projectID, container.name, marker, signal);
         if (objects.length > 0) {
-          objects.forEach((obj) => {
+          objects.forEach(obj => {
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
@@ -424,11 +440,11 @@ const store = new Vuex.Store({
             signal,
             owner,
           );
-          tags.map((item) => {
+          tags.map(item => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {
-              objects.forEach((obj) => {
+              objects.forEach(obj => {
                 if (obj.name === objectName) {
                   obj.tags = tags;
                 }

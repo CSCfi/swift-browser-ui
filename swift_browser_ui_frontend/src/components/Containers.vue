@@ -63,6 +63,9 @@ export default {
       },
       set() {},
     },
+    isFolderCopied() {
+      return this.$store.state.isFolderCopied;
+    },
     locale() {
       return this.$i18n.locale;
     },
@@ -97,6 +100,14 @@ export default {
       } else {
         this.renderingContainers = this.containers.value;
       }
+    },
+    isFolderCopied: function () {
+      if (this.isFolderCopied) {
+        this.fetchContainers();
+      }
+    },
+    locale: function () {
+      this.updateTableOptions();
     },
   },
   created() {
