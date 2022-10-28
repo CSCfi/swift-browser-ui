@@ -1,6 +1,17 @@
 <template>
   <div class="contents">
     <div class="tokenContents">
+      <section class="section">
+        <router-link
+          class="back-link"
+          :to="{
+            name: 'AllFolders',
+          }"
+        >
+          <i class="mdi mdi-chevron-left" />
+          {{ $t('message.tokens.back') }}
+        </router-link>
+      </section>
       <b-field grouped>
         <b-field
           :label="$t('message.tokens.identLabel')"
@@ -139,17 +150,17 @@ export default {
   },
   methods: {
     getTokens: function () {
-      listTokens(this.project).then((ret) => {this.tokens = ret;});
+      listTokens(this.active).then((ret) => {this.tokens = ret;});
     },
     removeToken: function (identifier) {
       removeToken(
-        this.project,
+        this.active,
         identifier,
       ).then(() => {this.getTokens();});
     },
     addToken: function (identifier) {
       createExtToken(
-        this.project,
+        this.active,
         identifier,
       ).then((ret) => {
         this.latest = ret;
@@ -180,7 +191,8 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/css/prod.scss";
 .tokenContents {
   width: 90%;
   margin-left: 5%;
@@ -199,5 +211,16 @@ export default {
 }
 .copyButton {
   margin-left: 1%;
+}
+.back-link {
+  display: flex;
+  padding-bottom: .5rem;
+  color: $csc-primary;
+  font-weight: 600;
+  align-items: center;
+
+  & .mdi {
+    font-size: 2rem;
+  }
 }
 </style>

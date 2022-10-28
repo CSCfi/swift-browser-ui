@@ -20,6 +20,7 @@ let vueConfig = {
       "/download":            {target: proxyTo},
       "/sign":                {target: proxyTo},
       "/replicate":           {target: proxyTo},
+      "/token":               {target: proxyTo},
     },
     client: {
       webSocketURL: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,

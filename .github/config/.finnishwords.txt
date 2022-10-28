@@ -1,4 +1,3 @@
-
 ajaksi
 alapuolisesta
 alla
@@ -282,12 +281,14 @@ ota
 ottaneesi
 ovat
 oy
+päänäkymään
 pääsy
 paina
 painikkeella
 painikkeesta
 päivitä
 pakollista
+palaa
 palautus
 paloitellaan
 paluu

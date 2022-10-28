@@ -352,6 +352,7 @@ let default_translations = {
           "the token somewhere before navigating away from the " +
           "token page.",
         tokenCopied: "Token copied.",
+        back: "Back to main view",
       },
       encrypt: {
         uploadFiles: "Upload files",
@@ -776,6 +777,7 @@ let default_translations = {
         identMessage: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",
+        back: "Palaa päänäkymään",
         copyToken:
           "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
           "kopiointi tai palautus jälkeenpäin ole mahdollista. " +

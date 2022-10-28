@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- (GH #741) Fixed incorrect API token list logic causing an incorrect 404
 - (GH #780) Fixed tables' Display Options rendering the menu options correctly when data changed
 - (GH #502) Items being removed from IndexedDB on network errors.
 - (GH #514) Fixed container and metadata updates.
