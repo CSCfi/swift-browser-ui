@@ -80,7 +80,7 @@ export default {
       folderName: "",
       tags: [],
       taginputConfirmKeys,
-      folders: { value: [] },
+      folders: [],
     };
   },
   computed: {
@@ -133,8 +133,8 @@ export default {
       const safeKey = escapeRegExp(this.folderName).trim();
       let re = new RegExp("^".concat(safeKey, "$"));
 
-      if (this.folders.value) {
-        for (let folder of this.folders.value) {
+      if (this.folders) {
+        for (let folder of this.folders) {
           if (folder.name.match(re)) {
             this.folderExists = true;
             return;

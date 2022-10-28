@@ -60,6 +60,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Deprecate `.value` from container and object db listings
+  - `dexie` or `rxjs` removed this from db returns, couldn't find a change causing
+    this in either project, but this is the observed behavior
 - Fix routing issues from trailing slash when adding project to container ACL.
 - Fix incorrect session fetch in backend when accessing objects owned by foreign projects
 - Fix routing issues when accessing shared objects
