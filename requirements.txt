@@ -8,7 +8,7 @@ cryptography==38.0.1
 gunicorn==20.1.0
 keystoneauth1==5.0.0
 oidcrp==2.1.4
-python-swiftclient==4.0.0
+python-swiftclient==4.1.0
 sphinx==5.0.2
 sphinx-rtd-theme==1.0.0
 uvloop==0.16.0
