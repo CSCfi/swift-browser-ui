@@ -196,7 +196,7 @@ class ObjectReplicationProxy:
 
             # Copy over metadata headers
             for i in resp_g.headers:
-                if "Meta" in resp_g.headers[i]:
+                if "X-Object-Meta-Usertags" in i:
                     headers[i] = resp_g.headers[i]
 
             # If the object fits into the 5GiB limit imposed by Swift

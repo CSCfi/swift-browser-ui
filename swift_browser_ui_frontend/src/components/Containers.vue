@@ -104,6 +104,7 @@ export default {
     isFolderCopied: function () {
       if (this.isFolderCopied) {
         this.fetchContainers();
+        this.$store.commit("setFolderCopiedStatus", false);
       }
     },
     locale: function () {
