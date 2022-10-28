@@ -13,7 +13,7 @@
   "dependencies": {
     "@vue/cli-service": "^5.0.8",
     "@vue/composition-api": "^1.7.1",
-    "@vueuse/rxjs": "^8.7.5",
+    "@vueuse/rxjs": "^9.3.0",
     "buefy": "^0.9.21",
     "core-js": "^3.23.3",
     "dexie": "^3.2.2",
