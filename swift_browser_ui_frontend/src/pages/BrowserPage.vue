@@ -66,13 +66,11 @@
           </p>
         </div>
       </c-toasts>
-      <CFooter/>
-    </div>
-    <div id="footer">
-   </div>
-   <div id="footer">
-      <CFooter/>
-  </div> 
+      <!--New Footer Component-->
+      <div id="footer">
+       <CFooter/>
+      </div> 
+  </div>
 </div>
 </template>
 

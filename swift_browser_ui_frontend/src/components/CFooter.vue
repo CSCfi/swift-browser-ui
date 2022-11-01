@@ -73,6 +73,7 @@ export default {
 }
 .linktext {
   color: #595959; 
+  font-weight: 400;
 }
 
 #rightmenu{
