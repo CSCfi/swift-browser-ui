@@ -14,7 +14,7 @@
       {{ $t('message.container_ops.norename') }}
     </b-message>
     <b-field
-      :label="$t('message.container_ops.containerName')"
+      :label="$t('message.container_ops.folderName')"
     >
       <b-input 
         v-model="container"

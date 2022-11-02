@@ -72,6 +72,7 @@ let default_translations = {
         sharedTo: "Folders shared with you",
       },
       table: {
+        hidden: "Hidden files",
         name: "Name",
         objects: "Objects",
         size: "Size",
@@ -435,6 +436,7 @@ let default_translations = {
         sharedTo: "Sinulle jaetut kansiot",
       },
       table: {
+        hidden: "Piilotetut tiedostot",
         name: "Nimi",
         objects: "Objekteja",
         size: "Koko",

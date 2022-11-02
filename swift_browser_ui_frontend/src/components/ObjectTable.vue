@@ -39,6 +39,13 @@
           {{ $t('message.table.paginated') }}
         </b-switch>
       </div>
+      <div
+      class="control is-flex"
+      >
+        <b-switch v-model="displayHidden">
+          {{ $t('message.table.hidden') }}
+        </b-switch>
+      </div>
       <div class="control is-flex">
         <b-switch v-model="renderFolders">
           {{ $t('message.renderFolders') }}
@@ -106,7 +113,7 @@
       :checked-rows.sync="checkedRows"
       :is-row-checkable="isRowCheckable"
       default-sort="name"
-      :data="oList.value"
+      :data="filteredOList"
       :selected.sync="selected"
       :current-page.sync="currentPage"
       :paginated="isPaginated"
@@ -339,7 +346,11 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import {
+  getHumanReadableSize,
+  truncate,
+  filterSegments,
+} from "@/common/conv";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import debounce from "lodash/debounce";
@@ -360,12 +371,14 @@ export default {
   },
   data: function () {
     return {
+      filteredOList: [],
       oList: {value: []},
       selected: undefined,
       isPaginated: true,
       renderFolders: false,
       showTags: true,
       perPage: 15,
+      displayHidden: false,
       defaultSortDirection: "asc",
       searchQuery: "",
       currentPage: 1,
@@ -403,6 +416,24 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
+    ["oList.value"]: function () {
+      if (this.oList.value !== undefined) {
+        this.filteredOList = this.displayHidden
+          ? this.oList.value
+          : filterSegments(this.oList.value);
+      } else {
+        this.filteredOList = [];
+      }
+      if (this.oList.value !== undefined && this.$route.query.selected) {
+        const selected = this.$route.query.selected;
+        const obj = this.oList.value.find(o => {
+          return o.name === selected;
+        });
+        if (obj) {
+          this.selected = obj;
+        }
+      }
+    },
     renderFolders: function () {
       this.selected = undefined;
       this.checkedRows = [];
@@ -428,16 +459,10 @@ export default {
     queryPage: function () {
       this.currentPage = this.queryPage;
     },
-    ["oList.value"]: async function() {
-      if (this.oList.value !== undefined && this.$route.query.selected) {
-        const selected = this.$route.query.selected;
-        const obj = this.oList.value.find(o => {
-          return o.name === selected;
-        });
-        if (obj) {
-          this.selected = obj;
-        }
-      }
+    displayHidden: function () {
+      this.filteredOList = this.displayHidden
+        ? this.oList.value
+        : filterSegments(this.oList.value);
     },
   },
   created: function () {

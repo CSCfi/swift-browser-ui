@@ -44,6 +44,8 @@
 <script>
 import {swiftCopyContainer} from "@/common/api";
 import escapeRegExp from "lodash/escapeRegExp";
+import { liveQuery } from "dexie";
+import { useObservable } from "@vueuse/rxjs";
 
 export default {
   name: "ReplicationView",
@@ -52,14 +54,12 @@ export default {
       destination: this.$route.params.container,
       project: this.$route.params.project,
       destinationExists: false,
+      containers: { value: [] },
     };
   },
   computed: {
     active () {
       return this.$store.state.active;
-    },
-    containerCache () {
-      return this.$store.state.containerCache;
     },
   },
   watch: {
@@ -67,10 +67,29 @@ export default {
       this.checkDestination();
     },
   },
-  mounted () {
-    this.checkDestination();
+  created () {
+    this.fetchContainers().then(() => this.checkDestination());
   },
   methods: {
+    fetchContainers: async function () {
+      if (
+        this.active.id === undefined &&
+        this.$route.params.project === undefined
+      ) {
+        return;
+      }
+      this.containers = useObservable(
+        liveQuery(() => 
+          this.$store.state.db.containers
+            .where({ projectID: this.$route.params.project })
+            .toArray(),
+        ),
+      );
+      await this.$store.dispatch("updateContainers", {
+        projectID: this.$route.params.project,
+        signal: null,
+      });
+    },
     replicateContainer: function () {
       // Initiate the container replication operation
       swiftCopyContainer(
@@ -78,12 +97,15 @@ export default {
         this.destination,
         this.$route.params.from,
         this.$route.params.container,
-      ).then(() => {
+      ).then(async () => {
         this.$buefy.toast.open({
           message: this.$t("message.copysuccess"),
           type: "is-success",
         });
-        this.$store.dispatch("updateContainers");
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.$route.params.project,
+          signal: null,
+        });
         this.$router.go(-1);
       }).catch(() => {
         this.$buefy.toast.open({
@@ -96,11 +118,15 @@ export default {
       // request parameter should be sanitized first
       var safeKey = escapeRegExp(this.destination);
       let re = new RegExp("^".concat(safeKey, "$"));
-      for (let cont of this.containerCache) {
+      for (let cont of this.containers.value) {
         if (cont.name.match(re)) {
           this.destinationExists = true;
           return;
         }
+      }
+      if (this.$route.params.container.match(re)) {
+        this.destinationExists = true;
+        return;
       }
       this.destinationExists = false;
     },

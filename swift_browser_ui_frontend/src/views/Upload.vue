@@ -279,6 +279,7 @@
 import { getUploadEndpoint } from "@/common/api";
 import { getHumanReadableSize, truncate, computeSHA256 } from "@/common/conv";
 import EncryptedUploadSession from "@/common/upload";
+import delay from "lodash/delay";
 
 export default {
   name: "UploadView",
@@ -519,7 +520,11 @@ export default {
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
-      this.toggleUploadModal();
+      delay(() => {
+        if (this.$store.state.encryptedFile == "") {
+          this.beginEncryptedUpload();
+        }
+      }, 5000);
     },
     cancelUpload() {
       this.$store.commit("eraseDropFiles");
