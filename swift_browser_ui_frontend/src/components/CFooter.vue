@@ -56,7 +56,7 @@ export default {
   z-index: 2;
 }
 .largetext{
-  font-family: 'Museo Sans';
+  font-family: var(--csc-font-family);
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
@@ -64,7 +64,7 @@ export default {
   color: #595959;
 }
 .smalltext{
-  font-family: 'Museo Sans';
+  font-family:  var(--csc-font-family);;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;

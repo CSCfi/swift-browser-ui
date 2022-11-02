@@ -97,6 +97,7 @@ html, body {
 #mainContainer {
   min-height: 100vh;
   position: relative;
+  font-family: var(--csc-font-family);
 }
 
 #subContainer {
@@ -104,6 +105,7 @@ html, body {
   display: flex;
   flex-direction: column;
   z-index: 1;
+  font-family: var(--csc-font-family);
 }
 
 .subContainer-additionalStyles {

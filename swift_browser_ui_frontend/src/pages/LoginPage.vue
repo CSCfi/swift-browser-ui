@@ -86,19 +86,19 @@
 }
 
 h2 {
-  font-family: sans-serif;
+  font-family: 'Museo Sans';
   text-align: center;
 }
 
 .maintext {
-  font-family: sans-serif;
+  font-family: 'Museo Sans';
   text-align: justify;
   line-height: 1.5;
 }
 
 #manlist {
   text-align: justify;
-  font-family: monospace;
+  font-family:'Museo Sans';
   line-height: 1.4;
 }
 
