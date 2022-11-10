@@ -231,7 +231,7 @@ class TarQueueWrapper:
             maxsize=int(os.environ.get("SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE", 1024))
         )
 
-    def write(self, payload: bytes = None) -> None:
+    def write(self, payload: bytes) -> None:
         """Emulate BytesIO write function to be used with tarfile."""
         self.q.put(payload)
 
