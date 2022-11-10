@@ -49,7 +49,7 @@ export default {
 
 #c-footer{
   flex-shrink: 0;
-  height:  10rem;
+  height:  8rem;
   width: 100%;
   padding:40px 60px;
   background-color:#DFE1E3;
