@@ -75,6 +75,10 @@ export default {
   color: #595959; 
   font-weight: 400;
 }
+a:hover {
+  background-color: #CCF4F0;
+  text-decoration: underline;     
+}
 
 #rightmenu{
   margin-top: 15px;

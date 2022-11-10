@@ -140,6 +140,7 @@ export default {
     width: auto;
     margin-left: 5%;
     margin-right: 5%;
+    font-family: 'museo-sans';
   }
   .requesthead {
     margin: 1% 1% 1% 0;

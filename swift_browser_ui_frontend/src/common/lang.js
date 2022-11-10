@@ -452,9 +452,9 @@ let default_translations = {
         about: "About Sensitive Data Services",
       },
       footerMenu:{
-        groupandprogram:"Sensitive Data Service-SD Connect",
-        csc:"Powered by CSC -IT Center for Science Ltd",
-        servicedescription: "Service Description",
+        groupandprogram:"Sensitive Data Services - SD Connect",
+        csc:"Powered by CSC - IT Center for Science Ltd.",
+        servicedescription:"Service Description",
         accessibility:"Accessibility",
       },
     },

@@ -193,6 +193,10 @@ export default {
 
 <style scoped lang="scss">
 @import "@/css/prod.scss";
+
+.contents{
+  font-family: var(--csc-font-family);
+}
 .tokenContents {
   width: 90%;
   margin-left: 5%;
