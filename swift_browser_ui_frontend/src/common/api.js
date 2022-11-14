@@ -364,7 +364,8 @@ export async function swiftDeleteObjects(
   let ret = await DELETE(
     fetchURL, JSON.stringify(objects),
   );
-  if (ret.status != 204) {
+
+  if (ret.status != 200) {
     throw new Error("Object / objects deletion not successful.");
   }
 }

@@ -9,7 +9,6 @@ import {
   getMetadataForSharedContainer,
   getTagsForObjects,
   makeGetObjectsMetaURL,
-  filterSegments,
   tokenize,
 } from "./conv";
 
@@ -248,7 +247,6 @@ const store = new Vuex.Store({
         commit("loading", true);
       }
       let containers;
-      //let sharedContainers;
       let marker = "";
       let newContainers = [];
       do {
@@ -262,7 +260,6 @@ const store = new Vuex.Store({
             cont.tokens = tokenize(cont.name);
             cont.projectID = projectID;
           });
-          await state.db.containers.bulkPut(containers).catch(() => {});
           newContainers = newContainers.concat(containers);
           marker = containers[containers.length - 1].name;
         }
@@ -308,34 +305,47 @@ const store = new Vuex.Store({
         .where({ projectID })
         .toArray();
 
-      for (let i = 0; i < containersFromDB.length; i++) {
-        const container = containersFromDB[i];
-        const oldContainer = existingContainers.find(
+      for (let i = 0; i < newContainers.length; i++) {
+        const container = newContainers[i];
+        const oldContainer = containersFromDB.find(
           cont => cont.name === container.name,
         );
-
+        let key;
         let updateObjects = true;
-        const dbObjects = await state.db.objects
-          .where({ containerID: container.id })
-          .count();
+        let dbObjects = 0;
 
-        if (
-          oldContainer &&
-          container.count === oldContainer.count &&
-          container.bytes === oldContainer.bytes &&
-          !(dbObjects === 0)
-        ) {
-          updateObjects = false;
+        if (oldContainer !== undefined) {
+          key = oldContainer.id;
+          dbObjects = await state.db.objects
+            .where({ containerID: oldContainer.id })
+            .count();
         }
-        if (container.count === 0) {
-          updateObjects = false;
-          await state.db.objects.where({ containerID: container.id }).delete();
+        if (oldContainer !== undefined) {
+          if (
+            container.count === oldContainer.count &&
+            container.bytes === oldContainer.bytes &&
+            !(dbObjects === 0)
+          ) {
+            updateObjects = false;
+          }
+          if (container.count === 0) {
+            updateObjects = false;
+            await state.db.objects
+              .where({ containerID: oldContainer.id })
+              .delete();
+          }
+          await state.db.containers.update(oldContainer.id, container);
+        } else {
+          key = await state.db.containers.put(container);
         }
 
         if (updateObjects && !container.owner) {
           dispatch("updateObjects", {
             projectID: projectID,
-            container: container,
+            container: {
+              id: key,
+              ...container,
+            },
             signal: signal,
           });
         }
@@ -375,7 +385,6 @@ const store = new Vuex.Store({
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
           });
-          await state.db.objects.bulkPut(objects).catch(() => {});
           newObjects = newObjects.concat(objects);
           marker = objects[objects.length - 1].name;
         }
@@ -390,6 +399,16 @@ const store = new Vuex.Store({
       if (toDelete.length) {
         await state.db.objects.bulkDelete(toDelete);
       }
+
+      newObjects.map(newObj => {
+        let oldObj = existingObjects.find(obj => obj.name === newObj.name);
+
+        if (oldObj) {
+          state.db.objects.update(oldObj.id, newObj);
+        } else {
+          state.db.objects.put(newObj);
+        }
+      });
       if (!isSegmentsContainer) {
         dispatch("updateObjectTags", {
           projectID,
@@ -487,7 +506,6 @@ const store = new Vuex.Store({
         }
       } while (objects.length > 0);
       commit("loading", false);
-      sharedObjects = filterSegments(sharedObjects);
       commit("updateObjects", sharedObjects);
       dispatch("updateObjectTags", {
         projectID: project,
