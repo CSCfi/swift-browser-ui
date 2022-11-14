@@ -137,7 +137,6 @@ new Vue({
     EditTagsModal,
     ShareModal,
     CopyFolderModal,
-    CFooter,
   },
   data: function () {
     return {
