@@ -12,7 +12,7 @@ setuptools.setup(
     },
     license="MIT",
     install_requires=[
-        "aiohttp==3.8.1",
+        "aiohttp==3.8.3",
         "aiohttp-session==2.11.0",
         "aioredis==2.0.1",
         "asyncpg==0.27.0",
