@@ -1,5 +1,5 @@
 aiohttp==3.8.3
-aiohttp-session==2.11.0
+aiohttp-session==2.12.0
 aioredis==2.0.1
 asyncpg==0.27.0
 certifi==2022.9.24
