@@ -564,7 +564,7 @@ export default {
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
       delay(() => {
-        if (this.$store.state.encryptedFile == "") {
+        if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
           this.beginEncryptedUpload();
         }
       }, 1000);
