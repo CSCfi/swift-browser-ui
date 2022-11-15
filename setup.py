@@ -34,7 +34,7 @@ setuptools.setup(
             "pytest==7.1.2",
             "pytest-cov==3.0.0",
             "pytest-xdist==2.5.0",
-            "tox==3.26.0",
+            "tox==3.27.1",
         ],
         "docs": ["sphinx==5.3.0", "sphinx_rtd_theme==1.0.0"],
         "ui_test": ["pytest==7.1.2", "pytest-timeout==2.1.0"],
