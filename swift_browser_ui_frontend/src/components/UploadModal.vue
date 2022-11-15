@@ -343,6 +343,7 @@ export default {
     },
     dropFiles: function () {
       this.checkUploadSize();
+      this.refreshNoUpload();
     },
     transfer: function () {
       this.setFiles();
