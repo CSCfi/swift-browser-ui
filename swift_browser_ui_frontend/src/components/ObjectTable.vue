@@ -99,7 +99,7 @@
       </c-menu>
     </c-row>
     <CObjectTable
-      :objs="filteredObjects.length ? filteredObjects : oList.value"
+      :objs="filteredObjects.length ? filteredObjects : oList"
       :disable-pagination="disablePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
@@ -137,7 +137,7 @@ export default {
       sharedContainers: [],
       ownerProject: "",
       dateOfSharing: "",
-      oList: {value: []},
+      oList: [],
       selected: undefined,
       disablePagination: false,
       renderFolders: true,
@@ -216,10 +216,10 @@ export default {
     queryPage: function () {
       this.currentPage = this.queryPage;
     },
-    ["oList.value"]: async function() {
-      if (this.oList.value !== undefined && this.$route.query.selected) {
+    oList: function() {
+      if (this.oList !== undefined && this.$route.query.selected) {
         const selected = this.$route.query.selected;
-        const obj = this.oList.value.find(o => {
+        const obj = this.oList.find(o => {
           return o.name === selected;
         });
         if (obj) {
@@ -475,7 +475,7 @@ export default {
       var safeKey = escapeRegExp(this.getPrefix());
       let pre_re = new RegExp(safeKey);
 
-      let tmpList = this.oList.value.filter(
+      let tmpList = this.oList.filter(
         el => el.name.match(pre_re),
       );
 
@@ -577,9 +577,9 @@ export default {
         return prev;
       }
 
-      const filteredObjectsIds = this.oList.value.reduce(search, []);
+      const filteredObjectsIds = this.oList.reduce(search, []);
 
-      this.filteredObjects = this.oList.value.
+      this.filteredObjects = this.oList.
         filter(obj => filteredObjectsIds.indexOf(obj.id) === -1);
     },
     displayTags: function (name) {
@@ -635,7 +635,7 @@ export default {
       });
     },
     handleSelection(selection) {
-      const objects = this.oList.value;
+      const objects = this.oList;
       this.checkedRows = objects.filter(
         item => selection.indexOf(item.name) > -1,
       );

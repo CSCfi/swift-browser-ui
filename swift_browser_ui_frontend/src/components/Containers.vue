@@ -49,7 +49,7 @@ export default {
       showTags: true,
       optionsKey: 1,
       abortController: null,
-      containers: { value: [] },
+      containers: [],
       renderingContainers: [],
     };
   },
@@ -82,11 +82,11 @@ export default {
         this.fetchContainers();
       }
     },
-    "containers.value": function() {
+    "containers": function() {
       if (this.$route.name === "SharedFrom") {
         getSharingContainers(this.$route.params.project)
           .then(sharingContainers => {
-            this.renderingContainers = this.containers.value.filter(
+            this.renderingContainers = this.containers.filter(
               cont => sharingContainers.some(item =>
                 item === cont.name,
               ),
@@ -94,11 +94,11 @@ export default {
           });
       }
       else if (this.$route.name === "SharedTo") {
-        this.renderingContainers = this.containers.value.filter(cont =>
+        this.renderingContainers = this.containers.filter(cont =>
           cont.owner,
         );
       } else {
-        this.renderingContainers = this.containers.value;
+        this.renderingContainers = this.containers;
       }
     },
     isFolderCopied: function () {
