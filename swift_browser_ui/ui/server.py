@@ -61,6 +61,7 @@ from swift_browser_ui.ui.api import (
     swift_get_project_metadata,
     remove_project_container_acl,
     get_upload_session,
+    close_upload_session,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.settings import setd
@@ -257,6 +258,7 @@ async def servinit(
     # Add upload routes
     app.add_routes(
         [
+            aiohttp.web.delete("/upload/{project}", close_upload_session),
             aiohttp.web.get("/upload/{project}/{container}", get_upload_session),
             aiohttp.web.get(
                 "/enupload/{project}/{container}/{object_name:.*}",
