@@ -23,7 +23,7 @@ setuptools.setup(
         "keystoneauth1==5.0.0",
         "oidcrp==2.1.4",
         "python-swiftclient==4.1.0",
-        "uvloop==0.16.0",
+        "uvloop==0.17.0",
     ],
     extras_require={
         "test": [
