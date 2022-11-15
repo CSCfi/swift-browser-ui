@@ -23,6 +23,7 @@ export function toggleCopyFolderModal(folderName, sourceProjectId) {
   if(sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
+  modifyBrowserPageStyles();
 }
 
 export function modifyBrowserPageStyles() {
