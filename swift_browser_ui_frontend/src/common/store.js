@@ -57,6 +57,7 @@ const store = new Vuex.Store({
     openCopyFolderModal: false,
     isFolderCopied: false,
     sourceProjectId: "",
+    uploadAbort: undefined,
   },
   mutations: {
     loading(state, payload) {
@@ -219,6 +220,16 @@ const store = new Vuex.Store({
       delete state.currentUpload;
       state.currentUpload = undefined;
       state.uploadNotification = false;
+    },
+    createCurrentUploadAbort(state) {
+      state.uploadAbort = new AbortController();
+    },
+    abortCurrentUpload(state) {
+      if (state.uploadAbort !== undefined) {
+        state.uploadAbort.abort();
+      }
+      delete state.uploadAbort;
+      state.uploadAbort = undefined;
     },
     toggleEditTagsModal(state, payload) {
       state.openEditTagsModal = payload;
