@@ -14,7 +14,7 @@
     "@vue/cli-service": "^5.0.8",
     "@vueuse/rxjs": "^9.3.0",
     "buefy": "^0.9.21",
-    "core-js": "^3.26.0",
+    "core-js": "^3.26.1",
     "dexie": "^3.2.2",
     "lodash": "^4.17.21",
     "material-design-icons": "^3.0.1",
