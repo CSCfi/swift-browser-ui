@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
 - (GH #884) Fixed multiple bugs
   - Redirected to AllFolders view whenever the selected project changes
   - Modified function and fixed notification for removing a shared permission

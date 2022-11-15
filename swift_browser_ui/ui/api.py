@@ -9,6 +9,9 @@ import urllib.parse
 import aiohttp.web
 import aiohttp_session
 
+import ssl
+import certifi
+
 from swiftclient.utils import generate_temp_url
 
 from swift_browser_ui.ui._convenience import (
@@ -17,6 +20,10 @@ from swift_browser_ui.ui._convenience import (
     sign,
 )
 from swift_browser_ui.ui.settings import setd
+
+
+ssl_context = ssl.create_default_context()
+ssl_context.load_verify_locations(certifi.where())
 
 
 async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -833,3 +840,29 @@ async def get_crypted_upload_session(
             "wssignature": ws_signature,
         }
     )
+
+
+async def close_upload_session(
+    request: aiohttp.web.Request,
+    project: str = "",
+) -> aiohttp.web.Response:
+    """Close the upload session opened for the token."""
+    session = await aiohttp_session.get_session(request)
+    status = 204
+    if not project:
+        project = request.match_info["project"]
+    if "runner" in session["projects"][project]:
+        runner = session["projects"][project]["runner"]
+        client = request.app["api_client"]
+        path = f"{setd['upload_internal_endpoint']}/{project}"
+        signature = await sign(3600, f"/{project}")
+        async with client.delete(
+            path,
+            cookies={"RUNNER_SESSION_ID": runner},
+            params=signature,
+            ssl=ssl_context,
+        ) as resp:
+            status = resp.status
+        session["projects"][project].pop("runner")
+        session.changed()
+    return aiohttp.web.Response(status=status)

@@ -1,4 +1,7 @@
-import { getUploadCryptedEndpoint } from "@/common/api";
+import {
+  getUploadCryptedEndpoint,
+  killUploadEndpoint,
+} from "@/common/api";
 
 // Add a private key to the ServiceWorker filesystem
 function addPrivKey(pkey) {
@@ -79,6 +82,7 @@ export default class EncryptedUploadSession {
     this.receivers = receivers;
     this.pkey = pkey;
     this.passphrase = passphrase;
+    this.signal = store.state.uploadAbort.signal;
     
     this.totalFiles = this.files.length;
     this.finished = false;
@@ -96,80 +100,7 @@ export default class EncryptedUploadSession {
     }
     this.totalUploaded = 0;
 
-    this.abortController = new AbortController();
-  }
-
-  encryptChunk(i) {
-    navigator.serviceWorker.ready.then(reg => {
-      this.currentFile.slice(
-        i,
-        i + 65536,
-      ).arrayBuffer().then(c => {
-        reg.active.postMessage(
-          {
-            cmd: "encryptChunk",
-            chunk: c,
-            iter: Math.floor(this.currentByte / 65536),
-          },
-        );
-        this.currentByte += 65536;
-        this.totalUploaded += 65536;
-      });
-    });
-  }
-
-  // Ask ServiceWorker to clean up the filesystem
-  cleanUp() {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.active.postMessage({
-        cmd: "cleanUp",
-      });
-    });
-  }
-  
-  // Initialize filesystem for encrypting a file
-  initFileSystem() {
-    this.currentFile = this.files.pop();
-    this.$store.commit(
-      "setEncryptedFile",
-      this.currentFile.name + ".c4gh",
-    );
-    // Total size of the file will be increased by 28 bytes per
-    // each 64KiB block
-    this.currentTotalBytes = Math.floor(
-      this.currentFile.size / 65536,
-    ) * 65564;
-    this.currentByte = 0;
-    // Plus the last block if it exists
-    if (this.currentFile.size % 65536 > 0) {
-      this.currentTotalBytes += this.currentFile.size % 65536 + 28;
-    }
-    getUploadCryptedEndpoint(
-      this.active.id,
-      this.project,
-      this.container,
-      `${this.prefix}${this.currentFile.name}.c4gh`,
-    ).then(resp => {
-      this.$store.commit("setUploadInfo", resp);
-      navigator.serviceWorker.ready.then(reg => {
-        reg.active.postMessage({
-          cmd: "initFileSystem",
-        });
-      });
-    });
-  }
-
-  cancelUpload() {
-    this.finished = true;
-    this.files = [];
-    this.socket.close();
-    this.cleanUp();
-  }
-
-  // Initialize the service worker for upload session
-  initServiceWorker() {
-    // Add event listener for the current upload session
-    navigator.serviceWorker.addEventListener("message", (e) => {
+    this.handleMessage = (e) => {
       e.stopImmediatePropagation();
       switch (e.data.eventType) {
         case "wasmFilesystemInitialized":
@@ -277,11 +208,8 @@ export default class EncryptedUploadSession {
             "updateEncryptedProgress",
             (this.totalFiles - this.files.length) / this.totalFiles,
           );
-
+  
           // Cache the succeeded file metadata to IndexedDB
-          this.abortController.abort();
-          delete this.abortController;
-          this.abortController = new AbortController();
           this.$store.state.db.containers.get({
             projectID: this.project,
             name: this.container,
@@ -289,10 +217,10 @@ export default class EncryptedUploadSession {
             await this.$store.dispatch("updateObjects", {
               projectID: this.project,
               container: container,
-              signal: this.abortController.signal,
+              signal: undefined,
             });
           }).catch(() => {});
-
+  
           if (this.files.length > 0) {
             this.currentFile = undefined;
             this.initFileSystem();
@@ -303,14 +231,96 @@ export default class EncryptedUploadSession {
             this.$store.commit("eraseEncryptedFileProgress");
             this.$store.commit("stopUploading");
             this.$store.commit("stopChunking");
+            killUploadEndpoint(
+              this.active.id,
+              this.project,
+            ).then(() => {})
+              .catch(() => {});
             document.getElementById("subContainer")
               .dispatchEvent(new Event("uploadComplete"));
             // Try if purging the upload session from inside the upload
             // session doesn't break anything
+            this.$store.commit("abortCurrentUpload");
             this.$store.commit("eraseCurrentUpload");
           }
           break;
       }
+    };
+  }
+
+  encryptChunk(i) {
+    navigator.serviceWorker.ready.then(reg => {
+      this.currentFile.slice(
+        i,
+        i + 65536,
+      ).arrayBuffer().then(c => {
+        reg.active.postMessage(
+          {
+            cmd: "encryptChunk",
+            chunk: c,
+            iter: Math.floor(this.currentByte / 65536),
+          },
+        );
+        this.currentByte += 65536;
+        this.totalUploaded += 65536;
+      });
     });
+  }
+
+  // Ask ServiceWorker to clean up the filesystem
+  cleanUp() {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.active.postMessage({
+        cmd: "cleanUp",
+      });
+    });
+  }
+  
+  // Initialize filesystem for encrypting a file
+  initFileSystem() {
+    this.currentFile = this.files.pop();
+    this.$store.commit(
+      "setEncryptedFile",
+      this.currentFile.name + ".c4gh",
+    );
+    // Total size of the file will be increased by 28 bytes per
+    // each 64KiB block
+    this.currentTotalBytes = Math.floor(
+      this.currentFile.size / 65536,
+    ) * 65564;
+    this.currentByte = 0;
+    // Plus the last block if it exists
+    if (this.currentFile.size % 65536 > 0) {
+      this.currentTotalBytes += this.currentFile.size % 65536 + 28;
+    }
+    getUploadCryptedEndpoint(
+      this.active.id,
+      this.project,
+      this.container,
+      `${this.prefix}${this.currentFile.name}.c4gh`,
+    ).then(resp => {
+      this.$store.commit("setUploadInfo", resp);
+      navigator.serviceWorker.ready.then(reg => {
+        reg.active.postMessage({
+          cmd: "initFileSystem",
+        });
+      });
+    });
+  }
+
+  cancelUpload() {
+    this.finished = true;
+    this.files = [];
+    this.socket.close();
+    this.cleanUp();
+  }
+
+  // Initialize the service worker for upload session
+  initServiceWorker() {
+    // Add event listener for the current upload session
+    navigator.serviceWorker.addEventListener(
+      "message",
+      this.handleMessage, {signal: this.signal},
+    );
   }
 }

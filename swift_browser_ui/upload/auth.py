@@ -10,6 +10,7 @@ import aiohttp.web
 
 import swift_browser_ui.common.types
 import swift_browser_ui.common.signature
+import swift_browser_ui.upload.common
 
 
 LOGGER = logging.getLogger(__name__)
@@ -75,6 +76,17 @@ async def handle_login(request: aiohttp.web.Request) -> aiohttp.web.StreamRespon
         return resp
     except KeyError:
         raise aiohttp.web.HTTPUnauthorized(reason="Login token or project missing")
+
+
+async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Close the specified upload session."""
+    try:
+        # We can safely ignore any errors in keys, since that just means the session
+        # doesn't exist
+        session_key: str = swift_browser_ui.upload.common.get_session_id(request)
+        request.app.pop(session_key)
+    finally:
+        return aiohttp.web.Response(status=204)
 
 
 @aiohttp.web.middleware
