@@ -289,6 +289,7 @@ let default_translations = {
       remove: "Remove",
       edit: "Edit",
       editTags: "Edit tags",
+      cancel: "Cancel",
       save: "Save",
       options: "Options",
       createContainerButton: "Create folder",
@@ -363,8 +364,9 @@ let default_translations = {
           "megabytes, which can lead to a failure in encryption. " +
           "Try uploading files in smaller batches, or encrypt " +
           "them before uploading normally.",
-        enNotAvail: "ServiceWorker function not available in this browser. " +
-                    "Recommended browsers are Firefox and Chrome.",
+        enNotAvail:
+          "ServiceWorker function not available in this browser. " +
+          "Recommended browsers are Firefox and Chrome.",
         enFiles: "Encrypt files before upload",
         fsWriteFail:
           "Failed to copy files into temporary file system. " +
@@ -726,6 +728,7 @@ let default_translations = {
       remove: "Poista",
       edit: "Muokkaa",
       editTags: "Muokkaa tägejä",
+      cancel: "Peruuta",
       save: "Tallenna",
       options: "Valinnat",
       createContainerButton: "Luo säiliö",
@@ -795,8 +798,9 @@ let default_translations = {
           "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
           "pienemmissä erissä tai salaa ne ennen lähettämistä " +
           "tavallisesti.",
-        enNotAvail: "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
-                    "Suositellut selaimet ovat Chrome ja Firefox.",
+        enNotAvail:
+          "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
+          "Suositellut selaimet ovat Chrome ja Firefox.",
         enFiles: "Salaa tiedostot ennen lähetystä",
         fsWriteFail:
           "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +

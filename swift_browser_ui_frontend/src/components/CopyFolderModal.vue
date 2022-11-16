@@ -49,7 +49,7 @@
         size="large"
         @click="cancelCopy"
       >
-        Cancel
+        {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"

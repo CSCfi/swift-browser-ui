@@ -61,7 +61,7 @@
         size="large"
         @click="toggleCreateFolderModal"
       >
-        Cancel
+        {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"

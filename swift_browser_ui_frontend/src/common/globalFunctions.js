@@ -5,6 +5,7 @@ export function toggleCreateFolderModal(folderName) {
   if (folderName) {
     store.commit("setFolderName", folderName);
   }
+  modifyBrowserPageStyles();
 }
 
 export function toggleEditTagsModal(object) {
