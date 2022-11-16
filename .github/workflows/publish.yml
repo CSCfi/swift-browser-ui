@@ -5,6 +5,8 @@ on:
     types: [published]
   push:
     branches: [master, devel]
+    tags:
+      - 'v*'
 
 jobs:
   push_to_registry:
