@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- (GH #853) Fix Node 18 needing python for npm install
 - (GH #827) Fixed for updating folder's items count and size when deleting objects inside it
 - (GH #788) Fixed for objects of a copied folder rendering their tags correctly
 - (GH #741) Fixed incorrect API token list logic causing an incorrect 404
