@@ -64,7 +64,7 @@
           {{ $t("message.container_ops.viewProjectMembers") }}
           <i class="mdi mdi-open-in-new" />
         </c-link>
-        <c-accordion :value="$t('message.encrypt.advancedOptions')">
+        <c-accordion value="advancedOptions">
           <c-accordion-item
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
