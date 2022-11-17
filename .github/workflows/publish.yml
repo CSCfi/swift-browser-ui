@@ -5,6 +5,8 @@ on:
     types: [published]
   push:
     branches: [master, devel]
+    tags:
+      - 'v*'
 
 jobs:
   push_to_registry:
@@ -13,26 +15,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-
-      - name: Prepare
-        id: prep
-        run: |
-          DOCKER_IMAGE=cscfi/swift-ui
-          VERSION=edge
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
-          elif [[ $GITHUB_REF == refs/heads/* ]]; then
-            BRANCH=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
-            if [[ $BRANCH == master ]]; then
-              VERSION=latest
-            elif [[ $BRANCH == devel ]]; then
-              VERSION=stage
-            fi
-          fi
-          TAGS="${DOCKER_IMAGE}:${VERSION}"
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -43,6 +25,16 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: cscfi/swift-ui
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+            type=raw,value=stage,enable=${{ github.ref == format('refs/heads/{0}', 'devel') }}
+            type=ref,event=tag
       
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -50,10 +42,10 @@ jobs:
           context: .
           file: ./dockerfiles/Dockerfile-ui
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.prep.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=cscfi/swift-ui:latest
           cache-to: type=inline
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.clone_url }}
-            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             org.opencontainers.image.revision=${{ github.sha }}
