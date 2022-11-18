@@ -267,10 +267,9 @@ c-modal {
 }
 
 #footer{
-  position:fixed;
+  position:relative;
   bottom:0;
   width: 100%;
-  flex-shrink: 0;
   margin-top: 15px;
   z-index: 2;
 }
