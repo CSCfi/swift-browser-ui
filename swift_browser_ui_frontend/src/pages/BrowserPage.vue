@@ -267,7 +267,7 @@ c-modal {
 }
 
 #footer{
-  position:relative;
+  position:fixed;
   bottom:0;
   width: 100%;
   margin-top: 15px;
