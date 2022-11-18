@@ -96,17 +96,13 @@ kansio
 kansioille
 kansioina
 kansion
-kansion
 kansiossa
 kansiot
-kansiot
-kansiota
 kansiota
 kanssa
 kanssasi
 käynnissä
 käynnistyy
-käytä
 käytä
 käytettävissä
 käytetylle
@@ -165,6 +161,7 @@ koskevia
 kulutuksesta
 kulutus
 kunnes
+kuvaus
 kyseisen
 ladata
 ladattavat
@@ -173,7 +170,6 @@ lähetetään
 lähetettäväksi
 lähetettävät
 lähetettiin
-lähetetyt
 lähetetyt
 lähettäessä
 lähettäjän
@@ -318,7 +314,6 @@ projekteja
 projekti
 projektia
 projektien
-projektien
 projektiin
 projektilla
 projektille
@@ -350,6 +345,7 @@ rajoitteiden
 resurssienkäyttö
 resurssit
 rivinvaihtoa
+saavutettavuus
 sähköpostitse
 säiliö
 säiliöitä
@@ -432,7 +428,6 @@ tarkoittaen
 tarvitset
 tässä
 tätä
-tätä
 taustalla
 tavallisesti
 täytyy
@@ -450,6 +445,7 @@ tieto
 tietoa
 tietosivulta
 tietotekniikan
+tietotekniikkakeskus
 tila
 tilan
 tilankäyttö
@@ -472,6 +468,7 @@ tunnuksen
 tunnus
 tunti
 tuo
+tuottaa
 tyhjä
 tyhjennä
 tyyppi
