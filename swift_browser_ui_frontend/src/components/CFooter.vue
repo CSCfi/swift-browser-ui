@@ -1,15 +1,15 @@
 <template>
   <div id="c-footer">
-    <div class="">
-      <div class="navbar-menu">
-        <div class="navbar-start">
+    <nav class="navbar">
+    <div class="navbar-menu is-active">
+        <div class="navbar-start" >
           <div class="col-3">
-            <div class="row">
+            <div class="row navbar-item " >
               <span class="largetext">
               {{ $t("message.footerMenu.groupandprogram") }}
             </span>
             </div>
-            <div class=" row smalltext">
+            <div class="row navbar-item smalltext">
               <a class="linktext"
               href="https://csc.fi"
               :alt="$t('message.footerMenu.csc')"
@@ -19,7 +19,8 @@
             </div>
           </div>        
         </div>
-        <div class="navbar-end" id="rightmenu">
+    
+        <div class="navbar-end" id="rightmenu"> 
             <div class="navbar-item smalltext">
                 <a class="linktext"
               href="https://research.csc.fi/-/sd-connect"
@@ -32,9 +33,10 @@
             <p>{{ $t("message.footerMenu.accessibility") }}</p> 
           </div>
         </div>
-        </div>
       </div>
-    </div>
+    </nav>
+  </div>
+    
 </template>
 
 <script>
@@ -47,14 +49,41 @@ export default {
 <style lang="scss" scoped>
 @import "@/css/prod.scss";
 
+
 #c-footer{
-  flex-shrink: 0;
-  height:  8rem;
+  height:  fit-content;
   width: 100%;
   padding:40px 60px;
   background-color:#DFE1E3;
   z-index: 2;
 }
+
+.navbar{
+  background-color:#DFE1E3;
+  padding: auto;
+  width: 100%;  
+ 
+}
+.navbar-menu{
+  background-color:#DFE1E3; 
+  width: 100%;
+  height: 100%;
+  box-shadow: none;
+}
+
+.navbar-start{
+  background-color:#DFE1E3; ;
+}
+
+.navbar-end{
+  background-color:#DFE1E3; ;
+}
+
+#leftmenu{
+  padding-left: 10px;
+}
+
+
 .largetext{
   font-family: var(--csc-font-family);
   font-style: normal;
@@ -80,8 +109,5 @@ a:hover {
   text-decoration: underline;     
 }
 
-#rightmenu{
-  margin-top: 15px;
-}
 
 </style>
