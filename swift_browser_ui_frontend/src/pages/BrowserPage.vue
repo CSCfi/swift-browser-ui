@@ -102,6 +102,7 @@ html, body {
 
 #subContainer {
   height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   z-index: 1;
@@ -267,7 +268,7 @@ c-modal {
 }
 
 #footer{
-  position:fixed;
+  position:relative;
   bottom:0;
   width: 100%;
   margin-top: 15px;
