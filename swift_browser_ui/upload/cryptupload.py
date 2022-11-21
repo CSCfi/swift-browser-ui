@@ -1,6 +1,5 @@
 """Server upload propxy using aiohttp."""
-
-
+import base64
 import os
 import logging
 import asyncio
@@ -110,6 +109,12 @@ class EncryptedUploadProxy:
         self.q_cache = [asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)]
 
         header = await request.content.read()
+        b64_header = base64.standard_b64encode(header).decode("ascii")
+
+        # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
+        await request.app[common.VAULT_CLIENT].put_header(
+            self.project, self.container, self.object_name, b64_header
+        )
 
         resp = await self.client.put(
             common.generate_download_url(

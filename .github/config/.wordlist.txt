@@ -3,6 +3,7 @@ allas
 api
 apis
 apiversion
+approle
 args
 auth
 automodule
@@ -79,6 +80,7 @@ ssl
 sso
 subcommands
 svg
+swiftbrowser
 swiftrequest
 swiftsharing
 swiftui
@@ -88,6 +90,7 @@ tls
 toctree
 tooltip
 tox
+ttl
 txt
 Ue
 ui

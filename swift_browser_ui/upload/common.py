@@ -17,6 +17,7 @@ LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 DATA_PREFIX = "data/"
 SEGMENTS_PREFIX = ".segments/"
+VAULT_CLIENT = "vault_client"
 
 
 def generate_download_url(

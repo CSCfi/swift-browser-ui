@@ -211,6 +211,45 @@ cat oidc-cert.pem >> ${cert_path}
 rm oidc-cert.pem
 ```
 
+#### Encrypted uploads
+Encrypted uploads require that Hashicorp Vault is running and configured to use the `crypt4gh` transit encryption plugin.
+
+With that done, set the policies and permissions to an account, so that they can use it, and set the account token to
+the environment variables `VAULT_ROLE`, `VAULT_SECRET`, and `VAULT_URL`.
+
+During development, you can configure and run Vault locally
+
+Follow instructions for starting vault local dev server https://gitlab.ci.csc.fi/sds-dev/c4gh-transit#usage
+
+##### Setting up API authentication
+Enable `approle` module
+```
+vault auth enable approle
+```
+
+Create [policy](.github/config/vault_policy.hcl) to give access rights to the role
+```
+vault policy write swiftbrowser .github/config/vault_policy.hcl
+```
+
+Create a new role
+```
+vault write auth/approle/role/swiftbrowser \
+    secret_id_ttl=0 \
+    secret_id_num_uses=0 \
+    token_ttl=5m \
+    token_max_ttl=5m \
+    token_num_uses=0 \
+    token_policies=swiftbrowser \
+    role_id=swiftbrowserui
+```
+
+Get role and secret (= username and password), set them to the environment variables mentioned above
+```
+vault read auth/approle/role/swiftbrowser/role-id
+vault write -f auth/approle/role/swiftbrowser/secret-id secret_id=swiftui
+```
+
 ### Testing
 
 #### Backend

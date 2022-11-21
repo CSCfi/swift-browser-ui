@@ -9,12 +9,13 @@ import base64
 import json
 import os
 
-
+from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
     get_encrypted_upload_instance,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
+    VAULT_CLIENT,
 )
 from swift_browser_ui.upload.download import (
     FileDownloadProxy,
@@ -279,3 +280,50 @@ async def handle_health_check(_: aiohttp.web.Request) -> aiohttp.web.Response:
             "status": "Ok",
         }
     )
+
+
+async def handle_project_key(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Answer project specific encryption keys."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    public_key = await vault_client.get_public_key(project)
+
+    return aiohttp.web.Response(
+        text=public_key,
+    )
+
+
+async def handle_object_header(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """GET the header for an object."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    obj = request.match_info["object_name"]
+    header = await vault_client.get_header(project, container, obj)
+
+    return aiohttp.web.Response(
+        text=header,
+    )
+
+
+async def handle_project_whitelist(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Whitelist a project's public key."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    flavor = request.query.get("flavor", "crypt4gh")
+    public_key = await request.text()
+
+    await vault_client.put_whitelist_key(project, flavor, public_key)
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_delete_project_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Delete the project's whitelisted key."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    await vault_client.remove_whitelist_key(project)
+
+    return aiohttp.web.HTTPNoContent()
