@@ -114,7 +114,10 @@
 <script>
 import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
-import { getSharedContainers } from "@/common/globalFunctions";
+import {
+  getSharedContainers,
+  getAccessDetails,
+} from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable";
@@ -296,7 +299,7 @@ export default {
                 cont => cont.container === this.container) > -1) {
                 this.isSharedFolder = true;
                 const sharedDetails
-                  = await this.client.getAccessDetails(
+                  = await getAccessDetails(
                     this.project,
                     this.container,
                     this.$route.params.owner,
