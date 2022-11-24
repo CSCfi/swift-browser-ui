@@ -27,6 +27,7 @@ import {
   toggleCreateFolderModal,
   getSharingContainers,
   getSharedContainers,
+  getAccessDetails,
   toggleCopyFolderModal,
 } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
@@ -139,7 +140,18 @@ export default {
         return "";
       };
 
-      this.containers = this.conts.slice(offset, offset + limit).reduce((
+      // Map the 'accessRights' to the container if it's a shared container
+      const mappedContainers = await Promise.all(this.conts.map(async(cont) => {
+        const sharedDetails = cont.owner ? await getAccessDetails(
+          this.$route.params.project,
+          cont.container,
+          cont.owner) : null;
+        const accessRights = sharedDetails ? sharedDetails.access : null;
+        return sharedDetails && accessRights ?
+          {...cont, accessRights} : {...cont};
+      }));
+
+      this.containers = mappedContainers.slice(offset, offset + limit).reduce((
         items,
         item,
       ) => {
@@ -230,35 +242,24 @@ export default {
                 },
               },
               // Share button is disabled for Shared (with you) Folders
-              item.owner ?
-                {
-                  value: null,
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      text: true,
-                      size: "small",
-                      disabled: true,
+              {
+                value: this.$t("message.share.share"),
+                component: {
+                  tag: "c-button",
+                  params: {
+                    text: true,
+                    size: "small",
+                    title: this.$t("message.share.share"),
+                    path: mdiShareVariantOutline,
+                    onClick: (item) => {
+                      this.$store.commit("toggleShareModal", true);
+                      this.$store.commit(
+                        "setFolderName", item.data.name.value);
                     },
-                  },
-                } :
-                {
-                  value: this.$t("message.share.share"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      text: true,
-                      size: "small",
-                      title: this.$t("message.share.share"),
-                      path: mdiShareVariantOutline,
-                      onClick: (item) => {
-                        this.$store.commit("toggleShareModal", true);
-                        this.$store.commit(
-                          "setFolderName", item.data.name.value);
-                      },
-                    },
+                    disabled: item.owner,
                   },
                 },
+              },
               {
                 value: null,
                 component: {
@@ -267,7 +268,7 @@ export default {
                     items: [
                       {
                         name: this.$t("message.copy"),
-                        action: item.owner 
+                        action: item.owner
                           ? () => toggleCopyFolderModal(item.name, item.owner)
                           : () => toggleCopyFolderModal(item.name),
                         disabled: !item.bytes ? true : false,
@@ -281,10 +282,12 @@ export default {
                         action: () => this.confirmDelete(
                           item.name, item.count,
                         ),
+                        disabled: item.owner && item.accessRights.length > 1,
                       },
                     ],
                     customTrigger: {
                       value: this.$t("message.options"),
+                      disabled: true,
                       component: {
                         tag: "c-button",
                         params: {
@@ -292,11 +295,11 @@ export default {
                           path: mdiDotsHorizontal,
                           title: "Menu with custom trigger",
                           size: "small",
+                          disabled: item.owner
+                            && item.accessRights.length === 1,
                         },
                       },
                     },
-                    path: mdiDotsHorizontal,
-
                   },
                 },
               },
