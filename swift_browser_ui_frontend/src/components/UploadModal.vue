@@ -556,7 +556,12 @@ export default {
       });
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
-      delay(upload.cleanUp, 1500);
+      upload.cleanUp();
+      delay(() => {
+        if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
+          this.beginEncryptedUpload();
+        }
+      }, 1000);
       this.toggleUploadModal();
     },
   },
