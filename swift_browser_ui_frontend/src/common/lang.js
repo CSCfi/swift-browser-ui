@@ -640,7 +640,7 @@ let default_translations = {
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
-        project_id: "Projektin tunnus",
+        project_id: "Jaa tunnus",
         field_label: "Jaa projektitunnisteille",
         field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
