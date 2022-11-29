@@ -10,6 +10,7 @@
       <c-modal
         v-control
         v-csc-model="openCreateFolderModal"
+        width="64vw"
       >
         <CreateFolderModal />
       </c-modal>
@@ -34,7 +35,7 @@
       <c-modal
         v-control
         v-csc-model="openShareModal"
-        width="50vw"
+        width="64vw"
       >
         <ShareModal />
       </c-modal>
