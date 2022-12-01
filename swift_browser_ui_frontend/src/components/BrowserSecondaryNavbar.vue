@@ -96,10 +96,9 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: this.$router.name,
+          name: "AllFolders",
           params: {user: this.uname, project: item.id},
         };
-
         // Pushing to router before ´go´ method
         // enables navigation with updated item id
         this.$router.push(navigationParams);
@@ -147,11 +146,11 @@ export default {
 
 <style scoped lang="scss">
   @import "@/css/prod.scss";
-  
+
   #secondary-navbar {
     border-bottom: 6px solid $csc-primary-light;
   }
-  
+
   .container {
     display: flex;
     padding: 0.5rem 1rem !important;
@@ -174,7 +173,7 @@ export default {
   c-select {
     flex: 1;
   }
-  
+
   @media screen and (max-width: 767px) {
     .select-project {
       width: 100%;
