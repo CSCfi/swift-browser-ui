@@ -28,7 +28,7 @@ setuptools.setup(
     extras_require={
         "test": [
             "black==22.10.0",
-            "flake8==5.0.4",
+            "flake8==6.0.0",
             "coverage==6.5.0",
             "flake8-docstrings==1.6.0",
             "pytest==7.2.0",
