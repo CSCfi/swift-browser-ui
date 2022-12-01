@@ -96,10 +96,9 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: this.$router.name,
+          name: "AllFolders",
           params: {user: this.uname, project: item.id},
         };
-
         // Pushing to router before ´go´ method
         // enables navigation with updated item id
         this.$router.push(navigationParams);
