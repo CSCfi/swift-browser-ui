@@ -63,7 +63,7 @@ export default {
                   title: this.$t("message.remove"),
                   onClick: ({ data }) => {
                     this.$emit("removeSharedFolder", data);
-                    this.deleteFolderShare();
+                    this.deleteFolderShare(data);
                   },
                 },
               },
@@ -129,22 +129,17 @@ export default {
         rights,
       );
     },
-    deleteFolderShare: function () {
+    deleteFolderShare: function (folderData) {
       removeAccessControlMeta(
         this.projectId,
         this.folderName,
       ).then(
         () => {
-          this.$store.state.client.shareContainerDeleteAccess(
+          this.$store.state.client.shareDeleteAccess(
             this.projectId,
             this.folderName,
-          ).then(() => {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: this.$t("message.share.success_delete"),
-              type: "is-success",
-            });
-          });
+            [folderData.projectId.value],
+          );
         },
       );
     },

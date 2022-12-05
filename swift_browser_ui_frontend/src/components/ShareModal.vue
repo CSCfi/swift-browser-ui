@@ -83,25 +83,27 @@
           </c-button>
         </c-flex>
       </c-container>
+      <c-alert
+        v-show="isShared || isPermissionRemoved"
+        type="success"
+      >
+        <div class="shared-notification">
+          {{ isShared ? $t('message.share.shared_successfully')
+                      : $t('message.share.remove_permission')
+          }}
+          <c-button
+            text
+            size="small"
+            @click="closeSharedNotification()"
+          >
+            <c-icon-button text>
+              <i class="mdi mdi-close" />
+            </c-icon-button>
+            {{ $t("message.share.close") }}
+          </c-button>
+        </div>
+      </c-alert>
       <c-container v-show="sharedDetails.length > 0">
-        <c-alert
-          v-show="isShared"
-          type="success"
-        >
-          <div class="shared-notification">
-            {{ $t('message.share.shared_successfully') }}
-            <c-button
-              text
-              size="small"
-              @click="closeSharedNotification()"
-            >
-              <c-icon-button text>
-                <i class="mdi mdi-close" />
-              </c-icon-button>
-              {{ $t("message.share.close") }}
-            </c-button>
-          </div>
-        </c-alert>
         <ShareModalTable
           :shared-details="sharedDetails"
           :folder-name="folderName"
@@ -112,7 +114,6 @@
     </c-card-content>
     <c-toasts
       id="shareModal-toasts"
-      vertical="top"
       data-testid="shareModal-toasts"
     />
   </c-card>
@@ -139,6 +140,8 @@ export default {
       sharedAccessRight: null,
       isShared: false,
       sharedDetails: [],
+      isPermissionRemoved: false,
+      timeout: null,
     };
   },
   computed: {
@@ -154,7 +157,7 @@ export default {
       this.setAccessRights();
     },
     folderName: function () {
-      if (this.folderName)  this.getSharedDetails();
+      if (this.folderName) this.getSharedDetails();
     },
     read: function () {
       if(!this.read) {
@@ -204,6 +207,16 @@ export default {
           if (ret) {
             this.isShared = true;
             this.getSharedDetails();
+
+            if (this.timeout !== null) {
+              clearTimeout(this.timeout);
+              this.timeout = null;
+              if(this.isPermissionRemoved) {
+                this.isPermissionRemoved = false;
+              }
+            }
+            this.timeout = setTimeout(
+              () => this.closeSharedNotification(), 3000);
           }
         },
       );
@@ -266,6 +279,7 @@ export default {
           throw error;
         }
       }
+
       await addAccessControlMeta(
         this.$route.params.project,
         this.folderName,
@@ -280,12 +294,14 @@ export default {
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", false);
       this.$store.commit("setFolderName", "");
+      this.sharedAccessRight = null;
       this.openShareGuide = false;
       this.tags = [];
       this.isShared = false;
+      this.isPermissionRemoved = false;
     },
     closeSharedNotification: function () {
-      this.isShared = false;
+      this.isShared ? this.isShared = false : this.isPermissionRemoved = false;
     },
     getSharedDetails: function () {
       this.$store.state.client.getShareDetails(
@@ -301,6 +317,16 @@ export default {
         item => {
           return item.sharedTo !== folderData.projectId.value;
         });
+      this.isPermissionRemoved = true;
+
+      if (this.timeout !== null) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+        if (this.isShared) {
+          this.isShared = false;
+        }
+      }
+      this.timeout = setTimeout(() => this.isPermissionRemoved = false, 3000);
     },
   },
 };
