@@ -194,6 +194,7 @@ let default_translations = {
         read_perm: "Read",
         write_perm: "Read and write",
         shared_successfully: "Folder was shared successfully!",
+        remove_permission: "Permission was removed successfully!",
         project_id: "Project ID",
         field_label: "Project Identifiers to share with",
         field_placeholder: "Add Project IDs",
@@ -363,8 +364,9 @@ let default_translations = {
           "megabytes, which can lead to a failure in encryption. " +
           "Try uploading files in smaller batches, or encrypt " +
           "them before uploading normally.",
-        enNotAvail: "ServiceWorker function not available in this browser. " +
-                    "Recommended browsers are Firefox and Chrome.",
+        enNotAvail:
+          "ServiceWorker function not available in this browser. " +
+          "Recommended browsers are Firefox and Chrome.",
         enFiles: "Encrypt files before upload",
         fsWriteFail:
           "Failed to copy files into temporary file system. " +
@@ -632,6 +634,7 @@ let default_translations = {
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
+        remove_permission: "Lupa poistettiin onnistuneesti!",
         project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
         field_placeholder: "Lisää projektitunnukset",
@@ -795,8 +798,9 @@ let default_translations = {
           "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
           "pienemmissä erissä tai salaa ne ennen lähettämistä " +
           "tavallisesti.",
-        enNotAvail: "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
-                    "Suositellut selaimet ovat Chrome ja Firefox.",
+        enNotAvail:
+          "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
+          "Suositellut selaimet ovat Chrome ja Firefox.",
         enFiles: "Salaa tiedostot ennen lähetystä",
         fsWriteFail:
           "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
