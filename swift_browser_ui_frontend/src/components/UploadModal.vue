@@ -1,6 +1,6 @@
 <template>
   <c-card class="upload-card">
-    <div class="modal-content-wrapper">
+    <div class="modal-content-wrapper" id="upload-modal-content">
       <h3 class="title is-3 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
       </h3>
@@ -460,12 +460,6 @@ export default {
     clearFiles() {
       this.$store.commit("eraseDropFiles");
     },
-    cancelUpload() {
-      this.$store.commit("eraseDropFiles");
-      this.$store.commit("toggleUploadModal", false);
-      this.inputFolder = "";
-      modifyBrowserPageStyles();
-    },
     dragHandler: function (e) {
       e.preventDefault();
       let dt = e.dataTransfer;
@@ -531,6 +525,8 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.ephemeral = true;
+      this.files = [];
+      this.clearFiles();
       modifyBrowserPageStyles();
     },
     beginEncryptedUpload() {
