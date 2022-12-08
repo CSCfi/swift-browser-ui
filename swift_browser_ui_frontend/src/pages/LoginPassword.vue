@@ -82,7 +82,7 @@
 <style>
 c-main { 
   height: unset; 
-  min-height: 100vh 
+  min-height: 100vh;
 }
 c-login-card { 
   margin: 2rem auto;
@@ -96,7 +96,9 @@ footer {
   background-color: var(--csc-light-grey);
   color: var(--csc-dark-grey);
   padding: 1rem 0 1rem;
-  position: fixed;
+  margin-top: auto;
+  position: -webkit-sticky;
+  position: sticky;
   left: 0;
   right: 0;
   bottom: 0;

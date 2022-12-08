@@ -87,11 +87,11 @@ export default {
 
 <style>
 html, body {
-  height: 100%;
+  min-height: 100vh;
 }
 
 #mainContainer {
-  height: 100%;
+  min-height: 100vh;
 }
 
 #subContainer {

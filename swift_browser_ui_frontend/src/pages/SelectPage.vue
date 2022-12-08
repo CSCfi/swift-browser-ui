@@ -55,11 +55,11 @@
 
 <style>
 html, body {
-  height: 100%;
+  min-height: 100vh;
 }
 .selectpage {
   width: 40%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   margin: auto;
