@@ -1,10 +1,10 @@
 <template>
   <c-card class="share-card">
     <header>
-      <h3 class="title is-3 has-text-dark">
+      <h4 class="title is-4 has-text-dark">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
-      </h3>
+      </h4>
       <c-button
         text
         @click="toggleShareModal"
@@ -24,9 +24,9 @@
           justify="space-between"
           align="center"
         >
-          <h4 class="title is-4 has-text-dark">
+          <h5 class="title is-5 has-text-dark">
             {{ $t("message.share.share_other_projects") }}
-          </h4>
+          </h5>
           <c-flex
             class="toggle-instructions"
             @click="toggleShareGuide"
@@ -354,7 +354,7 @@ export default {
   c-card-content  {
     overflow-y: scroll;
     scrollbar-width: 0.5rem;
-    padding: 1rem 1rem 6rem 1rem;
+    padding: 0 1rem 6rem 1rem;
     &::-webkit-scrollbar {
       width: 0.5rem;
     }
@@ -395,7 +395,7 @@ export default {
     align-items: center;
   }
 
-  h4 {
+  h5 {
     margin: 0 !important;
   }
 

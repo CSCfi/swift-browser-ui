@@ -1,10 +1,10 @@
 <template>
   <c-card class="copy-folder">
-    <h3 class="title is-3 has-text-dark">
+    <h4 class="title is-4 has-text-dark">
       {{
         $t("message.replicate.copy_folder") + selectedFolderName
       }}
-    </h3>
+    </h4>
     <c-card-content>
       <c-alert
         v-show="folderExists"
