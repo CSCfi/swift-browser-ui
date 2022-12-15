@@ -5,6 +5,7 @@
       size="small"
       title="Delete"
       @click="confirmDelete ()"
+      @keyup.enter="confirmDelete ()"
     >
       {{ $t('message.delete') }}
     </c-button>

@@ -9,6 +9,7 @@
       :key="tab.key"
       class="tab-button"
       @click="navigate(tab.route.name)"
+      @keyup.enter="navigate(tab.route.name)"
     >
       {{ $t(tab.key) }}
     </c-button>

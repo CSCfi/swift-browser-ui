@@ -30,6 +30,7 @@
           ghost
           data-testid="copy-projectId"
           @click="copyProjectId"
+          @keyup.enter="copyProjectId"
         >
           <i
             slot="icon"
@@ -57,12 +58,16 @@
           outlined
           data-testid="create-folder"
           @click="toggleCreateFolderModal"
+          @keyup.enter="toggleCreateFolderModal"
         >
           {{ $t("message.createFolder") }}
         </c-button>
       </div>
       <div class="navbar-item">
-        <c-button @click="toggleUploadModal">
+        <c-button
+          @click="toggleUploadModal"
+          @keyup.enter="toggleUploadModal"
+        >
           {{ $t("message.uploadSecondaryNav") }}
         </c-button>
       </div>

@@ -26,12 +26,14 @@
         outlined
         size="large"
         @click="toggleEditTagsModal"
+        @keyup.enter="toggleEditTagsModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
         @click="saveTags"
+        @keyup.enter="saveTags"
       >
         {{ $t("message.save") }}
       </c-button>
