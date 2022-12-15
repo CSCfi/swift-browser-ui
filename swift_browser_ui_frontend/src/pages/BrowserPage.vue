@@ -213,6 +213,9 @@ c-modal {
 
 .search {
   flex: 0.4;
+  border: 1px solid #CACACA;
+    border-radius: 4px;
+    background: #FFFFFF;
 
   input, input::placeholder, .icon {
     color: $csc-grey !important;
@@ -223,7 +226,7 @@ c-modal {
   }
 
   input, input:focus {
-    box-shadow:rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    box-shadow:none;
   }
 
   input {
