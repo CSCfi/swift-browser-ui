@@ -6,7 +6,29 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-let sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray;
+let streamController;
+let sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray, pubkeyPtr;
+let pubKey;
+let fileSize;
+
+self.addEventListener("fetch", (e) => {
+  console.log(e);
+  const stream = new ReadableStream({
+    start(controller) {
+      streamController = controller;
+    },
+  });
+  const response = new Response(stream);
+  response.headers.append(
+    "Content-Disposition",
+    'attachment; filename="' + fileName + '"',
+  );
+  response.headers.append(
+    "Content-Length",
+    fileSize,
+  )
+  e.respondWith(response);
+});
 
 console.log(Module);
 console.log(FS);
@@ -160,6 +182,85 @@ wasmReady.then(() => {
             eventType: "cleanUpDone",
           });
         }
+        break;
+      // Download related features
+      case "beginDownload":
+        sessionPtr = Module.ccall(
+          "open_decrypt_session",
+          "number",
+          [],
+          [],
+        );
+        pubkeyPtr = Module.ccall(
+          "get_session_public_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        pubKey = new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 44));
+        console.log(new TextDecoder().decode(pubKey));
+        e.source.postMessage({
+          eventType: "downloadSessionOpened",
+        })
+        break;
+      case "addHeader":
+        try {
+          FS.unlink("header");
+        } catch (e) {
+          console.log("FS ignoring error on remove", e);
+        }
+        FS.writeFile(
+          "header",
+          e.data.header,
+        );
+        fileName = e.data.fileName;
+        fileSize = e.data.fileSize;
+        Module.ccall(
+          "open_crypt4gh_header",
+          undefined,
+          ["number"],
+          [sessionPtr],
+        );
+        e.source.postMessage({
+          eventType: "beginDecryption",
+        });
+        break;
+      case "decryptChunk":
+        chunkArray = new Uint8Array(e.data.chunk);
+        chunk = Module.ccall(
+          "decrypt_chunk",
+          "number",
+          ["number", "array", "number"],
+          [sessionPtr, chunkArray, chunkArray.length],
+        );
+        chunkPtr = Module.ccall(
+          "wrap_chunk_content",
+          "number",
+          ["number"],
+          [header]
+        );
+        chunkLen = Module.ccall(
+          "wrap_chunk_len",
+          "number",
+          ["number"],
+          [header],
+        );
+        streamController.enqueue(new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen)));
+        e.source.postMessage({
+          eventType: "nextDecryptChunk",
+        });
+        Module.ccall(
+          "free_chunk",
+          "number",
+          ["number"],
+          [chunk],
+        );
+        break;
+      case "decryptionFinished":
+        streamController.close();
+        e.source.postMessage({
+          eventType: "streamClosed",
+        });
         break;
     }
   });
