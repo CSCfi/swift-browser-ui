@@ -18,7 +18,6 @@ from swift_browser_ui.upload.common import (
     generate_download_url,
     get_path_from_list,
     get_download_host,
-    SEGMENTS_PREFIX,
 )
 
 
@@ -307,9 +306,6 @@ class ContainerArchiveDownloadProxy:
             if len(path) > 1:
                 if path[0] in ret_fs.keys():
                     LOGGER.debug(f"Skipping path {path} as added.")
-                    continue
-                if path[0].endswith(SEGMENTS_PREFIX):
-                    LOGGER.debug(f"Skipping {SEGMENTS_PREFIX} for {path}.")
                     continue
 
                 LOGGER.debug(f"Adding directory for {path[0]} {path_prefix}")

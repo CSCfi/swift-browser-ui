@@ -5,6 +5,7 @@
 #ifndef SWIFT_UI_UPLOAD_TYPES
 #define SWIFT_UI_UPLOAD_TYPES
 
+
 // Encryption session storage
 struct ENCRYPT_SESSION
 {
@@ -15,6 +16,7 @@ struct ENCRYPT_SESSION
     char *passphrase;
     unsigned int recv_key_amount;
 };
+
 
 /*
 Struct for length aware chunk for easier interfacing with JS.

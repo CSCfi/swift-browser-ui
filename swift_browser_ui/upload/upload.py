@@ -58,7 +58,7 @@ class ResumableFileUploadProxy:
         self.ident: str = query["resumableIdentifier"]
         self.filename: str = query["resumableFilename"]
         # Will use the relative path for object names
-        self.path: str = common.DATA_PREFIX + query["resumableRelativePath"]
+        self.path: str = query["resumableRelativePath"]
 
         self.total_uploaded = 0
 
@@ -134,8 +134,8 @@ class ResumableFileUploadProxy:
         self,
     ) -> None:
         """Add manifest file after segmented upload finish."""
-        path = self.path.replace(common.DATA_PREFIX, "")
-        manifest = f"{self.container}/{common.SEGMENTS_PREFIX}{path}/"
+        path = self.path
+        manifest = f"{self.container}{common.SEGMENTS_CONTAINER}/{path}/"
         LOGGER.info(f"Add manifest to {manifest}.")
         async with self.client.put(
             common.generate_download_url(
@@ -207,13 +207,13 @@ class ResumableFileUploadProxy:
 
         # Otherwise segmented upload
         segment_number: int = 0
-        path = self.path.replace(common.DATA_PREFIX, "")
+        path = self.path
         while len(self.done_chunks) < self.total_chunks:
             async with self.client.put(
                 common.generate_download_url(
                     self.host,
-                    container=self.container,
-                    object_name=f"""{common.SEGMENTS_PREFIX}{path}/{segment_number:08d}""",
+                    container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+                    object_name=f"""{path}/{segment_number:08d}""",
                 ),
                 data=self.generate_from_queue(),
                 headers={
