@@ -18,6 +18,7 @@ typedef struct ENCRYPT_SESSION
 } ENCRYPT_SESSION;
 
 
+
 /*
 Struct for length aware chunk for easier interfacing with JS.
 */
