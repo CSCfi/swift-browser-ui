@@ -5,6 +5,16 @@ RUN wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stab
     && tar xvf libsodium-1.0.18-stable.tar.gz && cd libsodium-stable \
     && dist-build/emscripten.sh --sumo
 
+# Build libb64
+FROM emscripten/emsdk:latest AS LIBB64
+
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get install git \
+    && git clone https://github.com/libb64/libb64.git \
+    && cd libb64 \
+    && emmake make all_src
+
 # Build openssl
 FROM emscripten/emsdk:latest AS OPENSSL
 
@@ -79,6 +89,9 @@ COPY --from=LIBCRYPT4GH /emsdk/upstream/lib/ /emsdk/upstream/lib/
 
 COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/include/ /emsdk/upstream/include/
 COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/lib/ /emsdk/upstream/lib/
+
+COPY --from=LIBB64 /src/libb64/src/libb64.a /emsdk/upstream/lib/libb64.a
+COPY --from=LIBB64 /src/libb64/include/ /emsdk/upstream/include/
 
 COPY build_wasm.sh /bin/build_wasm.sh
 

@@ -119,8 +119,8 @@ class EncryptedUploadProxy:
         resp = await self.client.put(
             common.generate_download_url(
                 self.host,
-                container=self.container,
-                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{0:08d}",
+                container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+                object_name=f"{self.object_name}/{self.segment_id}/{0:08d}",
             ),
             data=header,
             headers={
@@ -149,12 +149,12 @@ class EncryptedUploadProxy:
             common.generate_download_url(
                 self.host,
                 container=self.container,
-                object_name=common.DATA_PREFIX + self.object_name,
+                object_name=self.object_name,
             ),
             data=b"",
             headers={
                 "X-Auth-Token": self.token,
-                "X-Object-Manifest": f"{self.container}/{common.SEGMENTS_PREFIX}{self.object_name}",
+                "X-Object-Manifest": f"{self.container}{common.SEGMENTS_CONTAINER}/{self.object_name}/{self.segment_id}/",
             },
             ssl=ssl_context,
         ) as resp:
@@ -273,8 +273,8 @@ class EncryptedUploadProxy:
         async with self.client.put(
             common.generate_download_url(
                 self.host,
-                container=self.container,
-                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{(order + 1):08d}",
+                container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+                object_name=f"{self.object_name}/{self.segment_id}/{(order + 1):08d}",
             ),
             data=self.queue_generator(q),
             headers=headers,
