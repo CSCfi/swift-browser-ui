@@ -208,6 +208,7 @@ luo
 luonnin
 luonti
 luotu
+lupa
 määrä
 määrästä
 mahdollisia
@@ -272,6 +273,7 @@ omistavan
 on
 ongelmiin
 onnistui
+onnistuneesti
 onnistunut
 onnistuu
 operaatio
@@ -307,6 +309,7 @@ poista
 poistaa
 poistaminen
 poistettava
+poistettiin
 poistettu
 polku
 postamista

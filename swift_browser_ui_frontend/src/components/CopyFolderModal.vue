@@ -1,21 +1,26 @@
 <template>
   <c-card class="copy-folder">
-    <div class="modal-content-wrapper">
-      <h3 class="title is-3 has-text-dark">
-        {{
-          $t("message.replicate.copy_folder") + selectedFolderName
-        }}
-      </h3>
-      <c-card-content>
-        <c-alert
-          v-show="folderExists"
-          type="warning"
-        >
-          <p class="has-text-dark">
-            {{ $t("message.replicate.destinationExists") }}
-          </p>
-        </c-alert>
-        <b-field
+    <h4 class="title is-4 has-text-dark">
+      {{
+        $t("message.replicate.copy_folder") + selectedFolderName
+      }}
+    </h4>
+    <c-card-content>
+      <c-alert
+        v-show="folderExists"
+        type="warning"
+      >
+        <p class="has-text-dark">
+          {{ $t("message.replicate.destinationExists") }}
+        </p>
+      </c-alert>
+      <b-field
+        custom-class="has-text-dark"
+        :label="$t('message.replicate.name_newFolder')"
+      >
+        <b-input
+          v-model="folderName"
+          name="foldername"
           custom-class="has-text-dark"
           :label="$t('message.replicate.name_newFolder')"
         >

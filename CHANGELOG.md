@@ -50,6 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - (GH #858) Fixed for multiple bugs related to modals and background page's scrolling effect
+- (GH #884) Fixed multiple bugs
+  - Redirected to AllFolders view whenever the selected project changes
+  - Modified function and fixed notification for removing a shared permission
+  - Made modal's scroll position to be always on top when opening a modal
+  - Add tooltip for Copy Share ID button
+  - Fine-tuned modals' font sizes and gaps between elements
 - (GH #853) Fix Node 18 needing python for npm install
 - (GH #871) Fixed for data table's folders' Options, sorting functionality, and modals' widths
 - (GH #853) Fixed Node 18 needing python for npm install

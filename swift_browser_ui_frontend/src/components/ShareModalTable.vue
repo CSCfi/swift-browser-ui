@@ -1,12 +1,17 @@
 <template>
-  <c-data-table
-    v-if="tableData.length > 0"
-    :data.prop="tableData"
-    :headers.prop="headers"
-    :no-data-text="$t('message.encrypt.empty')"
-    :pagination.prop="pagination"
-    :footer-options.prop="footer"
-  />
+  <c-container>
+    <h5 class="title is-5 has-text-dark">
+      {{ $t("message.share.shared_table_title") }}
+    </h5>
+    <c-data-table
+      v-if="tableData.length > 0"
+      :data.prop="tableData"
+      :headers.prop="headers"
+      :no-data-text="$t('message.encrypt.empty')"
+      :pagination.prop="pagination"
+      :footer-options.prop="footer"
+    />
+  </c-container>
 </template>
 
 <script>
@@ -29,7 +34,7 @@ export default {
       return [
         {
           key: "projectId",
-          value: this.$t("message.share.project_id"),
+          value: this.$t("message.share.share_id"),
           width: "50%",
           sortable: true,
           align: "start",
@@ -63,7 +68,7 @@ export default {
                   title: this.$t("message.remove"),
                   onClick: ({ data }) => {
                     this.$emit("removeSharedFolder", data);
-                    this.deleteFolderShare();
+                    this.deleteFolderShare(data);
                   },
                 },
               },
@@ -129,22 +134,17 @@ export default {
         rights,
       );
     },
-    deleteFolderShare: function () {
+    deleteFolderShare: function (folderData) {
       removeAccessControlMeta(
         this.projectId,
         this.folderName,
       ).then(
         () => {
-          this.$store.state.client.shareContainerDeleteAccess(
+          this.$store.state.client.shareDeleteAccess(
             this.projectId,
             this.folderName,
-          ).then(() => {
-            this.$buefy.toast.open({
-              duration: 5000,
-              message: this.$t("message.share.success_delete"),
-              type: "is-success",
-            });
-          });
+            [folderData.projectId.value],
+          );
         },
       );
     },
@@ -153,6 +153,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+h5 {
+   margin: 0 !important;
+}
+
 c-data-table {
   color: var(--csc-dark-grey);
   margin-top: 1rem;
