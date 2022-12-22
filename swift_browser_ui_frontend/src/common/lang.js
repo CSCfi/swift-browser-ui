@@ -449,6 +449,12 @@ let default_translations = {
         sharing: "Sharing API tokens",
         about: "About Sensitive Data Services",
       },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Service-SD Connect",
+        csc:"Powered by CSC -IT Center for Science Ltd",
+        servicedescription: "Service Description",
+        accessibility:"Accessibility",
+      },
     },
   },
   fi: {
@@ -880,6 +886,12 @@ let default_translations = {
         billing: "Hinnoittelulaskuri",
         sharing: "API avainten jakaminen",
         about: "Tietoa",
+      },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Service-SD Connect",
+        csc:"Palvelun tuottaa CSC -Tieteen Tietotekniikkakeskus Oy",
+        servicedescription: "Palvelun Kuvaus",
+        accessibility:"Saavutettavuus",
       },
     },
   },

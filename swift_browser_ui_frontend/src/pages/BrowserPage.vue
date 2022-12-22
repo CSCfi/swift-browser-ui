@@ -51,25 +51,10 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <footer
-        id="footer"
-        class="footer"
-      >
-        <div class="content has-text-centered">
-          <p>
-            <span class="has-text-weight-bold">
-              {{ $t("message.program_name") }}
-            </span>
-            {{ $t("message.devel") }}
-            <a
-              href="https://csc.fi"
-              :alt="$t('message.cscOrg')"
-            >{{
-              $t("message.cscOrg")
-            }}</a>
-          </p>
-        </div>
-      </footer>
+   <!--New Footer Component-->
+   <div id="footer">
+      <CFooter/>
+  </div> 
       <c-toasts id="toasts" />
       <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts
@@ -92,11 +77,13 @@
 <script>
 import { truncate } from "@/common/conv";
 
+
 export default {
   name: "BrowserPage",
   filters: {
     truncate,
   },
+  
 };
 </script>
 
@@ -116,6 +103,7 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 .subContainer-additionalStyles {
@@ -267,14 +255,13 @@ c-modal {
   border-radius: 6px;
 }
 
-.footer {
-  flex-shrink: 0;
-  height: 10rem;
+#footer{
+  position:fixed;
+  bottom:0;
   width: 100%;
-}
-
-#footer {
+  flex-shrink: 0;
   margin-top: 15px;
+  z-index: 2;
 }
 
 #copyFolder-toasts {
@@ -285,4 +272,5 @@ c-modal {
 .toasts-wrapper {
   padding: 1rem;
 }
+
 </style>
