@@ -23,13 +23,8 @@
           name="foldername"
           custom-class="has-text-dark"
           :label="$t('message.replicate.name_newFolder')"
-        >
-          <b-input
-            v-model="folderName"
-            name="foldername"
-            custom-class="has-text-dark"
-          />
-        </b-field>
+        />
+      </b-field>
         <b-field
           custom-class="has-text-dark"
           :label="$t('message.tagName')"
@@ -47,7 +42,6 @@
           />
         </b-field>
       </c-card-content>
-    </div>
     <c-card-actions justify="space-between">
       <c-button
         outlined
