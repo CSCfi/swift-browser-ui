@@ -53,5 +53,18 @@ export async function getSharedContainers (projectId) {
     : [];
 }
 
+export async function getAccessDetails (
+  projectId,
+  folderName,
+  sourceProjectId)
+{
+  return store.state.client
+    ? await store.state.client.getAccessDetails(
+      projectId,
+      folderName,
+      sourceProjectId)
+    : [];
+}
+
 
 

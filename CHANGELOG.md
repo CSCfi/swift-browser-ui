@@ -51,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (GH #858) Fixed for multiple bugs related to modals and background page's scrolling effect
 - (GH #853) Fix Node 18 needing python for npm install
+- (GH #871) Fixed for data table's folders' Options, sorting functionality, and modals' widths
+- (GH #853) Fixed Node 18 needing python for npm install
 - (GH #827) Fixed for updating folder's items count and size when deleting objects inside it
 - (GH #788) Fixed for objects of a copied folder rendering their tags correctly
 - (GH #850) Call `refreshNoUpload` on file entry in upload modal
