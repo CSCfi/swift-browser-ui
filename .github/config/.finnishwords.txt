@@ -42,7 +42,9 @@ haku
 hakuindeksi
 haluat
 haluatko
+halutaan
 halutako
+Halutessasi
 haluttu
 halutun
 hinnoittelulaskuri
@@ -63,6 +65,8 @@ jaettua
 jaettuja
 jaetun
 jaetut
+jakaa
+jakaa
 jakamaan
 jakamasi
 jakaminen
@@ -74,8 +78,12 @@ jakoa
 jakopyynnöt
 jakopyyntöjä
 jakopyyntöjen
+jakotunnus
+jakotunnusta
 jälkeen
 jälkeenpäin
+jäsenelle
+jäseneltä
 jäsenet
 jäsenille
 jäsenten
@@ -83,6 +91,7 @@ jne
 jo
 johtaa
 johtua
+joltakin
 jonka
 jos
 jota
@@ -231,6 +240,7 @@ muuttaa
 muuttaaksesi
 näkyvissä
 nämä
+nappi
 nappia
 navigointia
 näytä
@@ -457,6 +467,7 @@ tilapäisesti
 toiminto
 toiseen
 toisen
+toisesta
 toteuttaa
 tueta
 tuettu
