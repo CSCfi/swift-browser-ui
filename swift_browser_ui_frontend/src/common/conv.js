@@ -286,14 +286,11 @@ export function sortObjects(objects, sortBy, sortDirection) {
     let valueA = a[sortBy];
     let valueB = b[sortBy];
 
-
-
     // Handle tags as single string
     if (Array.isArray(valueA)) {
       valueA = valueA.join(" ");
       valueB = valueB.join(" ");
     }
-
 
     if (typeof valueA === "string") {
       valueA = valueA.toLowerCase();
@@ -301,7 +298,6 @@ export function sortObjects(objects, sortBy, sortDirection) {
       if (sortDirection === "asc") {
         return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
       }
-
       return valueB < valueA ? -1 : valueB > valueA ? 1 : 0;
     }
 
@@ -309,7 +305,6 @@ export function sortObjects(objects, sortBy, sortDirection) {
       if (sortDirection === "asc") {
         return valueA - valueB;
       }
-
       return valueB - valueA;
     }
   });
