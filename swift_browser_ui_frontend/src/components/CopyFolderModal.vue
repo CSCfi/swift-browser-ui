@@ -1,53 +1,55 @@
 <template>
   <c-card class="copy-folder">
-    <h3 class="title is-3 has-text-dark">
-      {{
-        $t("message.replicate.copy_folder") + selectedFolderName
-      }}
-    </h3>
-    <c-card-content>
-      <c-alert
-        v-show="folderExists"
-        type="warning"
-      >
-        <p class="has-text-dark">
-          {{ $t("message.replicate.destinationExists") }}
-        </p>
-      </c-alert>
-      <b-field
-        custom-class="has-text-dark"
-        :label="$t('message.replicate.name_newFolder')"
-      >
-        <b-input
-          v-model="folderName"
-          name="foldername"
+    <div class="modal-content-wrapper">
+      <h3 class="title is-3 has-text-dark">
+        {{
+          $t("message.replicate.copy_folder") + selectedFolderName
+        }}
+      </h3>
+      <c-card-content>
+        <c-alert
+          v-show="folderExists"
+          type="warning"
+        >
+          <p class="has-text-dark">
+            {{ $t("message.replicate.destinationExists") }}
+          </p>
+        </c-alert>
+        <b-field
           custom-class="has-text-dark"
-        />
-      </b-field>
-      <b-field
-        custom-class="has-text-dark"
-        :label="$t('message.tagName')"
-      >
-        <b-taginput
-          v-model="tags"
-          ellipsis
-          maxlength="20"
-          has-counter
-          rounded
-          type="is-primary"
-          :placeholder="$t('message.tagPlaceholder')"
-          :confirm-keys="taginputConfirmKeys"
-          :on-paste-separators="taginputConfirmKeys"
-        />
-      </b-field>
-    </c-card-content>
+          :label="$t('message.replicate.name_newFolder')"
+        >
+          <b-input
+            v-model="folderName"
+            name="foldername"
+            custom-class="has-text-dark"
+          />
+        </b-field>
+        <b-field
+          custom-class="has-text-dark"
+          :label="$t('message.tagName')"
+        >
+          <b-taginput
+            v-model="tags"
+            ellipsis
+            maxlength="20"
+            has-counter
+            rounded
+            type="is-primary"
+            :placeholder="$t('message.tagPlaceholder')"
+            :confirm-keys="taginputConfirmKeys"
+            :on-paste-separators="taginputConfirmKeys"
+          />
+        </b-field>
+      </c-card-content>
+    </div>
     <c-card-actions justify="space-between">
       <c-button
         outlined
         size="large"
         @click="cancelCopy"
       >
-        Cancel
+        {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
@@ -68,6 +70,7 @@ import {
   updateContainerMeta,
 } from "@/common/api";
 
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
@@ -76,7 +79,7 @@ export default {
   name: "CopyFolderModal",
   data() {
     return {
-      folderExists: true,
+      folderExists: false,
       folderName: "",
       tags: [],
       taginputConfirmKeys,
@@ -99,8 +102,9 @@ export default {
   watch: {
     selectedFolderName: function () {
       if (this.selectedFolderName && this.selectedFolderName.length > 0) {
-        this.folderName = this.selectedFolderName;
-        this.fetchFolders().then(() => this.checkSelectedFolder());
+        this.fetchFolders().then(() => {
+          this.getCopyFolder(this.selectedFolderName);
+        });
       }
     },
     folderName: debounce(function () {
@@ -128,6 +132,39 @@ export default {
         signal: null,
       });
     },
+    getCopyFolder: function (origFolderName) {
+      if (this.folders.value) {
+        // Check if current folder is a copy
+        const reg = new RegExp("\\b(copy)\\s(\\d+)\\b$", "i");
+        const isCopied = origFolderName.match(reg);
+
+        // Use a var to keep the folder as a copy name without copy version
+        let copiedFolder = "";
+        if (isCopied) {
+          copiedFolder = `${origFolderName.slice(0, isCopied["index"])}copy`;
+        } else {
+          copiedFolder = `${origFolderName} copy`;
+        }
+
+        const existingCopiedFolders = [];
+        for (let folder of this.folders.value) {
+          // Check if folder is one of the copy versions
+          // which ends in the form 'copy + number'
+          const copiedReg = new RegExp(`\\b${copiedFolder}\\s(\\d+)\\b$`, "gi");
+          folder.name.match(copiedReg) ?
+            existingCopiedFolders.push(folder.name) : null;
+        }
+
+        if (existingCopiedFolders.length > 0) {
+          // Sort the array in asc, the last item is the latest copy
+          // then extract the copy version from it
+          existingCopiedFolders.sort();
+          const latestVer= existingCopiedFolders[
+            existingCopiedFolders.length-1].match(reg);
+          this.folderName = !isCopied ? `${copiedFolder} ${+latestVer[2] + 1}` : origFolderName.replace(/\d+$/, +latestVer[2]+1);
+        }
+      }
+    },
     checkSelectedFolder: function () {
       // request parameter should be sanitized first
       const safeKey = escapeRegExp(this.folderName).trim();
@@ -148,6 +185,7 @@ export default {
       this.$store.commit("setFolderName", "");
       this.folderName = "";
       this.tags = [];
+      modifyBrowserPageStyles();
     },
     replicateContainer: function () {
       // Initiate the container replication operation
@@ -225,10 +263,6 @@ export default {
   .copy-folder {
     max-height: 50vh;
   }
-}
-
-h3 {
-  margin: 0 !important;
 }
 
 c-card-content {

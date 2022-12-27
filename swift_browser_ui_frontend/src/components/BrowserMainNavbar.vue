@@ -24,8 +24,8 @@
           :items.prop="item.subs.map(subItem => ({
             name: subItem.title,
             action: () => {
-              subItem.route && handleItemRoute(subItem)
-              subItem.action && subItem.action()
+              (subItem.route || subItem.href) && handleItemRoute(subItem);
+              subItem.action && subItem.action();
             },
             icon: subItem.href && extLinkIcon,
           }))"
@@ -66,8 +66,8 @@
             :target="subItem.href && '_blank'"
             :data-testid="subItem.testid"
             @click="() => {
-              subItem.route && handleItemRoute(subItem)
-              subItem.action && subItem.action()
+              (subItem.route || subItem.href) && handleItemRoute(subItem);
+              subItem.action && subItem.action();
             }"
           >
             {{ subItem.title }}
@@ -158,7 +158,7 @@ export default {
           icon: "mdi-web",
           testid: "language-selector",
           subs: this.langs.map(lang => ({
-            title: lang.ph, 
+            title: lang.ph,
             action: () => {
               this.$i18n.locale = lang.value;
               this.currentLang = lang.ph;
@@ -179,13 +179,13 @@ export default {
               href: "https://research.csc.fi/pricing#buc",
             },
             {
-              title: this.$t("message.supportMenu.sharing"), 
-              route: {name: "TokensView", params: {        
-                user: this.uname, 
+              title: this.$t("message.supportMenu.sharing"),
+              route: {name: "TokensView", params: {
+                user: this.uname,
                 project: this.active.id}},
             },
             {
-              title: this.$t("message.supportMenu.about"), 
+              title: this.$t("message.supportMenu.about"),
               href: "https://research.csc.fi/sensitive-data",
             },
           ],
@@ -245,27 +245,27 @@ export default {
     padding: 0 1rem;
     box-shadow: rgba(0, 0, 0, 0.16) 2px 4px 10px;
   }
-  
+
   .app-name {
     color: $csc-grey;
     font-size: 20px;
   }
-  
+
   .desktop-menu {
     display: flex;
     align-items: center;
   }
-  
+
   @media screen and (max-width: 767px) {
     .desktop-menu {
       display: none;
     }
   }
-  
+
   @media screen and (min-width: 768px) {
     c-navigationbutton {
       display: none;
     }
   }
-  
+
   </style>

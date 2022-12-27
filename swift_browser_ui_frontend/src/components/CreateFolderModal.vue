@@ -61,7 +61,7 @@
         size="large"
         @click="toggleCreateFolderModal"
       >
-        Cancel
+        {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
@@ -110,7 +110,8 @@ export default {
   },
   watch: {
     selectedFolderName: function () {
-      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
+      if (this.selectedFolderName && this.selectedFolderName.length > 0
+        && this.$store.state.openCreateFolderModal) {
         this.create = false;
         this.getContainer();
       }
@@ -219,10 +220,8 @@ export default {
 }
 
 c-card-content {
-  background-color: $csc-primary-lighter;
   color: var(--csc-dark-grey);
-  margin-top: 1rem;
-  padding: 1.5rem;
+  padding: 1.5rem 0 0 0;
 }
 
 c-card-actions {

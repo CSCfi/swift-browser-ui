@@ -5,6 +5,7 @@ export function toggleCreateFolderModal(folderName) {
   if (folderName) {
     store.commit("setFolderName", folderName);
   }
+  modifyBrowserPageStyles();
 }
 
 export function toggleEditTagsModal(object) {
@@ -23,6 +24,7 @@ export function toggleCopyFolderModal(folderName, sourceProjectId) {
   if(sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
+  modifyBrowserPageStyles();
 }
 
 export function modifyBrowserPageStyles() {
