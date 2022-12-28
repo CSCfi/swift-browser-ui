@@ -194,6 +194,11 @@ export default {
                     title: "Edit tags",
                     path: mdiPencilOutline,
                     onClick: ({ data }) => toggleEditTagsModal(data),
+                    onKeyUp: (event) => {
+                      if(event.keyCode === 13) {
+                        toggleEditTagsModal(item.data);
+                      }
+                    },
                   },
                 },
               },
@@ -208,7 +213,11 @@ export default {
                     path: mdiDeleteOutline,
                     onClick: () => {
                       this.$emit("delete-object", item);
-
+                    },
+                    onKeyUp: (event) => {
+                      if(event.keyCode === 13) {
+                        this.$emit("delete-object", item);
+                      }
                     },
                   },
                 },
