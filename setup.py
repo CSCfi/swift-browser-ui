@@ -33,7 +33,7 @@ setuptools.setup(
             "flake8-docstrings==1.6.0",
             "pytest==7.2.0",
             "pytest-cov==4.0.0",
-            "pytest-xdist==3.0.2",
+            "pytest-xdist==3.1.0",
             "tox==3.27.1",
         ],
         "docs": ["sphinx==5.3.0", "sphinx_rtd_theme==1.1.1"],
