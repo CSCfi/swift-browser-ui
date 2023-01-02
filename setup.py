@@ -16,7 +16,7 @@ setuptools.setup(
         "aiohttp-session==2.12.0",
         "aioredis==2.0.1",
         "asyncpg==0.27.0",
-        "certifi==2022.9.24",
+        "certifi==2022.12.7",
         "click==8.1.3",
         "cryptography==38.0.4",
         "gunicorn==20.1.0",
