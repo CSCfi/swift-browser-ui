@@ -45,7 +45,6 @@
             {{ $t("message.share.share_id_tooltip") }}
           </span>
         </div>
-
       </div>
       <c-toasts
         id="copy-toasts"

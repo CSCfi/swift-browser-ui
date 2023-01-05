@@ -1,6 +1,9 @@
 <template>
   <c-card class="upload-card">
-    <div class="modal-content-wrapper" id="upload-modal-content">
+    <div
+      id="upload-modal-content"
+      class="modal-content-wrapper"
+    >
       <h4 class="title is-4 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
       </h4>

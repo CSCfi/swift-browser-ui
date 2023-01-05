@@ -1,6 +1,9 @@
 <template>
   <c-card class="add-folder">
-    <div class="modal-content-wrapper" id="createFolder-modal-content">
+    <div
+      id="createFolder-modal-content"
+      class="modal-content-wrapper"
+    >
       <h4 class="title is-4 has-text-dark">
         {{
           create
