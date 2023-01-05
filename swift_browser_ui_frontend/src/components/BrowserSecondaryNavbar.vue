@@ -37,15 +37,21 @@
           />
           {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
         </c-button>
+        <div class="tooltip">
+          <c-icon-button text>
+            <i class="mdi mdi-information-outline" />
+          </c-icon-button>
+          <span class="tooltip-content">
+            {{ $t("message.share.share_id_tooltip") }}
+          </span>
+        </div>
       </div>
       <c-toasts
         id="copy-toasts"
         vertical="center"
         data-testid="copy-toasts"
       />
-
       <c-spacer />
-
       <div class="navbar-item">
         <c-button
           outlined
@@ -96,10 +102,9 @@ export default {
       const item = event.target.value;
       if (item.id !== this.active.id) {
         const navigationParams = {
-          name: this.$router.name,
+          name: "AllFolders",
           params: {user: this.uname, project: item.id},
         };
-
         // Pushing to router before ´go´ method
         // enables navigation with updated item id
         this.$router.push(navigationParams);
@@ -139,6 +144,9 @@ export default {
           );
         });
       }
+    },
+    hoverTooltip: function () {
+      console.log("HOVER!");
     },
   },
 };
@@ -180,4 +188,54 @@ export default {
       flex: auto;
     }
   }
+
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip-content {
+    visibility: hidden;
+    text-align: left;
+    width: 20rem;
+    background-color: $white;
+    color: $text;
+    border: 1px solid $csc-primary;
+    border-radius: 0.375rem;
+    padding: 1rem;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 5;
+    top: 120%;
+    left: 50%;
+    margin-left: -10rem;
+  }
+
+  .tooltip:hover .tooltip-content {
+    visibility: visible;
+  }
+
+  .tooltip-content::before {
+    content: " ";
+    position: absolute;
+    left: 46%;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+    border: 0.7rem solid transparent;
+    border-bottom-color: $csc-primary;
+  }
+  .tooltip-content::after {
+    content: " ";
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+    margin-left: -0.75rem;
+    border: 0.65rem solid transparent;
+    border-bottom-color: $white;
+  }
+
   </style>

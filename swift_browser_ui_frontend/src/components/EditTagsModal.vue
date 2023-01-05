@@ -1,8 +1,8 @@
 <template>
   <c-card class="edit-tags">
-    <h3 class="title is-3 has-text-dark">
+    <h4 class="title is-4 has-text-dark">
       {{ $t('message.objects.editObject') + object.name }}
-    </h3>
+    </h4>
     <c-card-content>
       <b-field
         custom-class="has-text-dark"

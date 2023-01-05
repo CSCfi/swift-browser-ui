@@ -82,7 +82,7 @@ if ("serviceWorker" in navigator) {
   if(DEV) console.log("Did not register Service Worker.");
 }
 
-window.onerror = function(error) { 
+window.onerror = function(error) {
   if(DEV) console.log("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
@@ -172,10 +172,10 @@ new Vue({
     isUploading() {
       return this.$store.state.isUploading;
     },
-    displayUploadNotification () {
+    displayUploadNotification() {
       return this.$store.state.uploadNotification;
     },
-    resumableClient () {
+    resumableClient() {
       return this.$store.state.resumableClient;
     },
     altContainer() {
@@ -224,6 +224,22 @@ new Vue({
         return this.$store.state.openShareModal;
       },
       set() {},
+    },
+  },
+  watch: {
+    openCreateFolderModal: function () {
+      if (this.openCreateFolderModal) {
+        // Set the modal to scroll to top whenever it's opened
+        const el = document.getElementById("createFolder-modal-content");
+        el.scrollTo(0, 0);
+      }
+    },
+    openUploadModal: function () {
+      if (this.openUploadModal) {
+        // Set the modal to scroll to top whenever it's opened
+        const el = document.getElementById("upload-modal-content");
+        el.scrollTo(0, 0);
+      }
     },
   },
   created() {
@@ -362,7 +378,8 @@ new Vue({
     delay(this.containerSyncWrapper, 10000);
   },
   mounted() {
-    document.getElementById("mainContainer")
+    document
+      .getElementById("mainContainer")
       .addEventListener("uploadComplete", () => {
         this.$buefy.toast.open({
           message: this.$t("message.upload.complete"),
@@ -377,7 +394,7 @@ new Vue({
     // Following are the methods used for resumablejs, as the methods
     // need to have access to the vue instance.
     addFile: function () {
-      if(!this.isUploading) {
+      if (!this.isUploading) {
         this.resumableClient.upload();
       }
     },
@@ -407,12 +424,12 @@ new Vue({
         message: this.$t("message.upload.upfail").concat(file.fileName),
       });
     },
-    removeUploadToast () {
+    removeUploadToast() {
       const uploadToast = document.querySelector("#upload-toast");
       if (uploadToast) {
         document.querySelector("#upload-toast").removeToast("upload-toast");
       }
-      
+
       this.$store.commit("toggleUploadNotification", false);
     },
     getUploadUrl: function (params) {
@@ -543,7 +560,7 @@ new Vue({
       }
 
       return retl;
-    },  
+    },
   },
   ...App,
 }).$mount("#app");

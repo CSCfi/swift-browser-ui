@@ -1,11 +1,11 @@
 <template>
   <c-card class="copy-folder">
     <div class="modal-content-wrapper">
-      <h3 class="title is-3 has-text-dark">
+      <h4 class="title is-4 has-text-dark">
         {{
           $t("message.replicate.copy_folder") + selectedFolderName
         }}
-      </h3>
+      </h4>
       <c-card-content>
         <c-alert
           v-show="folderExists"
@@ -23,6 +23,7 @@
             v-model="folderName"
             name="foldername"
             custom-class="has-text-dark"
+            :loading="loadingFoldername"
           />
         </b-field>
         <b-field
@@ -81,6 +82,7 @@ export default {
     return {
       folderExists: false,
       folderName: "",
+      loadingFoldername: true,
       tags: [],
       taginputConfirmKeys,
       folders: [],
@@ -103,7 +105,9 @@ export default {
     selectedFolderName: function () {
       if (this.selectedFolderName && this.selectedFolderName.length > 0) {
         this.fetchFolders().then(() => {
-          this.getCopyFolder(this.selectedFolderName);
+          if(this.folders && this.folders.length > 0) {
+            this.getCopyFolder(this.selectedFolderName);
+          }
         });
       }
     },
@@ -133,7 +137,7 @@ export default {
       });
     },
     getCopyFolder: function (origFolderName) {
-      if (this.folders.value) {
+      if (this.folders) {
         // Check if current folder is a copy
         const reg = new RegExp("\\b(copy)\\s(\\d+)\\b$", "i");
         const isCopied = origFolderName.match(reg);
@@ -147,7 +151,7 @@ export default {
         }
 
         const existingCopiedFolders = [];
-        for (let folder of this.folders.value) {
+        for (let folder of this.folders) {
           // Check if folder is one of the copy versions
           // which ends in the form 'copy + number'
           const copiedReg = new RegExp(`\\b${copiedFolder}\\s(\\d+)\\b$`, "gi");
@@ -162,7 +166,10 @@ export default {
           const latestVer= existingCopiedFolders[
             existingCopiedFolders.length-1].match(reg);
           this.folderName = !isCopied ? `${copiedFolder} ${+latestVer[2] + 1}` : origFolderName.replace(/\d+$/, +latestVer[2]+1);
+        } else {
+          this.folderName = `${copiedFolder} 1`;
         }
+        this.loadingFoldername = false;
       }
     },
     checkSelectedFolder: function () {

@@ -1,13 +1,16 @@
 <template>
   <c-card class="add-folder">
-    <div class="modal-content-wrapper">
-      <h3 class="title is-3 has-text-dark">
+    <div
+      id="createFolder-modal-content"
+      class="modal-content-wrapper"
+    >
+      <h4 class="title is-4 has-text-dark">
         {{
           create
             ? $t("message.container_ops.addContainer")
             : $t("message.container_ops.editContainer") + folderName
         }}
-      </h3>
+      </h4>
       <c-card-content>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}

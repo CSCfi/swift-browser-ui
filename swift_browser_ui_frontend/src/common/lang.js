@@ -173,6 +173,14 @@ let default_translations = {
       share: {
         share: "Share",
         share_id: "Share ID",
+        share_id_tooltip:
+          "When another project wants share a folder " +
+          "with your project: Select this button and " +
+          "send Share ID (now copied in your cache) " +
+          "to the project’s member. " +
+          "When you want to share a folder with " +
+          "another project. Ask Share ID from " +
+          "another project’s member.",
         close: "Close",
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
@@ -194,7 +202,8 @@ let default_translations = {
         read_perm: "Read",
         write_perm: "Read and write",
         shared_successfully: "Folder was shared successfully!",
-        project_id: "Project ID",
+        remove_permission: "Permission was removed successfully!",
+        shared_table_title: "Project's folder has been shared with",
         field_label: "Project Identifiers to share with",
         field_placeholder: "Add Share IDs",
         cancel: "Cancel",
@@ -623,6 +632,12 @@ let default_translations = {
       share: {
         share: "Jaa",
         share_id: "Jaa tunnus",
+        share_id_tooltip:
+          "Mikäli toisesta projektista halutaan jakaa kansio projektisi " +
+          "kanssa: Valitse tämä nappi ja lähetä Jakotunnus toisen " +
+          "projektin jäsenelle. Halutessasi jakaa kansion toisen " +
+          "projektin kanssa, pyydä jakotunnusta joltakin kyseisen " +
+          "projektin jäseneltä.",
         close: "Kiinni",
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
@@ -640,7 +655,9 @@ let default_translations = {
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
-        project_id: "Jaa tunnus",
+        remove_permission: "Lupa poistettiin onnistuneesti!",
+        shared_table_title: "Projektin kansio on jaettu",
+        project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
         field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
