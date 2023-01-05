@@ -197,11 +197,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/css/prod.scss";
+
   #sharingview {
     width: auto;
     margin-left: 5%;
     margin-right: 5%;
+    font-family: 'museo-sans';
   }
   .sharinghead {
     margin: 1% 1% 1% 0;

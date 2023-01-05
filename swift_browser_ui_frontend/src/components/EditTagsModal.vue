@@ -27,7 +27,7 @@
         size="large"
         @click="toggleEditTagsModal"
       >
-         {{ $t("message.cancel") }}
+        {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"

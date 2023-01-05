@@ -51,25 +51,6 @@
         :active.sync="isLoading"
         :can-cancel="false"
       />
-      <footer
-        id="footer"
-        class="footer"
-      >
-        <div class="content has-text-centered">
-          <p>
-            <span class="has-text-weight-bold">
-              {{ $t("message.program_name") }}
-            </span>
-            {{ $t("message.devel") }}
-            <a
-              href="https://csc.fi"
-              :alt="$t('message.cscOrg')"
-            >{{
-              $t("message.cscOrg")
-            }}</a>
-          </p>
-        </div>
-      </footer>
       <c-toasts id="toasts" />
       <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts
@@ -85,6 +66,10 @@
           </p>
         </div>
       </c-toasts>
+      <!--New Footer Component-->
+      <div id="footer">
+        <CFooter />
+      </div> 
     </div>
   </div>
 </template>
@@ -92,11 +77,13 @@
 <script>
 import { truncate } from "@/common/conv";
 
+
 export default {
   name: "BrowserPage",
   filters: {
     truncate,
   },
+  
 };
 </script>
 
@@ -110,12 +97,16 @@ html, body {
 #mainContainer {
   min-height: 100vh;
   position: relative;
+  font-family: var(--csc-font-family);
 }
 
 #subContainer {
   height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  z-index: 1;
+  font-family: var(--csc-font-family);
 }
 
 .subContainer-additionalStyles {
@@ -222,6 +213,9 @@ c-modal {
 
 .search {
   flex: 0.4;
+  border: 1px solid #CACACA;
+    border-radius: 4px;
+    background: #FFFFFF;
 
   input, input::placeholder, .icon {
     color: $csc-grey !important;
@@ -232,7 +226,7 @@ c-modal {
   }
 
   input, input:focus {
-    box-shadow:rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    box-shadow:none;
   }
 
   input {
@@ -267,16 +261,6 @@ c-modal {
   border-radius: 6px;
 }
 
-.footer {
-  flex-shrink: 0;
-  height: 10rem;
-  width: 100%;
-}
-
-#footer {
-  margin-top: 15px;
-}
-
 #copyFolder-toasts {
   position: sticky;
   bottom: 30vh;
@@ -285,4 +269,13 @@ c-modal {
 .toasts-wrapper {
   padding: 1rem;
 }
+
+#footer{
+  position:relative;
+  bottom:0;
+  width: 100%;
+  margin-top: 15px;
+  z-index: 2;
+}
+
 </style>

@@ -46,6 +46,9 @@ import Resumable from "resumablejs";
 // Upload notification handler
 import UploadNotification from "@/components/UploadNotification";
 
+//Custom footer element
+import CFooter from "@/components/CFooter";
+
 // Import delay
 import delay from "lodash/delay";
 
@@ -123,6 +126,7 @@ new Vue({
   router,
   store,
   components: {
+    CFooter,
     BrowserMainNavbar,
     BrowserSecondaryNavbar,
     CreateFolderModal,

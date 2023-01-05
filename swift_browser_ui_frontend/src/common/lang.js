@@ -177,7 +177,7 @@ let default_translations = {
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
         share_cont: "Share the bucket",
-        share_title: "Share folder: ",
+        share_title: "Share folder",
         share_subtitle:
           "This folder is already accessible to all the members" +
           " of this project.",
@@ -196,7 +196,7 @@ let default_translations = {
         shared_successfully: "Folder was shared successfully!",
         project_id: "Project ID",
         field_label: "Project Identifiers to share with",
-        field_placeholder: "Add Project IDs",
+        field_placeholder: "Add Share IDs",
         cancel: "Cancel",
         confirm: "Share",
         to_me: "Shared to the project",
@@ -451,6 +451,12 @@ let default_translations = {
         sharing: "Sharing API tokens",
         about: "About Sensitive Data Services",
       },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Services - SD Connect",
+        csc:"Powered by CSC - IT Center for Science Ltd.",
+        servicedescription:"Service Description",
+        accessibility:"Accessibility",
+      },
     },
   },
   fi: {
@@ -621,7 +627,7 @@ let default_translations = {
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
-        share_title: "Jaa kansio: ",
+        share_title: "Jaa kansio ",
         share_subtitle:
           "Tämä kansio on jo kaikkien tämän projektin jäsenten käytettävissä.",
         share_other_projects: "Jaa toisen projektin kanssa",
@@ -634,7 +640,7 @@ let default_translations = {
         read_perm: "Salli säiliön luku",
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
-        project_id: "Projektin tunnus",
+        project_id: "Jaa tunnus",
         field_label: "Jaa projektitunnisteille",
         field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
@@ -884,6 +890,12 @@ let default_translations = {
         billing: "Hinnoittelulaskuri",
         sharing: "API avainten jakaminen",
         about: "Tietoa",
+      },
+      footerMenu:{
+        groupandprogram:"Sensitive Data Service-SD Connect",
+        csc:"Palvelun tuottaa CSC -Tieteen Tietotekniikkakeskus Oy",
+        servicedescription: "Palvelun Kuvaus",
+        accessibility:"Saavutettavuus",
       },
     },
   },
