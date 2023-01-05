@@ -94,9 +94,8 @@ export default {
           });
       }
       else if (this.$route.name === "SharedTo") {
-        this.renderingContainers = this.containers.filter(cont =>
-          cont.owner,
-        );
+        this.renderingContainers = this.containers ?
+          this.containers.filter(cont => cont.owner) : [];
       } else {
         this.renderingContainers = this.containers;
       }

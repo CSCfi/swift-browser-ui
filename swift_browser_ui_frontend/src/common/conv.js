@@ -279,7 +279,8 @@ export function tokenize(text, ignoreSmallerThan = 2) {
 export const DEV = process.env.NODE_ENV === "development";
 
 export function sortObjects(objects, sortBy, sortDirection) {
-  sortBy = sortBy === "size" ? "bytes" : sortBy;
+  sortBy = sortBy === "size" ? "bytes"
+    : sortBy === "items" ? "count" : sortBy;
 
   objects.sort((a, b) => {
     let valueA = a[sortBy];
@@ -292,18 +293,18 @@ export function sortObjects(objects, sortBy, sortDirection) {
     }
 
     if (typeof valueA === "string") {
+      valueA = valueA.toLowerCase();
+      valueB = valueB.toLowerCase();
       if (sortDirection === "asc") {
-        return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
       }
-
-      return valueB.toLowerCase().localeCompare(valueA.toLowerCase());
+      return valueB < valueA ? -1 : valueB > valueA ? 1 : 0;
     }
 
     if (typeof valueA === "number") {
       if (sortDirection === "asc") {
         return valueA - valueB;
       }
-
       return valueB - valueA;
     }
   });
