@@ -207,7 +207,7 @@ export default {
 
     /* Position the tooltip */
     position: absolute;
-    z-index: 1;
+    z-index: 5;
     top: 120%;
     left: 50%;
     margin-left: -10rem;
