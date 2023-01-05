@@ -59,7 +59,7 @@
         </c-container>
       </c-flex>
     </c-row>
-    <CFooter/>
+    <CFooter />
   </c-main>
 </template>
 

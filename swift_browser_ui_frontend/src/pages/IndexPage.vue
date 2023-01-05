@@ -94,9 +94,9 @@
       </c-flex>
     </c-row>
     <div id="footer">
-      <CFooter/>
+      <CFooter />
     </div>
- </c-main>
+  </c-main>
 </template>
 
 <script>
@@ -104,11 +104,11 @@ import checkIDB from "@/common/idb_support";
 import CFooter from "@/components/CFooter.vue";
 
 export default {
-  mounted: function () {
-    checkIDB().then(result => this.idb = result);
-  },
   components:{
     CFooter,
+  },
+  mounted: function () {
+    checkIDB().then(result => this.idb = result);
   },
 };
 </script>

@@ -68,10 +68,10 @@
       </c-toasts>
       <!--New Footer Component-->
       <div id="footer">
-       <CFooter/>
+        <CFooter />
       </div> 
+    </div>
   </div>
-</div>
 </template>
 
 <script>

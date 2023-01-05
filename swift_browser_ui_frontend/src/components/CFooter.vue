@@ -2,15 +2,17 @@
   <div id="c-footer">
     <nav class="navbar">
       <div class="navbar-menu is-active">
-        <div class="navbar-start" >
+        <div class="navbar-start">
           <div class="col-3">
-            <div class="row navbar-item " >
+            <div class="row navbar-item ">
               <span class="largetext">
                 {{ $t("message.footerMenu.groupandprogram") }}
               </span>
             </div>
             <div class="row navbar-item smalltext">
-              <a class="linktext" href="https://csc.fi"
+              <a
+                class="linktext"
+                href="https://csc.fi"
                 :alt="$t('message.footerMenu.csc')"
               >
                 {{ $t("message.footerMenu.csc") }}
@@ -19,22 +21,26 @@
           </div>        
         </div>
     
-        <div class="navbar-end" id="rightmenu"> 
+        <div
+          id="rightmenu"
+          class="navbar-end"
+        > 
           <div class="navbar-item smalltext">
-              <a class="linktext" href="https://research.csc.fi/-/sd-connect"
-                :alt="$t('message.footerMenu.servicedescription')"
-                >
-                  {{ $t("message.footerMenu.servicedescription") }}
-              </a>
+            <a
+              class="linktext"
+              href="https://research.csc.fi/-/sd-connect"
+              :alt="$t('message.footerMenu.servicedescription')"
+            >
+              {{ $t("message.footerMenu.servicedescription") }}
+            </a>
           </div> 
           <div class="navbar-item smalltext">
-              <p>{{ $t("message.footerMenu.accessibility") }}</p> 
+            <p>{{ $t("message.footerMenu.accessibility") }}</p> 
           </div>
         </div>
       </div>
     </nav>
   </div>
-    
 </template>
 
 <script>
