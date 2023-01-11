@@ -31,6 +31,7 @@
           data-testid="copy-projectId"
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
+          aria-describedby="shareidrules"
         >
           <i
             slot="icon"
@@ -38,7 +39,7 @@
           />
           {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
         </c-button>
-        <div class="tooltip">
+        <div class="tooltip" role="tooltip" id="shareidrules">
           <c-icon-button text>
             <i class="mdi mdi-information-outline" />
           </c-icon-button>
@@ -150,9 +151,6 @@ export default {
         });
       }
     },
-    hoverTooltip: function () {
-      console.log("HOVER!");
-    },
   },
 };
 </script>
@@ -217,7 +215,7 @@ export default {
     margin-left: -10rem;
   }
 
-  .tooltip:hover .tooltip-content {
+  .tooltip:hover .tooltip-content, .tooltip:focus-within .tooltip-content {
     visibility: visible;
   }
 
