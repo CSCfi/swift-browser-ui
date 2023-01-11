@@ -318,6 +318,8 @@ let default_translations = {
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
+        deleteNote: "Deleting a container requires "+ 
+          "deleting all objects first.",
         deleteConfirmMessage:
           "Are you sure you want to delete this " + "bucket?",
         deleteSuccess: "Bucket Deleted",
@@ -770,6 +772,8 @@ let default_translations = {
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteConfirm: "Poista säiliö",
+        deleteNote: "Säilön poistaminen edellyttää kaikkien " +
+          "objektien poistamista ensin.",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
         folderName: "Kansion nimi",

@@ -293,7 +293,7 @@ export default {
                         params: {
                           text: true,
                           path: mdiDotsHorizontal,
-                          title: "Menu with custom trigger",
+                          title: this.$t("message.options"),
                           size: "small",
                           disabled: item.owner
                             && item.accessRights.length === 1,
@@ -357,7 +357,7 @@ export default {
     confirmDelete: function (container, objects) {
       if (objects > 0) {
         this.$buefy.notification.open({
-          message: "Deleting a container requires deleting all objects first.",
+          message: this.$t("message.container_ops.deleteNote"),
           type: "is-danger",
           position: "is-top-right",
           duration: 30000,

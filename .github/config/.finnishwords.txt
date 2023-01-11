@@ -18,11 +18,13 @@ avainta
 avainten
 dataa
 edellinen
+edellyttää
 edistyneitä
 ei
 eikä
 englanniksi
 ennen
+ensin
 epäonnistui
 epäonnistunut
 epäonnistuttiin
@@ -65,7 +67,6 @@ jaettua
 jaettuja
 jaetun
 jaetut
-jakaa
 jakaa
 jakamaan
 jakamasi
@@ -257,6 +258,7 @@ nykyisen
 objekteja
 objekti
 objektia
+objektien
 objektit
 objektitietojärjestelmissä
 odota
@@ -314,6 +316,7 @@ poissa
 poista
 poistaa
 poistaminen
+poistamista
 poistettava
 poistettiin
 poistettu
