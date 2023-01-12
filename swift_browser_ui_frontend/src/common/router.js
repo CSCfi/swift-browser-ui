@@ -7,6 +7,7 @@ import SharedObjects from "@/views/SharedObjects";
 import DirectRequest from "@/views/DirectRequest";
 import TokensView from "@/views/Tokens";
 import DirectShare from "@/views/DirectShare";
+import AccessibilityInfo from "@/components/AccessibilityInfo";
 
 Vue.use(Router);
 
@@ -57,6 +58,11 @@ export default new Router({
       path: "/browse/:user/:project/:container",
       name: "ObjectsView",
       component: ObjectsView,
+    },
+    {
+      path:"/browse/accessibilty",
+      name:"AccessibilityInfo",
+      component:AccessibilityInfo,
     },
   ],
 });

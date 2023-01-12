@@ -46,8 +46,11 @@ import Resumable from "resumablejs";
 // Upload notification handler
 import UploadNotification from "@/components/UploadNotification";
 
-//Custom footer element
+// Custom footer element
 import CFooter from "@/components/CFooter";
+
+// Accessibilty Info page
+import AccessibilityInfo from "@/components/AccessibilityInfo";
 
 // Import delay
 import delay from "lodash/delay";
@@ -135,6 +138,8 @@ new Vue({
     EditTagsModal,
     ShareModal,
     CopyFolderModal,
+    AccessibilityInfo,
+
   },
   data: function () {
     return {
