@@ -102,7 +102,7 @@ RUN cd /root/swift_ui/swift_browser_ui_frontend \
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && OIDC_ENABLED=$OIDC_ENABLED npm run build
 
-FROM python:3.8-alpine3.15 as BACKEND
+FROM python:3.10-alpine3.17 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git \
@@ -120,7 +120,7 @@ RUN pip install --upgrade pip
 RUN pip install -r /root/swift_ui/requirements.txt
 RUN pip install /root/swift_ui
 
-FROM python:3.8-alpine3.15
+FROM python:3.10-alpine3.17
 
 RUN apk add --no-cache --update bash
 
@@ -128,7 +128,7 @@ LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCfi/swift-browser-ui"
 
-COPY --from=BACKEND /usr/local/lib/python3.8/ /usr/local/lib/python3.8/
+COPY --from=BACKEND /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 
