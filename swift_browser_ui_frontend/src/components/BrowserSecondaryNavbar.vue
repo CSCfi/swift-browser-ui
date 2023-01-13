@@ -29,9 +29,9 @@
         <c-button
           ghost
           data-testid="copy-projectId"
+          aria-describedby="shareidrules"
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
-          aria-describedby="shareidrules"
         >
           <i
             slot="icon"
@@ -39,7 +39,11 @@
           />
           {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
         </c-button>
-        <div class="tooltip" role="tooltip" id="shareidrules">
+        <div
+          id="shareidrules"
+          class="tooltip"
+          role="tooltip"
+        >
           <c-icon-button text>
             <i class="mdi mdi-information-outline" />
           </c-icon-button>

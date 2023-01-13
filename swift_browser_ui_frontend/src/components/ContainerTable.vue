@@ -257,7 +257,6 @@ export default {
                         "setFolderName", item.data.name.value);
                     },
                     onKeyUp: (event) => {
-                      console.log("item", item);
                       if(event.keyCode === 13) {
                         this.$store.commit("toggleShareModal", true);
                         this.$store.commit(

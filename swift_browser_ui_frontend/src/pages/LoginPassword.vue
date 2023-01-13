@@ -15,7 +15,7 @@
         <c-container class="padding">
           <form
             method="POST"
-            action ="/login/credentials"
+            action="/login/credentials"
           >
             <c-login-card
               :src="require('@/assets/banner_login.png')"
@@ -48,7 +48,10 @@
                   />
                   {{ $t('message.index.logIn') }}
                 </c-button>
-                <input type="submit" style="display:none"/>
+                <input
+                  type="submit"
+                  style="display:none"
+                >
               </c-login-card-actions>
               <c-login-card-content v-if="!idb">
                 <p>
