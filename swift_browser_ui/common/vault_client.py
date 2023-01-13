@@ -259,19 +259,19 @@ class VaultClient:
         LOGGER.debug("Got key %r for project %r", key, project)
         return key
 
-    async def put_whitelist_key(self, project: str, flavor: str, public_key: str) -> None:
+    async def put_whitelist_key(self, project: str, flavor: str, public_key: bytes) -> None:
         """Updates the project's whitelisted key.
 
         :param project: Project ID
         :param flavor: Public key flavor: one of crypt4gh or ed25519
-        :param public_key: Public key string
+        :param public_key: Public key bytes
         """
         await self._request(
             "POST",
             f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}",
             json_data={
                 "flavor": flavor,
-                "pubkey": standard_b64encode(public_key.encode("ascii")).decode("ascii"),
+                "pubkey": standard_b64encode(public_key).decode("ascii"),
             },
         )
 

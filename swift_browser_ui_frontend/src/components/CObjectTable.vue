@@ -27,6 +27,10 @@ import {
   sortObjects,
   parseDateTime,
 } from "@/common/conv";
+import {
+  DecryptedDownloadSession,
+  beginDownload,
+} from "@/common/download";
 
 import {
   toggleEditTagsModal,
@@ -59,6 +63,7 @@ export default {
   },
   data() {
     return {
+      currentDownload: undefined,
       objects: [],
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
@@ -81,6 +86,9 @@ export default {
     },
     locale () {
       return this.$i18n.locale;
+    },
+    active () {
+      return this.$store.state.active;
     },
   },
   watch: {
@@ -179,8 +187,7 @@ export default {
                     text: true,
                     size: "small",
                     title: "Download",
-                    href: item.url,
-                    target: "_blank",
+                    onClick: ({ data }) => this.beginDownload(data),
                     path: mdiTrayArrowDown,
                   },
                 },
@@ -261,6 +268,17 @@ export default {
     },
     handleSelection(event) {
       this.$emit("selected-rows", event.detail);
+    },
+    beginDownload(object) {
+      this.currentDownload = new DecryptedDownloadSession(
+        this.active,
+        this.active.id,
+        [object.name.value],
+        this.$route.params.container,
+        this.$store,
+      );
+      this.currentDownload.initServiceWorker();
+      beginDownload();
     },
     setHeaders() {
       this.headers = [

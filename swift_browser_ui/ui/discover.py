@@ -13,5 +13,6 @@ async def handle_discover(_: Union[aiohttp.web.Request, None]) -> aiohttp.web.Re
         {
             "sharing_endpoint": setd["sharing_endpoint"],
             "request_endpoint": setd["request_endpoint"],
+            "upload_endpoint": setd["upload_external_endpoint"],
         }
     )

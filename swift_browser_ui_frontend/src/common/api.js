@@ -37,21 +37,21 @@ export async function GET(url, signal) {
     method: "GET",
   });
 }
-async function POST(url, body) {
+export async function POST(url, body) {
   return fetchWithCookie({
     url,
     body,
     method: "POST",
   });
 }
-async function PUT(url, body) {
+export async function PUT(url, body) {
   return fetchWithCookie({
     url,
     body,
     method: "PUT",
   });
 }
-async function DELETE(url, body) {
+export async function DELETE(url, body) {
   return fetchWithCookie({
     url,
     body,
