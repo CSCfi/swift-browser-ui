@@ -8,10 +8,10 @@ RUN wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stab
 # Build openssl
 FROM emscripten/emsdk:latest AS OPENSSL
 
-RUN wget https://www.openssl.org/source/openssl-1.1.1m.tar.gz \
-    && bash -c 'if [[ $(sha256sum < openssl-1.1.1m.tar.gz) != *$(curl https://www.openssl.org/source/openssl-1.1.1m.tar.gz.sha256)* ]]; then echo $(sha256sum < openssl-1.1.1m.tar.gz) $(curl https://www.openssl.org/source/openssl-1.1.1m.tar.gz.sha256); echo Downloaded file checksum does not match. ; exit 1; fi' \
-    && tar xvf openssl-1.1.1m.tar.gz \
-    && cd openssl-1.1.1m \
+RUN wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz \
+    && bash -c 'if [[ $(sha256sum < openssl-1.1.1s.tar.gz) != *$(curl https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256)* ]]; then echo $(sha256sum < openssl-1.1.1s.tar.gz) $(curl https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256); echo Downloaded file checksum does not match. ; exit 1; fi' \
+    && tar xvf openssl-1.1.1s.tar.gz \
+    && cd openssl-1.1.1s \
     && emconfigure ./Configure linux-generic64 no-asm no-threads no-engine no-hw no-weak-ssl-ciphers no-dtls no-shared no-dso --prefix=/emsdk/upstream \
     && sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile \
     && sed -i '/^CFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
@@ -36,7 +36,7 @@ RUN git clone https://github.com/CSCfi/libcrypt4gh
 RUN  export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && export LDFLAGS="-L/emsdk/upstream/lib" \
     && cd libcrypt4gh \
-    && autoreconf \
+    && autoreconf --install \
     && sed -i 's/$(LIBS) //' Makefile.in \
     && emconfigure ./configure --prefix=/emsdk/upstream \
     && emmake make \
@@ -62,7 +62,7 @@ RUN git clone https://github.com/CSCfi/libcrypt4gh-keys.git
 RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && export LDFLAGS="-L/emsdk/upstream/lib" \
     && cd libcrypt4gh-keys \
-    && autoreconf \
+    && autoreconf --install \
     && sed -i 's/$(LIBS) //' Makefile.in \
     && emconfigure ./configure --prefix=/emsdk/upstream --with-openssl=/emsdk/upstream \
     && emmake make \
@@ -87,7 +87,7 @@ RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
     && emmake make
 
 # Build UI with encryption
-FROM node:18.12.1-alpine3.15 as FRONTEND
+FROM node:18-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
@@ -102,11 +102,11 @@ RUN cd /root/swift_ui/swift_browser_ui_frontend \
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && OIDC_ENABLED=$OIDC_ENABLED npm run build
 
-FROM python:3.8-alpine3.15 as BACKEND
+FROM python:3.10-alpine3.17 as BACKEND
 
 RUN apk add --update \
     && apk add --no-cache build-base curl-dev linux-headers bash git \
-    && apk add --no-cache libressl-dev libffi-dev rust cargo \
+    && apk add --no-cache openssl-dev libffi-dev rust cargo \
     && rm -rf /var/cache/apk/*
 
 COPY requirements.txt /root/swift_ui/requirements.txt
@@ -120,7 +120,7 @@ RUN pip install --upgrade pip
 RUN pip install -r /root/swift_ui/requirements.txt
 RUN pip install /root/swift_ui
 
-FROM python:3.8-alpine3.15
+FROM python:3.10-alpine3.17
 
 RUN apk add --no-cache --update bash
 
@@ -128,7 +128,7 @@ LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCfi/swift-browser-ui"
 
-COPY --from=BACKEND /usr/local/lib/python3.8/ /usr/local/lib/python3.8/
+COPY --from=BACKEND /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['16']
+        node: ['18']
     name: Node ${{ matrix.node }} eslint check
     steps:
       - uses: actions/checkout@v3
