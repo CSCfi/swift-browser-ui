@@ -23,7 +23,7 @@ import { vControlV2 } from "csc-ui-vue-directive";
 // Project JS functions
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
-import { getUser } from "@/common/api";
+import { GET, getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
 
 // Import SharingView and Request API
@@ -316,47 +316,50 @@ new Vue({
           },
         });
       }
-      return active;
+      let discovery = await fetch("/discover");
+      discovery = await discovery.json();
+      console.log(discovery);
+      if (discovery.sharing_endpoint) {
+        this.$store.commit(
+          "setSharingClient",
+          new SwiftXAccountSharing(
+            discovery.sharing_endpoint,
+            document.location.origin,
+          ),
+        );
+      }
+      if (discovery.request_endpoint) {
+        this.$store.commit(
+          "setRequestClient",
+          new SwiftSharingRequest(
+            discovery.request_endpoint,
+            document.location.origin,
+          ),
+        );
+      }
+      if (discovery.upload_endpoint) {
+        this.$store.commit(
+          "setUploadEndpoint",
+          discovery.upload_endpoint,
+        );
+        let keyPath = `/cryptic/${this.active.id}/keys`;
+        let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
+        signatureUrl.searchParams.append("path", keyPath);
+        let signed = await GET(signatureUrl);
+        signed = await signed.json();
+        let keyURL = new URL(
+          keyPath,
+          discovery.upload_endpoint,
+        );
+        keyURL.searchParams.append("valid", signed.valid);
+        keyURL.searchParams.append("signature", signed.signature);
+        let key = await GET(keyURL);
+        key = await key.text();
+        key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
+        this.$store.commit("appendPubKey", key);
+      }
     };
-    initialize().then(ret => {
-      let keyURL = new URL(
-        "/download/" +
-          ret.id +
-          "/key",
-        document.location.origin,
-      );
-      fetch(keyURL)
-        .then(resp => {
-          return resp.text();
-        })
-        .then(resp => {
-          this.$store.commit("appendPubKey", resp);
-        });
-    });
-    fetch("/discover")
-      .then(resp => {
-        return resp.json();
-      })
-      .then(ret => {
-        if (ret.sharing_endpoint) {
-          this.$store.commit(
-            "setSharingClient",
-            new SwiftXAccountSharing(
-              ret.sharing_endpoint,
-              document.location.origin,
-            ),
-          );
-        }
-        if (ret.request_endpoint) {
-          this.$store.commit(
-            "setRequestClient",
-            new SwiftSharingRequest(
-              ret.request_endpoint,
-              document.location.origin,
-            ),
-          );
-        }
-      });
+    initialize().then(() => {console.log("Initialized successfully.");});
     delay(this.containerSyncWrapper, 10000);
   },
   mounted() {

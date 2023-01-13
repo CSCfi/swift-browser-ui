@@ -116,23 +116,23 @@ class EncryptedUploadProxy:
             self.project, self.container, self.object_name, b64_header
         )
 
-        resp = await self.client.put(
-            common.generate_download_url(
-                self.host,
-                container=f"{self.container}{common.SEGMENTS_CONTAINER}",
-                object_name=f"{self.object_name}/{self.segment_id}/{0:08d}",
-            ),
-            data=header,
-            headers={
-                "X-Auth-Token": self.token,
-                "Content-Type": "application/swiftclient-segment",
-            },
-            timeout=UPL_TIMEOUT,
-            ssl=ssl_context,
-        )
-        if resp.status == 408:
-            raise aiohttp.web.HTTPRequestTimeout()
-        LOGGER.debug(f"Successfully uploaded header for {self.object_name}.")
+        # resp = await self.client.put(
+        #     common.generate_download_url(
+        #         self.host,
+        #         container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+        #         object_name=f"{self.object_name}/{self.segment_id}/{0:08d}",
+        #     ),
+        #     data=header,
+        #     headers={
+        #         "X-Auth-Token": self.token,
+        #         "Content-Type": "application/swiftclient-segment",
+        #     },
+        #     timeout=UPL_TIMEOUT,
+        #     ssl=ssl_context,
+        # )
+        # if resp.status == 408:
+        #     raise aiohttp.web.HTTPRequestTimeout()
+        # LOGGER.debug(f"Successfully uploaded header for {self.object_name}.")
 
         self.header_uploaded = True
 

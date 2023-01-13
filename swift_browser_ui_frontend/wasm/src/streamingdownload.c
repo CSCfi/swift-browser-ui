@@ -33,8 +33,8 @@ struct ENCRYPT_SESSION *open_decrypt_session() {
     // Create temporary keys for the session
     randombytes_stir();
     crypto_kx_keypair(
-        ret->seckey,
-        ret->pubkey
+        ret->pubkey,
+        ret->seckey
     );
 
     return ret;
@@ -45,20 +45,32 @@ struct ENCRYPT_SESSION *open_decrypt_session() {
 Dump crypt4gh public key
 */
 char *get_session_public_key(struct ENCRYPT_SESSION *sess) {
-    // b64 length = 4 * (32 / 3) rounded to 4 + 1 for `\0`
-    char* output = malloc(45 * sizeof(char));
-    char* c = output;
-    int cnt = 0;
+    char *ret = malloc(33 * sizeof(char));
+    memset(ret, '\0', 33);
+    memcpy(ret, sess->pubkey, 32);
+    return ret;
+}
 
-    base64_encodestate s;
-    base64_init_encodestate(&s);
-    cnt = base64_encode_block(sess->pubkey, 32, c, &s);
-    c += cnt;
-    cnt = base64_encode_blockend(c, &s);
-    c += cnt;
-    *c = 0;
 
-    return output;
+/*
+Dump crypt4gh private key
+*/
+char *get_session_private_key(struct ENCRYPT_SESSION *sess) {
+    char *ret = malloc(33 * sizeof(char));
+    memset(ret, '\0', 33);
+    memcpy(ret, sess->seckey, 32);
+    return ret;
+}
+
+
+/*
+Dump crypt4gh session key
+*/
+char *get_session_key(struct ENCRYPT_SESSION *sess) {
+    char *ret = malloc(33 * sizeof(char));
+    memset(ret, '\0', 33);
+    memcpy(ret, sess->sessionkey, 32);
+    return ret;
 }
 
 
@@ -74,7 +86,7 @@ void open_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
     uint64_t** edit_list;
     unsigned int edit_list_len = 0;
 
-    crypt4gh_header_parse(
+    ret = crypt4gh_header_parse(
         fd,
         sess->seckey,
         sess->pubkey,
@@ -83,6 +95,12 @@ void open_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
         edit_list,
         &edit_list_len
     );
+
+    printf("Got %d valid keys.\n", nkeys);
+
+    sess->sessionkey = *keys;
+
+    printf("Header parse return condition: %d\n", ret);
 
     close(fd);
     return;
@@ -99,12 +117,13 @@ struct CHUNK* decrypt_chunk(
 ) {
     struct CHUNK* ret = allocate_chunk();
     ret->chunk = malloc(65535 * sizeof(uint8_t));
-    crypt4gh_segment_decrypt(
+    int retc = crypt4gh_segment_decrypt(
         sess->sessionkey,
         segment,
         len_segment,
         ret->chunk,
         &(ret->len)
     );
+    printf("Segment decryption return condition %d\n", retc);
     return ret;
 }

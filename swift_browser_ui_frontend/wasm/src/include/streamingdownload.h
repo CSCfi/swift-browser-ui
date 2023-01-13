@@ -13,6 +13,10 @@ struct ENCRYPT_SESSION *open_decrypt_session();
 
 char *get_session_public_key(struct ENCRYPT_SESSION *sess);
 
+char *get_session_private_key(struct ENCRYPT_SESSION *sess);
+
+char *get_session_key(struct ENCRYPT_SESSION *sess);
+
 void open_crypt4gh_header(struct ENCRYPT_SESSION *sess);
 
 struct CHUNK *decrypt_chunk(

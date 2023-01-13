@@ -6,28 +6,41 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-let streamController;
-let sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray, pubkeyPtr;
-let pubKey;
-let fileSize;
+let 
+  streamController,
+  sessionPtr,
+  filename,
+  headerPtr,
+  headerLen,
+  chunkPtr,
+  chunkLen,
+  chunk,
+  header,
+  chunkArray,
+  pubkeyPtr,
+  pubkey,
+  fileSize,
+  privkeyPtr,
+  privKey,
+  sessKeyPtr,
+  sessKey
+;
 
 self.addEventListener("fetch", (e) => {
   console.log(e);
-  const stream = new ReadableStream({
-    start(controller) {
-      streamController = controller;
-    },
-  });
-  const response = new Response(stream);
-  response.headers.append(
-    "Content-Disposition",
-    'attachment; filename="' + fileName + '"',
-  );
-  response.headers.append(
-    "Content-Length",
-    fileSize,
-  )
-  e.respondWith(response);
+  if (e.request.url.startsWith(self.location.origin + "/file")) {
+    const stream = new ReadableStream({
+      start(controller) {
+        streamController = controller;
+      },
+    });
+    const response = new Response(stream);
+    response.headers.append(
+      "Content-Disposition",
+      'attachment; filename="' + fileName + '"',
+    );
+    e.respondWith(response);
+  }
 });
 
 console.log(Module);
@@ -185,6 +198,26 @@ wasmReady.then(() => {
         break;
       // Download related features
       case "beginDownload":
+        if (streamController) {
+          try {
+            streamController.close();
+          } catch(e) {
+            console.log(e);
+          }
+        }
+        if (sessionPtr) {
+          try {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+          } catch(e) {
+            console.log(e);
+          }
+        }
+
         sessionPtr = Module.ccall(
           "open_decrypt_session",
           "number",
@@ -197,11 +230,24 @@ wasmReady.then(() => {
           ["number"],
           [sessionPtr],
         );
-        pubKey = new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 44));
-        console.log(new TextDecoder().decode(pubKey));
+        privkeyPtr = Module.ccall(
+          "get_session_private_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        sessKeyPtr = Module.ccall(
+          "get_session_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        pubKey = new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 32));
+        console.log("Download session was opened, posting message from SW.");
         e.source.postMessage({
           eventType: "downloadSessionOpened",
-        })
+          pubKey: pubKey,
+        });
         break;
       case "addHeader":
         try {
@@ -226,38 +272,47 @@ wasmReady.then(() => {
         });
         break;
       case "decryptChunk":
-        chunkArray = new Uint8Array(e.data.chunk);
         chunk = Module.ccall(
           "decrypt_chunk",
           "number",
           ["number", "array", "number"],
-          [sessionPtr, chunkArray, chunkArray.length],
+          [sessionPtr, new Uint8Array(e.data.chunk), e.data.chunk.length],
         );
         chunkPtr = Module.ccall(
           "wrap_chunk_content",
           "number",
           ["number"],
-          [header]
+          [chunk]
         );
         chunkLen = Module.ccall(
           "wrap_chunk_len",
           "number",
           ["number"],
-          [header],
+          [chunk],
         );
         streamController.enqueue(new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen)));
-        e.source.postMessage({
-          eventType: "nextDecryptChunk",
-        });
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [chunk],
         );
+        e.source.postMessage({
+          eventType: "nextDecryptChunk",
+        });
         break;
       case "decryptionFinished":
         streamController.close();
+        try {
+          Module.ccall(
+            "clean_session",
+            undefined,
+            ["number"],
+            [sessionPtr],
+          );
+        } catch(e) {
+          console.log(e);
+        }
         e.source.postMessage({
           eventType: "streamClosed",
         });
