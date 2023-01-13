@@ -42,6 +42,7 @@ const store = new Vuex.Store({
     uploadNotification: false,
     altContainer: undefined,
     uploadInfo: undefined,
+    uploadEndpoint: "",
     transfer: [],
     pubkey: [],
     currentPrefix: "",
@@ -150,6 +151,9 @@ const store = new Vuex.Store({
     },
     eraseUploadInfo(state) {
       state.uploadInfo = undefined;
+    },
+    setUploadEndpoint(state, endpoint) {
+      state.uploadEndpoint = endpoint;
     },
     appendFileTransfer(state, file) {
       state.transfer.push(file);

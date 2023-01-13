@@ -311,7 +311,7 @@ async def handle_project_whitelist(request: aiohttp.web.Request) -> aiohttp.web.
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     flavor = request.query.get("flavor", "crypt4gh")
-    public_key = await request.text()
+    public_key = await request.read()
 
     await vault_client.put_whitelist_key(project, flavor, public_key)
 
