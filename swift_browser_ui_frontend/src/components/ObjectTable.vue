@@ -64,6 +64,7 @@
           inverted
           text
           @click="button.action"
+          @keyup.enter="button.action"
         >
           <i
             slot="icon"

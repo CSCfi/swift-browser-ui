@@ -63,6 +63,7 @@
         outlined
         size="large"
         @click="toggleCreateFolderModal"
+        @keyup.enter="toggleCreateFolderModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
@@ -70,6 +71,7 @@
         size="large"
         data-testid="save-folder"
         @click="create ? createContainer() : updateContainer()"
+        @keyup.enter="create ? createContainer() : updateContainer()"
       >
         {{ $t("message.save") }}
       </c-button>

@@ -8,14 +8,12 @@
       />
       <ProgressBar v-if="isUploading || isChunking" />
       <c-modal
-        v-control
         v-csc-model="openCreateFolderModal"
         width="64vw"
       >
         <CreateFolderModal />
       </c-modal>
       <c-modal
-        v-control
         v-csc-model="openUploadModal"
         width="64vw"
       >
@@ -26,21 +24,18 @@
         @cancel-upload="currentUpload.cancelUpload()"
       />
       <c-modal
-        v-control
         v-csc-model="openEditTagsModal"
         width="64vw"
       >
         <EditTagsModal />
       </c-modal>
       <c-modal
-        v-control
         v-csc-model="openShareModal"
         width="64vw"
       >
         <ShareModal />
       </c-modal>
       <c-modal
-        v-control
         v-csc-model="openCopyFolderModal"
         width="64vw"
       >
@@ -70,7 +65,7 @@
       <!--New Footer Component-->
       <div id="footer">
         <CFooter />
-      </div> 
+      </div>
     </div>
   </div>
 </template>
@@ -84,7 +79,7 @@ export default {
   filters: {
     truncate,
   },
-  
+
 };
 </script>
 

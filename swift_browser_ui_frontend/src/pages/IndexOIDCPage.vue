@@ -24,6 +24,7 @@
                   :loading="loading"
                   :disabled="!idb"
                   @click="loginButtonClick"
+                  @keyup.enter="loginButtonClick"
                 >
                   {{ $t('message.indexOIDC.logIn') }}
                 </c-button>
@@ -42,14 +43,14 @@
 </template>
 
 <style>
-c-main { 
-  height: unset; 
-  min-height: 100vh 
+c-main {
+  height: unset;
+  min-height: 100vh
 }
-c-login-card { 
+c-login-card {
   margin: 2rem auto;
   max-width: 55rem;
-  height: 35rem; 
+  height: 35rem;
 }
 c-button {
   margin-top: 2rem;

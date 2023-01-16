@@ -49,6 +49,7 @@
         outlined
         size="large"
         @click="cancelCopy"
+        @keyup.enter="cancelCopy"
       >
         {{ $t("message.cancel") }}
       </c-button>
@@ -56,6 +57,7 @@
         size="large"
         :disabled="folderExists"
         @click="replicateContainer"
+        @keyup.enter="replicateContainer"
       >
         {{ $t("message.copy") }}
       </c-button>

@@ -111,6 +111,7 @@
                   type="is-success"
                   icon-left="lock-plus"
                   @click="appendPublicKey"
+                  @keyup.enter="appendPublicKey"
                 >
                   {{ $t("message.encrypt.addkey") }}
                 </c-button>
@@ -133,6 +134,7 @@
         outlined
         size="large"
         @click="toggleUploadModal"
+        @keyup.enter="toggleUploadModal"
       >
         {{ $t("message.encrypt.cancel") }}
       </c-button>
@@ -140,6 +142,7 @@
         size="large"
         :disabled="noUpload"
         @click="beginEncryptedUpload"
+        @keyup.enter="beginEncryptedUpload"
       >
         {{ $t("message.encrypt.normup") }}
       </c-button>

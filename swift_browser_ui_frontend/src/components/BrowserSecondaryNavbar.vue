@@ -29,7 +29,9 @@
         <c-button
           ghost
           data-testid="copy-projectId"
+          aria-describedby="shareidrules"
           @click="copyProjectId"
+          @keyup.enter="copyProjectId"
         >
           <i
             slot="icon"
@@ -37,7 +39,11 @@
           />
           {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
         </c-button>
-        <div class="tooltip">
+        <div
+          id="shareidrules"
+          class="tooltip"
+          role="tooltip"
+        >
           <c-icon-button text>
             <i class="mdi mdi-information-outline" />
           </c-icon-button>
@@ -57,12 +63,16 @@
           outlined
           data-testid="create-folder"
           @click="toggleCreateFolderModal"
+          @keyup.enter="toggleCreateFolderModal"
         >
           {{ $t("message.createFolder") }}
         </c-button>
       </div>
       <div class="navbar-item">
-        <c-button @click="toggleUploadModal">
+        <c-button
+          @click="toggleUploadModal"
+          @keyup.enter="toggleUploadModal"
+        >
           {{ $t("message.uploadSecondaryNav") }}
         </c-button>
       </div>
@@ -145,9 +155,6 @@ export default {
         });
       }
     },
-    hoverTooltip: function () {
-      console.log("HOVER!");
-    },
   },
 };
 </script>
@@ -212,7 +219,7 @@ export default {
     margin-left: -10rem;
   }
 
-  .tooltip:hover .tooltip-content {
+  .tooltip:hover .tooltip-content, .tooltip:focus-within .tooltip-content {
     visibility: visible;
   }
 

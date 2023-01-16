@@ -8,6 +8,7 @@
       <c-button
         text
         @click="toggleShareModal"
+        @keyup.enter="toggleShareModal"
       >
         <c-icon-button text>
           <i class="mdi mdi-close" />
@@ -77,7 +78,8 @@
           />
           <c-button
             :loading="loading"
-            @click="shareSubmit()"
+            @click="shareSubmit"
+            @keyup.enter="shareSubmit"
           >
             {{ $t('message.share.confirm') }}
           </c-button>

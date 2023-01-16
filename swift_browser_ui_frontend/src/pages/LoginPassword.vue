@@ -48,6 +48,10 @@
                   />
                   {{ $t('message.index.logIn') }}
                 </c-button>
+                <input
+                  type="submit"
+                  style="display:none"
+                >
               </c-login-card-actions>
               <c-login-card-content v-if="!idb">
                 <p>
@@ -64,14 +68,14 @@
 </template>
 
 <style>
-c-main { 
-  height: unset; 
-  min-height: 100vh 
+c-main {
+  height: unset;
+  min-height: 100vh
 }
-c-login-card { 
+c-login-card {
   margin: 2rem auto;
   max-width: 55rem;
-  height: 35rem; 
+  height: 35rem;
 }
 c-button {
   margin-top: 2rem;

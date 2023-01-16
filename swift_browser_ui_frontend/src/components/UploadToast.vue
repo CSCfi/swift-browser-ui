@@ -28,7 +28,7 @@
 
       <div class="toast-main">
         <p>
-          {{ $t("message.upload.estimate") }} 
+          {{ $t("message.upload.estimate") }}
           <a
             class="link-underline"
             href="javascript:void(0)"
@@ -43,6 +43,7 @@
         <c-button
           outlined
           @click="cancelUpload"
+          @keyup.enter="cancelUpload"
         >
           {{ $t("message.share.cancel") }}
         </c-button>

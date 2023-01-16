@@ -256,6 +256,13 @@ export default {
                       this.$store.commit(
                         "setFolderName", item.data.name.value);
                     },
+                    onKeyUp: (event) => {
+                      if(event.keyCode === 13) {
+                        this.$store.commit("toggleShareModal", true);
+                        this.$store.commit(
+                          "setFolderName", item.name);
+                      }
+                    },
                     disabled: item.owner,
                   },
                 },
