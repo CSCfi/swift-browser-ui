@@ -55,6 +55,8 @@ export class DecryptedDownloadSession {
     this.offset = 0;
     this.remainder = 0;
     this.chunkBuffer = [];
+
+    this.controller = new AbortController();
   }
 
   // Imagine needing a separate function to specify chunk size when reading
@@ -156,7 +158,12 @@ export class DecryptedDownloadSession {
       }
     }
     if (this.readerDone) {
-      if (this.chunkBuffer.length > 0) {
+      if (this.chunk.length > 0 && this.chunk.length > this.offset) {
+        this.chunkBuffer = this.chunkBuffer.concat(
+          Array.from(
+            this.chunk.subarray(this.offset, this.offset + this.remainder),
+          ),
+        );
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             cmd: "decryptChunk",
@@ -267,10 +274,12 @@ export class DecryptedDownloadSession {
             console.log(resp);
             if (this.objects.length > 0) {
               beginDownload();
+            } else {
+              this.controller.abort();
             }
           })();
           break;
       }
-    });
+    }, { signal: this.controller.signal });
   }
 }
