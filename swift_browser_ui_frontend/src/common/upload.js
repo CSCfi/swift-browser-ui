@@ -90,9 +90,12 @@ export default class EncryptedUploadSession {
     this.ptr = 0;
     this.currentTotalBytes = 0;
     this.currentUpload = undefined;
+    this.currentTotalChunks = 0;
     this.socket = undefined;
     this.headUrl = undefined;
     this.ingestUrl = undefined;
+
+    this.currentChunks = [];
 
     this.totalBytes = 0;
     for (let f of this.files) {
@@ -171,12 +174,17 @@ export default class EncryptedUploadSession {
             this.socket = new WebSocket(this.ingestUrl);
             this.socket.onmessage = (message) => {
               let mout = JSON.parse(message.data);
-              if (mout.cmd == "nextChunk") {
-                this.encryptChunk(mout.iter);
-              }
-              if (mout.cmd == "canClose") {
-                this.socket.close();
-                this.cleanUp();
+              switch (mout.cmd) {
+                case "nextChunk":
+                  this.encryptChunk(this.currentChunks.shift());
+                  break;
+                case "retryChunk":
+                  this.encryptChunk(mout.iter);
+                  break;
+                case "canClose":
+                  this.socket.close();
+                  this.cleanUp();
+                  break;
               }
             };
             this.socket.onopen = () => {
@@ -250,16 +258,20 @@ export default class EncryptedUploadSession {
   }
 
   encryptChunk(i) {
+    if (i === undefined) {
+      return;
+    }
+    let ptr = i * 65536;
     navigator.serviceWorker.ready.then(reg => {
       this.currentFile.slice(
-        i,
-        i + 65536,
+        ptr,
+        ptr + 65536,
       ).arrayBuffer().then(c => {
         reg.active.postMessage(
           {
             cmd: "encryptChunk",
             chunk: c,
-            iter: Math.floor(this.currentByte / 65536),
+            iter: i,
           },
         );
         this.currentByte += 65536;
@@ -293,6 +305,15 @@ export default class EncryptedUploadSession {
     // Plus the last block if it exists
     if (this.currentFile.size % 65536 > 0) {
       this.currentTotalBytes += this.currentFile.size % 65536 + 28;
+    }
+    this.currentTotalChunks = Math.floor(
+      this.currentFile.size / 65536,
+    );
+    if (this.currentFile.size % 65536) {
+      this.currentTotalChunks++;
+    }
+    for (let i= 0; i < this.currentTotalChunks; i++) {
+      this.currentChunks.push(i);
     }
     getUploadCryptedEndpoint(
       this.active.id,
