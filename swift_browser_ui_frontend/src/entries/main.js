@@ -329,27 +329,19 @@ new Vue({
       return active;
     };
     initialize().then(ret => {
-      if (this.$te("message.keys")) {
-        for (let item of Object.entries(this.$t("message.keys"))) {
-          let keyURL = new URL(
-            "/download/" +
-              item[1]["project"] +
-              "/" +
-              item[1]["container"] +
-              "/" +
-              item[1]["object"],
-            document.location.origin,
-          );
-          keyURL.searchParams.append("project", ret.id);
-          fetch(keyURL)
-            .then(resp => {
-              return resp.text();
-            })
-            .then(resp => {
-              this.$store.commit("appendPubKey", resp);
-            });
-        }
-      }
+      let keyURL = new URL(
+        "/download/" +
+          ret.id +
+          "/key",
+        document.location.origin,
+      );
+      fetch(keyURL)
+        .then(resp => {
+          return resp.text();
+        })
+        .then(resp => {
+          this.$store.commit("appendPubKey", resp);
+        });
     });
     fetch("/discover")
       .then(resp => {

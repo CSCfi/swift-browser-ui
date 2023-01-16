@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #864) Vault c4ghtransit integration - Uploads object headers to Vault in addition to Object Storage
 - (GH #781) Render full details of Folders you have shared and Folders shared with you
   - Show Folder status including Shared status, source project and date of sharing
   - Show tags for Folders and Objects inside them
