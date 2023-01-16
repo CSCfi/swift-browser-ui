@@ -70,7 +70,6 @@ class EncryptedUploadProxy:
             self.project,
         )
 
-        self.next_iter = 0
         self.have_closed = False
 
         self.chunk_cache: typing.Dict[
@@ -165,10 +164,16 @@ class EncryptedUploadProxy:
         ws: aiohttp.web.WebSocketResponse,
     ) -> None:
         """Schedule fetching of the next chunk in order."""
-        if self.next_iter >= self.total_chunks:
+        if len(self.done_chunks) >= self.total_chunks:
             return
-        await ws.send_json({"cmd": "nextChunk", "iter": self.next_iter * 65536})
-        self.next_iter += 1
+        await ws.send_json({"cmd": "nextChunk"})
+
+    async def retry_chunk(
+        self,
+        ws: aiohttp.web.WebSocketResponse,
+        iter: int,
+    ) -> None:
+        """Retry a chunk via websocket."""
 
     async def add_to_chunks(
         self,
@@ -227,8 +232,15 @@ class EncryptedUploadProxy:
         LOGGER.debug(f"Pushing chunks from {seg_start} until {seg_end} to queue.")
 
         for i in range(seg_start, seg_end):
+            wait_count = 0
             while i not in self.chunk_cache:
+                wait_count += 1
                 await asyncio.sleep(0.05)
+                # if handler has waited too long for the next chunk, ask for it again.
+                # 10 seconds is considered too long
+                if wait_count > 2000:
+                    await self.retry_chunk(self.ws, i)
+                    wait_count = 0
             self.done_chunks.add(i)
             chunk, ws = self.chunk_cache.pop(i)
             await q.put(chunk)
