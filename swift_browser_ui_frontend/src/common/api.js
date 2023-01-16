@@ -468,6 +468,22 @@ export async function getUploadEndpoint(
   return ret.json();
 }
 
+export async function killUploadEndpoint(
+  project,
+  owner,
+) {
+  let fetchURL = new URL(
+    `/upload/${encodeURI(owner)}`,
+    document.location.origin,
+  );
+  fetchURL.searchParams.append("project", project);
+  let ret = await DELETE(fetchURL);
+
+  if (ret.status != 204) {
+    throw new Error("Failed to kill upload session.");
+  }
+}
+
 export async function getUploadCryptedEndpoint(
   project,
   owner,

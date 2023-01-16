@@ -17,6 +17,7 @@ import swift_browser_ui.common.common_util
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.auth import (
     handle_login,
+    handle_logout,
     handle_validate_authentication,
 )
 from swift_browser_ui.upload.api import (
@@ -60,12 +61,17 @@ async def servinit() -> aiohttp.web.Application:
     app["client"] = http_client
     app[VAULT_CLIENT] = VaultClient(http_client)
 
+    app.add_routes([aiohttp.web.get("/health", handle_health_check)])
+
     # Add auth related routes
     # Can use direct project post for creating a session, as it's intuitive
     # and POST upload against an account doesn't exist
-    app.add_routes([aiohttp.web.get("/health", handle_health_check)])
-
-    app.add_routes([aiohttp.web.post("/{project}", handle_login)])
+    app.add_routes(
+        [
+            aiohttp.web.post("/{project}", handle_login),
+            aiohttp.web.delete("/{project}", handle_logout),
+        ]
+    )
 
     # Add api routes
     app.add_routes(

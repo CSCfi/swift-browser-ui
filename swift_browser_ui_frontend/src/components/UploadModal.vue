@@ -536,6 +536,12 @@ export default {
       if (this.pubkey.length > 0) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
       }
+      // Clean up old stale upload if exists
+      this.$store.commit("abortCurrentUpload");
+      this.$store.commit("eraseCurrentUpload");
+
+      // Create a fresh session from scratch
+      this.$store.commit("createCurrentUploadAbort");
       let upload = new EncryptedUploadSession(
         this.active,
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
