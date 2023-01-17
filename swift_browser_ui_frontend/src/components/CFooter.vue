@@ -6,16 +6,16 @@
           <div class="col-3">
             <div class="row navbar-item ">
               <span class="largetext">
-                {{ $t("message.footerMenu.groupandprogram") }}
+                {{ $t("message.footerMenu.title") }}
               </span>
             </div>
             <div class="row navbar-item smalltext">
               <a
                 class="linktext"
-                href="https://csc.fi"
-                :alt="$t('message.footerMenu.csc')"
+                :href="$t('message.footerMenu.serviceProviderLink')"
+                :alt="$t('message.footerMenu.serviceProvider')"
               >
-                {{ $t("message.footerMenu.csc") }}
+                {{ $t("message.footerMenu.serviceProvider") }}
               </a>
             </div>
           </div>        
@@ -28,14 +28,20 @@
           <div class="navbar-item smalltext">
             <a
               class="linktext"
-              href="https://research.csc.fi/-/sd-connect"
-              :alt="$t('message.footerMenu.servicedescription')"
+              :href="$t('message.footerMenu.menuItemLink1')"
+              :alt="$t('message.footerMenu.menuItem1')"
             >
-              {{ $t("message.footerMenu.servicedescription") }}
+              {{ $t("message.footerMenu.menuItem1") }}
             </a>
-          </div> 
+          </div>
           <div class="navbar-item smalltext">
-            <p>{{ $t("message.footerMenu.accessibility") }}</p> 
+            <a
+              class="linktext"
+              :href="$t('message.footerMenu.menuItemLink2')"
+              :alt="$t('message.footerMenu.menuItem2')"
+            >
+              {{ $t("message.footerMenu.menuItem2") }}
+            </a>
           </div>
         </div>
       </div>
