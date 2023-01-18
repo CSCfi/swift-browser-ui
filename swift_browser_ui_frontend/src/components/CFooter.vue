@@ -12,6 +12,7 @@
             <div class="row navbar-item smalltext">
               <a
                 class="linktext"
+                target="_blank"
                 :href="$t('message.footerMenu.serviceProviderLink')"
                 :alt="$t('message.footerMenu.serviceProvider')"
               >
@@ -28,6 +29,7 @@
           <div class="navbar-item smalltext">
             <a
               class="linktext"
+              target="_blank"
               :href="$t('message.footerMenu.menuItemLink1')"
               :alt="$t('message.footerMenu.menuItem1')"
             >
@@ -37,6 +39,7 @@
           <div class="navbar-item smalltext">
             <a
               class="linktext"
+              target="_blank"
               :href="$t('message.footerMenu.menuItemLink2')"
               :alt="$t('message.footerMenu.menuItem2')"
             >
