@@ -6,7 +6,7 @@
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyProject')"
+    :no-data-text="getEmptyText()"
     :sort-by="sortBy"
     :sort-direction="sortDirection"
     external-data
@@ -408,6 +408,17 @@ export default {
       this.paginationOptions.textOverrides = this.locale === "fi"
         ? this.paginationTextOverrides
         : {};
+    },
+    getEmptyText() {
+      if (this.$route.name == "SharedFrom") {
+        return this.$t("message.emptyProject.sharedFrom");
+      }
+      
+      if (this.$route.name == "SharedTo") {
+        return this.$t("message.emptyProject.sharedTo");
+      }
+
+      return this.$t("message.emptyProject.all");
     },
   },
 };

@@ -76,8 +76,8 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. You can view" +
-          " and download files in this folder (Read access).",
+          "This folder is shared with you. You can view files only by" +
+          " using SD Desktop and download files in this folder (Read access)",
         shared_with_read_write:
           "This folder is shared with you. You can view, download, upload" +
           " and edit tags in this folder (Read and write access).",
@@ -261,9 +261,11 @@ let default_translations = {
         "enable them for the duration of the session.",
       largeDownAction: "Enable",
       emptyContainer: "This bucket is empty.",
-      emptyProject:
-        "The project does not contain any buckets " +
-        "or their use is not permitted.",
+      emptyProject: {
+        all: "There are no folders in this project.",
+        sharedFrom: "You haven't shared any folders.",
+        sharedTo: "No folders have been shared with you.",
+      },
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested:
         "No shared buckets have been requested for the " + "project.",
@@ -718,8 +720,11 @@ let default_translations = {
         "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
       emptyContainer: "Säiliö on tyhjä.",
-      emptyProject:
-        "Projektilla ei ole säiliöitä " + "tai niiden käyttöä ei ole sallittu.",
+      emptyProject: {
+        all: "Tässä projektissa ei ole kansioita.",
+        sharedFrom: "Et ole jakanut yhtään kansiota.",
+        sharedTo: "Sinulle ei ole jaettu kansioita.",
+      },
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
