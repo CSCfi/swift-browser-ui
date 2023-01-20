@@ -86,19 +86,16 @@
 }
 
 h2 {
-  font-family: 'Museo Sans';
   text-align: center;
 }
 
 .maintext {
-  font-family: 'Museo Sans';
   text-align: justify;
   line-height: 1.5;
 }
 
 #manlist {
   text-align: justify;
-  font-family:'Museo Sans';
   line-height: 1.4;
 }
 
@@ -119,7 +116,6 @@ a:hover {
 form {
   text-align: center;
   line-height: 2.5;
-  font-family: sans-serif;
 }
 
 #inputbox {

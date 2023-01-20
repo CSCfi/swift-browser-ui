@@ -122,7 +122,6 @@ async def servinit() -> aiohttp.web.Application:
 async def kill_client(app: aiohttp.web.Application) -> None:
     """Kill the app client session."""
     await app["client"].close()
-    await app[VAULT_CLIENT].close()
 
 
 def run_server(app: typing.Union[typing.Coroutine, aiohttp.web.Application]) -> None:

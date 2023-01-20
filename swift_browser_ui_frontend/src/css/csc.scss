@@ -3,6 +3,9 @@
 
 @import "~bulma/sass/utilities/_all";
 
+@import "~csc-ui/dist/styles/variables.css";
+@import "~csc-ui/dist/styles/variables.scss";
+
 $csc-primary: #006778;
 $csc-primary-light: #c2dbdf;
 $csc-primary-lighter: #d8e8ea;
@@ -25,7 +28,7 @@ $csc-green: #51a808;
 $csc-orange: #ff5800;
 
 //Font Setting
-$csc-font-family: 'museo-sans';
+$family-primary: $csc-font-family;
 
 // Set bulma initial colors to be derived from
 // Not overriding black, black's fine as is
