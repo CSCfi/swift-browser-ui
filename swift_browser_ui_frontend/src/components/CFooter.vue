@@ -96,7 +96,6 @@ export default {
 }
 
 .largetext{
-  font-family: var(--csc-font-family);
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
@@ -104,7 +103,6 @@ export default {
   color: $csc-grey;
 }
 .smalltext{
-  font-family:  var(--csc-font-family);;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
