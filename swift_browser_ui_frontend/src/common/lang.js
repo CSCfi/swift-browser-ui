@@ -260,7 +260,7 @@ let default_translations = {
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
       largeDownAction: "Enable",
-      emptyContainer: "This bucket is empty.",
+      emptyContainer: "This folder has no content.",
       emptyProject: {
         all: "There are no folders in this project.",
         sharedFrom: "You haven't shared any folders.",
@@ -719,7 +719,7 @@ let default_translations = {
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
         "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
-      emptyContainer: "Säiliö on tyhjä.",
+      emptyContainer: "Tämä kansio on tyhjä.",
       emptyProject: {
         all: "Tässä projektissa ei ole kansioita.",
         sharedFrom: "Et ole jakanut yhtään kansiota.",
