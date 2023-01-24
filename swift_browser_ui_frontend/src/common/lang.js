@@ -174,13 +174,13 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         share_id_tooltip:
-          "When another project wants share a folder " +
-          "with your project: Select this button and " +
-          "send Share ID (now copied in your cache) " +
-          "to the project’s member. " +
-          "When you want to share a folder with " +
-          "another project. Ask Share ID from " +
-          "another project’s member.",
+          "<strong>When another project wants to share a folder " +
+          "with your project</strong><br/>Select this button and " +
+          "send the Share ID (now copied in your cache) " +
+          "to the project's member.<br/><br/> " +
+          "<strong>When you want to share a folder with " +
+          "another project</strong><br/>Ask the Share ID from " +
+          "another project's member.",
         close: "Close",
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
@@ -640,11 +640,11 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jaa tunnus",
         share_id_tooltip:
-          "Mikäli toisesta projektista halutaan jakaa kansio projektisi " +
-          "kanssa: Valitse tämä nappi ja lähetä Jakotunnus toisen " +
-          "projektin jäsenelle. Halutessasi jakaa kansion toisen " +
-          "projektin kanssa, pyydä jakotunnusta joltakin kyseisen " +
-          "projektin jäseneltä.",
+          "<strong>Mikäli toisesta projektista halutaan jakaa kansio " +
+          "projektisi kanssa</strong><br/>Valitse tämä nappi ja lähetä " +
+          "Jakotunnus toisen projektin jäsenelle.<br/><br/><strong>" +
+          "Halutessasi jakaa kansion toisen projektin kanssa</strong>" +
+          "<br/>Pyydä jakotunnusta joltakin kyseisen projektin jäseneltä.",
         close: "Kiinni",
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
