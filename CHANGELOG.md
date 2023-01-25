@@ -73,6 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #549) Fixed changing project keeps loading previous project data.
 - (GH #550) Fixed changing project shows container from previous project.
 - Correctly set the global font to Museo sans
+- Unify editing tags modal for objects and containers
 
 ## [v2.0.1]
 

@@ -24,7 +24,7 @@ import {
   mdiFolder,
 } from "@mdi/js";
 import {
-  toggleCreateFolderModal,
+  toggleEditTagsModal,
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
@@ -282,7 +282,7 @@ export default {
                       },
                       {
                         name: this.$t("message.editTags"),
-                        action: () => toggleCreateFolderModal(item.name),
+                        action: () => toggleEditTagsModal(null, item.name),
                       },
                       {
                         name: this.$t("message.delete"),
