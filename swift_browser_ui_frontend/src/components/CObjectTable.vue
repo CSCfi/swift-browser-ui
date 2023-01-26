@@ -7,7 +7,7 @@
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyProject')"
+    :no-data-text="$t('message.emptyContainer')"
     :sort-by="sortBy"
     :sort-direction="sortDirection"
     selection-property="name"
