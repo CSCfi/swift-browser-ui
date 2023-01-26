@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 THE_HOST=${HOST:="0.0.0.0"}
 THE_PORT=${PORT:="9090"}
