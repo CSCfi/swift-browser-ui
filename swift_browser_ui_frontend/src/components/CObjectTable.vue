@@ -193,10 +193,11 @@ export default {
                     size: "small",
                     title: "Edit tags",
                     path: mdiPencilOutline,
-                    onClick: ({ data }) => toggleEditTagsModal(data),
+                    onClick: ({ data }) => 
+                      toggleEditTagsModal(data.name.value, null),
                     onKeyUp: (event) => {
                       if(event.keyCode === 13) {
-                        toggleEditTagsModal(item.data);
+                        toggleEditTagsModal(item.data.name.value, null);
                       }
                     },
                   },

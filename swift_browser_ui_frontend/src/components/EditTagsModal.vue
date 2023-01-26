@@ -1,15 +1,14 @@
 <template>
   <c-card class="edit-tags">
     <h4 class="title is-4 has-text-dark">
-      {{ $t('message.objects.editObject') + object.name }}
+      {{ $t('message.editTags') }}
     </h4>
     <c-card-content>
       <b-field
         custom-class="has-text-dark"
-        :label="$t('message.tagName')"
       >
         <b-taginput
-          v-model="object.tags"
+          v-model="tags"
           ellipsis
           maxlength="20"
           has-counter
@@ -32,8 +31,8 @@
       </c-button>
       <c-button
         size="large"
-        @click="saveTags"
-        @keyup.enter="saveTags"
+        @click="isObject ? saveObjectTags() : saveContainerTags()"
+        @keyup.enter="isObject ? saveObjectTags() : saveContainerTags()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -44,17 +43,22 @@
 <script>
 import {
   updateObjectMeta,
+  updateContainerMeta,
 } from "@/common/api";
 import {
   taginputConfirmKeys,
   getTagsForObjects,
+  getTagsForContainer,
 } from "@/common/conv";
 
 export default {
   name: "EditTagsModal",
   data() {
     return {
-      object: {id: 0, name: "", tags: []},
+      container: null,
+      object: null,
+      tags: [],
+      isObject: false,
       taginputConfirmKeys,
     };
   },
@@ -64,55 +68,79 @@ export default {
         ? this.$store.state.selectedObjectName
         : "";
     },
+    selectedFolderName() {
+      return this.$store.state.selectedFolderName.length > 0
+        ? this.$store.state.selectedFolderName
+        : "";
+    },
   },
   watch: {
     selectedObjectName: function () {
       if (this.selectedObjectName && this.selectedObjectName.length > 0) {
+        this.isObject = true;
         this.getObject();
+      }
+    },
+    selectedFolderName: function () {
+      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
+        this.isObject = false;
+        this.getContainer();
       }
     },
   },
   methods: {
     getObject: async function () {
+      this.container = await this.$store.state.db.containers.get({
+        projectID: this.$route.params.project,
+        name: this.$route.params.container,
+      });
       if (this.$route.name === "SharedObjects") {
-        this.container.name = this.$route.params.container;
-        this.object.name = this.selectedObjectName;
         this.$store.state.objectCache.map(obj => {
-          if (obj.name === this.object.name) {
-            this.object.tags = obj.tags;
+          if (obj.name === this.selectedObjectName) {
+            this.tags = obj.tags;
           }
         });
       } else {
-        this.container = await this.$store.state.db.containers.get({
-          projectID: this.$route.params.project,
-          name: this.$route.params.container,
-        });
         this.object = await this.$store.state.db.objects.get({
           containerID: this.container.id,
           name: this.selectedObjectName,
         });
+        if (!this.object.tags.length) {
+          const tags = await getTagsForObjects(
+            this.$route.params.project,
+            this.container.name,
+            [this.selectedObjectName],
+          );
+          this.tags = tags[0][1] || [];
+        } else {
+          this.tags = this.object.tags;
+        }
       }
-
-      if (!this.object.tags.length) {
-        const tags = await getTagsForObjects(
+    },
+    getContainer: async function () {
+      this.container = await this.$store.state.db.containers.get({
+        projectID: this.$route.params.project,
+        name: this.selectedFolderName,
+      });
+      if (!this.container.tags) {
+        this.tags = await getTagsForContainer(
           this.$route.params.project,
           this.container.name,
-          [this.object.name],
         );
-        this.tags = tags[0][1] || [];
       } else {
-        this.tags = this.object.tags;
+        this.tags = this.container.tags;
       }
     },
     toggleEditTagsModal: function () {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
+      this.$store.commit("setFolderName", "");
     },
-    saveTags: function () {
+    saveObjectTags: function () {
       let objectMeta = [
         this.object.name,
         {
-          usertags: this.object.tags.join(";"),
+          usertags: this.tags.join(";"),
         },
       ];
       updateObjectMeta(
@@ -123,10 +151,28 @@ export default {
         if (this.$route.name !== "SharedObjects") {
           await this.$store.state.db.objects
             .where(":id").equals(this.object.id)
-            .modify({tags: this.object.tags});
+            .modify({tags: this.tags});
         }
+        // FIXME: Looks like it's missing to save SharedObject tags
         this.toggleEditTagsModal();
       });
+    },
+    saveContainerTags: function () {
+      const tags = this.tags;
+      const containerName = this.container.name;
+      let meta = {
+        usertags: tags.join(";"),
+      };
+      updateContainerMeta(this.$route.params.project, containerName, meta)
+        .then(async () => {
+          await this.$store.state.db.containers
+            .where({
+              projectID: this.$route.params.project,
+              name: containerName,
+            })
+            .modify({ tags });
+        });
+      this.toggleEditTagsModal();
     },
   },
 };
