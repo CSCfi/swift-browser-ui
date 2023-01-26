@@ -47,9 +47,12 @@
           <c-icon-button text>
             <i class="mdi mdi-information-outline" />
           </c-icon-button>
-          <span class="tooltip-content">
-            {{ $t("message.share.share_id_tooltip") }}
-          </span>
+          <!-- eslint-disable vue/no-v-html -->
+          <span 
+            class="tooltip-content"
+            v-html="$t('message.share.share_id_tooltip')"
+          />
+          <!-- eslint-enable vue/no-v-html -->
         </div>
       </div>
       <c-toasts
@@ -210,6 +213,8 @@ export default {
     border: 1px solid $csc-primary;
     border-radius: 0.375rem;
     padding: 1rem;
+    font-size: 14px;
+    line-height: 16px;
 
     /* Position the tooltip */
     position: absolute;
