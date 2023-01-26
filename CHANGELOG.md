@@ -75,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Correctly set the global font to Museo sans
 - Unify editing tags modal for objects and containers
 - Fix 'Share ID' tooltip formatting.
+- Libupload path in docker files
 
 ## [v2.0.1]
 
