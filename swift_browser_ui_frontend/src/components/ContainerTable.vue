@@ -321,9 +321,25 @@ export default {
         itemCount: this.conts.length,
       };
     },
-    onSort(event) {
+    async onSort(event) {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
+
+      if (this.sortBy === "sharing") {
+        const sharingContainers = await getSharingContainers(this.active.id);
+        const sharedContainers = await getSharedContainers(this.active.id);
+
+        let allSharing = this.conts.map(x => sharingContainers.includes(x.name)
+          ? this.$t("message.table.sharing") : "");
+        let allShared = this.conts.map(x => 
+          sharedContainers.some(cont => cont.container === x.name)
+            ? this.$t("message.table.shared") : "");
+
+        let combined = allSharing.map((value, idx) => 
+          value !== "" ? value : allShared[idx]);
+        this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
+      }
+      
       sortObjects(this.conts, this.sortBy, this.sortDirection);
     },
     setHeaders() {
