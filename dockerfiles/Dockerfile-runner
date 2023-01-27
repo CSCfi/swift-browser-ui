@@ -1,21 +1,13 @@
 FROM python:3.10-alpine3.17 as BACKEND
 
-RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git \
-    && apk add --no-cache openssl-dev libffi-dev rust cargo \
-    && rm -rf /var/cache/apk/*
-
-COPY requirements.txt /root/swift_upload_runner/requirements.txt
 COPY setup.py /root/swift_upload_runner/setup.py
 COPY swift_browser_ui /root/swift_upload_runner/swift_browser_ui
 
-RUN pip install --upgrade pip\
-    && pip install -r /root/swift_upload_runner/requirements.txt \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip \
     && pip install /root/swift_upload_runner
 
 FROM python:3.10-alpine3.17
-
-RUN apk add --no-cache --update bash
 
 LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"

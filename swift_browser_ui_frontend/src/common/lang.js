@@ -76,8 +76,8 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. You can view" +
-          " and download files in this folder (Read access).",
+          "This folder is shared with you. You can view files only by" +
+          " using SD Desktop and download files in this folder (Read access)",
         shared_with_read_write:
           "This folder is shared with you. You can view, download, upload" +
           " and edit tags in this folder (Read and write access).",
@@ -174,13 +174,13 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         share_id_tooltip:
-          "When another project wants share a folder " +
-          "with your project: Select this button and " +
-          "send Share ID (now copied in your cache) " +
-          "to the project’s member. " +
-          "When you want to share a folder with " +
-          "another project. Ask Share ID from " +
-          "another project’s member.",
+          "<strong>When another project wants to share a folder " +
+          "with your project</strong><br/>Select this button and " +
+          "send the Share ID (now copied in your cache) " +
+          "to the project's member.<br/><br/> " +
+          "<strong>When you want to share a folder with " +
+          "another project</strong><br/>Ask the Share ID from " +
+          "another project's member.",
         close: "Close",
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
@@ -260,10 +260,12 @@ let default_translations = {
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
       largeDownAction: "Enable",
-      emptyContainer: "This bucket is empty.",
-      emptyProject:
-        "The project does not contain any buckets " +
-        "or their use is not permitted.",
+      emptyContainer: "This folder has no content.",
+      emptyProject: {
+        all: "There are no folders in this project.",
+        sharedFrom: "You haven't shared any folders.",
+        sharedTo: "No folders have been shared with you.",
+      },
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested:
         "No shared buckets have been requested for the " + "project.",
@@ -638,11 +640,11 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jaa tunnus",
         share_id_tooltip:
-          "Mikäli toisesta projektista halutaan jakaa kansio projektisi " +
-          "kanssa: Valitse tämä nappi ja lähetä Jakotunnus toisen " +
-          "projektin jäsenelle. Halutessasi jakaa kansion toisen " +
-          "projektin kanssa, pyydä jakotunnusta joltakin kyseisen " +
-          "projektin jäseneltä.",
+          "<strong>Mikäli toisesta projektista halutaan jakaa kansio " +
+          "projektisi kanssa</strong><br/>Valitse tämä nappi ja lähetä " +
+          "Jakotunnus toisen projektin jäsenelle.<br/><br/><strong>" +
+          "Halutessasi jakaa kansion toisen projektin kanssa</strong>" +
+          "<br/>Pyydä jakotunnusta joltakin kyseisen projektin jäseneltä.",
         close: "Kiinni",
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
@@ -720,9 +722,12 @@ let default_translations = {
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
         "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
-      emptyContainer: "Säiliö on tyhjä.",
-      emptyProject:
-        "Projektilla ei ole säiliöitä " + "tai niiden käyttöä ei ole sallittu.",
+      emptyContainer: "Tämä kansio on tyhjä.",
+      emptyProject: {
+        all: "Tässä projektissa ei ole kansioita.",
+        sharedFrom: "Et ole jakanut yhtään kansiota.",
+        sharedTo: "Sinulle ei ole jaettu kansioita.",
+      },
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",

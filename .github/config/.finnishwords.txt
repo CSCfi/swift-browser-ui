@@ -105,6 +105,7 @@ kaikkien
 kansio
 kansioille
 kansioina
+kansioita
 kansion
 kansiossa
 kansiot
@@ -531,6 +532,7 @@ yhdelle
 yhden
 yhteenlaskettu
 yhteys
+yhtään
 yksityinen
 yksityisen
 yksityiskohtia

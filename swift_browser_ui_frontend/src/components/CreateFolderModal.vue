@@ -5,11 +5,7 @@
       class="modal-content-wrapper"
     >
       <h4 class="title is-4 has-text-dark">
-        {{
-          create
-            ? $t("message.container_ops.addContainer")
-            : $t("message.container_ops.editContainer") + folderName
-        }}
+        {{ $t("message.container_ops.addContainer") }}
       </h4>
       <c-card-content>
         <p class="info-text is-size-6">
@@ -23,7 +19,6 @@
             v-model="folderName"
             name="foldername"
             aria-required="true"
-            :disabled="!create"
             data-testid="folder-name"
           />
         </b-field>
@@ -70,8 +65,8 @@
       <c-button
         size="large"
         data-testid="save-folder"
-        @click="create ? createContainer() : updateContainer()"
-        @keyup.enter="create ? createContainer() : updateContainer()"
+        @click="createContainer"
+        @keyup.enter="createContainer"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -80,10 +75,9 @@
 </template>
 
 <script>
-import { swiftCreateContainer, updateContainerMeta } from "@/common/api";
+import { swiftCreateContainer } from "@/common/api";
 import {
   taginputConfirmKeys,
-  getTagsForContainer,
   tokenize,
 } from "@/common/conv";
 
@@ -96,7 +90,6 @@ export default {
   name: "CreateFolderModal",
   data() {
     return {
-      create: true,
       folderName: "",
       tags: [],
       taginputConfirmKeys,
@@ -107,20 +100,8 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    selectedFolderName() {
-      return this.$store.state.selectedFolderName.length > 0
-        ? this.$store.state.selectedFolderName
-        : "";
-    },
   },
   watch: {
-    selectedFolderName: function () {
-      if (this.selectedFolderName && this.selectedFolderName.length > 0
-        && this.$store.state.openCreateFolderModal) {
-        this.create = false;
-        this.getContainer();
-      }
-    },
     active: function () {
       this.projectNumber = getProjectNumber(this.active);
     },
@@ -159,47 +140,11 @@ export default {
           }
         });
     },
-    getContainer: async function () {
-      this.folderName = this.$store.state.selectedFolderName;
-      const container = await this.$store.state.db.containers.get({
-        projectID: this.$store.state.active.id,
-        name: this.folderName,
-      });
-      if (!container.tags) {
-        this.tags = await getTagsForContainer(
-          this.$route.params.project,
-          this.folderName,
-        );
-      } else {
-        this.tags = container.tags;
-      }
-    },
-    updateContainer: function () {
-      const tags = this.tags;
-      const folderName = this.folderName;
-      let meta = {
-        usertags: tags.join(";"),
-      };
-      updateContainerMeta(this.$route.params.project, folderName, meta).then(
-        async () => {
-          await this.$store.state.db.containers
-            .where({
-              projectID: this.$route.params.project,
-              name: folderName,
-            })
-            .modify({ tags });
-        },
-      );
-      this.toggleCreateFolderModal();
-    },
     toggleCreateFolderModal: function () {
       this.$store.commit("toggleCreateFolderModal", false);
       this.folderName = "";
       this.tags = [];
       this.create = true;
-      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
-        this.$store.commit("setFolderName", "");
-      }
       modifyBrowserPageStyles();
     },
   },
