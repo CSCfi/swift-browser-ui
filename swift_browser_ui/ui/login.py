@@ -70,7 +70,7 @@ async def sso_query_begin_oidc(
         headers={
             "Location": f"{str(setd['auth_endpoint_url'])}/auth/OS-FEDERATION"
             "/identity_providers"
-            "/oidc_test/protocols/openid/websso"
+            "/oidc/protocols/openid/websso"
             f"?origin={str(setd['set_origin_address'])}",
         },
     )
