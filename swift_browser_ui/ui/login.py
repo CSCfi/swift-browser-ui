@@ -55,6 +55,27 @@ async def sso_query_begin(
     return response
 
 
+async def sso_query_begin_oidc(
+    request: typing.Union[aiohttp.web.Request, None]
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Initiate a federated Keystone authentication with OIDC."""
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+
+    if not setd["has_trust"]:
+        response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
+        return disable_cache(response)
+
+    return aiohttp.web.Response(
+        status=302,
+        headers={
+            "Location": f"{str(setd['auth_endpoint_url'])}/auth/OS-FEDERATION"
+            "/identity_providers"
+            "/oidc_test/protocols/openid/websso"
+            f"?origin={str(setd['set_origin_address'])}",
+        },
+    )
+
+
 def test_token(
     formdata: MultiDictProxy[typing.Union[str, bytes, aiohttp.web.FileField]],
     request: aiohttp.web.Request,

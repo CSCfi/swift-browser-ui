@@ -26,6 +26,7 @@ from swift_browser_ui.ui.login import (
     handle_logout,
     sso_query_begin,
     sso_query_end,
+    sso_query_begin_oidc,
     credentials_login_end,
     handle_project_lock,
 )
@@ -153,6 +154,7 @@ async def servinit(
     app.add_routes(
         [
             aiohttp.web.get("/login", handle_login),
+            aiohttp.web.get("/login/oidc_front", sso_query_begin_oidc),
             aiohttp.web.get("/login/kill", handle_logout),
             aiohttp.web.get("/login/front", sso_query_begin),
             aiohttp.web.post("/login/return", sso_query_end),
