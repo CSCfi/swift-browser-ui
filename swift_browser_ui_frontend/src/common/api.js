@@ -27,7 +27,7 @@ async function fetchWithCookie({method, url, body, signal}) {
     })
     .catch(error => {
       if(DEV) console.log("Fetch error. Might be a networking issue", error);
-      return error;
+      throw new Error(error);
     });
 }
 export async function GET(url, signal) {
@@ -84,9 +84,7 @@ export async function getContainers(
   if (marker) {
     getBucketsUrl.searchParams.append("marker", marker);
   }
-  let ret = await GET(getBucketsUrl).catch(() => {
-    return [];
-  });
+  let ret = await GET(getBucketsUrl);
   if (ret.status == 200) {
     return await ret.json();
   } else {
@@ -129,6 +127,7 @@ export async function getObjects(
   container,
   marker = "",
   signal,
+  shared = false,
 ) {
   // Fetch object listing for a container.
   let objUrl = new URL(
@@ -141,19 +140,27 @@ export async function getObjects(
   if (marker) {
     objUrl.searchParams.append("marker", marker);
   }
-  let objects = await GET(objUrl, signal).catch(() => {
-    return [];
-  });
+  let objects = await GET(objUrl, signal);
   if (objects.status == 200) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
-      objects[i]["url"] = "/api/".concat(
-        encodeURI(project),
-        "/",
-        encodeURI(container),
-        "/",
-        encodeURI(objects[i]["name"]),
-      );
+      if (shared) {
+        objects[i]["url"] = "/download/".concat(
+          encodeURI(project),
+          "/",
+          encodeURI(container),
+          "/",
+          encodeURI(objects[i]["name"]),
+        );
+      } else {
+        objects[i]["url"] = "/api/".concat(
+          encodeURI(project),
+          "/",
+          encodeURI(container),
+          "/",
+          encodeURI(objects[i]["name"]),
+        );
+      }
     }
     return objects;
   } else {
@@ -259,7 +266,7 @@ export async function addAccessControlMeta(
   let aclURL = new URL(
     "/api/access/".concat(
       encodeURI(project), "/",
-      encodeURI(container), "/",
+      encodeURI(container),
     ),
     document.location.origin,
   );
@@ -425,16 +432,18 @@ export async function removeToken(
 
 export async function getUploadEndpoint(
   project,
+  owner,
   container,
 ) {
   // Fetch upload endpoint, session and signature information
   let fetchURL = new URL("/upload/".concat(
-    encodeURI(project),
+    encodeURI(owner),
     "/",
     encodeURI(container),
   ),
   document.location.origin,
   );
+  fetchURL.searchParams.append("project", project);
   let ret = await GET(fetchURL);
 
   if (ret.status != 200) {

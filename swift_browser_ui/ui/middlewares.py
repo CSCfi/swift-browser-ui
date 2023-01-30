@@ -9,6 +9,7 @@ import aiohttp_session
 
 from swift_browser_ui.ui.settings import setd
 
+
 AiohttpHandler = typing.Callable[
     [web.Request], typing.Coroutine[typing.Awaitable, typing.Any, web.Response]
 ]
@@ -43,6 +44,30 @@ async def check_session_at(
         session.invalidate()
         if not ("login" in request.path or request.path == "/"):
             raise web.HTTPUnauthorized(reason="Token expired.")
+    return await handler(request)
+
+
+@web.middleware
+async def check_session_taintness(
+    request: web.Request,
+    handler: AiohttpHandler,
+) -> web.StreamResponse:
+    """Override tainted sessions with project selection until scoped."""
+    session = await aiohttp_session.get_session(request)
+    if (
+        "taint" in session
+        and session["taint"]
+        and "select" not in request.path
+        and "projects" not in request.path
+        and "lock" not in request.path
+        and "static" not in request.path
+    ):
+        return web.Response(
+            status=303,
+            headers={
+                "Location": "/select",
+            },
+        )
     return await handler(request)
 
 

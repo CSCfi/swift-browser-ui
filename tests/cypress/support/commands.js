@@ -27,10 +27,10 @@
 Cypress.Commands.add("login", (loginMessage) => {
     cy.visit(Cypress.config().baseUrl)
     cy.contains(loginMessage).parent().click()
-    cy.wait(1000)
-    cy.get('#inputbox').type('abcdefabcdefabcdefabcdefabcdefab')
-    cy.get('#retform > [type="submit"]').click()
-    cy.wait(1000)
+
+    cy.get('#classicform input[name=username]').type('swift')
+    cy.get('#classicform input[name=password]').type('veryfast')
+    cy.get('#classicform [type="submit"]').click()
 })
 
 Cypress.Commands.add("deleteDB", () => {

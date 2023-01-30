@@ -22,6 +22,18 @@ async def browse(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     )
 
 
+async def select(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve a project selection for users with tainted projects."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/select.html",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
+
+
 async def index(
     request: typing.Optional[aiohttp.web.Request],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:

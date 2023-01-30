@@ -300,6 +300,20 @@ let default_translations = {
         buildingIndex: "This project has a large number of objects. Please, " +
                        "wait while the search index is ready, and try again.",
       },
+      select: {
+        heading: "Select project for logging in",
+        description: "The user account used for logging in contains " +
+          "projects flagged as restricted. The interface scope is limited " +
+          "when a restricted project is opened, i.e. only the restricted " +
+          "project is visible during a restricted session. This means you " +
+          "cannot copy or move items across projects or view items in " +
+          "other projects available to you. Select a project you want to " +
+          "use from the following listing, after selection you will not be " +
+          "able to change the project without logging out. If you want to " +
+          "browse unrestricted projects, use the unrestricted projects " +
+          "button below.",
+        unrestricted: "All unrestricted projects",
+      },
     },
   },
   fi: {
@@ -593,6 +607,19 @@ let default_translations = {
         searchBy: "Etsi nimellä tai tägillä",
         buildingIndex: "Tässä projektissa on suuri määrä kohteita. Odota, " +
                        "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
+      },
+      select: {
+        heading: "Valitse projekti kirjautuaksesi sisään",
+        description: "Käyttäjällä on pääsy rajoitettuihin projekteihin. " +
+          "Selatessa rajoitettua projektia käyttöliittymän pääsy on " +
+          "rajattu, eli vain rajatun projektin sisältö on näkyvissä. " +
+          "Tiedostojen kopiointi ja siirto projektista toiseen, ja " +
+          "muiden projektien sisällön selailu on estetty. Valitse " +
+          "projekti, jota haluat käyttää. Valinnan jälkeen projektin " +
+          "vaihto onnistuu vain kirjautumalla ulos. Mikäli haluat " + 
+          "selailla vain rajoittamattomia projekteja, paina " +
+          "rajoittamattomien projektien nappia alla.",
+        unrestricted: "Kaikki rajoittamattomat projektit",
       },
     },
   },

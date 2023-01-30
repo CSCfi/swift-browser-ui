@@ -35,6 +35,7 @@
         params: {
           container: getContainer(),
           project: getProject(),
+          from: getFrom(),
         }
       })"
     >
@@ -51,6 +52,7 @@
         params: {
           container: getContainer(),
           project: getProject(),
+          from: getFrom(),
         }
       })"
     >
@@ -68,6 +70,7 @@ export default {
     "smallsize",
     "inverted",
     "disabled",
+    "from",
   ],
   computed: {
     active () {
@@ -79,6 +82,12 @@ export default {
       if(this.$route.params.user == undefined) {
         return this.$props.project ? this.$props.project :
           this.$route.params.project;
+      }
+      return this.active.id;
+    },
+    getFrom: function() {
+      if (this.$props.from != undefined) {
+        return this.$props.from;
       }
       return this.active.id;
     },

@@ -97,11 +97,13 @@
               <ReplicateContainerButton
                 v-if="selected==props.row"
                 :inverted="true"
+                :project="props.row.owner"
                 :container="props.row.container"
                 :smallsize="true"
               />
               <ReplicateContainerButton
                 v-else
+                :project="props.row.owner"
                 :container="props.row.container"
                 :smallsize="true"
               />

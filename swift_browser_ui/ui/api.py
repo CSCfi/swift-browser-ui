@@ -37,7 +37,14 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
     )
     # Filter out the tokens contained in session token
     return aiohttp.web.json_response(
-        [{"name": v["name"], "id": v["id"]} for _, v in session["projects"].items()]
+        [
+            {
+                "name": v["name"],
+                "id": v["id"],
+                "tainted": v["tainted"],
+            }
+            for _, v in session["projects"].items()
+        ]
     )
 
 
@@ -356,7 +363,7 @@ async def swift_batch_update_object_metadata(
     ]
     batch = await asyncio.gather(*batch, return_exceptions=False)
     for ret in batch:
-        if ret != 204:
+        if ret not in {202, 204}:
             raise aiohttp.web.HTTPNotFound
     return aiohttp.web.HTTPNoContent()
 
@@ -376,7 +383,7 @@ async def swift_update_container_metadata(
     project = request.match_info["project"]
     container = request.match_info["container"]
     meta = await request.json()
-    meta = {f"X-Container-Meta-{k}": v for k, v in meta}
+    meta = {f"X-Container-Meta-{k}": v for k, v in meta.items()}
     headers = {
         "X-Auth-Token": session["projects"][project]["token"],
     }
@@ -660,12 +667,17 @@ async def swift_download_shared_object(
         "API call for shared download runner "
         f"from {request.remote}, sess: {session} :: {time.ctime()}"
     )
+
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+
     path = (
         f"/{request.match_info['project']}/"
         + f"{request.match_info['container']}/"
         + request.match_info["object"]
     )
-    runner_id = await open_upload_runner_session(request)
+    runner_id = await open_upload_runner_session(request, project=project)
     signature = await sign(3600, path)
     path += (
         f"?session={runner_id}"
@@ -689,8 +701,13 @@ async def swift_download_container(
         "API call for container download runner from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
+
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+
     path = f"/{request.match_info['project']}/" + f"{request.match_info['container']}"
-    runner_id = await open_upload_runner_session(request)
+    runner_id = await open_upload_runner_session(request, project=project)
     signature = await sign(3600, path)
     path += (
         f"?session={runner_id}"
@@ -714,8 +731,8 @@ async def swift_replicate_container(
         "API call for replication endpoint from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    runner_id = open_upload_runner_session(request)
-    path = f"{request.match_info['project']}/" + f"{request.match_info['container']}"
+    runner_id = await open_upload_runner_session(request)
+    path = f"/{request.match_info['project']}/{request.match_info['container']}"
     signature = await sign(3600, path)
     path += (
         f"?session={runner_id}"
@@ -727,7 +744,7 @@ async def swift_replicate_container(
     return aiohttp.web.Response(
         status=307,
         headers={
-            "Location": f"{setd['upload_external_endpoint']}/{path}",
+            "Location": f"{setd['upload_external_endpoint']}{path}",
         },
     )
 
@@ -741,7 +758,10 @@ async def get_upload_session(
         "API call for object upload runner info request from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    runner_id = await open_upload_runner_session(request)
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+    runner_id = await open_upload_runner_session(request, project=project)
     path = f"/{request.match_info['project']}/{request.match_info['container']}"
     signature = await sign(3600, path)
     return aiohttp.web.json_response(

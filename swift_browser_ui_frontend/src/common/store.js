@@ -369,6 +369,7 @@ const store = new Vuex.Store({
           container.name,
           marker,
           signal,
+          true,
         ).catch(() => {
           commit("loading", false);
           commit("updateObjects", []);

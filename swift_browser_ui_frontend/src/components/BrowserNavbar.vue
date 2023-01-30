@@ -127,6 +127,7 @@
           <div class="navbar-item">
             <div class="buttons">
               <a
+                data-testid="logout"
                 class="button is-primary is-outlined"
                 href="/login/kill"
               >{{ $t("message.logOut") }}</a>

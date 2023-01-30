@@ -171,10 +171,12 @@ async def get_tempurl_key(request: aiohttp.web.Request) -> str:
 
 async def open_upload_runner_session(
     request: aiohttp.web.Request,
+    project: str = "",
 ) -> str:
     """Open an upload session to the token."""
     session = await aiohttp_session.get_session(request)
-    project = request.match_info["project"]
+    if not project:
+        project = request.match_info["project"]
     try:
         return session["projects"][project]["runner"]
     except KeyError:
