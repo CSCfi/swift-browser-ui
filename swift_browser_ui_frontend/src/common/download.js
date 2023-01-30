@@ -59,52 +59,6 @@ export class DecryptedDownloadSession {
     this.controller = new AbortController();
   }
 
-  // Imagine needing a separate function to specify chunk size when reading
-  // response streams SMH
-  async readChunk() {
-    let buffer = new ArrayBuffer(65564);
-
-    let offset = 0;
-    let reader = this.stream;
-
-    let done, value;    
-
-    while (offset < buffer.byteLength) {
-      done, value = await reader.read(new Uint8Array(
-        buffer,
-        offset,
-        buffer.byteLength - offset,
-      ));
-
-      console.log(value);
-
-      if(done) {
-        this.finished = true;
-        break;
-      }
-    }
-
-    console.log(buffer);
-    return buffer;
-  }
-
-  async decryptChunk() { 
-    if (this.finished) {
-      await navigator.serviceWorker.ready.then(reg => {
-        reg.active.postMessage({
-          cmd: "decryptionFinishded",
-        });
-      });
-    }
-    let buf = await this.readChunk();
-    await navigator.serviceWorker.ready.then(reg => {
-      reg.active.postMessage({
-        cmd: "decryptChunk",
-        chunk: buf,
-      });
-    });
-  }
-
   async getFile(objectUrl) {
     const response = await fetch(objectUrl);
     let reader = response.body.getReader();
@@ -122,14 +76,8 @@ export class DecryptedDownloadSession {
   async getSlice() {
     let chunk = this.chunk;
     let readerDone = this.readerDone;
-    console.log(this.offset);
-    console.log(this.chunk.length);
-    while (!readerDone) {
+    while (!this.readerDone) {
       this.remainder = 65564 - this.chunkBuffer.length;
-
-      console.log(this.remainder);
-      console.log(this.chunkBuffer.length);
-
       this.chunkBuffer = this.chunkBuffer.concat(
         Array.from(
           this.chunk.subarray(this.offset, this.offset + this.remainder),
@@ -139,9 +87,6 @@ export class DecryptedDownloadSession {
       if (this.chunk.length - this.offset > this.remainder) {
         this.offset += this.remainder;
         navigator.serviceWorker.ready.then(reg => {
-          // this.chunk = chunk;
-          // this.readerDone = readerDone;
-          console.log(new Uint8Array(this.chunkBuffer));
           reg.active.postMessage({
             cmd: "decryptChunk",
             chunk: new Uint8Array(this.chunkBuffer),
@@ -150,7 +95,6 @@ export class DecryptedDownloadSession {
         });
         break;
       } else {
-        console.log("ran out, fetching another chunk");
         this.offset = 0;
         ({ value: chunk, done: readerDone } = await this.reader.read());
         this.chunk = chunk;
@@ -158,19 +102,25 @@ export class DecryptedDownloadSession {
       }
     }
     if (this.readerDone) {
-      if (this.chunk.length > 0 && this.chunk.length > this.offset) {
+      if (this.chunk !== undefined) {
         this.chunkBuffer = this.chunkBuffer.concat(
           Array.from(
-            this.chunk.subarray(this.offset, this.offset + this.remainder),
+            this.chunk.subarray(this.offset),
           ),
         );
+        this.chunk = undefined;
+      }
+
+      if (this.chunkBuffer.length > 0) {
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             cmd: "decryptChunk",
-            chunk: new Blob(this.chunkBuffer).arrayBuffer(),
+            chunk: new Uint8Array(this.chunkBuffer),
           });
+          this.chunkBuffer = [];
         });
       } else {
+        console.log("Telling the serviceWorker that decryption is done.");
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             cmd: "decryptionFinished",
@@ -237,29 +187,23 @@ export class DecryptedDownloadSession {
       e.stopImmediatePropagation();
       switch(e.data.eventType) {
         case "downloadSessionOpened":
-          console.log(`Download session was openfed, fetching header with pubkey ${e.data.pubKey}.`);
           this.object = this.objects.pop();
           this.currentFinished = false;
           if (this.object == undefined) {
             this.finished = true;
           }
-          this.getHeader(e.data.pubKey).then(() => {
-            console.log("got header");
-          });
+          this.getHeader(e.data.pubKey).then(() => {});
           break;
         case "beginDecryption":
           window.open(new URL("/file", document.location.origin), "_blank");
           this.getFile(this.getFileUrl()).then(() => {
-            console.log("Started slicing file.");
             this.getSlice().then(() => {
               console.log("Added first slice to serviceworker.");
             });
           });
           break;
         case "nextDecryptChunk":
-          this.getSlice().then(() => {
-            console.log("Added new slice to serviceworker.");
-          });
+          this.getSlice().then(() => {});
           break;
         case "streamClosed":
           (async () => {
@@ -270,8 +214,7 @@ export class DecryptedDownloadSession {
             let whitelistUrl = new URL(this.whitelistPath, this.endpoint);
             whitelistUrl.searchParams.append("valid", signed.valid);
             whitelistUrl.searchParams.append("signature", signed.signature);
-            let resp = await DELETE(whitelistUrl);
-            console.log(resp);
+            await DELETE(whitelistUrl);
             if (this.objects.length > 0) {
               beginDownload();
             } else {

@@ -22,7 +22,7 @@ Using global variable scope for the key variables to enable using them
 inside the `encrypt_file` function. Without global scope would need to pass
 the keys inside ftw.
 */
-struct ENCRYPT_SESSION *sess = NULL;
+ENCRYPT_SESSION *sess = NULL;
 
 int encrypt_file(
     const char *path,
