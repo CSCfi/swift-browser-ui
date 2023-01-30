@@ -172,6 +172,20 @@ async def handle_upload_encrypted_object_options(
     return resp
 
 
+async def handle_whitelist_options(
+    _: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Handle options for editing project whitelist."""
+    resp = aiohttp.web.Response(
+        headers={
+            "Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS",
+            "Access-Control-Max-Age": "84600",
+            "Access-Control-Allow-Headers": "Content-Type",
+        }
+    )
+    return resp
+
+
 async def handle_upload_encrypted_object(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:

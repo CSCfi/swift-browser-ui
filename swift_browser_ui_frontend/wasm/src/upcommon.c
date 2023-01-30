@@ -75,9 +75,9 @@ int rmrf() {
 /*
 Allocate chunk.
 */
-struct CHUNK* allocate_chunk() {
-    struct CHUNK* ret;
-    ret = malloc(sizeof(struct CHUNK*));
+CHUNK* allocate_chunk() {
+    CHUNK* ret;
+    ret = malloc(sizeof(CHUNK*));
     ret->chunk = NULL;
     ret->len = 0;
     return ret;
@@ -87,7 +87,7 @@ struct CHUNK* allocate_chunk() {
 /*
 Wrap chunk length from pointer
 */
-int wrap_chunk_len(struct CHUNK* chunk) {
+int wrap_chunk_len(CHUNK* chunk) {
     return chunk->len;
 }
 
@@ -95,7 +95,7 @@ int wrap_chunk_len(struct CHUNK* chunk) {
 /*
 Wrap chunk content ptr get
 */
-uint8_t* wrap_chunk_content(struct CHUNK* chunk) {
+uint8_t* wrap_chunk_content(CHUNK* chunk) {
     return chunk->chunk;
 }
 
@@ -103,7 +103,7 @@ uint8_t* wrap_chunk_content(struct CHUNK* chunk) {
 /*
 Free chunk contents.
 */
-void free_chunk(struct CHUNK* chunk) {
+void free_chunk(CHUNK* chunk) {
     if (chunk->chunk) {
         free(chunk->chunk);
     }
@@ -114,7 +114,7 @@ void free_chunk(struct CHUNK* chunk) {
 /*
 Release session resources.
 */
-void clean_session(struct ENCRYPT_SESSION *sess) {
+void clean_session(ENCRYPT_SESSION *sess) {
     rmrf();
     close_session(sess);
     return;

@@ -24,8 +24,8 @@ Upload service worker handlers
 /*
 Open an ephemeral key upload session
 */
-struct ENCRYPT_SESSION *open_session_eph() {
-    struct ENCRYPT_SESSION *ret = open_session_enc();
+ENCRYPT_SESSION *open_session_eph() {
+    ENCRYPT_SESSION *ret = open_session_enc();
     read_in_recv_keys(ret);
     ret->sessionkey = crypt4gh_session_key_new();
     return ret;
@@ -35,10 +35,10 @@ struct ENCRYPT_SESSION *open_session_eph() {
 /* 
 Open an upload session
 */
-struct ENCRYPT_SESSION *open_session(
+ENCRYPT_SESSION *open_session(
     const char *passphrase // optional
 ) {
-    struct ENCRYPT_SESSION *ret = open_session_enc();
+    ENCRYPT_SESSION *ret = open_session_enc();
     read_in_keys(
         passphrase,
         ret);
@@ -50,8 +50,8 @@ struct ENCRYPT_SESSION *open_session(
 /*
 Wrap crypt4gh header creation for access in JS side.
 */
-struct CHUNK* wrap_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
-    struct CHUNK* ret = allocate_chunk();
+CHUNK* wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
+    CHUNK* ret = allocate_chunk();
     crypt4gh_header_build(
         sess->sessionkey,
         sess->seckey,
@@ -66,12 +66,12 @@ struct CHUNK* wrap_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
 /*
 Encrypt a 64KiB chunk of data.
 */
-struct CHUNK* encrypt_chunk(
-    struct ENCRYPT_SESSION *sess,
+CHUNK* encrypt_chunk(
+    ENCRYPT_SESSION *sess,
     uint8_t* segment,
     size_t len_segment
 ) {
-    struct CHUNK* ret = allocate_chunk();
+    CHUNK* ret = allocate_chunk();
     ret->chunk = malloc(CRYPT4GH_CIPHERSEGMENT_SIZE * sizeof(uint8_t));
     crypt4gh_segment_encrypt(
         sess->sessionkey,

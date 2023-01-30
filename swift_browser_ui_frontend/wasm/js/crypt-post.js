@@ -18,7 +18,7 @@ let
   header,
   chunkArray,
   pubkeyPtr,
-  pubkey,
+  pubKey,
   fileSize,
   privkeyPtr,
   privKey,
@@ -27,7 +27,6 @@ let
 ;
 
 self.addEventListener("fetch", (e) => {
-  console.log(e);
   if (e.request.url.startsWith(self.location.origin + "/file")) {
     const stream = new ReadableStream({
       start(controller) {
@@ -43,11 +42,8 @@ self.addEventListener("fetch", (e) => {
   }
 });
 
-console.log(Module);
-console.log(FS);
 
 wasmReady.then(() => {
-  console.log("Adding sw event listeners.");
   self.addEventListener("message", (e) => {
     e.stopImmediatePropagation();
     switch(e.data.cmd) {
@@ -131,6 +127,14 @@ wasmReady.then(() => {
           ["number"],
           [header],
         )
+        sessKeyPtr = Module.ccall(
+          "get_session_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        sessKey = new Uint8Array(HEAPU8.subarray(sessKeyPtr, sessKeyPtr + 32));
+        sessKey = btoa(String.fromCharCode(...sessKey));
         // Copy chunk buffer contents to new array and answer
         e.source.postMessage({
           eventType: "encryptedHeaderReady",
@@ -143,6 +147,8 @@ wasmReady.then(() => {
           ["number"],
           [header],
         );
+        _free(sessKeyPtr);
+        _free(headerPtr);
         break;
       case "encryptChunk":
         chunkArray = new Uint8Array(e.data.chunk);
@@ -189,7 +195,7 @@ wasmReady.then(() => {
           FS.rmdir("/keys");
           FS.rmdir("/data");
         } catch (e) {
-          console.log("FS ignoring error on remove ", e);
+          // console.log("FS ignoring error on remove ", e);
         } finally {
           e.source.postMessage({
             eventType: "cleanUpDone",
@@ -236,24 +242,20 @@ wasmReady.then(() => {
           ["number"],
           [sessionPtr],
         );
-        sessKeyPtr = Module.ccall(
-          "get_session_key",
-          "number",
-          ["number"],
-          [sessionPtr],
-        );
         pubKey = new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 32));
-        console.log("Download session was opened, posting message from SW.");
         e.source.postMessage({
           eventType: "downloadSessionOpened",
           pubKey: pubKey,
         });
+        _free(pubkeyPtr);
+        _free(privkeyPtr);
+        _free(sessKeyPtr);
         break;
       case "addHeader":
         try {
           FS.unlink("header");
         } catch (e) {
-          console.log("FS ignoring error on remove", e);
+          // console.log("FS ignoring error on remove", e);
         }
         FS.writeFile(
           "header",
@@ -267,6 +269,14 @@ wasmReady.then(() => {
           ["number"],
           [sessionPtr],
         );
+        sessKeyPtr = Module.ccall(
+          "get_session_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        sessKey = new Uint8Array(HEAPU8.subarray(sessKeyPtr, sessKeyPtr + 32))
+        sessKey = btoa(String.fromCharCode(...sessKey));
         e.source.postMessage({
           eventType: "beginDecryption",
         });
