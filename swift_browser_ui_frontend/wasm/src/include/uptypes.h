@@ -7,7 +7,7 @@
 
 
 // Encryption session storage
-struct ENCRYPT_SESSION
+typedef struct ENCRYPT_SESSION
 {
     uint8_t *sessionkey;
     uint8_t seckey[crypto_kx_SECRETKEYBYTES];
@@ -15,16 +15,16 @@ struct ENCRYPT_SESSION
     uint8_t *recv_keys;
     char *passphrase;
     unsigned int recv_key_amount;
-};
+} ENCRYPT_SESSION;
 
 
 /*
 Struct for length aware chunk for easier interfacing with JS.
 */
-struct CHUNK
+typedef struct CHUNK
 {
     uint8_t *chunk;
     size_t len;
-};
+} CHUNK;
 
 #endif

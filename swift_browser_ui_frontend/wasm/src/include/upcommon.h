@@ -24,29 +24,29 @@ int rmrf();
 /*
 Allocate a chunk.
 */
-struct CHUNK *allocate_chunk();
+CHUNK *allocate_chunk();
 
 /*
 Get chunk length from struct.
 */
-int warp_chunk_len(struct CHUNK* chunk);
+int warp_chunk_len(CHUNK* chunk);
 
 
 /*
 Get chunk ptr from struct.
 */
-uint8_t* wrap_chunk_content(struct CHUNK* chunk);
+uint8_t* wrap_chunk_content(CHUNK* chunk);
 
 /*
 Free a chunk from memory.
 */
-void free_chunk (struct CHUNK* chunk);
+void free_chunk (CHUNK* chunk);
 
 
 /*
 Release session resources.
 */
-void clean_session(struct ENCRYPT_SESSION *sess);
+void clean_session(ENCRYPT_SESSION *sess);
 
 
 #endif

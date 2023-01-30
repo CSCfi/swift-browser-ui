@@ -288,7 +288,7 @@ class VaultClient:
         header_response = await self._request(
             "GET",
             f"c4ghtransit/files/{project}/{container}/{path}",
-            json_data={"service": self.service, "key": self._key_name},
+            params={"service": self.service, "key": self._key_name},
         )
         if isinstance(header_response, dict) and "data" in header_response:
             return header_response["data"]["header"]

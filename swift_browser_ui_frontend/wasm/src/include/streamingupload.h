@@ -14,26 +14,26 @@ Encrypted file streaming functions.
 /*
 Open an upload session.
 */
-struct ENCRYPT_SESSION *open_session(const char *passphrase);
+ENCRYPT_SESSION *open_session(const char *passphrase);
 
 
 /*
 Open an upload session with ephemeral keys.
 */
-struct ENCRYPT_SESSION *open_session_eph();
+ENCRYPT_SESSION *open_session_eph();
 
 
 /*
 Wrap crypt4gh header creation for access in JS side.
 */
-struct CHUNK *wrap_crypt4gh_header(struct ENCRYPT_SESSION *sess);
+struct CHUNK *wrap_crypt4gh_header(ENCRYPT_SESSION *sess);
 
 
 /*
 Encrypt a 64KiB chunk of data.
 */
 struct CHUNK *encrypt_chunk (
-    struct ENCRYPT_SESSION *sess,
+    ENCRYPT_SESSION *sess,
     uint8_t *segment,
     size_t len_segment
 );

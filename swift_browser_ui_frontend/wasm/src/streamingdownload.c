@@ -27,8 +27,8 @@ Download service worker handlers.
 /*
 Open a download session
 */
-struct ENCRYPT_SESSION *open_decrypt_session() {
-    struct ENCRYPT_SESSION *ret = open_session_enc();
+ENCRYPT_SESSION *open_decrypt_session() {
+    ENCRYPT_SESSION *ret = open_session_enc();
 
     // Create temporary keys for the session
     randombytes_stir();
@@ -44,7 +44,7 @@ struct ENCRYPT_SESSION *open_decrypt_session() {
 /*
 Dump crypt4gh public key
 */
-char *get_session_public_key(struct ENCRYPT_SESSION *sess) {
+char *get_session_public_key(ENCRYPT_SESSION *sess) {
     char *ret = malloc(33 * sizeof(char));
     memset(ret, '\0', 33);
     memcpy(ret, sess->pubkey, 32);
@@ -55,7 +55,7 @@ char *get_session_public_key(struct ENCRYPT_SESSION *sess) {
 /*
 Dump crypt4gh private key
 */
-char *get_session_private_key(struct ENCRYPT_SESSION *sess) {
+char *get_session_private_key(ENCRYPT_SESSION *sess) {
     char *ret = malloc(33 * sizeof(char));
     memset(ret, '\0', 33);
     memcpy(ret, sess->seckey, 32);
@@ -66,7 +66,7 @@ char *get_session_private_key(struct ENCRYPT_SESSION *sess) {
 /*
 Dump crypt4gh session key
 */
-char *get_session_key(struct ENCRYPT_SESSION *sess) {
+char *get_session_key(ENCRYPT_SESSION *sess) {
     char *ret = malloc(33 * sizeof(char));
     memset(ret, '\0', 33);
     memcpy(ret, sess->sessionkey, 32);
@@ -77,30 +77,34 @@ char *get_session_key(struct ENCRYPT_SESSION *sess) {
 /*
 Open crypt4gh header opening for access in JS side.
 */
-void open_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
+void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
     int ret = 0;
     int fd = open("header", O_RDONLY);
 
-    uint8_t** keys;
+    uint8_t* keys = NULL;
     unsigned int nkeys = 0;
-    uint64_t** edit_list;
+    uint64_t* edit_list = NULL;
     unsigned int edit_list_len = 0;
 
     ret = crypt4gh_header_parse(
         fd,
         sess->seckey,
         sess->pubkey,
-        keys,
+        &keys,
         &nkeys,
-        edit_list,
+        &edit_list,
         &edit_list_len
     );
 
-    printf("Got %d valid keys.\n", nkeys);
+    if (keys != NULL && nkeys > 0) {
+        sess->sessionkey = sodium_malloc(sizeof(uint8_t) * crypto_kx_SECRETKEYBYTES);
+        memcpy(sess->sessionkey, keys, crypto_kx_SECRETKEYBYTES);
+        sodium_free(keys);
+    }
 
-    sess->sessionkey = *keys;
-
-    printf("Header parse return condition: %d\n", ret);
+    if (edit_list != NULL && edit_list_len > 0) {        
+        sodium_free(edit_list);
+    }
 
     close(fd);
     return;
@@ -110,12 +114,12 @@ void open_crypt4gh_header(struct ENCRYPT_SESSION *sess) {
 /*
 Decrypt a 64KiB + 22 chunk of data.
 */
-struct CHUNK* decrypt_chunk(
-    struct ENCRYPT_SESSION *sess,
+CHUNK* decrypt_chunk(
+    ENCRYPT_SESSION *sess,
     uint8_t* segment,
     size_t len_segment
 ) {
-    struct CHUNK* ret = allocate_chunk();
+    CHUNK* ret = allocate_chunk();
     ret->chunk = malloc(65535 * sizeof(uint8_t));
     int retc = crypt4gh_segment_decrypt(
         sess->sessionkey,
@@ -124,6 +128,5 @@ struct CHUNK* decrypt_chunk(
         ret->chunk,
         &(ret->len)
     );
-    printf("Segment decryption return condition %d\n", retc);
     return ret;
 }
