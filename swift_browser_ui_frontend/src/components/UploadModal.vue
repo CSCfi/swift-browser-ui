@@ -217,6 +217,9 @@ export default {
     currentUpload() {
       return this.$store.state.uploadState;
     },
+    currentFolder() {
+      return this.$route.params.container;
+    },
     fileHeaders() {
       return [
         {
@@ -350,6 +353,9 @@ export default {
       if(this.selectedFolder !== null) {
         this.inputFolder = this.selectedFolder.name;
       }
+    },
+    currentFolder: function() {
+      this.inputFolder = this.currentFolder;
     },
     inputFolder: function() {
       this.refreshNoUpload();
