@@ -2,6 +2,9 @@ FROM node:18-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
+RUN --mount=type=cache,target=/var/cache/apk/ \
+    apk add git
+
 COPY swift_browser_ui_frontend/package.json /root/swift_ui/swift_browser_ui_frontend/package.json
 COPY swift_browser_ui_frontend/package-lock.json /root/swift_ui/swift_browser_ui_frontend/package-lock.json
 
@@ -25,7 +28,7 @@ RUN pip install --upgrade pip && \
 
 FROM python:3.10-alpine3.17
 
-LABEL maintainer "CSC Developers"
+LABEL maintainer="CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCfi/swift-browser-ui"
 

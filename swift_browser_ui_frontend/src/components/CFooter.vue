@@ -19,6 +19,18 @@
                 {{ $t("message.footerMenu.serviceProvider") }}
               </a>
             </div>
+            <div 
+              v-if="dev" 
+              class="row navbar-item smalltext"
+            >
+              <a
+                class="linktext"
+                target="_blank"
+                :href="gitLink"
+              >
+                {{ gitVersion }}
+              </a>
+            </div>
           </div>        
         </div>
     
@@ -53,9 +65,17 @@
 </template>
 
 <script>
+import { DEV } from "@/common/conv";
 
 export default {
   name:"CFooter",
+  data: function() {
+    return {
+      dev: DEV,
+      gitVersion: process.env.VUE_APP_GIT_VERSION || "Version not set",
+      gitLink: process.env.VUE_APP_GIT_LINK || "#",
+    };
+  },
 };
 </script>
 
