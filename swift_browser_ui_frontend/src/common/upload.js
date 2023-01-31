@@ -319,7 +319,7 @@ export default class EncryptedUploadSession {
       this.active.id,
       this.project,
       this.container,
-      `${this.prefix}${this.currentFile.name}.c4gh`,
+      `${this.prefix}${this.currentFile.relativePath}.c4gh`,
     ).then(resp => {
       this.$store.commit("setUploadInfo", resp);
       navigator.serviceWorker.ready.then(reg => {
