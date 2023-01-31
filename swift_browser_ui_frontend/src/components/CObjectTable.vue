@@ -187,7 +187,11 @@ export default {
                     text: true,
                     size: "small",
                     title: "Download",
-                    onClick: ({ data }) => this.beginDownload(data),
+                    onClick: ({ data }) => {
+                      data.name.value.match(".c4gh")
+                        ? this.beginDownload(data)
+                        : this.navDownload(item.url);
+                    },
                     path: mdiTrayArrowDown,
                   },
                 },
@@ -279,6 +283,10 @@ export default {
       );
       this.currentDownload.initServiceWorker();
       beginDownload();
+    },
+    navDownload(url) {
+      console.log(url);
+      window.open(url, "_blank");
     },
     setHeaders() {
       this.headers = [
