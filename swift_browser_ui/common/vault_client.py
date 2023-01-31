@@ -259,7 +259,9 @@ class VaultClient:
         LOGGER.debug("Got key %r for project %r", key, project)
         return key
 
-    async def put_whitelist_key(self, project: str, flavor: str, public_key: bytes) -> None:
+    async def put_whitelist_key(
+        self, project: str, flavor: str, public_key: bytes
+    ) -> None:
         """Updates the project's whitelisted key.
 
         :param project: Project ID
