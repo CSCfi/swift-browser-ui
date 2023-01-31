@@ -191,6 +191,7 @@ wasmReady.then(() => {
             ["number"],
             [sessionPtr],
           );
+          sessionPtr = undefined;
           FS.rmdir("/keys/recv_keys")
           FS.rmdir("/keys");
           FS.rmdir("/data");
@@ -219,6 +220,7 @@ wasmReady.then(() => {
               ["number"],
               [sessionPtr],
             );
+            sessionPtr = undefined;
           } catch(e) {
             console.log(e);
           }
@@ -320,6 +322,7 @@ wasmReady.then(() => {
             ["number"],
             [sessionPtr],
           );
+          sessionPtr = undefined;
         } catch(e) {
           console.log(e);
         }
