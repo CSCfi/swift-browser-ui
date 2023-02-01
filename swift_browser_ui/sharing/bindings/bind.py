@@ -66,7 +66,6 @@ class SwiftXAccountSharing:
         params = swift_browser_ui.common.signature.sign_api_request(path)
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
-
             return await self._handler_response(resp)
 
     async def get_access_details(self, username: str, container: str, owner: str) -> dict:

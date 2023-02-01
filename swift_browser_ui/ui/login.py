@@ -235,17 +235,17 @@ async def credentials_login_end(
         },
     ) as resp:
         if resp.status == 400:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPBadRequest(reason="No username or password provided.")
         if resp.status == 401:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPUnauthorized(
                 reason="Wrong username or password, or no access to the service."
             )
         if resp.status != 201:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPUnauthorized
 
