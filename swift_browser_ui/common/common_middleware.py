@@ -58,7 +58,7 @@ async def check_db_conn(
         )
     try:
         return await handler(request)
-    except (asyncpg.exceptions.InterfaceError):
+    except asyncpg.exceptions.InterfaceError:
         raise aiohttp.web.HTTPServiceUnavailable(reason="Database connection error")
 
 
