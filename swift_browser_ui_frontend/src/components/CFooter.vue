@@ -1,5 +1,5 @@
 <template>
-  <div id="c-footer">
+  <footer>
     <nav class="navbar">
       <div class="navbar-menu is-active">
         <div class="navbar-start">
@@ -61,7 +61,7 @@
         </div>
       </div>
     </nav>
-  </div>
+  </footer>
 </template>
 
 <script>
@@ -82,12 +82,9 @@ export default {
 <style lang="scss" scoped>
 @import "@/css/prod.scss";
 
-#c-footer{
-  height:  fit-content;
-  width: 100%;
+footer{
   padding:40px 60px;
   background-color:$csc-lightest-grey;
-  z-index: 2;
 }
 
 .navbar{

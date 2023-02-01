@@ -93,9 +93,7 @@
         </c-container>
       </c-flex>
     </c-row>
-    <div id="footer">
-      <CFooter />
-    </div>
+    <CFooter />
   </c-main>
 </template>
 
@@ -133,13 +131,6 @@ c-login-card {
 
 c-button {
   margin-top: 2rem;
-}
-
-#footer{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  z-index: 2;
 }
 
 </style>
