@@ -5,6 +5,7 @@
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
+    :hide-footer="disablePagination"
     :footer-options.prop="footerOptions"
     :no-data-text="getEmptyText()"
     :sort-by="sortBy"
