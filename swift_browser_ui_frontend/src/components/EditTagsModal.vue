@@ -98,6 +98,7 @@ export default {
         this.$store.state.objectCache.map(obj => {
           if (obj.name === this.selectedObjectName) {
             this.tags = obj.tags;
+            this.object = obj;
           }
         });
       } else {
@@ -144,16 +145,21 @@ export default {
         },
       ];
       updateObjectMeta(
-        this.$route.params.project,
-        this.container.name,
+        this.$route.params.owner || this.$route.params.project,
+        this.$route.params.container,
         objectMeta,
       ).then(async () => {
         if (this.$route.name !== "SharedObjects") {
           await this.$store.state.db.objects
             .where(":id").equals(this.object.id)
             .modify({tags: this.tags});
+        } else {
+          await this.$store.dispatch("updateSharedObjects", {
+            project: this.$route.params.project,
+            container: {name: this.$route.params.container},
+            owner: this.$route.params.owner,
+          });
         }
-        // FIXME: Looks like it's missing to save SharedObject tags
         this.toggleEditTagsModal();
       });
     },
@@ -165,12 +171,14 @@ export default {
       };
       updateContainerMeta(this.$route.params.project, containerName, meta)
         .then(async () => {
-          await this.$store.state.db.containers
-            .where({
-              projectID: this.$route.params.project,
-              name: containerName,
-            })
-            .modify({ tags });
+          if (this.$route.name !== "SharedObjects") {
+            await this.$store.state.db.containers
+              .where({
+                projectID: this.$route.params.project,
+                name: containerName,
+              })
+              .modify({ tags });
+          }
         });
       this.toggleEditTagsModal();
     },

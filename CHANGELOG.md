@@ -80,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix 'Share ID' tooltip formatting.
 - Libupload path in docker files
 - Fix hiding the pagination of data tables
+- Fix shared objects functionality: visibility, deleting, editing tags
 
 ## [v2.0.1]
 
