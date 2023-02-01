@@ -30,7 +30,7 @@ setuptools.setup(
             "black==22.12.0",
             "flake8==6.0.0",
             "coverage==7.0.1",
-            "flake8-docstrings==1.6.0",
+            "flake8-docstrings==1.7.0",
             "pytest==7.2.0",
             "pytest-cov==4.0.0",
             "pytest-xdist==3.1.0",
