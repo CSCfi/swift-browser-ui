@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #642) Add support for decrypting downloaded files
 - Use OIDC as the default Keystone login provider for SSO
 - (GH #864) Vault c4ghtransit integration - Uploads object headers to Vault in addition to Object Storage
 - (GH #781) Render full details of Folders you have shared and Folders shared with you
@@ -48,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- (GH #779) Remove `/data` `/.segments` split in container, revert to `_segments` container for segments
 - (GH #514) Cypress integration tests run against keystone-swift container from https://github.com/CSCfi/docker-keystone-swift.
 - Improved development workflow, and added development and testing instructions.
 - (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
@@ -56,6 +58,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- (GH #704) Fix lost folder structure in shared mode uploads
+- (GH #705) Fix logic for creating folders on upload and uploading into pseudofolders
+- (GH #819) Fix upload modal not pre-filling current folder name
+- (GH #869) Fix pseudofolder rendering
 - Use oidc login Keystone provider for automatically forwarded SSO in oidc return
 - (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
 - (GH #884) Fixed multiple bugs
