@@ -16,6 +16,7 @@ class DiscoverTestClass(unittest.IsolatedAsyncioTestCase):
             new={
                 "sharing_endpoint": "http://example",
                 "request_endpoint": "http://example",
+                "upload_external_endpoint": "http://example",
             },
         )
         with patch_setd:

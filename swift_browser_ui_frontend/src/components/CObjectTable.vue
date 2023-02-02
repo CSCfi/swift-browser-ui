@@ -243,22 +243,22 @@ export default {
                     },
                   },
                 },
-              },
-              {
-                value: this.$t("message.table.editTags"),
-                component: {
-                  tag: "c-button",
-                  params: {
-                    text: true,
-                    size: "small",
-                    title: "Edit tags",
-                    path: mdiPencilOutline,
-                    onClick: ({ data }) => 
-                      toggleEditTagsModal(data.name.value, null),
-                    onKeyUp: (event) => {
-                      if(event.keyCode === 13) {
-                        toggleEditTagsModal(item.data.name.value, null);
-                      }
+                {
+                  value: this.$t("message.table.editTags"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: "Edit tags",
+                      path: mdiPencilOutline,
+                      onClick: ({ data }) => 
+                        toggleEditTagsModal(data.name.value, null),
+                      onKeyUp: (event) => {
+                        if(event.keyCode === 13) {
+                          toggleEditTagsModal(item.data.name.value, null);
+                        }
+                      },
                     },
                   },
                 },
