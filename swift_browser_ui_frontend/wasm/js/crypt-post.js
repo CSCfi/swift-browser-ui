@@ -9,7 +9,7 @@ self.addEventListener("activate", (event) => {
 let 
   streamController,
   sessionPtr,
-  filename,
+  fileName,
   headerPtr,
   headerLen,
   chunkPtr,
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (e) => {
     const response = new Response(stream);
     response.headers.append(
       "Content-Disposition",
-      'attachment; filename="' + filename.replace(".c4gh", "") + '"',
+      'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
     );
     e.respondWith(response);
   }
@@ -89,7 +89,7 @@ wasmReady.then(() => {
           [],
           [],
         );
-        fileName = e.data.filename + ".c4gh";
+        fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
           ptr: sessionPtr,
@@ -102,7 +102,7 @@ wasmReady.then(() => {
           ["string"],
           [e.data.passphrase],
         );
-        fileName = e.data.filename + ".c4gh";
+        fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
           ptr: sessionPtr,
