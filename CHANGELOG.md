@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
 - Show notification when changing permission in share modal
 - Use OIDC as the default Keystone login provider for SSO
@@ -50,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- (GH #779) Remove `/data` `/.segments` split in container, revert to `_segments` container for segments
 - Allow installing js deps with pnpm install --prod for faster and smaller install
 - (GH #514) Cypress integration tests run against keystone-swift container from https://github.com/CSCfi/docker-keystone-swift.
 - Improved development workflow, and added development and testing instructions.
@@ -59,6 +61,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- (GH #704) Fix lost folder structure in shared mode uploads
+- (GH #705) Fix logic for creating folders on upload and uploading into pseudofolders
+- (GH #819) Fix upload modal not pre-filling current folder name
+- (GH #869) Fix pseudofolder rendering
 - Fix missing footer and language-selector component setup
 - Use oidc login Keystone provider for automatically forwarded SSO in oidc return
 - (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
