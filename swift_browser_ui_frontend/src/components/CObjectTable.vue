@@ -234,8 +234,8 @@ export default {
                       text: true,
                       size: "small",
                       title: "Download",
-                      onClick: ({ data }) => {
-                        data.name.value.match(".c4gh")
+                      onClick: () => {
+                        item.name.match(".c4gh")
                           ? this.beginDownload(item)
                           : this.navDownload(item.url);
                       },
