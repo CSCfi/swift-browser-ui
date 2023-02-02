@@ -84,6 +84,9 @@ export default {
     container () {
       return this.$route.params.container;
     },
+    prefix () {
+      return this.$route.query.prefix;
+    },
     locale () {
       return this.$i18n.locale;
     },
@@ -93,6 +96,7 @@ export default {
   },
   watch: {
     disablePagination() {
+      this.componentKey += 1;
       this.getPage();
     },
     hideTags() {
@@ -100,9 +104,15 @@ export default {
       this.getPage();
     },
     renderFolders() {
+      this.componentKey += 1;
+      this.getPage();
+    },
+    prefix() {
+      this.componentKey += 1;
       this.getPage();
     },
     objs() {
+      this.componentKey += 1;
       this.getPage();
     },
     locale() {
@@ -119,6 +129,18 @@ export default {
       // Return true if path represents a file in the active prefix context
       return path.replace(this.getPrefix(), "").match("/") ? false : true;
     },
+    changeFolder: function (folder) {
+      this.$router.push(
+        `${window.location.pathname}?prefix=${this.getPrefix()}${folder}`,
+      );
+      this.componentKey += 1;
+      this.getPage();
+    },
+    getFolderName: function (path) {
+      // Get the name of the currently displayed pseudofolder
+      let endregex = new RegExp("/.*$");
+      return path.replace(this.getPrefix(), "").replace(endregex, "");
+    },
     getPage: function () {
       let offset = 0;
       let limit = this.objs.length;
@@ -131,68 +153,94 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      this.objects = this.objs.slice(offset, offset + limit).reduce((
-        items,
-        item,
-      ) => {
-        items.push({
-          name: {
-            value: truncate(item.name),
-            ...(this.renderFolders ? {
-              component: {
-                tag: "c-link",
-                params: {
-                  href: "javascript:void(0)",
-                  color: "dark-grey",
-                  onClick: () => this.$emit("changeFolder", item.name),
-                },
-              },
-            } : {}),
-          },
-          size: {
-            value: getHumanReadableSize(item.bytes),
-          },
-          last_modified: {
-            value: parseDateTime(this.locale, item.last_modified),
-          },
-          ...(this.hideTags ? {} : {
-            tags: {
-              value: null,
-              children: [
-                ...(item.tags || []).map((tag, index) => ({
-                  key: "tag_" + index + "",
-                  value: tag,
-                  component: {
-                    tag: "c-tag",
-                    params: {
-                      flat: true,
-                    },
-                  },
-                })),
-                ...(item.tags && !item.tags.length ?
-                  [{ key: "no_tags", value: "-" }] : []),
-              ],
-            },
-          }),
-          actions: {
-            value: null,
-            sortable: null,
-            align: "end",
-            children: [
-              {
-                value: this.$t("message.download"),
+      this.objects = this
+        .objs
+        .filter((obj) => {
+          return obj.name.startsWith(this.getPrefix());
+        })
+        .reduce((items, item) => {
+          if (this.isFile(item.name) || !this.renderFolders) {
+            items.push(item);
+          } else {
+            if (items.find(el => {
+              return this.getFolderName(
+                el.name,
+              ).match(this.getFolderName(item.name)) ? true : false;
+            })) {
+              return items;
+            } else {
+              items.push(item);
+            }
+          }
+          return items;
+        }, [])
+        .slice(offset, offset + limit)
+        .reduce((
+          items,
+          item,
+        ) => {
+          let value = truncate(
+            this.renderFolders ? this.getFolderName(item.name) : item.name,
+          );
+          items.push({
+            name: {
+              value: value,
+              ...(this.renderFolders && !this.isFile(item.name) ? {
                 component: {
-                  tag: "c-button",
+                  tag: "c-link",
                   params: {
-                    text: true,
-                    size: "small",
-                    title: "Download",
-                    onClick: ({ data }) => {
-                      data.name.value.match(".c4gh")
-                        ? this.beginDownload(data)
-                        : this.navDownload(item.url);
+                    href: "javascript:void(0)",
+                    color: "dark-grey",
+                    onClick: () => this.changeFolder(value),
+                  },
+                },
+              } : {}),
+            },
+            size: {
+              value: getHumanReadableSize(item.bytes),
+            },
+            last_modified: {
+              value: parseDateTime(this.locale, item.last_modified),
+            },
+            ...(this.hideTags ? {} : {
+              tags: {
+                value: null,
+                children: [
+                  ...(item.tags || []).map((tag, index) => ({
+                    key: "tag_" + index + "",
+                    value: tag,
+                    component: {
+                      tag: "c-tag",
+                      params: {
+                        flat: true,
+                      },
                     },
-                    path: mdiTrayArrowDown,
+                  })),
+                  ...(item.tags && !item.tags.length ?
+                    [{ key: "no_tags", value: "-" }] : []),
+                ],
+              },
+            }),
+            actions: {
+              value: null,
+              sortable: null,
+              align: "end",
+              children: [
+                {
+                  value: this.$t("message.download"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: "Download",
+                      onClick: ({ data }) => {
+                        data.name.value.match(".c4gh")
+                          ? this.beginDownload(item)
+                          : this.navDownload(item.url);
+                      },
+                      path: mdiTrayArrowDown,
+                    },
                   },
                 },
               },
@@ -214,32 +262,31 @@ export default {
                     },
                   },
                 },
-              },
-              {
-                value: this.$t("message.delete"),
-                component: {
-                  tag: "c-button",
-                  params: {
-                    text: true,
-                    size: "small",
-                    title: "Delete object",
-                    path: mdiDeleteOutline,
-                    onClick: () => {
-                      this.$emit("delete-object", item);
-                    },
-                    onKeyUp: (event) => {
-                      if(event.keyCode === 13) {
+                {
+                  value: this.$t("message.delete"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: "Delete object",
+                      path: mdiDeleteOutline,
+                      onClick: () => {
                         this.$emit("delete-object", item);
-                      }
+                      },
+                      onKeyUp: (event) => {
+                        if(event.keyCode === 13) {
+                          this.$emit("delete-object", item);
+                        }
+                      },
                     },
                   },
                 },
-              },
-            ],
-          },
-        });
-        return items;
-      }, []);
+              ],
+            },
+          });
+          return items;
+        }, []);
 
       this.paginationOptions = {
         ...this.paginationOptions,
@@ -277,7 +324,7 @@ export default {
       this.currentDownload = new DecryptedDownloadSession(
         this.active,
         this.active.id,
-        [object.name.value],
+        [object.name],
         this.$route.params.container,
         this.$store,
       );
@@ -285,8 +332,14 @@ export default {
       beginDownload();
     },
     navDownload(url) {
-      console.log(url);
       window.open(url, "_blank");
+    },
+    getPrefix() {
+      // Get current pseudofolder prefix
+      if (this.$route.query.prefix == undefined) {
+        return "";
+      }
+      return `${this.$route.query.prefix}/`;
     },
     setHeaders() {
       this.headers = [
