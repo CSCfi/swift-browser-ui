@@ -29,7 +29,7 @@ function initEphemeral(filename) {
   navigator.serviceWorker.ready.then(reg => {
     reg.active.postMessage({
       cmd: "initEphemeral",
-      filename: filename,
+      fileName: filename,
     });
   });
 }
@@ -43,7 +43,7 @@ function initNormal(
     reg.active.postMessage({
       cmd: "initNormal",
       passphrase: passphrase,
-      filename: filename,
+      fileName: filename,
     });
   });
 }
@@ -75,7 +75,7 @@ export default class EncryptedUploadSession {
     this.project = project;
     this.files = files;
     this.container = container;
-    this.prefix = prefix;
+    this.prefix = prefix.length == 0 ? "" : `${prefix}/`;
     this.$store = store;
     this.$el = el;
     this.ephemeral = ephemeral;
