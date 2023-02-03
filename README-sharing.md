@@ -23,13 +23,15 @@ production is PostgreSQL.
 
 The PostgreSQL implementation can be enabled via environment variables,
 that are
-* SHARING_DB_POSTGRES; if found in environment, uses PostgreSQL.
-* SHARING_DB_PASSWORD; REQUIRED; The password used for connecting to the
+* `SHARING_DB_POSTGRES`; if found in environment, uses PostgreSQL.
+* `SHARING_DB_PASSWORD`; **REQUIRED**: The password used for connecting to the
   database.
-* SHARING_DB_USER; DEFAULT: sharing; The user used for the database
+* `SHARING_DB_USER`; **DEFAULT**: sharing; The user used for the database
   access.
-* SHARING_DB_HOST; DEFAULT: localhost; The host of the database server.
-* SHARING_DB_NAME; DEFAULT: swiftsharing; The database that the backend
+* `SHARING_DB_HOST`; **DEFAULT**: localhost; The host of the database server.
+* `SHARING_DB_PORT`; **DEFAULT**: 5432; The port of the database server.
+* `SHARING_DB_SSL`; **DEFAULT**: prefer; The SSL to connect to the database server.
+* `SHARING_DB_NAME`; **DEFAULT**: swiftsharing; The database that the backend
   needs to connect to.
 
 ### Access

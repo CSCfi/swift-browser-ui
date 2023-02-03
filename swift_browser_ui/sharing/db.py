@@ -35,6 +35,8 @@ class DBConn:
                     password=os.environ.get("SHARING_DB_PASSWORD", None),
                     user=os.environ.get("SHARING_DB_USER", "sharing"),
                     host=os.environ.get("SHARING_DB_HOST", "localhost"),
+                    port=int(os.environ.get("REQUEST_DB_PORT", 5432)),
+                    ssl=os.environ.get("SHARING_DB_SSL", "prefer"),
                     database=os.environ.get("SHARING_DB_NAME", "swiftsharing"),
                     min_size=os.environ.get("SHARING_DB_MIN_CONNECTIONS", 0),
                     max_size=os.environ.get("SHARING_DB_MAX_CONNECTIONS", 49),

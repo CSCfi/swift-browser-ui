@@ -30,6 +30,8 @@ class DBConn:
                     password=os.environ.get("REQUEST_DB_PASSWORD", None),
                     user=os.environ.get("REQUEST_DB_USER", "request"),
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
+                    port=int(os.environ.get("REQUEST_DB_PORT", 5432)),
+                    ssl=os.environ.get("REQUEST_DB_SSL", "prefer"),
                     database=os.environ.get("REQUEST_DB_DATABASE", "swiftrequest"),
                     min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 0),
                     max_size=os.environ.get("REQUEST_DB_MAX_CONNECTIONS", 49),
