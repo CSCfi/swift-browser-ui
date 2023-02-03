@@ -27,7 +27,7 @@ jobs:
       run: |
         pushd swift_browser_ui_frontend
         npm install
-        npm run build
+        npm run docker-build
     - name: Run unit tests
       run: |
         tox -e pytest
