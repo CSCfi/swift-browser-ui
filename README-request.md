@@ -9,7 +9,6 @@ machine in port 5432. If a database is not run on the local machine, the
 relevant information on the database can be provided with the following
 environment variables:
 
-* `REQUEST_DB_POSTGRES`; if found in environment, uses PostgreSQL.
 * `REQUEST_DB_PASSWORD`; **REQUIRED**: The password used for connecting to the
   database.
 * `REQUEST_DB_USER`; **DEFAULT**: request; The user used for the database
