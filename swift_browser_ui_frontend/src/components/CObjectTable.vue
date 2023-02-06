@@ -153,6 +153,8 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
+      let pagedLength = 0;
+
       this.objects = this
         .objs
         .filter((obj) => {
@@ -172,6 +174,7 @@ export default {
               items.push(item);
             }
           }
+          pagedLength = items.length;
           return items;
         }, [])
         .slice(offset, offset + limit)
@@ -290,7 +293,7 @@ export default {
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.objs.length,
+        itemCount: pagedLength,
       };
     },
     onSort(event) {
