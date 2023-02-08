@@ -86,12 +86,13 @@
         </c-flex>
       </c-container>
       <c-alert
-        v-show="isShared || isPermissionRemoved"
+        v-show="isShared || isPermissionRemoved || isPermissionUpdated"
         type="success"
       >
         <div class="shared-notification">
           {{ isShared ? $t('message.share.shared_successfully')
-            : $t('message.share.remove_permission')
+            : isPermissionUpdated ? $t('message.share.update_permission') 
+              : $t('message.share.remove_permission')
           }}
           <c-button
             text
@@ -111,6 +112,7 @@
           :folder-name="folderName"
           :access-rights="accessRights"
           @removeSharedFolder="removeSharedFolder"
+          @updateSharedFolder="updateSharedFolder"
         />
       </c-container>
     </c-card-content>
@@ -143,6 +145,7 @@ export default {
       isShared: false,
       sharedDetails: [],
       isPermissionRemoved: false,
+      isPermissionUpdated: false,
       timeout: null,
     };
   },
@@ -207,16 +210,9 @@ export default {
         (ret) => {
           this.loading = false;
           if (ret) {
-            this.isShared = true;
             this.getSharedDetails();
-
-            if (this.timeout !== null) {
-              clearTimeout(this.timeout);
-              this.timeout = null;
-              if(this.isPermissionRemoved) {
-                this.isPermissionRemoved = false;
-              }
-            }
+            this.closeSharedNotification();
+            this.isShared = true;
             this.timeout = setTimeout(
               () => this.closeSharedNotification(), 3000);
           }
@@ -303,7 +299,13 @@ export default {
       this.isPermissionRemoved = false;
     },
     closeSharedNotification: function () {
-      this.isShared ? this.isShared = false : this.isPermissionRemoved = false;
+      if (this.timeout !== null) {
+        clearTimeout(this.timeout);
+      }
+
+      this.isShared = false;
+      this.isPermissionRemoved = false;
+      this.isPermissionUpdated = false;
     },
     getSharedDetails: function () {
       this.$store.state.client.getShareDetails(
@@ -314,21 +316,20 @@ export default {
         this.tags = [];
       });
     },
+    updateSharedFolder: function () {
+      this.closeSharedNotification();
+      this.isPermissionUpdated = true;
+      this.timeout = setTimeout(() => this.closeSharedNotification(), 3000);
+    },
     removeSharedFolder: function (folderData) {
+      this.closeSharedNotification();
       this.sharedDetails = this.sharedDetails.filter(
         item => {
           return item.sharedTo !== folderData.projectId.value;
         });
       this.isPermissionRemoved = true;
 
-      if (this.timeout !== null) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
-        if (this.isShared) {
-          this.isShared = false;
-        }
-      }
-      this.timeout = setTimeout(() => this.isPermissionRemoved = false, 3000);
+      this.timeout = setTimeout(() => this.closeSharedNotification(), 3000);
     },
   },
 };
