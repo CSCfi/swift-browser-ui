@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add git commit version and link to footer
 - Add option to specify database port and SSL mode for request and sharing DB connections
 - Add option to specify Redis Sentinel connection parameters for redis configured with Sentinel
+- avoid giving over-detailed `Server` values from services
 
 ### Changed
 

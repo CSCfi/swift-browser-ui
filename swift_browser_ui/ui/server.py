@@ -103,6 +103,15 @@ async def servinit(
         middlewares = middlewares + inject_middleware
     app = aiohttp.web.Application()  # type: ignore
 
+    async def on_prepare(
+        _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
+    ) -> None:
+        """Modify Server headers."""
+        response.headers["Server"] = "Swift Browser"
+
+    # add custom response headers
+    app.on_response_prepare.append(on_prepare)
+
     # Initialize aiohttp_session
     sentinel_url = str(os.environ.get("SWIFT_UI_REDIS_SENTINEL_HOST", ""))
     # we make this str to make it easier to check if exists

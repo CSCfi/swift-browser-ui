@@ -53,6 +53,15 @@ async def servinit() -> aiohttp.web.Application:
 
     app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
 
+    async def on_prepare(
+        _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
+    ) -> None:
+        """Modify Server headers."""
+        response.headers["Server"] = "Swift Browser Runner"
+
+    # add custom response headers
+    app.on_response_prepare.append(on_prepare)
+
     app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
     app.on_shutdown.append(kill_client)
 
