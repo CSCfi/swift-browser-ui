@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also fixes some bugs related to encrypted upload engine and repeatability
 - Add git commit version and link to footer
 - Add option to specify database port and SSL mode for request and sharing DB connections
+- Add option to specify Redis Sentinel connection parameters for redis configured with Sentinel
 
 ### Changed
 
