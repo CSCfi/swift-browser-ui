@@ -42,7 +42,7 @@
     "@vue/vue2-jest": "^27.0.0",
     "babel-jest": "^27.5.1",
     "cli-highlight": "^2.1.11",
-    "csc-ui": "^0.6.14",
+    "csc-ui": "^0.6.15",
     "csc-ui-vue-directive": "^0.0.6",
     "cypress": "^12.5.1",
     "eslint-plugin-vue": "^9.9.0",
