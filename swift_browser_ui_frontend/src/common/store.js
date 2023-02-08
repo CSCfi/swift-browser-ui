@@ -25,7 +25,7 @@ const store = new Vuex.Store({
     multipleProjects: false,
     isLoading: false,
     isFullPage: true,
-    objectCache: {}, // Only for shared objects
+    objectCache: [], // Only for shared objects
     langs: [
       { ph: "In English", value: "en" },
       { ph: "Suomeksi", value: "fi" },

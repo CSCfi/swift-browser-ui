@@ -209,7 +209,7 @@ export default {
       if(this.$route.name !== "SharedObjects") {
         return;
       }
-      this.oList = {value: this.sharedObjects};
+      this.oList = this.sharedObjects;
     },
     prefix: function () {
       if (this.renderFolders) {
@@ -620,7 +620,7 @@ export default {
         this.$store.state.db.objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
-        this.$route.params.project,
+        this.ownerProject,
         this.$route.params.container,
         to_remove,
       ).then(async () => {
@@ -629,6 +629,7 @@ export default {
             "updateSharedObjects",
             {
               project: this.$route.params.project,
+              owner: this.ownerProject,
               container: {
                 name: this.$route.params.container,
                 id: 0,
