@@ -16,7 +16,7 @@
         {{ $t("message.share.close") }}
       </c-button>
     </header>
-    <c-card-content>
+    <c-card-content id="share-card-modal-content">
       <h6 class="subtitle is-6 has-text-dark">
         {{ $t("message.share.share_subtitle") }}
       </h6>
@@ -213,8 +213,7 @@ export default {
             this.getSharedDetails();
             this.closeSharedNotification();
             this.isShared = true;
-            this.timeout = setTimeout(
-              () => this.closeSharedNotification(), 3000);
+            this.closeSharedNotificationWithTimeout();
           }
         },
       );
@@ -298,6 +297,10 @@ export default {
       this.isShared = false;
       this.isPermissionRemoved = false;
     },
+    closeSharedNotificationWithTimeout() {
+      document.getElementById("share-card-modal-content").scrollTo(0, 0);
+      this.timeout = setTimeout(() => this.closeSharedNotification(), 3000);
+    },
     closeSharedNotification: function () {
       if (this.timeout !== null) {
         clearTimeout(this.timeout);
@@ -319,7 +322,7 @@ export default {
     updateSharedFolder: function () {
       this.closeSharedNotification();
       this.isPermissionUpdated = true;
-      this.timeout = setTimeout(() => this.closeSharedNotification(), 3000);
+      this.closeSharedNotificationWithTimeout();
     },
     removeSharedFolder: function (folderData) {
       this.closeSharedNotification();
@@ -328,8 +331,7 @@ export default {
           return item.sharedTo !== folderData.projectId.value;
         });
       this.isPermissionRemoved = true;
-
-      this.timeout = setTimeout(() => this.closeSharedNotification(), 3000);
+      this.closeSharedNotificationWithTimeout();
     },
   },
 };
