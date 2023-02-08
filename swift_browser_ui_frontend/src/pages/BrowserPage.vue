@@ -62,10 +62,7 @@
           </p>
         </div>
       </c-toasts>
-      <!--New Footer Component-->
-      <div id="footer">
-        <CFooter />
-      </div>
+      <CFooter />
     </div>
   </div>
 </template>
@@ -262,14 +259,6 @@ c-modal {
 
 .toasts-wrapper {
   padding: 1rem;
-}
-
-#footer{
-  position:relative;
-  bottom:0;
-  width: 100%;
-  margin-top: 15px;
-  z-index: 2;
 }
 
 </style>
