@@ -190,6 +190,20 @@ async def handle_upload_encrypted_object(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Handle uploading an object spliced into segments."""
+    if "nosession" in request.query:
+        project = request.match_info["project"]
+        container = request.match_info["container"]
+        object_name = request.match_info["object_name"]
+
+        header = await request.content.read()
+        b64_header = base64.standard_b64encode(header).decode("ascii")
+
+        await request.app[VAULT_CLIENT].put_header(
+            project, container, object_name, b64_header
+        )
+
+        return aiohttp.web.Response(status=201)
+
     upload_session = await get_encrypted_upload_instance(request)
     return await upload_session.add_header(request)
 
