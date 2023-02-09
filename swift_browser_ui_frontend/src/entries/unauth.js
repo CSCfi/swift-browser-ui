@@ -9,6 +9,7 @@ import cModel from "@/common/csc-ui.js";
 
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
 
+import CFooter from "@/components/CFooter.vue";
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 import { vControlV2 } from "csc-ui-vue-directive";
 
@@ -36,6 +37,7 @@ new Vue({
   name: "UnauthorizedPage",
   i18n,
   components: {
+    CFooter,
     LanguageSelector,
   },
   data: {

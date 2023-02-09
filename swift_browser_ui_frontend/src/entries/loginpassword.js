@@ -5,6 +5,7 @@ import VueI18n from "vue-i18n";
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
 
+import CFooter from "@/components/CFooter.vue";
 import cModel from "@/common/csc-ui.js";
 
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
@@ -36,6 +37,7 @@ new Vue({
   name: "LoginPassword",
   i18n,
   components: {
+    CFooter,
     LanguageSelector,
   },
   data: {

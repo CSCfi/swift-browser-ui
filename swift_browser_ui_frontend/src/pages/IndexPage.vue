@@ -100,10 +100,12 @@
 <script>
 import checkIDB from "@/common/idb_support";
 import CFooter from "@/components/CFooter.vue";
+import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 export default {
   components:{
     CFooter,
+    LanguageSelector,
   },
   mounted: function () {
     checkIDB().then(result => this.idb = result);
