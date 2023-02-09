@@ -9,8 +9,6 @@ Download service worker handlers.
 #include <fcntl.h>
 #include <string.h>
 
-#include <b64/cencode.h>
-
 #include <crypt4gh/header.h>
 #include <crypt4gh/segment.h>
 #include <crypt4gh.h>
