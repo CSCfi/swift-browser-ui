@@ -17,7 +17,8 @@ async function fetchWithCookie({method, url, body, signal}) {
       switch (response.status) {
         case 401:
         case 403:
-          window.location.pathname = "/unauth";
+          console.log("would go to /unauth");
+          // window.location.pathname = "/unauth";
           break;
         case 500:
           break;
