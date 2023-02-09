@@ -170,12 +170,12 @@ SWIFT_UI_TLS_HOST=hostname
 Additionally you'll need to configure the endpoints to be correct, so that
 the backend APIs work as intended.
 ```
-BROWSER_START_SHARING_ENDPOINT_URL=https://devenv:8443/sharing
+BROWSER_START_SHARING_ENDPOINT_URL=https://devenv:9443
 BROWSER_START_SHARING_INT_ENDPOINT_URL=http://localhost:9090
-BROWSER_START_REQUEST_ENDPOINT_URL=https://devenv:8443/request
+BROWSER_START_REQUEST_ENDPOINT_URL=https://devenv:10443
 BROWSER_START_REQUEST_INT_ENDPOINT_URL=http://localhost:9091
 BROWSER_START_RUNNER_ENDPOINT=http://localhost:9092
-BROWSER_START_RUNNER_EXT_ENDPOINT=https://devenv:8443/runner
+BROWSER_START_RUNNER_EXT_ENDPOINT=https://devenv:11443
 ```
 
 If your Docker network does not match the default, you'll need to change the
