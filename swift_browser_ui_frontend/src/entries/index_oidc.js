@@ -9,7 +9,11 @@ import checkIDB from "@/common/idb_support";
 import cModel from "@/common/csc-ui.js";
 
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
+import { vControlV2 } from "csc-ui-vue-directive";
 import VueI18n from "vue-i18n";
+
+import CFooter from "@/components/CFooter.vue";
+import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 // Import project css
 import "@/css/prod.scss";
@@ -22,7 +26,8 @@ applyPolyfills().then(() => {
 });
 
 Vue.use(VueI18n);
-
+Vue.directive("control", vControlV2);
+Vue.directive("csc-model", cModel);
 
 const i18n = new VueI18n({
   locale: getLangCookie(),
@@ -31,6 +36,10 @@ const i18n = new VueI18n({
 
 new Vue ({
   i18n,
+  components: {
+    CFooter,
+    LanguageSelector,
+  },
   data: {
     loading: false,
     idb: true,
@@ -57,6 +66,3 @@ new Vue ({
   },
   ...App,
 }).$mount("#app");
-
-
-Vue.directive("csc-model", cModel);
