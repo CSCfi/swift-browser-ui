@@ -70,7 +70,8 @@
 <style>
 c-main {
   height: unset;
-  min-height: 100vh
+  min-height: 100vh;
+  justify-content: space-between;
 }
 c-login-card {
   margin: 2rem auto;

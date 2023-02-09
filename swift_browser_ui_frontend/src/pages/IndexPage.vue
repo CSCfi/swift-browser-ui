@@ -114,7 +114,8 @@ export default {
 <style>
 c-main { 
   height: unset; 
-  min-height: 100vh 
+  min-height: 100vh;
+  justify-content: space-between;
 }
 
 c-card {
