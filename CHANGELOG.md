@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix missing footer and language-selector component setup
 - Use oidc login Keystone provider for automatically forwarded SSO in oidc return
 - (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
 - (GH #884) Fixed multiple bugs

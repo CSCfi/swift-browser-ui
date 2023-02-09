@@ -4,6 +4,7 @@
       <c-csc-logo />
       {{ $t('message.program_name') }}
       <c-spacer />
+      <LanguageSelector />
     </c-toolbar>
     <c-row>
       <c-flex>
@@ -39,6 +40,7 @@
         </c-container>
       </c-flex>
     </c-row>
+    <CFooter />
   </c-main>
 </template>
 
