@@ -98,8 +98,9 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
     )
 
     if session["oidc"]["userinfo"].get("homeFederation", "") == "Haka":
-        response.headers["Location"] = HAKA_ENDPOINT(
+        response.headers["Location"] = HAKA_OIDC_ENDPOINT(
             endpoint=str(setd["auth_endpoint_url"]),
+            oidc=str(setd["keystone_oidc_provider"]),
             origin=str(setd["set_origin_address"]),
         )
 
