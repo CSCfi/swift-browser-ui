@@ -277,30 +277,7 @@ The frontend tests are run with `cypress`, and you will need
 2. Building the `wasm` code for encryption support
 3. using a specific command for generating data
 
-The encryption requires an additional build step: you'll need to build the `wasm` code. It can be built with one of the docker images, and you can copy the files from there.
-
-Build the image
-
-```bash
-docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
-```
-
-Build the wasm files with provided container, which acts in practise
-like the make command in the specified folder. Available targets can be
-found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
-targets can be achieved with:
-
-```bash
-docker run --rm -it --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
-```
-
-Copy these files into the static JS files built with the frontend.
-
-```bash
-cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
-```
-
-These files will be integrated into the root folder of the built frontend.
+The wasm code is built automatically when using `npm` commands. It can also be triggered by running `npm run build-wasm`
 
 > NOTE: Remember that the encrypted upload features cannot be used without
 > having trusted TLS set up on all backend services.
