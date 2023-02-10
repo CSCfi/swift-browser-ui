@@ -46,10 +46,9 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
-        idb: "Browser not supported.",
+        idb: "Private mode not supported.",
         idb_text:
-          "This browser is not supported.\n" +
-          "Please, use a supported browser.",
+          "Please switch private mode off to enable login to SD Connect.",    
       },
       dropFiles: "Drag and drop folders here or ",
       help: "Help",
@@ -511,8 +510,9 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
-        idb: "Selain ei tuettu.",
-        idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
+        idb: "Yksityinen selaaminen ei ole tuettu.",
+        idb_text:
+          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",
