@@ -133,6 +133,7 @@ export default {
         [sharedProjectId],
         rights,
       );
+      this.$emit("updateSharedFolder");
     },
     deleteFolderShare: function (folderData) {
       removeAccessControlMeta(
