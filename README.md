@@ -52,8 +52,9 @@ Getting started:
 git clone git@github.com:CSCfi/swift-browser-ui.git
 cd swift-browser-ui
 cd swift_browser_ui_frontend
-npm install
-npm run build
+npm install -g pnpm@7
+pnpm install
+pnpm run build
 cd ..
 pip install -r requirements.txt
 pip install .
@@ -107,8 +108,8 @@ cd swift-browser-ui
 Install frontend dependencies, and build (without encryption or OIDC enabled).
 
 ```bash
-npm --prefix swift_browser_ui_frontend install
-npm --prefix swift_browser_ui_frontend run build
+pnpm --prefix swift_browser_ui_frontend install
+pnpm --prefix swift_browser_ui_frontend run build
 ```
 
 Install python dependencies, optionally in a virtual environment.
@@ -198,7 +199,7 @@ honcho start
 
 To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
 
-    OIDC_ENABLED=True npm --prefix swift_browser_ui_frontend run build
+    OIDC_ENABLED=True pnpm --prefix swift_browser_ui_frontend run build
 
 CSC OIDC provider's certificate should be added to `certifi`'s certificate store:
 ```bash
