@@ -20,17 +20,25 @@ if (process.env.NODE_ENV === "development") {
   }
 }
 
-const proxyTo = `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`;
+const proxyTo = `https://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`;
 const oidcEnabled = process.env.OIDC_ENABLED === "True";
 
 let vueConfig = {
   publicPath: "/static",
   devServer: {
+    server: {
+      type: "https",
+      options: {
+        key: "../sd-connect.test-key.pem",
+        cert: "../sd-connect.test.pem",
+      },
+    },
     allowedHosts: `${process.env.ALLOWED_HOSTS}`,
     proxy: {
       "/static":              {target: proxyTo},
       "/api":                 {target: proxyTo},
       "/discover":            {target: proxyTo},
+      "/libupload":           {target: proxyTo},
       "/login":               {target: proxyTo},
       "/login/oidc":          {target: proxyTo},
       "/login/oidc-redirect": {target: proxyTo},

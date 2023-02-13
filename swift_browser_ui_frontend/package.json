@@ -3,13 +3,13 @@
   "version": "2.0.1",
   "private": true,
   "scripts": {
-    "serve": "bash build_wasm.sh && vue-cli-service serve --mode development",
-    "build": "bash build_wasm.sh && vue-cli-service build --mode production",
+    "serve": "./build_wasm.sh && vue-cli-service serve --mode development",
+    "build": "./build_wasm.sh && vue-cli-service build --mode production",
     "test": "vue-cli-service test:unit --config=jest.config.js",
     "lint": "vue-cli-service lint --mode production",
-    "build-devel": "bash build_wasm.sh && vue-cli-service build --mode development",
-    "serve-prod": "bash build_wasm.sh && vue-cli-service serve --mode production",
-    "build-wasm": "bash build_wasm.sh",
+    "build-devel": "./build_wasm.sh && vue-cli-service build --mode development",
+    "serve-prod": "./build_wasm.sh && vue-cli-service serve --mode production",
+    "build-wasm": "./build_wasm.sh",
     "docker-build": "vue-cli-service build --mode production",
     "docker-build-devel": "vue-cli-service build --mode development"
   },
