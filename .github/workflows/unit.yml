@@ -35,7 +35,7 @@ jobs:
     - name: Install frontend
       run: |
         pushd swift_browser_ui_frontend
-        pnpm install
+        pnpm install --prod
         pnpm run docker-build
     - name: Run unit tests
       run: |
