@@ -12,17 +12,21 @@ jobs:
     name: Node ${{ matrix.node }} eslint check
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+          cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
       - name: Install dependencies
         run: |
           pushd swift_browser_ui_frontend
-          npm install
-          npm ci
+          pnpm install
       - name: Run eslint
         run: |
           pushd swift_browser_ui_frontend
-          npm run lint
+          pnpm run lint
       
