@@ -38,8 +38,9 @@ and the tests are developed for both Firefox and Chrome web browsers.
 .. code-block:: console
 
     $ cd swift_browser_ui_frontend/
-    $ npm install 
-    $ npm run build
+    $ npm install -g pnpm@7
+    $ pnpm install 
+    $ pnpm run build
     $ cd  ..
-    $ npm install cypress
-    $ npx cypress open
+    $ pnpm install cypress
+    $ pnpm exec cypress open

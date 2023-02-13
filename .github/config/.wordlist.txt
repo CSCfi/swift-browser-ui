@@ -67,6 +67,7 @@ palletsprojects
 pem
 plaintext
 png
+pnpm
 postgres
 pouta
 proxying

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - (GH #642) Add support for decrypting downloaded files
+- Automate building wasm with npm
+- Show notification when changing permission in share modal
 - Use OIDC as the default Keystone login provider for SSO
 - (GH #864) Vault c4ghtransit integration - Uploads object headers to Vault in addition to Object Storage
 - (GH #781) Render full details of Folders you have shared and Folders shared with you
@@ -58,10 +60,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+<<<<<<< HEAD
 - (GH #704) Fix lost folder structure in shared mode uploads
 - (GH #705) Fix logic for creating folders on upload and uploading into pseudofolders
 - (GH #819) Fix upload modal not pre-filling current folder name
 - (GH #869) Fix pseudofolder rendering
+||||||| 7c785820
+=======
+- Fix missing footer and language-selector component setup
+>>>>>>> devel
 - Use oidc login Keystone provider for automatically forwarded SSO in oidc return
 - (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
 - (GH #884) Fixed multiple bugs

@@ -10,6 +10,7 @@ import cModel from "@/common/csc-ui.js";
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
 import { vControlV2 } from "csc-ui-vue-directive";
 
+import CFooter from "@/components/CFooter.vue";
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 // Import project css
@@ -36,6 +37,7 @@ new Vue({
   name: "BadRequest",
   i18n,
   components: {
+    CFooter,
     LanguageSelector,
   },
   data: {

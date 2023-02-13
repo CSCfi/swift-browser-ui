@@ -3,16 +3,17 @@ FROM node:18-alpine3.17 as FRONTEND
 ARG OIDC_ENABLED
 
 COPY swift_browser_ui_frontend/package.json /root/swift_ui/swift_browser_ui_frontend/package.json
-COPY swift_browser_ui_frontend/package-lock.json /root/swift_ui/swift_browser_ui_frontend/package-lock.json
+COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift_ui/swift_browser_ui_frontend/pnpm-lock.yaml
 
-RUN --mount=type=cache,target=/root/.npm \
+RUN --mount=type=cache,target=/root/.pnpm-store \
     cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm install
+    && npm install -g pnpm@7 \
+    && pnpm install
 
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && OIDC_ENABLED=$OIDC_ENABLED npm run build
+    && OIDC_ENABLED=$OIDC_ENABLED pnpm run build
 
 FROM python:3.10-alpine3.17 as BACKEND
 

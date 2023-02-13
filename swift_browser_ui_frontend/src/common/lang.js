@@ -46,10 +46,11 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
-        idb: "Browser not supported.",
+        idb: "Firefox in private mode is not supported.",
         idb_text:
-          "This browser is not supported.\n" +
-          "Please, use a supported browser.",
+          "Firefox is not supported in private mode. " +
+          "To continue, please turn off Firefox's private browsing or " +
+          "switch to another browser.",
       },
       dropFiles: "Drag and drop folders here or ",
       help: "Help",
@@ -203,6 +204,7 @@ let default_translations = {
         write_perm: "Read and write",
         shared_successfully: "Folder was shared successfully!",
         remove_permission: "Permission was removed successfully!",
+        update_permission: "Permission was changed successfully.",
         shared_table_title: "Project's folder has been shared with",
         field_label: "Project Identifiers to share with",
         field_placeholder: "Add Share IDs",
@@ -511,8 +513,11 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
-        idb: "Selain ei tuettu.",
-        idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
+        idb: "Firefoxin yksityinen selaus ei ole tuettu.",
+        idb_text:
+          "Firefoxin yksityinen selaus ei ole tuettu." +
+          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta " +
+          "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",
@@ -663,6 +668,7 @@ let default_translations = {
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
         remove_permission: "Lupa poistettiin onnistuneesti!",
+        update_permission: "Lupa muutettiin onnistuneesti.",
         shared_table_title: "Projektin kansio on jaettu",
         project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
