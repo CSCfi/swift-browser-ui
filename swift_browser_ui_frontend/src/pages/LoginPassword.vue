@@ -20,6 +20,9 @@
             <c-login-card
               :src="require('@/assets/banner_login.png')"
             >
+              <c-alert type="error" v-if="!idb">
+                <p>{{ $t('message.error.idb_text') }}</p>
+              </c-alert>
               <c-login-card-title>
                 {{ $t('message.pwdlogin.header') }}
               </c-login-card-title>
@@ -53,11 +56,6 @@
                   style="display:none"
                 >
               </c-login-card-actions>
-              <c-login-card-content v-if="!idb">
-                <p>
-                  <strong>{{ $t('message.error.idb') }}</strong>
-                </p>
-              </c-login-card-content>
             </c-login-card>
           </form>
         </c-container>

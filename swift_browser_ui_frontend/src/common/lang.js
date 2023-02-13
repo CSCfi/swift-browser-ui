@@ -46,9 +46,11 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
-        idb: "Private mode not supported.",
+        idb: "Firefox in private mode is not supported.",
         idb_text:
-          "Please switch private mode off to enable login to SD Connect.",    
+          "Firefox is not supported in private mode. " +
+          "To continue, please turn off Firefox's private browsing or " +
+          "switch to another browser.",
       },
       dropFiles: "Drag and drop folders here or ",
       help: "Help",
@@ -510,9 +512,11 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
-        idb: "Yksityinen selaaminen ei ole tuettu.",
+        idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
-          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta.",
+          "Firefoxin yksityinen selaus ei ole tuettu." +
+          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta " +
+          "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",

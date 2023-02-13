@@ -39,6 +39,7 @@ etsittyä
 että
 etusivulle
 etusivun
+Firefoxin
 hakea
 haku
 hakuindeksi
@@ -144,6 +145,7 @@ kestää
 kiellettyä
 kiinni
 kirjaudu
+kirjautua
 kirjautuaksesi
 kirjautumalla
 kirjautuminen
@@ -269,6 +271,7 @@ ohjeet
 oikeuden
 oikeudet
 oikeuksia
+ole
 olemassa
 olet
 oletusarvoisesti
@@ -386,6 +389,7 @@ sallittu
 se
 sekunnin
 selaamiseen
+selaamisesta
 selailla
 selailu
 selaimestasi
@@ -393,6 +397,7 @@ selaimet
 selain
 selainta
 selatessa
+selaus
 sen
 seuraava
 siirry
@@ -472,6 +477,7 @@ toiminto
 toiseen
 toisen
 toisesta
+toista
 toteuttaa
 tueta
 tuettu
@@ -501,6 +507,7 @@ uusi
 uusia
 vaatii
 vähintään
+vaihda
 vaihto
 väliaikaiseen
 valikkoon
@@ -525,16 +532,18 @@ virhe
 virheellinen
 voi
 voida
+voidaksesi
 voit
 voivat
 vuoksi
 yhdelle
 yhden
+yhtään
 yhteenlaskettu
 yhteys
-yhtään
 yksityinen
 yksityisen
+yksityisestä
 yksityiskohtia
 yksityistä
 yli
