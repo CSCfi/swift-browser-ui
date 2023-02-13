@@ -177,7 +177,7 @@ class VaultClient:
                     },
                 ) as response:
                     LOGGER.debug(
-                        "%s request to: %s, path %r returned: %s",
+                        "%s request to: %r, returned: %r",
                         method,
                         url,
                         response.status,
@@ -248,7 +248,9 @@ class VaultClient:
         LOGGER.debug("Getting public key for project %r", project)
         key = await get_key()
         if not key:
-            LOGGER.debug("No key found for project %r, creating a new one.", key, project)
+            LOGGER.debug(
+                "No key: %s found for project %r, creating a new one.", key, project
+            )
             await self._request(
                 "POST", f"c4ghtransit/keys/{project}", json_data={"flavor": "crypt4gh"}
             )
