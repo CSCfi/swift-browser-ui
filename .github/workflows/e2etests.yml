@@ -44,7 +44,7 @@ jobs:
         run: |
           pushd swift_browser_ui_frontend
           npm install
-          npm run build
+          npm run build-docker
       - name: Setup and Run backend
         run: |
           pip install -r requirements.txt
