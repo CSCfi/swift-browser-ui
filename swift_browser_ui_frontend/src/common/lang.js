@@ -43,9 +43,9 @@ let default_translations = {
           "performed, contact the service administrator. " +
           "Otherwise head back to the front page from the " +
           "button below.",
-        inUse: "Bucket name already in use.",
-        invalidName: "Bucket name is invalid.",
-        createFail: "Bucket creation failed.",
+        inUse: "Folder name already in use.",
+        invalidName: "Folder name is invalid.",
+        createFail: "Folder creation failed.",
         idb: "Firefox in private mode is not supported.",
         idb_text:
           "Firefox is not supported in private mode. " +
@@ -56,7 +56,7 @@ let default_translations = {
       help: "Help",
       helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Support",
-      program_name: "SD Connect",
+      program_name: "Swift browser",
       program_description:
         "Web UI for browsing contents in Swift object " + "storage systems.",
       program_description_step_2: "",
@@ -77,8 +77,7 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. You can view files only by" +
-          " using SD Desktop and download files in this folder (Read access)",
+          "This folder is shared with you.",
         shared_with_read_write:
           "This folder is shared with you. You can view, download, upload" +
           " and edit tags in this folder (Read and write access).",
@@ -128,15 +127,15 @@ let default_translations = {
         showPagination: "Display pagination",
       },
       discover: {
-        sync_shares: "Synchronize shared buckets",
+        sync_shares: "Synchronize shared folders",
         sync_success_template: "Successfully synchronized ",
-        sync_success_concat: " shared buckets",
-        sync_failure_template: "No new shared buckets to synchronize.",
+        sync_success_concat: " shared folders",
+        sync_failure_template: "No new shared folders to synchronize.",
       },
       dashboard: {
         prj_usage: "Project usage",
         account: "Project Identifier",
-        containers: "Buckets",
+        containers: "Folders",
         objects: "Objects",
         usage: "Usage",
         cur_billing: "Currently consumes",
@@ -185,19 +184,19 @@ let default_translations = {
         close: "Close",
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
-        share_cont: "Share the bucket",
+        share_cont: "Share the folder",
         share_title: "Share folder",
         share_subtitle:
           "This folder is already accessible to all the members" +
           " of this project.",
         share_other_projects: "Share with other projects",
         share_guide_step1:
-          "1. Ask recipient project’s member to select " +
+          "1. Ask recipient project's member to select " +
           "Copy Share ID button next to Select project dropdown when " +
           "correct project is selected.",
         share_guide_step2:
-          "2. Recipient’s Share ID is copied in the cache memory " +
-          "and recipient project’s member can paste it to email etc. " +
+          "2. Recipient's Share ID is copied in the cache memory " +
+          "and recipient project's member can paste it to email etc. " +
           "and send it to you.",
         permissions: "Permissions",
         read_perm: "Read",
@@ -215,47 +214,47 @@ let default_translations = {
         request_sharing: "Request sharing",
         shared: "Shared",
         sharedTo: "Shared to",
-        container: "Bucket",
+        container: "Folder",
         owner: "Owner project identifier",
         shared_details_to: "Shared to: ",
-        shared_details_address: "Bucket address: ",
+        shared_details_address: "Folder address: ",
         shared_details_rights: "Rights given: ",
         shared_details_read: "Read access",
         shared_details_write: "Write access",
         created: "Created",
         fail_noperm: "Please select permissions to grant!",
         fail_noid: "Please give at least one Project Identifier!",
-        fail_nocont: "Please specify the bucket!",
-        fail_duplicate: "The project already has access to the bucket!",
-        new_share_button: "Share a bucket",
-        container_label: "Bucket",
-        revoke: "Revoke bucket access",
+        fail_nocont: "Please specify the folder!",
+        fail_duplicate: "The project already has access to the folder!",
+        new_share_button: "Share a folder",
+        container_label: "Folder",
+        revoke: "Revoke folder access",
         revoke_project: "Revoke access from project",
         success_delete: "Successfully deleted sharing action",
         request_sync_nocont:
-          "Cannot synchronize access requests without a " + "bucket",
+          "Cannot synchronize access requests without a folder",
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
-        sync_requests: "Synchronize bucket share requests",
+        sync_requests: "Synchronize folder share requests",
       },
       request: {
         project: "Project",
-        container: "Bucket / Identifier",
-        container_message: "The requested bucket name",
+        container: "Folder / Identifier",
+        container_message: "The requested folder name",
         owner: "Owner Project Identifier",
-        owner_message: "Project Identifier of the bucket owner",
+        owner_message: "Project Identifier of the folder owner",
         request: "Request",
         multi_project:
           "Your account has access to multiple projects. " +
           "Please verify that the correct project is set " +
           "active in the menu, and submit the request with " +
           "the Request button.",
-        requestHeading: "Request access to a bucket",
+        requestHeading: "Request access to a folder",
       },
       largeFileMessage: "",
       download: " Download",
       downloadLink: "Download Link",
-      downloadContainer: " Download Bucket",
+      downloadContainer: " Download Folder",
       downloadAlt: "Download link for",
       downloadAltLarge: "Confirm download large file",
       largeDownMessage:
@@ -268,11 +267,11 @@ let default_translations = {
         sharedFrom: "You haven't shared any folders.",
         sharedTo: "No folders have been shared with you.",
       },
-      emptyShared: "No buckets have been shared to the project.",
+      emptyShared: "No folders have been shared to the project.",
       emptyRequested:
-        "No shared buckets have been requested for the " + "project.",
+        "No shared folders have been requested for the project.",
       sharing: "Sharing - ",
-      containers: "Buckets - ",
+      containers: "Folders - ",
       upload: {
         upload: " Upload",
         uploadfolder: " Upload Folder",
@@ -308,29 +307,29 @@ let default_translations = {
       createContainerButton: "Create folder",
       copysuccess: "The folder is being copied",
       copytime: "It may take few seconds",
-      copyfail: "Failed to copy the bucket",
+      copyfail: "Failed to copy the folder",
       renderFolders: "Render as Folders",
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
         addContainer: "Create new folder",
-        editContainer: "Editing bucket: ",
+        editContainer: "Editing folder: ",
         norename:
           "Please note that folder names cannot be modified " +
           "after creating a folder.",
         createdFolder:
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
-        deleteConfirm: "Delete Bucket",
+        deleteConfirm: "Delete Folder",
         deleteNote: "Deleting a container requires "+ 
           "deleting all objects first.",
         deleteConfirmMessage:
-          "Are you sure you want to delete this " + "bucket?",
-        deleteSuccess: "Bucket Deleted",
+          "Are you sure you want to delete this folder?",
+        deleteSuccess: "Folder Deleted",
         folderName: "Folder name",
-        containerMessage: "The name of the new bucket",
+        containerMessage: "The name of the new folder",
         fullDelete:
-          "Deleting a bucket with contents requires deleting " +
+          "Deleting a folder with contents requires deleting " +
           "all objects inside it first.",
       },
       objects: {
@@ -344,11 +343,11 @@ let default_translations = {
         deleteObjects: "Delete Object / Objects",
         deleteSuccess: "Objects deleted",
         deleteObjectsMessage:
-          "Are you sure you want to delete these " + "objects?",
+          "Are you sure you want to delete these objects?",
       },
       replicate: {
-        destinationLabel: "Destination bucket",
-        destinationMessage: "Insert copy destination bucket here",
+        destinationLabel: "Destination folder",
+        destinationMessage: "Insert copy destination folder here",
         destinationExists: "Folder already exists",
         copy_folder: "Copy folder: ",
         name_newFolder: "Name new folder",
@@ -380,12 +379,12 @@ let default_translations = {
           "Try uploading files in smaller batches, or encrypt " +
           "them before uploading normally.",
         enNotAvail:
-          "ServiceWorker function not available in this browser. " +
-          "Recommended browsers are Firefox and Chrome.",
+          "This browser is not supported. " +
+          "Recommended browsers are latest versions of Firefox and Chrome.",
         enFiles: "Encrypt files before upload",
         fsWriteFail:
-          "Failed to copy files into temporary file system. " +
-          "Try refreshing and uploading in smaller batches.",
+          "Failed to upload. " +
+          "Try refreshing the and uploading in smaller batches.",
         enFail:
           "Failed to encrypt files. This might be due to incorrectly " +
           "loaded encryption engine, or unavailable memory. Try " +
@@ -400,12 +399,12 @@ let default_translations = {
         pubkey: "Receiver public keys",
         pubkey_msg: "Paste a receiver public key",
         pubkeyLabel: "Public key (sha256)",
-        noRecipients: "No additional receivers public keys",
+        noRecipients: "No additional receivers' public keys",
         addkey: "Add receiver public key",
         addFiles: "Add files",
-        container: "Destination bucket",
-        container_msg: "Upload destination bucket",
-        container_hint: "Use this field to change the name of the bucket",
+        container: "Destination folder",
+        container_msg: "Upload destination folder",
+        container_hint: "Use this field to change the name of the folder",
         dropMsg: "Select files",
         enup: "Encrypt and Upload",
         normup: "Upload",
@@ -427,7 +426,7 @@ let default_translations = {
         advancedOptions: "Advanced encryption options",
       },
       search: {
-        container: "Bucket",
+        container: "Folder",
         object: "Object",
         folder: "Folder",
         tags: "Tags",
@@ -436,8 +435,8 @@ let default_translations = {
         empty: "No results found",
         searchBy: "Search by Name or Tag",
         buildingIndex:
-          "This project has a large number of objects. Please, " +
-          "wait while the search index is ready, and try again.",
+          "This project has a large number of files. Please, " +
+          "wait a moment, and try again.",
       },
       select: {
         heading: "Select project for logging in",
@@ -462,12 +461,12 @@ let default_translations = {
       },
       supportMenu: {
         manual: "User manual",
-        billing: "Billing unit calculator",
+        billing: "Billing",
         sharing: "Sharing API tokens",
-        about: "About Sensitive Data Services",
+        about: "About",
       },
       footerMenu: {
-        title:"SD Connect",
+        title:"Swift browser",
         serviceProvider:"CSC - IT Center for Science Ltd.",
         serviceProviderLink:"https://csc.fi",
         menuItem1: "Item 1",
@@ -497,13 +496,13 @@ let default_translations = {
           "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
-        Unauthorized: "401 – Kirjaudu sisään",
+        Unauthorized: "401 - Kirjaudu sisään",
         Unauthorized_text:
           "Sivun näyttäminen vaatii sisäänkirjauksen, " +
           "jonka voi toteuttaa oheisesta painikkeesta.",
-        Notfound: "404 – Etsittyä sivua ei löydetty.",
+        Notfound: "404 - Etsittyä sivua ei löydetty.",
         Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
-        Forbidden: "403 – Tuo on kiellettyä.",
+        Forbidden: "403 - Tuo on kiellettyä.",
         Forbidden_text:
           "Edellinen operaatio ei ole sallittu. Mikäli " +
           "kyseisen operaation tulisi olla sallittu, ota " +
@@ -532,7 +531,7 @@ let default_translations = {
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
       logOut: "Kirjaudu ulos",
-      cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
+      cscOrg: "CSC - Tieteen Tietotekniikan Keskus Oy",
       devel: "kehittänyt",
       folderTabs: {
         all: "Kaikki kansiot",
@@ -928,7 +927,7 @@ let default_translations = {
       },
       footerMenu: {
         title:"SD Connect",
-        serviceProvider:"CSC – Tieteen tietotekniikan keskus Oy",
+        serviceProvider:"CSC - Tieteen tietotekniikan keskus Oy",
         serviceProviderLink:"#",
         menuItem1: "Menu 1",
         menuItemLink1: "#",
