@@ -10,9 +10,6 @@ FROM node:18-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
-RUN --mount=type=cache,target=/var/cache/apk/ \
-    apk add git
-
 COPY swift_browser_ui_frontend/package.json /root/swift_ui/swift_browser_ui_frontend/package.json
 COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift_ui/swift_browser_ui_frontend/pnpm-lock.yaml
 
