@@ -1,66 +1,64 @@
 <template>
   <footer>
-    <nav class="navbar">
-      <div class="navbar-menu is-active">
-        <div class="navbar-start">
-          <div class="col-3">
-            <div class="row navbar-item ">
-              <span class="largetext">
-                {{ $t("message.footerMenu.title") }}
-              </span>
-            </div>
-            <div class="row navbar-item smalltext">
-              <a
-                class="linktext"
-                target="_blank"
-                :href="$t('message.footerMenu.serviceProviderLink')"
-                :alt="$t('message.footerMenu.serviceProvider')"
-              >
-                {{ $t("message.footerMenu.serviceProvider") }}
-              </a>
-            </div>
-            <div 
-              v-if="dev" 
-              class="row navbar-item smalltext"
-            >
-              <a
-                class="linktext"
-                target="_blank"
-                :href="gitLink"
-              >
-                {{ gitVersion }}
-              </a>
-            </div>
-          </div>        
-        </div>
-    
-        <div
-          id="rightmenu"
-          class="navbar-end"
-        > 
-          <div class="navbar-item smalltext">
+    <div class="navbar-menu is-active">
+      <div class="navbar-start">
+        <div class="col-3">
+          <div class="row navbar-item ">
+            <span class="largetext">
+              {{ $t("message.footerMenu.title") }}
+            </span>
+          </div>
+          <div class="row navbar-item smalltext">
             <a
               class="linktext"
               target="_blank"
-              :href="$t('message.footerMenu.menuItemLink1')"
-              :alt="$t('message.footerMenu.menuItem1')"
+              :href="$t('message.footerMenu.serviceProviderLink')"
+              :alt="$t('message.footerMenu.serviceProvider')"
             >
-              {{ $t("message.footerMenu.menuItem1") }}
+              {{ $t("message.footerMenu.serviceProvider") }}
             </a>
           </div>
-          <div class="navbar-item smalltext">
+          <div
+            v-if="dev"
+            class="row navbar-item smalltext"
+          >
             <a
               class="linktext"
               target="_blank"
-              :href="$t('message.footerMenu.menuItemLink2')"
-              :alt="$t('message.footerMenu.menuItem2')"
+              :href="gitLink"
             >
-              {{ $t("message.footerMenu.menuItem2") }}
+              {{ gitVersion }}
             </a>
           </div>
         </div>
       </div>
-    </nav>
+
+      <div
+        id="rightmenu"
+        class="navbar-end"
+      >
+        <div class="navbar-item smalltext">
+          <a
+            class="linktext"
+            target="_blank"
+            :href="$t('message.footerMenu.menuItemLink1')"
+            :alt="$t('message.footerMenu.menuItem1')"
+          >
+            {{ $t("message.footerMenu.menuItem1") }}
+          </a>
+        </div>
+        <div class="navbar-item smalltext">
+          <a
+            class="linktext"
+            target="_blank"
+            :href="$t('message.footerMenu.menuItemLink2')"
+            :alt="$t('message.footerMenu.menuItem2')"
+          >
+            {{ $t("message.footerMenu.menuItem2") }}
+          </a>
+        </div>
+      </div>
+    </div>
   </footer>
 </template>
 
@@ -83,29 +81,18 @@ export default {
 @import "@/css/prod.scss";
 
 footer{
-  padding:40px 60px;
-  background-color:$csc-lightest-grey;
+  padding: 40px 60px;
 }
 
-.navbar{
-  background-color:$csc-lightest-grey;
-  padding: auto;
-  width: 100%;  
- 
+footer, footer > * div {
+  background-color: $csc-lightest-grey !important;
 }
+
 .navbar-menu{
-  background-color:$csc-lightest-grey; 
   width: 100%;
   height: 100%;
   box-shadow: none;
-}
-
-.navbar-start{
-  background-color:$csc-lightest-grey;
-}
-
-.navbar-end{
-  background-color:$csc-lightest-grey;
+  padding: 0;
 }
 
 #leftmenu{
@@ -119,6 +106,7 @@ footer{
   line-height: 19px;
   color: $csc-grey;
 }
+
 .smalltext{
   font-style: normal;
   font-weight: 400;
@@ -126,12 +114,14 @@ footer{
   line-height: 18px;
   color: $csc-grey;
 }
+
 .linktext {
-  color: $csc-grey; 
+  color: $csc-grey;
   font-weight: 400;
 }
+
 a:hover {
   background-color: #CCF4F0;
-  text-decoration: underline;     
+  text-decoration: underline;
 }
 </style>
