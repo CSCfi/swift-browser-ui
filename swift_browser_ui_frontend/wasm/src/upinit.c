@@ -41,7 +41,9 @@ int add_recv_key(
         // Skip if couldn't read from the file or current session is NULL
         if (amount <= 0 || !current)
         {
+            #ifdef C4GH_WASM_DEV
             printf("Failed to open the receiver key.\n");
+            #endif
             goto finalAddRecv;
         }
         // We need space for the new key inside encrypt session
