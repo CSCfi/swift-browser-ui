@@ -98,14 +98,18 @@ int encrypt_folder(char *passphrase)
         sess);
     if (ret)
     {
+        #ifdef C4GH_WASM_DEV
         printf("Failure in reading in keys – aborting\n");
+        #endif
         goto final_eup;
     }
 
     ret = encrypt_files();
     if (ret)
     {
+        #ifdef C4GH_WASM_DEV
         printf("Failure in file encryption – aborting\n");
+        #endif
         goto final_eup;
     }
 final_eup:
@@ -126,14 +130,18 @@ int encrypt_folder_ephemeral() {
 
     ret = read_in_recv_keys(sess);
     if(ret) {
+        #ifdef C4GH_WASM_DEV
         printf("Failure in reading in keys – aborting\n");
+        #endif
         goto final_eph_eup;
     }
 
     ret = encrypt_files();
     if (ret)
     {
+        #ifdef C4GH_WASM_DEV
         printf("Failure in file encryption – aborting\n");
+        #endif
         goto final_eph_eup;
     }
 final_eph_eup:

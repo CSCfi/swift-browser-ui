@@ -67,7 +67,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register(workerUrl).then(reg => {
     reg.update();
     if (ping) {
-      console.log("Pinging first serviceWorker.");
+      if (DEV) console.log("Pinging first serviceWorker.");
       navigator.serviceWorker.ready.then(reg => {
         reg.active.postMessage({
           cmd: "pingWasm",
@@ -75,8 +75,8 @@ if ("serviceWorker" in navigator) {
       });
     }
   }).catch((err) => {
-    console.log("Failed to register service worker.");
-    console.log(err);
+    if(DEV) console.log("Failed to register service worker.");
+    if(DEV) console.log(err);
   });
 } else {
   if(DEV) console.log("Did not register Service Worker.");
@@ -359,7 +359,9 @@ new Vue({
         this.$store.commit("appendPubKey", key);
       }
     };
-    initialize().then(() => {console.log("Initialized successfully.");});
+    initialize().then(() => {
+      if(DEV) console.log("Initialized successfully.");
+    });
     delay(this.containerSyncWrapper, 10000);
   },
   mounted() {
