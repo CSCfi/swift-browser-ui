@@ -186,7 +186,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import "@/css/prod.scss";
 
   #secondary-navbar {
     border-bottom: 6px solid $csc-primary-light;

@@ -276,7 +276,7 @@ export function tokenize(text, ignoreSmallerThan = 2) {
   return result;
 }
 
-export const DEV = process.env.NODE_ENV === "development";
+export const DEV = import.meta.env.MODE === "development";
 
 export function sortObjects(objects, sortBy, sortDirection) {
   sortBy = sortBy === "size" ? "bytes"

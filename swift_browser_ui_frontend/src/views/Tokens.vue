@@ -195,7 +195,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "@/css/prod.scss";
 
 .contents{
   font-family: var(--csc-font-family);

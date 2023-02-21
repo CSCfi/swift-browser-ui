@@ -90,7 +90,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/css/prod.scss";
 
 html, body {
   height: 100%;

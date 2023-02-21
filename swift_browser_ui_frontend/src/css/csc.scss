@@ -1,10 +1,27 @@
 @charset "utf-8";
 // CSS file for integrating CSC brand colors
 
-@import "~bulma/sass/utilities/_all";
+:root {
+  --csc-border-radius: 4px;
+  --csc-dark-grey: rgb(89, 89, 89);
+  --csc-error: #e71d32;
+  --csc-font-family: 'museo-sans', sans-serif;
+  --csc-light-grey: rgb(223, 225, 227);
+  --csc-light-grey-blue: rgb(204, 244, 240);
+  --csc-lightest-grey: rgba(223, 225, 227, 0.5);
+  --csc-link: #025B97;
+  --csc-mid-grey: rgb(140, 140, 140);
+  --csc-primary: rgb(0, 103, 120);
+  --csc-primary-ghost: rgba(0, 103, 120, 0.15);
+  --csc-primary-ghost-hover: rgba(0, 103, 120, 0.25);
+  --csc-primary-hover: rgb(80, 151, 141);
+  --csc-primary-text-hover: rgba(0, 103, 120, 0.15);
+  --csc-success: #51a808;
+  --csc-warning: #ff5800;
+}
 
-@import "~csc-ui/dist/styles/variables.css";
-@import "~csc-ui/dist/styles/variables.scss";
+@import "bulma/sass/utilities/_all.sass";
+@import "csc-ui/dist/styles/variables.scss";
 
 $csc-primary: #006778;
 $csc-primary-light: #c2dbdf;
@@ -119,4 +136,4 @@ $colors: mergeColorMaps(
 $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
-@import "~bulma";
+@import "bulma/bulma.sass";
