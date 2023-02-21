@@ -39,8 +39,8 @@ let default_translations = {
         Forbidden: "403 – Forbidden",
         Forbidden_text:
           "Your previous request could not be fulfilled. " +
-          "If this request should have been allowed, " +
-          "please contact servicedesk@csc.fi.",
+          "If this request should have been allowed " +
+          ", please contact servicedesk@csc.fi. ",
         inUse: "Folder name already in use.",
         invalidName: "Folder name is invalid.",
         createFail: "Folder creation failed.",
