@@ -234,7 +234,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "@/css/prod.scss";
 
   .toolbar {
     z-index: 31;

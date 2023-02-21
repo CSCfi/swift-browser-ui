@@ -139,7 +139,7 @@ import {
 } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
-import CObjectTable from "@/components/CObjectTable";
+import CObjectTable from "@/components/CObjectTable.vue";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 
@@ -617,7 +617,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "@/css/prod.scss";
 
 #search {
   flex: 0.4;

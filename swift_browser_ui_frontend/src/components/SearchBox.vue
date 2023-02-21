@@ -55,7 +55,7 @@
 <script>
 import { tokenize } from "@/common/conv";
 import escapeRegExp from "lodash/escapeRegExp";
-import SearchResultItem from "@/components/SearchResultItem";
+import SearchResultItem from "@/components/SearchResultItem.vue";
 import debounce from "lodash/debounce";
 
 export default {

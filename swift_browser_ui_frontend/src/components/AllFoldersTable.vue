@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Containers from "@/components/Containers";
+import Containers from "@/components/Containers.vue";
 
 export default {
   name: "AllFoldersTable",

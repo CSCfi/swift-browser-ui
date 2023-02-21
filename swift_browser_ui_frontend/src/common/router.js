@@ -2,8 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
-import SharedObjects from "@/views/SharedObjects";
-import TokensView from "@/views/Tokens";
+import SharedObjects from "@/views/SharedObjects.vue";
+import TokensView from "@/views/Tokens.vue";
 
 Vue.use(Router);
 

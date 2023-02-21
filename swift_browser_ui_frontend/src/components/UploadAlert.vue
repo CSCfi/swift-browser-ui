@@ -53,7 +53,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "@/css/prod.scss";
 
 c-alert {
   margin: 1rem 5%;

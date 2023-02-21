@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import UploadToast from "@/components/UploadToast";
-import UploadAlert from "./UploadAlert.vue";
+import UploadToast from "@/components/UploadToast.vue";
+import UploadAlert from "@/components/UploadAlert.vue";
 export default {
   name: "UploadNotification",
   components: {
@@ -62,7 +62,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/css/prod.scss";
 
 h3 {
   color: $csc-grey !important;

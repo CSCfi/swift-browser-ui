@@ -70,15 +70,14 @@ export default {
   data: function() {
     return {
       dev: DEV,
-      gitVersion: process.env.VUE_APP_GIT_VERSION || "Version not set",
-      gitLink: process.env.VUE_APP_GIT_LINK || "#",
+      gitVersion: import.meta.env.VITE_GIT_VERSION || "Version not set",
+      gitLink: import.meta.env.VITE_GIT_LINK || "#",
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@import "@/css/prod.scss";
 
 footer{
   padding: 40px 60px;

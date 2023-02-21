@@ -32,8 +32,8 @@
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import { getSharingContainers } from "@/common/globalFunctions";
-import ContainerTable from "@/components/ContainerTable";
-import SearchBox from "@/components/SearchBox";
+import ContainerTable from "@/components/ContainerTable.vue";
+import SearchBox from "@/components/SearchBox.vue";
 
 export default {
   name: "ContainersView",

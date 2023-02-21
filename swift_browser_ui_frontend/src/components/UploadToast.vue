@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import ProgressBar from "./UploadProgressBar.vue";
+import ProgressBar from "@/components/UploadProgressBar.vue";
 
 export default {
   name: "UploadToast",
@@ -101,7 +101,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "@/css/prod.scss";
 
 .toast-wrapper {
   padding: 1rem;

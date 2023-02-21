@@ -77,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #1025) add timeout to `requests` as recommended by `bandit`
 - (GL #944) Replace buefy dialogs with c-modal from `csc-ui`
 - (GL #944) Replace buefy notifications with c-toasts from `csc-ui`
+- (GH #982) Migrate from vue-cli to vite
 
 ### Fixed
 

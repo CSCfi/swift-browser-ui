@@ -8,12 +8,12 @@ import VueI18n from "vue-i18n";
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
-import CreateFolderModal from "@/components/CreateFolderModal";
-import UploadModal from "@/components/UploadModal";
-import EditTagsModal from "@/components/EditTagsModal";
-import ShareModal from "@/components/ShareModal";
-import CopyFolderModal from "@/components/CopyFolderModal";
-import DeleteModal from "@/components/DeleteModal";
+import CreateFolderModal from "@/components/CreateFolderModal.vue";
+import UploadModal from "@/components/UploadModal.vue";
+import EditTagsModal from "@/components/EditTagsModal.vue";
+import ShareModal from "@/components/ShareModal.vue";
+import CopyFolderModal from "@/components/CopyFolderModal.vue";
+import DeleteModal from "@/components/DeleteModal.vue";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -45,10 +45,10 @@ import "@/css/prod.scss";
 import Resumable from "resumablejs";
 
 // Upload notification handler
-import UploadNotification from "@/components/UploadNotification";
+import UploadNotification from "@/components/UploadNotification.vue";
 
 //Custom footer element
-import CFooter from "@/components/CFooter";
+import CFooter from "@/components/CFooter.vue";
 
 // Import delay
 import delay from "lodash/delay";
