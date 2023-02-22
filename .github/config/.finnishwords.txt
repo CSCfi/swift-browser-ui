@@ -31,6 +31,7 @@ epäonnistuttiin
 erikseen
 erillinen
 erissä
+erityyppisiä
 esimerkiksi
 esitetty
 estetty
@@ -127,6 +128,7 @@ käyttäjällä
 käyttäjän
 käyttäjänimestä
 käyttäjänimi
+käyttäjätuki
 käyttäjätunnuksella
 käyttäjätunnustasi
 käyttöä
@@ -142,6 +144,7 @@ kenttää
 kerran
 keskus
 kestää
+kieli
 kiellettyä
 kiinni
 kirjaudu
@@ -199,6 +202,7 @@ lataus
 latauslinkki
 leikepöydälle
 liitä
+linkki
 lisää
 lisätäksesi
 lisätietoja
@@ -259,6 +263,7 @@ nimetä
 nimi
 nykyinen
 nykyisen
+nykyisiä
 objekteja
 objekti
 objektia
@@ -454,6 +459,7 @@ tätä
 taustalla
 tavallisesti
 täytyy
+tekijänoikeustiedot
 tekstinä
 tiedosto
 tiedostoa
@@ -496,6 +502,7 @@ tuo
 tuottaa
 tyhjä
 tyhjennä
+työkaluvinkki
 tyyppi
 ulos
 useille

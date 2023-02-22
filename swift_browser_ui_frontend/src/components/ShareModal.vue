@@ -32,7 +32,7 @@
           </h3>
           <c-flex
             class="toggle-instructions"
-            aria-label="instructions-for-shareid"
+            :aria-label="$t('shareid_instructions')"
             @click="toggleShareGuide"
             @keyup.enter="toggleShareGuide"
           >
@@ -68,7 +68,7 @@
         >
           <b-taginput
             v-model="tags"
-            aria-label="folders-to-be-shared"
+            :aria-label="$t('label.list_of_shareids')"
             ellipsis
             :placeholder="$t('message.share.field_placeholder')"
           />

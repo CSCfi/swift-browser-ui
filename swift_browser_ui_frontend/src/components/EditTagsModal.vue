@@ -9,7 +9,7 @@
       >
         <b-taginput
           v-model="tags"
-          aria-label="edit-tags"
+          :aria-label="$t('label.edit_tag')"
           aria-close-label="delete-tag"
           ellipsis
           maxlength="20"

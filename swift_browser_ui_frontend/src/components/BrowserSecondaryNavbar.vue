@@ -29,7 +29,7 @@
         <c-button
           ghost
           data-testid="copy-projectId"
-          aria-label="copy-share-id"
+          :aria-label="$t('label.copyshareid')"
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
         >
@@ -42,7 +42,7 @@
         <div
           class="tooltip"
           role="tooltip"
-          aria-label="shareid-tooltip"
+          :aria-label="$t('label.shareid_tooltip')"
         >
           <c-icon
             :path="path"

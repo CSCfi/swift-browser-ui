@@ -1,5 +1,5 @@
 <template>
-  <footer aria-label="Footer">
+  <footer :aria-label="$t('label.footer')">
     <div class="navbar-menu is-active">
       <div class="navbar-start">
         <div class="col-3">

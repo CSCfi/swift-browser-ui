@@ -1,6 +1,6 @@
 <template>
   <div id="mainContainer">
-    <nav aria-label="navigation">
+    <nav>
       <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
