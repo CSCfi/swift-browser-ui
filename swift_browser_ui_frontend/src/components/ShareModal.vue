@@ -54,7 +54,7 @@
             </c-link>
           </c-flex>
         </c-row>
-        <ul
+        <div
           v-show="openShareGuide"
           class="content guide-content"
         >
@@ -63,15 +63,14 @@
           </p>
           <p>
             {{ $t("message.share.share_guide_step1") }}
-          </li>
-          <li>
+          </p>
+          <p>
             {{ $t("message.share.share_guide_step2") }}
           </p>
           <ul>
             <li 
-              v-for="(item, i) in 
-                $t('message.share.share_guide_step2_list')"
-              :key="i"
+              v-for='(item, i) in $t("message.share.share_guide_step2_list")'
+              :key='i'
             >
               {{ item }}
             </li>
