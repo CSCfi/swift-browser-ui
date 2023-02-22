@@ -23,7 +23,8 @@
     <c-card-content id="share-card-modal-content">
       <p class="is-6 has-text-dark">
         {{ $t("message.share.share_subtitle") }}
-      </p>
+        <b>{{ active.name }}</b>.
+      </h6>
       <c-container>
         <c-row
           justify="space-between"
@@ -55,30 +56,44 @@
         </c-row>
         <ul
           v-show="openShareGuide"
-          class="guide-content"
+          class="content guide-content"
         >
-          <li>
+          <p>
+            {{ $t("message.share.share_guide_intro") }}
+          </p>
+          <p>
             {{ $t("message.share.share_guide_step1") }}
           </li>
           <li>
             {{ $t("message.share.share_guide_step2") }}
-          </li>
-        </ul>
-        <TagInput
-          :tags="tags"
-          :aria-label="$t('label.list_of_shareids')"
-          :placeholder="$t('message.share.field_placeholder')"
-          @addTag="addingTag"
-          @deleteTag="deletingTag"
-        />
+          </p>
+          <ul>
+            <li 
+              v-for='(item, i) in $t("message.share.share_guide_step2_list")'
+              :key='i'
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+        <b-field
+          custom-class="field"
+          type="is-dark"
+        >
+          <b-taginput
+            v-model="tags"
+            ellipsis
+            :placeholder="$t('message.share.field_placeholder')"
+          />
+        </b-field>
         <c-flex>
           <c-select
             v-control
             v-csc-model="sharedAccessRight"
             shadow="false"
-            :label="$t('message.share.permissions')"
             :items.prop="accessRights"
-            placeholder="Select permission"
+            :label="$t('message.share.permissions')"
+            :placeholder="$t('message.share.permissions')"
             @changeValue="onSelectPermission($event)"
           />
           <c-button
@@ -168,6 +183,9 @@ export default {
     };
   },
   computed: {
+    active() {
+      return this.$store.state.active;
+    },
     folderName() {
       return this.$store.state.selectedFolderName;
     },

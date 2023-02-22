@@ -200,9 +200,9 @@ let default_translations = {
           "new files to the shared folder accessible to both CSC projects.",
         ],  
         permissions: "Select permissions",
-        view_perm: "can view",
-        read_perm: "can copy and download",
-        write_perm: "can copy, download and upload",
+        view_perm: "View",
+        read_perm: "Copy and download",
+        write_perm: "Copy, download and upload",
         shared_successfully: "Folder was shared successfully!",
         remove_permission: "Permissions were removed successfully!",
         update_permission: "Permissions were changed successfully.",
@@ -626,8 +626,7 @@ let default_translations = {
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
         share_subtitle:
-          "Tämä kansio on kaikkien projektin " +
-          "jäsenten käytettävissä.",
+          "Tämä kansio on kaikkien jäsenten käytettävissä projektissa ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro: 
           "Kun haluat jakaa kansion toisen CSC projektin kanssa: ",
@@ -650,9 +649,9 @@ let default_translations = {
           "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
           "He voivat myös lähettää tiedostoja jaettuun kansioon."],
         permissions: "Käyttöoikeudet",
-        view_perm: "",
-        read_perm: "Salli säiliön luku",
-        write_perm: "Salli säiliöön kirjoitus",
+        view_perm: "Katsele",
+        read_perm: "Kopioi ja lataa",
+        write_perm: "Kopioida, lataa ja lähetä",
         shared_successfully: "Kansion jakaminen onnistui!",
         remove_permission: "Lupa poistettiin onnistuneesti!",
         update_permission: "Lupa muutettiin onnistuneesti.",
