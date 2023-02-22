@@ -1,11 +1,11 @@
 <template>
   <c-card class="copy-folder">
     <div class="modal-content-wrapper">
-      <h4 class="title is-4 has-text-dark">
+      <h2 class="title is-4 has-text-dark">
         {{
           $t("message.replicate.copy_folder") + selectedFolderName
         }}
-      </h4>
+      </h2>
       <c-card-content>
         <c-alert
           v-show="folderExists"
@@ -18,8 +18,10 @@
         <b-field
           custom-class="has-text-dark"
           :label="$t('message.replicate.name_newFolder')"
+          label-for="new-copy-folderName"
         >
           <b-input
+            id="new-copy-folderName"
             v-model="folderName"
             name="foldername"
             custom-class="has-text-dark"
@@ -29,8 +31,10 @@
         <b-field
           custom-class="has-text-dark"
           :label="$t('message.tagName')"
+          label-for="copy-folder-taginput"
         >
           <b-taginput
+            id="copy-folder-taginput"
             v-model="tags"
             ellipsis
             maxlength="20"
@@ -274,7 +278,7 @@ export default {
   }
 }
 
-@media screen and (max-height: 580px) and (max-width: 773px), 
+@media screen and (max-height: 580px) and (max-width: 773px),
 (max-width: 533px) {
   .copy-folder {
     top: -9rem;

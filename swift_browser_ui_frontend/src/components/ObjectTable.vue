@@ -597,6 +597,8 @@ export default {
         type: "is-danger",
         hasIcon: true,
         onConfirm: () => {this.deleteObjects(deletables);},
+        ariaModal: true,
+        ariaRole: "alertdialog",
       });
     },
     deleteObjects: function (deletables) {

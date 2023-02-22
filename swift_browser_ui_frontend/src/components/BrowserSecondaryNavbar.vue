@@ -44,13 +44,16 @@
           role="tooltip"
           aria-label="shareid-tooltip"
         >
-          <c-icon :path="path" tabindex="0"></c-icon>
+          <c-icon
+            :path="path"
+            tabindex="0"
+          />
           <!-- eslint-disable vue/no-v-html -->
           <span
-            class="tooltip-content"
-            v-html="$t('message.share.share_id_tooltip')"
-            role="tootip"
             id="shareid-tooltip-content"
+            class="tooltip-content"
+            role="tootip"
+            v-html="$t('message.share.share_id_tooltip')"
           />
           <!-- eslint-enable vue/no-v-html -->
         </div>

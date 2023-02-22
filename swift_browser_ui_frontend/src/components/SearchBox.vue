@@ -6,6 +6,7 @@
     <b-autocomplete
       id="searchbox"
       v-model="searchQuery"
+      aria-label="Search folders by Name or Tag"
       icon="magnify"
       clearable
       :placeholder="$t('message.search.searchBy')"

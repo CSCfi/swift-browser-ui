@@ -4,15 +4,12 @@
       <router-link
         class="navbar-item pl-4"
         :to="`/browse/${uname}/${active.id}`"
+        aria-label="Link to SD-Connect main page"
       >
-        <c-csc-logo />
-      </router-link>
-
-      <router-link
-        class="navbar-item app-name"
-        :to="`/browse/${uname}/${active.id}`"
-      >
-        <b class="app-name">{{ $t("message.program_name") }}</b>
+        <c-csc-logo alt="CSC_Logo" />
+        <h1 class="app-name">
+          {{ $t("message.program_name") }}
+        </h1>
       </router-link>
 
       <c-spacer />
@@ -248,7 +245,8 @@ export default {
 
   .app-name {
     color: $csc-grey;
-    font-size: 20px;
+    font-size: 1.25rem;
+    margin-left: 2rem;
   }
 
   .desktop-menu {

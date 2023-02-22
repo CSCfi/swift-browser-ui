@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer aria-label="Footer">
     <div class="navbar-menu is-active">
       <div class="navbar-start">
         <div class="col-3">
