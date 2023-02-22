@@ -21,6 +21,7 @@ cp
 cryptfiles
 csc
 cscfi
+dev
 devel
 devenv
 Dockerfile

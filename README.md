@@ -118,6 +118,7 @@ Install python dependencies, optionally in a virtual environment.
 python3 -m venv venv --prompt swiftui  # Optional step, creates python virtual environment
 source venv/bin/activate  # activates virtual environment
 pip install -Ue .[docs,test,dev]
+pre-commit install
 ```
 
 Set up the environment variables
