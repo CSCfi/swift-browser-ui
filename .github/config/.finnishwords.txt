@@ -17,11 +17,13 @@ avain
 avainta
 avainten
 dataa
+Desktopin
 edellinen
 edellyttää
 edistyneitä
 ei
 eikä
+eivät
 englanniksi
 ennen
 ensin
@@ -32,6 +34,7 @@ erikseen
 erillinen
 erissä
 erityyppisiä
+esim
 esimerkiksi
 esitetty
 estetty
@@ -58,6 +61,7 @@ hyväksyäksesi
 ilman
 ja
 jaa
+jaan
 jaat
 jaetaan
 jaettava
@@ -67,6 +71,7 @@ jaettiin
 jaettu
 jaettua
 jaettuja
+jaettuun
 jaetun
 jaetut
 jakaa
@@ -94,6 +99,7 @@ jne
 jo
 johtaa
 johtua
+joka
 joltakin
 jonka
 jos
@@ -109,11 +115,15 @@ kansioille
 kansioina
 kansioita
 kansion
+kansioon
 kansiossa
 kansiot
 kansiota
 kanssa
 kanssasi
+Katsele
+katsella
+kautta
 käynnissä
 käynnistyy
 käytä
@@ -134,6 +144,7 @@ käyttäjätunnustasi
 käyttöä
 käyttöliittymä
 käyttöliittymän
+käyttöliittymästä
 käyttöohje
 käyttöoikeudet
 käyttörajoista
@@ -167,6 +178,9 @@ koita
 kokeile
 koko
 kontteja
+koodi
+koodin
+Kopio
 kopioi
 kopioida
 kopioidaan
@@ -174,8 +188,10 @@ kopioinnin
 kopiointi
 kopioitu
 koskevia
+Kuinka
 kulutuksesta
 kulutus
+Kun
 kunnes
 kuvaus
 kyseisen
@@ -187,6 +203,7 @@ lähetettäväksi
 lähetettävät
 lähetettiin
 lähetetyt
+lähettää
 lähettäessä
 lähettäjän
 lähettämistä
@@ -249,8 +266,10 @@ muutamia
 muutettiin
 muuttaa
 muuttaaksesi
+myös
 näkyvissä
 nämä
+napilla
 nappi
 nappia
 navigointia
@@ -259,10 +278,13 @@ näytetään
 näytetyistä
 näyttäminen
 niiden
+niin
 nimeä
 nimellä
 nimetä
 nimi
+numeroinen
+numeroisen
 nykyinen
 nykyisen
 nykyisiä
@@ -344,6 +366,7 @@ projekti
 projektia
 projektien
 projektiin
+projektiisi
 projektilla
 projektille
 projektilta
@@ -357,6 +380,7 @@ projektitunnisteille
 projektitunnuksen
 projektitunnukset
 pudota
+purkaa
 puuttuvasta
 pyydä
 pyydetty
@@ -375,6 +399,7 @@ resurssienkäyttö
 resurssit
 rivinvaihtoa
 saavutettavuus
+sähköpostilla
 sähköpostitse
 säiliö
 säiliöitä
@@ -389,6 +414,7 @@ salasana
 salasanasta
 salataan
 salattua
+salauksen
 salaus
 salausohjelman
 salausratkaisun
@@ -396,6 +422,7 @@ salausvaihtoehtoja
 salli
 sallittu
 se
+sekä
 sekunnin
 selaamiseen
 selaamisesta
@@ -412,10 +439,12 @@ seuraava
 siirry
 siirto
 sinulle
+Sinun
 sisään
 sisäänkirjauksen
 sisällön
 sisältö
+sisältöä
 sivu
 sivua
 sivulla
@@ -472,6 +501,7 @@ tiedostolle
 tiedoston
 tiedostot
 tiedot
+tietää
 tieteen
 tieto
 tietoa
@@ -483,6 +513,7 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiminnolla
 toiminto
 toiseen
 toisen
@@ -493,6 +524,7 @@ tueta
 tuettu
 tuettua
 tuki
+tulee
 tulisi
 tuloksia
 tunniste
@@ -511,6 +543,8 @@ tyhjennä
 työkaluvinkki
 tyyppi
 ulos
+uniikin
+useiden
 useille
 useisiin
 uudella
@@ -537,8 +571,10 @@ valmis
 varmasti
 varmistathan
 varten
+Vastaanottaja
 vastaanottajan
 vastaanottajien
+vastaanottavan
 vastaanottimien
 vedä
 viimeisin
@@ -553,6 +589,7 @@ voivat
 vuoksi
 yhdelle
 yhden
+yhdistetty
 yhtään
 yhteenlaskettu
 yhteys

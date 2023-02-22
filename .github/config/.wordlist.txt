@@ -21,6 +21,7 @@ cp
 cryptfiles
 csc
 cscfi
+decrypt
 devel
 devenv
 Dockerfile
@@ -74,6 +75,7 @@ proxying
 py
 quickstart
 saml
+servicedesk
 serviceworker
 sha
 sLo
