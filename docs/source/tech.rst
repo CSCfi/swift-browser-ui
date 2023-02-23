@@ -56,4 +56,3 @@ the API during normal usage.
 
 The api is documented in the api.yml file, that conforms to the OpenAPI
 specification (the file can be rendered with the `swagger editor <https://editor.swagger.io/?url=https://raw.githubusercontent.com/CSCfi/swift-browser-ui/master/docs/_static/api.yml>`_):
-

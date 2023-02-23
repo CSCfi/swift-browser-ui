@@ -67,6 +67,3 @@ export async function getAccessDetails (
       sourceProjectId)
     : [];
 }
-
-
-

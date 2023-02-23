@@ -83,7 +83,7 @@ export default class EncryptedUploadSession {
     this.pkey = pkey;
     this.passphrase = passphrase;
     this.signal = store.state.uploadAbort.signal;
-    
+
     this.totalFiles = this.files.length;
     this.finished = false;
     this.currentFile = "";
@@ -208,7 +208,7 @@ export default class EncryptedUploadSession {
             "updateEncryptedProgress",
             (this.totalFiles - this.files.length) / this.totalFiles,
           );
-  
+
           // Cache the succeeded file metadata to IndexedDB
           this.$store.state.db.containers.get({
             projectID: this.project,
@@ -220,7 +220,7 @@ export default class EncryptedUploadSession {
               signal: undefined,
             });
           }).catch(() => {});
-  
+
           if (this.files.length > 0) {
             this.currentFile = undefined;
             this.initFileSystem();
@@ -275,7 +275,7 @@ export default class EncryptedUploadSession {
       });
     });
   }
-  
+
   // Initialize filesystem for encrypting a file
   initFileSystem() {
     this.currentFile = this.files.pop();

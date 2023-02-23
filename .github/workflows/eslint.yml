@@ -29,4 +29,3 @@ jobs:
         run: |
           pushd swift_browser_ui_frontend
           pnpm run lint
-      
