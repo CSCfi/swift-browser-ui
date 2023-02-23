@@ -153,7 +153,7 @@ struct ENCRYPT_SESSION *open_session_enc(void) {
 Close and free an upload session
 */
 void close_session(
-    struct ENCRYPT_SESSION *sess 
+    struct ENCRYPT_SESSION *sess
 ) {
     if (sess) {
         free(sess->recv_keys);

@@ -274,7 +274,7 @@ export default {
   }
 }
 
-@media screen and (max-height: 580px) and (max-width: 773px), 
+@media screen and (max-height: 580px) and (max-width: 773px),
 (max-width: 533px) {
   .copy-folder {
     top: -9rem;

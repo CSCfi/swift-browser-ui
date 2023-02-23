@@ -91,7 +91,7 @@
       >
         <div class="shared-notification">
           {{ isShared ? $t('message.share.shared_successfully')
-            : isPermissionUpdated ? $t('message.share.update_permission') 
+            : isPermissionUpdated ? $t('message.share.update_permission')
               : $t('message.share.remove_permission')
           }}
           <c-button

@@ -332,15 +332,15 @@ export default {
 
         let allSharing = this.conts.map(x => sharingContainers.includes(x.name)
           ? this.$t("message.table.sharing") : "");
-        let allShared = this.conts.map(x => 
+        let allShared = this.conts.map(x =>
           sharedContainers.some(cont => cont.container === x.name)
             ? this.$t("message.table.shared") : "");
 
-        let combined = allSharing.map((value, idx) => 
+        let combined = allSharing.map((value, idx) =>
           value !== "" ? value : allShared[idx]);
         this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
       }
-      
+
       sortObjects(this.conts, this.sortBy, this.sortDirection);
     },
     setHeaders() {
@@ -430,7 +430,7 @@ export default {
       if (this.$route.name == "SharedFrom") {
         return this.$t("message.emptyProject.sharedFrom");
       }
-      
+
       if (this.$route.name == "SharedTo") {
         return this.$t("message.emptyProject.sharedTo");
       }

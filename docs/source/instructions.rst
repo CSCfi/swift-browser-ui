@@ -19,7 +19,7 @@ The program can be installed with pip from the git repository:
           can be found from the git repositories. The instructions for getting
           the services up and running can be found in their respective
           repositories, and partly under the *Deployment* section.
-          
+
           * https://github.com/cscfi/swift-x-account-sharing
           * https://github.com/cscfi/swift-sharing-request
           * https://github.com/cscfi/swiftui-upload-runner
@@ -82,7 +82,7 @@ For the Pouta test environment with NGINX TLS termination proxy in use::
 For the Pouta production environment for testing unsecurely without trust::
 
     export BROWSER_START_AUTH_ENDPOINT_URL="https://pouta.csc.fi:5001/v3"
-    
+
 
 Setting up TLS termination proxy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

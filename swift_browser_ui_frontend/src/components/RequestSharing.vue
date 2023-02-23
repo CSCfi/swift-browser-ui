@@ -7,7 +7,7 @@
         :message="$t('message.request.container_message')"
         expanded
       >
-        <b-input 
+        <b-input
           v-model="container"
           name="container"
           expanded

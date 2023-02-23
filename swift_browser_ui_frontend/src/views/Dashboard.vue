@@ -102,7 +102,7 @@
               {{ $t('message.dashboard.more_info') }}
             </p>
             <ul>
-              <li 
+              <li
                 v-for="item in $t('message.dashboard.links')"
                 :key="item.msg"
               >

@@ -49,10 +49,10 @@ export default {
       if (this.$route.params.container !== this.container) {
         this.$router.push({
           name: "ObjectsView",
-          params: { 
+          params: {
             user: this.user,
             project: this.project,
-            container: this.container, 
+            container: this.container,
           }},
         );
       }

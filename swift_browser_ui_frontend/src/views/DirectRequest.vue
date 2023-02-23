@@ -29,7 +29,7 @@
       :label="$t('message.request.container')"
       :message="$t('message.request.container_message')"
     >
-      <b-input 
+      <b-input
         v-model="container"
         name="container"
         expanded

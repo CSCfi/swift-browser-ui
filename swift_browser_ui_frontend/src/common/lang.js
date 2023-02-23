@@ -322,7 +322,7 @@ let default_translations = {
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
-        deleteNote: "Deleting a container requires "+ 
+        deleteNote: "Deleting a container requires "+
           "deleting all objects first.",
         deleteConfirmMessage:
           "Are you sure you want to delete this " + "bucket?",

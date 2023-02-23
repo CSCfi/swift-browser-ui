@@ -1,7 +1,7 @@
 <template>
   <section class="contents">
     <div class="sharing-view columns">
-      <SharedMenu 
+      <SharedMenu
         class="column is-one-fifth"
       />
       <div class="requestview column">

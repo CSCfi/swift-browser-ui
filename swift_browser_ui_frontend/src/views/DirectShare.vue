@@ -40,7 +40,7 @@
     <b-field
       :label="$t('message.share.container')"
     >
-      <b-input 
+      <b-input
         v-model="container"
         name="container"
         expanded

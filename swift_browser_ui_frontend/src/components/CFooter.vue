@@ -19,8 +19,8 @@
                 {{ $t("message.footerMenu.serviceProvider") }}
               </a>
             </div>
-            <div 
-              v-if="dev" 
+            <div
+              v-if="dev"
               class="row navbar-item smalltext"
             >
               <a
@@ -31,13 +31,13 @@
                 {{ gitVersion }}
               </a>
             </div>
-          </div>        
+          </div>
         </div>
-    
+
         <div
           id="rightmenu"
           class="navbar-end"
-        > 
+        >
           <div class="navbar-item smalltext">
             <a
               class="linktext"
@@ -90,11 +90,11 @@ footer{
 .navbar{
   background-color:$csc-lightest-grey;
   padding: auto;
-  width: 100%;  
- 
+  width: 100%;
+
 }
 .navbar-menu{
-  background-color:$csc-lightest-grey; 
+  background-color:$csc-lightest-grey;
   width: 100%;
   height: 100%;
   box-shadow: none;
@@ -127,11 +127,11 @@ footer{
   color: $csc-grey;
 }
 .linktext {
-  color: $csc-grey; 
+  color: $csc-grey;
   font-weight: 400;
 }
 a:hover {
   background-color: #CCF4F0;
-  text-decoration: underline;     
+  text-decoration: underline;
 }
 </style>

@@ -48,7 +48,7 @@
             <i class="mdi mdi-information-outline" />
           </c-icon-button>
           <!-- eslint-disable vue/no-v-html -->
-          <span 
+          <span
             class="tooltip-content"
             v-html="$t('message.share.share_id_tooltip')"
           />

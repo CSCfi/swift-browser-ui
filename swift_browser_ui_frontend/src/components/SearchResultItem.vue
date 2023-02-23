@@ -5,8 +5,8 @@
     <div class="media">
       <div class="media-content">
         <span>
-          <b>{{ 
-            isContainer() 
+          <b>{{
+            isContainer()
               ? $t('message.search.container')
               : $t('message.search.object')
           }}: </b>
@@ -47,7 +47,7 @@
 <script>
 import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
 
-const highlightTemplate = 
+const highlightTemplate =
   "$1<span class='has-background-primary-dark has-text-light hl-1'>$2</span>";
 
 export default {

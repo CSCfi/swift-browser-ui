@@ -26,7 +26,7 @@
                   :key="item.msg"
                   :disabled="!idb"
                   :href="item.href"
-                  target="_self" 
+                  target="_self"
                   type="button"
                 >
                   <i
@@ -114,8 +114,8 @@ export default {
 </script>
 
 <style>
-c-main { 
-  height: unset; 
+c-main {
+  height: unset;
   min-height: 100vh;
   justify-content: space-between;
 }

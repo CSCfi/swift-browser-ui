@@ -73,7 +73,7 @@
         field="delete"
         label=""
         width="40"
-      > 
+      >
         <template #default="props">
           <b-button
             type="is-danger"

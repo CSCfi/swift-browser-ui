@@ -88,7 +88,7 @@ struct ENCRYPT_SESSION *open_session_eph() {
 }
 
 
-/* 
+/*
 Open an upload session
 */
 struct ENCRYPT_SESSION *open_session(

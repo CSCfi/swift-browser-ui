@@ -14,7 +14,7 @@ import LanguageSelector from "@/components/CLanguageSelector.vue";
 import { vControlV2 } from "csc-ui-vue-directive";
 
 // Import project css
-import "@/css/prod.scss";    
+import "@/css/prod.scss";
 
 Vue.config.productiontip = true;
 
@@ -61,7 +61,7 @@ new Vue({
                         i18n.locale +
                         "; path=/; expires="
                         + expiryDate.toUTCString();
-    },  
+    },
   },
   ...App,
 }).$mount("#app");

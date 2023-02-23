@@ -61,7 +61,7 @@ new Vue({
                         i18n.locale +
                         "; path=/; expires="
                         + expiryDate.toUTCString();
-    },  
+    },
   },
   ...App,
 }).$mount("#app");

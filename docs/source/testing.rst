@@ -39,7 +39,7 @@ and the tests are developed for both Firefox and Chrome web browsers.
 
     $ cd swift_browser_ui_frontend/
     $ npm install -g pnpm@7
-    $ pnpm install 
+    $ pnpm install
     $ pnpm run build
     $ cd  ..
     $ pnpm install cypress

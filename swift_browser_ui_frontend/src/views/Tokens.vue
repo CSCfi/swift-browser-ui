@@ -23,7 +23,7 @@
             name="newIdentifier"
             expanded
           />
-        
+
           <p
             id="submitButton"
             class="control"
