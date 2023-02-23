@@ -84,8 +84,10 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
         # doesn't exist
         session_key: str = swift_browser_ui.upload.common.get_session_id(request)
         request.app.pop(session_key)
-    finally:
-        return aiohttp.web.Response(status=204)
+    except KeyError:
+        pass
+
+    return aiohttp.web.Response(status=204)
 
 
 @aiohttp.web.middleware

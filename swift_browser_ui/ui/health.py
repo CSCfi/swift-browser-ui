@@ -125,8 +125,8 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
         "status": "Ok",
     }
 
-    services: typing.Dict[str, typing.Any] = dict()
-    performance: typing.Dict[str, typing.Any] = dict()
+    services: typing.Dict[str, typing.Any] = {}
+    performance: typing.Dict[str, typing.Any] = {}
 
     signature = swift_browser_ui.common.signature.sign_api_request("/health")
     api_params = {
