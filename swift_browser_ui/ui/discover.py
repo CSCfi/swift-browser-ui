@@ -2,6 +2,7 @@
 
 
 from typing import Union
+
 import aiohttp.web
 
 from swift_browser_ui.ui.settings import setd

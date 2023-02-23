@@ -2,12 +2,12 @@
 
 
 import logging
-import typing
 import os
-import aiohttp.web
-import aiohttp.client
-
 import ssl
+import typing
+
+import aiohttp.client
+import aiohttp.web
 import certifi
 
 from swift_browser_ui.upload import common

@@ -1,34 +1,31 @@
 """Sharing backend server module."""
 
 
-import sys
-import logging
 import asyncio
+import logging
+import sys
 import typing
 
 import aiohttp.web
 import uvloop
 
-
-import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_handlers
+import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
-
 from swift_browser_ui.sharing.api import (
-    has_access_handler,
     access_details_handler,
-    gave_access_handler,
-    shared_details_handler,
-    share_container_handler,
     delete_share_handler,
     edit_share_handler,
+    gave_access_handler,
+    handle_health_check,
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
-    handle_health_check,
+    has_access_handler,
+    share_container_handler,
+    shared_details_handler,
 )
 from swift_browser_ui.sharing.db import DBConn
-
 
 logging.basicConfig(level=logging.DEBUG)
 

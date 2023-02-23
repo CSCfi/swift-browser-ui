@@ -1,28 +1,28 @@
 """API handlers for swift-upload-runner."""
 
 
-import logging
-import typing
-import aiohttp.web
 import asyncio
 import base64
 import json
+import logging
 import os
+import typing
+
+import aiohttp.web
 
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
+    VAULT_CLIENT,
     get_encrypted_upload_instance,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
-    VAULT_CLIENT,
 )
 from swift_browser_ui.upload.download import (
-    FileDownloadProxy,
     ContainerArchiveDownloadProxy,
+    FileDownloadProxy,
 )
 from swift_browser_ui.upload.replicate import ObjectReplicationProxy
-
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

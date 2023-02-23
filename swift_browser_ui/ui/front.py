@@ -4,7 +4,6 @@ import typing
 
 import aiohttp.web
 import aiohttp_session
-
 from cryptography.fernet import InvalidToken
 
 from swift_browser_ui.ui.settings import setd

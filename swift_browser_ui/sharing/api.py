@@ -3,8 +3,8 @@
 
 import logging
 import os
-import aiohttp.web
 
+import aiohttp.web
 
 MODULE_LOGGER = logging.getLogger("api")
 MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

@@ -1,17 +1,16 @@
 """Authorization handlers for swift-upload-runner."""
 
 
+import logging
 import os
 import secrets
-import logging
 
 import aiohttp
 import aiohttp.web
 
-import swift_browser_ui.common.types
 import swift_browser_ui.common.signature
+import swift_browser_ui.common.types
 import swift_browser_ui.upload.common
-
 
 LOGGER = logging.getLogger(__name__)
 

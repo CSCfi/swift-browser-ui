@@ -1,10 +1,11 @@
 """A module for handling the project login related tasks."""
 
 
-import time
-import re
 import base64
 import binascii
+import re
+import time
+import typing
 
 # aiohttp
 import aiohttp.web
@@ -12,14 +13,11 @@ import aiohttp_session
 from multidict import MultiDictProxy
 from oidcrp.exception import OidcServiceError
 
-import typing
-
 from swift_browser_ui.ui._convenience import (
     disable_cache,
     get_availability_from_token,
 )
 from swift_browser_ui.ui.settings import setd
-
 
 HAKA_ENDPOINT = (
     "{endpoint}/auth/OS-FEDERATION/identity_providers"

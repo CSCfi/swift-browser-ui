@@ -1,19 +1,17 @@
 """Server upload propxy using aiohttp."""
-import base64
-import os
-import logging
 import asyncio
-import typing
+import base64
+import logging
+import os
 import secrets
-
 import ssl
-import certifi
+import typing
 
 import aiohttp
 import aiohttp.web
+import certifi
 
 import swift_browser_ui.upload.common as common
-
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())

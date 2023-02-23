@@ -37,8 +37,7 @@ The different configurations are also listed here:
 
 import logging
 from os import environ
-from typing import Union, Dict
-
+from typing import Dict, Union
 
 FORMAT = """\
 [%(asctime)s][%(name)s][%(process)d %(processName)s][%(levelname)-8s] \

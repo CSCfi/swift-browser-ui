@@ -1,8 +1,8 @@
 """Module containing launchers for the different services."""
 
-import swift_browser_ui.ui.shell
-import swift_browser_ui.sharing.server
 import swift_browser_ui.request.server
+import swift_browser_ui.sharing.server
+import swift_browser_ui.ui.shell
 import swift_browser_ui.upload.server
 
 

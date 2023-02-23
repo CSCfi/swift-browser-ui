@@ -1,15 +1,14 @@
 """Common resources for swift-upload-runner."""
 
 
-import typing
 import logging
 import os
+import typing
 
 import aiohttp.web
 
 import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.upload import upload
-
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

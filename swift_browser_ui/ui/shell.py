@@ -7,10 +7,9 @@ import typing
 
 import click
 
-
 from swift_browser_ui.__init__ import __version__
-from swift_browser_ui.ui.settings import setd, set_key, FORMAT
-from swift_browser_ui.ui.server import servinit, run_server_insecure, run_server_secure
+from swift_browser_ui.ui.server import run_server_insecure, run_server_secure, servinit
+from swift_browser_ui.ui.settings import FORMAT, set_key, setd
 
 
 @click.group()

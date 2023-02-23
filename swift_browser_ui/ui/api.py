@@ -1,17 +1,15 @@
 """Project functions for handling API requests from front-end."""
 
+import asyncio
 import re
+import ssl
 import time
 import typing
-import asyncio
 import urllib.parse
 
 import aiohttp.web
 import aiohttp_session
-
-import ssl
 import certifi
-
 from swiftclient.utils import generate_temp_url
 
 from swift_browser_ui.ui._convenience import (
@@ -20,7 +18,6 @@ from swift_browser_ui.ui._convenience import (
     sign,
 )
 from swift_browser_ui.ui.settings import setd
-
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
