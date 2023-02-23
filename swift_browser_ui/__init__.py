@@ -1,5 +1,4 @@
-"""
-Web application for browsing OS Swift object storage.
+"""Web application for browsing OS Swift object storage.
 
 Uses OS keystone for authentication and python-swiftclient for communicating
 with the object storage.

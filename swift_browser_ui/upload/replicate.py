@@ -260,7 +260,6 @@ class ObjectReplicationProxy:
             self.source_host, container=self.source_container
         )
         LOGGER.debug(f"Container url: {container_url}")
-        objects: typing.Union[typing.List, str]
         async with self.client.get(
             common.generate_download_url(
                 self.source_host,

@@ -80,6 +80,7 @@ class EncryptedUploadProxy:
     def check_header(
         self,
     ) -> bool:
+        """Return wether the header has been uploaded."""
         return self.header_uploaded
 
     async def a_create_container(self) -> None:
