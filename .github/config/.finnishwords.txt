@@ -209,6 +209,7 @@ lisätietoja
 lisättiin
 lisätty
 lisättyjä
+lista
 loppuminen
 löydetty
 löydy
@@ -274,6 +275,7 @@ odota
 oheisesta
 ohje
 ohjeet
+ohjeita
 oikeuden
 oikeudet
 oikeuksia
@@ -495,7 +497,9 @@ tuloksia
 tunniste
 tunnisteet
 tunnisteita
+tunnukselle
 tunnuksen
+tunnuksista
 tunnus
 tunti
 tuo
@@ -530,6 +534,7 @@ valitut
 valmis
 varmasti
 varmistathan
+varten
 vastaanottajan
 vastaanottajien
 vastaanottimien

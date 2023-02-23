@@ -1,6 +1,8 @@
 <template>
   <c-card class="share-card">
-    <div class="heading">
+    <c-card-actions
+      justify="space-between"
+    >
       <h2 class="title is-4 has-text-dark">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
@@ -17,7 +19,7 @@
         />
         {{ $t("message.share.close") }}
       </c-button>
-    </div>
+    </c-card-actions>
     <c-card-content id="share-card-modal-content">
       <p class="is-6 has-text-dark">
         {{ $t("message.share.share_subtitle") }}
@@ -392,19 +394,12 @@ export default {
     };
   }
 
-  .heading {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    & > h2 {
-      margin: 0 !important;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  c-card-actions > h2 {
+    margin: 0 !important;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .toggle-instructions {
