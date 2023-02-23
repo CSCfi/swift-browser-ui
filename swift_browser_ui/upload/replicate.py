@@ -276,6 +276,6 @@ class ObjectReplicationProxy:
                 raise aiohttp.web.HTTPBadRequest(reason="Source container fetch failed")
             LOGGER.debug("Got container object listing")
             objects = await resp.text()
-            objects = objects.rstrip().lstrip().split("\n")
-            for i in objects:
+            objects_list = objects.rstrip().lstrip().split("\n")
+            for i in objects_list:
                 await self.a_copy_object(i)
