@@ -412,21 +412,17 @@ async def handle_project_lock(request: aiohttp.web.Request) -> aiohttp.web.Respo
 
     # Ditch all projects that aren't the one specified if project is defined
     if project in session["projects"]:
-        session["projects"] = {
-            k: v
-            for k, v in filter(
+        session["projects"] = dict(
+            filter(
                 lambda val: val[0] == project,
                 session["projects"].items(),
             )
-        }
+        )
     # If the project doesn't exist, allow all untainted projects
     else:
-        session["projects"] = {
-            k: v
-            for k, v in filter(
-                lambda val: not val[1]["tainted"], session["projects"].items()
-            )
-        }
+        session["projects"] = dict(
+            filter(lambda val: not val[1]["tainted"], session["projects"].items())
+        )
 
     if not session["projects"]:
         session.invalidate()

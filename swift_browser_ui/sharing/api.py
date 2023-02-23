@@ -24,7 +24,7 @@ async def has_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respon
 
 async def access_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle access-details endpoint query."""
-    access_details = dict()
+    access_details = {}
     access_details = await request.app["db_conn"].get_access_container_details(
         request.match_info["user"],
         request.query["owner"],
@@ -56,7 +56,7 @@ async def gave_access_handler(request: aiohttp.web.Request) -> aiohttp.web.Respo
 
 async def shared_details_handler(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle shared-details endpoint query."""
-    shared_details = dict()
+    shared_details = {}
     shared_details = await request.app["db_conn"].get_shared_container_details(
         request.match_info["owner"], request.match_info["container"]
     )

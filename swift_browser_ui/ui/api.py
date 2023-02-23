@@ -282,9 +282,9 @@ async def _swift_get_object_metadata_wrapper(
         meta = dict(filter(lambda i: "X-Object-Meta" in i[0], ret.headers.items()))
         meta = {k.replace("X-Object-Meta-", ""): v for k, v in meta.items()}
         if "s3cmd-attrs" in meta.keys():
-            meta["s3cmd-attrs"] = {
-                k: v for k, v in [j.split(":") for j in meta["s3cmd-attrs"].split("/")]
-            }
+            meta["s3cmd-attrs"] = dict(
+                [j.split(":") for j in meta["s3cmd-attrs"].split("/")]
+            )
     return (obj, meta)
 
 
