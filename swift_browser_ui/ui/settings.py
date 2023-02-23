@@ -1,5 +1,4 @@
-"""
-Module containing all of the settings required in the global scope.
+"""Module containing all of the settings required in the global scope.
 
 The different configurations are also listed here:
 

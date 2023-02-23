@@ -1,5 +1,4 @@
-"""
-Miscallaneous convenience functions used during the project.
+"""Miscallaneous convenience functions used during the project.
 
 Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
@@ -66,8 +65,7 @@ def disable_cache(
 
 
 async def get_availability_from_token(token: str, client: aiohttp.ClientSession) -> dict:
-    """
-    List available domains and projects for the unscoped token specified.
+    """List available domains and projects for the unscoped token specified.
 
     Params:
         token: str

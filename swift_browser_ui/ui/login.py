@@ -48,6 +48,7 @@ async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 
 async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Finalize OIDC login and create a new session with the data from the OIDC provicer."""
     # Response from AAI must have the query params `state` and `code`
     if "state" in request.query and "code" in request.query:
         request.app["Log"].debug("AAI response contained the correct params.")

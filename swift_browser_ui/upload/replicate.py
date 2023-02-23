@@ -12,7 +12,6 @@ import certifi
 
 from swift_browser_ui.upload import common
 
-
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
@@ -261,7 +260,6 @@ class ObjectReplicationProxy:
             self.source_host, container=self.source_container
         )
         LOGGER.debug(f"Container url: {container_url}")
-        objects: typing.Union[typing.List, str]
         async with self.client.get(
             common.generate_download_url(
                 self.source_host,

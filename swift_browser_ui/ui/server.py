@@ -328,8 +328,7 @@ def run_server_secure(
     cert_file: str,
     cert_key: str,
 ) -> None:
-    """
-    Run the server securely with a given ssl context.
+    """Run the server securely with a given ssl context.
 
     While this function is incomplete, the project is safe to run in
     production only via a TLS termination proxy with e.g. NGINX.
