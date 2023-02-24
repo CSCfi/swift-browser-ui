@@ -83,7 +83,7 @@ class VaultClient:
     _vault_token = str()
     service = "SD-Connect"
 
-    def __init__(self, http_client: ClientSession):
+    def __init__(self, http_client: ClientSession) -> None:
         """Reuse an existing http client, and load environment variables.
 
         :param http_client: aiohttp.ClientSession instance
