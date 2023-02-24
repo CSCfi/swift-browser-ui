@@ -218,11 +218,24 @@ export default {
   max-height: 75vh;
 }
 
-@media screen and (max-height: 720px), (max-width: 992px ) {
-  .add-folder {
-    max-height: 50vh;
+@media screen and (max-width: 773px), (max-height: 580px) {
+   .add-folder {
+    top: -5rem;
   }
 }
+
+@media screen and (max-height: 580px) and (max-width: 773px), 
+(max-width: 533px) {
+  .add-folder {
+    top: -9rem;
+  }
+}
+
+@media screen and (max-height: 580px) and (max-width: 533px) {
+  .add-folder {
+    top: -13rem;
+   }
+ }
 
 c-card-content {
   color: var(--csc-dark-grey);
