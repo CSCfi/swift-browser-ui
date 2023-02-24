@@ -13,7 +13,7 @@ matrix:
       context_visible_first: true
       escapes: '\\[\\`~]'
       delimiters:
-      # Ignore text between inline back ticks as this is code or hightlight words
+      # Ignore text between inline back ticks as this is code or highlight words
       - open: '(?P<open>`+)'
         close: '(?P=open)'
       # Ignore surrounded in <> as in RST it is link

@@ -2,7 +2,7 @@ Getting started
 ===============
 
 .. note::
-    Please note that the things related to project development aren’t
+    Please note that the things related to project development aren't
     documented here, and everything on this page is only related to the
     running of the program
 

@@ -24,7 +24,7 @@ cscfi
 dev
 devel
 devenv
-Dockerfile
+dockerfile
 dockerfiles
 drag'n'drop
 dropdown
@@ -70,14 +70,16 @@ plaintext
 png
 pnpm
 postgres
+postgresql
 pouta
 proxying
 py
 quickstart
+redis
 saml
 serviceworker
 sha
-sLo
+slo
 ssl
 sso
 subcommands
@@ -94,7 +96,7 @@ tooltip
 tox
 ttl
 txt
-Ue
+ue
 ui
 untrusted
 url
@@ -106,4 +108,5 @@ vue
 wasm
 webdrivers
 websso
+whitelisted
 yml
