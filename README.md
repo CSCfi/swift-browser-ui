@@ -57,7 +57,7 @@ pnpm install
 pnpm run build
 cd ..
 pip install -r requirements.txt
-pip install .
+pip install .[]
 ```
 
 After install there should be `swift-browser-ui` command available:
@@ -117,8 +117,7 @@ Install python dependencies, optionally in a virtual environment.
 ```bash
 python3 -m venv venv --prompt swiftui  # Optional step, creates python virtual environment
 source venv/bin/activate  # activates virtual environment
-pip install -Ue .
-pip install honcho  # to run the Procfile
+pip install -Ue .[docs,test,dev]
 ```
 
 Set up the environment variables
