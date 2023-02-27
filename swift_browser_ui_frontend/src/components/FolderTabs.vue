@@ -3,6 +3,7 @@
     :value="activeTab"
     :mandatory="true"
     data-testid="folder-tabs"
+    :aria-label="$t('label.folder_tabs')"
   >
     <c-button
       v-for="tab in tabs"

@@ -1,14 +1,16 @@
 <template>
   <c-card class="edit-tags">
-    <h4 class="title is-4 has-text-dark">
+    <h2 class="title is-4 has-text-dark">
       {{ $t('message.editTags') }}
-    </h4>
+    </h2>
     <c-card-content>
       <b-field
         custom-class="has-text-dark"
       >
         <b-taginput
           v-model="tags"
+          :aria-label="$t('label.edit_tag')"
+          aria-close-label="delete-tag"
           ellipsis
           maxlength="20"
           has-counter
@@ -45,11 +47,14 @@ import {
   updateObjectMeta,
   updateContainerMeta,
 } from "@/common/api";
+
 import {
   taginputConfirmKeys,
   getTagsForObjects,
   getTagsForContainer,
 } from "@/common/conv";
+
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
 
 export default {
   name: "EditTagsModal",
@@ -136,6 +141,7 @@ export default {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
+      modifyBrowserPageStyles();
     },
     saveObjectTags: function () {
       let objectMeta = [

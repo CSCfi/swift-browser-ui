@@ -13,7 +13,10 @@
             <c-login-card
               :src="require('@/assets/banner_login.png')"
             >
-              <c-alert type="error" v-if="!idb">
+              <c-alert
+                v-if="!idb"
+                type="error"
+              >
                 <p>{{ $t('message.error.idb_text') }}</p>
               </c-alert>
               <c-login-card-title>

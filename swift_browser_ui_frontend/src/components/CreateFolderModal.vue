@@ -4,9 +4,9 @@
       id="createFolder-modal-content"
       class="modal-content-wrapper"
     >
-      <h4 class="title is-4 has-text-dark">
+      <h2 class="title is-4 has-text-dark">
         {{ $t("message.container_ops.addContainer") }}
-      </h4>
+      </h2>
       <c-card-content>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
@@ -14,8 +14,10 @@
         <b-field
           custom-class="has-text-dark"
           :label="$t('message.container_ops.folderName')"
+          label-for="folderName"
         >
           <b-input
+            id="folderName"
             v-model="folderName"
             name="foldername"
             aria-required="true"
@@ -25,9 +27,12 @@
         <b-field
           custom-class="has-text-dark"
           :label="$t('message.tagName')"
+          label-for="folder-taginput"
         >
           <b-taginput
+            id="folder-taginput"
             v-model="tags"
+            aria-close-label="delete-tag"
             ellipsis
             maxlength="20"
             has-counter

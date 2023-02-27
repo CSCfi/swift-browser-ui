@@ -1,67 +1,76 @@
 <template>
   <c-card class="share-card">
-    <header>
-      <h4 class="title is-4 has-text-dark">
+    <c-card-actions
+      justify="space-between"
+    >
+      <h2 class="title is-4 has-text-dark">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
-      </h4>
+      </h2>
       <c-button
         text
         @click="toggleShareModal"
         @keyup.enter="toggleShareModal"
       >
-        <c-icon-button text>
-          <i class="mdi mdi-close" />
-        </c-icon-button>
+        <c-icon
+          :path="mdiClose"
+          alt=""
+          aria-hidden="true"
+        />
         {{ $t("message.share.close") }}
       </c-button>
-    </header>
+    </c-card-actions>
     <c-card-content id="share-card-modal-content">
-      <h6 class="subtitle is-6 has-text-dark">
+      <p class="is-6 has-text-dark">
         {{ $t("message.share.share_subtitle") }}
-      </h6>
+      </p>
       <c-container>
         <c-row
           justify="space-between"
           align="center"
         >
-          <h5 class="title is-5 has-text-dark">
+          <h3 class="title is-5 has-text-dark">
             {{ $t("message.share.share_other_projects") }}
-          </h5>
+          </h3>
           <c-flex
             class="toggle-instructions"
+            :aria-label="$t('shareid_instructions')"
             @click="toggleShareGuide"
+            @keyup.enter="toggleShareGuide"
           >
-            <c-icon-button
-              v-show="!openShareGuide"
-              text
+            <c-icon
+              :path="mdiInformationOutline"
+              alt=""
+              aria-hidden="true"
+            />
+            <c-link
+              underline
+              tabindex="0"
             >
-              <i class="mdi mdi-information-outline" />
-            </c-icon-button>
-            <c-link underline>
               {{ openShareGuide ? $t("message.share.close_instructions")
                 : $t("message.share.instructions")
               }}
             </c-link>
           </c-flex>
         </c-row>
-        <div
+        <ul
           v-show="openShareGuide"
           class="guide-content"
         >
-          <p>
+          <li>
             {{ $t("message.share.share_guide_step1") }}
-          </p>
-          <p>
+          </li>
+          <li>
             {{ $t("message.share.share_guide_step2") }}
-          </p>
-        </div>
+          </li>
+        </ul>
         <b-field
           custom-class="field"
           type="is-dark"
         >
           <b-taginput
             v-model="tags"
+            :aria-label="$t('label.list_of_shareids')"
             ellipsis
             :placeholder="$t('message.share.field_placeholder')"
           />
@@ -91,17 +100,19 @@
       >
         <div class="shared-notification">
           {{ isShared ? $t('message.share.shared_successfully')
-            : isPermissionUpdated ? $t('message.share.update_permission') 
+            : isPermissionUpdated ? $t('message.share.update_permission')
               : $t('message.share.remove_permission')
           }}
           <c-button
             text
             size="small"
-            @click="closeSharedNotification()"
+            @click="closeSharedNotification"
           >
-            <c-icon-button text>
-              <i class="mdi mdi-close" />
-            </c-icon-button>
+            <c-icon
+              :path="mdiClose"
+              alt=""
+              aria-hidden="true"
+            />
             {{ $t("message.share.close") }}
           </c-button>
         </div>
@@ -128,7 +139,11 @@ import {
   addAccessControlMeta,
   getSharedContainerAddress,
 } from "@/common/api";
+
+import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+
 import ShareModalTable from "@/components/ShareModalTable";
+import { mdiClose, mdiInformationOutline } from "@mdi/js";
 
 export default {
   name: "ShareModal",
@@ -147,6 +162,8 @@ export default {
       isPermissionRemoved: false,
       isPermissionUpdated: false,
       timeout: null,
+      mdiClose,
+      mdiInformationOutline,
     };
   },
   computed: {
@@ -296,6 +313,7 @@ export default {
       this.tags = [];
       this.isShared = false;
       this.isPermissionRemoved = false;
+      modifyBrowserPageStyles();
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);
@@ -374,25 +392,14 @@ export default {
     & > * {
       margin: 0 !important;
     };
-    & > p {
-      margin-top: -1rem !important;
-      font-size: 0.875rem;
-    }
   }
 
-  header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 1rem;
-    & > h3 {
-      margin: 0 !important;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  c-card-actions > h2 {
+    margin: 0 !important;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .toggle-instructions {
@@ -400,7 +407,7 @@ export default {
     align-items: center;
   }
 
-  h5 {
+  h3 {
     margin: 0 !important;
   }
 
@@ -409,6 +416,10 @@ export default {
     background-color: $csc-primary-lighter;
     justify-content: space-between;
     padding: 1rem;
+  }
+
+  .guide-content > li {
+    font-size: 0.875rem;
   }
 
   c-select {

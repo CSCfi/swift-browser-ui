@@ -1,12 +1,16 @@
 <template>
   <div id="mainContainer">
-    <div id="subContainer">
+    <nav>
       <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
         :multiple-projects="multipleProjects"
         :projects="projects"
       />
-      <ProgressBar v-if="isUploading || isChunking" />
+    </nav>
+    <div
+      id="mainContent"
+      role="main"
+    >
       <c-modal
         v-csc-model="openCreateFolderModal"
         width="64vw"
@@ -62,8 +66,8 @@
           </p>
         </div>
       </c-toasts>
-      <CFooter />
     </div>
+    <CFooter />
   </div>
 </template>
 
@@ -89,10 +93,12 @@ html, body {
 
 #mainContainer {
   min-height: 100vh;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-#subContainer {
+#mainContent {
   height: 100%;
   min-height: 100vh;
   display: flex;
@@ -100,7 +106,7 @@ html, body {
   z-index: 1;
 }
 
-.subContainer-additionalStyles {
+.mainContainer-additionalStyles {
   position: fixed;
   width: 100%;
 }

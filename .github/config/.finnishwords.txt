@@ -31,6 +31,7 @@ epäonnistuttiin
 erikseen
 erillinen
 erissä
+erityyppisiä
 esimerkiksi
 esitetty
 estetty
@@ -127,6 +128,7 @@ käyttäjällä
 käyttäjän
 käyttäjänimestä
 käyttäjänimi
+käyttäjätuki
 käyttäjätunnuksella
 käyttäjätunnustasi
 käyttöä
@@ -142,6 +144,7 @@ kenttää
 kerran
 keskus
 kestää
+kieli
 kiellettyä
 kiinni
 kirjaudu
@@ -199,12 +202,14 @@ lataus
 latauslinkki
 leikepöydälle
 liitä
+linkki
 lisää
 lisätäksesi
 lisätietoja
 lisättiin
 lisätty
 lisättyjä
+lista
 loppuminen
 löydetty
 löydy
@@ -259,6 +264,7 @@ nimetä
 nimi
 nykyinen
 nykyisen
+nykyisiä
 objekteja
 objekti
 objektia
@@ -269,6 +275,7 @@ odota
 oheisesta
 ohje
 ohjeet
+ohjeita
 oikeuden
 oikeudet
 oikeuksia
@@ -454,6 +461,7 @@ tätä
 taustalla
 tavallisesti
 täytyy
+tekijänoikeustiedot
 tekstinä
 tiedosto
 tiedostoa
@@ -489,13 +497,16 @@ tuloksia
 tunniste
 tunnisteet
 tunnisteita
+tunnukselle
 tunnuksen
+tunnuksista
 tunnus
 tunti
 tuo
 tuottaa
 tyhjä
 tyhjennä
+työkaluvinkki
 tyyppi
 ulos
 useille
@@ -523,6 +534,7 @@ valitut
 valmis
 varmasti
 varmistathan
+varten
 vastaanottajan
 vastaanottajien
 vastaanottimien

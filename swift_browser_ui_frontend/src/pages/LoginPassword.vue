@@ -5,7 +5,7 @@
 <template>
   <c-main>
     <c-toolbar class="relative">
-      <c-csc-logo />
+      <c-csc-logo alt="CSC-Logo" />
       {{ $t('message.program_name') }}
       <c-spacer />
       <LanguageSelector />

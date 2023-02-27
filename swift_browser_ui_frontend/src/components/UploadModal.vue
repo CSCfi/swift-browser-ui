@@ -4,13 +4,13 @@
       id="upload-modal-content"
       class="modal-content-wrapper"
     >
-      <h4 class="title is-4 has-text-dark">
+      <h2 class="title is-4 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
-      </h4>
+      </h2>
       <c-card-content>
-        <h6 class="title is-6 has-text-dark">
+        <h3 class="title is-6 has-text-dark">
           1. {{ $t("message.encrypt.upload_step1") }}
-        </h6>
+        </h3>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
@@ -24,9 +24,9 @@
           required
           @changeQuery="onQueryChange"
         />
-        <h6 class="title is-6 has-text-dark">
+        <h3 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
-        </h6>
+        </h3>
         <div
           class="dropArea is-flex
                 is-align-items-center is-justify-content-center"
