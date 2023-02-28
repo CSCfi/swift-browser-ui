@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #965) Show notification when changing permission in share modal
 - (GH #969) Automate building wasm with npm
 - (GH #983) Make elements more semantic and improve accessibility for screen reader users
+- (GH #989) Make selected Display Options consistent when browsing between pages
 
 ### Changed
 
