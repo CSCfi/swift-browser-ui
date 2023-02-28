@@ -1,7 +1,6 @@
 // Project main imports
 import Vue from "vue";
 import App from "@/pages/BrowserPage.vue";
-import Buefy from "buefy";
 import router from "@/common/router";
 import VueI18n from "vue-i18n";
 
@@ -105,7 +104,6 @@ Vue.config.warnHandler = function (msg, vm, info) {
   if (DEV) console.log("Vue warning: ", msg, vm, info);
 };
 
-Vue.use(Buefy);
 Vue.use(VueI18n);
 
 // Configure csc-ui

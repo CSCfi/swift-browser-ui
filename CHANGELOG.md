@@ -126,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `swift_browser_ui_frontend/src/views/ShareRequests.vue`
     - `swift_browser_ui_frontend/src/views/SharedFrom.vue`
     - `swift_browser_ui_frontend/src/views/SharedTo.vue`
+- (GL #944) Buefy dependency
 
 ## [v2.0.1]
 

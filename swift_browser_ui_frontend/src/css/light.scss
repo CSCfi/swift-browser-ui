@@ -1,10 +1,9 @@
 @charset "utf-8";
 
-$buefy-prime: #7957D5;
 $light-blue: hsl(204, 86%, 65%); 
 
 $link: $light-blue;
-$primary: $buefy-prime;
+$primary: #7957D5;
 
 @import "~bulma/sass/utilities/_all";
 
@@ -15,4 +14,3 @@ $primary: $buefy-prime;
 @import "~bulma/sass/form/_all.sass";
 @import "~bulma/sass/grid/_all.sass";
 @import "~bulma/sass/layout/_all.sass";
-@import "~buefy/src/scss/buefy";
