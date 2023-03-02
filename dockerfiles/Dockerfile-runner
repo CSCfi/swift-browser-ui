@@ -1,6 +1,7 @@
 FROM python:3.10-alpine3.17 as BACKEND
 
-COPY setup.py /root/swift_upload_runner/setup.py
+COPY pyproject.toml /root/swift_upload_runner/pyproject.toml
+COPY README.md /root/swift_upload_runner/README.md
 COPY swift_browser_ui /root/swift_upload_runner/swift_browser_ui
 
 RUN --mount=type=cache,target=/root/.cache/pip \
