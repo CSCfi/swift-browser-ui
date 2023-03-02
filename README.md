@@ -247,7 +247,7 @@ vault write auth/approle/role/swiftbrowser \
 Get role and secret (= username and password), set them to the environment variables mentioned above
 ```
 vault read auth/approle/role/swiftbrowser/role-id
-vault write -f auth/approle/role/swiftbrowser/secret-id secret_id=swiftui
+vault write -f auth/approle/role/swiftbrowser/custom-secret-id secret_id=swiftui
 ```
 
 ### Testing
