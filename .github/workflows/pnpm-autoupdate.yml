@@ -41,4 +41,4 @@ jobs:
 
             Close and re-open this PR for the checks to run.
           branch: update/pnpm-updates
-          base: devel
+          # base: devel
