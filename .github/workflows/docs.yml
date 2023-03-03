@@ -1,6 +1,6 @@
 name: Documentation check
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   style_check:

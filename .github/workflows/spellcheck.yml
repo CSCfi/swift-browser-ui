@@ -1,6 +1,6 @@
 name: Spelling Errors Check
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:

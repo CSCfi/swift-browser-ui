@@ -1,6 +1,6 @@
 name: Javascript ESLint check
 
-on: [push]
+on: [push, pull_request]
 
 
 jobs:
