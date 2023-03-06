@@ -17,19 +17,14 @@
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
-        <b-field
-          custom-class="has-text-dark"
+        <c-text-field
+          id="folderName"
+          v-csc-model="folderName"
           :label="$t('message.container_ops.folderName')"
-          label-for="folderName"
-        >
-          <b-input
-            id="folderName"
-            v-model="folderName"
-            name="foldername"
-            aria-required="true"
-            data-testid="folder-name"
-          />
-        </b-field>
+          name="foldername"
+          aria-required="true"
+          data-testid="folder-name"
+        />
         <label
           class="taginput-label"
           label-for="create-folder-taginput"

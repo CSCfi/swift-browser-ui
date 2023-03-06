@@ -79,15 +79,18 @@
       id="optionsbar"
       justify="space-between"
     >
-      <div class="search">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.objects.filterBy')"
-          type="search"
-          icon="filter-variant"
+      <c-text-field
+        id="search"
+        v-csc-model="searchQuery"
+        name="search"
+        :placeholder="$t('message.objects.filterBy')"
+        type="search"
+      >
+        <i 
+          slot="pre" 
+          class="mdi mdi-filter-variant mdi-24px"
         />
-      </div>
-
+      </c-text-field>
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
@@ -763,6 +766,10 @@ export default {
 
 <style scoped lang="scss">
 @import "@/css/prod.scss";
+
+#search {
+  flex: 0.4;
+}
 
 .back-link {
   display: flex;
