@@ -31,9 +31,8 @@
           v-if="searchArray.length > 0 && searchArray[0].length > 1"
           class="media empty-search"
         >
-          <b-loading
-            v-model="isSearching"
-            :is-full-page="false"
+          <c-loader
+            v-show="isSearching"
           />
           <div
             v-show="!isSearching"
