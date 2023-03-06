@@ -64,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #1014) Replace buefy snackbars with custom c-toasts from `csc-ui`
 - (GL #944) Replace buefy b-input with c-text-field from `csc-ui`
 - (GL #944) Replace buefy b-button with c-button from `csc-ui`
+- (GL #944) Replace buefy b-select with c-select from `csc-ui`
 
 ### Fixed
 

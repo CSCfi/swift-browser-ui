@@ -29,23 +29,14 @@
         </c-button>
       </p>
       <p>
-        <b-field class="locale-changed block center">
-          <b-select
-            v-model="$i18n.locale"
-            placeholder="Language"
-            icon="earth"
-            expanded
-            @input="setCookieLang ()"
-          >
-            <option
-              v-for="lang in langs"
-              :key="lang.value"
-              :value="lang.value"
-            >
-              {{ lang.ph }}
-            </option>
-          </b-select>
-        </b-field>
+        <c-select
+          v-csc-model="$i18n.locale"
+          class="locale-changed block center"
+          placeholder="Language"
+          :items="langs"
+          fit
+          @input="setCookieLang ()"
+        />
       </p>
     </div>
   </div>
