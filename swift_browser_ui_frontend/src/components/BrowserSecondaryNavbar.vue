@@ -1,6 +1,11 @@
 <template>
   <div id="secondary-navbar">
     <div class="container is-fluid">
+      <c-toasts
+        id="delete-toasts"
+        vertical="center"
+        data-testid="delete-toasts"
+      />
       <div
         v-if="multipleProjects"
         class="navbar-item select-project"
@@ -139,7 +144,7 @@ export default {
     },
     copyProjectId: function () {
       const toastMessage = {
-        duration: 3000,
+        duration: 6000,
         persistent: false,
         progress: false,
       };
@@ -154,7 +159,7 @@ export default {
           // avoid multiple clicks of copy button
           // that can stack up the toasts
           // by setting the value for 'copy'
-          setTimeout(() => { this.copy = false; }, 3000);
+          setTimeout(() => { this.copy = false; }, 6000);
         },() => {
           document.querySelector("#copy-toasts").addToast(
             { ...toastMessage,

@@ -613,10 +613,11 @@ export default {
     },
     deleteObjects: function (deletables) {
       this.clearSelections();
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
+      document.querySelector("#delete-toasts").addToast(
+        { progress: false,
+          type: "success",
+          message: this.$t("message.objects.deleteSuccess")},
+      );
       let to_remove = new Array;
       if (typeof(deletables) == "string") {
         to_remove.push(deletables);

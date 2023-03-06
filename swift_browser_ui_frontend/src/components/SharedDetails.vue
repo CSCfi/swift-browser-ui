@@ -90,11 +90,7 @@ export default {
           this.container,
           [recipient],
         ).then(() => {
-          this.$buefy.toast.open({
-            duration: 5000,
-            message: this.$t("message.share.success_delete"),
-            type: "is-success",
-          });
+          //removed toast for page that will be deleted
         });
       });
     },

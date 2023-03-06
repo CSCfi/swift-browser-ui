@@ -4,6 +4,12 @@
       id="createFolder-modal-content"
       class="modal-content-wrapper"
     >
+      <c-toasts
+        id="createModal-toasts"
+        data-testid="createModal-toasts"
+        vertical="bottom"
+        absolute
+      />
       <h2 class="title is-4 has-text-dark">
         {{ $t("message.container_ops.addContainer") }}
       </h2>
@@ -127,22 +133,17 @@ export default {
           this.toggleCreateFolderModal();
         })
         .catch(err => {
+          let errorMessage = this.$t("message.error.createFail");
           if (err.message.match("Container name already in use")) {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.inUse"),
-              type: "is-danger",
-            });
+            errorMessage = this.$t("message.error.inUse");
           } else if (err.message.match("Invalid container name")) {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.invalidName"),
-              type: "is-danger",
-            });
-          } else {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.createFail"),
-              type: "is-danger",
-            });
+            errorMessage = this.$t("message.error.invalidName");
           }
+          document.querySelector("#createModal-toasts").addToast(
+            { progress: false,
+              type: "error",
+              message: errorMessage },
+          );
         });
     },
     toggleCreateFolderModal: function () {

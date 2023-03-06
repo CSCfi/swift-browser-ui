@@ -118,6 +118,10 @@
         </span>
       </template>
     </b-table>
+    <c-toasts
+      id="token-toasts"
+      data-testid="token-toasts"
+    />
   </div>
 </template>
 
@@ -137,6 +141,7 @@ export default {
       defaultSortDirection: "asc",
       newIdentifier: "",
       latest: undefined,
+      copied: false,
     };
   },
   computed: {
@@ -176,15 +181,24 @@ export default {
       return this.tokens.includes(identifier) ? true : false;
     },
     copyTokenHex: function () {
-      navigator.clipboard.writeText(
-        this.latest,
-      ).then(() => {
-        this.$buefy.toast.open({
-          message: this.$t("message.tokens.tokenCopied"),
-          type: "is-success",
-          queue: false,
+      if (!this.copied) {
+        navigator.clipboard.writeText(
+          this.latest,
+        ).then(() => {
+          this.copied = true;
+          document.querySelector("#token-toasts").addToast(
+            {
+              duration: 6000,
+              type: "success",
+              progress: false,
+              message: this.$t("message.tokens.tokenCopied"),
+            },
+          );
+          //like with ShareID copy button:
+          //avoid overlapping toasts
+          setTimeout(() => { this.copied = false; }, 6000);
         });
-      });
+      }
     },
   },
 };
