@@ -12,17 +12,13 @@
           {{ $t('message.tokens.back') }}
         </router-link>
       </section>
-      <b-field grouped>
-        <b-field
-          :label="$t('message.tokens.identLabel')"
-          :message="$t('message.tokens.identMessage')"
-          expanded
-        >
-          <b-input
-            v-model="newIdentifier"
-            name="newIdentifier"
-            expanded
-          />
+      <c-text-field
+        v-csc-model="newIdentifier"
+        name="newIdentifier"
+        :label="$t('message.tokens.identLabel')"
+        :hint="$t('message.tokens.identMessage')"
+        fit
+      />
 
           <p
             id="submitButton"
