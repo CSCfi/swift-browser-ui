@@ -72,7 +72,6 @@
 <script>
 import { swiftCreateContainer } from "@/common/api";
 import {
-  taginputConfirmKeys,
   tokenize,
 } from "@/common/conv";
 
@@ -91,7 +90,6 @@ export default {
     return {
       folderName: "",
       tags: [],
-      taginputConfirmKeys,
       projectNumber: "",
     };
   },

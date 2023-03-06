@@ -73,7 +73,7 @@
             :value="$t('message.encrypt.advancedOptions')"
           >
             <c-container>
-              <c-checkbox 
+              <c-checkbox
                 v-csc-model="ownPrivateKey"
                 :label="$t('message.encrypt.ephemeral')"
               />
@@ -96,7 +96,7 @@
               </c-flex>
             </c-container>
             <c-container>
-              <c-checkbox 
+              <c-checkbox
                 v-csc-model="multipleReceivers"
                 :label="$t('message.encrypt.multipleReceivers')"
               />
@@ -157,7 +157,6 @@ import EncryptedUploadSession from "@/common/upload";
 import { getUploadEndpoint } from "@/common/api";
 import {
   getHumanReadableSize,
-  taginputConfirmKeys,
   truncate,
   computeSHA256,
 } from "@/common/conv";
@@ -178,7 +177,6 @@ export default {
     return {
       inputFolder: "",
       selectedFolder: null,
-      taginputConfirmKeys,
       filteredItems: [],
       tooLarge: false,
       ownPrivateKey: false,
