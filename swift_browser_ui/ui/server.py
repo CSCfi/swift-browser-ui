@@ -19,6 +19,7 @@ import aiohttp_session
 import aiohttp_session.redis_storage
 
 import aioredis
+import aioredis.sentinel
 
 from oidcrp.rp_handler import RPHandler
 
@@ -35,6 +36,7 @@ from swift_browser_ui.ui.login import (
     oidc_end,
     handle_login,
     handle_logout,
+    sso_query_begin_oidc,
     sso_query_begin,
     sso_query_end,
     credentials_login_end,
@@ -102,17 +104,43 @@ async def servinit(
         middlewares = middlewares + inject_middleware
     app = aiohttp.web.Application()  # type: ignore
 
+    async def on_prepare(
+        _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
+    ) -> None:
+        """Modify Server headers."""
+        response.headers["Server"] = "Swift Browser"
+
+    # add custom response headers
+    app.on_response_prepare.append(on_prepare)
+
     # Initialize aiohttp_session
-    redis_creds = ""
+    sentinel_url = str(os.environ.get("SWIFT_UI_REDIS_SENTINEL_HOST", ""))
+    # we make this str to make it easier to check if exists
+    sentinel_port = str(os.environ.get("SWIFT_UI_REDIS_SENTINEL_PORT", ""))
+    sentinel_master = os.environ.get("SWIFT_UI_REDIS_SENTINEL_MASTER", "mymaster")
+
     redis_user = str(os.environ.get("SWIFT_UI_REDIS_USER", ""))
     redis_password = str(os.environ.get("SWIFT_UI_REDIS_PASSWORD", ""))
-    if redis_user and redis_password:
-        redis_creds = f"{redis_user}:{redis_password}@"
-    redis_port = str(os.environ.get("SWIFT_UI_REDIS_PORT", ""))
-    if redis_port:
-        redis_port = f":{redis_port}"
-    redis_host = str(os.environ.get("SWIFT_UI_REDIS_HOST", "localhost"))
-    redis = aioredis.from_url(f"redis://{redis_creds}{redis_host}{redis_port}")
+
+    redis: aioredis.Redis
+    if sentinel_url and sentinel_port:
+        # we forward the auth to redis so no need for auth on sentinel
+        sentinel = aioredis.sentinel.Sentinel([(str(sentinel_url), int(sentinel_port))])
+
+        redis = sentinel.master_for(
+            service_name=sentinel_master,
+            redis_class=aioredis.Redis,
+            password=redis_password,
+            username=redis_user,
+        )
+    else:
+        redis_port = str(os.environ.get("SWIFT_UI_REDIS_PORT", ""))
+        redis_host = str(os.environ.get("SWIFT_UI_REDIS_HOST", "localhost"))
+
+        redis_creds = ""
+        if redis_user and redis_password:
+            redis_creds = f"{redis_user}:{redis_password}@"
+        redis = aioredis.from_url(f"redis://{redis_creds}{redis_host}:{redis_port}")
     storage = aiohttp_session.redis_storage.RedisStorage(
         redis,
         cookie_name="SWIFT_UI_SESSION",
@@ -187,6 +215,7 @@ async def servinit(
             aiohttp.web.get("/login", handle_login),
             aiohttp.web.get("/login/kill", handle_logout),
             aiohttp.web.get("/login/front", sso_query_begin),
+            aiohttp.web.get("/login/oidc_front", sso_query_begin_oidc),
             aiohttp.web.post("/login/return", sso_query_end),
             aiohttp.web.post("/login/websso", sso_query_end),
             aiohttp.web.post("/login/credentials", credentials_login_end),

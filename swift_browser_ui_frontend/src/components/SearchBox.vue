@@ -6,6 +6,7 @@
     <b-autocomplete
       id="searchbox"
       v-model="searchQuery"
+      :aria-label="$t('label.searchbox')"
       icon="magnify"
       clearable
       :placeholder="$t('message.search.searchBy')"

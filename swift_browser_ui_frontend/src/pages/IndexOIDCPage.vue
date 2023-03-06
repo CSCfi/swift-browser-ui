@@ -4,6 +4,7 @@
       <c-csc-logo />
       {{ $t('message.program_name') }}
       <c-spacer />
+      <LanguageSelector />
     </c-toolbar>
     <c-row>
       <c-flex>
@@ -12,6 +13,12 @@
             <c-login-card
               :src="require('@/assets/banner_login.png')"
             >
+              <c-alert
+                v-if="!idb"
+                type="error"
+              >
+                <p>{{ $t('message.error.idb_text') }}</p>
+              </c-alert>
               <c-login-card-title>
                 {{ $t('message.program_name') }}
               </c-login-card-title>
@@ -29,23 +36,20 @@
                   {{ $t('message.indexOIDC.logIn') }}
                 </c-button>
               </c-login-card-actions>
-              <c-login-card-content v-if="!idb">
-                <p>
-                  <strong>{{ $t('message.error.idb') }}</strong>
-                </p>
-              </c-login-card-content>
             </c-login-card>
           </form>
         </c-container>
       </c-flex>
     </c-row>
+    <CFooter />
   </c-main>
 </template>
 
 <style>
 c-main {
   height: unset;
-  min-height: 100vh
+  min-height: 100vh;
+  justify-content: space-between;
 }
 c-login-card {
   margin: 2rem auto;

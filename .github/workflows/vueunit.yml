@@ -1,22 +1,26 @@
-# name: Vue.js Unit Tests
+name: Vue.js Unit Tests
 
-# on: [push]
+on: [pull_request]
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         node: ["18"]
-#     name: Jest unit tests
-#     steps:
-#       - uses: actions/checkout@v3
-#       - name: Setup node ${{ matrix.node }}
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: ${{ matrix.node-version }}
-#       - name: Install dependencies and run tests
-#         run: |
-#           pushd swift_browser_ui_frontend
-#           npm install
-#           npm test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["18"]
+    name: Jest unit tests
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "pnpm"
+          cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Install dependencies and run tests
+        run: |
+          pushd swift_browser_ui_frontend
+          pnpm install
+          pnpm run test

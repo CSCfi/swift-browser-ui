@@ -55,6 +55,15 @@ async def init_server() -> aiohttp.web.Application:
         ]
     )
 
+    async def on_prepare(
+        _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
+    ) -> None:
+        """Modify Server headers."""
+        response.headers["Server"] = "Swift Browser Request"
+
+    # add custom response headers
+    app.on_response_prepare.append(on_prepare)
+
     app.add_routes(
         [
             aiohttp.web.get("/health", handle_health_check),

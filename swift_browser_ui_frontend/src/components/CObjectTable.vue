@@ -6,8 +6,9 @@
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
+    :hide-footer="disablePagination"
     :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyProject')"
+    :no-data-text="$t('message.emptyContainer')"
     :sort-by="sortBy"
     :sort-direction="sortDirection"
     selection-property="name"
@@ -193,10 +194,11 @@ export default {
                     size: "small",
                     title: "Edit tags",
                     path: mdiPencilOutline,
-                    onClick: ({ data }) => toggleEditTagsModal(data),
+                    onClick: ({ data }) => 
+                      toggleEditTagsModal(data.name.value, null),
                     onKeyUp: (event) => {
                       if(event.keyCode === 13) {
-                        toggleEditTagsModal(item.data);
+                        toggleEditTagsModal(item.data.name.value, null);
                       }
                     },
                   },

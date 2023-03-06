@@ -65,7 +65,6 @@ class SwiftSharingRequest:
         }
 
         async with self.session.post(url, params=params, ssl=ssl_context) as resp:
-
             return await self._handler_response(resp)
 
     async def list_made_requests(self, user: str) -> typing.List[dict]:
@@ -81,7 +80,6 @@ class SwiftSharingRequest:
         }
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
-
             return await self._handler_response(resp)
 
     async def list_owned_requests(self, user: str) -> typing.List[dict]:
@@ -97,7 +95,6 @@ class SwiftSharingRequest:
         }
 
         async with self.session.get(url, params=params, ssl=ssl_context) as resp:
-
             return await self._handler_response(resp)
 
     async def list_container_requests(self, container: str) -> typing.List[dict]:

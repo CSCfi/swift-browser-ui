@@ -64,7 +64,7 @@ html, body {
   flex-direction: column;
   margin: auto;
   align-content: center;
-  justify-content: center;;
+  justify-content: center;
 }
 .center {
   width: 50%;

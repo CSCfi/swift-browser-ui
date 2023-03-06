@@ -40,16 +40,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #565) Skip second login button click when first authentication used Haka.
 - (GH #599) Add support for streaming uploads allowing > 1GiB files encrypted uploads
   - Also fixes some bugs related to encrypted upload engine and repeatability
+- (GH #928) Add git commit version and link to footer
+- Add option to specify database port and SSL mode for request and sharing DB connections
+- Add option to specify Redis Sentinel connection parameters for redis configured with Sentinel
+- avoid giving over-detailed `Server` values from services
+- (GH #962) Use OIDC as the default Keystone login provider for SSO
+- (GH #965) Show notification when changing permission in share modal
+- (GH #969) Automate building wasm with npm
+- (GH #983) Make elements more semantic and improve accessibility for screen reader users
+- (GH #989) Make selected Display Options consistent when browsing between pages
 
 ### Changed
 
+- Migrate to using pyproject.toml with hatch as build tool
+- Allow installing js deps with pnpm install --prod for faster and smaller install
 - (GH #514) Cypress integration tests run against keystone-swift container from https://github.com/CSCfi/docker-keystone-swift.
 - Improved development workflow, and added development and testing instructions.
 - (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
 - (GH #601) Add a language selector to login page menu bar, using `csc-ui`
+- (GH #920) Optimize docker builds, making them faster by leveraging more caching mechanisms and removing unnecessary package installation
 
 ### Fixed
 
+- Fix missing footer and language-selector component setup
+- Use oidc login Keystone provider for automatically forwarded SSO in oidc return
 - (GH #851) Kill upload sessions upon finishing uploads to allow reuploading same files in all cases
 - (GH #884) Fixed multiple bugs
   - Redirected to AllFolders view whenever the selected project changes
@@ -72,6 +86,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #549) Fixed changing project keeps loading previous project data.
 - (GH #550) Fixed changing project shows container from previous project.
 - Correctly set the global font to Museo sans
+- (GL #27) Fixed the sorting of `Shared status` table column.
+- Unify editing tags modal for objects and containers
+- Fix 'Share ID' tooltip formatting.
+- Libupload path in docker files
+- Fix hiding the pagination of data tables
+- Fix shared objects functionality: visibility, deleting, editing tags
 
 ## [v2.0.1]
 

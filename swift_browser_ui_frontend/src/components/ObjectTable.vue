@@ -18,7 +18,7 @@
     <div class="folder-info">
       <div class="folder-info-heading">
         <i class="mdi mdi-folder-outline" />
-        <span>{{ container }}</span>
+        <span>{{ containerName }}</span>
       </div>
       <ul class="folder-details">
         <li>
@@ -101,7 +101,7 @@
     </c-row>
     <CObjectTable
       :objs="filteredObjects.length ? filteredObjects : oList"
-      :disable-pagination="disablePagination"
+      :disable-pagination="hidePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
@@ -143,7 +143,7 @@ export default {
       dateOfSharing: "",
       oList: [],
       selected: undefined,
-      disablePagination: false,
+      hidePagination: false,
       renderFolders: true,
       hideTags: false,
       searchQuery: "",
@@ -154,6 +154,7 @@ export default {
       filteredObjects: [],
       inCurrentFolder: [],
       tableOptions: [],
+      currentContainer: {},
     };
   },
   computed: {
@@ -166,7 +167,7 @@ export default {
     project () {
       return this.$route.params.project;
     },
-    container () {
+    containerName () {
       return this.$route.params.container;
     },
     client () {
@@ -209,7 +210,7 @@ export default {
       if(this.$route.name !== "SharedObjects") {
         return;
       }
-      this.oList = {value: this.sharedObjects};
+      this.oList = this.sharedObjects;
     },
     prefix: function () {
       if (this.renderFolders) {
@@ -219,6 +220,15 @@ export default {
     },
     queryPage: function () {
       this.currentPage = this.queryPage;
+    },
+    currentContainer: function() {
+      const savedDisplayOptions = this.currentContainer.displayOptions;
+      if (savedDisplayOptions) {
+        this.renderFolders = savedDisplayOptions.renderFolders;
+        this.hideTags = savedDisplayOptions.hideTags;
+        this.hidePagination = savedDisplayOptions.hidePagination;
+        this.setTableOptionsMenu();
+      }
     },
     oList: function() {
       if (this.oList !== undefined && this.$route.query.selected) {
@@ -284,7 +294,7 @@ export default {
       if (this.client) {
         await this.client.getShareDetails(
           this.project,
-          this.container,
+          this.containerName,
         ).then(
           async (ret) => {
             if (ret.length > 0) {
@@ -297,12 +307,12 @@ export default {
             }
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
-                cont => cont.container === this.container) > -1) {
+                cont => cont.container === this.containerName) > -1) {
                 this.isSharedFolder = true;
                 const sharedDetails
                   = await getAccessDetails(
                     this.project,
-                    this.container,
+                    this.containerName,
                     this.$route.params.owner,
                   );
 
@@ -327,11 +337,11 @@ export default {
     },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", true);
-      this.$store.commit("setFolderName", this.container);
+      this.$store.commit("setFolderName", this.containerName);
     },
     updateObjects: async function () {
       if (
-        this.container === undefined
+        this.containerName === undefined
         || (
           this.active.id === undefined
           && this.$route.params.project
@@ -356,16 +366,16 @@ export default {
         return;
       }
 
-      const container = await this.$store.state.db.containers
+      this.currentContainer = await this.$store.state.db.containers
         .get({
           projectID: this.$route.params.project,
-          name: this.container,
+          name: this.containerName,
         });
 
       this.oList = useObservable(
         liveQuery(() =>
           this.$store.state.db.objects
-            .where({"containerID": container.id})
+            .where({"containerID": this.currentContainer.id})
             .toArray(),
         ),
       );
@@ -374,7 +384,7 @@ export default {
         "updateObjects",
         {
           projectID: this.$route.params.project,
-          container: container,
+          container: this.currentContainer,
           signal: this.abortController.signal,
         },
       );
@@ -597,6 +607,8 @@ export default {
         type: "is-danger",
         hasIcon: true,
         onConfirm: () => {this.deleteObjects(deletables);},
+        ariaModal: true,
+        ariaRole: "alertdialog",
       });
     },
     deleteObjects: function (deletables) {
@@ -620,7 +632,7 @@ export default {
         this.$store.state.db.objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
-        this.$route.params.project,
+        this.ownerProject,
         this.$route.params.container,
         to_remove,
       ).then(async () => {
@@ -629,6 +641,7 @@ export default {
             "updateSharedObjects",
             {
               project: this.$route.params.project,
+              owner: this.ownerProject,
               container: {
                 name: this.$route.params.container,
                 id: 0,
@@ -649,13 +662,26 @@ export default {
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
+      const displayOptions = {
+        renderFolders: this.renderFolders,
+        hideTags: this.hideTags,
+        hidePagination: this.renderFolders,
+      };
+
       this.tableOptions = [
         {
           name: this.renderFolders
             ? this.$t("message.tableOptions.text")
             : this.$t("message.tableOptions.render"),
-          action: () => {
+          action: async () => {
             this.renderFolders = !(this.renderFolders);
+
+            const newContainer = {
+              ...this.currentContainer,
+              displayOptions: {
+                ...displayOptions, renderFolders: this.renderFolders}};
+            await this.$store.state.db.containers.put(newContainer);
+
             this.setTableOptionsMenu();
           },
         },
@@ -663,21 +689,35 @@ export default {
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")
             : this.$t("message.tableOptions.hideTags"),
-          action: () => {
+          action: async () => {
             this.hideTags = !(this.hideTags);
+
+            const newContainer = {
+              ...this.currentContainer,
+              displayOptions: { ...displayOptions, hideTags: this.hideTags}};
+            await this.$store.state.db.containers.put(newContainer);
+
             this.setTableOptionsMenu();
           },
         },
         {
-          name: this.disablePagination
+          name: this.hidePagination
             ? this.$t("message.tableOptions.showPagination")
             : this.$t("message.tableOptions.hidePagination"),
-          action: () => {
-            this.disablePagination = !(this.disablePagination);
+          action: async () => {
+            this.hidePagination = !(this.hidePagination);
+
+            const newContainer = {
+              ...this.currentContainer,
+              displayOptions: {
+                ...displayOptions, hidePagination: this.hidePagination}};
+            await this.$store.state.db.containers.put(newContainer);
+
             this.setTableOptionsMenu();
           },
         },
       ];
+
       this.optionsKey++;
     },
     setSelectionActionButtons() {

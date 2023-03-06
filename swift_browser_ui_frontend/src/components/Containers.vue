@@ -18,7 +18,7 @@
     </c-row>
     <ContainerTable
       :conts="renderingContainers"
-      :disable-pagination="disablePagination"
+      :disable-pagination="hidePagination"
       :hide-tags="hideTags"
     />
   </div>
@@ -39,7 +39,8 @@ export default {
   },
   data: function () {
     return {
-      disablePagination: false,
+      currentProject: {},
+      hidePagination: false,
       hideTags: false,
       selected: undefined,
       isPaginated: true,
@@ -74,15 +75,20 @@ export default {
     active: function () {
       this.fetchContainers();
     },
-    project: function () {
-      this.fetchContainers();
-    },
     openShareModal: function () {
       if(!this.openShareModal) {
         this.fetchContainers();
       }
     },
-    "containers": function() {
+    currentProject: function() {
+      const savedDisplayOptions = this.currentProject.displayOptions;
+      if (savedDisplayOptions) {
+        this.hideTags = savedDisplayOptions.hideTags;
+        this.hidePagination = savedDisplayOptions.hidePagination;
+        this.updateTableOptions();
+      }
+    },
+    containers: function() {
       if (this.$route.name === "SharedFrom") {
         getSharingContainers(this.$route.params.project)
           .then(sharingContainers => {
@@ -125,22 +131,45 @@ export default {
   },
   methods: {
     updateTableOptions: function () {
+      const displayOptions = {
+        hideTags: this.hideTags,
+        hidePagination: this.renderFolders,
+      };
       this.tableOptions = [
         {
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")
             : this.$t("message.tableOptions.hideTags"),
-          action: () => {
+          action: async () => {
             this.hideTags = !(this.hideTags);
+
+            const newProject = {
+              ...this.currentProject,
+              displayOptions: {
+                ...displayOptions,
+                hideTags: this.hideTags,
+              },
+            };
+            await this.$store.state.db.projects.put(newProject);
+
             this.updateTableOptions();
           },
         },
         {
-          name: this.disablePagination
+          name: this.hidePagination
             ? this.$t("message.tableOptions.showPagination")
             : this.$t("message.tableOptions.hidePagination"),
-          action: () => {
-            this.disablePagination = !(this.disablePagination);
+          action: async () => {
+            this.hidePagination = !(this.hidePagination);
+
+            const newProject = {
+              ...this.currentProject,
+              displayOptions: {
+                ...displayOptions,
+                hidePagination: this.hidePagination,
+              },
+            };
+            await this.$store.state.db.projects.put(newProject);
             this.updateTableOptions();
           },
         },
@@ -154,6 +183,10 @@ export default {
       ) {
         return;
       }
+
+      this.currentProject = await this.$store.state.db.projects.get({
+        id: this.active.id,
+      });
 
       this.containers = useObservable(
         liveQuery(() =>

@@ -1,3 +1,25 @@
+if (process.env.NODE_ENV === "development") {
+  const { execSync } = require("child_process");
+  const shell = (cmd) => execSync(cmd, {encoding: "utf8"}).trim();
+
+  try {
+    const branch = shell("git branch --show-current");
+    const version = shell("git describe --always --long --tags");
+    const hash = shell("git rev-parse HEAD");
+    const url = "https://github.com/CSCfi/swift-browser-ui/commit/";
+
+    process.env.VUE_APP_GIT_VERSION = `${branch} | ${version}`;
+    process.env.VUE_APP_GIT_LINK = url + hash;
+
+    console.log(process.env.VUE_APP_GIT_VERSION);
+    console.log(process.env.VUE_APP_GIT_LINK);
+  }
+  catch(error){
+    console.log("Failed to get version from git");
+    console.log(error);
+  }
+}
+
 const proxyTo = `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`;
 const oidcEnabled = process.env.OIDC_ENABLED === "True";
 

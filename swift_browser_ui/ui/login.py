@@ -26,6 +26,11 @@ HAKA_ENDPOINT = (
     "/haka/protocols/saml2/websso?origin={origin}"
 ).format
 
+HAKA_OIDC_ENDPOINT = (
+    "{endpoint}/auth/OS-FEDERATION/identity_providers"
+    "/{oidc}/protocols/openid/websso?origin={origin}"
+).format
+
 
 async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Redirect to OpenID Connect provider."""
@@ -93,8 +98,9 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
     )
 
     if session["oidc"]["userinfo"].get("homeFederation", "") == "Haka":
-        response.headers["Location"] = HAKA_ENDPOINT(
+        response.headers["Location"] = HAKA_OIDC_ENDPOINT(
             endpoint=str(setd["auth_endpoint_url"]),
+            oidc=str(setd["keystone_oidc_provider"]),
             origin=str(setd["set_origin_address"]),
         )
 
@@ -151,6 +157,32 @@ async def sso_query_begin(
     )
 
     return response
+
+
+async def sso_query_begin_oidc(
+    request: typing.Union[aiohttp.web.Request, None]
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Initiate a federated Keystone authentication with OIDC."""
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+
+    if request and setd["oidc_enabled"]:
+        session = await aiohttp_session.get_session(request)
+        if "oidc" not in session:
+            return aiohttp.web.Response(status=302, headers={"Location": "/"})
+    if not setd["has_trust"]:
+        response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
+        return disable_cache(response)
+
+    return aiohttp.web.Response(
+        status=302,
+        headers={
+            "Location": HAKA_OIDC_ENDPOINT(
+                endpoint=str(setd["auth_endpoint_url"]),
+                oidc=str(setd["keystone_oidc_provider"]),
+                origin=str(setd["set_origin_address"]),
+            ),
+        },
+    )
 
 
 def test_token(
@@ -235,17 +267,17 @@ async def credentials_login_end(
         },
     ) as resp:
         if resp.status == 400:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPBadRequest(reason="No username or password provided.")
         if resp.status == 401:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPUnauthorized(
                 reason="Wrong username or password, or no access to the service."
             )
         if resp.status != 201:
-            text = await (resp.text())
+            text = await resp.text()
             request.app["Log"].debug(text)
             raise aiohttp.web.HTTPUnauthorized
 

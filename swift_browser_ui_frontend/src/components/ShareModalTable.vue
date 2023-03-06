@@ -1,8 +1,8 @@
 <template>
   <c-container>
-    <h5 class="title is-5 has-text-dark">
+    <h3 class="title is-5 has-text-dark">
       {{ $t("message.share.shared_table_title") }}
-    </h5>
+    </h3>
     <c-data-table
       v-if="tableData.length > 0"
       :data.prop="tableData"
@@ -133,6 +133,7 @@ export default {
         [sharedProjectId],
         rights,
       );
+      this.$emit("updateSharedFolder");
     },
     deleteFolderShare: function (folderData) {
       removeAccessControlMeta(

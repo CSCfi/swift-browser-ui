@@ -1,6 +1,6 @@
 name: Python Unit Tests
 
-on: [push]
+on: [pull_request]
 
 jobs:
   unit_test:
@@ -23,11 +23,20 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions coverage
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+    - name: Use Node.js ${{ matrix.node }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node }}
+        cache: 'pnpm'
+        cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
     - name: Install frontend
       run: |
         pushd swift_browser_ui_frontend
-        npm install
-        npm run build
+        pnpm install --prod
+        pnpm run docker-build
     - name: Run unit tests
       run: |
         tox -e pytest

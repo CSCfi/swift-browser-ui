@@ -56,6 +56,7 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "auth_endpoint_url": environ.get(
         "BROWSER_START_AUTH_ENDPOINT_URL", environ.get("OS_AUTH_URL", "")
     ),
+    "keystone_oidc_provider": environ.get("BROWSER_START_KEYSTONE_OIDC_PROVIDER", "oidc"),
     "sharing_endpoint": environ.get("BROWSER_START_SHARING_ENDPOINT_URL", None),
     "sharing_internal_endpoint": environ.get(
         "BROWSER_START_SHARING_INT_ENDPOINT_URL", None

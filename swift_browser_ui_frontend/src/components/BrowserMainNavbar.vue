@@ -4,15 +4,12 @@
       <router-link
         class="navbar-item pl-4"
         :to="`/browse/${uname}/${active.id}`"
+        :aria-label="$t('label.csclogo')"
       >
-        <c-csc-logo />
-      </router-link>
-
-      <router-link
-        class="navbar-item app-name"
-        :to="`/browse/${uname}/${active.id}`"
-      >
-        <b class="app-name">{{ $t("message.program_name") }}</b>
+        <c-csc-logo alt="CSC_Logo" />
+        <h1 class="app-name">
+          {{ $t("message.program_name") }}
+        </h1>
       </router-link>
 
       <c-spacer />
@@ -21,6 +18,7 @@
         <c-menu
           v-for="item of navigationMenuItems"
           :key="item.title"
+          :aria-label="item.ariaLabel"
           :items.prop="item.subs.map(subItem => ({
             name: subItem.title,
             action: () => {
@@ -157,6 +155,7 @@ export default {
           title: this.currentLang,
           icon: "mdi-web",
           testid: "language-selector",
+          ariaLabel: this.$t("label.language_menu"),
           subs: this.langs.map(lang => ({
             title: lang.ph,
             action: () => {
@@ -169,6 +168,7 @@ export default {
           title: this.$t("message.support"),
           icon: "mdi-help-circle-outline",
           testid: "support-menu",
+          ariaLabel: this.$t("label.support_menu"),
           subs: [
             {
               title: this.$t("message.supportMenu.manual"),
@@ -194,6 +194,7 @@ export default {
           title: this.uname,
           icon: "mdi-account",
           testid: "user-menu",
+          ariaLabel: this.$t("label.project_info"),
           subs: [
             {
               title: this.$t("message.dashboard.project_info"),
@@ -248,12 +249,17 @@ export default {
 
   .app-name {
     color: $csc-grey;
-    font-size: 20px;
+    font-size: 1.25rem;
+    margin-left: 2rem;
   }
 
   .desktop-menu {
     display: flex;
     align-items: center;
+  }
+
+  c-menu {
+    z-index: 1;
   }
 
   @media screen and (max-width: 767px) {

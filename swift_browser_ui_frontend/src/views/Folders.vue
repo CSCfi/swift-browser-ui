@@ -1,5 +1,8 @@
 <template>
-  <c-flex class="container-box">
+  <c-flex
+    class="container-box"
+    role="region"
+  >
     <FolderTabs />
     <div
       v-for="component of folderComponents"

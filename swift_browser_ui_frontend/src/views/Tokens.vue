@@ -23,7 +23,7 @@
             name="newIdentifier"
             expanded
           />
-        
+
           <p
             id="submitButton"
             class="control"
@@ -83,7 +83,6 @@
       </b-table-column>
       <b-table-column
         field="controls"
-        label=""
       >
         <template #default="props">
           <div class="field has-addons">

@@ -1,130 +1,44 @@
-# Build libsodium
-FROM emscripten/emsdk:latest AS SODIUM
-
-RUN wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable.tar.gz \
-    && tar xvf libsodium-1.0.18-stable.tar.gz && cd libsodium-stable \
-    && dist-build/emscripten.sh --sumo
-
-# Build openssl
-FROM emscripten/emsdk:latest AS OPENSSL
-
-RUN wget https://www.openssl.org/source/openssl-1.1.1s.tar.gz \
-    && bash -c 'if [[ $(sha256sum < openssl-1.1.1s.tar.gz) != *$(curl https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256)* ]]; then echo $(sha256sum < openssl-1.1.1s.tar.gz) $(curl https://www.openssl.org/source/openssl-1.1.1s.tar.gz.sha256); echo Downloaded file checksum does not match. ; exit 1; fi' \
-    && tar xvf openssl-1.1.1s.tar.gz \
-    && cd openssl-1.1.1s \
-    && emconfigure ./Configure linux-generic64 no-asm no-threads no-engine no-hw no-weak-ssl-ciphers no-dtls no-shared no-dso --prefix=/emsdk/upstream \
-    && sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile \
-    && sed -i '/^CFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
-    && sed -i '/^CXXFLAGS/ s/$/ -D__STDC_NO_ATOMICS__=1/' Makefile \
-    && emmake make -j 2 all \
-    && emmake make install
-
-# Build libcrypt4gh
-FROM emscripten/emsdk:latest AS LIBCRYPT4GH
-
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
-
-RUN sudo apt-get update \
-    && sudo apt-get upgrade -y \
-    && sudo apt-get install -y autoconf
-
-RUN git clone https://github.com/CSCfi/libcrypt4gh
-
-# We'll skip linking libraries since emcc only produces static libraries
-# Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
-RUN  export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
-    && export LDFLAGS="-L/emsdk/upstream/lib" \
-    && cd libcrypt4gh \
-    && autoreconf --install \
-    && sed -i 's/$(LIBS) //' Makefile.in \
-    && emconfigure ./configure --prefix=/emsdk/upstream \
-    && emmake make \
-    && emmake make install
-
-# Build libcrypt4gh-keys
-FROM emscripten/emsdk:latest AS LIBCRYPT4GHKEYS
-
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
-
-COPY --from=OPENSSL /emsdk/upstream/include/ /emsdk/upstream/include/
-COPY --from=OPENSSL /emsdk/upstream/lib/ /emsdk/upstream/lib/
-
-RUN sudo apt-get update \
-    && sudo apt-get upgrade -y \
-    && sudo apt-get install -y autoconf build-essential
-
-RUN git clone https://github.com/CSCfi/libcrypt4gh-keys.git
-
-# We'll skip linking libraries since emcc only produces static libraries
-# Linking sodium at this point causes a linker conflict – thus cutting out $(LIBS)
-RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
-    && export LDFLAGS="-L/emsdk/upstream/lib" \
-    && cd libcrypt4gh-keys \
-    && autoreconf --install \
-    && sed -i 's/$(LIBS) //' Makefile.in \
-    && emconfigure ./configure --prefix=/emsdk/upstream --with-openssl=/emsdk/upstream \
-    && emmake make \
-    && emmake make install
-
 # Build wasm encryption
-FROM emscripten/emsdk:latest AS WASMCRYPT
-
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/include/ /emsdk/upstream/include/
-COPY --from=SODIUM /src/libsodium-stable/libsodium-js-sumo/lib/ /emsdk/upstream/lib/
-
-COPY --from=LIBCRYPT4GH /emsdk/upstream/include/ /emsdk/upstream/include/
-COPY --from=LIBCRYPT4GH /emsdk/upstream/lib/ /emsdk/upstream/lib/
-
-COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/include/ /emsdk/upstream/include/
-COPY --from=LIBCRYPT4GHKEYS /emsdk/upstream/lib/ /emsdk/upstream/lib/
+FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.1.0 AS WASMCRYPT
 
 COPY swift_browser_ui_frontend/wasm/ /src/
 
-RUN export EMCC_CFLAGS="-I/emsdk/upstream/include -L/emsdk/upstream/lib" \
-    && export EMCC_FORCE_STDLIBS=libc \
-    && emmake make
+RUN bash /bin/build_wasm.sh all
 
 # Build UI with encryption
 FROM node:18-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
-RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git python3 \
-    && rm -rf /var/cache/apk/*
+COPY swift_browser_ui_frontend/package.json /root/swift_ui/swift_browser_ui_frontend/package.json
+COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift_ui/swift_browser_ui_frontend/pnpm-lock.yaml
 
-COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    cd /root/swift_ui/swift_browser_ui_frontend \
+    && npm install -g pnpm@7 \
+    && pnpm install --prod
+
+COPY . /root/swift_ui/
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm install
-RUN cd /root/swift_ui/swift_browser_ui_frontend \
-    && OIDC_ENABLED=$OIDC_ENABLED npm run build-devel
+    && OIDC_ENABLED=$OIDC_ENABLED pnpm run build-devel
 
 FROM python:3.10-alpine3.17 as BACKEND
 
-RUN apk add --update \
-    && apk add --no-cache build-base curl-dev linux-headers bash git \
-    && apk add --no-cache openssl-dev libffi-dev rust cargo \
-    && rm -rf /var/cache/apk/*
-
-COPY requirements.txt /root/swift_ui/requirements.txt
-COPY setup.py /root/swift_ui/setup.py
+COPY pyproject.toml /root/swift_ui/pyproject.toml
+COPY README.md /root/swift_ui/README.md
 COPY swift_browser_ui /root/swift_ui/swift_browser_ui
 COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist /root/swift_ui/swift_browser_ui_frontend/dist
-COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/sw/libupload.js
-COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/sw/libupload.wasm
+COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/libupload.js
+COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/libupload.wasm
 
-RUN pip install --upgrade pip
-RUN pip install -r /root/swift_ui/requirements.txt
-RUN pip install /root/swift_ui
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip \
+    && pip install /root/swift_ui
 
 FROM python:3.10-alpine3.17
 
-RUN apk add --no-cache --update bash
-
-LABEL maintainer "CSC Developers"
+LABEL maintainer="CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCfi/swift-browser-ui"
 

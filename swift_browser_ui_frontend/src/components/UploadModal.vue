@@ -4,13 +4,13 @@
       id="upload-modal-content"
       class="modal-content-wrapper"
     >
-      <h4 class="title is-4 has-text-dark">
+      <h2 class="title is-4 has-text-dark">
         {{ $t("message.encrypt.uploadFiles") }}
-      </h4>
+      </h2>
       <c-card-content>
-        <h6 class="title is-6 has-text-dark">
+        <h3 class="title is-6 has-text-dark">
           1. {{ $t("message.encrypt.upload_step1") }}
-        </h6>
+        </h3>
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
@@ -24,9 +24,9 @@
           required
           @changeQuery="onQueryChange"
         />
-        <h6 class="title is-6 has-text-dark">
+        <h3 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
-        </h6>
+        </h3>
         <div
           class="dropArea is-flex
                 is-align-items-center is-justify-content-center"
@@ -58,24 +58,25 @@
         <p class="info-text is-size-6">
           {{ $t("message.encrypt.uploadedFiles") }}
           <b>{{ active.name }}</b>.
+          <c-link
+            :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
+            underline
+            target="_blank"
+          >
+            {{ $t("message.container_ops.viewProjectMembers") }}
+            <i class="mdi mdi-open-in-new" />
+          </c-link>
         </p>
-        <c-link
-          :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
-          underline
-          target="_blank"
-        >
-          {{ $t("message.container_ops.viewProjectMembers") }}
-          <i class="mdi mdi-open-in-new" />
-        </c-link>
         <c-accordion value="advancedOptions">
           <c-accordion-item
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
           >
             <c-container>
-              <c-switch v-csc-model="ownPrivateKey">
-                {{ $t("message.encrypt.ephemeral") }}
-              </c-switch>
+              <c-checkbox 
+                v-csc-model="ownPrivateKey"
+                :label="$t('message.encrypt.ephemeral')"
+              />
               <c-flex v-if="ownPrivateKey">
                 <c-text-field
                   v-csc-model="privkey"
@@ -95,9 +96,10 @@
               </c-flex>
             </c-container>
             <c-container>
-              <c-switch v-csc-model="multipleReceivers">
-                {{ $t("message.encrypt.multipleReceivers") }}
-              </c-switch>
+              <c-checkbox 
+                v-csc-model="multipleReceivers"
+                :label="$t('message.encrypt.multipleReceivers')"
+              />
               <c-flex v-if="multipleReceivers">
                 <c-text-field
                   v-csc-model="addRecvkey"
@@ -600,6 +602,7 @@ c-card-content {
 }
 
 c-autocomplete {
+  margin-top: -0.5rem;
   width: 70%;
 }
 
@@ -609,10 +612,6 @@ c-autocomplete {
 
 .title.is-6 {
   margin: 0 !important;
-}
-
-p.info-text.is-size-6 {
-  margin-bottom: -1rem;
 }
 
 .dropArea {
@@ -636,17 +635,8 @@ c-card-actions {
   border-top: 1px solid var(--csc-primary);
 }
 
-c-container {
-  margin-top: 1rem;
-}
-
-c-flex {
-  margin-top: 1rem;
-}
-
 c-data-table.publickey-table {
   margin-top: 1rem;
 }
-
 
 </style>

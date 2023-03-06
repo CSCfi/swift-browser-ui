@@ -29,7 +29,7 @@
         <c-button
           ghost
           data-testid="copy-projectId"
-          aria-describedby="shareidrules"
+          :aria-label="$t('label.copyshareid')"
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
         >
@@ -40,16 +40,22 @@
           {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
         </c-button>
         <div
-          id="shareidrules"
           class="tooltip"
           role="tooltip"
+          :aria-label="$t('label.shareid_tooltip')"
         >
-          <c-icon-button text>
-            <i class="mdi mdi-information-outline" />
-          </c-icon-button>
-          <span class="tooltip-content">
-            {{ $t("message.share.share_id_tooltip") }}
-          </span>
+          <c-icon
+            :path="path"
+            tabindex="0"
+          />
+          <!-- eslint-disable vue/no-v-html -->
+          <span
+            id="shareid-tooltip-content"
+            class="tooltip-content"
+            role="tootip"
+            v-html="$t('message.share.share_id_tooltip')"
+          />
+          <!-- eslint-enable vue/no-v-html -->
         </div>
       </div>
       <c-toasts
@@ -85,12 +91,15 @@ import {
   toggleCreateFolderModal,
   modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
+import { mdiInformationOutline } from "@mdi/js";
+
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
   data: function () {
     return {
       copy: false,
+      path: mdiInformationOutline,
     };
   },
   computed: {
@@ -201,6 +210,10 @@ export default {
     display: inline-block;
   }
 
+  c-icon {
+    margin-left: 0.5rem;
+  }
+
   .tooltip-content {
     visibility: hidden;
     text-align: left;
@@ -210,11 +223,13 @@ export default {
     border: 1px solid $csc-primary;
     border-radius: 0.375rem;
     padding: 1rem;
+    font-size: 14px;
+    line-height: 16px;
 
     /* Position the tooltip */
     position: absolute;
     z-index: 5;
-    top: 120%;
+    top: 150%;
     left: 50%;
     margin-left: -10rem;
   }
@@ -226,7 +241,7 @@ export default {
   .tooltip-content::before {
     content: " ";
     position: absolute;
-    left: 46%;
+    left: 48%;
     bottom: 100%;
     width: 0;
     height: 0;
@@ -236,7 +251,7 @@ export default {
   .tooltip-content::after {
     content: " ";
     position: absolute;
-    left: 50%;
+    left: 52%;
     bottom: 100%;
     width: 0;
     height: 0;

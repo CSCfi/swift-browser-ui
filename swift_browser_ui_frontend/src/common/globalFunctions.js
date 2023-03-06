@@ -8,12 +8,15 @@ export function toggleCreateFolderModal(folderName) {
   modifyBrowserPageStyles();
 }
 
-export function toggleEditTagsModal(object) {
+export function toggleEditTagsModal(objectName, containerName) {
   store.commit("toggleEditTagsModal", true);
-  const objectName = object.name.value;
   if (objectName) {
     store.commit("setObjectName", objectName);
   }
+  if (containerName) {
+    store.commit("setFolderName", containerName);
+  }
+  modifyBrowserPageStyles();
 }
 
 export function toggleCopyFolderModal(folderName, sourceProjectId) {
@@ -28,8 +31,8 @@ export function toggleCopyFolderModal(folderName, sourceProjectId) {
 }
 
 export function modifyBrowserPageStyles() {
-  const element = document.getElementById("subContainer");
-  element.classList.toggle("subContainer-additionalStyles");
+  const element = document.getElementById("mainContainer");
+  element.classList.toggle("mainContainer-additionalStyles");
 }
 
 export function getProjectNumber(project) {

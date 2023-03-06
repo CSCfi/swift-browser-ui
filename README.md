@@ -52,11 +52,12 @@ Getting started:
 git clone git@github.com:CSCfi/swift-browser-ui.git
 cd swift-browser-ui
 cd swift_browser_ui_frontend
-npm install
-npm run build
+npm install -g pnpm@7
+pnpm install
+pnpm run build
 cd ..
 pip install -r requirements.txt
-pip install .
+pip install .[]
 ```
 
 After install there should be `swift-browser-ui` command available:
@@ -107,8 +108,8 @@ cd swift-browser-ui
 Install frontend dependencies, and build (without encryption or OIDC enabled).
 
 ```bash
-npm --prefix swift_browser_ui_frontend install
-npm --prefix swift_browser_ui_frontend run build
+pnpm --prefix swift_browser_ui_frontend install
+pnpm --prefix swift_browser_ui_frontend run build
 ```
 
 Install python dependencies, optionally in a virtual environment.
@@ -116,8 +117,7 @@ Install python dependencies, optionally in a virtual environment.
 ```bash
 python3 -m venv venv --prompt swiftui  # Optional step, creates python virtual environment
 source venv/bin/activate  # activates virtual environment
-pip install -Ue .
-pip install honcho  # to run the Procfile
+pip install -Ue .[docs,test,dev]
 ```
 
 Set up the environment variables
@@ -198,7 +198,7 @@ honcho start
 
 To run with OIDC support, set the `OIDC_` environment variables in the `.env` file and restart the services. You'll also need to build the frontend again:
 
-    OIDC_ENABLED=True npm --prefix swift_browser_ui_frontend run build
+    OIDC_ENABLED=True pnpm --prefix swift_browser_ui_frontend run build
 
 CSC OIDC provider's certificate should be added to `certifi`'s certificate store:
 ```bash
@@ -247,7 +247,7 @@ vault write auth/approle/role/swiftbrowser \
 Get role and secret (= username and password), set them to the environment variables mentioned above
 ```
 vault read auth/approle/role/swiftbrowser/role-id
-vault write -f auth/approle/role/swiftbrowser/secret-id secret_id=swiftui
+vault write -f auth/approle/role/swiftbrowser/custom-secret-id secret_id=swiftui
 ```
 
 ### Testing
@@ -277,30 +277,7 @@ The frontend tests are run with `cypress`, and you will need
 2. Building the `wasm` code for encryption support
 3. using a specific command for generating data
 
-The encryption requires an additional build step: you'll need to build the `wasm` code. It can be built with one of the docker images, and you can copy the files from there.
-
-Build the image
-
-```bash
-docker buildx build -f devproxy/Dockerfile-emsdk-deps -t swift-browser-ui:wasmbuilder ./devproxy
-```
-
-Build the wasm files with provided container, which acts in practise
-like the make command in the specified folder. Available targets can be
-found in `$pwd/swift_browser_ui_frontend/wasm/Makefile`. Building all
-targets can be achieved with:
-
-```bash
-docker run --rm -it --mount type=bind,source="$(pwd)"/swift_browser_ui_frontend/wasm/,target=/src/ swift-browser-ui:wasmbuilder all
-```
-
-Copy these files into the static JS files built with the frontend.
-
-```bash
-cp swift_browser_ui_frontend/wasm/src/libupload* swift_browser_ui_frontend/public
-```
-
-These files will be integrated into the root folder of the built frontend.
+The wasm code is built automatically when using `npm` commands. It can also be triggered by running `npm run build-wasm`
 
 > NOTE: Remember that the encrypted upload features cannot be used without
 > having trusted TLS set up on all backend services.

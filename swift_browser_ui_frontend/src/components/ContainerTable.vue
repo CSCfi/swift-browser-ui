@@ -5,8 +5,9 @@
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
+    :hide-footer="disablePagination"
     :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyProject')"
+    :no-data-text="getEmptyText()"
     :sort-by="sortBy"
     :sort-direction="sortDirection"
     external-data
@@ -24,11 +25,12 @@ import {
   mdiFolder,
 } from "@mdi/js";
 import {
-  toggleCreateFolderModal,
+  toggleEditTagsModal,
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
   toggleCopyFolderModal,
+  modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
 import {swiftDeleteContainer} from "@/common/api";
 
@@ -255,12 +257,14 @@ export default {
                       this.$store.commit("toggleShareModal", true);
                       this.$store.commit(
                         "setFolderName", item.data.name.value);
+                      modifyBrowserPageStyles();
                     },
                     onKeyUp: (event) => {
                       if(event.keyCode === 13) {
                         this.$store.commit("toggleShareModal", true);
                         this.$store.commit(
-                          "setFolderName", item.name);
+                          "setFolderName", item.data.name.value);
+                        modifyBrowserPageStyles();
                       }
                     },
                     disabled: item.owner,
@@ -282,7 +286,7 @@ export default {
                       },
                       {
                         name: this.$t("message.editTags"),
-                        action: () => toggleCreateFolderModal(item.name),
+                        action: () => toggleEditTagsModal(null, item.name),
                       },
                       {
                         name: this.$t("message.delete"),
@@ -321,9 +325,25 @@ export default {
         itemCount: this.conts.length,
       };
     },
-    onSort(event) {
+    async onSort(event) {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
+
+      if (this.sortBy === "sharing") {
+        const sharingContainers = await getSharingContainers(this.active.id);
+        const sharedContainers = await getSharedContainers(this.active.id);
+
+        let allSharing = this.conts.map(x => sharingContainers.includes(x.name)
+          ? this.$t("message.table.sharing") : "");
+        let allShared = this.conts.map(x =>
+          sharedContainers.some(cont => cont.container === x.name)
+            ? this.$t("message.table.shared") : "");
+
+        let combined = allSharing.map((value, idx) =>
+          value !== "" ? value : allShared[idx]);
+        this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
+      }
+
       sortObjects(this.conts, this.sortBy, this.sortDirection);
     },
     setHeaders() {
@@ -358,6 +378,7 @@ export default {
           align: "end",
           value: null,
           sortable: false,
+          ariaLabel: "test",
         },
       ];
     },
@@ -408,6 +429,17 @@ export default {
       this.paginationOptions.textOverrides = this.locale === "fi"
         ? this.paginationTextOverrides
         : {};
+    },
+    getEmptyText() {
+      if (this.$route.name == "SharedFrom") {
+        return this.$t("message.emptyProject.sharedFrom");
+      }
+
+      if (this.$route.name == "SharedTo") {
+        return this.$t("message.emptyProject.sharedTo");
+      }
+
+      return this.$t("message.emptyProject.all");
     },
   },
 };

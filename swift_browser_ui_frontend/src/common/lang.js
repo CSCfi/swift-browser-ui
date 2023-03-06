@@ -15,7 +15,7 @@ let default_translations = {
         loginmethods: [
           {
             msg: "Log In with SSO",
-            href: "/login/front",
+            href: "/login/oidc_front",
           },
         ],
       },
@@ -46,10 +46,11 @@ let default_translations = {
         inUse: "Bucket name already in use.",
         invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
-        idb: "Browser not supported.",
+        idb: "Firefox in private mode is not supported.",
         idb_text:
-          "This browser is not supported.\n" +
-          "Please, use a supported browser.",
+          "Firefox is not supported in private mode. " +
+          "To continue, please turn off Firefox's private browsing or " +
+          "switch to another browser.",
       },
       dropFiles: "Drag and drop folders here or ",
       help: "Help",
@@ -76,8 +77,8 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. You can view" +
-          " and download files in this folder (Read access).",
+          "This folder is shared with you. You can view files only by" +
+          " using SD Desktop and download files in this folder (Read access)",
         shared_with_read_write:
           "This folder is shared with you. You can view, download, upload" +
           " and edit tags in this folder (Read and write access).",
@@ -174,13 +175,13 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         share_id_tooltip:
-          "When another project wants share a folder " +
-          "with your project: Select this button and " +
-          "send Share ID (now copied in your cache) " +
-          "to the project’s member. " +
-          "When you want to share a folder with " +
-          "another project. Ask Share ID from " +
-          "another project’s member.",
+          "<strong>When another project wants to share a folder " +
+          "with your project</strong><br/>Select this button and " +
+          "send the Share ID (now copied in your cache) " +
+          "to the project's member.<br/><br/> " +
+          "<strong>When you want to share a folder with " +
+          "another project</strong><br/>Ask the Share ID from " +
+          "another project's member.",
         close: "Close",
         instructions: "Share ID instructions",
         close_instructions: "Close instructions",
@@ -203,6 +204,7 @@ let default_translations = {
         write_perm: "Read and write",
         shared_successfully: "Folder was shared successfully!",
         remove_permission: "Permission was removed successfully!",
+        update_permission: "Permission was changed successfully.",
         shared_table_title: "Project's folder has been shared with",
         field_label: "Project Identifiers to share with",
         field_placeholder: "Add Share IDs",
@@ -260,10 +262,12 @@ let default_translations = {
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
       largeDownAction: "Enable",
-      emptyContainer: "This bucket is empty.",
-      emptyProject:
-        "The project does not contain any buckets " +
-        "or their use is not permitted.",
+      emptyContainer: "This folder has no content.",
+      emptyProject: {
+        all: "There are no folders in this project.",
+        sharedFrom: "You haven't shared any folders.",
+        sharedTo: "No folders have been shared with you.",
+      },
       emptyShared: "No buckets have been shared to the project.",
       emptyRequested:
         "No shared buckets have been requested for the " + "project.",
@@ -318,8 +322,8 @@ let default_translations = {
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete Bucket",
-        deleteNote: "Deleting a container requires "+ 
-          "deleting all objects first.",
+        deleteNote:
+          "Deleting a container requires " + "deleting all objects first.",
         deleteConfirmMessage:
           "Are you sure you want to delete this " + "bucket?",
         deleteSuccess: "Bucket Deleted",
@@ -463,14 +467,28 @@ let default_translations = {
         about: "About Sensitive Data Services",
       },
       footerMenu: {
-        title:"SD Connect",
-        serviceProvider:"CSC - IT Center for Science Ltd.",
-        serviceProviderLink:"https://csc.fi",
+        title: "SD Connect",
+        serviceProvider: "CSC - IT Center for Science Ltd.",
+        serviceProviderLink: "https://csc.fi",
         menuItem1: "Item 1",
         menuItemLink1: "#",
-        menuItem2:"Item 2",
-        menuItemLink2:"#",
+        menuItem2: "Item 2",
+        menuItemLink2: "#",
       },
+    },
+    label: {
+      csclogo: "link to main page",
+      language_menu: "select language",
+      support_menu: "user support",
+      project_info: "more project information",
+      copyshareid: "copy share id",
+      shareid_tooltip: "tooltip for share id",
+      shareid_instructions: "instructions for share id",
+      list_of_shareids: "list of share ids",
+      folder_tabs: "different types of folder",
+      searchbox: "search for folders",
+      edit_tag: "modify current tags",
+      footer: "copyright information",
     },
   },
   fi: {
@@ -481,7 +499,7 @@ let default_translations = {
         loginmethods: [
           {
             msg: "Kirjaudu SSO:ta käyttäen",
-            href: "/login",
+            href: "/login/oidc_front",
           },
         ],
       },
@@ -509,8 +527,11 @@ let default_translations = {
         inUse: "Säiliön nimi on jo käytössä.",
         invalidName: "Säiliön nimi ei kelpaa.",
         createFail: "Säiliön luonti epäonnistui.",
-        idb: "Selain ei tuettu.",
-        idb_text: "Tätä selainta ei tueta. Käytä tuettua selainta.",
+        idb: "Firefoxin yksityinen selaus ei ole tuettu.",
+        idb_text:
+          "Firefoxin yksityinen selaus ei ole tuettu." +
+          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta " +
+          "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",
@@ -638,11 +659,11 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jaa tunnus",
         share_id_tooltip:
-          "Mikäli toisesta projektista halutaan jakaa kansio projektisi " +
-          "kanssa: Valitse tämä nappi ja lähetä Jakotunnus toisen " +
-          "projektin jäsenelle. Halutessasi jakaa kansion toisen " +
-          "projektin kanssa, pyydä jakotunnusta joltakin kyseisen " +
-          "projektin jäseneltä.",
+          "<strong>Mikäli toisesta projektista halutaan jakaa kansio " +
+          "projektisi kanssa</strong><br/>Valitse tämä nappi ja lähetä " +
+          "Jakotunnus toisen projektin jäsenelle.<br/><br/><strong>" +
+          "Halutessasi jakaa kansion toisen projektin kanssa</strong>" +
+          "<br/>Pyydä jakotunnusta joltakin kyseisen projektin jäseneltä.",
         close: "Kiinni",
         instructions: "Jaa tunnus ohjeet",
         close_instructions: "Sulje ohjeet",
@@ -661,6 +682,7 @@ let default_translations = {
         write_perm: "Salli säiliöön kirjoitus",
         shared_successfully: "Kansion jakaminen onnistui!",
         remove_permission: "Lupa poistettiin onnistuneesti!",
+        update_permission: "Lupa muutettiin onnistuneesti.",
         shared_table_title: "Projektin kansio on jaettu",
         project_id: "Projektin tunnus",
         field_label: "Jaa projektitunnisteille",
@@ -720,9 +742,12 @@ let default_translations = {
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
         "nykyisen kirjautumisen ajaksi.",
       largeDownAction: "Hyväksy",
-      emptyContainer: "Säiliö on tyhjä.",
-      emptyProject:
-        "Projektilla ei ole säiliöitä " + "tai niiden käyttöä ei ole sallittu.",
+      emptyContainer: "Tämä kansio on tyhjä.",
+      emptyProject: {
+        all: "Tässä projektissa ei ole kansioita.",
+        sharedFrom: "Et ole jakanut yhtään kansiota.",
+        sharedTo: "Sinulle ei ole jaettu kansioita.",
+      },
       emptyShared: "Projektille ei ole jaettu säiliöitä.",
       emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
@@ -775,7 +800,8 @@ let default_translations = {
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteConfirm: "Poista säiliö",
-        deleteNote: "Säilön poistaminen edellyttää kaikkien " +
+        deleteNote:
+          "Säilön poistaminen edellyttää kaikkien " +
           "objektien poistamista ensin.",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
@@ -916,14 +942,28 @@ let default_translations = {
         about: "Tietoa",
       },
       footerMenu: {
-        title:"SD Connect",
-        serviceProvider:"CSC – Tieteen tietotekniikan keskus Oy",
-        serviceProviderLink:"#",
+        title: "SD Connect",
+        serviceProvider: "CSC – Tieteen tietotekniikan keskus Oy",
+        serviceProviderLink: "#",
         menuItem1: "Menu 1",
         menuItemLink1: "#",
-        menuItem2:"Menu 2",
-        menuItemLink2:"#",
+        menuItem2: "Menu 2",
+        menuItemLink2: "#",
       },
+    },
+    label: {
+      csclogo: "linkki etusivulle",
+      language_menu: "kieli",
+      support_menu: "käyttäjätuki",
+      project_info: "lisätietoja projektista",
+      copyshareid: "kopioi jakotunnus",
+      shareid_tooltip: "työkaluvinkki jaa tunnukselle",
+      shareid_instructions: "ohjeita varten jaa tunnukselle",
+      list_of_shareids: "lista jaa tunnuksista",
+      folder_tabs: "erityyppisiä kansioita",
+      searchbox: "etsi kansioita",
+      edit_tag: "muokata nykyisiä tunnisteita",
+      footer: "tekijänoikeustiedot",
     },
   },
 };

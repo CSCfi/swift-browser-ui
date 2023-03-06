@@ -93,19 +93,19 @@
         </c-container>
       </c-flex>
     </c-row>
-    <div id="footer">
-      <CFooter />
-    </div>
+    <CFooter />
   </c-main>
 </template>
 
 <script>
 import checkIDB from "@/common/idb_support";
 import CFooter from "@/components/CFooter.vue";
+import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 export default {
   components:{
     CFooter,
+    LanguageSelector,
   },
   mounted: function () {
     checkIDB().then(result => this.idb = result);
@@ -116,7 +116,8 @@ export default {
 <style>
 c-main { 
   height: unset; 
-  min-height: 100vh 
+  min-height: 100vh;
+  justify-content: space-between;
 }
 
 c-card {
@@ -133,13 +134,6 @@ c-login-card {
 
 c-button {
   margin-top: 2rem;
-}
-
-#footer{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  z-index: 2;
 }
 
 </style>

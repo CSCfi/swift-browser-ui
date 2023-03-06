@@ -40,17 +40,25 @@ jobs:
         run: |
           docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --containers 15
           docker exec keystone-swift generate_data.py --keystone --username swift --password veryfast --project "swift-project"
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+          cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
       - name: Build Frontend
         run: |
           pushd swift_browser_ui_frontend
-          npm install
-          npm run build
+          pnpm install
+          pnpm run build-docker
       - name: Setup and Run backend
         run: |
           pip install -r requirements.txt
           pip install honcho
           honcho start -f ${{ github.workspace }}/.github/config/Procfile --env ${{ github.workspace }}/.github/config/.env.test &
-      - run: npm i cypress
       - uses: cypress-io/github-action@v5
         with:
           project: ./swift_browser_ui_frontend
