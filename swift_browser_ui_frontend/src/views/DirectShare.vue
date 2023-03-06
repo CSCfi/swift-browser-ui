@@ -40,22 +40,21 @@
     <b-field
       :label="$t('message.share.container')"
     >
-      <b-input 
+      <b-input
         v-model="container"
         name="container"
         expanded
         aria-required="true"
       />
     </b-field>
-    <b-field
-      :label="$t('message.share.field_label')"
-    >
-      <b-taginput
-        v-model="tags"
-        :placeholder="$t('message.share.field_placeholder')"
-      />
-    </b-field>
-
+    <TagInput
+      id="shareid-tags"
+      :tags="tags"
+      :aria-label="$t('label.list_of_shareids')"
+      :placeholder="$t('message.share.field_placeholder')"
+      @addTag="addingTag"
+      @deleteTag="deletingTag"
+    />
     <b-field>
       <p class="control">
         <button
@@ -77,8 +76,16 @@ import {
   getSharedContainerAddress,
 } from "@/common/api.js";
 
+import {
+  addNewTag,
+  deleteTag,
+} from "@/common/globalFunctions";
+
+import TagInput from "@/components/TagInput.vue";
+
 export default {
   name: "DirectShare",
+  components: { TagInput },
   data () {
     return {
       container: "",
@@ -192,6 +199,12 @@ export default {
       } catch (ReferenceError) {
         delay(this.checkMultiProject, wait, [wait * 2]);
       }
+    },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
     },
   },
 };

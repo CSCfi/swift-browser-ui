@@ -1,4 +1,5 @@
 import store from "@/common/store";
+import { taginputConfirmKeyCodes } from "@/common/conv";
 
 export function toggleCreateFolderModal(folderName) {
   store.commit("toggleCreateFolderModal", true);
@@ -67,6 +68,23 @@ export async function getAccessDetails (
       folderName,
       sourceProjectId)
     : [];
+}
+
+export function addNewTag (event, currentTags, onBlur) {
+  if (taginputConfirmKeyCodes.includes(event.keyCode) || onBlur) {
+    event.preventDefault();
+    const newTag = event.target.value.trim();
+    event.target.value = "";
+    if (newTag !== "" && !currentTags.includes(newTag)) {
+      currentTags.push(newTag);
+    }
+  }
+  return currentTags;
+}
+
+export function deleteTag (event, tag, currentTags) {
+  event.preventDefault();
+  return currentTags.filter(el => el !== tag);
 }
 
 

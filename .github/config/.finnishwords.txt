@@ -216,6 +216,7 @@ löydy
 löytää
 löytävät
 löytynyt
+luettelo
 luku
 lukuoikeus
 luo
@@ -496,6 +497,7 @@ tulisi
 tuloksia
 tunniste
 tunnisteet
+tunnisteista
 tunnisteita
 tunnukselle
 tunnuksen

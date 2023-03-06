@@ -24,26 +24,16 @@
             data-testid="folder-name"
           />
         </b-field>
-        <b-field
-          custom-class="has-text-dark"
-          :label="$t('message.tagName')"
-          label-for="folder-taginput"
-        >
-          <b-taginput
-            id="folder-taginput"
-            v-model="tags"
-            aria-close-label="delete-tag"
-            ellipsis
-            maxlength="20"
-            has-counter
-            rounded
-            type="is-primary"
-            :placeholder="$t('message.tagPlaceholder')"
-            :confirm-keys="taginputConfirmKeys"
-            :on-paste-separators="taginputConfirmKeys"
-            data-testid="folder-tag"
-          />
-        </b-field>
+        <label label-for="create-folder-taginput">
+          {{ $t('message.tagName') }}
+        </label>
+        <TagInput
+          id="create-folder-taginput"
+          :tags="tags"
+          data-testid="folder-tag"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdFolder") }}
           <b>{{ active.name }}</b>.
@@ -87,12 +77,16 @@ import {
 } from "@/common/conv";
 
 import {
+  addNewTag,
+  deleteTag,
   modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
+import TagInput from "@/components/TagInput.vue";
 
 export default {
   name: "CreateFolderModal",
+  components: { TagInput },
   data() {
     return {
       folderName: "",
@@ -152,6 +146,12 @@ export default {
       this.create = true;
       modifyBrowserPageStyles();
     },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
+    },
   },
 };
 </script>
@@ -190,6 +190,11 @@ export default {
 c-card-content {
   color: var(--csc-dark-grey);
   padding: 1.5rem 0 0 0;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: -1rem;
 }
 
 c-card-actions {
