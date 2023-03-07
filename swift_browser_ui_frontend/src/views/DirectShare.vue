@@ -142,11 +142,7 @@ export default {
         rights.push("w");
       }
       if (rights.length < 1) {
-        this.$buefy.toast.open({
-          duration: 5000,
-          message: this.$t("message.share.fail_noperm"),
-          type: "is-danger",
-        });
+        //removed toast for page that will be deleted
       }
       // create the container
       await swiftCreateContainer(

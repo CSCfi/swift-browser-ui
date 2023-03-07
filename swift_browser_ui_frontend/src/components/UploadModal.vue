@@ -1,5 +1,10 @@
 <template>
   <c-card class="upload-card">
+    <c-toasts
+      id="uploadModal-toasts"
+      data-testid="uploadModal-toasts"
+      absolute
+    />
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
@@ -558,10 +563,13 @@ export default {
         this.$store,
         this.$el,
       );
-      this.$buefy.toast.open({
-        message: this.$t("message.upload.isStarting"),
-        type: "is-success",
-      });
+      document.querySelector("#uploadModal-toasts").addToast(
+        {
+          type: "success",
+          progress: false,
+          message: this.$t("message.upload.isStarting"),
+        },
+      );
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();

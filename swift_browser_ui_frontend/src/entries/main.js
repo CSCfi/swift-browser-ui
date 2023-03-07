@@ -373,10 +373,11 @@ new Vue({
     document
       .getElementById("mainContainer")
       .addEventListener("uploadComplete", () => {
-        this.$buefy.toast.open({
-          message: this.$t("message.upload.complete"),
-          type: "is-success",
-        });
+        document.querySelector("#toasts").addToast({
+          progress: false,
+          type: "success",
+          message: this.$t("message.upload.complete")},
+        );
       });
   },
   methods: {
@@ -498,9 +499,10 @@ new Vue({
       });
 
       if (!res.support) {
-        this.$buefy.toast.open({
+        document.querySelector("#toasts").addToast({
+          progress: false,
+          type: "error",
           message: this.$("message.upload.upnotsupported"),
-          type: "is-danger",
         });
         return;
       }

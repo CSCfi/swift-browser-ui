@@ -21,6 +21,10 @@
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
     />
+    <c-toasts
+      id="container-toasts"
+      data-testid="container-toasts"
+    />
   </div>
 </template>
 

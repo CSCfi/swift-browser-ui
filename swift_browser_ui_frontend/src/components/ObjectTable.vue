@@ -109,6 +109,10 @@
       @selected-rows="handleSelection"
       @delete-object="confirmDelete([$event])"
     />
+    <c-toasts
+      id="objects-toasts"
+      data-testid="objects-toasts"
+    />
   </div>
 </template>
 
@@ -613,10 +617,11 @@ export default {
     },
     deleteObjects: function (deletables) {
       this.clearSelections();
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
+      document.querySelector("#objects-toasts").addToast(
+        { progress: false,
+          type: "success",
+          message: this.$t("message.objects.deleteSuccess")},
+      );
       let to_remove = new Array;
       if (typeof(deletables) == "string") {
         to_remove.push(deletables);

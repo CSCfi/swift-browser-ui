@@ -35,10 +35,7 @@ export default {
       });
     },
     deleteObjects: function () {
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
+      //removed toast for page that will be deleted
       let to_remove = new Array;
       if (typeof(this.$props.objects) == "string") {
         to_remove.push(this.$props.objects);

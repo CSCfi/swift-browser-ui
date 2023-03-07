@@ -408,10 +408,11 @@ export default {
       }
     },
     deleteContainer: function(container) {
-      this.$buefy.toast.open({
-        message: this.$t("message.container_ops.deleteSuccess"),
-        type: "is-success",
-      });
+      document.querySelector("#container-toasts").addToast(
+        { progress: false,
+          type: "success",
+          message: this.$t("message.container_ops.deleteSuccess")},
+      );
       const projectID = this.$store.state.active.id;
       swiftDeleteContainer(
         projectID,

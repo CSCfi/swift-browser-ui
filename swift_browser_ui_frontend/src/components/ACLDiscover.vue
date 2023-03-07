@@ -35,18 +35,9 @@ export default {
       syncContainerACLs(this.$store.state.client, this.$store.state.active.id)
         .then((amount) => {
           if (amount > 1) {
-            this.$buefy.toast.open({
-              message: this.$t("message.discover.sync_success_template").concat(
-                amount,
-                this.$t("message.discover.sync_success_concat"),
-              ),
-              type: "is-success",
-            });
+            //removed toast for page that will be deleted
           } else {
-            this.$buefy.toast.open({
-              message: this.$t("message.discover.sync_failure_template"),
-              type: "is-success",
-            });
+            //removed toast for page that will be deleted
           }
           this.isLoading = false;
           this.$emit("synced");
