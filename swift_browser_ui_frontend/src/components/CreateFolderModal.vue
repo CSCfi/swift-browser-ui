@@ -24,7 +24,10 @@
             data-testid="folder-name"
           />
         </b-field>
-        <label label-for="create-folder-taginput">
+        <label
+          class="taginput-label"
+          label-for="create-folder-taginput"
+        >
           {{ $t('message.tagName') }}
         </label>
         <TagInput
@@ -172,7 +175,7 @@ export default {
   }
 }
 
-@media screen and (max-height: 580px) and (max-width: 773px), 
+@media screen and (max-height: 580px) and (max-width: 773px),
 (max-width: 533px) {
   .add-folder {
     top: -9rem;
@@ -188,11 +191,6 @@ export default {
 c-card-content {
   color: var(--csc-dark-grey);
   padding: 1.5rem 0 0 0;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: -1rem;
 }
 
 c-card-actions {

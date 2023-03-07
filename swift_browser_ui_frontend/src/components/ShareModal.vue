@@ -65,7 +65,6 @@
           </li>
         </ul>
         <TagInput
-          id="shareid-tags"
           :tags="tags"
           :aria-label="$t('label.list_of_shareids')"
           :placeholder="$t('message.share.field_placeholder')"
@@ -436,15 +435,6 @@ export default {
 
   c-link > span {
     font-size: 0.875rem;
-  }
-
-  #shareid-tags {
-    margin: 1rem 0;
-    border: 1px solid $csc-dark-grey;
-  }
-
-  #shareid-tags:focus-within {
-    border: 2px solid $csc-primary;
   }
 
   c-flex, .shared-notification {

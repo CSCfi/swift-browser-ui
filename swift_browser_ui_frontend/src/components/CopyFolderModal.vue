@@ -28,7 +28,10 @@
             :loading="loadingFoldername"
           />
         </b-field>
-        <label label-for="copy-folder-taginput">
+        <label
+          class="taginput-label"
+          label-for="copy-folder-taginput"
+        >
           {{ $t('message.tagName') }}
         </label>
         <TagInput
@@ -295,11 +298,6 @@ export default {
 c-card-content {
   color: var(--csc-dark-grey);
   padding: 0;
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: -1rem;
 }
 
 c-card-actions {

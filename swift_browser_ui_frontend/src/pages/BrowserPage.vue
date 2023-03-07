@@ -267,4 +267,8 @@ c-modal {
   padding: 1rem;
 }
 
+.taginput-label {
+  font-weight: bold;
+  margin-bottom: -2rem;
+}
 </style>
