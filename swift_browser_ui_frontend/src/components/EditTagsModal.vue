@@ -4,23 +4,11 @@
       {{ $t('message.editTags') }}
     </h2>
     <c-card-content>
-      <b-field
-        custom-class="has-text-dark"
-      >
-        <b-taginput
-          v-model="tags"
-          :aria-label="$t('label.edit_tag')"
-          aria-close-label="delete-tag"
-          ellipsis
-          maxlength="20"
-          has-counter
-          rounded
-          type="is-primary"
-          :placeholder="$t('message.tagPlaceholder')"
-          :confirm-keys="taginputConfirmKeys"
-          :on-paste-separators="taginputConfirmKeys"
-        />
-      </b-field>
+      <TagInput
+        :tags="tags"
+        @addTag="addingTag"
+        @deleteTag="deletingTag"
+      />
     </c-card-content>
     <c-card-actions justify="space-between">
       <c-button
@@ -49,22 +37,28 @@ import {
 } from "@/common/api";
 
 import {
-  taginputConfirmKeys,
   getTagsForObjects,
   getTagsForContainer,
 } from "@/common/conv";
 
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+import {
+  addNewTag,
+  deleteTag,
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
+import TagInput from "@/components/TagInput.vue";
+import { mdiClose } from "@mdi/js";
 
 export default {
   name: "EditTagsModal",
+  components: { TagInput },
   data() {
     return {
       container: null,
       object: null,
       tags: [],
       isObject: false,
-      taginputConfirmKeys,
+      mdiClose,
     };
   },
   computed: {
@@ -188,6 +182,12 @@ export default {
         });
       this.toggleEditTagsModal();
     },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
+    },
   },
 };
 </script>
@@ -204,6 +204,7 @@ export default {
   max-height: 75vh;
 }
 
+h2 { margin: 0 !important; }
 
 c-card-content {
   color: var(--csc-dark-grey);
@@ -213,5 +214,6 @@ c-card-content {
 c-card-actions {
   padding: 0;
 }
+
 
 </style>

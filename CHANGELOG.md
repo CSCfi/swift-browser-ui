@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
 - (GH #601) Add a language selector to login page menu bar, using `csc-ui`
 - (GH #920) Optimize docker builds, making them faster by leveraging more caching mechanisms and removing unnecessary package installation
+- (GH #1007) Create new Taginput component to replace Buefy's taginput component
 
 ### Fixed
 

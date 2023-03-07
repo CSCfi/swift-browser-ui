@@ -28,24 +28,18 @@
             :loading="loadingFoldername"
           />
         </b-field>
-        <b-field
-          custom-class="has-text-dark"
-          :label="$t('message.tagName')"
+        <label
+          class="taginput-label"
           label-for="copy-folder-taginput"
         >
-          <b-taginput
-            id="copy-folder-taginput"
-            v-model="tags"
-            ellipsis
-            maxlength="20"
-            has-counter
-            rounded
-            type="is-primary"
-            :placeholder="$t('message.tagPlaceholder')"
-            :confirm-keys="taginputConfirmKeys"
-            :on-paste-separators="taginputConfirmKeys"
-          />
-        </b-field>
+          {{ $t('message.tagName') }}
+        </label>
+        <TagInput
+          id="copy-folder-taginput"
+          :tags="tags"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
       </c-card-content>
     </div>
     <c-card-actions justify="space-between">
@@ -73,24 +67,28 @@
 import { debounce, delay } from "lodash";
 import {
   swiftCopyContainer,
-  taginputConfirmKeys,
   updateContainerMeta,
 } from "@/common/api";
 
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+import {
+  addNewTag,
+  deleteTag,
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
+import TagInput from "@/components/TagInput.vue";
 
 export default {
   name: "CopyFolderModal",
+  components: { TagInput },
   data() {
     return {
       folderExists: false,
       folderName: "",
       loadingFoldername: true,
       tags: [],
-      taginputConfirmKeys,
       folders: [],
     };
   },
@@ -255,6 +253,12 @@ export default {
           },
         );
       });
+    },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
     },
   },
 };
