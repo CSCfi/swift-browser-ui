@@ -30,26 +30,19 @@
             data-testid="folder-name"
           />
         </b-field>
-        <b-field
-          custom-class="has-text-dark"
-          :label="$t('message.tagName')"
-          label-for="folder-taginput"
+        <label
+          class="taginput-label"
+          label-for="create-folder-taginput"
         >
-          <b-taginput
-            id="folder-taginput"
-            v-model="tags"
-            aria-close-label="delete-tag"
-            ellipsis
-            maxlength="20"
-            has-counter
-            rounded
-            type="is-primary"
-            :placeholder="$t('message.tagPlaceholder')"
-            :confirm-keys="taginputConfirmKeys"
-            :on-paste-separators="taginputConfirmKeys"
-            data-testid="folder-tag"
-          />
-        </b-field>
+          {{ $t('message.tagName') }}
+        </label>
+        <TagInput
+          id="create-folder-taginput"
+          :tags="tags"
+          data-testid="folder-tag"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdFolder") }}
           <b>{{ active.name }}</b>.
@@ -88,22 +81,24 @@
 <script>
 import { swiftCreateContainer } from "@/common/api";
 import {
-  taginputConfirmKeys,
   tokenize,
 } from "@/common/conv";
 
 import {
+  addNewTag,
+  deleteTag,
   modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
+import TagInput from "@/components/TagInput.vue";
 
 export default {
   name: "CreateFolderModal",
+  components: { TagInput },
   data() {
     return {
       folderName: "",
       tags: [],
-      taginputConfirmKeys,
       projectNumber: "",
     };
   },
@@ -153,6 +148,12 @@ export default {
       this.create = true;
       modifyBrowserPageStyles();
     },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
+    },
   },
 };
 </script>
@@ -169,11 +170,24 @@ export default {
   max-height: 75vh;
 }
 
-@media screen and (max-height: 720px), (max-width: 992px ) {
-  .add-folder {
-    max-height: 50vh;
+@media screen and (max-width: 773px), (max-height: 580px) {
+   .add-folder {
+    top: -5rem;
   }
 }
+
+@media screen and (max-height: 580px) and (max-width: 773px),
+(max-width: 533px) {
+  .add-folder {
+    top: -9rem;
+  }
+}
+
+@media screen and (max-height: 580px) and (max-width: 533px) {
+  .add-folder {
+    top: -13rem;
+   }
+ }
 
 c-card-content {
   color: var(--csc-dark-grey);
