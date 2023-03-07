@@ -12,23 +12,16 @@
           {{ $t('message.tokens.back') }}
         </router-link>
       </section>
-      <c-text-field
-        v-csc-model="newIdentifier"
-        name="newIdentifier"
-        :label="$t('message.tokens.identLabel')"
-        :hint="$t('message.tokens.identMessage')"
-        fit
-      />
-
       <c-row gap="8">
+        <c-text-field
+          v-csc-model="newIdentifier"
+          name="newIdentifier"
+          :label="$t('message.tokens.identLabel')"
+          :hint="$t('message.tokens.identMessage')"
+          fit
+        />
         <c-button
-          v-if="tokenExists(newIdentifier)"
-          disabled
-        >
-          {{ $t('message.tokens.createToken') }}
-        </c-button>
-        <c-button
-          v-else
+          :disabled="tokenExists(newIdentifier)"
           @click="addToken(newIdentifier)"
         >
           {{ $t('message.tokens.createToken') }}
@@ -56,68 +49,15 @@
         </c-button>
       </div>
     </div>
-    <b-table
+    <c-data-table
       class="tokenContents"
-      narrowed
-      default-sort="identifier"
-      :data="tokens"
-      :selected.sync="selected"
-      :default-sort-direction="defaultSortDirection"
-    >
-      <b-table-column
-        field="identifier"
-        :label="$t('message.tokens.identifier')"
-        sortable
-      >
-        <template #default="props">
-          {{ props.row }}
-        </template>
-      </b-table-column>
-      <b-table-column
-        field="controls"
-      >
-        <template #default="props">
-          <div class="field has-addons">
-            <p class="control">
-              <!-- How can i apply 'type="is-danger"'? -->
-              <!-- Also, what's the difference between the buttons? -->
-              <c-button
-                v-if="selected==props.row"
-                type="is-danger"
-                outlined
-                size="small"
-                inverted
-                @click="removeToken(props.row)"
-              >
-                <i
-                  slot="icon"
-                  class="mdi mdi-delete"
-                />
-                {{ $t('message.tokens.revoke') }}
-              </c-button>
-              <c-button
-                v-else
-                type="is-danger"
-                outlined
-                size="small"
-                @click="removeToken(props.row)"
-              >
-                <i
-                  slot="icon"
-                  class="mdi mdi-delete"
-                />
-                {{ $t('message.tokens.revoke') }}
-              </c-button>
-            </p>
-          </div>
-        </template>
-      </b-table-column>
-      <template #empty>
-        <span class="emptyContents">
-          {{ $t('message.tokens.empty') }}
-        </span>
-      </template>
-    </b-table>
+      sort-by="identifier"
+      sort-direction="asc"
+      :data.prop="tableTokens"
+      :headers.prop="headers"
+      :no-data-text="$t('message.tokens.empty')"
+      hide-footer
+    />
     <c-toasts
       id="token-toasts"
       data-testid="token-toasts"
@@ -131,6 +71,9 @@ import {
   listTokens,
   removeToken,
 } from "@/common/api";
+import {
+  mdiDelete,
+} from "@mdi/js";
 
 export default {
   name: "TokensView",
@@ -138,7 +81,6 @@ export default {
     return {
       tokens: [],
       selected: undefined,
-      defaultSortDirection: "asc",
       newIdentifier: "",
       latest: undefined,
       copied: false,
@@ -148,6 +90,46 @@ export default {
     active () {
       return this.$route.params.project;
     },
+    headers () {
+      return [
+        {
+          key: "identifier",
+          value: this.$t("message.tokens.identifier"),
+          sortable: true,
+        },
+        {
+          key: "controls",
+          value: null,
+          sortable: false,
+          children: [
+            {
+              value: this.$t("message.tokens.revoke"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: this.$t("message.tokens.revoke"),
+                  type: "error",
+                  path: mdiDelete,
+                  onClick: ({ data: { identifier } }) =>
+                    this.deleteToken(identifier.value),
+                },
+              },
+            },
+          ],
+        },
+      ];
+    },
+    tableTokens () {
+      return this.tokens.map(token => {
+        return {
+          identifier: {
+            value: token,
+          },
+        };
+      });
+    },
   },
   beforeMount () {
     this.getTokens();
@@ -156,7 +138,7 @@ export default {
     getTokens: function () {
       listTokens(this.active).then((ret) => {this.tokens = ret;});
     },
-    removeToken: function (identifier) {
+    deleteToken: function (identifier) {
       removeToken(
         this.active,
         identifier,
