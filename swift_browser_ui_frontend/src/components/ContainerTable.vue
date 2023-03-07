@@ -408,7 +408,7 @@ export default {
       }
     },
     deleteContainer: function(container) {
-      document.querySelector("#delete-toasts").addToast(
+      document.querySelector("#container-toasts").addToast(
         { progress: false,
           type: "success",
           message: this.$t("message.container_ops.deleteSuccess")},

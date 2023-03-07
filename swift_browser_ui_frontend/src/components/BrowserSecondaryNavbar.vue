@@ -1,11 +1,6 @@
 <template>
   <div id="secondary-navbar">
     <div class="container is-fluid">
-      <c-toasts
-        id="delete-toasts"
-        vertical="center"
-        data-testid="delete-toasts"
-      />
       <div
         v-if="multipleProjects"
         class="navbar-item select-project"

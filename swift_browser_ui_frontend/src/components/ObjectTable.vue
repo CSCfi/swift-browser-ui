@@ -109,6 +109,10 @@
       @selected-rows="handleSelection"
       @delete-object="confirmDelete([$event])"
     />
+    <c-toasts
+      id="objects-toasts"
+      data-testid="objects-toasts"
+    />
   </div>
 </template>
 
@@ -613,7 +617,7 @@ export default {
     },
     deleteObjects: function (deletables) {
       this.clearSelections();
-      document.querySelector("#delete-toasts").addToast(
+      document.querySelector("#objects-toasts").addToast(
         { progress: false,
           type: "success",
           message: this.$t("message.objects.deleteSuccess")},
