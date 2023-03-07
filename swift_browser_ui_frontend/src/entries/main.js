@@ -247,18 +247,14 @@ new Vue({
 
     navigator.serviceWorker.addEventListener("message", e => {
       if (e.data.eventType == "wasmReady") {
-        this.$buefy.snackbar.open({
-          message:
-            "Encryption engine is ready. Hit refresh to refresh the " +
-            "window to enable encryption.",
-          type: "is-success",
-          position: "is-top",
-          actionText: "Refresh",
-          indefinite: true,
-          onAction: () => {
-            location.reload();
-          },
-        });
+        document.querySelector("#refresh-toasts").addToast(
+          { type: "success",
+            message: "",
+            id: "refresh-toast",
+            progress: false,
+            persistent: true,
+            custom: true },
+        );
       }
     });
 

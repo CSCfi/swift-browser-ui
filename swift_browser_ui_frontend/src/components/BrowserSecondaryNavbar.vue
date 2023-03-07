@@ -63,6 +63,19 @@
         vertical="center"
         data-testid="copy-toasts"
       />
+      <c-toasts
+        id="refresh-toasts"
+        data-testid="refresh-toasts"
+      >
+        <p>Encryption engine is ready. Refresh the
+           window to enable encryption.</p>
+        <c-button
+          text
+          @click="handleRefreshClick"
+        >
+          Refresh
+        </c-button>
+      </c-toasts>
       <c-spacer />
       <div class="navbar-item">
         <c-button
@@ -163,6 +176,10 @@ export default {
           );
         });
       }
+    },
+    handleRefreshClick: function() {
+      document.querySelector("#refresh-toasts").removeToast("refresh-toast");
+      location.reload();
     },
   },
 };
