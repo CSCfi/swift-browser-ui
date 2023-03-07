@@ -1,5 +1,5 @@
 import store from "@/common/store";
-import { taginputConfirmKeyCodes } from "@/common/conv";
+import { taginputConfirmKeys } from "@/common/conv";
 
 export function toggleCreateFolderModal(folderName) {
   store.commit("toggleCreateFolderModal", true);
@@ -71,7 +71,7 @@ export async function getAccessDetails (
 }
 
 export function addNewTag (event, currentTags, onBlur) {
-  if (taginputConfirmKeyCodes.includes(event.keyCode) || onBlur) {
+  if (taginputConfirmKeys.includes(event.key) || onBlur) {
     event.preventDefault();
     const newTag = event.target.value.trim();
     event.target.value = "";

@@ -71,6 +71,10 @@ export default {
   align-items: center;
 }
 
+.tags-list:focus-within {
+  border: 2px solid $csc-primary;
+}
+
 .tags-list input {
   background: transparent;
   border: none;

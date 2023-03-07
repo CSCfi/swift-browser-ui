@@ -443,6 +443,10 @@ export default {
     border: 1px solid $csc-dark-grey;
   }
 
+  #shareid-tags:focus-within {
+    border: 2px solid $csc-primary;
+  }
+
   c-flex, .shared-notification {
     display: flex;
     flex-direction: row;
