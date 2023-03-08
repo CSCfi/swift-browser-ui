@@ -380,6 +380,10 @@ let default_translations = {
         uploadedFiles:
           "Uploaded files will be shared with all project members in ",
         advancedOptions: "Advanced encryption options",
+        enReady:
+          "Encryption engine is ready. Refresh the " +
+          "window to enable encryption.",
+        refresh: "Refresh",
       },
       search: {
         container: "Folder",
@@ -827,6 +831,10 @@ let default_translations = {
         uploadedFiles:
           "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
+        enReady:
+          "Encryption engine is ready. Refresh the " +
+          "window to enable encryption.",
+        refresh: "Refresh",
       },
       search: {
         container: "Säiliö",

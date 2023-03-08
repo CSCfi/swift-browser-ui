@@ -67,13 +67,12 @@
         id="refresh-toasts"
         data-testid="refresh-toasts"
       >
-        <p>Encryption engine is ready. Refresh the
-           window to enable encryption.</p>
+        <p>{{ $t("message.encrypt.enReady") }}</p>
         <c-button
           text
           @click="handleRefreshClick"
         >
-          Refresh
+          {{ $t("message.encrypt.refresh") }}
         </c-button>
       </c-toasts>
       <c-spacer />
