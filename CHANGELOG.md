@@ -95,6 +95,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix hiding the pagination of data tables
 - Fix shared objects functionality: visibility, deleting, editing tags
 
+### Removed
+
+- (GL #944) Unused views and components
+  - views
+    - `swift_browser_ui_frontend/src/views/Dashboard.vue`
+    - `swift_browser_ui_frontend/src/views/DirectRequest.vue`
+    - `swift_browser_ui_frontend/src/views/DirectShare.vue`
+    - `swift_browser_ui_frontend/src/views/ShareRequests.vue`
+    - `swift_browser_ui_frontend/src/views/SharedFrom.vue`
+    - `swift_browser_ui_frontend/src/views/SharedTo.vue`
+
 ## [v2.0.1]
 
 ### Fixed
