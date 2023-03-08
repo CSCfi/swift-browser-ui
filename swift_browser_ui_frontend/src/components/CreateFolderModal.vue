@@ -201,4 +201,8 @@ c-card-actions {
 c-card-actions > c-button {
   margin: 0;
 }
+
+c-link {
+  margin-top: -1rem;
+}
 </style>
