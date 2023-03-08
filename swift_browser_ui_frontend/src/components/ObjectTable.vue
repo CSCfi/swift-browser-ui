@@ -117,12 +117,12 @@
       id="largeDownload-toasts"
       data-testid="largeDownload-toasts"
     >
-      <p>{{ this.$t("message.largeDownMessage") }}</p>
+      <p>{{ $t("message.largeDownMessage") }}</p>
       <c-button
         text
         @click="removeToast"
       >
-        {{ this.$t("message.largeDownAction") }}
+        {{ $t("message.largeDownAction") }}
       </c-button>
     </c-toasts>
   </div>
