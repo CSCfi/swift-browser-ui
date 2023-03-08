@@ -19,11 +19,10 @@
       </div>
       <div
         v-if="!multipleProjects"
-        class="navbar-item"
+        class="navbar-item column"
       >
-        {{ $t("message.currentProj") }}: &nbsp;<span>
-          {{ active.name }}
-        </span>
+        <p class="label">{{ $t("message.currentProj") }}</p>
+        <p class="project-number">{{ active.name }}</p>
       </div>
       <div class="navbar-item">
         <c-button
@@ -199,13 +198,14 @@ export default {
 
   .navbar-item {
     height: 100%;
+    align-self: center;
   }
 
   c-toasts {
     width: fit-content;
   }
 
-  .select-project {
+  .select-project, .column {
     min-width: 15rem;
     flex: 0.5;
   }
@@ -215,7 +215,7 @@ export default {
   }
 
   @media screen and (max-width: 767px) {
-    .select-project {
+    .select-project, .column {
       width: 100%;
       flex: auto;
     }
@@ -276,4 +276,18 @@ export default {
     border-bottom-color: $white;
   }
 
+  .column {
+    flex-direction: column;
+    padding: 0 0 0 1.5rem;
+    color: var(--csc-dark-grey);
+  }
+
+  .project-number {
+    font-size: 0.875rem;
+  }
+
+  .label {
+    font-weight: 400;
+    font-size: 0.75rem;
+  }
   </style>
