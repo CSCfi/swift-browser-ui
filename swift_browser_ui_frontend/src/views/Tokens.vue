@@ -20,27 +20,20 @@
         fit
       />
 
-          <p
-            id="submitButton"
-            class="control"
-          >
-            <button
-              v-if="tokenExists(newIdentifier)"
-              class="button is-primary"
-              disabled
-            >
-              {{ $t('message.tokens.createToken') }}
-            </button>
-            <button
-              v-else
-              class="button is-primary"
-              @click="addToken(newIdentifier)"
-            >
-              {{ $t('message.tokens.createToken') }}
-            </button>
-          </p>
-        </b-field>
-      </b-field>
+      <c-row gap="8">
+        <c-button
+          v-if="tokenExists(newIdentifier)"
+          disabled
+        >
+          {{ $t('message.tokens.createToken') }}
+        </c-button>
+        <c-button
+          v-else
+          @click="addToken(newIdentifier)"
+        >
+          {{ $t('message.tokens.createToken') }}
+        </c-button>
+      </c-row>
     </div>
     <div
       v-if="latest"
@@ -50,14 +43,17 @@
         <span>
           <b>{{ $t('message.tokens.latestToken') }}</b>&nbsp;{{ latest }}&nbsp;
         </span>
-        <b-button
+        <c-button
           class="copyButton"
           outlined
-          icon-left="content-copy"
           @click="copyTokenHex()"
         >
+          <i
+            slot="icon"
+            class="mdi mdi-content-copy"
+          />
           {{ $t('message.copy') }}
-        </b-button>
+        </c-button>
       </div>
     </div>
     <b-table
@@ -83,27 +79,35 @@
         <template #default="props">
           <div class="field has-addons">
             <p class="control">
-              <b-button
+              <!-- How can i apply 'type="is-danger"'? -->
+              <!-- Also, what's the difference between the buttons? -->
+              <c-button
                 v-if="selected==props.row"
                 type="is-danger"
-                icon-left="delete"
                 outlined
-                size="is-small"
+                size="small"
                 inverted
                 @click="removeToken(props.row)"
               >
+                <i
+                  slot="icon"
+                  class="mdi mdi-delete"
+                />
                 {{ $t('message.tokens.revoke') }}
-              </b-button>
-              <b-button
+              </c-button>
+              <c-button
                 v-else
                 type="is-danger"
-                icon-left="delete"
                 outlined
-                size="is-small"
+                size="small"
                 @click="removeToken(props.row)"
               >
+                <i
+                  slot="icon"
+                  class="mdi mdi-delete"
+                />
                 {{ $t('message.tokens.revoke') }}
-              </b-button>
+              </c-button>
             </p>
           </div>
         </template>
