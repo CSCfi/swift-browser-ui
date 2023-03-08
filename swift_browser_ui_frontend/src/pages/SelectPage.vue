@@ -9,26 +9,24 @@
         v-for="project in projects.filter(pro => pro.tainted)"
         :key="project.id"
       >
-        <b-button
-          tag="a"
-          expanded
+        <c-button
           :href="'/lock/'.concat(project.id)"
-          size="is-large"
-          type="is-primary is-outlined"
+          size="large"
+          outlined
+          fit
         >
           {{ project.name }}
-        </b-button>
+        </c-button>
       </p>
       <p>
-        <b-button
-          tag="a"
-          expanded
+        <c-button
           href="/lock/none"
-          size="is-large"
-          type="is-primary is-outlined"
+          size="large"
+          outlined
+          fit
         >
           {{ $t("message.select.unrestricted" ) }}
-        </b-button>
+        </c-button>
       </p>
       <p>
         <b-field class="locale-changed block center">
