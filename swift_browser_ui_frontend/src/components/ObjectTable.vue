@@ -113,6 +113,18 @@
       id="objects-toasts"
       data-testid="objects-toasts"
     />
+    <c-toasts
+      id="largeDownload-toasts"
+      data-testid="largeDownload-toasts"
+    >
+      <p>{{ $t("message.largeDownMessage") }}</p>
+      <c-button
+        text
+        @click="removeToast"
+      >
+        {{ $t("message.largeDownAction") }}
+      </c-button>
+    </c-toasts>
   </div>
 </template>
 
@@ -430,17 +442,19 @@ export default {
         });
       }
     },
+    removeToast: function() {
+      this.enableDownload();
+      document.querySelector("#largeDownload-toasts")
+        .removeToast("largeDownload");
+    },
     confirmDownload: function () {
-      // Snackbar for enabling large downloads for the duration of the
-      // session
-      this.$buefy.snackbar.open({
-        duration: 5000,
-        message: this.$t("message.largeDownMessage"),
-        type: "is-success",
-        position: "is-top",
-        actionText: this.$t("message.largeDownAction"),
-        onAction: this.enableDownload,
-      });
+      document.querySelector("#largeDownload-toasts").addToast(
+        { type: "info",
+          message: "",
+          id: "largeDownload",
+          progress: false,
+          custom: true },
+      );
     },
     enableDownload: function () {
       // Enables large downloads upon execution

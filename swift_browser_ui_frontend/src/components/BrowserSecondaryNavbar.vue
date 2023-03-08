@@ -63,6 +63,18 @@
         vertical="center"
         data-testid="copy-toasts"
       />
+      <c-toasts
+        id="refresh-toasts"
+        data-testid="refresh-toasts"
+      >
+        <p>{{ $t("message.encrypt.enReady") }}</p>
+        <c-button
+          text
+          @click="handleRefreshClick"
+        >
+          {{ $t("message.encrypt.refresh") }}
+        </c-button>
+      </c-toasts>
       <c-spacer />
       <div class="navbar-item">
         <c-button
@@ -163,6 +175,10 @@ export default {
           );
         });
       }
+    },
+    handleRefreshClick: function() {
+      document.querySelector("#refresh-toasts").removeToast("refresh-toast");
+      location.reload();
     },
   },
 };
