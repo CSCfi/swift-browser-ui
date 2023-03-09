@@ -1,9 +1,6 @@
 name: Python Unit Tests
 
 on:
-  push:
-    branches:
-      - "dependabot/**"
   pull_request:
 
 jobs:
