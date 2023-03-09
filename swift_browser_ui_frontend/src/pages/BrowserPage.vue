@@ -46,11 +46,6 @@
         <CopyFolderModal />
       </c-modal>
       <router-view class="content-wrapper" />
-      <b-loading
-        :is-full-page="isFullPage"
-        :active.sync="isLoading"
-        :can-cancel="false"
-      />
       <c-toasts id="toasts" />
       <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts

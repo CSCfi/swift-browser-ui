@@ -15,23 +15,17 @@
             {{ $t("message.replicate.destinationExists") }}
           </p>
         </c-alert>
-        <b-field
-          custom-class="has-text-dark"
+        <c-text-field
+          id="new-copy-folderName"
+          v-csc-model="folderName"
           :label="$t('message.replicate.name_newFolder')"
-          label-for="new-copy-folderName"
-        >
-          <b-input
-            id="new-copy-folderName"
-            v-model="folderName"
-            name="foldername"
-            custom-class="has-text-dark"
-            :loading="loadingFoldername"
-          />
-        </b-field>
+          name="foldername"
+          :loading="loadingFoldername"
+        />
         <label
           class="taginput-label"
           label-for="copy-folder-taginput"
-        >
+        >  
           {{ $t('message.tagName') }}
         </label>
         <TagInput

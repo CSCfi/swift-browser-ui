@@ -12,39 +12,21 @@
           {{ $t('message.tokens.back') }}
         </router-link>
       </section>
-      <b-field grouped>
-        <b-field
+      <c-row gap="8">
+        <c-text-field
+          v-csc-model="newIdentifier"
+          name="newIdentifier"
           :label="$t('message.tokens.identLabel')"
-          :message="$t('message.tokens.identMessage')"
-          expanded
+          :hint="$t('message.tokens.identMessage')"
+          fit
+        />
+        <c-button
+          :disabled="tokenExists(newIdentifier)"
+          @click="addToken(newIdentifier)"
         >
-          <b-input
-            v-model="newIdentifier"
-            name="newIdentifier"
-            expanded
-          />
-
-          <p
-            id="submitButton"
-            class="control"
-          >
-            <button
-              v-if="tokenExists(newIdentifier)"
-              class="button is-primary"
-              disabled
-            >
-              {{ $t('message.tokens.createToken') }}
-            </button>
-            <button
-              v-else
-              class="button is-primary"
-              @click="addToken(newIdentifier)"
-            >
-              {{ $t('message.tokens.createToken') }}
-            </button>
-          </p>
-        </b-field>
-      </b-field>
+          {{ $t('message.tokens.createToken') }}
+        </c-button>
+      </c-row>
     </div>
     <div
       v-if="latest"
@@ -54,70 +36,28 @@
         <span>
           <b>{{ $t('message.tokens.latestToken') }}</b>&nbsp;{{ latest }}&nbsp;
         </span>
-        <b-button
+        <c-button
           class="copyButton"
           outlined
-          icon-left="content-copy"
           @click="copyTokenHex()"
         >
+          <i
+            slot="icon"
+            class="mdi mdi-content-copy"
+          />
           {{ $t('message.copy') }}
-        </b-button>
+        </c-button>
       </div>
     </div>
-    <b-table
+    <c-data-table
       class="tokenContents"
-      narrowed
-      default-sort="identifier"
-      :data="tokens"
-      :selected.sync="selected"
-      :default-sort-direction="defaultSortDirection"
-    >
-      <b-table-column
-        field="identifier"
-        :label="$t('message.tokens.identifier')"
-        sortable
-      >
-        <template #default="props">
-          {{ props.row }}
-        </template>
-      </b-table-column>
-      <b-table-column
-        field="controls"
-      >
-        <template #default="props">
-          <div class="field has-addons">
-            <p class="control">
-              <b-button
-                v-if="selected==props.row"
-                type="is-danger"
-                icon-left="delete"
-                outlined
-                size="is-small"
-                inverted
-                @click="removeToken(props.row)"
-              >
-                {{ $t('message.tokens.revoke') }}
-              </b-button>
-              <b-button
-                v-else
-                type="is-danger"
-                icon-left="delete"
-                outlined
-                size="is-small"
-                @click="removeToken(props.row)"
-              >
-                {{ $t('message.tokens.revoke') }}
-              </b-button>
-            </p>
-          </div>
-        </template>
-      </b-table-column>
-      <template #empty>
-        <span class="emptyContents">
-          {{ $t('message.tokens.empty') }}
-        </span>
-      </template>
-    </b-table>
+      sort-by="identifier"
+      sort-direction="asc"
+      :data.prop="tableTokens"
+      :headers.prop="headers"
+      :no-data-text="$t('message.tokens.empty')"
+      hide-footer
+    />
     <c-toasts
       id="token-toasts"
       data-testid="token-toasts"
@@ -131,6 +71,9 @@ import {
   listTokens,
   removeToken,
 } from "@/common/api";
+import {
+  mdiDelete,
+} from "@mdi/js";
 
 export default {
   name: "TokensView",
@@ -138,7 +81,6 @@ export default {
     return {
       tokens: [],
       selected: undefined,
-      defaultSortDirection: "asc",
       newIdentifier: "",
       latest: undefined,
       copied: false,
@@ -148,6 +90,46 @@ export default {
     active () {
       return this.$route.params.project;
     },
+    headers () {
+      return [
+        {
+          key: "identifier",
+          value: this.$t("message.tokens.identifier"),
+          sortable: true,
+        },
+        {
+          key: "controls",
+          value: null,
+          sortable: false,
+          children: [
+            {
+              value: this.$t("message.tokens.revoke"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: this.$t("message.tokens.revoke"),
+                  type: "error",
+                  path: mdiDelete,
+                  onClick: ({ data: { identifier } }) =>
+                    this.deleteToken(identifier.value),
+                },
+              },
+            },
+          ],
+        },
+      ];
+    },
+    tableTokens () {
+      return this.tokens.map(token => {
+        return {
+          identifier: {
+            value: token,
+          },
+        };
+      });
+    },
   },
   beforeMount () {
     this.getTokens();
@@ -156,7 +138,7 @@ export default {
     getTokens: function () {
       listTokens(this.active).then((ret) => {this.tokens = ret;});
     },
-    removeToken: function (identifier) {
+    deleteToken: function (identifier) {
       removeToken(
         this.active,
         identifier,

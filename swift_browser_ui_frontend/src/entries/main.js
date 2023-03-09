@@ -160,12 +160,6 @@ new Vue({
     user() {
       return this.$store.state.uname;
     },
-    isFullPage() {
-      return this.$store.state.isFullPage;
-    },
-    isLoading() {
-      return this.$store.state.isLoading;
-    },
     isChunking() {
       return this.$store.state.isChunking;
     },

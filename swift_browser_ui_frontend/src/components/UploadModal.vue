@@ -115,11 +115,13 @@
                   rows="3"
                 />
                 <c-button
-                  type="is-success"
-                  icon-left="lock-plus"
                   @click="appendPublicKey"
                   @keyup.enter="appendPublicKey"
                 >
+                  <i
+                    slot="icon"
+                    class="mdi mdi-lock-plus"
+                  />
                   {{ $t("message.encrypt.addkey") }}
                 </c-button>
                 <c-data-table
