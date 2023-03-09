@@ -60,7 +60,7 @@ let default_translations = {
       program_description:
         "Web UI for browsing contents in Swift object " + "storage systems.",
       program_description_step_2: "",
-      currentProj: "Current project",
+      currentProj: "Project",
       selectProj: "Select project",
       createFolder: "Create folder",
       uploadSecondaryNav: "Upload",
@@ -547,7 +547,7 @@ let default_translations = {
       program_description:
         "Web-käyttöliittymä tallennettujen tiedostojen " +
         "selaamiseen Swift-objektitietojärjestelmissä.",
-      currentProj: "Nykyinen projekti",
+      currentProj: "Projekti",
       selectProj: "Valitse projekti",
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
