@@ -1,5 +1,9 @@
 name: End-to-end tests
-on: [pull_request]
+on:
+  push:
+    branches:
+      - "dependabot/**"
+  pull_request:
 
 jobs:
   cypress-e2e-headless:
@@ -47,7 +51,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'pnpm'
+          cache: "pnpm"
           cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
       - name: Build Frontend
         run: |
