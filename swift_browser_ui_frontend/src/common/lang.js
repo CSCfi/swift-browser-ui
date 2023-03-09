@@ -502,7 +502,7 @@ let default_translations = {
       program_description:
         "Web-käyttöliittymä tallennettujen tiedostojen " +
         "selaamiseen Swift-objektitietojärjestelmissä.",
-      currentProj: "Nykyinen projekti",
+      currentProj: "Projekti",
       selectProj: "Valitse projekti",
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
