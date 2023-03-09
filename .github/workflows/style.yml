@@ -1,6 +1,10 @@
 name: Python style check
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - "dependabot/**"
+  pull_request:
 
 jobs:
   style_check:
@@ -8,30 +12,30 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10']
-      
+        python-version: ["3.10"]
+
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node }}
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox tox-gh-actions
-    - name: Test flake8 syntax with tox
-      run: tox -e flake8
-    - name: Test mypy typing with tox
-      run: tox -e mypy
-    - name: bandit static check
-      run: tox -e bandit
-    - name: black style check
-      run: tox -e black
+      - uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Test flake8 syntax with tox
+        run: tox -e flake8
+      - name: Test mypy typing with tox
+        run: tox -e mypy
+      - name: bandit static check
+        run: tox -e bandit
+      - name: black style check
+        run: tox -e black

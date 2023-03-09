@@ -1,6 +1,10 @@
 name: Vue.js Unit Tests
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - "dependabot/**"
+  pull_request:
 
 jobs:
   test:
