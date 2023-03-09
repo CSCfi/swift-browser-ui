@@ -21,8 +21,12 @@
         v-if="!multipleProjects"
         class="navbar-item column"
       >
-        <p class="label">{{ $t("message.currentProj") }}</p>
-        <p class="project-number">{{ active.name }}</p>
+        <p class="label">
+          {{ $t("message.currentProj") }}
+        </p>
+        <p class="project-number">
+          {{ active.name }}
+        </p>
       </div>
       <div class="navbar-item">
         <c-button
