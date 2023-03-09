@@ -8,12 +8,12 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest]
-      
+
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: rojopolis/spellcheck-github-actions@0.30.0
-      name: Spellcheck
-      with:
-        config_path: .github/config/.spellcheck.yml
+      - uses: actions/checkout@v3
+      - uses: rojopolis/spellcheck-github-actions@0.30.0
+        name: Spellcheck
+        with:
+          config_path: .github/config/.spellcheck.yml
