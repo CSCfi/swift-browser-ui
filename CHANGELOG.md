@@ -67,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy b-select with c-select from `csc-ui`
 - (GL #944) Replace buefy b-loading with c-loader from `csc-ui` and remove unused b-loading
 - (GL #944) Replace buefy b-table with c-data-table from `csc-ui`
-- (GL #944) Replace buefy dialogs with c-modal from `csc-ui`
+- (GH #1028) Switch from `aioredis` to `redis` library due to deprecation
+- (GH #1025) add timeout to `requests` as recommended by `bandit`
 
 ### Fixed
 
