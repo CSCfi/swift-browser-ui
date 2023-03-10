@@ -64,7 +64,7 @@ export class DecryptedDownloadSession {
     let reader = response.body.getReader();
     this.reader = reader;
     let { value: chunk, done: readerDone } = await this.reader.read();
-    
+
     this.chunk = chunk;
     this.readerDone = readerDone;
 
@@ -165,7 +165,7 @@ export class DecryptedDownloadSession {
     signatureUrl.searchParams.append("path", headerPath);
     signed = await GET(signatureUrl);
     signed = await signed.json();
-    let headerUrl = new URL(headerPath, this.endpoint);
+    let headerUrl = new URL(this.endpoint.concat(headerPath));
     headerUrl.searchParams.append("valid", signed.valid);
     headerUrl.searchParams.append("signature", signed.signature);
     headerUrl.searchParams.append(
@@ -185,14 +185,14 @@ export class DecryptedDownloadSession {
   initServiceWorker() {
     navigator.serviceWorker.addEventListener("message", (e) => {
       e.stopImmediatePropagation();
-      switch(e.data.eventType) {
+      switch (e.data.eventType) {
         case "downloadSessionOpened":
           this.object = this.objects.pop();
           this.currentFinished = false;
           if (this.object == undefined) {
             this.finished = true;
           }
-          this.getHeader(e.data.pubKey).then(() => {});
+          this.getHeader(e.data.pubKey).then(() => { });
           break;
         case "beginDecryption":
           window.open(new URL("/file", document.location.origin), "_blank");
@@ -203,7 +203,7 @@ export class DecryptedDownloadSession {
           });
           break;
         case "nextDecryptChunk":
-          this.getSlice().then(() => {});
+          this.getSlice().then(() => { });
           break;
         case "streamClosed":
           (async () => {
@@ -211,7 +211,9 @@ export class DecryptedDownloadSession {
             signatureUrl.searchParams.append("path", this.whitelistPath);
             let signed = await GET(signatureUrl);
             signed = await signed.json();
-            let whitelistUrl = new URL(this.whitelistPath, this.endpoint);
+            let whitelistUrl = new URL(
+              this.endpoint.concat(this.whitelistPath),
+            );
             whitelistUrl.searchParams.append("valid", signed.valid);
             whitelistUrl.searchParams.append("signature", signed.signature);
             await DELETE(whitelistUrl);
