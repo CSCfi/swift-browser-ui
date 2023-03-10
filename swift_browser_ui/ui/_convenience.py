@@ -30,7 +30,7 @@ ssl_context.load_verify_locations(certifi.where())
 def test_swift_endpoint(endpoint: str) -> None:
     """Test swift endpoint connectivity."""
     try:
-        requests.head(endpoint)
+        requests.head(endpoint, timeout=5)
     except requests.exceptions.ConnectionError as e:
         logging.debug(f"The {endpoint} couldn't fulfill the request.")
         logging.debug(f"Error code: {e}")
