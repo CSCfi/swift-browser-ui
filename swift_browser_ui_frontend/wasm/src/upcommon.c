@@ -76,8 +76,10 @@ int rmrf() {
 Allocate chunk.
 */
 CHUNK* allocate_chunk() {
-    CHUNK* ret;
-    ret = malloc(sizeof(CHUNK*));
+    CHUNK* ret = malloc(sizeof(CHUNK));
+    if (!ret) {
+        return NULL;
+    }
     ret->chunk = NULL;
     ret->len = 0;
     return ret;

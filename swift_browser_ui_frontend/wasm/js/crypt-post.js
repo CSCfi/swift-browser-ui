@@ -15,7 +15,9 @@ let
   chunkPtr,
   chunkLen,
   chunk,
+  chunkView,
   header,
+  headerView,
   chunkArray,
   pubkeyPtr,
   pubKey,
@@ -42,8 +44,18 @@ self.addEventListener("fetch", (e) => {
   }
 });
 
-
 wasmReady.then(() => {
+  FS.mkdir("/keys");
+  FS.mkdir("/keys/recv_keys");
+  FS.mkdir("/data");
+
+  Module.ccall(
+    "libinit",
+    undefined,
+    [],
+    [],
+  );
+
   self.addEventListener("message", (e) => {
     e.stopImmediatePropagation();
     switch(e.data.cmd) {
@@ -53,9 +65,6 @@ wasmReady.then(() => {
         });
         break;
       case "initFileSystem":
-        FS.mkdir("/keys");
-        FS.mkdir("/keys/recv_keys");
-        FS.mkdir("/data");
         // Create output device
         e.source.postMessage({
           eventType: "wasmFilesystemInitialized",
@@ -92,7 +101,6 @@ wasmReady.then(() => {
         fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
-          ptr: sessionPtr,
         });
         break;
       case "initNormal":
@@ -105,7 +113,6 @@ wasmReady.then(() => {
         fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
-          ptr: sessionPtr,
         });
         break;
       case "createHeader":
@@ -126,29 +133,21 @@ wasmReady.then(() => {
           "number",
           ["number"],
           [header],
-        )
-        sessKeyPtr = Module.ccall(
-          "get_session_key",
-          "number",
-          ["number"],
-          [sessionPtr],
         );
-        sessKey = new Uint8Array(HEAPU8.subarray(sessKeyPtr, sessKeyPtr + 32));
-        sessKey = btoa(String.fromCharCode(...sessKey));
         // Copy chunk buffer contents to new array and answer
-        e.source.postMessage({
-          eventType: "encryptedHeaderReady",
-          header: new Uint8Array(HEAPU8.subarray(headerPtr, headerPtr + headerLen)),
-        });
-        // Free header memory
+        headerView = new Uint8Array(headerLen);
+        headerView.set(HEAPU8.subarray(headerPtr, headerPtr + headerLen));
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [header],
         );
-        _free(sessKeyPtr);
-        _free(headerPtr);
+        header, headerPtr, headerLen = undefined;
+        e.source.postMessage({
+          eventType: "encryptedHeaderReady",
+          header: headerView,
+        });
         break;
       case "encryptChunk":
         chunkArray = new Uint8Array(e.data.chunk);
@@ -162,39 +161,41 @@ wasmReady.then(() => {
           "wrap_chunk_content",
           "number",
           ["number"],
-          [header]
+          [chunk]
         );
         chunkLen = Module.ccall(
           "wrap_chunk_len",
           "number",
           ["number"],
-          [header],
+          [chunk],
         );
         // Respond with the chunk, and ask for the next one
-        e.source.postMessage({
-          eventType: "nextChunk",
-          chunk: new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen)),
-          iter: e.data.iter,
-        });
+        chunkView = new Uint8Array(chunkLen);
+        chunkView.set(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [chunk],
-        )
+        );
+        chunkPtr, chunk, chunkLen = undefined;
+        e.source.postMessage({
+          eventType: "nextChunk",
+          chunk: chunkView,
+          iter: e.data.iter,
+        });
         break;
       case "cleanUp":
         try {
-          Module.ccall(
-            "clean_session",
-            undefined,
-            ["number"],
-            [sessionPtr],
-          );
-          sessionPtr = undefined;
-          FS.rmdir("/keys/recv_keys")
-          FS.rmdir("/keys");
-          FS.rmdir("/data");
+          if (sessionPtr != undefined) {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+            sessionPtr = undefined;
+          }
         } catch (e) {
           // console.log("FS ignoring error on remove ", e);
         } finally {
@@ -209,10 +210,10 @@ wasmReady.then(() => {
           try {
             streamController.close();
           } catch(e) {
-            console.log(e);
+            // console.log(e);
           }
         }
-        if (sessionPtr) {
+        if (sessionPtr != undefined) {
           try {
             Module.ccall(
               "clean_session",
@@ -222,10 +223,9 @@ wasmReady.then(() => {
             );
             sessionPtr = undefined;
           } catch(e) {
-            console.log(e);
+            // console.log(e);
           }
         }
-
         sessionPtr = Module.ccall(
           "open_decrypt_session",
           "number",
@@ -302,13 +302,14 @@ wasmReady.then(() => {
           ["number"],
           [chunk],
         );
-        streamController.enqueue(new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen)));
+        chunkView = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [chunk],
         );
+        streamController.enqueue(chunkView);
         e.source.postMessage({
           eventType: "nextDecryptChunk",
         });
@@ -316,15 +317,17 @@ wasmReady.then(() => {
       case "decryptionFinished":
         streamController.close();
         try {
-          Module.ccall(
-            "clean_session",
-            undefined,
-            ["number"],
-            [sessionPtr],
-          );
-          sessionPtr = undefined;
+          if (sessionPtr != undefined) {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+            sessionPtr = undefined;
+          }
         } catch(e) {
-          console.log(e);
+          // console.log(e);
         }
         e.source.postMessage({
           eventType: "streamClosed",
