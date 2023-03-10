@@ -114,6 +114,7 @@ class FileDownloadProxy:
             },
             stream=True,
             verify=True,
+            timeout=30,
         ) as req:
             LOGGER.info(f"Request headers: {req.headers}")
             try:
@@ -366,6 +367,7 @@ class ContainerArchiveDownloadProxy:
             ),
             headers={"X-Auth-Token": self.token},
             verify=True,
+            timeout=30,
         ) as req:
             self.fs = self._parse_archive_fs(
                 [i.split("/") for i in req.text.lstrip().rstrip().split("\n")]

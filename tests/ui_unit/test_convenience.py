@@ -37,7 +37,7 @@ class TestConvenienceFunctions(
             swift_browser_ui.ui._convenience.test_swift_endpoint("test-endpoint")
         with p_get:
             swift_browser_ui.ui._convenience.test_swift_endpoint("test-endpoint")
-        mock_get.assert_called_with("test-endpoint")
+        mock_get.assert_called_with("test-endpoint", timeout=5)
 
     async def test_sign(self):
         """Test the signature generation."""
