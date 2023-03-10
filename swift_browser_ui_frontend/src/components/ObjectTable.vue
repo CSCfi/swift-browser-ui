@@ -695,7 +695,7 @@ export default {
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
-          action: () => toggleDeleteModal(this.checkedRows, null),
+          action: () => toggleDeleteModal(this.checkedRows),
         },
         {
           label: this.$t("message.table.clearSelected"),

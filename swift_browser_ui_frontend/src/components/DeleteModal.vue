@@ -13,7 +13,7 @@
           @click="toggleDeleteModal"
           @keyup.enter="toggleDeleteModal"
         >
-          Cancel
+          {{ $t("message.cancel") }}
         </c-button>
         <c-button 
           @click="isObject ? deleteObjects() : deleteContainer()"
@@ -31,6 +31,9 @@ import {
   swiftDeleteObjects,
   swiftDeleteContainer,
 } from "@/common/api";
+import {
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
 
 export default {
   name: "DeleteModal",
@@ -80,6 +83,7 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
       this.$store.commit("setFolderName", "");
+      modifyBrowserPageStyles();
     },
     deleteContainer: function() {
       document.querySelector("#container-toasts").addToast(
