@@ -20,6 +20,7 @@
       :conts="renderingContainers"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
+      :key="tableKey"
     />
   </div>
 </template>
@@ -52,6 +53,7 @@ export default {
       abortController: null,
       containers: [],
       renderingContainers: [],
+      tableKey: 1,
     };
   },
   computed: {
@@ -63,6 +65,9 @@ export default {
         return this.$store.state.openShareModal;
       },
       set() {},
+    },
+    openDeleteModal() {
+      return this.$store.state.openDeleteModal;
     },
     isFolderCopied() {
       return this.$store.state.isFolderCopied;
@@ -78,6 +83,11 @@ export default {
     openShareModal: function () {
       if(!this.openShareModal) {
         this.fetchContainers();
+      }
+    },
+    openDeleteModal: function () {
+      if (!this.openDeleteModal) {
+        this.tableKey++;
       }
     },
     currentProject: function() {

@@ -107,17 +107,17 @@
       :checked-rows="checkedRows"
       @change-folder="changeFolder"
       @selected-rows="handleSelection"
-      @delete-object="confirmDelete([$event])"
+      @delete-object="toggleDeleteModal([$event])"
     />
   </div>
 </template>
 
 <script>
-import { swiftDeleteObjects } from "@/common/api";
 import { getHumanReadableSize, truncate } from "@/common/conv";
 import {
   getSharedContainers,
   getAccessDetails,
+  toggleDeleteModal,
 } from "@/common/globalFunctions";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
@@ -339,6 +339,7 @@ export default {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit("setFolderName", this.containerName);
     },
+    toggleDeleteModal,
     updateObjects: async function () {
       if (
         this.containerName === undefined
@@ -599,58 +600,6 @@ export default {
     displayTags: function (name) {
       return this.showTags && !(this.renderFolders && !this.isFile(name));
     },
-    confirmDelete: function (deletables) {
-      this.$buefy.dialog.confirm({
-        title: this.$t("message.objects.deleteObjects"),
-        message: this.$t("message.objects.deleteObjectsMessage"),
-        confirmText: this.$t("message.objects.deleteConfirm"),
-        type: "is-danger",
-        hasIcon: true,
-        onConfirm: () => {this.deleteObjects(deletables);},
-        ariaModal: true,
-        ariaRole: "alertdialog",
-      });
-    },
-    deleteObjects: function (deletables) {
-      this.clearSelections();
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
-      let to_remove = new Array;
-      if (typeof(deletables) == "string") {
-        to_remove.push(deletables);
-      } else {
-        for (let object of deletables) {
-          to_remove.push(object.name);
-        }
-      }
-      if(this.$route.name !== "SharedObjects") {
-        const objIDs = deletables.reduce(
-          (prev, obj) => [...prev, obj.id], [],
-        );
-        this.$store.state.db.objects.bulkDelete(objIDs);
-      }
-      swiftDeleteObjects(
-        this.ownerProject,
-        this.$route.params.container,
-        to_remove,
-      ).then(async () => {
-        if (this.$route.name === "SharedObjects") {
-          await this.$store.dispatch(
-            "updateSharedObjects",
-            {
-              project: this.$route.params.project,
-              owner: this.ownerProject,
-              container: {
-                name: this.$route.params.container,
-                id: 0,
-              },
-            },
-          );
-        }
-      });
-    },
     handleSelection(selection) {
       const objects = this.oList;
       this.checkedRows = objects.filter(
@@ -725,7 +674,7 @@ export default {
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
-          action: () => this.confirmDelete(this.checkedRows),
+          action: () => toggleDeleteModal(this.checkedRows, null),
         },
         {
           label: this.$t("message.table.clearSelected"),
@@ -825,5 +774,4 @@ export default {
     padding: .5rem 0;
   }
 }
-
 </style>

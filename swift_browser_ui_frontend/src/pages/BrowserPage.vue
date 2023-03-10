@@ -45,6 +45,11 @@
       >
         <CopyFolderModal />
       </c-modal>
+      <c-modal
+        v-csc-model="openDeleteModal"
+      >
+        <DeleteModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <b-loading
         :is-full-page="isFullPage"

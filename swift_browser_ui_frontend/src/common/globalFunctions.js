@@ -30,6 +30,16 @@ export function toggleCopyFolderModal(folderName, sourceProjectId) {
   modifyBrowserPageStyles();
 }
 
+export function toggleDeleteModal(objects, containerName) {
+  store.commit("toggleDeleteModal", true);
+  if (objects) {
+    store.commit("setDeletableObjects", objects);
+  }
+  if (containerName) {
+    store.commit("setFolderName", containerName);
+  }
+}
+
 export function modifyBrowserPageStyles() {
   const element = document.getElementById("mainContainer");
   element.classList.toggle("mainContainer-additionalStyles");
