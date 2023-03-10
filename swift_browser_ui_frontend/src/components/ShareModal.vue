@@ -23,6 +23,7 @@
     <c-card-content id="share-card-modal-content">
       <p class="is-6 has-text-dark">
         {{ $t("message.share.share_subtitle") }}
+        <b>{{ active.name }}</b>.
       </p>
       <c-container>
         <c-row
@@ -53,17 +54,29 @@
             </c-link>
           </c-flex>
         </c-row>
-        <ul
+        <div
           v-show="openShareGuide"
-          class="guide-content"
+          class="content guide-content"
         >
-          <li>
+          <p>
+            {{ $t("message.share.share_guide_intro") }}
+          </p>
+          <p>
             {{ $t("message.share.share_guide_step1") }}
-          </li>
-          <li>
+          </p>
+          <p>
             {{ $t("message.share.share_guide_step2") }}
-          </li>
-        </ul>
+          </p>
+          <ul>
+            <li
+              v-for="(item, i) 
+                in $t(&quot;message.share.share_guide_step2_list&quot;)"
+              :key="i"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
         <TagInput
           :tags="tags"
           aria-label="label.list_of_shareids"
@@ -78,7 +91,7 @@
             shadow="false"
             :label="$t('message.share.permissions')"
             :items.prop="accessRights"
-            placeholder="Select permission"
+            :placeholder="$t('message.share.permissions')"
             @changeValue="onSelectPermission($event)"
           />
           <c-button
@@ -167,6 +180,9 @@ export default {
     };
   },
   computed: {
+    active() {
+      return this.$store.state.active;
+    },
     folderName() {
       return this.$store.state.selectedFolderName;
     },
