@@ -34,7 +34,7 @@
           </h3>
           <c-flex
             class="toggle-instructions"
-            :aria-label="$t('shareid_instructions')"
+            :aria-label="$t('label.shareid_instructions')"
             @click="toggleShareGuide"
             @keyup.enter="toggleShareGuide"
           >
@@ -66,8 +66,8 @@
         </ul>
         <TagInput
           :tags="tags"
-          :aria-label="$t('label.list_of_shareids')"
-          :placeholder="$t('message.share.field_placeholder')"
+          aria-label="label.list_of_shareids"
+          placeholder="message.share.field_placeholder"
           @addTag="addingTag"
           @deleteTag="deletingTag"
         />
