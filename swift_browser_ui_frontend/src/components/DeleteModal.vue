@@ -121,7 +121,7 @@ export default {
         this.$store.state.db.objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
-        this.$route.params.project,
+        this.$route.params.owner || this.$route.params.project,
         this.$route.params.container,
         to_remove,
       ).then(async () => {
