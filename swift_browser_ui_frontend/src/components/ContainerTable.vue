@@ -384,13 +384,14 @@ export default {
     },
     confirmDelete: function (container, objects) {
       if (objects > 0) {
-        this.$buefy.notification.open({
-          message: this.$t("message.container_ops.deleteNote"),
-          type: "is-danger",
-          position: "is-top-right",
-          duration: 30000,
-          hasIcon: true,
-        });
+        document.querySelector("#container-error-toasts").addToast(
+          { 
+            progress: false,
+            type: "error",
+            duration: 30000,
+            message: this.$t("message.container_ops.deleteNote"),
+          },
+        );
         this.$router.push(
           this.$route.params.project
             + "/"
