@@ -11,6 +11,79 @@ const proxyTo = {
 };
 
 const oidcEnabled = process.env.OIDC_ENABLED === "True";
+const root = path.resolve(__dirname, "src");
+let pages = {
+  "index":         path.resolve(root, "index.html"),
+  "select":        path.resolve(root, "select.html"),
+  "badrequest":    path.resolve(root, "400.html"),
+  "unauth":        path.resolve(root, "401.html"),
+  "forbid":        path.resolve(root, "403.html"),
+  "notfound":      path.resolve(root, "404.html"),
+  "uidown":        path.resolve(root, "503.html"),
+  "browse":        path.resolve(root, "browse.html"),
+  "loginpassword": path.resolve(root, "loginpassword.html"),
+  "login":         path.resolve(root, "login.html"),
+  "login2step":    path.resolve(root, "login2step.html"),
+};
+if (oidcEnabled) {
+  pages["index"] = path.resolve(root, "index_oidc.html");
+}
+let proxy = {
+  "/static/assets":       proxyTo,
+  "/api":                 proxyTo,
+  "/discover":            proxyTo,
+  "/libupload":           proxyTo,
+  "/login/oidc":          proxyTo,
+  "/login/oidc_front":    proxyTo,
+  "/login/oidc-redirect": proxyTo,
+  "/login/credentials":   proxyTo,
+  "/login/return":        proxyTo,
+  "/login/rescope":       proxyTo,
+  "/upload":              proxyTo,
+  "/enupload":            proxyTo,
+  "/download":            proxyTo,
+  "/sign":                proxyTo,
+  "/replicate":           proxyTo,
+  "/token":               proxyTo,
+  "/ws": {
+    target: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,
+    ws: true,
+  },
+};
+
+// Vite doesn't work "out-of-the-box" with multiple SPAs
+// This middleware loads existing html pages and
+// forwards all routes starting with "/browse" to "browse.html"
+// solution based on https://github.com/vitejs/vite/issues/2958#issuecomment-1065810046
+const multipagePlugin = () => ({
+  name: "multipage-middleware",
+  configureServer(server) {
+    server.middlewares.use(async (req, res, next) => {
+      // Remove query, hash and trailing slash
+      let url = req.url
+        .replace(/\?.*$/s, "")
+        .replace(/#.*$/s, "")
+        .replace(/.+\/$/, "");
+
+      // skip proxy paths
+      const proxyUrls = Object.keys(proxy);
+      for (let index in proxyUrls) {
+        if (url.startsWith(proxyUrls[index])) {
+          return next();
+        }
+      }
+
+      // redirect to defined page's HTML file
+      let pageName = url.split("/")[1];
+      // eslint-disable-next-line no-prototype-builtins
+      if (pages.hasOwnProperty(pageName)) {
+        let pathArray = pages[pageName].split("/");
+        req.url = "/" + pathArray[pathArray.length - 1];
+      }
+      next();
+    });
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -36,32 +109,17 @@ export default defineConfig(({ command, mode }) => {
       console.log(error);
     }
   }
-
-  const root = path.resolve(__dirname, "src");
-  let pages = {
-    "index":         path.resolve(root, "index.html"),
-    "select":        path.resolve(root, "select.html"),
-    "badrequest":    path.resolve(root, "400.html"),
-    "unauth":        path.resolve(root, "401.html"),
-    "forbid":        path.resolve(root, "403.html"),
-    "notfound":      path.resolve(root, "404.html"),
-    "uidown":        path.resolve(root, "503.html"),
-    "browse":        path.resolve(root, "browse.html"),
-    "loginpassword": path.resolve(root, "loginpassword.html"),
-    "login":         path.resolve(root, "login.html"),
-    "login2step":    path.resolve(root, "login2step.html"),
-  };
-
-  if (oidcEnabled) {
-    pages["index"] = path.resolve(root, "index_oidc.html");
-  }
   let base = undefined;
   if (command === "build") base = "/static/";
 
   return {
     root,
     base,
-    plugins: [vue()],
+    appType: "mpa", // set the dev server as a multi-page app
+    plugins: [
+      vue(), 
+      multipagePlugin(),
+    ],
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,
@@ -77,30 +135,7 @@ export default defineConfig(({ command, mode }) => {
       host: "0.0.0.0",
       port: process.env.FRONTEND_PORT || "8081",
       strictPort: true,
-      proxy: {
-        "/static":              proxyTo,
-        "/api":                 proxyTo,
-        "/browse":              proxyTo,
-        "/discover":            proxyTo,
-        "/login":               proxyTo,
-        "/libupload":           proxyTo,
-        "/login/oidc":          proxyTo,
-        "/login/oidc-front":    proxyTo,
-        "/login/oidc-redirect": proxyTo,
-        "/login/credentials":   proxyTo,
-        "/login/return":        proxyTo,
-        "/login/rescope":       proxyTo,
-        "/upload":              proxyTo,
-        "/enupload":            proxyTo,
-        "/download":            proxyTo,
-        "/sign":                proxyTo,
-        "/replicate":           proxyTo,
-        "/token":               proxyTo,
-        "/ws": {
-          target: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,
-          ws: true,
-        },
-      },
+      proxy,
     },
     resolve: {
       alias: {
