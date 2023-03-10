@@ -341,3 +341,44 @@ async def handle_delete_project_whitelist(
     await vault_client.remove_whitelist_key(project)
 
     return aiohttp.web.HTTPNoContent()
+
+
+async def handle_batch_add_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Add projects in sharing whitelist in batch."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    receivers = await request.json()
+
+    for receiver in receivers:
+        await vault_client.put_project_whitelist(
+            project,
+            receiver,
+            container,
+            "undefined",
+        )
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_batch_remove_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Add projects in sharing whitelist in batch."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    receivers = await request.json()
+
+    for receiver in receivers:
+        await vault_client.remove_project_whitelist(
+            project,
+            receiver,
+            container,
+        )
+
+    return aiohttp.web.HTTPNoContent()

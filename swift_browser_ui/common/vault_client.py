@@ -285,6 +285,29 @@ class VaultClient:
             "DELETE", f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}"
         )
 
+    async def put_project_whitelist(self, project: str, receiver: str, container: str, keystoneid: str,) -> None:
+        """Add a project to a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container to be shared
+        :param keystoneid: Receiving project keystone ID
+        """
+        await self._request(
+            "POST", f"c4ghtransit/sharing/{project}/{container}/{receiver}", json_data={"idkeystone": keystoneid},
+        )
+
+    async def remove_project_whitelist(self, project: str, receiver: str, container: str,) -> None:
+        """Add a project to a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container to be shared
+        """
+        await self._request(
+            "DELETE", f"c4ghtransit/sharing/{project}/{container}/{receiver}",
+        )
+
     async def get_header(self, project: str, container: str, path: str) -> str:
         """Retrieve header.
 

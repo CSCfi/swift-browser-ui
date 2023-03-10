@@ -216,11 +216,24 @@ export default {
   methods: {
     onSelectPermission: function(e) {
       const val = e.target.value.value;
-      if (val === "read") this.giveReadAccess();
-      else this.giveReadWriteAccess();
+      switch (val) {
+        case "view":
+          this.giveViewAccess();
+          break;
+        case "read":
+          this.giveReadAccess();
+          break;
+        case "read and write":
+          this.giveReadWriteAccess();
+          break;
+      }
     },
     setAccessRights: function () {
       this.accessRights = [
+        {
+          name: this.$t("message.share.view_perm"),
+          value: "view"
+        },
         {
           name: this.$t("message.share.read_perm"),
           value: "read",
@@ -231,11 +244,18 @@ export default {
         },
       ];
     },
+    giveViewAccess: function () {
+      this.view = true;
+      this.read = false;
+      this.write = false;
+    },
     giveReadAccess: function () {
+      this.view = true;
       this.read = true;
       this.write = false;
     },
     giveReadWriteAccess: function () {
+      this.view = true;
       this.read = true;
       this.write = true;
     },
@@ -255,7 +275,7 @@ export default {
     },
     shareContainer: async function () {
       let rights = [];
-      if (this.read) {
+      if (this.view) {
         rights.push("r");
       }
       if (this.write) {
@@ -356,6 +376,43 @@ export default {
         rights,
         this.tags,
       );
+
+      let signatureUrl = new URL("/sign/3600", document.location.origin);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+      let signed = await GET(signatureUrl);
+      signed = signed.json();
+      let whitelistUrl = new URL(
+        "/cryptic/${this.$route.params.project}/${this.folderName}",
+        this.$store.state.uploadEndpoint
+      );
+      whitelistUrl.searchParams.append(
+        "valid",
+        signed.valid,
+      );
+      whitelistUrl.searchParams.append(
+        "signature",
+        signed.signature,
+      )
+
+      // Add access to cross-project sharing in case of read or read+write
+      if (this.read | this.write) {
+        fetch(
+          whitelistUrl,
+          {
+            method: "PUT",
+            body: JSON.stringify(this.tags),
+          },
+        );
+      } else {
+        fetch(
+          whitelistUrl,
+          {
+            method: "DELETE",
+            body: JSON.stringify(this.tags),
+          },
+        );
+      }
+      
       return true;
     },
     toggleShareGuide: function () {
