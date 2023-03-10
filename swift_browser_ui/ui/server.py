@@ -18,8 +18,7 @@ import aiohttp.web
 import aiohttp_session
 import aiohttp_session.redis_storage
 
-import aioredis
-import aioredis.sentinel
+from redis import asyncio as aioredis
 
 from oidcrp.rp_handler import RPHandler
 
@@ -122,12 +121,12 @@ async def servinit(
     redis_user = str(os.environ.get("SWIFT_UI_REDIS_USER", ""))
     redis_password = str(os.environ.get("SWIFT_UI_REDIS_PASSWORD", ""))
 
-    redis: aioredis.Redis
+    redis_client: aioredis.Redis
     if sentinel_url and sentinel_port:
         # we forward the auth to redis so no need for auth on sentinel
         sentinel = aioredis.sentinel.Sentinel([(str(sentinel_url), int(sentinel_port))])
 
-        redis = sentinel.master_for(
+        redis_client = sentinel.master_for(
             service_name=sentinel_master,
             redis_class=aioredis.Redis,
             password=redis_password,
@@ -140,9 +139,11 @@ async def servinit(
         redis_creds = ""
         if redis_user and redis_password:
             redis_creds = f"{redis_user}:{redis_password}@"
-        redis = aioredis.from_url(f"redis://{redis_creds}{redis_host}:{redis_port}")
+        redis_client = aioredis.from_url(
+            f"redis://{redis_creds}{redis_host}:{redis_port}"
+        )
     storage = aiohttp_session.redis_storage.RedisStorage(
-        redis,
+        redis_client,
         cookie_name="SWIFT_UI_SESSION",
     )
     app["seckey"] = base64.urlsafe_b64decode(cryptography.fernet.Fernet.generate_key())
