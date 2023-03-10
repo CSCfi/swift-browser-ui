@@ -55,7 +55,6 @@ let default_translations = {
       program_name: "Swift browser",
       program_description:
         "Web UI for browsing contents in Swift object " + "storage systems.",
-      program_description_step_2: "",
       currentProj: "Project",
       selectProj: "Select project",
       createFolder: "Create folder",
@@ -85,7 +84,6 @@ let default_translations = {
         modified: "Last modified",
         paginated: "Paginated",
         pageNb: "per page",
-        created: "Created",
         tags: "Tags",
         editTags: "Edit tags",
         deleteSelected: "Delete",
@@ -173,23 +171,7 @@ let default_translations = {
         fail_noid: "Please give at least one Project Identifier!",
         fail_duplicate: "The project already has access to the folder!",
       },
-      request: {
-        project: "Project",
-        container: "Folder / Identifier",
-        container_message: "The requested folder name",
-        owner: "Owner Project Identifier",
-        owner_message: "Project Identifier of the folder owner",
-        request: "Request",
-        multi_project:
-          "Your account has access to multiple projects. " +
-          "Please verify that the correct project is set " +
-          "active in the menu, and submit the request with " +
-          "the Request button.",
-        requestHeading: "Request access to a folder",
-      },
       download: " Download",
-      downloadLink: "Download link",
-      downloadContainer: " Download folder",
       largeDownMessage:
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
@@ -200,18 +182,9 @@ let default_translations = {
         sharedFrom: "You haven't shared any folders.",
         sharedTo: "No folders have been shared with you.",
       },
-      emptyShared: "No folders have been shared to the project.",
-      emptyRequested:
-        "No shared folders have been requested for the project.",
       sharing: "Sharing - ",
       containers: "Folders - ",
       upload: {
-        upload: " Upload",
-        uploadfolder: " Upload folder",
-        chunking: "Chunking",
-        uploading: "Uploading ",
-        cancelupload: " Cancel uploading",
-        addfiles: "File / Files scheduled for uploading",
         upfinish: "Finished uploading ",
         upfail: "Failed uploading ",
         upnotsupported: "Uploading is not supported by your browser",
@@ -229,19 +202,15 @@ let default_translations = {
       copy: " Copy",
       copied: "Share ID copied to clipboard",
       copy_failed: "Copying failed",
-      create: "Create",
       delete: "Delete",
       remove: "Remove",
-      edit: "Edit",
       editTags: "Edit tags",
       cancel: "Cancel",
       save: "Save",
       options: "Options",
-      createContainerButton: "Create folder",
       copysuccess: "Copying in progress",
       copytime: "It may take few seconds",
       copyfail: "Failed to copy the folder",
-      renderFolders: "Render as folders",
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
@@ -431,10 +400,8 @@ let default_translations = {
         "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
-      help: "Apua",
-      helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Tuki",
-      program_name: "SD Connect",
+      program_name: "Swift browser",
       program_description:
         "Web-käyttöliittymä tallennettujen tiedostojen " +
         "selaamiseen Swift-objektitietojärjestelmissä.",
@@ -472,8 +439,6 @@ let default_translations = {
         fileHash: "Tarkistussumma",
         fileType: "Tyyppi",
         fileDown: "Tiedoston lataus",
-        owner: "Omistavan projektin tunniste",
-        created: "Luotu",
         folderDetails: "Ei yksityiskohtia kansioille",
         clearChecked: "Poista valinnat",
         tags: "Tunnisteet",
@@ -561,25 +526,7 @@ let default_translations = {
           "Anna vähintään yhden projektin tunniste (Project " + "Identifier)!",
         fail_duplicate: "Säiliö on jo jaettu projektille!",
       },
-      request: {
-        project: "Projekti",
-        container: "Säiliö / tunniste",
-        container_message: "Jaettavaksi pyydetyn säiliön nimi",
-        owner: "Omistavan projektin tunniste",
-        owner_message: "Halutun säiliön omistavan projektin tunniste",
-        request: "Pyydä jakoa",
-        multi_project:
-          "Käyttäjällä on pääsy useisiin projekteihin. " +
-          "Tarkistathan, että haluttu projekti on valittu " +
-          "valikossa, ja lisää pyyntö Pyydä jakoa " +
-          "-painikkeella.",
-        requestHeading: "Pyydä oikeuksia säiliöön",
-      },
       download: " Lataa",
-      downloadContainer: " Lataa säiliö",
-      downloadLink: "Latauslinkki",
-      downloadAlt: "Latauslinkki tiedostolle",
-      downloadAltLarge: "Hyväksy suuren tiedoston lataus",
       largeDownMessage:
         "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
@@ -591,17 +538,9 @@ let default_translations = {
         sharedFrom: "Et ole jakanut yhtään kansiota.",
         sharedTo: "Sinulle ei ole jaettu kansioita.",
       },
-      emptyShared: "Projektille ei ole jaettu säiliöitä.",
-      emptyRequested: "Projektille ei ole pyydetty jakamaan säiliöitä.",
       sharing: "Jako - ",
       containers: "Säiliöt - ",
       upload: {
-        upload: " Lähetä",
-        uploadfolder: " Lähetä kansio",
-        chunking: "Paloitellaan ",
-        uploading: "Lähetetään ",
-        cancelupload: " Peru lähetys",
-        addfiles: "Lisättiin tiedosto / tiedostoja lähetettäväksi",
         upfinish: "Lähetettiin tiedosto ",
         upfail: "Epäonnistuttiin lähettäessä tiedosto ",
         upnotsupported: "Selain ei tue tiedostojen lähettämistä",
@@ -619,19 +558,15 @@ let default_translations = {
       copy: " Kopioi",
       copied: "Jaa tunnus kopioitu leikepöydälle!",
       copy_failed: "Kopiointi epäonnistui!",
-      create: "Luo",
       delete: "Poista",
       remove: "Poista",
-      edit: "Muokkaa",
       editTags: "Muokkaa tägejä",
       cancel: "Peruuta",
       save: "Tallenna",
       options: "Valinnat",
-      createContainerButton: "Luo säiliö",
       copysuccess: "Kansiota kopioidaan",
       copytime: "Se voi kestää muutaman sekunnin",
       copyfail: "Säiliön kopiointi epäonnistui",
-      renderFolders: "Näytä kansioina",
       tagName: "Tägit",
       tagPlaceholder: "# Lisää tunniste ja paina rivinvaihtoa",
       container_ops: {
