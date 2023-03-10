@@ -64,17 +64,13 @@
             {{ $t("message.share.share_guide_step2") }}
           </li>
         </ul>
-        <b-field
-          custom-class="field"
-          type="is-dark"
-        >
-          <b-taginput
-            v-model="tags"
-            :aria-label="$t('label.list_of_shareids')"
-            ellipsis
-            :placeholder="$t('message.share.field_placeholder')"
-          />
-        </b-field>
+        <TagInput
+          :tags="tags"
+          :aria-label="$t('label.list_of_shareids')"
+          :placeholder="$t('message.share.field_placeholder')"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
         <c-flex>
           <c-select
             v-control
@@ -140,14 +136,19 @@ import {
   getSharedContainerAddress,
 } from "@/common/api";
 
-import { modifyBrowserPageStyles } from "@/common/globalFunctions";
+import {
+  addNewTag,
+  deleteTag,
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
 
 import ShareModalTable from "@/components/ShareModalTable";
+import TagInput from "@/components/TagInput.vue";
 import { mdiClose, mdiInformationOutline } from "@mdi/js";
 
 export default {
   name: "ShareModal",
-  components: { ShareModalTable },
+  components: { ShareModalTable, TagInput },
   data () {
     return {
       tags: [],
@@ -351,6 +352,12 @@ export default {
       this.isPermissionRemoved = true;
       this.closeSharedNotificationWithTimeout();
     },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
+    },
   },
 };
 </script>
@@ -423,15 +430,11 @@ export default {
   }
 
   c-select {
-    color: var(--csc-dark-grey);
+    color: $csc-dark-grey;
   }
 
   c-link > span {
     font-size: 0.875rem;
-  }
-
-  .field {
-    margin: 2rem 0 0 0;
   }
 
   c-flex, .shared-notification {
@@ -461,6 +464,4 @@ export default {
     margin-bottom: 1.5rem;
     box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
   }
-
-
 </style>

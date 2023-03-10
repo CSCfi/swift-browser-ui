@@ -23,8 +23,6 @@ const store = new Vuex.Store({
     active: {},
     uname: "",
     multipleProjects: false,
-    isLoading: false,
-    isFullPage: true,
     objectCache: [], // Only for shared objects
     langs: [
       { ph: "In English", value: "en" },
@@ -61,9 +59,6 @@ const store = new Vuex.Store({
     uploadAbort: undefined,
   },
   mutations: {
-    loading(state, payload) {
-      state.isLoading = payload;
-    },
     updateObjects(state, objects) {
       // Update object cache with the new object listing.
       state.objectCache = [...objects];
@@ -87,9 +82,6 @@ const store = new Vuex.Store({
     setUname(state, newUname) {
       // Update the username in store
       state.uname = newUname;
-    },
-    setLoading(state, newValue) {
-      state.isLoading = newValue;
     },
     setSharingClient(state, newClient) {
       state.client = newClient;
@@ -256,24 +248,18 @@ const store = new Vuex.Store({
   },
   actions: {
     updateContainers: async function (
-      { state, commit, dispatch },
+      { state, dispatch },
       { projectID, signal },
     ) {
       const existingContainers = await state.db.containers
         .where({ projectID })
         .toArray();
-      if (existingContainers.length === 0) {
-        commit("loading", true);
-      }
       let containers;
       let marker = "";
       let newContainers = [];
       do {
         containers = [];
-        containers = await getContainers(projectID, marker).catch(() => {
-          commit("loading", false);
-        });
-        commit("loading", false);
+        containers = await getContainers(projectID, marker).catch(() => {});
         if (containers.length > 0) {
           containers.forEach(cont => {
             cont.tokens = tokenize(cont.name);
@@ -502,7 +488,6 @@ const store = new Vuex.Store({
       { commit, dispatch },
       { project, owner, container, signal },
     ) {
-      commit("loading", true);
       let sharedObjects = [];
       let marker = "";
       let objects = [];
@@ -515,7 +500,6 @@ const store = new Vuex.Store({
           true,
           owner,
         ).catch(() => {
-          commit("loading", false);
           commit("updateObjects", []);
         });
 
@@ -524,7 +508,6 @@ const store = new Vuex.Store({
           marker = objects[objects.length - 1].name;
         }
       } while (objects.length > 0);
-      commit("loading", false);
       commit("updateObjects", sharedObjects);
       dispatch("updateObjectTags", {
         projectID: project,

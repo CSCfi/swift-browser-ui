@@ -1,12 +1,9 @@
 import Vue from "vue";
 import Router from "vue-router";
-import DashboardView from "@/views/Dashboard.vue";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects";
-import DirectRequest from "@/views/DirectRequest";
 import TokensView from "@/views/Tokens";
-import DirectShare from "@/views/DirectShare";
 
 Vue.use(Router);
 
@@ -19,24 +16,9 @@ export default new Router({
       component: TokensView,
     },
     {
-      path: "/browse/:user/:project/sharing/requestdirect",
-      name: "DirectRequest",
-      component: DirectRequest,
-    },
-    {
-      path: "/browse/:user/:project/sharing/sharedirect",
-      name: "DirectShare",
-      component: DirectShare,
-    },
-    {
       path: "/browse/:user/:project/:container/shared/:owner",
       name: "SharedObjects",
       component: SharedObjects,
-    },
-    {
-      path: "/browse/:user/:project/info",
-      name: "DashboardView",
-      component: DashboardView,
     },
     {
       path: "/browse/:user/:project",

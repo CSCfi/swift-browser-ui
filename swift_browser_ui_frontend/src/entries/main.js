@@ -162,12 +162,6 @@ new Vue({
     user() {
       return this.$store.state.uname;
     },
-    isFullPage() {
-      return this.$store.state.isFullPage;
-    },
-    isLoading() {
-      return this.$store.state.isLoading;
-    },
     isChunking() {
       return this.$store.state.isChunking;
     },
@@ -257,18 +251,14 @@ new Vue({
 
     navigator.serviceWorker.addEventListener("message", e => {
       if (e.data.eventType == "wasmReady") {
-        this.$buefy.snackbar.open({
-          message:
-            "Encryption engine is ready. Hit refresh to refresh the " +
-            "window to enable encryption.",
-          type: "is-success",
-          position: "is-top",
-          actionText: "Refresh",
-          indefinite: true,
-          onAction: () => {
-            location.reload();
-          },
-        });
+        document.querySelector("#refresh-toasts").addToast(
+          { type: "success",
+            message: "",
+            id: "refresh-toast",
+            progress: false,
+            persistent: true,
+            custom: true },
+        );
       }
     });
 
@@ -383,10 +373,11 @@ new Vue({
     document
       .getElementById("mainContainer")
       .addEventListener("uploadComplete", () => {
-        this.$buefy.toast.open({
-          message: this.$t("message.upload.complete"),
-          type: "is-success",
-        });
+        document.querySelector("#toasts").addToast({
+          progress: false,
+          type: "success",
+          message: this.$t("message.upload.complete")},
+        );
       });
   },
   methods: {
@@ -508,9 +499,10 @@ new Vue({
       });
 
       if (!res.support) {
-        this.$buefy.toast.open({
+        document.querySelector("#toasts").addToast({
+          progress: false,
+          type: "error",
           message: this.$("message.upload.upnotsupported"),
-          type: "is-danger",
         });
         return;
       }

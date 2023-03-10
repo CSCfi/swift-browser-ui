@@ -59,6 +59,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
 - (GH #601) Add a language selector to login page menu bar, using `csc-ui`
 - (GH #920) Optimize docker builds, making them faster by leveraging more caching mechanisms and removing unnecessary package installation
+- (GH #1007) Create new Taginput component to replace Buefy's taginput component
+- (GH #1009) Replace buefy toasts with c-toasts from `csc-ui`
+- (GH #1014) Replace buefy snackbars with custom c-toasts from `csc-ui`
+- (GL #944) Replace buefy b-input with c-text-field from `csc-ui`
+- (GL #944) Replace buefy b-button with c-button from `csc-ui`
+- (GL #944) Replace buefy b-select with c-select from `csc-ui`
+- (GL #944) Replace buefy b-loading with c-loader from `csc-ui` and remove unused b-loading
+- (GL #944) Replace buefy b-table with c-data-table from `csc-ui`
 
 ### Fixed
 
@@ -92,6 +100,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Libupload path in docker files
 - Fix hiding the pagination of data tables
 - Fix shared objects functionality: visibility, deleting, editing tags
+
+### Removed
+
+- (GL #944) Unused views and components
+  - views
+    - `swift_browser_ui_frontend/src/views/Dashboard.vue`
+    - `swift_browser_ui_frontend/src/views/DirectRequest.vue`
+    - `swift_browser_ui_frontend/src/views/DirectShare.vue`
+    - `swift_browser_ui_frontend/src/views/ShareRequests.vue`
+    - `swift_browser_ui_frontend/src/views/SharedFrom.vue`
+    - `swift_browser_ui_frontend/src/views/SharedTo.vue`
 
 ## [v2.0.1]
 

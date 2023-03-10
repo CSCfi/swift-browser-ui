@@ -60,7 +60,7 @@ let default_translations = {
       program_description:
         "Web UI for browsing contents in Swift object " + "storage systems.",
       program_description_step_2: "",
-      currentProj: "Current project",
+      currentProj: "Project",
       selectProj: "Select project",
       createFolder: "Create folder",
       uploadSecondaryNav: "Upload",
@@ -425,6 +425,10 @@ let default_translations = {
         uploadedFiles:
           "Uploaded files will be shared with all project members in ",
         advancedOptions: "Advanced encryption options",
+        enReady:
+          "Encryption engine is ready. Refresh the " +
+          "window to enable encryption.",
+        refresh: "Refresh",
       },
       search: {
         container: "Bucket",
@@ -487,7 +491,9 @@ let default_translations = {
       list_of_shareids: "list of share ids",
       folder_tabs: "different types of folder",
       searchbox: "search for folders",
+      tagsList: "list of tags",
       edit_tag: "modify current tags",
+      delete_tag: "delete tag",
       footer: "copyright information",
     },
   },
@@ -541,7 +547,7 @@ let default_translations = {
       program_description:
         "Web-käyttöliittymä tallennettujen tiedostojen " +
         "selaamiseen Swift-objektitietojärjestelmissä.",
-      currentProj: "Nykyinen projekti",
+      currentProj: "Projekti",
       selectProj: "Valitse projekti",
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
@@ -901,6 +907,10 @@ let default_translations = {
         uploadedFiles:
           "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
+        enReady:
+          "Encryption engine is ready. Refresh the " +
+          "window to enable encryption.",
+        refresh: "Refresh",
       },
       search: {
         container: "Säiliö",
@@ -962,7 +972,9 @@ let default_translations = {
       list_of_shareids: "lista jaa tunnuksista",
       folder_tabs: "erityyppisiä kansioita",
       searchbox: "etsi kansioita",
+      tagsList: "luettelo tunnisteista",
       edit_tag: "muokata nykyisiä tunnisteita",
+      delete_tag: "poista tunniste",
       footer: "tekijänoikeustiedot",
     },
   },

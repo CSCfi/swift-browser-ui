@@ -51,11 +51,6 @@
         <DeleteModal />
       </c-modal>
       <router-view class="content-wrapper" />
-      <b-loading
-        :is-full-page="isFullPage"
-        :active.sync="isLoading"
-        :can-cancel="false"
-      />
       <c-toasts id="toasts" />
       <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts
@@ -272,4 +267,8 @@ c-modal {
   padding: 1rem;
 }
 
+.taginput-label {
+  font-weight: bold;
+  margin-bottom: -2rem;
+}
 </style>

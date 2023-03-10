@@ -82,10 +82,11 @@ export default {
       this.$store.commit("setFolderName", "");
     },
     deleteContainer: function() {
-      this.$buefy.toast.open({
-        message: this.$t("message.container_ops.deleteSuccess"),
-        type: "is-success",
-      });
+      document.querySelector("#container-toasts").addToast(
+        { progress: false,
+          type: "success",
+          message: this.$t("message.container_ops.deleteSuccess")},
+      );
 
       const projectID = this.$route.params.project;
       swiftDeleteContainer(
@@ -103,10 +104,11 @@ export default {
       });
     },
     deleteObjects: function () {
-      this.$buefy.toast.open({
-        message: this.$t("message.objects.deleteSuccess"),
-        type: "is-success",
-      });
+      document.querySelector("#objects-toasts").addToast(
+        { progress: false,
+          type: "success",
+          message: this.$t("message.objects.deleteSuccess")},
+      );
 
       let to_remove = new Array;
       for (let object of this.selectedObjects) {

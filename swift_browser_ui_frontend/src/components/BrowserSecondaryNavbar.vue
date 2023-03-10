@@ -19,11 +19,14 @@
       </div>
       <div
         v-if="!multipleProjects"
-        class="navbar-item"
+        class="navbar-item column"
       >
-        {{ $t("message.currentProj") }}: &nbsp;<span>
+        <p class="label">
+          {{ $t("message.currentProj") }}
+        </p>
+        <p class="project-number">
           {{ active.name }}
-        </span>
+        </p>
       </div>
       <div class="navbar-item">
         <c-button
@@ -63,6 +66,18 @@
         vertical="center"
         data-testid="copy-toasts"
       />
+      <c-toasts
+        id="refresh-toasts"
+        data-testid="refresh-toasts"
+      >
+        <p>{{ $t("message.encrypt.enReady") }}</p>
+        <c-button
+          text
+          @click="handleRefreshClick"
+        >
+          {{ $t("message.encrypt.refresh") }}
+        </c-button>
+      </c-toasts>
       <c-spacer />
       <div class="navbar-item">
         <c-button
@@ -139,7 +154,7 @@ export default {
     },
     copyProjectId: function () {
       const toastMessage = {
-        duration: 3000,
+        duration: 6000,
         persistent: false,
         progress: false,
       };
@@ -154,7 +169,7 @@ export default {
           // avoid multiple clicks of copy button
           // that can stack up the toasts
           // by setting the value for 'copy'
-          setTimeout(() => { this.copy = false; }, 3000);
+          setTimeout(() => { this.copy = false; }, 6000);
         },() => {
           document.querySelector("#copy-toasts").addToast(
             { ...toastMessage,
@@ -163,6 +178,10 @@ export default {
           );
         });
       }
+    },
+    handleRefreshClick: function() {
+      document.querySelector("#refresh-toasts").removeToast("refresh-toast");
+      location.reload();
     },
   },
 };
@@ -183,13 +202,14 @@ export default {
 
   .navbar-item {
     height: 100%;
+    align-self: center;
   }
 
   c-toasts {
     width: fit-content;
   }
 
-  .select-project {
+  .select-project, .column {
     min-width: 15rem;
     flex: 0.5;
   }
@@ -199,7 +219,7 @@ export default {
   }
 
   @media screen and (max-width: 767px) {
-    .select-project {
+    .select-project, .column {
       width: 100%;
       flex: auto;
     }
@@ -260,4 +280,18 @@ export default {
     border-bottom-color: $white;
   }
 
+  .column {
+    flex-direction: column;
+    padding: 0 0 0 1.5rem;
+    color: var(--csc-dark-grey);
+  }
+
+  .project-number {
+    font-size: 0.875rem;
+  }
+
+  .label {
+    font-weight: 400;
+    font-size: 0.75rem;
+  }
   </style>

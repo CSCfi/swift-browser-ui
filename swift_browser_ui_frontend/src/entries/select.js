@@ -28,7 +28,7 @@ new Vue ({
     loginformname: "Openstack account:",
     idb: true,
     projects: [],
-    langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
+    langs: [{name: "In English", value: "en"}, {name: "Suomeksi", value: "fi"}],
   },
   created() {
     document.title = this.$t("message.program_name");

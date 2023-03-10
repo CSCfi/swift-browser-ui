@@ -1,5 +1,10 @@
 <template>
   <c-card class="upload-card">
+    <c-toasts
+      id="uploadModal-toasts"
+      data-testid="uploadModal-toasts"
+      absolute
+    />
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
@@ -73,7 +78,7 @@
             :value="$t('message.encrypt.advancedOptions')"
           >
             <c-container>
-              <c-checkbox 
+              <c-checkbox
                 v-csc-model="ownPrivateKey"
                 :label="$t('message.encrypt.ephemeral')"
               />
@@ -96,7 +101,7 @@
               </c-flex>
             </c-container>
             <c-container>
-              <c-checkbox 
+              <c-checkbox
                 v-csc-model="multipleReceivers"
                 :label="$t('message.encrypt.multipleReceivers')"
               />
@@ -110,11 +115,13 @@
                   rows="3"
                 />
                 <c-button
-                  type="is-success"
-                  icon-left="lock-plus"
                   @click="appendPublicKey"
                   @keyup.enter="appendPublicKey"
                 >
+                  <i
+                    slot="icon"
+                    class="mdi mdi-lock-plus"
+                  />
                   {{ $t("message.encrypt.addkey") }}
                 </c-button>
                 <c-data-table
@@ -157,7 +164,6 @@ import EncryptedUploadSession from "@/common/upload";
 import { getUploadEndpoint } from "@/common/api";
 import {
   getHumanReadableSize,
-  taginputConfirmKeys,
   truncate,
   computeSHA256,
 } from "@/common/conv";
@@ -178,7 +184,6 @@ export default {
     return {
       inputFolder: "",
       selectedFolder: null,
-      taginputConfirmKeys,
       filteredItems: [],
       tooLarge: false,
       ownPrivateKey: false,
@@ -560,10 +565,13 @@ export default {
         this.$store,
         this.$el,
       );
-      this.$buefy.toast.open({
-        message: this.$t("message.upload.isStarting"),
-        type: "is-success",
-      });
+      document.querySelector("#uploadModal-toasts").addToast(
+        {
+          type: "success",
+          progress: false,
+          message: this.$t("message.upload.isStarting"),
+        },
+      );
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();

@@ -1,14 +1,14 @@
 name: Javascript ESLint check
 
-on: [pull_request]
-
+on:
+  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['18']
+        node: ["18"]
     name: Node ${{ matrix.node }} eslint check
     steps:
       - uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          cache: 'pnpm'
+          cache: "pnpm"
           cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
       - name: Install dependencies
         run: |
@@ -29,4 +29,3 @@ jobs:
         run: |
           pushd swift_browser_ui_frontend
           pnpm run lint
-      

@@ -22,6 +22,10 @@
       :hide-tags="hideTags"
       :key="tableKey"
     />
+    <c-toasts
+      id="container-toasts"
+      data-testid="container-toasts"
+    />
   </div>
 </template>
 

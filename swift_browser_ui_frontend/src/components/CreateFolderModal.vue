@@ -4,6 +4,12 @@
       id="createFolder-modal-content"
       class="modal-content-wrapper"
     >
+      <c-toasts
+        id="createModal-toasts"
+        data-testid="createModal-toasts"
+        vertical="bottom"
+        absolute
+      />
       <h2 class="title is-4 has-text-dark">
         {{ $t("message.container_ops.addContainer") }}
       </h2>
@@ -11,39 +17,27 @@
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.norename") }}
         </p>
-        <b-field
-          custom-class="has-text-dark"
+        <c-text-field
+          id="folderName"
+          v-csc-model="folderName"
           :label="$t('message.container_ops.folderName')"
-          label-for="folderName"
+          name="foldername"
+          aria-required="true"
+          data-testid="folder-name"
+        />
+        <label
+          class="taginput-label"
+          label-for="create-folder-taginput"
         >
-          <b-input
-            id="folderName"
-            v-model="folderName"
-            name="foldername"
-            aria-required="true"
-            data-testid="folder-name"
-          />
-        </b-field>
-        <b-field
-          custom-class="has-text-dark"
-          :label="$t('message.tagName')"
-          label-for="folder-taginput"
-        >
-          <b-taginput
-            id="folder-taginput"
-            v-model="tags"
-            aria-close-label="delete-tag"
-            ellipsis
-            maxlength="20"
-            has-counter
-            rounded
-            type="is-primary"
-            :placeholder="$t('message.tagPlaceholder')"
-            :confirm-keys="taginputConfirmKeys"
-            :on-paste-separators="taginputConfirmKeys"
-            data-testid="folder-tag"
-          />
-        </b-field>
+          {{ $t('message.tagName') }}
+        </label>
+        <TagInput
+          id="create-folder-taginput"
+          :tags="tags"
+          data-testid="folder-tag"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdFolder") }}
           <b>{{ active.name }}</b>.
@@ -82,22 +76,24 @@
 <script>
 import { swiftCreateContainer } from "@/common/api";
 import {
-  taginputConfirmKeys,
   tokenize,
 } from "@/common/conv";
 
 import {
+  addNewTag,
+  deleteTag,
   modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
+import TagInput from "@/components/TagInput.vue";
 
 export default {
   name: "CreateFolderModal",
+  components: { TagInput },
   data() {
     return {
       folderName: "",
       tags: [],
-      taginputConfirmKeys,
       projectNumber: "",
     };
   },
@@ -127,22 +123,17 @@ export default {
           this.toggleCreateFolderModal();
         })
         .catch(err => {
+          let errorMessage = this.$t("message.error.createFail");
           if (err.message.match("Container name already in use")) {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.inUse"),
-              type: "is-danger",
-            });
+            errorMessage = this.$t("message.error.inUse");
           } else if (err.message.match("Invalid container name")) {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.invalidName"),
-              type: "is-danger",
-            });
-          } else {
-            this.$buefy.toast.open({
-              message: this.$t("message.error.createFail"),
-              type: "is-danger",
-            });
+            errorMessage = this.$t("message.error.invalidName");
           }
+          document.querySelector("#createModal-toasts").addToast(
+            { progress: false,
+              type: "error",
+              message: errorMessage },
+          );
         });
     },
     toggleCreateFolderModal: function () {
@@ -151,6 +142,12 @@ export default {
       this.tags = [];
       this.create = true;
       modifyBrowserPageStyles();
+    },
+    addingTag: function (e, onBlur) {
+      this.tags = addNewTag(e, this.tags, onBlur);
+    },
+    deletingTag: function (e, tag) {
+      this.tags = deleteTag(e, tag, this.tags);
     },
   },
 };
@@ -174,7 +171,7 @@ export default {
   }
 }
 
-@media screen and (max-height: 580px) and (max-width: 773px), 
+@media screen and (max-height: 580px) and (max-width: 773px),
 (max-width: 533px) {
   .add-folder {
     top: -9rem;
@@ -198,5 +195,9 @@ c-card-actions {
 
 c-card-actions > c-button {
   margin: 0;
+}
+
+c-link {
+  margin-top: -1rem;
 }
 </style>

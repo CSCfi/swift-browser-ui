@@ -79,15 +79,18 @@
       id="optionsbar"
       justify="space-between"
     >
-      <div class="search">
-        <b-input
-          v-model="searchQuery"
-          :placeholder="$t('message.objects.filterBy')"
-          type="search"
-          icon="filter-variant"
+      <c-text-field
+        id="search"
+        v-csc-model="searchQuery"
+        name="search"
+        :placeholder="$t('message.objects.filterBy')"
+        type="search"
+      >
+        <i 
+          slot="pre" 
+          class="mdi mdi-filter-variant mdi-24px"
         />
-      </div>
-
+      </c-text-field>
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
@@ -109,6 +112,22 @@
       @selected-rows="handleSelection"
       @delete-object="toggleDeleteModal([$event])"
     />
+    <c-toasts
+      id="objects-toasts"
+      data-testid="objects-toasts"
+    />
+    <c-toasts
+      id="largeDownload-toasts"
+      data-testid="largeDownload-toasts"
+    >
+      <p>{{ $t("message.largeDownMessage") }}</p>
+      <c-button
+        text
+        @click="removeToast"
+      >
+        {{ $t("message.largeDownAction") }}
+      </c-button>
+    </c-toasts>
   </div>
 </template>
 
@@ -427,17 +446,19 @@ export default {
         });
       }
     },
+    removeToast: function() {
+      this.enableDownload();
+      document.querySelector("#largeDownload-toasts")
+        .removeToast("largeDownload");
+    },
     confirmDownload: function () {
-      // Snackbar for enabling large downloads for the duration of the
-      // session
-      this.$buefy.snackbar.open({
-        duration: 5000,
-        message: this.$t("message.largeDownMessage"),
-        type: "is-success",
-        position: "is-top",
-        actionText: this.$t("message.largeDownAction"),
-        onAction: this.enableDownload,
-      });
+      document.querySelector("#largeDownload-toasts").addToast(
+        { type: "info",
+          message: "",
+          id: "largeDownload",
+          progress: false,
+          custom: true },
+      );
     },
     enableDownload: function () {
       // Enables large downloads upon execution
@@ -693,6 +714,10 @@ export default {
 
 <style scoped lang="scss">
 @import "@/css/prod.scss";
+
+#search {
+  flex: 0.4;
+}
 
 .back-link {
   display: flex;
