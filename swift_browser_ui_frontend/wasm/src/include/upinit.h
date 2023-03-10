@@ -9,6 +9,11 @@ Upload process initialization functions.
 #define SWIFT_UI_UPLOAD_UPINIT_INCLUDED
 
 /*
+Wrapt libsodium initialization.
+*/
+void libinit();
+
+/*
 Add a public key from ftw entry
 */
 int add_recv_key(

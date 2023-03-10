@@ -4,6 +4,9 @@ var Module = {
   onRuntimeInitialized: () => {
     moduleStartComplete = true;
   },
+  printErr: (text) => {
+    console.log("WASM execution debug: ", text);
+  },
 };
 
 function timeout(ms) {

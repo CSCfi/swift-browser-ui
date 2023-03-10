@@ -79,6 +79,18 @@ finalAddRecv:
     return 0;
 }
 
+void libinit() {
+    if (sodium_init() == -1) {
+        #ifdef C4GH_WASM_DEV
+        printf("Couldn't initialize sodium\n");
+        #endif
+        return;
+    }
+
+    // Main reason for init, only stir once to not run out of entropy
+    randombytes_stir();
+}
+
 /*
 Read in the receiver keys
 */
@@ -89,7 +101,6 @@ int read_in_recv_keys(ENCRYPT_SESSION *sess) {
     }
 
     // Create an ephemeral keypair
-    randombytes_stir();
     crypto_kx_keypair(
         sess->seckey,
         sess->pubkey

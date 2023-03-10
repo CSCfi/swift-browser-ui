@@ -29,7 +29,6 @@ ENCRYPT_SESSION *open_decrypt_session() {
     ENCRYPT_SESSION *ret = open_session_enc();
 
     // Create temporary keys for the session
-    randombytes_stir();
     crypto_kx_keypair(
         ret->pubkey,
         ret->seckey
