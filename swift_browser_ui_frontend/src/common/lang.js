@@ -6,46 +6,44 @@ let default_translations = {
   en: {
     message: {
       indexOIDC: {
-        logIn: "Login",
+        logIn: "Log in",
         href: "/login/oidc",
       },
       index: {
         formName: "Openstack Account",
-        logIn: "Log In",
+        logIn: "Log in",
         loginmethods: [
           {
-            msg: "Log In with SSO",
+            msg: "Log in with SSO",
             href: "/login/oidc_front",
           },
         ],
       },
       error: {
-        frontPage: "To the Front Page",
-        BadRequest: "400 - Bad Request",
+        frontPage: "Go to front page",
+        BadRequest: "400 – Bad Request",
         BadRequest_text:
           "Something was wrong with the request. This can " +
           "be for example due to missing password and/or " +
           "username.",
-        UIdown: "503 - Service Unavailable",
-        UIdown_text: "Allas User Interface is currently Unavailable",
-        Unauthorized: "401 – Not logged in",
+        UIdown: "503 – Service Unavailable",
+        UIdown_text: "Allas user interface is currently unavailable",
+        Unauthorized: "401 – Not Logged In",
         Unauthorized_text:
           "The action requested requires logging " +
           "in, or the log in credentials were incorrect. " +
           "Use the button below to Log in.",
-        Notfound: "404 – Could not find the page that was requested.",
+        Notfound: "404 – Page Not Found",
         Notfound_text:
-          "The front page, however, can be found – in the link " + "below.",
-        Forbidden: "403 – Wait, that is forbidden!",
+          "The page you were looking for was not found.",
+        Forbidden: "403 – Forbidden",
         Forbidden_text:
-          "The previous request could not be fulfilled. " +
-          "If said operation should be allowed to be " +
-          "performed, contact the service administrator. " +
-          "Otherwise head back to the front page from the " +
-          "button below.",
-        inUse: "Bucket name already in use.",
-        invalidName: "Bucket name is invalid.",
-        createFail: "Bucket creation failed.",
+          "Your previous request could not be fulfilled. " +
+          "If this request should have been allowed, " +
+          "please contact servicedesk@csc.fi.",
+        inUse: "Folder name already in use.",
+        invalidName: "Folder name is invalid.",
+        createFail: "Folder creation failed.",
         idb: "Firefox in private mode is not supported.",
         idb_text:
           "Firefox is not supported in private mode. " +
@@ -53,10 +51,8 @@ let default_translations = {
           "switch to another browser.",
       },
       dropFiles: "Drag and drop folders here or ",
-      help: "Help",
-      helplink: "https://docs.csc.fi/data/sensitive-data/sd_connect/",
       support: "Support",
-      program_name: "SD Connect",
+      program_name: "Swift browser",
       program_description:
         "Web UI for browsing contents in Swift object " + "storage systems.",
       program_description_step_2: "",
@@ -64,8 +60,8 @@ let default_translations = {
       selectProj: "Select project",
       createFolder: "Create folder",
       uploadSecondaryNav: "Upload",
-      logOut: "Log Out",
-      cscOrg: "CSC - IT Center For Science LTD",
+      logOut: "Log out",
+      cscOrg: "CSC - IT Center For Science Ltd.",
       devel: "Developed by",
       folderTabs: {
         all: "All folders",
@@ -77,8 +73,7 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. You can view files only by" +
-          " using SD Desktop and download files in this folder (Read access)",
+          "This folder is shared with you. (Read access)",
         shared_with_read_write:
           "This folder is shared with you. You can view, download, upload" +
           " and edit tags in this folder (Read and write access).",
@@ -87,26 +82,20 @@ let default_translations = {
         name: "Name",
         objects: "Objects",
         size: "Size",
-        modified: "Last Modified",
+        modified: "Last modified",
         paginated: "Paginated",
         pageNb: "per page",
-        fileHash: "Hash",
-        fileType: "Type",
-        fileDown: "File Download",
-        owner: "Owner Project Identifier",
         created: "Created",
-        folderDetails: "No details for folders",
-        clearChecked: "Clear checked",
         tags: "Tags",
         editTags: "Edit tags",
-        deleteSelected: "Delete selected items",
-        clearSelected: "Clear selections",
+        deleteSelected: "Delete",
+        clearSelected: "Clear",
         itemSelected: "item selected",
         itemsSelected: "items selected",
         items: "Items",
         itemsPerPage: "Items per page: ",
         nextPage: "Next page",
-        prevPage: "Previous Page",
+        prevPage: "Previous page",
         page: "Page",
         shared_status: "Shared status",
         sharing: "You have shared",
@@ -120,144 +109,87 @@ let default_translations = {
       },
       tableOptions: {
         displayOptions: "Display options",
-        render: "Render folders",
-        text: "Display as text",
+        render: "Show as folders",
+        text: "Show as objects",
         hideTags: "Hide tags",
         showTags: "Display tags",
         hidePagination: "Hide pagination",
         showPagination: "Display pagination",
       },
-      discover: {
-        sync_shares: "Synchronize shared buckets",
-        sync_success_template: "Successfully synchronized ",
-        sync_success_concat: " shared buckets",
-        sync_failure_template: "No new shared buckets to synchronize.",
-      },
       dashboard: {
-        prj_usage: "Project usage",
-        account: "Project Identifier",
-        containers: "Buckets",
-        objects: "Objects",
-        usage: "Usage",
-        cur_billing: "Currently consumes",
-        prj_str_usag: "Project storage usage",
-        equals: "Equals",
-        more_info: "More information",
-        dashboard: "User information",
-        browser: "Browser",
         project_info: "Project information",
-        tooltip_disable: "Hide tooltip",
-        hour: "hour",
-        default_notify:
-          "The information on consumed billing units and the " +
-          "available quota is derived from the default Pouta " +
-          "values. If there's a separate pricing contract " +
-          "with CSC for the project used, the values " +
-          "specific the project may vary.",
-        resources: "Resources",
-        tokens: "Sharing API tokens",
-        links: [
-          {
-            msg: "Pouta billing information",
-            href: "https://docs.csc.fi/cloud/pouta/accounting/",
-          },
-          {
-            msg: "Pouta default quotas",
-            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-          },
-          {
-            msg: "Information on project billing unit availability etc.",
-            href: "https://my.csc.fi",
-          },
-        ],
       },
       share: {
         share: "Share",
         share_id: "Share ID",
         share_id_tooltip:
-          "<strong>When another project wants to share a folder " +
-          "with your project</strong><br/>Select this button and " +
-          "send the Share ID (now copied in your cache) " +
-          "to the project's member.<br/><br/> " +
-          "<strong>When you want to share a folder with " +
-          "another project</strong><br/>Ask the Share ID from " +
-          "another project's member.",
+          "With this action, you can copy the Share ID: " +
+          "a unique 32-digit code associated with your <b>currently " +
+          "selected</b> CSC project. Provide the Share ID to members " +
+          "of other CSC projects (e.g., via email) so that they can " + 
+          "share folders with you.",
         close: "Close",
-        instructions: "Share ID instructions",
-        close_instructions: "Close instructions",
-        share_cont: "Share the bucket",
+        instructions: "How to share a folder",
+        close_instructions: "Hide",
+        share_cont: "Share the folder",
         share_title: "Share folder",
         share_subtitle:
-          "This folder is already accessible to all the members" +
-          " of this project.",
+          "This folder is shared by default " +
+          "with all project members in the project ",
         share_other_projects: "Share with other projects",
+        share_guide_intro:
+          "To share a folder with another CSC project you need to:",
         share_guide_step1:
-          "1. Ask recipient project’s member to select " +
-          "Copy Share ID button next to Select project dropdown when " +
-          "correct project is selected.",
+          "1. Enter the Share ID. You need to know in advance " +
+          "the Share ID (a 32-digit code) associated " +
+          "with the CSC project you want to share a folder with. The " +
+          "recipient can copy the Share ID from the user " +
+          "interface and provide it to you via email. You can share " +
+          "a folder with multiple CSC projects.",
         share_guide_step2:
-          "2. Recipient’s Share ID is copied in the cache memory " +
-          "and recipient project’s member can paste it to email etc. " +
-          "and send it to you.",
-        permissions: "Permissions",
-        read_perm: "Read",
-        write_perm: "Read and write",
+          "2. Select the permission rights: ",
+        share_guide_step2_list: [
+          "View: project members can access the folder's content via " +
+          "SD Desktop but can not directly download or copy " +
+          "its content.",
+          "Copy and download: project members can copy, download " +
+          "and decrypt the folder content.",
+          "Copy, download and upload: project members can copy, " +
+          "download and decrypt the folder content. They can also upload " +
+          "new files to the shared folder accessible to both CSC projects.",
+        ],
+        permissions: "Select permissions",
+        view_perm: "View",
+        read_perm: "Copy and download",
+        write_perm: "Copy, download and upload",
         shared_successfully: "Folder was shared successfully!",
-        remove_permission: "Permission was removed successfully!",
-        update_permission: "Permission was changed successfully.",
-        shared_table_title: "Project's folder has been shared with",
-        field_label: "Project Identifiers to share with",
+        remove_permission: "Permissions were removed successfully!",
+        update_permission: "Permissions were changed successfully.",
+        shared_table_title: "This folder is shared with",
         field_placeholder: "Add Share IDs",
         cancel: "Cancel",
         confirm: "Share",
-        to_me: "Shared to the project",
-        from_me: "Shared from the project",
-        request_sharing: "Request sharing",
-        shared: "Shared",
-        sharedTo: "Shared to",
-        container: "Bucket",
-        owner: "Owner project identifier",
-        shared_details_to: "Shared to: ",
-        shared_details_address: "Bucket address: ",
-        shared_details_rights: "Rights given: ",
-        shared_details_read: "Read access",
-        shared_details_write: "Write access",
-        created: "Created",
         fail_noperm: "Please select permissions to grant!",
         fail_noid: "Please give at least one Project Identifier!",
-        fail_nocont: "Please specify the bucket!",
-        fail_duplicate: "The project already has access to the bucket!",
-        new_share_button: "Share a bucket",
-        container_label: "Bucket",
-        revoke: "Revoke bucket access",
-        revoke_project: "Revoke access from project",
-        success_delete: "Successfully deleted sharing action",
-        request_sync_nocont:
-          "Cannot synchronize access requests without a " + "bucket",
-        request_synced: "Successfully synchronized access requests",
-        request_not_synced: "No access requests to sync",
-        sync_requests: "Synchronize bucket share requests",
+        fail_duplicate: "The project already has access to the folder!",
       },
       request: {
         project: "Project",
-        container: "Bucket / Identifier",
-        container_message: "The requested bucket name",
+        container: "Folder / Identifier",
+        container_message: "The requested folder name",
         owner: "Owner Project Identifier",
-        owner_message: "Project Identifier of the bucket owner",
+        owner_message: "Project Identifier of the folder owner",
         request: "Request",
         multi_project:
           "Your account has access to multiple projects. " +
           "Please verify that the correct project is set " +
           "active in the menu, and submit the request with " +
           "the Request button.",
-        requestHeading: "Request access to a bucket",
+        requestHeading: "Request access to a folder",
       },
-      largeFileMessage: "",
       download: " Download",
-      downloadLink: "Download Link",
-      downloadContainer: " Download Bucket",
-      downloadAlt: "Download link for",
-      downloadAltLarge: "Confirm download large file",
+      downloadLink: "Download link",
+      downloadContainer: " Download folder",
       largeDownMessage:
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
@@ -268,35 +200,35 @@ let default_translations = {
         sharedFrom: "You haven't shared any folders.",
         sharedTo: "No folders have been shared with you.",
       },
-      emptyShared: "No buckets have been shared to the project.",
+      emptyShared: "No folders have been shared to the project.",
       emptyRequested:
-        "No shared buckets have been requested for the " + "project.",
+        "No shared folders have been requested for the project.",
       sharing: "Sharing - ",
-      containers: "Buckets - ",
+      containers: "Folders - ",
       upload: {
         upload: " Upload",
-        uploadfolder: " Upload Folder",
+        uploadfolder: " Upload folder",
         chunking: "Chunking",
         uploading: "Uploading ",
         cancelupload: " Cancel uploading",
         addfiles: "File / Files scheduled for uploading",
         upfinish: "Finished uploading ",
         upfail: "Failed uploading ",
-        upnotsupported: "Uploading is not supported on your browser",
+        upnotsupported: "Uploading is not supported by your browser",
         isStarting: "Data upload will start shortly",
-        hasStarted: "Upload has started",
+        hasStarted: "Uploading has started",
         inProgress: "Upload in progress",
-        longProgress: "Upload in progress, uploading ",
+        longProgress: "Upload in progress",
         viewDestinationFolder: "View destination folder",
         maximize: "Maximize",
         minimize: "Minimize",
         estimate: "It may take few minutes.",
         complete: "Uploading completed",
-        cancelled: "Upload cancelled",
+        cancelled: "Uploading cancelled",
       },
       copy: " Copy",
-      copied: "Share ID copied to clipboard!",
-      copy_failed: "Copy failed!",
+      copied: "Share ID copied to clipboard",
+      copy_failed: "Copying failed",
       create: "Create",
       delete: "Delete",
       remove: "Remove",
@@ -306,49 +238,37 @@ let default_translations = {
       save: "Save",
       options: "Options",
       createContainerButton: "Create folder",
-      copysuccess: "The folder is being copied",
+      copysuccess: "Copying in progress",
       copytime: "It may take few seconds",
-      copyfail: "Failed to copy the bucket",
-      renderFolders: "Render as Folders",
+      copyfail: "Failed to copy the folder",
+      renderFolders: "Render as folders",
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
         addContainer: "Create new folder",
-        editContainer: "Editing bucket: ",
         norename:
           "Please note that folder names cannot be modified " +
           "after creating a folder.",
         createdFolder:
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
-        deleteConfirm: "Delete Bucket",
-        deleteNote:
-          "Deleting a container requires " + "deleting all objects first.",
+        deleteConfirm: "Delete folder",
+        deleteNote: "You can only delete empty folders. " +
+        "Please delete all items first.",
         deleteConfirmMessage:
-          "Are you sure you want to delete this " + "bucket?",
-        deleteSuccess: "Bucket Deleted",
+          "Are you sure you want to delete this folder?",
+        deleteSuccess: "Folder deleted",
         folderName: "Folder name",
-        containerMessage: "The name of the new bucket",
-        fullDelete:
-          "Deleting a bucket with contents requires deleting " +
-          "all objects inside it first.",
       },
       objects: {
-        objectName: "Object",
-        editObject: "Editing object: ",
-        filterBy: "Filter by Name or Tag",
-        norename:
-          "Please note that folder names cannot be modified" +
-          "after creating a folder.",
-        deleteConfirm: "Delete Objects",
-        deleteObjects: "Delete Object / Objects",
-        deleteSuccess: "Objects deleted",
+        filterBy: "Filter by name or tag",
+        deleteConfirm: "Delete files",
+        deleteObjects: "Delete file(s)",
+        deleteSuccess: "Files deleted",
         deleteObjectsMessage:
-          "Are you sure you want to delete these " + "objects?",
+          "Are you sure you want to delete the file(s)?",
       },
       replicate: {
-        destinationLabel: "Destination bucket",
-        destinationMessage: "Insert copy destination bucket here",
         destinationExists: "Folder already exists",
         copy_folder: "Copy folder: ",
         name_newFolder: "Name new folder",
@@ -368,53 +288,26 @@ let default_translations = {
           "the token somewhere before navigating away from the " +
           "token page.",
         tokenCopied: "Token copied.",
-        back: "Back to main view",
+        back: "Back to all folders",
       },
       encrypt: {
         uploadFiles: "Upload files",
         upload_step1: "Create a new folder or use existing ones.",
         upload_step2: "Files to be uploaded",
-        enTooLarge:
-          "The total size of files amounts to more than 1024 " +
-          "megabytes, which can lead to a failure in encryption. " +
-          "Try uploading files in smaller batches, or encrypt " +
-          "them before uploading normally.",
-        enNotAvail:
-          "ServiceWorker function not available in this browser. " +
-          "Recommended browsers are Firefox and Chrome.",
-        enFiles: "Encrypt files before upload",
-        fsWriteFail:
-          "Failed to copy files into temporary file system. " +
-          "Try refreshing and uploading in smaller batches.",
-        enFail:
-          "Failed to encrypt files. This might be due to incorrectly " +
-          "loaded encryption engine, or unavailable memory. Try " +
-          "refreshing the page.",
-        files: "Files",
-        ephemeral: "Use own private key",
-        multipleReceivers: "Add other receivers' public keys",
+        ephemeral: "Use your own private key for encryption",
+        multipleReceivers: "Add other recipient's public keys",
         pk: "Private key",
-        pk_msg: "Sender private key",
+        pk_msg: "Sender's private key",
         phrase: "Private key passphrase",
         phrase_msg: "Private key passphrase",
-        pubkey: "Receiver public keys",
-        pubkey_msg: "Paste a receiver public key",
-        pubkeyLabel: "Public key (sha256)",
-        noRecipients: "No additional receivers public keys",
-        addkey: "Add receiver public key",
-        addFiles: "Add files",
-        container: "Destination bucket",
-        container_msg: "Upload destination bucket",
-        container_hint: "Use this field to change the name of the bucket",
+        pubkey: "Recipient's public keys",
+        pubkey_msg: "Paste the public key of a recipient",
+        pubkeyLabel: "Public keys of recipients",
+        noRecipients: "No public keys added",
+        addkey: "Add the recipient's public key (sha256)",
         dropMsg: "Select files",
-        enup: "Encrypt and Upload",
         normup: "Upload",
-        upStart: "Started uploading.",
-        enStart: "Encrypting files. This might take a few minutes.",
-        enSuccess: "Encryption successful.",
         empty: "No files selected",
-        defaultKeysMessage: "Default public keys added.",
-        clearDrop: "Clear Files",
         cancel: "Cancel",
         table: {
           name: "Name",
@@ -431,17 +324,17 @@ let default_translations = {
         refresh: "Refresh",
       },
       search: {
-        container: "Bucket",
+        container: "Folder",
         object: "Object",
         folder: "Folder",
         tags: "Tags",
         objects: "Objects",
         size: "Size",
         empty: "No results found",
-        searchBy: "Search by Name or Tag",
+        searchBy: "Search by name or tag",
         buildingIndex:
-          "This project has a large number of objects. Please, " +
-          "wait while the search index is ready, and try again.",
+          "This project has a large number of files. Please " +
+          "wait a moment and try again.",
       },
       select: {
         heading: "Select project for logging in",
@@ -468,16 +361,16 @@ let default_translations = {
         manual: "User manual",
         billing: "Billing unit calculator",
         sharing: "Sharing API tokens",
-        about: "About Sensitive Data Services",
+        about: "About",
       },
       footerMenu: {
-        title: "SD Connect",
-        serviceProvider: "CSC - IT Center for Science Ltd.",
+        title: "Swift browser",
+        serviceProvider: "CSC – IT Center for Science Ltd.",
         serviceProviderLink: "https://csc.fi",
         menuItem1: "Item 1",
         menuItemLink1: "#",
-        menuItem2: "Item 2",
-        menuItemLink2: "#",
+        menuItem2:"Item 2",
+        menuItemLink2:"#",
       },
     },
     label: {
@@ -511,7 +404,7 @@ let default_translations = {
       },
       error: {
         frontPage: "Etusivulle",
-        BadRequest: "400 - Virheellinen pyyntö",
+        BadRequest: "400 – Virheellinen pyyntö",
         BadRequest_text:
           "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
           "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
@@ -615,113 +508,60 @@ let default_translations = {
         hidePagination: "Piilota sivutus",
         showPagination: "Näytä sivutus",
       },
-      discover: {
-        sync_shares: "Synkronoi jaetut säiliöt",
-        sync_success_template: "Synkronoitiin ",
-        sync_success_concat: " jaettua säiliötä",
-        sync_failure_template: "Ei uusia jaettuja säiliöitä synkronoitavaksi.",
-      },
       dashboard: {
-        prj_usage: "Projektin resurssienkäyttö",
-        account: "Projektin tunniste",
-        containers: "Kontteja",
-        objects: "Objekteja",
-        usage: "Tilankäyttö",
-        cur_billing: "Nykyinen kulutus",
-        prj_str_usag: "Projektin tilankäyttö",
-        equals: "Tarkoittaen",
-        more_info: "Lisätietoja",
-        dashboard: "Käyttäjän tiedot",
-        browser: "Selain",
         project_info: "Projektin tiedot",
-        tooltip_disable: "Piilota ohje",
-        hour: "tunti",
-        default_notify:
-          "Esitetty tieto laskutusysiköiden kulutuksesta ja " +
-          "käyttörajoista on laskettu Poudan oletusarvojen " +
-          "mukaan. Jos käytetylle projektille on erillinen " +
-          "sopimus laskutuksesta CSC:n kanssa, tarkat arvot " +
-          "voivat poiketa näytetyistä.",
-        resources: "Resurssit",
-        tokens: "Jaetun sisällön APIn avaimet",
-        links: [
-          {
-            msg: "Tietoa Pouta-palvelun laskutuksesta (englanniksi)",
-            href: "https://docs.csc.fi/cloud/pouta/accounting/",
-          },
-          {
-            msg: "Tietoa Pouta-palvelun käyttörajoista (englanniksi)",
-            href: "https://docs.csc.fi/data/Allas/introduction/#billing-and-quotas",
-          },
-          {
-            msg:
-              "Tietoa projektin laskutusyksiköiden määrästä jne." +
-              " (englanniksi)",
-            href: "https://my.csc.fi",
-          },
-        ],
       },
       share: {
         share: "Jaa",
         share_id: "Jaa tunnus",
         share_id_tooltip:
-          "<strong>Mikäli toisesta projektista halutaan jakaa kansio " +
-          "projektisi kanssa</strong><br/>Valitse tämä nappi ja lähetä " +
-          "Jakotunnus toisen projektin jäsenelle.<br/><br/><strong>" +
-          "Halutessasi jakaa kansion toisen projektin kanssa</strong>" +
-          "<br/>Pyydä jakotunnusta joltakin kyseisen projektin jäseneltä.",
-        close: "Kiinni",
-        instructions: "Jaa tunnus ohjeet",
+          "Tällä toiminnolla voit kopioida Jaa tunnuksen: uniikin " +
+          "32-numeroisen koodin, joka on yhdistetty CSC projektiisi. " +
+          "Lähetä tunnus (esim. sähköpostilla) muiden CSC projektien " +
+          "jäsenille, niin he voivat jakaa kansioita sinulle.",
+        close: "Sulje",
+        instructions: "Kuinka jaan kansion",
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
         share_subtitle:
-          "Tämä kansio on jo kaikkien tämän projektin jäsenten käytettävissä.",
+          "Tämä kansio on kaikkien jäsenten käytettävissä projektissa ",
         share_other_projects: "Jaa toisen projektin kanssa",
+        share_guide_intro:
+          "Kun haluat jakaa kansion toisen CSC projektin kanssa: ",
         share_guide_step1:
-          "1. Projektin jäsenet löytävät projektitunnuksen projektin " +
-          "tietosivulta. Siirry Profiili valikkoon -> Projektin tiedot.",
+          "1. Syötä Jaa tunnus koodi. Sinun tulee tietää " +
+          "vastaanottavan projektin Jaa tunnus (32-numeroinen " +
+          "koodi). Vastaanottaja voi " +
+          "kopioida Jaa tunnuksen käyttöliittymästä Kopio Jaa tunnus-napilla " +
+          "ja lähettää sen sinulle esim. sähköpostilla. " +
+          "Voit jakaa kansion useiden CSC projektien kanssa.",
         share_guide_step2:
-          "2. Kopioi projektin tunnus ja lähetä se sähköpostitse jne.",
+          "2. Valitse käyttöoikeudet: ",
+        share_guide_step2_list: [
+          "Katsele: projektin jäsenet voivat katsella kansion sisältöä " +
+          "SD Desktopin kautta, mutta eivät voi ladata ja kopioida " +
+          "kansion sisältöä.",
+          "Kopioi ja lataa: projektin jäsenet voivat kopioida ja ladata " +
+          "kansion sisällön sekä purkaa kansion sisällön salauksen.",
+          "Kopioi, lataa ja lähetä: projektin jäsenet voivat kopioida ja " +
+          "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
+          "He voivat myös lähettää tiedostoja jaettuun kansioon."],
         permissions: "Käyttöoikeudet",
-        read_perm: "Salli säiliön luku",
-        write_perm: "Salli säiliöön kirjoitus",
+        view_perm: "Katsele",
+        read_perm: "Kopioi ja lataa",
+        write_perm: "Kopioida, lataa ja lähetä",
         shared_successfully: "Kansion jakaminen onnistui!",
         remove_permission: "Lupa poistettiin onnistuneesti!",
         update_permission: "Lupa muutettiin onnistuneesti.",
-        shared_table_title: "Projektin kansio on jaettu",
-        project_id: "Projektin tunnus",
-        field_label: "Jaa projektitunnisteille",
+        shared_table_title: "Tämä kansio on jaettu",
         field_placeholder: "Lisää projektitunnukset",
         cancel: "Peru",
         confirm: "Jaa",
-        to_me: "Jaettu projektille",
-        from_me: "Jaettu projektista",
-        request_sharing: "Pyydä jakamista",
-        shared: "Jaettu",
-        sharedTo: "Jaettu",
-        container: "Säiliö",
-        owner: "Omistavan projektin tunniste",
-        created: "Luotu",
-        shared_details_to: "Jaettu projektille: ",
-        shared_details_address: "Säiliön osoite: ",
-        shared_details_rights: "Annetut oikeudet: ",
-        shared_details_read: "Lukuoikeus",
-        shared_details_write: "Kirjoitusoikeus",
         fail_noperm: "Valitse jaettavat oikeudet!",
         fail_noid:
           "Anna vähintään yhden projektin tunniste (Project " + "Identifier)!",
-        fail_nocont: "Anna jaettava säiliö!",
         fail_duplicate: "Säiliö on jo jaettu projektille!",
-        new_share_button: "Jaa säiliö",
-        container_label: "Säiliö",
-        revoke: "Poista jakaminen",
-        revoke_project: "Poista jakaminen projektilta",
-        success_delete: "Säiliön jaetun oikeuden poistaminen onnistui",
-        request_sync_nocont: "Ei voida hakea jakopyyntöjä ilman säiliötä",
-        request_synced: "Säiliön jakopyyntöjen haku onnistui",
-        request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
-        sync_requests: "Synkronoi säiliön jakopyynnöt",
       },
       request: {
         project: "Projekti",
@@ -737,7 +577,6 @@ let default_translations = {
           "-painikkeella.",
         requestHeading: "Pyydä oikeuksia säiliöön",
       },
-      largeFileMessage: "",
       download: " Lataa",
       downloadContainer: " Lataa säiliö",
       downloadLink: "Latauslinkki",
@@ -799,37 +638,26 @@ let default_translations = {
       tagPlaceholder: "# Lisää tunniste ja paina rivinvaihtoa",
       container_ops: {
         addContainer: "Luo uusi säiliö",
-        editContainer: "Muokataan säiliötä: ",
         norename:
           "Säiliötä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteConfirm: "Poista säiliö",
-        deleteNote:
-          "Säilön poistaminen edellyttää kaikkien " +
+        deleteNote: "Säilön poistaminen edellyttää kaikkien " +
           "objektien poistamista ensin.",
         deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
         deleteSuccess: "Säiliö poistettu",
         folderName: "Kansion nimi",
-        containerMessage: "Uuden säiliön nimi",
-        fullDelete: "Säiliön sisältö on poistettava ennen säiliön postamista.",
       },
       objects: {
-        objectName: "Objekti",
-        editObject: "Muokataan objekti: ",
         filterBy: "Suodata nimellä tai tägillä",
-        norename:
-          "Objektia ei voi nimetä uudelleen, " +
-          "mutta sen voi kopioida uudella nimellä.",
         deleteConfirm: "Poista objektit",
         deleteObjects: "Poista objekti / objektit",
         deleteSuccess: "Objektit poistettu",
         deleteObjectsMessage: "Halutako varmasti poistaa nämä objektit?",
       },
       replicate: {
-        destinationLabel: "Kohdesäiliö",
-        destinationMessage: "Lisää kopioinnin kohdesäiliö tähän",
         destinationExists: "Kansio on jo olemassa",
         copy_folder: "Kopioi kansio: ",
         name_newFolder: "Nimeä uusi kansio",
@@ -854,25 +682,6 @@ let default_translations = {
         uploadFiles: "Lataa tiedostoja",
         upload_step1: "Luo uusi kansio tai käytä olemassa olevia.",
         upload_step2: "Ladattavat tiedostot",
-        enTooLarge:
-          "Tiedostojen yhteenlaskettu koko on yli 1024 " +
-          "megatavun rajan, mikä voi johtaa ongelmiin nykyisen " +
-          "salausratkaisun rajoitteiden vuoksi. Lähetä tiedostot " +
-          "pienemmissä erissä tai salaa ne ennen lähettämistä " +
-          "tavallisesti.",
-        enNotAvail:
-          "Selaimestasi ei löydy ServiceWorker -ominaisuutta. " +
-          "Suositellut selaimet ovat Chrome ja Firefox.",
-        enFiles: "Salaa tiedostot ennen lähetystä",
-        fsWriteFail:
-          "Tiedostojen kopiointi väliaikaiseen tallennustilaan " +
-          "ei onnistunut. Päivitä sivu ja koita uudelleen, tai " +
-          "lähetä tiedostot pienemmissä erissä.",
-        enFail:
-          "Tiedostojen salaus epäonnistui. Mahdollisia syitä ovat " +
-          "epäonnistunut salausohjelman lataus tai tilan loppuminen. " +
-          "Päivitä sivu ja kokeile uudelleen.",
-        files: "Tiedostot",
         ephemeral: "Käytä omaa yksityistä avainta",
         multipleReceivers: "Lisää muita vastaanottajien julkisia avaimia",
         pk: "Yksityinen avain",
@@ -880,23 +689,13 @@ let default_translations = {
         phrase: "Yksityisen avaimen salasana",
         phrase_msg: "Yksityisen avaimen salasana",
         addkey: "Lisää vastaanottajan julkinen avain",
-        addFiles: "Lisää tiedostoja",
         pubkey: "Vastaanottajien julkiset avaimet",
         pubkeyLabel: "Julkinen avain (sha256)",
         pubkey_msg: "Liitä vastaanottajan julkinen avain",
         noRecipients: "Ei lisättyjä vastaanottajien julkisia avaimia",
-        container: "Kohdesäiliö",
-        container_msg: "Kohdesäiliö",
-        container_hint: "Voit muuttaa säiliön nimeä tällä kentällä",
         dropMsg: "Valitse tiedostot",
-        enup: "Salaa ja lähetä",
         normup: "Lähetä",
-        upStart: "Aloitettiin tiedostojen lähetys.",
-        enStart: "Salataan tiedostoja. Tämä voi kestää muutaman minuutin.",
-        enSuccess: "Salaaminen onnistui.",
         empty: "Ei valittuja tiedostoja",
-        defaultKeysMessage: "Oletusarvoiset julkiset avaimet lisätty.",
-        clearDrop: "Tyhjennä tiedostot",
         cancel: "Peruuta",
         table: {
           name: "Nimi",
@@ -910,7 +709,7 @@ let default_translations = {
         enReady:
           "Encryption engine is ready. Refresh the " +
           "window to enable encryption.",
-        refresh: "Refresh",
+        refresh: "Refresh", //to translate
       },
       search: {
         container: "Säiliö",
@@ -957,8 +756,8 @@ let default_translations = {
         serviceProviderLink: "#",
         menuItem1: "Menu 1",
         menuItemLink1: "#",
-        menuItem2: "Menu 2",
-        menuItemLink2: "#",
+        menuItem2:"Menu 2",
+        menuItemLink2:"#",
       },
     },
     label: {
