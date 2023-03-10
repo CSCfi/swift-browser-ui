@@ -68,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy b-loading with c-loader from `csc-ui` and remove unused b-loading
 - (GL #944) Replace buefy b-table with c-data-table from `csc-ui`
 - (GL #944) Replace buefy dialogs with c-modal from `csc-ui`
+- (GL #944) Replace buefy notifications with c-toasts from `csc-ui`
 
 ### Fixed
 
