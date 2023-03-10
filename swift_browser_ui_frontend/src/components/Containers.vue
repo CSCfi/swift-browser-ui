@@ -68,9 +68,6 @@ export default {
       },
       set() {},
     },
-    openDeleteModal() {
-      return this.$store.state.openDeleteModal;
-    },
     isFolderCopied() {
       return this.$store.state.isFolderCopied;
     },

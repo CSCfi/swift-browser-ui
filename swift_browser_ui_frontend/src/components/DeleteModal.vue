@@ -1,7 +1,9 @@
 <template>
   <c-card class="delete-modal">
     <c-alert type="error">
-      <div slot="title">{{ title }}</div>
+      <div slot="title">
+        {{ title }}
+      </div>
 
       {{ message }}
 
