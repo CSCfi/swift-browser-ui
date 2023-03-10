@@ -69,8 +69,8 @@
           </p>
           <ul>
             <li
-              v-for="(item, i) 
-                in $t(&quot;message.share.share_guide_step2_list&quot;)"
+              v-for="(item, i) in
+                $t('message.share.share_guide_step2_list')"
               :key="i"
             >
               {{ item }}

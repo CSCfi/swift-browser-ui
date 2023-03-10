@@ -366,7 +366,7 @@ let default_translations = {
       footerMenu: {
         title: "Swift browser",
         serviceProvider: "CSC – IT Center for Science Ltd.",
-        serviceProviderLink: "https://csc.fi",
+        serviceProviderLink: "https://www.csc.fi",
         menuItem1: "Item 1",
         menuItemLink1: "#",
         menuItem2:"Item 2",
@@ -413,24 +413,22 @@ let default_translations = {
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text:
           "Sivun näyttäminen vaatii sisäänkirjauksen, " +
-          "jonka voi toteuttaa oheisesta painikkeesta.",
+          "siirry kirjautumissivulle oheisesta painikkeesta.",
         Notfound: "404 – Etsittyä sivua ei löydetty.",
-        Notfound_text: "Etusivun voi löytää alapuolisesta painikkeesta.",
+        Notfound_text: "Siirry kirjautumissivulle oheisesta painikkeesta.",
         Forbidden: "403 – Tuo on kiellettyä.",
         Forbidden_text:
           "Edellinen operaatio ei ole sallittu. Mikäli " +
           "kyseisen operaation tulisi olla sallittu, ota " +
-          "yhteys palvelun ylläpitoon. Muussa tapauksessa " +
-          "paluu etusivulle on mahdollista oheisesta " +
-          "painikkeesta",
-        inUse: "Säiliön nimi on jo käytössä.",
-        invalidName: "Säiliön nimi ei kelpaa.",
-        createFail: "Säiliön luonti epäonnistui.",
+          "yhteyttä asiakaspalveluun (asiakaspalvelu@csc.fi).",
+        inUse: "Kansion nimi on jo käytössä.",
+        invalidName: "Kansion nimi ei kelpaa.",
+        createFail: "Kansion luonti epäonnistui.",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
-          "Firefoxin yksityinen selaus ei ole tuettu." +
-          "Voidaksesi kirjautua vaihda pois yksityisestä selaamisesta " +
-          "tai käytä toista selainta.",
+        "Firefoxin yksityinen selaustila ei ole tuettu." +
+        "Voidaksesi kirjautua vaihda pois yksityisestä selaustilasta " +
+        "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       help: "Apua",
@@ -445,7 +443,7 @@ let default_translations = {
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
       logOut: "Kirjaudu ulos",
-      cscOrg: "CSC – Tieteen Tietotekniikan Keskus Oy",
+      cscOrg: "CSC – Tieteen tietotekniikan keskus Oy",
       devel: "kehittänyt",
       folderTabs: {
         all: "Kaikki kansiot",
@@ -751,9 +749,9 @@ let default_translations = {
         about: "Tietoa",
       },
       footerMenu: {
-        title: "SD Connect",
+        title: "Swift browser",
         serviceProvider: "CSC – Tieteen tietotekniikan keskus Oy",
-        serviceProviderLink: "#",
+        serviceProviderLink: "https://www.csc.fi",
         menuItem1: "Menu 1",
         menuItemLink1: "#",
         menuItem2:"Menu 2",
