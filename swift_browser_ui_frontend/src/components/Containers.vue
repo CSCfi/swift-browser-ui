@@ -17,7 +17,6 @@
       </c-menu>
     </c-row>
     <ContainerTable
-      :key="tableKey"
       :conts="renderingContainers"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
@@ -57,7 +56,6 @@ export default {
       abortController: null,
       containers: [],
       renderingContainers: [],
-      tableKey: 1,
     };
   },
   computed: {
@@ -87,11 +85,6 @@ export default {
     openShareModal: function () {
       if(!this.openShareModal) {
         this.fetchContainers();
-      }
-    },
-    openDeleteModal: function () {
-      if (!this.openDeleteModal) {
-        this.tableKey++;
       }
     },
     currentProject: function() {
