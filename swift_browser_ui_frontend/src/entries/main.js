@@ -318,7 +318,6 @@ new Vue({
       }
       let discovery = await fetch("/discover");
       discovery = await discovery.json();
-      console.log(discovery);
       if (discovery.sharing_endpoint) {
         this.$store.commit(
           "setSharingClient",
