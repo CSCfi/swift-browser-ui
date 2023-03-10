@@ -17,10 +17,10 @@
       </c-menu>
     </c-row>
     <ContainerTable
+      :key="tableKey"
       :conts="renderingContainers"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
-      :key="tableKey"
     />
     <c-toasts
       id="container-toasts"

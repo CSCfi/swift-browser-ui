@@ -3,19 +3,23 @@
     <c-card-title>{{ title }}</c-card-title>
 
     <c-card-content>
-      <c-row gap="10px" align="center">
-        <i class="mdi mdi-alert-circle"></i>
+      <c-row 
+        gap="10px"
+        align="center"
+      >
+        <i class="mdi mdi-alert-circle" />
         {{ message }}
       </c-row>
     </c-card-content>
 
     <c-card-actions justify="end">
       <c-button 
+        outlined
         @click="toggleDeleteModal"
         @keyup.enter="toggleDeleteModal"
-        outlined
       >
-        Cancel</c-button>
+        Cancel
+      </c-button>
       <c-button 
         @click="isObject ? deleteObjects() : deleteContainer()"
         @keyup.enter="isObject ? deleteObjects() : deleteContainer()"
