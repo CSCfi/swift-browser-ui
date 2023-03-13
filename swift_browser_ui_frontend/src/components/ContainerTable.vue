@@ -30,7 +30,6 @@ import {
   getSharedContainers,
   getAccessDetails,
   toggleCopyFolderModal,
-  modifyBrowserPageStyles,
   toggleDeleteModal,
 } from "@/common/globalFunctions";
 
@@ -257,14 +256,12 @@ export default {
                       this.$store.commit("toggleShareModal", true);
                       this.$store.commit(
                         "setFolderName", item.data.name.value);
-                      modifyBrowserPageStyles();
                     },
                     onKeyUp: (event) => {
                       if(event.keyCode === 13) {
                         this.$store.commit("toggleShareModal", true);
                         this.$store.commit(
                           "setFolderName", item.data.name.value);
-                        modifyBrowserPageStyles();
                       }
                     },
                     disabled: item.owner,

@@ -104,7 +104,6 @@
 <script>
 import {
   toggleCreateFolderModal,
-  modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
 import { mdiInformationOutline } from "@mdi/js";
 
@@ -150,7 +149,6 @@ export default {
     },
     toggleUploadModal: function () {
       this.$store.commit("toggleUploadModal", true);
-      modifyBrowserPageStyles();
     },
     copyProjectId: function () {
       const toastMessage = {
