@@ -13,6 +13,7 @@ import UploadModal from "@/components/UploadModal";
 import EditTagsModal from "@/components/EditTagsModal";
 import ShareModal from "@/components/ShareModal";
 import CopyFolderModal from "@/components/CopyFolderModal";
+import DeleteModal from "@/components/DeleteModal";
 
 // CSC UI things
 import cModel from "@/common/csc-ui.js";
@@ -135,6 +136,7 @@ new Vue({
     EditTagsModal,
     ShareModal,
     CopyFolderModal,
+    DeleteModal,
   },
   data: function () {
     return {
@@ -208,6 +210,14 @@ new Vue({
     openCopyFolderModal: {
       get() {
         return this.$store.state.openCopyFolderModal;
+      },
+      set(newState) {
+        return newState;
+      },
+    },
+    openDeleteModal: {
+      get() {
+        return this.$store.state.openDeleteModal;
       },
       set(newState) {
         return newState;

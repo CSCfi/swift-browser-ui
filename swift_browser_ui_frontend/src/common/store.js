@@ -52,6 +52,8 @@ const store = new Vuex.Store({
     openEditTagsModal: false,
     selectedObjectName: "",
     openCopyFolderModal: false,
+    openDeleteModal: false,
+    deletableObjects: [],
     isFolderCopied: false,
     sourceProjectId: "",
     uploadAbort: undefined,
@@ -230,6 +232,12 @@ const store = new Vuex.Store({
     },
     toggleCopyFolderModal(state, payload) {
       state.openCopyFolderModal = payload;
+    },
+    toggleDeleteModal(state, payload) {
+      state.openDeleteModal = payload;
+    },
+    setDeletableObjects(state, payload) {
+      state.deletableObjects = payload;
     },
     setFolderCopiedStatus(state, payload) {
       state.isFolderCopied = payload;

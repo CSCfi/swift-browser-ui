@@ -31,8 +31,8 @@ import {
   getAccessDetails,
   toggleCopyFolderModal,
   modifyBrowserPageStyles,
+  toggleDeleteModal,
 } from "@/common/globalFunctions";
-import {swiftDeleteContainer} from "@/common/api";
 
 export default {
   name: "ContainerTable",
@@ -397,34 +397,8 @@ export default {
             + container,
         );
       } else {
-        this.$buefy.dialog.confirm({
-          title: this.$t("message.container_ops.deleteConfirm"),
-          message: this.$t("message.container_ops.deleteConfirmMessage"),
-          confirmText: this.$t("message.container_ops.deleteConfirm"),
-          type: "is-danger",
-          hasIcon: true,
-          onConfirm: () => {this.deleteContainer(container);},
-        });
+        toggleDeleteModal(null, container);
       }
-    },
-    deleteContainer: function(container) {
-      document.querySelector("#container-toasts").addToast(
-        { progress: false,
-          type: "success",
-          message: this.$t("message.container_ops.deleteSuccess")},
-      );
-      const projectID = this.$store.state.active.id;
-      swiftDeleteContainer(
-        projectID,
-        container,
-      ).then(async () => {
-        await this.$store.state.db.containers
-          .where({
-            projectID,
-            name: container,
-          })
-          .delete();
-      });
     },
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"
