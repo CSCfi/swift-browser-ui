@@ -681,10 +681,13 @@ let default_translations = {
         pwd: "Salasana",
       },
       supportMenu: {
-        manual: "Käyttöohje",
-        billing: "Hinnoittelulaskuri",
-        sharing: "API avainten jakaminen",
-        about: "Tietoa",
+        item1: "Käyttöohje",
+        itemLink1: "https://docs.csc.fi/data/sensitive-data/",
+        item2: "Hinnoittelulaskuri",
+        itemLink2: "https://research.csc.fi/pricing#buc",
+        item3: "API avainten jakaminen",
+        item4: "Tietoa",
+        itemLink4: "https://research.csc.fi/sensitive-data",
       },
       footerMenu: {
         title: "Swift browser",
