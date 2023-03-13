@@ -1,7 +1,7 @@
 // Swift cross account container sharing API JavaScript bindings module.
 
 
-import { 
+import {
   GET,
 } from "@/common/api";
 
@@ -39,8 +39,9 @@ class SwiftSharingRequest {
     owner,
   ) {
     // Add a request for container access.
-    let url = new URL("/request/user/".concat(username, "/", container),
-      this.address);
+    let url = new URL(this.address.concat("/request/user/",
+      username,
+      "/", container));
     url.searchParams.append("owner", owner);
 
     let signed = await this._getSignature(
@@ -62,8 +63,8 @@ class SwiftSharingRequest {
   async listMadeRequests(
     username,
   ) {
-    let url = new URL("/request/user/".concat(username),
-      this.address);
+    let url = new URL(this.address.concat("/request/user/", username),
+    );
 
     let signed = await this._getSignature(
       60,
@@ -83,8 +84,8 @@ class SwiftSharingRequest {
   async listOwnedRequests(
     username,
   ) {
-    let url = new URL("/request/owner/".concat(username),
-      this.address);
+    let url = new URL(this.address.concat("/request/owner/", username),
+    );
 
     let signed = await this._getSignature(
       60,
@@ -104,8 +105,8 @@ class SwiftSharingRequest {
   async listContainerRequests(
     container,
   ) {
-    let url = new URL("/request/container/".concat(container),
-      this.address);
+    let url = new URL(this.address.concat("/request/container/", container),
+    );
 
     let signed = await this._getSignature(
       60,
@@ -129,7 +130,7 @@ class SwiftSharingRequest {
   ) {
     // Delete the details of an existing share action.
     let url = new URL(
-      "/request/user/".concat(username, "/", container), this.address,
+      this.address.concat("/request/user/", username, "/", container),
     );
     url.searchParams.append("owner", owner);
 

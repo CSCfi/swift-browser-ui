@@ -79,11 +79,11 @@ if ("serviceWorker" in navigator) {
     if(DEV) console.log(err);
   });
 } else {
-  if(DEV) console.log("Did not register Service Worker.");
+  if (DEV) console.log("Did not register Service Worker.");
 }
 
-window.onerror = function(error) {
-  if(DEV) console.log("Global error", error);
+window.onerror = function (error) {
+  if (DEV) console.log("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
   if (DEV) console.log("unhandledrejection", event);
@@ -217,7 +217,7 @@ new Vue({
       get() {
         return this.$store.state.openShareModal;
       },
-      set() {},
+      set() { },
     },
   },
   watch: {
@@ -347,8 +347,7 @@ new Vue({
         let signed = await GET(signatureUrl);
         signed = await signed.json();
         let keyURL = new URL(
-          keyPath,
-          discovery.upload_endpoint,
+          discovery.upload_endpoint.concat(keyPath),
         );
         keyURL.searchParams.append("valid", signed.valid);
         keyURL.searchParams.append("signature", signed.signature);

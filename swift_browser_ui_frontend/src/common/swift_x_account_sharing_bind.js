@@ -47,7 +47,7 @@ class SwiftXAccountSharing {
     username,
   ) {
     // List the containers the user has been given access to.
-    let url = new URL("/access/".concat(username), this.address);
+    let url = new URL(this.address.concat("/access/", username));
 
     let signed = await this._getSignature(
       60,
@@ -71,7 +71,7 @@ class SwiftXAccountSharing {
   ) {
     // Get details from a container the user has been given access to.
     let url = new URL(
-      "/access/".concat(username, "/", container), this.address,
+      this.address.concat("/access/", username, "/", container),
     );
 
     let signed = await this._getSignature(
@@ -94,7 +94,7 @@ class SwiftXAccountSharing {
     username,
   ) {
     // List the containers the user has shared to another user / users.
-    let url = new URL("/share/".concat(username), this.address);
+    let url = new URL(this.address.concat("/share/", username));
 
     let signed = await this._getSignature(
       60,
@@ -117,7 +117,7 @@ class SwiftXAccountSharing {
   ) {
     // Get details from a container the user has given access to.
     let url = new URL(
-      "/share/".concat(username, "/", container), this.address,
+      this.address.concat("/share/", username, "/", container),
     );
 
     let signed = await this._getSignature(
@@ -144,7 +144,7 @@ class SwiftXAccountSharing {
   ) {
     // Upload details about a new share action.
     let url = new URL(
-      "/share/".concat(username, "/", container), this.address,
+      this.address.concat("/share/", username, "/", container),
     );
     url.searchParams.append("user", this._parseListString(userlist));
     url.searchParams.append("access", this._parseListString(accesslist));
@@ -173,7 +173,7 @@ class SwiftXAccountSharing {
   ) {
     // Edit the details of an existing share action.
     let url = new URL(
-      "/share/".concat(username, "/", container), this.address,
+      this.address.concat("/share/", username, "/", container),
     );
     url.searchParams.append("user", this._parseListString(userlist));
     url.searchParams.append("access", this._parseListString(accesslist));
@@ -200,7 +200,7 @@ class SwiftXAccountSharing {
   ) {
     // Delete the details of an existing share action.
     let url = new URL(
-      "/share/".concat(username, "/", container), this.address,
+      this.address.concat("/share/", username, "/", container),
     );
 
     let signed = await this._getSignature(
@@ -228,7 +228,7 @@ class SwiftXAccountSharing {
   ) {
     // Delete all shares on a container
     let url = new URL(
-      "/share/".concat(username, "/", container), this.address,
+      this.address.concat("/share/", username, "/", container),
     );
 
     let signed = await this._getSignature(
