@@ -8,7 +8,7 @@
       :key="tag"
       active
     >
-      {{ tag }}
+      <span>{{ tag }}</span>
       <c-icon
         :path="mdiClose"
         :alt="$t('label.delete_tag')"
@@ -18,10 +18,8 @@
       />
     </c-tag>
     <input
-      id="tag-input"
       type="text"
       :aria-label="$t('label.edit_tag')"
-      maxlength="20"
       :placeholder="$t(placeholder)"
       @blur="$emit('addTag', $event, true)"
       @keydown="$emit('addTag', $event)"
@@ -80,5 +78,12 @@ export default {
   border: none;
   outline: none;
   flex: 1;
+}
+
+span {
+  display: inline-block;
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
