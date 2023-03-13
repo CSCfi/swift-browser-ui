@@ -21,7 +21,7 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess);
 
 struct CHUNK *decrypt_chunk(
     ENCRYPT_SESSION *sess,
-    uint8_t* segment,
+    uint8_t *segment,
     size_t len_segment
 );
 

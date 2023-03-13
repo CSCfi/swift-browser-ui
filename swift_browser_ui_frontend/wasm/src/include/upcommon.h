@@ -14,7 +14,7 @@ Upload process common functions
 /*
 Key init function, from libcrypt4gh
 */
-uint8_t* crypt4gh_session_key_new(void);
+uint8_t *crypt4gh_session_key_new(void);
 
 /*
 Wipe the keys stored in FS.
@@ -29,18 +29,18 @@ CHUNK *allocate_chunk();
 /*
 Get chunk length from struct.
 */
-int warp_chunk_len(CHUNK* chunk);
+int warp_chunk_len(CHUNK *chunk);
 
 
 /*
 Get chunk ptr from struct.
 */
-uint8_t* wrap_chunk_content(CHUNK* chunk);
+uint8_t *wrap_chunk_content(CHUNK *chunk);
 
 /*
 Free a chunk from memory.
 */
-void free_chunk (CHUNK* chunk);
+void free_chunk (CHUNK *chunk);
 
 
 /*

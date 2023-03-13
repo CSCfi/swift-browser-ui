@@ -111,9 +111,9 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
 /*
 Decrypt a 64KiB + 22 chunk of data.
 */
-CHUNK* decrypt_chunk(
+CHUNK *decrypt_chunk(
     ENCRYPT_SESSION *sess,
-    uint8_t* segment,
+    uint8_t *segment,
     size_t len_segment
 ) {
     CHUNK* ret = allocate_chunk();

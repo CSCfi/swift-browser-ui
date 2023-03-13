@@ -19,7 +19,7 @@ Common upload and download related functions
 /*
 Key init function, copied over from libcrypt4gh
 */
-uint8_t* crypt4gh_session_key_new(void){
+uint8_t *crypt4gh_session_key_new(void){
     if (sodium_init() == -1) {
         return NULL;
     }
@@ -75,8 +75,8 @@ int rmrf() {
 /*
 Allocate chunk.
 */
-CHUNK* allocate_chunk() {
-    CHUNK* ret = malloc(sizeof(CHUNK));
+CHUNK *allocate_chunk() {
+    CHUNK *ret = malloc(sizeof(CHUNK));
     if (!ret) {
         return NULL;
     }
@@ -89,7 +89,7 @@ CHUNK* allocate_chunk() {
 /*
 Wrap chunk length from pointer
 */
-int wrap_chunk_len(CHUNK* chunk) {
+int wrap_chunk_len(CHUNK *chunk) {
     return chunk->len;
 }
 
@@ -97,7 +97,7 @@ int wrap_chunk_len(CHUNK* chunk) {
 /*
 Wrap chunk content ptr get
 */
-uint8_t* wrap_chunk_content(CHUNK* chunk) {
+uint8_t *wrap_chunk_content(CHUNK *chunk) {
     return chunk->chunk;
 }
 
@@ -105,7 +105,7 @@ uint8_t* wrap_chunk_content(CHUNK* chunk) {
 /*
 Free chunk contents.
 */
-void free_chunk(CHUNK* chunk) {
+void free_chunk(CHUNK *chunk) {
     if (chunk->chunk) {
         free(chunk->chunk);
     }

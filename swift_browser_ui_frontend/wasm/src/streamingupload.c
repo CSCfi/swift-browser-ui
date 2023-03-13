@@ -50,7 +50,7 @@ ENCRYPT_SESSION *open_session(
 /*
 Wrap crypt4gh header creation for access in JS side.
 */
-CHUNK* wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
+CHUNK *wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
     CHUNK* ret = allocate_chunk();
     crypt4gh_header_build(
         sess->sessionkey,
@@ -66,9 +66,9 @@ CHUNK* wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
 /*
 Encrypt a 64KiB chunk of data.
 */
-CHUNK* encrypt_chunk(
+CHUNK *encrypt_chunk(
     ENCRYPT_SESSION *sess,
-    uint8_t* segment,
+    uint8_t *segment,
     size_t len_segment
 ) {
     CHUNK* ret = allocate_chunk();
