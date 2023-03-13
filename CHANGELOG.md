@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #969) Automate building wasm with npm
 - (GH #983) Make elements more semantic and improve accessibility for screen reader users
 - (GH #989) Make selected Display Options consistent when browsing between pages
+- (GL #944) Replace buefy upload button with a new component: `CUploadButton`
 
 ### Changed
 
