@@ -171,22 +171,22 @@ export default {
           ariaLabel: this.$t("label.support_menu"),
           subs: [
             {
-              title: this.$t("message.supportMenu.manual"),
-              href: "https://docs.csc.fi/data/sensitive-data/",
+              title: this.$t("message.supportMenu.item1"),
+              href: this.$t("message.supportMenu.itemLink1"),
             },
             {
-              title: this.$t("message.supportMenu.billing"),
-              href: "https://research.csc.fi/pricing#buc",
+              title: this.$t("message.supportMenu.item2"),
+              href: this.$t("message.supportMenu.itemLink2"),
             },
             {
-              title: this.$t("message.supportMenu.sharing"),
+              title: this.$t("message.supportMenu.item3"),
               route: {name: "TokensView", params: {
                 user: this.uname,
                 project: this.active.id}},
             },
             {
-              title: this.$t("message.supportMenu.about"),
-              href: "https://research.csc.fi/sensitive-data",
+              title: this.$t("message.supportMenu.item4"),
+              href: this.$t("message.supportMenu.itemLink4"),
             },
           ],
         },
