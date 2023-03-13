@@ -151,7 +151,7 @@ export class DecryptedDownloadSession {
     signatureUrl.searchParams.append("path", this.whitelistPath);
     let signed = await GET(signatureUrl);
     signed = await signed.json();
-    let whitelistUrl = new URL(this.whitelistPath, this.endpoint);
+    let whitelistUrl = new URL(this.endpoint.concat(this.whitelistPath));
     whitelistUrl.searchParams.append("valid", signed.valid);
     whitelistUrl.searchParams.append("signature", signed.signature);
     whitelistUrl.searchParams.append("flavor", "crypt4gh");
