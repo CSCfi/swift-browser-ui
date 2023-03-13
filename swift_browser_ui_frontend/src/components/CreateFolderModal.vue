@@ -82,7 +82,6 @@ import {
 import {
   addNewTag,
   deleteTag,
-  modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
@@ -141,7 +140,6 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.create = true;
-      modifyBrowserPageStyles();
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);

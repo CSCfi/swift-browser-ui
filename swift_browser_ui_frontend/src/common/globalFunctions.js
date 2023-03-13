@@ -6,7 +6,6 @@ export function toggleCreateFolderModal(folderName) {
   if (folderName) {
     store.commit("setFolderName", folderName);
   }
-  modifyBrowserPageStyles();
 }
 
 export function toggleEditTagsModal(objectName, containerName) {
@@ -17,7 +16,6 @@ export function toggleEditTagsModal(objectName, containerName) {
   if (containerName) {
     store.commit("setFolderName", containerName);
   }
-  modifyBrowserPageStyles();
 }
 
 export function toggleCopyFolderModal(folderName, sourceProjectId) {
@@ -28,7 +26,6 @@ export function toggleCopyFolderModal(folderName, sourceProjectId) {
   if(sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
-  modifyBrowserPageStyles();
 }
 
 export function toggleDeleteModal(objects, containerName) {
@@ -39,12 +36,6 @@ export function toggleDeleteModal(objects, containerName) {
   if (containerName) {
     store.commit("setFolderName", containerName);
   }
-  modifyBrowserPageStyles();
-}
-
-export function modifyBrowserPageStyles() {
-  const element = document.getElementById("mainContainer");
-  element.classList.toggle("mainContainer-additionalStyles");
 }
 
 export function getProjectNumber(project) {

@@ -25,7 +25,7 @@
         <label
           class="taginput-label"
           label-for="copy-folder-taginput"
-        >  
+        >
           {{ $t('message.tagName') }}
         </label>
         <TagInput
@@ -67,7 +67,6 @@ import {
 import {
   addNewTag,
   deleteTag,
-  modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
@@ -190,7 +189,6 @@ export default {
       this.$store.commit("setFolderName", "");
       this.folderName = "";
       this.tags = [];
-      modifyBrowserPageStyles();
     },
     replicateContainer: function () {
       // Initiate the container replication operation

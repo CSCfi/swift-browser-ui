@@ -139,7 +139,6 @@ import {
 import {
   addNewTag,
   deleteTag,
-  modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
 
 import ShareModalTable from "@/components/ShareModalTable";
@@ -314,7 +313,6 @@ export default {
       this.tags = [];
       this.isShared = false;
       this.isPermissionRemoved = false;
-      modifyBrowserPageStyles();
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);

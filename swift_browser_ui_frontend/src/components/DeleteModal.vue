@@ -8,14 +8,14 @@
       {{ message }}
 
       <c-card-actions justify="end">
-        <c-button 
+        <c-button
           outlined
           @click="toggleDeleteModal"
           @keyup.enter="toggleDeleteModal"
         >
           {{ $t("message.cancel") }}
         </c-button>
-        <c-button 
+        <c-button
           @click="isObject ? deleteObjects() : deleteContainer()"
           @keyup.enter="isObject ? deleteObjects() : deleteContainer()"
         >
@@ -27,13 +27,10 @@
 </template>
 
 <script>
-import { 
+import {
   swiftDeleteObjects,
   swiftDeleteContainer,
 } from "@/common/api";
-import {
-  modifyBrowserPageStyles,
-} from "@/common/globalFunctions";
 
 export default {
   name: "DeleteModal",
@@ -44,17 +41,17 @@ export default {
   },
   computed: {
     title() {
-      return this.isObject 
+      return this.isObject
         ? this.$t("message.objects.deleteObjects")
         : this.$t("message.container_ops.deleteConfirm");
     },
     message() {
-      return this.isObject 
+      return this.isObject
         ? this.$t("message.objects.deleteObjectsMessage")
         : this.$t("message.container_ops.deleteConfirmMessage");
     },
     confirmText() {
-      return this.isObject 
+      return this.isObject
         ? this.$t("message.objects.deleteConfirm")
         : this.$t("message.container_ops.deleteConfirm");
     },
@@ -83,7 +80,6 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
       this.$store.commit("setFolderName", "");
-      modifyBrowserPageStyles();
     },
     deleteContainer: function() {
       document.querySelector("#container-toasts").addToast(

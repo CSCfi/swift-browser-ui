@@ -44,7 +44,6 @@ import {
 import {
   addNewTag,
   deleteTag,
-  modifyBrowserPageStyles,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
@@ -135,7 +134,6 @@ export default {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
-      modifyBrowserPageStyles();
     },
     saveObjectTags: function () {
       let objectMeta = [

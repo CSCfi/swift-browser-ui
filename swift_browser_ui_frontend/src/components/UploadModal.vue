@@ -169,7 +169,6 @@ import {
 } from "@/common/conv";
 
 import {
-  modifyBrowserPageStyles,
   getProjectNumber,
 } from "@/common/globalFunctions";
 
@@ -540,7 +539,6 @@ export default {
       this.ephemeral = true;
       this.files = [];
       this.clearFiles();
-      modifyBrowserPageStyles();
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

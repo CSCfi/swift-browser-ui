@@ -96,6 +96,10 @@ html, body {
   height: 100%;
 }
 
+body {
+  overflow-y: auto;
+}
+
 #mainContainer {
   min-height: 100vh;
   display: flex;
@@ -109,11 +113,6 @@ html, body {
   display: flex;
   flex-direction: column;
   z-index: 1;
-}
-
-.mainContainer-additionalStyles {
-  position: fixed;
-  width: 100%;
 }
 
 c-modal {
