@@ -59,8 +59,14 @@
       hide-footer
     />
     <c-toasts
-      id="token-toasts"
-      data-testid="token-toasts"
+      id="add-token-toasts"
+      data-testid="add-token-toasts"
+      vertical="top"
+      horizontal="right"
+    />
+    <c-toasts
+      id="copy-token-toasts"
+      data-testid="copy-token-toasts"
     />
   </div>
 </template>
@@ -150,12 +156,14 @@ export default {
         identifier,
       ).then((ret) => {
         this.latest = ret;
-        this.$buefy.notification.open({
-          message: this.$t("message.tokens.copyToken"),
-          duration: 3600000,
-          type: "is-success",
-          queue: false,
-        });
+        document.querySelector("#add-token-toasts").addToast(
+          {
+            duration: 3600000,
+            type: "success",
+            progress: false,
+            message: this.$t("message.tokens.copyToken"),
+          },
+        );
         this.getTokens();
       });
     },
@@ -168,7 +176,7 @@ export default {
           this.latest,
         ).then(() => {
           this.copied = true;
-          document.querySelector("#token-toasts").addToast(
+          document.querySelector("#copy-token-toasts").addToast(
             {
               duration: 6000,
               type: "success",

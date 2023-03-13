@@ -66,6 +66,11 @@
           </p>
         </div>
       </c-toasts>
+      <c-toasts
+        id="container-error-toasts"
+        vertical="top"
+        horizontal="right"
+      />
     </div>
     <CFooter />
   </div>
