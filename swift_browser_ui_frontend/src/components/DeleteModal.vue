@@ -1,28 +1,28 @@
 <template>
   <c-card class="delete-modal">
-    <c-card-title>{{ title }}</c-card-title>
+    <c-alert type="error">
+      <div slot="title">
+        {{ title }}
+      </div>
 
-    <c-card-content>
-      <c-row gap="10px" align="center">
-        <i class="mdi mdi-alert-circle"></i>
-        {{ message }}
-      </c-row>
-    </c-card-content>
+      {{ message }}
 
-    <c-card-actions justify="end">
-      <c-button 
-        @click="toggleDeleteModal"
-        @keyup.enter="toggleDeleteModal"
-        outlined
-      >
-        Cancel</c-button>
-      <c-button 
-        @click="isObject ? deleteObjects() : deleteContainer()"
-        @keyup.enter="isObject ? deleteObjects() : deleteContainer()"
-      >
-        {{ confirmText }}
-      </c-button>
-    </c-card-actions>
+      <c-card-actions justify="end">
+        <c-button 
+          outlined
+          @click="toggleDeleteModal"
+          @keyup.enter="toggleDeleteModal"
+        >
+          {{ $t("message.cancel") }}
+        </c-button>
+        <c-button 
+          @click="isObject ? deleteObjects() : deleteContainer()"
+          @keyup.enter="isObject ? deleteObjects() : deleteContainer()"
+        >
+          {{ confirmText }}
+        </c-button>
+      </c-card-actions>
+    </c-alert>
   </c-card>
 </template>
 
@@ -31,6 +31,9 @@ import {
   swiftDeleteObjects,
   swiftDeleteContainer,
 } from "@/common/api";
+import {
+  modifyBrowserPageStyles,
+} from "@/common/globalFunctions";
 
 export default {
   name: "DeleteModal",
@@ -80,6 +83,7 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
       this.$store.commit("setFolderName", "");
+      modifyBrowserPageStyles();
     },
     deleteContainer: function() {
       document.querySelector("#container-toasts").addToast(
@@ -121,7 +125,7 @@ export default {
         this.$store.state.db.objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
-        this.$route.params.project,
+        this.$route.params.owner || this.$route.params.project,
         this.$route.params.container,
         to_remove,
       ).then(async () => {
@@ -155,8 +159,6 @@ export default {
 }
 
 .delete-modal {
-  position: absolute;
-  left: 0;
-  right: 0;
+  padding: 0px;
 }
 </style>

@@ -39,6 +39,7 @@ export function toggleDeleteModal(objects, containerName) {
   if (containerName) {
     store.commit("setFolderName", containerName);
   }
+  modifyBrowserPageStyles();
 }
 
 export function modifyBrowserPageStyles() {
