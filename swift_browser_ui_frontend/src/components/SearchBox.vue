@@ -43,6 +43,12 @@
         </div>
       </template>
     </b-autocomplete>
+    <c-toasts
+      id="searchbox-toasts"
+      data-testid="searchbox-toasts"
+      vertical="top"
+      horizontal="right"
+    />
   </div>
 </template>
 
@@ -199,13 +205,14 @@ export default {
         ) &&
         ojbCount >= 10000
       ) {
-        this.$buefy.notification.open({
-          message: this.$t("message.search.buildingIndex"),
-          type: "is-info",
-          position: "is-top-right",
-          duration: 20000,
-          hasIcon: true,
-        });
+        document.querySelector("#searchbox-toasts").addToast(
+          {
+            duration: 20000,
+            type: "info",
+            progress: false,
+            message: this.$t("message.search.buildingIndex"),
+          },
+        );
         this.$store.state.db.preferences
           .where(":id")
           .equals(1)
