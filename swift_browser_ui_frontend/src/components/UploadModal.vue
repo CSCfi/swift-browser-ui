@@ -40,16 +40,13 @@
           @drop="navUpload"
         >
           <span>{{ $t("message.dropFiles") }}</span>
-          <b-upload
+          <CUploadButton
             v-model="files"
-            multiple
-            accept
-            class="file is-primary"
           >
-            <span class="file-cta">
+            <span>
               {{ $t("message.encrypt.dropMsg") }}
             </span>
-          </b-upload>
+          </CUploadButton>
         </div>
         <c-data-table
           v-if="dropFiles.length > 0"
@@ -171,11 +168,15 @@ import {
 import {
   getProjectNumber,
 } from "@/common/globalFunctions";
+import CUploadButton from "@/components/CUploadButton.vue";
 
 import delay from "lodash/delay";
 
 export default {
   name: "UploadModal",
+  components: {
+    CUploadButton,
+  },
   filters: {
     truncate,
   },
@@ -195,6 +196,7 @@ export default {
       recvHashedKeys: [],
       noUpload: true,
       projectNumber: "",
+      CUploadButton,
     };
   },
   computed: {
