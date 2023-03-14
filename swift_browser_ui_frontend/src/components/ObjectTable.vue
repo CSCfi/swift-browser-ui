@@ -108,7 +108,6 @@
       :hide-tags="hideTags"
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
-      @change-folder="changeFolder"
       @selected-rows="handleSelection"
       @delete-object="toggleDeleteModal([$event])"
     />
@@ -215,27 +214,11 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
-    renderFolders: function () {
-      this.selected = undefined;
-      this.checkedRows = [];
-      if (this.renderFolders) {
-        this.inCurrentFolder = this.getFolderContents();
-      } else {
-        this.inCurrentFolder = [];
-        this.$route.query.prefix = "";
-      }
-    },
     sharedObjects: function () {
       if(this.$route.name !== "SharedObjects") {
         return;
       }
       this.oList = this.sharedObjects;
-    },
-    prefix: function () {
-      if (this.renderFolders) {
-        this.inCurrentFolder = this.getFolderContents();
-        this.$store.commit("setPrefix", this.prefix);
-      }
     },
     queryPage: function () {
       this.currentPage = this.queryPage;
@@ -505,91 +488,12 @@ export default {
       }
       return dateVal.toLocaleDateString(langLocale, options, zone);
     },
-    getFolderContents: function () {
-      // Get folderized list of the objects
-      // request parameter should be sanitized first
-      var safeKey = escapeRegExp(this.getPrefix());
-      let pre_re = new RegExp(safeKey);
-
-      let tmpList = this.oList.filter(
-        el => el.name.match(pre_re),
-      );
-
-      let idList = [];
-      let folders = new Set();
-
-      tmpList.forEach(element => {
-        let folderName = this.getFolderName(element.name);
-
-        if (folders.has(folderName)) {
-          return;
-        }
-        folders.add(folderName);
-        idList.push(element.id);
-      });
-
-      return idList;
-    },
     getPrefix: function () {
       // Get current pseudofolder prefix
       if (this.$route.query.prefix == undefined) {
         return "";
       }
       return this.$route.query.prefix;
-    },
-    changeFolder: function (folder) {
-      // Change currently displayed pseudofolder
-      if (this.$route.name == "SharedObjects") {
-        this.$router.push({
-          name: "SharedObjects",
-          params: {
-            project: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: this.$route.params.container,
-          },
-          query: {
-            page: this.pageNumber,
-            prefix: this.getPrefix().concat(folder, "/"),
-          },
-        });
-      } else {
-        this.$router.push({
-          name: "ObjectsView",
-          params: {
-            project: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: this.$route.params.container,
-          },
-          query: {
-            page: this.pageNumber,
-            prefix: this.getPrefix().concat(folder, "/"),
-          },
-        });
-      }
-
-      this.inCurrentFolder = this.getFolderContents();
-    },
-    getFolderName: function (path) {
-      // Get the name of the currently displayed pseudofolder
-      let endregex = new RegExp("/.*$");
-      return path.replace(this.getPrefix(), "").replace(endregex, "");
-    },
-    isFile: function (path) {
-      // Return true if path represents a file in the active prefix context
-      return path.replace(this.getPrefix(), "").match("/") ? false : true;
-    },
-    isVisible: function(id) {
-      let visible = true;
-      if (
-        this.renderFolders
-        && !this.inCurrentFolder.includes(id)
-      ) {
-        visible = false;
-      }
-      if (this.filteredObjects.includes(id)) {
-        visible = false;
-      }
-      return visible;
     },
     filter: function () {
       if(this.searchQuery.length === 0) {

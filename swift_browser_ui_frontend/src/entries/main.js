@@ -24,7 +24,7 @@ import { vControlV2 } from "csc-ui-vue-directive";
 // Project JS functions
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
-import { getUser } from "@/common/api";
+import { GET, getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
 
 // Import SharingView and Request API
@@ -68,7 +68,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register(workerUrl).then(reg => {
     reg.update();
     if (ping) {
-      console.log("Pinging first serviceWorker.");
+      if (DEV) console.log("Pinging first serviceWorker.");
       navigator.serviceWorker.ready.then(reg => {
         reg.active.postMessage({
           cmd: "pingWasm",
@@ -76,15 +76,15 @@ if ("serviceWorker" in navigator) {
       });
     }
   }).catch((err) => {
-    console.log("Failed to register service worker.");
-    console.log(err);
+    if(DEV) console.log("Failed to register service worker.");
+    if(DEV) console.log(err);
   });
 } else {
-  if(DEV) console.log("Did not register Service Worker.");
+  if (DEV) console.log("Did not register Service Worker.");
 }
 
-window.onerror = function(error) {
-  if(DEV) console.log("Global error", error);
+window.onerror = function (error) {
+  if (DEV) console.log("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
   if (DEV) console.log("unhandledrejection", event);
@@ -227,7 +227,7 @@ new Vue({
       get() {
         return this.$store.state.openShareModal;
       },
-      set() {},
+      set() { },
     },
   },
   watch: {
@@ -326,47 +326,50 @@ new Vue({
           },
         });
       }
-      return active;
+      let discovery = await fetch("/discover");
+      discovery = await discovery.json();
+      if (discovery.sharing_endpoint) {
+        this.$store.commit(
+          "setSharingClient",
+          new SwiftXAccountSharing(
+            discovery.sharing_endpoint,
+            document.location.origin,
+          ),
+        );
+      }
+      if (discovery.request_endpoint) {
+        this.$store.commit(
+          "setRequestClient",
+          new SwiftSharingRequest(
+            discovery.request_endpoint,
+            document.location.origin,
+          ),
+        );
+      }
+      if (discovery.upload_endpoint) {
+        this.$store.commit(
+          "setUploadEndpoint",
+          discovery.upload_endpoint,
+        );
+        let keyPath = `/cryptic/${this.active.id}/keys`;
+        let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
+        signatureUrl.searchParams.append("path", keyPath);
+        let signed = await GET(signatureUrl);
+        signed = await signed.json();
+        let keyURL = new URL(
+          discovery.upload_endpoint.concat(keyPath),
+        );
+        keyURL.searchParams.append("valid", signed.valid);
+        keyURL.searchParams.append("signature", signed.signature);
+        let key = await GET(keyURL);
+        key = await key.text();
+        key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
+        this.$store.commit("appendPubKey", key);
+      }
     };
-    initialize().then(ret => {
-      let keyURL = new URL(
-        "/download/" +
-          ret.id +
-          "/key",
-        document.location.origin,
-      );
-      fetch(keyURL)
-        .then(resp => {
-          return resp.text();
-        })
-        .then(resp => {
-          this.$store.commit("appendPubKey", resp);
-        });
+    initialize().then(() => {
+      if(DEV) console.log("Initialized successfully.");
     });
-    fetch("/discover")
-      .then(resp => {
-        return resp.json();
-      })
-      .then(ret => {
-        if (ret.sharing_endpoint) {
-          this.$store.commit(
-            "setSharingClient",
-            new SwiftXAccountSharing(
-              ret.sharing_endpoint,
-              document.location.origin,
-            ),
-          );
-        }
-        if (ret.request_endpoint) {
-          this.$store.commit(
-            "setRequestClient",
-            new SwiftSharingRequest(
-              ret.request_endpoint,
-              document.location.origin,
-            ),
-          );
-        }
-      });
     delay(this.containerSyncWrapper, 10000);
   },
   mounted() {

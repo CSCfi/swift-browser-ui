@@ -6,13 +6,56 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-let sessionPtr, fileName, headerPtr, headerLen, chunkPtr, chunkLen, chunk, header, chunkArray;
+let 
+  streamController,
+  sessionPtr,
+  fileName,
+  headerPtr,
+  headerLen,
+  chunkPtr,
+  chunkLen,
+  chunk,
+  chunkView,
+  header,
+  headerView,
+  chunkArray,
+  pubkeyPtr,
+  pubKey,
+  fileSize,
+  privkeyPtr,
+  privKey,
+  sessKeyPtr,
+  sessKey
+;
 
-console.log(Module);
-console.log(FS);
+self.addEventListener("fetch", (e) => {
+  if (e.request.url.startsWith(self.location.origin + "/file")) {
+    const stream = new ReadableStream({
+      start(controller) {
+        streamController = controller;
+      },
+    });
+    const response = new Response(stream);
+    response.headers.append(
+      "Content-Disposition",
+      'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
+    );
+    e.respondWith(response);
+  }
+});
 
 wasmReady.then(() => {
-  console.log("Adding sw event listeners.");
+  FS.mkdir("/keys");
+  FS.mkdir("/keys/recv_keys");
+  FS.mkdir("/data");
+
+  Module.ccall(
+    "libinit",
+    undefined,
+    [],
+    [],
+  );
+
   self.addEventListener("message", (e) => {
     e.stopImmediatePropagation();
     switch(e.data.cmd) {
@@ -22,9 +65,6 @@ wasmReady.then(() => {
         });
         break;
       case "initFileSystem":
-        FS.mkdir("/keys");
-        FS.mkdir("/keys/recv_keys");
-        FS.mkdir("/data");
         // Create output device
         e.source.postMessage({
           eventType: "wasmFilesystemInitialized",
@@ -58,10 +98,9 @@ wasmReady.then(() => {
           [],
           [],
         );
-        fileName = e.data.filename + ".c4gh";
+        fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
-          ptr: sessionPtr,
         });
         break;
       case "initNormal":
@@ -71,10 +110,9 @@ wasmReady.then(() => {
           ["string"],
           [e.data.passphrase],
         );
-        fileName = e.data.filename + ".c4gh";
+        fileName = e.data.fileName + ".c4gh";
         e.source.postMessage({
           eventType: "encryptSessionInitiated",
-          ptr: sessionPtr,
         });
         break;
       case "createHeader":
@@ -95,19 +133,21 @@ wasmReady.then(() => {
           "number",
           ["number"],
           [header],
-        )
+        );
         // Copy chunk buffer contents to new array and answer
-        e.source.postMessage({
-          eventType: "encryptedHeaderReady",
-          header: new Uint8Array(HEAPU8.subarray(headerPtr, headerPtr + headerLen)),
-        });
-        // Free header memory
+        headerView = new Uint8Array(headerLen);
+        headerView.set(HEAPU8.subarray(headerPtr, headerPtr + headerLen));
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [header],
         );
+        header, headerPtr, headerLen = undefined;
+        e.source.postMessage({
+          eventType: "encryptedHeaderReady",
+          header: headerView,
+        });
         break;
       case "encryptChunk":
         chunkArray = new Uint8Array(e.data.chunk);
@@ -121,45 +161,177 @@ wasmReady.then(() => {
           "wrap_chunk_content",
           "number",
           ["number"],
-          [header]
+          [chunk]
         );
         chunkLen = Module.ccall(
           "wrap_chunk_len",
           "number",
           ["number"],
-          [header],
+          [chunk],
         );
         // Respond with the chunk, and ask for the next one
-        e.source.postMessage({
-          eventType: "nextChunk",
-          chunk: new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen)),
-          iter: e.data.iter,
-        });
+        chunkView = new Uint8Array(chunkLen);
+        chunkView.set(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
         Module.ccall(
           "free_chunk",
           "number",
           ["number"],
           [chunk],
-        )
+        );
+        chunkPtr, chunk, chunkLen = undefined;
+        e.source.postMessage({
+          eventType: "nextChunk",
+          chunk: chunkView,
+          iter: e.data.iter,
+        });
         break;
       case "cleanUp":
         try {
-          Module.ccall(
-            "clean_session",
-            undefined,
-            ["number"],
-            [sessionPtr],
-          );
-          FS.rmdir("/keys/recv_keys")
-          FS.rmdir("/keys");
-          FS.rmdir("/data");
+          if (sessionPtr != undefined) {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+            sessionPtr = undefined;
+          }
         } catch (e) {
-          console.log("FS ignoring error on remove ", e);
+          // console.log("FS ignoring error on remove ", e);
         } finally {
           e.source.postMessage({
             eventType: "cleanUpDone",
           });
         }
+        break;
+      // Download related features
+      case "beginDownload":
+        if (streamController) {
+          try {
+            streamController.close();
+          } catch(e) {
+            // console.log(e);
+          }
+        }
+        if (sessionPtr != undefined) {
+          try {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+            sessionPtr = undefined;
+          } catch(e) {
+            // console.log(e);
+          }
+        }
+        sessionPtr = Module.ccall(
+          "open_decrypt_session",
+          "number",
+          [],
+          [],
+        );
+        pubkeyPtr = Module.ccall(
+          "get_session_public_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        privkeyPtr = Module.ccall(
+          "get_session_private_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        pubKey = new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 32));
+        e.source.postMessage({
+          eventType: "downloadSessionOpened",
+          pubKey: pubKey,
+        });
+        _free(pubkeyPtr);
+        _free(privkeyPtr);
+        _free(sessKeyPtr);
+        break;
+      case "addHeader":
+        try {
+          FS.unlink("header");
+        } catch (e) {
+          // console.log("FS ignoring error on remove", e);
+        }
+        FS.writeFile(
+          "header",
+          e.data.header,
+        );
+        fileName = e.data.fileName;
+        fileSize = e.data.fileSize;
+        Module.ccall(
+          "open_crypt4gh_header",
+          undefined,
+          ["number"],
+          [sessionPtr],
+        );
+        sessKeyPtr = Module.ccall(
+          "get_session_key",
+          "number",
+          ["number"],
+          [sessionPtr],
+        );
+        sessKey = new Uint8Array(HEAPU8.subarray(sessKeyPtr, sessKeyPtr + 32))
+        sessKey = btoa(String.fromCharCode(...sessKey));
+        e.source.postMessage({
+          eventType: "beginDecryption",
+        });
+        break;
+      case "decryptChunk":
+        chunk = Module.ccall(
+          "decrypt_chunk",
+          "number",
+          ["number", "array", "number"],
+          [sessionPtr, new Uint8Array(e.data.chunk), e.data.chunk.length],
+        );
+        chunkPtr = Module.ccall(
+          "wrap_chunk_content",
+          "number",
+          ["number"],
+          [chunk]
+        );
+        chunkLen = Module.ccall(
+          "wrap_chunk_len",
+          "number",
+          ["number"],
+          [chunk],
+        );
+        chunkView = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
+        Module.ccall(
+          "free_chunk",
+          "number",
+          ["number"],
+          [chunk],
+        );
+        streamController.enqueue(chunkView);
+        e.source.postMessage({
+          eventType: "nextDecryptChunk",
+        });
+        break;
+      case "decryptionFinished":
+        streamController.close();
+        try {
+          if (sessionPtr != undefined) {
+            Module.ccall(
+              "clean_session",
+              undefined,
+              ["number"],
+              [sessionPtr],
+            );
+            sessionPtr = undefined;
+          }
+        } catch(e) {
+          // console.log(e);
+        }
+        e.source.postMessage({
+          eventType: "streamClosed",
+        });
         break;
     }
   });

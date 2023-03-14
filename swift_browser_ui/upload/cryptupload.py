@@ -70,7 +70,6 @@ class EncryptedUploadProxy:
             self.project,
         )
 
-        self.next_iter = 0
         self.have_closed = False
 
         self.chunk_cache: typing.Dict[
@@ -85,6 +84,25 @@ class EncryptedUploadProxy:
     ) -> bool:
         return self.header_uploaded
 
+    async def a_create_container(self) -> None:
+        """Create the container required by the upload."""
+        for container in {self.container, f"{self.container}_segments"}:
+            async with self.client.head(
+                common.generate_download_url(self.host, container),
+                headers={"Content-Length": "0", "X-Auth-Token": self.token},
+                ssl=ssl_context,
+            ) as resp_get:
+                if resp_get.status != 204:
+                    async with self.client.put(
+                        common.generate_download_url(self.host, container),
+                        headers={"Content-Length": "0", "X-Auth-Token": self.token},
+                        ssl=ssl_context,
+                    ) as resp_put:
+                        if resp_put.status not in {201, 202}:
+                            raise aiohttp.web.HTTPForbidden(
+                                reason=f'Failed to create container "{container}" for upload.'
+                            )
+
     async def add_header(
         self,
         request: aiohttp.web.Request,
@@ -93,6 +111,8 @@ class EncryptedUploadProxy:
         self.project = request.match_info["project"]
         self.container = request.match_info["container"]
         self.object_name = request.match_info["object_name"]
+
+        await self.a_create_container()
 
         self.total = int(request.query["total"])
 
@@ -116,24 +136,6 @@ class EncryptedUploadProxy:
             self.project, self.container, self.object_name, b64_header
         )
 
-        resp = await self.client.put(
-            common.generate_download_url(
-                self.host,
-                container=self.container,
-                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{0:08d}",
-            ),
-            data=header,
-            headers={
-                "X-Auth-Token": self.token,
-                "Content-Type": "application/swiftclient-segment",
-            },
-            timeout=UPL_TIMEOUT,
-            ssl=ssl_context,
-        )
-        if resp.status == 408:
-            raise aiohttp.web.HTTPRequestTimeout()
-        LOGGER.debug(f"Successfully uploaded header for {self.object_name}.")
-
         self.header_uploaded = True
 
         return aiohttp.web.Response(
@@ -149,12 +151,12 @@ class EncryptedUploadProxy:
             common.generate_download_url(
                 self.host,
                 container=self.container,
-                object_name=common.DATA_PREFIX + self.object_name,
+                object_name=self.object_name,
             ),
             data=b"",
             headers={
                 "X-Auth-Token": self.token,
-                "X-Object-Manifest": f"{self.container}/{common.SEGMENTS_PREFIX}{self.object_name}",
+                "X-Object-Manifest": f"{self.container}{common.SEGMENTS_CONTAINER}/{self.object_name}/{self.segment_id}/",
             },
             ssl=ssl_context,
         ) as resp:
@@ -165,10 +167,16 @@ class EncryptedUploadProxy:
         ws: aiohttp.web.WebSocketResponse,
     ) -> None:
         """Schedule fetching of the next chunk in order."""
-        if self.next_iter >= self.total_chunks:
+        if len(self.done_chunks) >= self.total_chunks:
             return
-        await ws.send_json({"cmd": "nextChunk", "iter": self.next_iter * 65536})
-        self.next_iter += 1
+        await ws.send_json({"cmd": "nextChunk"})
+
+    async def retry_chunk(
+        self,
+        ws: aiohttp.web.WebSocketResponse,
+        iter: int,
+    ) -> None:
+        """Retry a chunk via websocket."""
 
     async def add_to_chunks(
         self,
@@ -227,8 +235,15 @@ class EncryptedUploadProxy:
         LOGGER.debug(f"Pushing chunks from {seg_start} until {seg_end} to queue.")
 
         for i in range(seg_start, seg_end):
+            wait_count = 0
             while i not in self.chunk_cache:
+                wait_count += 1
                 await asyncio.sleep(0.05)
+                # if handler has waited too long for the next chunk, ask for it again.
+                # 10 seconds is considered too long
+                if wait_count > 2000:
+                    await self.retry_chunk(self.ws, i)
+                    wait_count = 0
             self.done_chunks.add(i)
             chunk, ws = self.chunk_cache.pop(i)
             await q.put(chunk)
@@ -273,8 +288,8 @@ class EncryptedUploadProxy:
         async with self.client.put(
             common.generate_download_url(
                 self.host,
-                container=self.container,
-                object_name=f"{common.SEGMENTS_PREFIX}{self.object_name}/{self.segment_id}/{(order + 1):08d}",
+                container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+                object_name=f"{self.object_name}/{self.segment_id}/{(order + 1):08d}",
             ),
             data=self.queue_generator(q),
             headers=headers,

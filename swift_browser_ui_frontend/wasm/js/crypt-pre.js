@@ -4,6 +4,9 @@ var Module = {
   onRuntimeInitialized: () => {
     moduleStartComplete = true;
   },
+  printErr: (text) => {
+    console.log("WASM execution debug: ", text);
+  },
 };
 
 function timeout(ms) {
@@ -11,12 +14,12 @@ function timeout(ms) {
 }
 
 async function waitAsm() {
-  console.log("Begin wait for WASM readiness.");
+  // console.log("Begin wait for WASM readiness.");
   while (!moduleStartComplete) {
-    console.log("Waiting 250ms for WASM readiness.");
+    // console.log("Waiting 250ms for WASM readiness.");
     await timeout(250);
   }
-  console.log("Module start finalized. Ready to answer.");
+  // console.log("Module start finalized. Ready to answer.");
   return true;
 }
 

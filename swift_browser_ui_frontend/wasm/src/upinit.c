@@ -16,7 +16,7 @@ Init functions for folder upload
 #include "include/upinit.h"
 
 // Global for current session to enable nice use of nftw
-struct ENCRYPT_SESSION *current = NULL;
+ENCRYPT_SESSION *current = NULL;
 
 /*
 Add a public key from ftw entry
@@ -41,7 +41,9 @@ int add_recv_key(
         // Skip if couldn't read from the file or current session is NULL
         if (amount <= 0 || !current)
         {
+            #ifdef C4GH_WASM_DEV
             printf("Failed to open the receiver key.\n");
+            #endif
             goto finalAddRecv;
         }
         // We need space for the new key inside encrypt session
@@ -77,17 +79,28 @@ finalAddRecv:
     return 0;
 }
 
+void libinit() {
+    if (sodium_init() == -1) {
+        #ifdef C4GH_WASM_DEV
+        printf("Couldn't initialize sodium\n");
+        #endif
+        return;
+    }
+
+    // Main reason for init, only stir once to not run out of entropy
+    randombytes_stir();
+}
+
 /*
 Read in the receiver keys
 */
-int read_in_recv_keys(struct ENCRYPT_SESSION *sess) {
+int read_in_recv_keys(ENCRYPT_SESSION *sess) {
     int ret = -2;
     if (!sess) {
         goto finalReadRecv;
     }
 
     // Create an ephemeral keypair
-    randombytes_stir();
     crypto_kx_keypair(
         sess->seckey,
         sess->pubkey
@@ -110,7 +123,7 @@ Read in the keys for upload encryption
 */
 int read_in_keys(
     const char *passphrase,
-    struct ENCRYPT_SESSION *sess)
+    ENCRYPT_SESSION *sess)
 {
     // Read in the private key
     // We assume current working directory to be of the correct structure
@@ -137,14 +150,15 @@ finalReadIn:
 /*
 Open and allocate an encryption session
 */
-struct ENCRYPT_SESSION *open_session_enc(void) {
-    struct ENCRYPT_SESSION *ret = malloc(sizeof(struct ENCRYPT_SESSION));
+ENCRYPT_SESSION *open_session_enc(void) {
+    ENCRYPT_SESSION *ret = calloc(1, sizeof(ENCRYPT_SESSION));
     if (!ret) {
         return NULL;
     }
     // Initialize the encryption session
-    ret->passphrase = calloc(1024, sizeof(char));
+    ret->passphrase = (char*)malloc(1024 * sizeof(char));
     ret->recv_keys = NULL;
+    ret->sessionkey = NULL;
     ret->recv_key_amount = 0;
     return ret;
 }
@@ -153,11 +167,18 @@ struct ENCRYPT_SESSION *open_session_enc(void) {
 Close and free an upload session
 */
 void close_session(
-    struct ENCRYPT_SESSION *sess 
+    ENCRYPT_SESSION *sess 
 ) {
-    if (sess) {
-        free(sess->recv_keys);
-        free(sess->passphrase);
+    if (sess != NULL) {
+        if (sess->recv_keys != NULL) {
+            free(sess->recv_keys);
+        }
+        if (sess->sessionkey != NULL) {
+            sodium_free(sess->sessionkey);
+        }
+        if (sess->passphrase != NULL) {
+            free(sess->passphrase);
+        }
         free(sess);
     }
 }

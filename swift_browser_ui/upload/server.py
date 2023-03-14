@@ -27,6 +27,7 @@ from swift_browser_ui.upload.api import (
     handle_post_object_options,
     handle_health_check,
     handle_upload_encrypted_object_options,
+    handle_whitelist_options,
     handle_upload_encrypted_object,
     handle_upload_encrypted_object_ws,
     handle_project_key,
@@ -97,13 +98,21 @@ async def servinit() -> aiohttp.web.Application:
                 "/cryptic/{project}/{container}/{object_name:.*}",
                 handle_upload_encrypted_object_ws,
             ),
+            aiohttp.web.options(
+                "/header/{project}/{container}/{object_name:.*}",
+                handle_upload_encrypted_object_options,
+            ),
             aiohttp.web.get(
-                "/cryptic/{project}/{container}/{object_name:.*}/header",
+                "/header/{project}/{container}/{object_name:.*}",
                 handle_object_header,
             ),
             aiohttp.web.get(
                 "/cryptic/{project}/keys",
                 handle_project_key,
+            ),
+            aiohttp.web.options(
+                "/cryptic/{project}/whitelist",
+                handle_whitelist_options,
             ),
             aiohttp.web.put(
                 "/cryptic/{project}/whitelist",
