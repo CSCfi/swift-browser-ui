@@ -37,9 +37,7 @@ let default_translations = {
           "The page you were looking for was not found.",
         Forbidden: "403 – Forbidden",
         Forbidden_text:
-          "Your previous request could not be fulfilled. " +
-          "If this request should have been allowed, " +
-          "please contact servicedesk@csc.fi.",
+          "Your previous request could not be fulfilled.",
         inUse: "Folder name already in use.",
         invalidName: "Folder name is invalid.",
         createFail: "Folder creation failed.",
@@ -113,7 +111,7 @@ let default_translations = {
       },
       dashboard: {
         projectInfo: "Project information",
-        projectInfoBaseLink: "https://my.csc.fi/projects/",
+        projectInfoBaseLink: "#",
       },
       share: {
         share: "Share",
@@ -121,8 +119,8 @@ let default_translations = {
         share_id_tooltip:
           "With this action, you can copy the Share ID: " +
           "a unique 32-digit code associated with your <b>currently " +
-          "selected</b> CSC project. Provide the Share ID to members " +
-          "of other CSC projects (e.g., via email) so that they can " + 
+          "selected</b> project. Provide the Share ID to members " +
+          "of other projects (e.g., via email) so that they can " +
           "share folders with you.",
         close: "Close",
         instructions: "How to share a folder",
@@ -134,25 +132,25 @@ let default_translations = {
           "with all project members in the project ",
         share_other_projects: "Share with other projects",
         share_guide_intro:
-          "To share a folder with another CSC project you need to:",
+          "To share a folder with another project you need to:",
         share_guide_step1:
           "1. Enter the Share ID. You need to know in advance " +
           "the Share ID (a 32-digit code) associated " +
-          "with the CSC project you want to share a folder with. The " +
+          "with the project you want to share a folder with. The " +
           "recipient can copy the Share ID from the user " +
           "interface and provide it to you via email. You can share " +
-          "a folder with multiple CSC projects.",
+          "a folder with multiple projects.",
         share_guide_step2:
           "2. Select the permission rights: ",
         share_guide_step2_list: [
-          "View: project members can access the folder's content via " +
-          "SD Desktop but can not directly download or copy " +
+          "View: project members can access the folder's content " +
+          "but can not directly download or copy " +
           "its content.",
           "Copy and download: project members can copy, download " +
           "and decrypt the folder content.",
           "Copy, download and upload: project members can copy, " +
           "download and decrypt the folder content. They can also upload " +
-          "new files to the shared folder accessible to both CSC projects.",
+          "new files to the shared folder accessible to both projects.",
         ],
         permissions: "Select permissions",
         view_perm: "View",
@@ -320,23 +318,23 @@ let default_translations = {
       },
       pwdlogin: {
         header: "Credential login",
-        description: "Login with your user credentials.",
+        description: "Log in with your user credentials.",
         uname: "Username",
         pwd: "Password",
       },
       supportMenu: {
         item1: "User manual",
-        itemLink1: "https://docs.csc.fi/data/sensitive-data/",
-        item2: "Billing unit calculator",
-        itemLink2: "https://research.csc.fi/pricing#buc",
+        itemLink1: "#",
+        item2: "Billing",
+        itemLink2: "#",
         item3: "Sharing API tokens",
         item4: "About",
-        itemLink4: "https://research.csc.fi/sensitive-data",
+        itemLink4: "#",
       },
       footerMenu: {
         title: "Swift browser",
-        serviceProvider: "CSC – IT Center for Science Ltd.",
-        serviceProviderLink: "https://www.csc.fi",
+        serviceProvider: "Service provider",
+        serviceProviderLink: "#",
         menuItem1: "Item 1",
         menuItemLink1: "#",
         menuItem2:"Item 2",
@@ -344,7 +342,7 @@ let default_translations = {
       },
     },
     label: {
-      csclogo: "link to main page",
+      logo: "link to main page",
       language_menu: "select language",
       support_menu: "user support",
       project_info: "more project information",
@@ -391,9 +389,7 @@ let default_translations = {
         Notfound_text: "Siirry kirjautumissivulle oheisesta painikkeesta.",
         Forbidden: "403 – Tuo on kiellettyä.",
         Forbidden_text:
-          "Edellinen operaatio ei ole sallittu. Mikäli " +
-          "kyseisen operaation tulisi olla sallittu, ota " +
-          "yhteyttä asiakaspalveluun (asiakaspalvelu@csc.fi).",
+          "Edellinen operaatio ei ole sallittu.",
         inUse: "Kansion nimi on jo käytössä.",
         invalidName: "Kansion nimi ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
@@ -475,15 +471,15 @@ let default_translations = {
       },
       dashboard: {
         projectInfo: "Projektin tiedot",
-        projectInfoBaseLink: "https://my.csc.fi/projects/",
+        projectInfoBaseLink: "#",
       },
       share: {
         share: "Jaa",
         share_id: "Jaa tunnus",
         share_id_tooltip:
           "Tällä toiminnolla voit kopioida Jaa tunnuksen: uniikin " +
-          "32-numeroisen koodin, joka on yhdistetty CSC projektiisi. " +
-          "Lähetä tunnus (esim. sähköpostilla) muiden CSC projektien " +
+          "32-numeroisen koodin, joka on yhdistetty projektiisi. " +
+          "Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa kansioita sinulle.",
         close: "Sulje",
         instructions: "Kuinka jaan kansion",
@@ -494,19 +490,19 @@ let default_translations = {
           "Tämä kansio on kaikkien jäsenten käytettävissä projektissa ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro:
-          "Kun haluat jakaa kansion toisen CSC projektin kanssa: ",
+          "Kun haluat jakaa kansion toisen projektin kanssa: ",
         share_guide_step1:
           "1. Syötä Jaa tunnus koodi. Sinun tulee tietää " +
           "vastaanottavan projektin Jaa tunnus (32-numeroinen " +
           "koodi). Vastaanottaja voi " +
           "kopioida Jaa tunnuksen käyttöliittymästä Kopio Jaa tunnus-napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
-          "Voit jakaa kansion useiden CSC projektien kanssa.",
+          "Voit jakaa kansion useiden projektien kanssa.",
         share_guide_step2:
           "2. Valitse käyttöoikeudet: ",
         share_guide_step2_list: [
-          "Katsele: projektin jäsenet voivat katsella kansion sisältöä " +
-          "SD Desktopin kautta, mutta eivät voi ladata ja kopioida " +
+          "Katsele: projektin jäsenet voivat katsella kansion sisältöä, " +
+          "mutta eivät voi ladata ja kopioida " +
           "kansion sisältöä.",
           "Kopioi ja lataa: projektin jäsenet voivat kopioida ja ladata " +
           "kansion sisällön sekä purkaa kansion sisällön salauksen.",
@@ -682,25 +678,25 @@ let default_translations = {
       },
       supportMenu: {
         item1: "Käyttöohje",
-        itemLink1: "https://docs.csc.fi/data/sensitive-data/",
-        item2: "Hinnoittelulaskuri",
-        itemLink2: "https://research.csc.fi/pricing#buc",
+        itemLink1: "#",
+        item2: "Hinnoittelu",
+        itemLink2: "#",
         item3: "API avainten jakaminen",
         item4: "Tietoa",
-        itemLink4: "https://research.csc.fi/sensitive-data",
+        itemLink4: "#",
       },
       footerMenu: {
         title: "Swift browser",
-        serviceProvider: "CSC – Tieteen tietotekniikan keskus Oy",
-        serviceProviderLink: "https://www.csc.fi",
+        serviceProvider: "Palveluntarjoaja",
+        serviceProviderLink: "#",
         menuItem1: "Menu 1",
         menuItemLink1: "#",
-        menuItem2:"Menu 2",
-        menuItemLink2:"#",
+        menuItem2: "Menu 2",
+        menuItemLink2: "#",
       },
     },
     label: {
-      csclogo: "linkki etusivulle",
+      logo: "linkki etusivulle",
       language_menu: "kieli",
       support_menu: "käyttäjätuki",
       project_info: "lisätietoja projektista",

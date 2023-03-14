@@ -4,7 +4,7 @@
       <router-link
         class="navbar-item pl-4"
         :to="{name: 'AllFolders'}"
-        :aria-label="$t('label.csclogo')"
+        :aria-label="$t('label.logo')"
       >
         <c-csc-logo alt="CSC_Logo" />
         <h1 class="app-name">
