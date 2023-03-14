@@ -31,7 +31,7 @@ let default_translations = {
         Unauthorized_text:
           "The action requested requires logging " +
           "in, or the log in credentials were incorrect. " +
-          "Use the button below to Log in.",
+          "Use the button below to log in.",
         Notfound: "404 – Page Not Found",
         Notfound_text:
           "The page you were looking for was not found.",
@@ -116,6 +116,7 @@ let default_translations = {
       share: {
         share: "Share",
         share_id: "Share ID",
+        share_id_copy: "Copy Share ID",
         share_id_tooltip:
           "With this action, you can copy the Share ID: " +
           "a unique 32-digit code associated with your <b>currently " +
@@ -127,9 +128,6 @@ let default_translations = {
         close_instructions: "Hide",
         share_cont: "Share the folder",
         share_title: "Share folder",
-        share_subtitle:
-          "This folder is shared by default " +
-          "with all project members in the project ",
         share_other_projects: "Share with other projects",
         share_guide_intro:
           "To share a folder with another project you need to:",
@@ -383,13 +381,13 @@ let default_translations = {
         UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text:
-          "Sivun näyttäminen vaatii sisäänkirjauksen, " +
-          "siirry kirjautumissivulle oheisesta painikkeesta.",
-        Notfound: "404 – Etsittyä sivua ei löydetty.",
-        Notfound_text: "Siirry kirjautumissivulle oheisesta painikkeesta.",
-        Forbidden: "403 – Tuo on kiellettyä.",
+          "Sinun täytyy olla kirjautunut sisään voidaksesi nähdä sivun, " +
+          "siirry kirjautumissivulle.",
+        Notfound: "404 – Etsittyä sivua ei löydetty",
+        Notfound_text: "Siirry kirjautumissivulle.",
+        Forbidden: "403 – Kielletty",
         Forbidden_text:
-          "Edellinen operaatio ei ole sallittu.",
+          "Edellinen toiminto on kielletty.",
         inUse: "Kansion nimi on jo käytössä.",
         invalidName: "Kansion nimi ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
@@ -416,16 +414,18 @@ let default_translations = {
         sharedTo: "Sinulle jaetut kansiot",
       },
       folderDetails: {
-        notShared: "Tätä kansiota ei ole jaettu millekään projektille.",
+        notShared: "Tätä kansiota ei ole jaettu toiselle projektille.",
         sharing_to_one_project: "Tämä kansio on jaettu yhdelle projektille.",
         sharing_to_many_projects: "Tämä kansio on jaettu useille projekteille.",
         shared_with_read:
-          "Tämä kansio on jaettu kanssasi. Voit tarkastella ja ladata" +
-          " tiedostoja tässä kansiossa (Read access).",
+          "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
+          "tiedostoja tässä kansiossa ja purkaa kansion sisällön " +
+          "salauksen. (Kopioi ja lataa).",
         shared_with_read_write:
-          "Tämä kansio on jaettu kanssasi. Voit tarkastella, ladata," +
-          " ladata ja muokata tunnisteita tässä kansiossa" +
-          " (Read and write access).",
+          "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
+          "tiedostoja, sekä purkaa kansion sisällön salauksen. " +
+          "Voit myös lähettää tiedostoja tähän kansioon. "+
+          "(Kopioi, lataa ja lähetä).",
       },
       table: {
         name: "Nimi",
@@ -439,33 +439,33 @@ let default_translations = {
         fileDown: "Tiedoston lataus",
         folderDetails: "Ei yksityiskohtia kansioille",
         clearChecked: "Poista valinnat",
-        tags: "Tunnisteet",
-        editTags: "Muokkaa tunnisteita",
+        tags: "Asiasanat",
+        editTags: "Muokkaa asiasanoja",
         deleteSelected: "Poista valitut kohteet",
         clearSelected: "Tyhjennä valinnat",
         itemSelected: "kohde valittu",
         itemsSelected: "kohdetta valittu",
-        items: "Kohteet",
-        itemsPerPage: "Kohteita sivulla: ",
+        items: "Tiedostot",
+        itemsPerPage: "Tiedostoja sivulla: ",
         nextPage: "Seuraava sivu",
         prevPage: "Edellinen sivu",
         page: "Sivu",
-        shared_status: "Jaettu tila",
+        shared_status: "Jakaminen",
         sharing: "Olet jakanut",
         shared: "Jaettu kanssasi",
         edit_sharing: " Muokkaa jakamista",
-        source_project_id: "Jaa tämän kansion tunnus",
+        source_project_id: "Jakamistunnus",
         date_of_sharing: "Jakamispäivämäärä",
-        back_to_all_folders: "Takaisin kaikki kansiot",
-        back_to_sharing_folders: "Takaisin jakamasi kansiot",
-        back_to_shared_folders: "Takaisin sinulle jaetut kansiot",
+        back_to_all_folders: "Takaisin",
+        back_to_sharing_folders: "Takaisin",
+        back_to_shared_folders: "Takaisin",
       },
       tableOptions: {
         displayOptions: "Asetukset",
-        render: "Luo kansiot",
+        render: "Näytä kansioina",
         text: "Näytä tekstinä",
-        hideTags: "Piilota tunnisteet",
-        showTags: "Näytä tunnisteet",
+        hideTags: "Piilota asiasanat",
+        showTags: "Näytä asiasanat",
         hidePagination: "Piilota sivutus",
         showPagination: "Näytä sivutus",
       },
@@ -475,9 +475,10 @@ let default_translations = {
       },
       share: {
         share: "Jaa",
-        share_id: "Jaa tunnus",
+        share_id: "Jakamistunnus",
+        share_id_copy: "Kopioi jakamistunnus",
         share_id_tooltip:
-          "Tällä toiminnolla voit kopioida Jaa tunnuksen: uniikin " +
+          "Tällä toiminnolla voit kopioida jakamistunnuksen: uniikin " +
           "32-numeroisen koodin, joka on yhdistetty projektiisi. " +
           "Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa kansioita sinulle.",
@@ -486,33 +487,31 @@ let default_translations = {
         close_instructions: "Sulje ohjeet",
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
-        share_subtitle:
-          "Tämä kansio on kaikkien jäsenten käytettävissä projektissa ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro:
           "Kun haluat jakaa kansion toisen projektin kanssa: ",
         share_guide_step1:
-          "1. Syötä Jaa tunnus koodi. Sinun tulee tietää " +
-          "vastaanottavan projektin Jaa tunnus (32-numeroinen " +
-          "koodi). Vastaanottaja voi " +
-          "kopioida Jaa tunnuksen käyttöliittymästä Kopio Jaa tunnus-napilla " +
+          "1. Syötä jakamistunnus. Sinun tulee tietää " +
+          "vastaanottavan projektin jakamistunnus (32-numeroinen " +
+          "koodi). Vastaanottaja voi kopioida" +
+          "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
         share_guide_step2:
           "2. Valitse käyttöoikeudet: ",
         share_guide_step2_list: [
-          "Katsele: projektin jäsenet voivat katsella kansion sisältöä, " +
-          "mutta eivät voi ladata ja kopioida " +
-          "kansion sisältöä.",
+          "Tarkastele: projektin jäsenet voivat tarkastella kansion sisältöä" +
+          ", mutta eivät voi ladata ja kopioida kansion sisältöä.",
           "Kopioi ja lataa: projektin jäsenet voivat kopioida ja ladata " +
           "kansion sisällön sekä purkaa kansion sisällön salauksen.",
           "Kopioi, lataa ja lähetä: projektin jäsenet voivat kopioida ja " +
           "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
-          "He voivat myös lähettää tiedostoja jaettuun kansioon."],
+          "He voivat myös lähettää tiedostoja jaettuun kansioon.",
+        ],
         permissions: "Käyttöoikeudet",
-        view_perm: "Katsele",
+        view_perm: "Tarkastele",
         read_perm: "Kopioi ja lataa",
-        write_perm: "Kopioida, lataa ja lähetä",
+        write_perm: "Kopioi, lataa ja lähetä",
         shared_successfully: "Kansion jakaminen onnistui!",
         remove_permission: "Lupa poistettiin onnistuneesti!",
         update_permission: "Lupa muutettiin onnistuneesti.",
@@ -559,7 +558,7 @@ let default_translations = {
       copy_failed: "Kopiointi epäonnistui!",
       delete: "Poista",
       remove: "Poista",
-      editTags: "Muokkaa tägejä",
+      editTags: "Muokkaa asiasanoja",
       cancel: "Peruuta",
       save: "Tallenna",
       options: "Valinnat",

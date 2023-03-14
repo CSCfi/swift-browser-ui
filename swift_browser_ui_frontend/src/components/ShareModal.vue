@@ -21,10 +21,6 @@
       </c-button>
     </c-card-actions>
     <c-card-content id="share-card-modal-content">
-      <p class="is-6 has-text-dark">
-        {{ $t("message.share.share_subtitle") }}
-        <b>{{ active.name }}</b>.
-      </p>
       <c-container>
         <c-row
           justify="space-between"

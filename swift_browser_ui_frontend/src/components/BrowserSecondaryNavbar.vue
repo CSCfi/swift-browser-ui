@@ -40,7 +40,7 @@
             slot="icon"
             class="mdi mdi-content-copy"
           />
-          {{ $t("message.copy") }} {{ $t("message.share.share_id") }}
+          {{ $t("message.share.share_id_copy") }}
         </c-button>
         <div
           class="tooltip"
