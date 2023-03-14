@@ -2,10 +2,26 @@
 import { defineConfig } from "vite";
 import { createVuePlugin as vue } from "vite-plugin-vue2";
 
+import fs from "node:fs";
 import path from "node:path";
 
+const TLS_ENABLED = process.env.VITE_TLS === "True";
+const http_mode = TLS_ENABLED ? "https" : "http";
+// paths should be absolute or relative to vite.config.js
+const TLS_CERT_PATH = process.env.VITE_TLS_CERT || undefined;
+const TLS_KEY_PATH = process.env.VITE_TLS_KEY || undefined;
+
+let https = null;
+if (TLS_ENABLED) {
+  console.log("vite dev serve will expect https");
+  https = {
+    key:  fs.readFileSync(TLS_KEY_PATH),
+    cert: fs.readFileSync(TLS_CERT_PATH),
+  };
+}
+
 const proxyTo = {
-  target: `http://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`,
+  target: `${http_mode}://${process.env.BACKEND_HOST || "localhost"}:${process.env.BACKEND_PORT || "8080"}`,
   changeOrigin: true,
   secure: false,  // Won't check certificates
 };
@@ -134,6 +150,7 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: "0.0.0.0",
       port: process.env.FRONTEND_PORT || "8081",
+      https,
       strictPort: true,
       proxy,
     },
