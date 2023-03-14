@@ -4,6 +4,10 @@ COPY pyproject.toml /root/swift_request/pyproject.toml
 COPY README.md /root/swift_request/README.md
 COPY swift_browser_ui /root/swift_request/swift_browser_ui
 
+# remove this link as it creates issues with hatch
+# in pyproject.toml
+RUN rm /root/swift_request/swift_browser_ui/ui/static
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip \
     && pip install /root/swift_request
