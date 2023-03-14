@@ -5,6 +5,10 @@ import {
   getUploadEndpoint,
 } from "@/common/api";
 
+import {
+  DEV,
+} from "@/common/conv";
+
 // Add a header to the ServiceWorker filesystem
 function addHeader(header, fname, fsize) {
   navigator.serviceWorker.ready.then(reg => {
@@ -120,7 +124,9 @@ export class DecryptedDownloadSession {
           this.chunkBuffer = [];
         });
       } else {
-        console.log("Telling the serviceWorker that decryption is done.");
+        if (DEV) {
+          console.log("Telling the serviceWorker that decryption is done.");
+        }
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             cmd: "decryptionFinished",
@@ -198,7 +204,7 @@ export class DecryptedDownloadSession {
           window.open(new URL("/file", document.location.origin), "_blank");
           this.getFile(this.getFileUrl()).then(() => {
             this.getSlice().then(() => {
-              console.log("Added first slice to serviceworker.");
+              if (DEV) console.log("Added first slice to serviceworker.");
             });
           });
           break;

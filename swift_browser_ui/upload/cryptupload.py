@@ -86,40 +86,22 @@ class EncryptedUploadProxy:
 
     async def a_create_container(self) -> None:
         """Create the container required by the upload."""
-        async with self.client.head(
-            common.generate_download_url(self.host, self.container),
-            headers={"Content-Length": "0", "X-Auth-Token": self.token},
-            ssl=ssl_context,
-        ) as resp_get:
-            if resp_get.status != 204:
-                async with self.client.put(
-                    common.generate_download_url(self.host, self.container),
-                    headers={"Content-Length": "0", "X-Auth-Token": self.token},
-                    ssl=ssl_context,
-                ) as resp_put:
-                    if resp_put.status not in {201, 202}:
-                        raise aiohttp.web.HTTPForbidden(
-                            reason="Upload container creation failed."
-                        )
-
-        async with self.client.head(
-            common.generate_download_url(self.host, f"{self.container}_segments"),
-            headers={"Content-Length": "0", "X-Auth-Token": self.token},
-            ssl=ssl_context,
-        ) as resp_get:
-            if resp_get.status != 204:
-                async with self.client.put(
-                    common.generate_download_url(
-                        self.host,
-                        f"{self.container}_segments",
-                    ),
-                    headers={"Content-Length": "0", "X-Auth-Token": self.token},
-                    ssl=ssl_context,
-                ) as resp_put:
-                    if resp_put.status not in {201, 202}:
-                        raise aiohttp.web.HTTPForbidden(
-                            reason="Upload segment container creation failed."
-                        )
+        for container in {self.container, f"{self.container}_segments"}:
+            async with self.client.head(
+                common.generate_download_url(self.host, container),
+                headers={"Content-Length": "0", "X-Auth-Token": self.token},
+                ssl=ssl_context,
+            ) as resp_get:
+                if resp_get.status != 204:
+                    async with self.client.put(
+                        common.generate_download_url(self.host, container),
+                        headers={"Content-Length": "0", "X-Auth-Token": self.token},
+                        ssl=ssl_context,
+                    ) as resp_put:
+                        if resp_put.status not in {201, 202}:
+                            raise aiohttp.web.HTTPForbidden(
+                                reason=f'Failed to create container "{container}" for upload.'
+                            )
 
     async def add_header(
         self,
