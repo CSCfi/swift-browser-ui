@@ -7,6 +7,7 @@ name = "swift-browser-ui"
 dynamic = ["version"]
 description = "Object browser Web UI for Openstack Swift API"
 readme = "README.md"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [
     { name = "CSC Developers" },
@@ -67,6 +68,7 @@ swift-x-account-sharing = "swift_browser_ui.launcher:run_sharing"
 
 [project.urls]
 Source = "https://github.com/CSCfi/swift-browser-ui"
+Documentation = "https://swift-browser-ui.readthedocs.io"
 
 [tool.hatch.version]
 path = "swift_browser_ui/__init__.py"
