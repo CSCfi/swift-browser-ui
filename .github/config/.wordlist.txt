@@ -21,6 +21,7 @@ cp
 cryptfiles
 csc
 cscfi
+decrypt
 dev
 devel
 devenv

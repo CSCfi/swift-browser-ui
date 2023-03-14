@@ -9,6 +9,8 @@ apin
 apua
 arvot
 asetukset
+asiasanat
+asiasanoja
 avaimelle
 avaimen
 avaimet
@@ -22,6 +24,7 @@ edellyttää
 edistyneitä
 ei
 eikä
+eivät
 englanniksi
 ennen
 ensin
@@ -32,6 +35,7 @@ erikseen
 erillinen
 erissä
 erityyppisiä
+esim
 esimerkiksi
 esitetty
 estetty
@@ -51,6 +55,7 @@ halutako
 halutessasi
 haluttu
 halutun
+hinnoittelu
 hinnoittelulaskuri
 hyväksy
 hyväksyä
@@ -58,6 +63,7 @@ hyväksyäksesi
 ilman
 ja
 jaa
+jaan
 jaat
 jaetaan
 jaettava
@@ -67,6 +73,7 @@ jaettiin
 jaettu
 jaettua
 jaettuja
+jaettuun
 jaetun
 jaetut
 jakaa
@@ -75,6 +82,8 @@ jakamasi
 jakaminen
 jakamispäivämäärä
 jakamista
+jakamistunnuksen
+jakamistunnus
 jakanut
 jako
 jakoa
@@ -87,6 +96,7 @@ jne
 jo
 johtaa
 johtua
+joka
 joltakin
 jonka
 jos
@@ -109,6 +119,7 @@ kansioille
 kansioina
 kansioita
 kansion
+kansioon
 kansiossa
 kansiot
 kansiota
@@ -122,6 +133,7 @@ kerran
 keskus
 kestää
 kieli
+kielletty
 kiellettyä
 kiinni
 kirjaudu
@@ -130,6 +142,8 @@ kirjautuaksesi
 kirjautumalla
 kirjautuminen
 kirjautumisen
+kirjautumissivulle
+kirjautunut
 kirjoitus
 kirjoitusoikeus
 klikkaa
@@ -144,6 +158,8 @@ koita
 kokeile
 koko
 kontteja
+koodi
+koodin
 kopioi
 kopioida
 kopioidaan
@@ -151,8 +167,10 @@ kopioinnin
 kopiointi
 kopioitu
 koskevia
+kuinka
 kulutuksesta
 kulutus
+kun
 kunnes
 kuvaus
 kyseisen
@@ -216,6 +234,7 @@ lähetetään
 lähettäessä
 lähettäjän
 lähettämistä
+lähettää
 lähetys
 lähetystä
 lähetä
@@ -253,13 +272,17 @@ nappi
 nappia
 navigointia
 niiden
+niin
 nimellä
 nimetä
 nimeä
 nimi
+numeroinen
+numeroisen
 nykyinen
 nykyisen
 nykyisiä
+nähdä
 näkyvissä
 nämä
 näytetyistä
@@ -314,6 +337,7 @@ paloitellaan
 paluu
 palvelu
 palvelun
+palveluntarjoaja
 peruuta
 peruutettu
 pian
@@ -341,6 +365,7 @@ projekti
 projektia
 projektien
 projektiin
+projektiisi
 projektilla
 projektille
 projektilta
@@ -354,6 +379,7 @@ projektitunnisteille
 projektitunnuksen
 projektitunnukset
 pudota
+purkaa
 puuttuvasta
 pyydetty
 pyydetyn
@@ -375,12 +401,25 @@ resurssienkäyttö
 resurssit
 rivinvaihtoa
 saavutettavuus
+<<<<<<< HEAD
+=======
+sähköpostilla
+sähköpostitse
+säiliö
+säiliöitä
+säiliön
+säiliöön
+säiliöt
+säiliötä
+säilön
+>>>>>>> 00af924d (Updated word lists)
 salaa
 salaaminen
 salasana
 salasanasta
 salataan
 salattua
+salauksen
 salaus
 salausohjelman
 salausratkaisun
@@ -388,6 +427,7 @@ salausvaihtoehtoja
 salli
 sallittu
 se
+sekä
 sekunnin
 selaamiseen
 selaamisesta
@@ -399,15 +439,26 @@ selain
 selainta
 selatessa
 selaus
+selaustila
+selaustilasta
 sen
 seuraava
 siirry
 siirto
 sinulle
+<<<<<<< HEAD
 sisällön
 sisältö
 sisään
 sisäänkirjauksen
+=======
+sinun
+sisään
+sisäänkirjauksen
+sisällön
+sisältö
+sisältöä
+>>>>>>> 00af924d (Updated word lists)
 sivu
 sivua
 sivulla
@@ -444,6 +495,7 @@ tallennettujen
 tallennustilaan
 talteen
 tapauksessa
+tarkastele
 tarkastella
 tarkat
 tarkistathan
@@ -462,6 +514,7 @@ tiedostolle
 tiedoston
 tiedostot
 tiedot
+tietää
 tieteen
 tieto
 tietoa
@@ -473,8 +526,10 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiminnolla
 toiminto
 toiseen
+toiselle
 toisen
 toisesta
 toista
@@ -483,6 +538,7 @@ tueta
 tuettu
 tuettua
 tuki
+tulee
 tulisi
 tuloksia
 tunniste
@@ -511,6 +567,8 @@ tässä
 tätä
 täytyy
 ulos
+uniikin
+useiden
 useille
 useisiin
 uudella
@@ -535,8 +593,10 @@ valmis
 varmasti
 varmistathan
 varten
+vastaanottaja
 vastaanottajan
 vastaanottajien
+vastaanottavan
 vastaanottimien
 vedä
 viimeisin
@@ -553,6 +613,11 @@ vähintään
 väliaikaiseen
 yhdelle
 yhden
+<<<<<<< HEAD
+=======
+yhdistetty
+yhtään
+>>>>>>> 00af924d (Updated word lists)
 yhteenlaskettu
 yhteys
 yhtään
