@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import { getProjectNumber } from "@/common/globalFunctions";
 import { mdiOpenInNew } from "@mdi/js";
 export default {
   name: "BrowserMainNavbar",
@@ -91,37 +92,9 @@ export default {
     return {
       menuVisible: false,
       navigationMenuItems: [],
-      mobileNavigationItems: [
-        {
-          title: "Support",
-          icon: "mdi-help-circle-outline",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-        {
-          title: "Finnish",
-          icon: "mdi-web",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-        {
-          title: "User name",
-          icon: "mdi-account",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-      ],
       currentLang: "",
       extLinkIcon: mdiOpenInNew,
+      projectInfoLink: "",
     };
   },
   computed: {
@@ -136,6 +109,11 @@ export default {
     },
   },
   watch: {
+    active () {
+      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+        + getProjectNumber(this.active);
+      this.setNavigationMenu();
+    },
     uname () {
       this.setNavigationMenu();
     },
@@ -197,8 +175,8 @@ export default {
           ariaLabel: this.$t("label.project_info"),
           subs: [
             {
-              title: this.$t("message.dashboard.project_info"),
-              href: `https://my.csc.fi/myProjects/project/${this.active.id}`,
+              title: this.$t("message.dashboard.projectInfo"),
+              href: this.projectInfoLink,
             },
             {
               title: this.$t("message.logOut"),

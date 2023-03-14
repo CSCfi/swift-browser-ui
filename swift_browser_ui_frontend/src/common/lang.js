@@ -10,7 +10,6 @@ let default_translations = {
         href: "/login/oidc",
       },
       index: {
-        formName: "Openstack Account",
         logIn: "Log in",
         loginmethods: [
           {
@@ -60,8 +59,6 @@ let default_translations = {
       createFolder: "Create folder",
       uploadSecondaryNav: "Upload",
       logOut: "Log out",
-      cscOrg: "CSC - IT Center For Science Ltd.",
-      devel: "Developed by",
       folderTabs: {
         all: "All folders",
         sharedFrom: "Folders you have shared",
@@ -115,7 +112,8 @@ let default_translations = {
         showPagination: "Display pagination",
       },
       dashboard: {
-        project_info: "Project information",
+        projectInfo: "Project information",
+        projectInfoBaseLink: "https://my.csc.fi/projects/",
       },
       share: {
         share: "Share",
@@ -364,8 +362,11 @@ let default_translations = {
   },
   fi: {
     message: {
+      indexOIDC: {
+        logIn: "Kirjaudu",
+        href: "/login/oidc",
+      },
       index: {
-        formName: "Openstack Käyttäjä",
         logIn: "Kirjaudu sisään",
         loginmethods: [
           {
@@ -413,8 +414,6 @@ let default_translations = {
       createFolder: "Luo kansio",
       uploadSecondaryNav: "Lähetä",
       logOut: "Kirjaudu ulos",
-      cscOrg: "CSC – Tieteen tietotekniikan keskus Oy",
-      devel: "kehittänyt",
       folderTabs: {
         all: "Kaikki kansiot",
         sharedFrom: "Jakamasi kansiot",
@@ -475,7 +474,8 @@ let default_translations = {
         showPagination: "Näytä sivutus",
       },
       dashboard: {
-        project_info: "Projektin tiedot",
+        projectInfo: "Projektin tiedot",
+        projectInfoBaseLink: "https://my.csc.fi/projects/",
       },
       share: {
         share: "Jaa",

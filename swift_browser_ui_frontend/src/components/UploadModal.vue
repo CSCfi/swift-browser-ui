@@ -61,7 +61,7 @@
           {{ $t("message.encrypt.uploadedFiles") }}
           <b>{{ active.name }}</b>.
           <c-link
-            :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
+            :href="projectInfoLink"
             underline
             target="_blank"
           >
@@ -200,8 +200,8 @@ export default {
       recvkeys: [],
       recvHashedKeys: [],
       noUpload: true,
-      projectNumber: "",
       CUploadButton,
+      projectInfoLink: "",
     };
   },
   computed: {
@@ -382,7 +382,8 @@ export default {
       this.refreshNoUpload();
     },
     active: function () {
-      this.projectNumber = getProjectNumber(this.active);
+      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+        + getProjectNumber(this.active);
     },
   },
   methods: {
