@@ -29,7 +29,7 @@
     "buefy": "^0.9.22",
     "bulma": "^0.9.4",
     "cli-highlight": "^2.1.11",
-    "csc-ui": "^0.6.18",
+    "csc-ui": "github:hannyle/csc-ui",
     "csc-ui-vue-directive": "^0.0.6",
     "core-js": "^3.27.2",
     "dexie": "^3.2.3",
