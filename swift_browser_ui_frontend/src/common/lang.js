@@ -26,7 +26,7 @@ let default_translations = {
           "be for example due to missing password and/or " +
           "username.",
         UIdown: "503 – Service Unavailable",
-        UIdown_text: "Allas user interface is currently unavailable",
+        UIdown_text: "Web user interface is currently unavailable",
         Unauthorized: "401 – Not Logged In",
         Unauthorized_text:
           "The action requested requires logging " +
@@ -161,9 +161,9 @@ let default_translations = {
         field_placeholder: "Add Share IDs",
         cancel: "Cancel",
         confirm: "Share",
-        fail_noperm: "Please select permissions to grant!",
-        fail_noid: "Please give at least one Project Identifier!",
-        fail_duplicate: "The project already has access to the folder!",
+        fail_noperm: "Please select permissions to grant.",
+        fail_noid: "Please enter at least one Share ID.",
+        fail_duplicate: "The project already has access to the folder.",
       },
       download: " Download",
       largeDownMessage:
@@ -378,7 +378,7 @@ let default_translations = {
           "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
           "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
         UIdown: "503 - Palvelu ei ole käytettävissä",
-        UIdown_text: "Allas-käyttöliittymä on tilapäisesti poissa käytöstä",
+        UIdown_text: "Käyttöliittymä on tilapäisesti poissa käytöstä",
         Unauthorized: "401 – Kirjaudu sisään",
         Unauthorized_text:
           "Sinun täytyy olla kirjautunut sisään voidaksesi nähdä sivun, " +
@@ -509,20 +509,20 @@ let default_translations = {
           "He voivat myös lähettää tiedostoja jaettuun kansioon.",
         ],
         permissions: "Käyttöoikeudet",
-        view_perm: "Tarkastele",
+        view_perm: "Katsele",
         read_perm: "Kopioi ja lataa",
         write_perm: "Kopioi, lataa ja lähetä",
-        shared_successfully: "Kansion jakaminen onnistui!",
-        remove_permission: "Lupa poistettiin onnistuneesti!",
-        update_permission: "Lupa muutettiin onnistuneesti.",
+        shared_successfully: "Kansion jakaminen onnistui.",
+        remove_permission: "Käyttöoikeus poistettiin onnistuneesti.",
+        update_permission: "Käyttöoikeus muutettiin onnistuneesti.",
         shared_table_title: "Tämä kansio on jaettu",
-        field_placeholder: "Lisää projektitunnukset",
+        field_placeholder: "Lisää jakamistunnus",
         cancel: "Peru",
         confirm: "Jaa",
-        fail_noperm: "Valitse jaettavat oikeudet!",
+        fail_noperm: "Valitse käyttöoikeudet.",
         fail_noid:
-          "Anna vähintään yhden projektin tunniste (Project " + "Identifier)!",
-        fail_duplicate: "Säiliö on jo jaettu projektille!",
+          "Anna vähintään yhden projektin jakamistunnus.",
+        fail_duplicate: "Kansio on jo jaettu kyseiselle projektille.",
       },
       download: " Lataa",
       largeDownMessage:
@@ -537,7 +537,7 @@ let default_translations = {
         sharedTo: "Sinulle ei ole jaettu kansioita.",
       },
       sharing: "Jako - ",
-      containers: "Säiliöt - ",
+      containers: "Kansiot - ",
       upload: {
         upfinish: "Lähetettiin tiedosto ",
         upfail: "Epäonnistuttiin lähettäessä tiedosto ",
@@ -551,11 +551,11 @@ let default_translations = {
         minimize: "Pienennä",
         estimate: "Toiminto voi kestää muutamia minuutteja.",
         complete: "Lähetys on valmis",
-        cancelled: "Lataus peruutettu",
+        cancelled: "Lähetys peruutettu",
       },
       copy: " Kopioi",
-      copied: "Jaa tunnus kopioitu leikepöydälle!",
-      copy_failed: "Kopiointi epäonnistui!",
+      copied: "Jakamistunnus kopioitu leikepöydälle.",
+      copy_failed: "Kopiointi epäonnistui.",
       delete: "Poista",
       remove: "Poista",
       editTags: "Muokkaa asiasanoja",
@@ -564,29 +564,29 @@ let default_translations = {
       options: "Valinnat",
       copysuccess: "Kansiota kopioidaan",
       copytime: "Se voi kestää muutaman sekunnin",
-      copyfail: "Säiliön kopiointi epäonnistui",
-      tagName: "Tägit",
-      tagPlaceholder: "# Lisää tunniste ja paina rivinvaihtoa",
+      copyfail: "Kansion kopiointi epäonnistui",
+      tagName: "Asiasanat",
+      tagPlaceholder: "# Lisää asiasana ja paina rivinvaihtoa",
       container_ops: {
-        addContainer: "Luo uusi säiliö",
+        addContainer: "Luo uusi kansio",
         norename:
-          "Säiliötä ei voi nimetä uudelleen, " +
+          "Kansiota ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        deleteConfirm: "Poista säiliö",
-        deleteNote: "Säilön poistaminen edellyttää kaikkien " +
-          "objektien poistamista ensin.",
-        deleteConfirmMessage: "Haluatko varmasti poistaa tämän säiliön?",
-        deleteSuccess: "Säiliö poistettu",
+        deleteConfirm: "Poista kansio",
+        deleteNote: "Kansion poistaminen edellyttää kaikkien " +
+          "tiedostojen poistamista ensin.",
+        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",
+        deleteSuccess: "Kansio poistettu",
         folderName: "Kansion nimi",
       },
       objects: {
-        filterBy: "Suodata nimellä tai tägillä",
-        deleteConfirm: "Poista objektit",
-        deleteObjects: "Poista objekti / objektit",
-        deleteSuccess: "Objektit poistettu",
-        deleteObjectsMessage: "Halutako varmasti poistaa nämä objektit?",
+        filterBy: "Suodata nimellä tai asiasanalla",
+        deleteConfirm: "Poista tiedostot",
+        deleteObjects: "Poista tiedostot",
+        deleteSuccess: "Tiedostot poistettu",
+        deleteObjectsMessage: "Haluatko varmasti poistaa nämä tiedostot?",
       },
       replicate: {
         destinationExists: "Kansio on jo olemassa",
@@ -605,8 +605,8 @@ let default_translations = {
         copyToken:
           "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
           "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
-          "Varmistathan ottaneesi avaimen talteen ennen " +
-          "navigointia pois sivulta.",
+          "Kopioi avain talteen ennen kuin " +
+          "poistut tältä sivulta.",
         tokenCopied: "Avain kopioitu.",
       },
       encrypt: {
@@ -639,21 +639,21 @@ let default_translations = {
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
         enReady:
           "Encryption engine is ready. Refresh the " +
-          "window to enable encryption.",
-        refresh: "Refresh", //to translate
+          "window to enable encryption.", //to translate
+        refresh: "Päivitä",
       },
       search: {
-        container: "Säiliö",
-        object: "Objekti",
-        folder: "Kansio",
-        tags: "Tägit",
-        objects: "Objektia",
+        container: "Kansio",
+        object: "Tiedosto",
+        folder: "Alikansio",
+        tags: "Asiasanat",
+        objects: "Tiedostoa",
         size: "Koko",
         empty: "Tuloksia ei löytynyt",
-        searchBy: "Etsi nimellä tai tägillä",
+        searchBy: "Etsi nimellä tai asiasanalla",
         buildingIndex:
-          "Tässä projektissa on suuri määrä kohteita. Odota, " +
-          "kunnes hakuindeksi on valmis, ja yritä uudelleen.",
+          "Tässä projektissa on paljon tiedostoja. Odota " +
+          "hetki ja yritä uudelleen.",
       },
       select: {
         heading: "Valitse projekti kirjautuaksesi sisään",
