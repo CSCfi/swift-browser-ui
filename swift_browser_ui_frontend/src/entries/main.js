@@ -1,8 +1,7 @@
 // Project main imports
-import Vue from "vue";
-import App from "@/pages/BrowserPage.vue";
+import { createApp } from "vue";
+import BrowserPage from "@/pages/BrowserPage.vue";
 import router from "@/common/router";
-import VueI18n from "vue-i18n";
 
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
@@ -15,14 +14,11 @@ import CopyFolderModal from "@/components/CopyFolderModal.vue";
 import DeleteModal from "@/components/DeleteModal.vue";
 
 // CSC UI things
-import cModel from "@/common/csc-ui.js";
-
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControlV2 } from "csc-ui-vue-directive";
+import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
-import getLangCookie from "@/common/conv";
-import translations from "@/common/lang";
+import { i18n } from "@/common/i18n";
 import { GET, getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
 
@@ -96,34 +92,12 @@ window.addEventListener("rejectionhandled", function (event) {
   event.stopPropagation();
 });
 
-Vue.config.productionTip = false;
-Vue.config.errorHandler = function (err, vm, info) {
-  if (DEV) console.log("Vue error: ", err, vm, info);
-};
-Vue.config.warnHandler = function (msg, vm, info) {
-  if (DEV) console.log("Vue warning: ", msg, vm, info);
-};
-
-Vue.use(VueI18n);
-
 // Configure csc-ui
-Vue.config.ignoredElements = [/c-\w*/];
 applyPolyfills().then(() => {
   defineCustomElements();
 });
 
-Vue.directive("control", vControlV2);
-Vue.directive("csc-model", cModel);
-
-const i18n = new VueI18n({
-  locale: getLangCookie(),
-  messages: translations,
-});
-
-new Vue({
-  i18n,
-  router,
-  store,
+const app = createApp({
   components: {
     CFooter,
     BrowserMainNavbar,
@@ -557,5 +531,19 @@ new Vue({
       return retl;
     },
   },
-  ...App,
-}).$mount("#app");
+  ...BrowserPage,
+});
+
+app.use(i18n);
+app.use(router);
+app.use(store);
+app.directive("csc-control", vControl);
+
+app.config.errorHandler = function (err, vm, info) {
+  if (DEV) console.log("Vue error: ", err, vm, info);
+};
+app.config.warnHandler = function (msg, vm, info) {
+  if (DEV) console.log("Vue warning: ", msg, vm, info);
+};
+
+router.isReady().then(() => app.mount("#app"));

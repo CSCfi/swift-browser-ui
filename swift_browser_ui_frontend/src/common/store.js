@@ -1,6 +1,5 @@
 // Vuex store for the variables that need to be globally available.
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 
 import { getContainers } from "@/common/api";
 import { getObjects } from "@/common/api";
@@ -14,9 +13,8 @@ import {
 
 import { initDB } from "@/common/db";
 import {getSharedContainers} from "./globalFunctions";
-Vue.use(Vuex);
 
-const store = new Vuex.Store({
+const store = createStore({
   state: {
     db: initDB(),
     projects: [],

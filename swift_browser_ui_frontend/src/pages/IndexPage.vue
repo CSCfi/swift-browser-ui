@@ -11,7 +11,7 @@
         <c-container class="padding">
           <form>
             <c-login-card
-              :src="require('@/assets/banner_login.png')"
+              src="/assets/banner_login.png"
             >
               <c-login-card-title>
                 {{ $t('message.program_name') }}
@@ -22,7 +22,7 @@
               <c-spacer />
               <c-login-card-actions>
                 <c-button
-                  v-for="item in $t('message.index.loginmethods')"
+                  v-for="item in $tm('message.index.loginmethods')"
                   :key="item.msg"
                   :disabled="!idb"
                   :href="item.href"

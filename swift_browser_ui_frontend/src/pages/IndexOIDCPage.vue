@@ -11,7 +11,7 @@
         <c-container class="padding">
           <form>
             <c-login-card
-              :src="require('@/assets/banner_login.png')"
+              src="/assets/banner_login.png"
             >
               <c-alert
                 v-if="!idb"
