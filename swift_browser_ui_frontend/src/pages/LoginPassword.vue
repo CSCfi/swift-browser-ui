@@ -18,7 +18,7 @@
             action="/login/credentials"
           >
             <c-login-card
-              :src="require('@/assets/banner_login.png')"
+              src="/assets/banner_login.png"
             >
               <c-alert
                 v-if="!idb"
@@ -32,13 +32,13 @@
               <c-login-card-content>
                 <p>{{ $t('message.pwdlogin.description') }}</p>
                 <c-text-field
-                  v-control
+                  v-csc-control
                   name="username"
                   :label="$t('message.pwdlogin.uname')"
                   type="text"
                 />
                 <c-text-field
-                  v-control
+                  v-csc-control
                   name="password"
                   :label="$t('message.pwdlogin.pwd')"
                   type="password"

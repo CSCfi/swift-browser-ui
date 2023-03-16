@@ -19,7 +19,8 @@
         </p>
         <c-text-field
           id="folderName"
-          v-csc-model="folderName"
+          v-model="folderName"
+          v-csc-control
           :label="$t('message.container_ops.folderName')"
           name="foldername"
           aria-required="true"

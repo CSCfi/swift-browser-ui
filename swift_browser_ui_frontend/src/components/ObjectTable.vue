@@ -81,7 +81,8 @@
     >
       <c-text-field
         id="search"
-        v-csc-model="searchQuery"
+        v-model="searchQuery"
+        v-csc-control
         name="search"
         :placeholder="$t('message.objects.filterBy')"
         type="search"

@@ -20,8 +20,8 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-autocomplete
-          v-control
-          v-csc-model="selectedFolder"
+          v-model="selectedFolder"
+          v-csc-control
           :items.prop="filteredItems"
           :query="inputFolder"
           :label="$t('message.container_ops.folderName')"
@@ -42,6 +42,7 @@
           <span>{{ $t("message.dropFiles") }}</span>
           <CUploadButton
             v-model="files"
+            v-csc-control
           >
             <span>
               {{ $t("message.encrypt.dropMsg") }}
@@ -76,19 +77,22 @@
           >
             <c-container>
               <c-checkbox
-                v-csc-model="ownPrivateKey"
+                v-model="ownPrivateKey"
+                v-csc-control
                 :label="$t('message.encrypt.ephemeral')"
               />
               <c-flex v-if="ownPrivateKey">
                 <c-text-field
-                  v-csc-model="privkey"
+                  v-model="privkey"
+                  v-csc-control
                   :placeholder="$t('message.encrypt.pk_msg')"
                   :label="$t('message.encrypt.pk')"
                   type="text"
                   max="1024"
                 />
                 <c-text-field
-                  v-csc-model="passphrase"
+                  v-model="passphrase"
+                  v-csc-control
                   :placeholder="$t('message.encrypt.phrase_msg')"
                   :label="$t('message.encrypt.phrase')"
                   type="text"
@@ -99,12 +103,14 @@
             </c-container>
             <c-container>
               <c-checkbox
-                v-csc-model="multipleReceivers"
+                v-model="multipleReceivers"
+                v-csc-control
                 :label="$t('message.encrypt.multipleReceivers')"
               />
               <c-flex v-if="multipleReceivers">
                 <c-text-field
-                  v-csc-model="addRecvkey"
+                  v-model="addRecvkey"
+                  v-csc-control
                   :placeholder="$t('message.encrypt.pubkey_msg')"
                   :label="$t('message.encrypt.pubkey')"
                   type="text"

@@ -1,6 +1,7 @@
 
 import { defineConfig } from "vite";
-import { createVuePlugin as vue } from "vite-plugin-vue2";
+import vue from "@vitejs/plugin-vue";
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -133,8 +134,15 @@ export default defineConfig(({ command, mode }) => {
     publicDir,
     appType: "mpa", // set the dev server as a multi-page app
     plugins: [
-      vue(), 
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith("c-"),
+          },
+        },
+      }),
       multipagePlugin(),
+      VueI18nPlugin(),
     ],
     build: {
       outDir: path.resolve(__dirname, "dist"),

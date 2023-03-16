@@ -17,7 +17,8 @@
         </c-alert>
         <c-text-field
           id="new-copy-folderName"
-          v-csc-model="folderName"
+          v-model="folderName"
+          v-csc-control
           :label="$t('message.replicate.name_newFolder')"
           name="foldername"
           :loading="loadingFoldername"

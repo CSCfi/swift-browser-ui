@@ -1,32 +1,32 @@
-import Vue from "vue";
-import App from "@/pages/SelectPage.vue";
+import { createApp } from "vue";
+import SelectPage from "@/pages/SelectPage.vue";
 
-import getLangCookie from "@/common/conv";
-import translations from "@/common/lang";
+import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
+import { vControl } from "@/common/csc-ui-vue-directive";
+
+import { i18n } from "@/common/i18n";
 
 import { getProjects } from "@/common/api";
 
 // Import project css
 import "@/css/prod.scss";
 
-import VueI18n from "vue-i18n";
-
-Vue.use(VueI18n);
-
-
-const i18n = new VueI18n({
-  locale: getLangCookie(),
-  messages: translations,
+applyPolyfills().then(() => {
+  defineCustomElements();
 });
 
-new Vue ({
-  i18n,
-  data: {
-    formname: "Token id:",
-    loginformname: "Openstack account:",
-    idb: true,
-    projects: [],
-    langs: [{name: "In English", value: "en"}, {name: "Suomeksi", value: "fi"}],
+const app = createApp({
+  data: function() {
+    return {
+      formname: "Token id:",
+      loginformname: "Openstack account:",
+      idb: true,
+      projects: [],
+      langs: [
+        {name: "In English", value: "en"}, 
+        {name: "Suomeksi", value: "fi"},
+      ],
+    };
   },
   created() {
     document.title = this.$t("message.program_name");
@@ -45,5 +45,10 @@ new Vue ({
                         + expiryDate.toUTCString();
     },
   },
-  ...App,
-}).$mount("#app");
+  ...SelectPage,
+});
+  
+app.use(i18n);
+app.directive("csc-control", vControl);
+
+app.mount("#app");

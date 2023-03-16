@@ -12,13 +12,15 @@
       role="main"
     >
       <c-modal
-        v-csc-model="openCreateFolderModal"
+        v-model="openCreateFolderModal"
+        v-csc-control
         width="64vw"
       >
         <CreateFolderModal />
       </c-modal>
       <c-modal
-        v-csc-model="openUploadModal"
+        v-model="openUploadModal"
+        v-csc-control
         width="64vw"
       >
         <UploadModal />
@@ -28,25 +30,29 @@
         @cancel-upload="currentUpload.cancelUpload()"
       />
       <c-modal
-        v-csc-model="openEditTagsModal"
+        v-model="openEditTagsModal"
+        v-csc-control
         width="64vw"
       >
         <EditTagsModal />
       </c-modal>
       <c-modal
-        v-csc-model="openShareModal"
+        v-model="openShareModal"
+        v-csc-control
         width="64vw"
       >
         <ShareModal />
       </c-modal>
       <c-modal
-        v-csc-model="openCopyFolderModal"
+        v-model="openCopyFolderModal"
+        v-csc-control
         width="64vw"
       >
         <CopyFolderModal />
       </c-modal>
       <c-modal
-        v-csc-model="openDeleteModal"
+        v-model="openDeleteModal"
+        v-csc-control
       >
         <DeleteModal />
       </c-modal>

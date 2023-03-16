@@ -30,7 +30,8 @@
       </p>
       <p>
         <c-select
-          v-csc-model="$i18n.locale"
+          v-model="$i18n.locale"
+          v-csc-control
           class="locale-changed block center"
           placeholder="Language"
           :items="langs"

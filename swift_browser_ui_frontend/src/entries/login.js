@@ -1,31 +1,21 @@
-import Vue from "vue";
-import App from "@/pages/LoginPage.vue";
+import { createApp } from "vue";
+import LoginPage from "@/pages/LoginPage.vue";
 
-import getLangCookie from "@/common/conv";
-import translations from "@/common/lang";
+import { i18n } from "@/common/i18n";
 
 // Import project css
 import "@/css/prod.scss";
 
-import VueI18n from "vue-i18n";
-
-Vue.use(VueI18n);
-
-
-const i18n = new VueI18n({
-  locale: getLangCookie(),
-  messages: translations,
-});
-
-new Vue ({
-  i18n,
-  data: {
-    formname: "Token id:",
-    loginformname: "Openstack account:",
-    idb: true,
+const app = createApp({
+  data: function() {
+    return {
+      formname: "Token id:",
+      loginformname: "Openstack account:",
+      idb: true,
+    };
   },
   created() {
-    document.title = this.$t("message.program_name");
+    document.title = i18n.$t("message.program_name");
   },
   methods: {
     "displayInvalid": function () {
@@ -38,5 +28,7 @@ new Vue ({
       }
     },
   },
-  ...App,
-}).$mount("#app");
+  ...LoginPage,
+});
+  
+app.mount("#app");

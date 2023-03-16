@@ -73,8 +73,8 @@
         />
         <c-flex>
           <c-select
-            v-control
-            v-csc-model="sharedAccessRight"
+            v-model="sharedAccessRight"
+            v-csc-control
             shadow="false"
             :label="$t('message.share.permissions')"
             :items.prop="accessRights"

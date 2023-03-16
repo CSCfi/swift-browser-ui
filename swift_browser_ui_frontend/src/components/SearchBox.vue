@@ -4,8 +4,8 @@
     @focus="event => searchGainedFocus()"
   >
     <c-autocomplete
-      v-control
-      v-csc-model="selectedItem"
+      v-model="selectedItem"
+      v-csc-control
       :items.prop="searchResults"
       :query="searchQuery"
       :aria-label="$t('label.searchbox')"
