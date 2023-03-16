@@ -28,6 +28,8 @@ const proxyTo = {
 
 const oidcEnabled = process.env.OIDC_ENABLED === "True";
 const root = path.resolve(__dirname, "src");
+const publicDir = path.resolve(__dirname, "public");
+
 let pages = {
   "index":         path.resolve(root, "index.html"),
   "select":        path.resolve(root, "select.html"),
@@ -48,7 +50,6 @@ let proxy = {
   "/static/assets":       proxyTo,
   "/api":                 proxyTo,
   "/discover":            proxyTo,
-  "/libupload":           proxyTo,
   "/login/oidc":          proxyTo,
   "/login/oidc_front":    proxyTo,
   "/login/oidc-redirect": proxyTo,
@@ -61,11 +62,9 @@ let proxy = {
   "/sign":                proxyTo,
   "/replicate":           proxyTo,
   "/token":               proxyTo,
-  "/ws": {
-    target: `ws${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}/ws`,
-    ws: true,
-  },
 };
+
+let origin = `http${process.env.SWIFT_UI_SECURE_WEBSOCKET}://${process.env.SWIFT_UI_TLS_HOST}:${process.env.SWIFT_UI_TLS_PORT}`;
 
 // Vite doesn't work "out-of-the-box" with multiple SPAs
 // This middleware loads existing html pages and
@@ -131,6 +130,7 @@ export default defineConfig(({ command, mode }) => {
   return {
     root,
     base,
+    publicDir,
     appType: "mpa", // set the dev server as a multi-page app
     plugins: [
       vue(), 
@@ -153,6 +153,7 @@ export default defineConfig(({ command, mode }) => {
       https,
       strictPort: true,
       proxy,
+      origin,
     },
     resolve: {
       alias: {
