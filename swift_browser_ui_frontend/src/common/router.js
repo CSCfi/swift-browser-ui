@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
-import SharedObjects from "@/views/SharedObjects.vue";
-import TokensView from "@/views/Tokens.vue";
+import SharedObjects from "@/views/SharedObjects";
 
 export default createRouter({
   history: createWebHistory(),
@@ -11,11 +10,6 @@ export default createRouter({
       path: "/browse",
       name: "AllFolders",
       component: FoldersView,
-    },
-    {
-      path: "/browse/:user/:project/tokens",
-      name: "TokensView",
-      component: TokensView,
     },
     {
       path: "/browse/:user/:project/:container/shared/:owner",

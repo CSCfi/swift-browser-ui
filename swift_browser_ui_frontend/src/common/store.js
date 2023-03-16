@@ -51,6 +51,7 @@ const store = createStore({
     selectedObjectName: "",
     openCopyFolderModal: false,
     openDeleteModal: false,
+    openTokenModal: false,
     deletableObjects: [],
     isFolderCopied: false,
     sourceProjectId: "",
@@ -230,6 +231,9 @@ const store = createStore({
     },
     toggleDeleteModal(state, payload) {
       state.openDeleteModal = payload;
+    },
+    toggleTokenModal(state, payload) {
+      state.openTokenModal = payload;
     },
     setDeletableObjects(state, payload) {
       state.deletableObjects = payload;
