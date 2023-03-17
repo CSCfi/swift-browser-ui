@@ -11,7 +11,6 @@
       :aria-label="$t('label.searchbox')"
       :placeholder="$t('message.search.searchBy')"
       hide-details
-      required
       custom-menu
       :items-per-page="8"
       @changeQuery="onQueryChange"
@@ -79,6 +78,8 @@ export default {
     selectedItem: function() {
       if(this.selectedItem !== null) {
         this.searchQuery = this.selectedItem.name;
+        const path = this.getSearchRoute(this.selectedItem);
+        this.$router.push(path);
       }
     },
   },
@@ -189,9 +190,11 @@ export default {
           container: item.container || item.name,
         },
       };
+
       if (item.container) {
         route["query"] = { selected: item.name };
       }
+
       return route;
     },
     searchGainedFocus: async function () {
@@ -235,5 +238,4 @@ export default {
 div[aria-selected='true'], div[slot="customMenu"]:hover {
   background-color: $csc-primary-lighter;
 }
-
 </style>
