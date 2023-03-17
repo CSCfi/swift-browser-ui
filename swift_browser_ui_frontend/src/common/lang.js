@@ -244,16 +244,14 @@ let default_translations = {
       tokens: {
         empty: "No API tokens created for the project",
         identifier: "Identifier",
-        revoke: "Revoke",
         identLabel: "Insert new token identifier",
         createToken: "Create token",
         latestToken: "Latest token: ",
         copyToken:
-          "The token will be displayed just this once after its " +
-          "creation, and recovering it will not be possible " +
-          "afterwards. Please make sure that you have stored " +
-          "the token somewhere before navigating away from the " +
-          "token page.",
+          "Token will be displayed just this once " +
+          "and recovering it is not be possible. " +
+          "Please store the token somewhere " +
+          "safe before closing this modal.",
         tokenCopied: "Token copied.",
         back: "Back to all folders",
       },
@@ -601,7 +599,6 @@ let default_translations = {
       tokens: {
         empty: "Projektille ei ole luotu API-avaimia",
         identifier: "Tunniste",
-        revoke: "Mitätöi",
         identLabel: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",

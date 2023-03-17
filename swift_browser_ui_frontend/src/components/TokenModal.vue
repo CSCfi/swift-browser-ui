@@ -5,7 +5,7 @@
       align="center"
     >
       <h2 class="title is-4 has-text-dark">
-        Create API-tokens
+        Create API-tokens <!--add to lang-->
       </h2>
       <c-button
         text
@@ -32,14 +32,15 @@
         @keyup.enter="addToken(newIdentifier)"
       >
         {{ $t('message.tokens.createToken') }}
-      </c-button> 
-      <c-container v-show="latest">
+      </c-button>
+      <div v-show="latest">
         <c-row
           align="center"
-          justify="space-around"
-          gap="10"
+          justify="space-between"
         >
-          <h3>{{ $t('message.tokens.latestToken') }}</h3>
+          <p>
+            <strong>{{ $t('message.tokens.latestToken') }}</strong>
+          </p>
           <p>{{ latest }}</p>
           <c-button
             size="small"
@@ -53,16 +54,33 @@
             Copy token
           </c-button>
         </c-row>
-      </c-container>
+        <c-alert type="warning">
+          <p>{{ $t('message.tokens.copyToken') }}</p> <!--edit Finnish text-->
+        </c-alert>
+      </div>
+      <c-data-table
+        v-show="tokens.length > 0"
+        class="tokenContents"
+        sort-by="identifier"
+        sort-direction="asc"
+        :data.prop="tableTokens"
+        :headers.prop="headers"
+        hide-footer
+      />
+      <c-toasts
+        id="copy-token-toasts"
+        data-testid="copy-token-toasts"
+      />
     </c-card-content>
   </c-card>
 </template>
 
 <script>
-import { mdiClose } from "@mdi/js";
+import { mdiClose, mdiDelete } from "@mdi/js";
 import {
   createExtToken,
   listTokens,
+  removeToken,
 } from "@/common/api";
 export default {
   name: "TokenModal",
@@ -71,42 +89,80 @@ export default {
       tokens: [],
       selected: undefined,
       newIdentifier: "",
-      latest: ".................................",
+      latest: undefined,
       copied: false,
       mdiClose,
+      mdiDelete,
     };
   },
   computed: {
-    active() {
-      return this.$store.state.active;
+    activeId() {
+      return this.$store.state.active.id;
+    },
+    headers () {
+      return [
+        {
+          key: "identifier",
+          value: this.$t("message.tokens.identifier"),
+          sortable: this.tokens.length > 1,
+        },
+        {
+          key: "controls",
+          width: "10%",
+          value: null,
+          sortable: false,
+          children: [
+            {
+              value: this.$t("message.remove"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: this.$t("message.remove"),
+                  type: "error",
+                  path: mdiDelete,
+                  onClick: ({ data: { identifier } }) =>
+                    this.deleteToken(identifier.value),
+                },
+              },
+            },
+          ],
+        },
+      ];
+    },
+    tableTokens () {
+      return this.tokens.map(token => {
+        return {
+          identifier: {
+            value: token,
+          },
+        };
+      });
+    },
+  },
+  watch: {
+    activeId () {
+      this.getTokens(this.activeId);
     },
   },
   methods: {
     closeTokenModal: function () {
       this.$store.commit("toggleTokenModal", false);
       this.newIdentifier = "";
-      this.tokens = [];
       this.selected = undefined;
-      //this.latest = undefined;
+      this.latest = undefined;
       this.copied = false;
     },
     getTokens: function () {
-      listTokens(this.active).then((ret) => {this.tokens = ret;});
+      listTokens(this.activeId).then((ret) => {this.tokens = ret;});
     },
     addToken: function (identifier) {
       createExtToken(
-        this.active,
+        this.activeId,
         identifier,
       ).then((ret) => {
         this.latest = ret;
-        /*document.querySelector("#add-token-toasts").addToast(
-          {
-            duration: 3600000,
-            type: "success",
-            progress: false,
-            message: this.$t("message.tokens.copyToken"),
-          },
-        );*/
         this.getTokens();
       });
     },
@@ -119,7 +175,7 @@ export default {
           this.latest,
         ).then(() => {
           this.copied = true;
-          /*document.querySelector("#copy-token-toasts").addToast(
+          document.querySelector("#copy-token-toasts").addToast(
             {
               duration: 6000,
               type: "success",
@@ -129,9 +185,15 @@ export default {
           );
           //like with ShareID copy button:
           //avoid overlapping toasts
-          setTimeout(() => { this.copied = false; }, 6000);*/
+          setTimeout(() => { this.copied = false; }, 6000);
         });
       }
+    },
+    deleteToken: function (identifier) {
+      removeToken(
+        this.activeId,
+        identifier,
+      ).then(() => {this.getTokens();});
     },
   },
 };
@@ -148,7 +210,12 @@ export default {
   right: 0;
 }
 
-#create-token >* {
-    margin-top: -2rem;
+#create-token > c-button {
+  margin-top: -2rem;
 }
+
+c-text-field {
+  margin-top: -1rem;
+}
+
 </style>
