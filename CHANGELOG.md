@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #969) Automate building wasm with npm
 - (GH #983) Make elements more semantic and improve accessibility for screen reader users
 - (GH #989) Make selected Display Options consistent when browsing between pages
+- (GH #944) Create new Taginput component to replace Buefy's taginput component
 - (GL #944) Replace buefy upload button with a new component: `CUploadButton`
 
 ### Changed
@@ -65,7 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #601) Implement new visual style using `csc-ui` in rest of the login and error pages
 - (GH #601) Add a language selector to login page menu bar, using `csc-ui`
 - (GH #920) Optimize docker builds, making them faster by leveraging more caching mechanisms and removing unnecessary package installation
-- (GH #1007) Create new Taginput component to replace Buefy's taginput component
 - (GH #1009) Replace buefy toasts with c-toasts from `csc-ui`
 - (GH #1014) Replace buefy snackbars with custom c-toasts from `csc-ui`
 - (GL #944) Replace buefy b-input with c-text-field from `csc-ui`
@@ -77,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #1025) add timeout to `requests` as recommended by `bandit`
 - (GL #944) Replace buefy dialogs with c-modal from `csc-ui`
 - (GL #944) Replace buefy notifications with c-toasts from `csc-ui`
-
+- (GL #944) Replace buefy Autocomplete component with c-autocomplete from `csc-ui`
 ### Fixed
 
 - (GH #704) Fix lost folder structure in shared mode uploads

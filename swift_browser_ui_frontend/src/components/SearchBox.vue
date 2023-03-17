@@ -3,46 +3,40 @@
     class="search"
     @focus="event => searchGainedFocus()"
   >
-    <b-autocomplete
-      id="searchbox"
-      v-model="searchQuery"
+    <c-autocomplete
+      v-control
+      v-csc-model="selectedItem"
+      :items.prop="searchResults"
+      :query="searchQuery"
       :aria-label="$t('label.searchbox')"
-      icon="magnify"
-      clearable
       :placeholder="$t('message.search.searchBy')"
-      :data="searchResults"
-      field="name"
-      :open-on-focus="true"
-      :keep-first="true"
-      :loading="isSearching"
-      max-height="350px"
-      @select="option => $router.push(getSearchRoute(option))"
-      @focus="event => searchGainedFocus()"
+      hide-details
+      custom-menu
+      :items-per-page="8"
+      @changeQuery="onQueryChange"
     >
-      <template slot-scope="props">
+      <i
+        slot="pre"
+        class="mdi mdi-magnify"
+      />
+      <div
+        v-for="(item, index) in searchResults"
+        :key="index"
+        slot="customMenu"
+        :aria-posinset="index + 1"
+        :aria-setsize="searchResults.length"
+        role="option"
+      >
+        <c-loader
+          v-show="isSearching"
+        />
         <SearchResultItem
-          :item="props.option"
+          :item="item"
           :search-array="searchArray"
           :route="getSearchRoute"
         />
-      </template>
-      <template #empty>
-        <div
-          v-if="searchArray.length > 0 && searchArray[0].length > 1"
-          class="media empty-search"
-        >
-          <c-loader
-            v-show="isSearching"
-          />
-          <div
-            v-show="!isSearching"
-            class="media-content"
-          >
-            {{ $t("message.search.empty") }}
-          </div>
-        </div>
-      </template>
-    </b-autocomplete>
+      </div>
+    </c-autocomplete>
     <c-toasts
       id="searchbox-toasts"
       data-testid="searchbox-toasts"
@@ -70,6 +64,7 @@ export default {
       searchResults: [],
       searchElements: [],
       searchQuery: "",
+      selectedItem: null,
       refs: [],
       isSearching: false,
     };
@@ -80,9 +75,20 @@ export default {
     },
   },
   watch: {
-    searchQuery() {
-      this.debounceSearch.cancel();
-      // request parameter should be sanitized first
+    selectedItem: function() {
+      if(this.selectedItem !== null) {
+        this.searchQuery = this.selectedItem.name;
+        const path = this.getSearchRoute(this.selectedItem);
+        this.$router.push(path);
+      }
+    },
+  },
+  created: function () {
+    this.debounceSearch = debounce(this.search, 400);
+  },
+  methods: {
+    onQueryChange: function (e) {
+      this.searchQuery = e.detail;
       const safeQuery = escapeRegExp(this.searchQuery);
       const query = safeQuery.trim();
       const newSearchArray = tokenize(query, 0);
@@ -97,11 +103,6 @@ export default {
         this.searchArray = [];
       }
     },
-  },
-  created: function () {
-    this.debounceSearch = debounce(this.search, 400);
-  },
-  methods: {
     search: async function () {
       if (this.searchArray.length === 0) {
         return;
@@ -151,7 +152,9 @@ export default {
         .and(cont => cont.projectID === this.active.id)
         .limit(1000)
         .toArray();
-      this.searchResults = containers.sort(rankedSort).slice(0, 100);
+      this.searchResults = containers.map(item => ({
+        ...item, value: item.name,
+      })).sort(rankedSort).slice(0, 100);
 
       const containerIDs = new Set(
         await this.$store.state.db.containers
@@ -171,7 +174,9 @@ export default {
         .toArray();
 
       this.searchResults = this.searchResults
-        .concat(objects.sort(rankedSort).slice(0, 100))
+        .concat(objects.map(item => ({
+          ...item, value: item.name,
+        })).sort(rankedSort).slice(0, 100))
         .sort(rankedSort);
       this.isSearching = false;
     },
@@ -185,9 +190,11 @@ export default {
           container: item.container || item.name,
         },
       };
+
       if (item.container) {
         route["query"] = { selected: item.name };
       }
+
       return route;
     },
     searchGainedFocus: async function () {
@@ -222,8 +229,13 @@ export default {
   },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
+ @import "@/css/prod.scss";
 .empty-search {
   height: 2rem;
+}
+
+div[aria-selected='true'], div[slot="customMenu"]:hover {
+  background-color: $csc-primary-lighter;
 }
 </style>

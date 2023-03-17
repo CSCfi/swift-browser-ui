@@ -2,11 +2,13 @@
   <router-link
     :to="route(item)"
   >
-    <div class="media">
+    <div
+      class="media"
+    >
       <div class="media-content">
         <span>
-          <b>{{ 
-            isContainer() 
+          <b>{{
+            isContainer()
               ? $t('message.search.container')
               : $t('message.search.object')
           }}: </b>
@@ -32,8 +34,10 @@
             <span v-html="highlight(item.tags.join(', '))"></span>
             <br>
           </span>
-          <b>{{ $t('message.search.size') }}: </b>
-          {{ getHumanReadableSize(item.bytes) }}
+          <span>
+            <b>{{ $t('message.search.size') }}: </b>
+            <span> {{ getHumanReadableSize(item.bytes) }}</span>
+          </span>
           <span v-if="isContainer()">
             <br>
             <b># {{ $t('message.search.objects') }}: </b>{{ item.count }}
@@ -47,7 +51,7 @@
 <script>
 import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
 
-const highlightTemplate = 
+const highlightTemplate =
   "$1<span class='has-background-primary-dark has-text-light hl-1'>$2</span>";
 
 export default {
@@ -94,7 +98,17 @@ export default {
 </script>
 
 <style>
-.hl-1 {
-    margin: 0.08rem;
+
+.media {
+  padding: 1rem;
 }
+
+span {
+  display: inline !important
+};
+
+.hl-1 {
+  margin: 0 0.08rem;
+}
+
 </style>
