@@ -181,10 +181,7 @@ export default {
       this.optionsKey++;
     },
     fetchContainers: async function () {
-      if (
-        this.active.id === undefined &&
-        this.$route.params.project === undefined
-      ) {
+      if (this.active.id === undefined) {
         return;
       }
 
@@ -201,7 +198,7 @@ export default {
       );
 
       await this.$store.dispatch("updateContainers", {
-        projectID: this.$route.params.project,
+        projectID: this.active.id,
         signal: null,
       });
     },
