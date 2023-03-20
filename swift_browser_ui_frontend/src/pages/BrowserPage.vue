@@ -58,7 +58,6 @@
       </c-modal>
       <router-view class="content-wrapper" />
       <c-toasts id="toasts" />
-      <!-- TODO: Move folder toast to programmatical modal -->
       <c-toasts
         id="copyFolder-toasts"
         vertical="top"

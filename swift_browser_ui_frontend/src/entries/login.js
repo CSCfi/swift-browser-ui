@@ -15,7 +15,7 @@ const app = createApp({
     };
   },
   created() {
-    document.title = i18n.$t("message.program_name");
+    document.title = this.$t("message.program_name");
   },
   methods: {
     "displayInvalid": function () {
@@ -31,4 +31,5 @@ const app = createApp({
   ...LoginPage,
 });
   
+app.use(i18n);
 app.mount("#app");
