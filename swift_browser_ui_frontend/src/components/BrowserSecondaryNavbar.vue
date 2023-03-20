@@ -6,8 +6,8 @@
         class="navbar-item select-project"
       >
         <c-select
+          v-csc-control
           v-bind="active"
-          c-control
           :items.prop="mappedProjects"
           :label="$t('message.selectProj')"
           placeholder="Select project"
@@ -138,10 +138,10 @@ export default {
           name: "AllFolders",
           params: {user: this.uname, project: item.id},
         };
-        // Pushing to router before ´go´ method
-        // enables navigation with updated item id
-        this.$router.push(navigationParams);
-        this.$router.go(navigationParams);
+        // Updates URL, and then refreshes the page
+        this.$router.push(navigationParams).then(() => {
+          this.$router.go(0);
+        });
       }
     },
     toggleCreateFolderModal: function (folderName) {
