@@ -78,6 +78,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy dialogs with c-modal from `csc-ui`
 - (GL #944) Replace buefy notifications with c-toasts from `csc-ui`
 - (GL #944) Replace buefy Autocomplete component with c-autocomplete from `csc-ui`
+- (GH #982) Migrate from vue-cli to vite
+
 ### Fixed
 
 - (GH #704) Fix lost folder structure in shared mode uploads

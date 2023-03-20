@@ -141,7 +141,7 @@ import {
   deleteTag,
 } from "@/common/globalFunctions";
 
-import ShareModalTable from "@/components/ShareModalTable";
+import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose, mdiInformationOutline } from "@mdi/js";
 
@@ -361,7 +361,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/css/prod.scss";
 
 .share-card {
   padding: 3rem 2rem 0 2rem;

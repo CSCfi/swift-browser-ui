@@ -152,7 +152,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/css/prod.scss";
 
 .add-folder {
   padding: 3rem;
