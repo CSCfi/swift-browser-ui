@@ -73,7 +73,7 @@ export default {
 </script>
 
 
-<style scroped>
+<style scoped>
 c-tab-buttons {
   display: block;
   padding-top: 1rem;
