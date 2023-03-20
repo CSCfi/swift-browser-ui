@@ -243,17 +243,21 @@ let default_translations = {
       },
       tokens: {
         empty: "No API tokens created for the project",
-        identifier: "Identifier",
+        title: "Create API-tokens",
+        identifier: "Token identifier",
         identLabel: "Insert new token identifier",
         createToken: "Create token",
         latestToken: "Latest token: ",
-        copyToken:
+        copy: "Copy token",
+        copyWarning:
           "Token will be displayed just this once " +
           "and recovering it is not be possible. " +
           "Please store the token somewhere " +
           "safe before closing this modal.",
         tokenCopied: "Token copied.",
-        back: "Back to all folders",
+        tokenRemoved: "Token removed.",
+        inUse: "Token identifier already in use.",
+        creationFailed: "Token creation failed.",
       },
       encrypt: {
         uploadFiles: "Upload files",
@@ -598,17 +602,21 @@ let default_translations = {
       },
       tokens: {
         empty: "Projektille ei ole luotu API-avaimia",
-        identifier: "Tunniste",
+        title: "Luo API-avaimet",
+        identifier: "Avainten tunnisteet",
         identLabel: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",
-        back: "Palaa päänäkymään",
-        copyToken:
-          "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
-          "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
-          "Kopioi avain talteen ennen kuin " +
-          "poistut tältä sivulta.",
+        copy: "Kopioi avain",
+        copyWarning:
+          "Avain näytetään vain tämän kerran, " +
+          "eikä sen kopiointi tai palautus ole mahdollista jälkeenpäin. " +
+          "Tallenna avain turvalliseen paikkaan " +
+          "ennen kuin suljet tämän ikkunan.",
         tokenCopied: "Avain kopioitu.",
+        tokenRemoved: "Avain poistettu.",
+        creationFailed: "Avaimen luonti epäonnistui.",
+        inUse: "Avaimen tunniste on jo käytössä.",
       },
       encrypt: {
         uploadFiles: "Lataa tiedostoja",

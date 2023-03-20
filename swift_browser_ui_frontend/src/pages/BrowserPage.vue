@@ -58,7 +58,7 @@
       </c-modal>
       <c-modal
         v-csc-model="openTokenModal"
-        width="60vw"
+        width="64vw"
       >
         <TokenModal />
       </c-modal>

@@ -5,7 +5,7 @@
       align="center"
     >
       <h2 class="title is-4 has-text-dark">
-        Create API-tokens <!--add to lang-->
+        {{ $t("message.tokens.title") }}
       </h2>
       <c-button
         text
@@ -17,47 +17,51 @@
           alt=""
           aria-hidden="true"
         />
-        {{ $t("message.share.close") }} <!--add to lg-->
+        {{ $t("message.close") }}
       </c-button>
     </c-card-actions>
-    <c-card-content id="create-token">
+    <c-card-content>
       <c-text-field
         v-csc-model="newIdentifier"
         name="newIdentifier"
         :label="$t('message.tokens.identLabel')"
       />
       <c-button
-        :disabled="tokenExists(newIdentifier)"
+        id="create-button"
         @click="addToken(newIdentifier)"
         @keyup.enter="addToken(newIdentifier)"
       >
         {{ $t('message.tokens.createToken') }}
       </c-button>
-      <div v-show="latest">
-        <c-row
-          align="center"
-          justify="space-between"
-        >
-          <p>
-            <strong>{{ $t('message.tokens.latestToken') }}</strong>
-          </p>
+      <c-row
+        v-show="latest"
+        align="start"
+        justify="space-between"
+      >
+        <p>
+          <strong>{{ $t('message.tokens.latestToken') }}</strong>
+        </p>
+        <div id="token">
           <p>{{ latest }}</p>
-          <c-button
-            size="small"
-            @click="copyLatestToken"
-            @keyup.enter="copyLatestToken"
-          >
-            <i
-              slot="icon"
-              class="mdi mdi-content-copy"
-            />
-            Copy token
-          </c-button>
-        </c-row>
-        <c-alert type="warning">
-          <p>{{ $t('message.tokens.copyToken') }}</p> <!--edit Finnish text-->
-        </c-alert>
-      </div>
+        </div>
+        <c-button
+          size="small"
+          @click="copyLatestToken"
+          @keyup.enter="copyLatestToken"
+        >
+          <i
+            slot="icon"
+            class="mdi mdi-content-copy"
+          />
+          {{ $t('message.tokens.copy') }}
+        </c-button>
+      </c-row>
+      <c-alert
+        v-show="latest"
+        type="warning"
+      >
+        <p>{{ $t('message.tokens.copyWarning') }}</p>
+      </c-alert>
       <c-data-table
         v-show="tokens.length > 0"
         class="tokenContents"
@@ -65,11 +69,13 @@
         sort-direction="asc"
         :data.prop="tableTokens"
         :headers.prop="headers"
-        hide-footer
+        :pagination.prop="tokenPagination"
+        :footer-options.prop="footer"
+        :hide-footer="tokens.length <= tokensPerPage"
       />
       <c-toasts
-        id="copy-token-toasts"
-        data-testid="copy-token-toasts"
+        id="token-toasts"
+        data-testid="token-toasts"
       />
     </c-card-content>
   </c-card>
@@ -87,10 +93,10 @@ export default {
   data() {
     return {
       tokens: [],
-      selected: undefined,
       newIdentifier: "",
       latest: undefined,
       copied: false,
+      tokensPerPage: 5,
       mdiClose,
       mdiDelete,
     };
@@ -140,6 +146,18 @@ export default {
         };
       });
     },
+    tokenPagination() {
+      return {
+        itemCount: this.tokens.length,
+        itemsPerPage: this.tokensPerPage,
+        currentPage: 1,
+      };
+    },
+    footer() {
+      return {
+        hideDetails: true,
+      };
+    },
   },
   watch: {
     activeId () {
@@ -150,7 +168,6 @@ export default {
     closeTokenModal: function () {
       this.$store.commit("toggleTokenModal", false);
       this.newIdentifier = "";
-      this.selected = undefined;
       this.latest = undefined;
       this.copied = false;
     },
@@ -158,13 +175,32 @@ export default {
       listTokens(this.activeId).then((ret) => {this.tokens = ret;});
     },
     addToken: function (identifier) {
-      createExtToken(
-        this.activeId,
-        identifier,
-      ).then((ret) => {
-        this.latest = ret;
-        this.getTokens();
-      });
+      if (!this.tokenExists(identifier)) {
+        createExtToken(
+          this.activeId,
+          identifier,
+        ).then((ret) => {
+          this.latest = ret;
+          this.getTokens();
+        }).catch(() => {
+          document.querySelector("#token-toasts").addToast(
+            {
+              type: "error",
+              progress: false,
+              message: this.$t("message.tokens.creationFailed"),
+            },
+          );
+        });
+      }
+      else {
+        document.querySelector("#token-toasts").addToast(
+          {
+            type: "error",
+            progress: false,
+            message: this.$t("message.tokens.inUse"),
+          },
+        );
+      }
     },
     tokenExists: function (identifier) {
       return this.tokens.includes(identifier) ? true : false;
@@ -175,9 +211,8 @@ export default {
           this.latest,
         ).then(() => {
           this.copied = true;
-          document.querySelector("#copy-token-toasts").addToast(
+          document.querySelector("#token-toasts").addToast(
             {
-              duration: 6000,
               type: "success",
               progress: false,
               message: this.$t("message.tokens.tokenCopied"),
@@ -193,7 +228,16 @@ export default {
       removeToken(
         this.activeId,
         identifier,
-      ).then(() => {this.getTokens();});
+      ).then(() => {
+        document.querySelector("#token-toasts").addToast(
+          {
+            type: "success",
+            progress: false,
+            message: this.$t("message.tokens.tokenRemoved"),
+          },
+        );
+        this.getTokens();
+      });
     },
   },
 };
@@ -203,19 +247,41 @@ export default {
 @import "@/css/prod.scss";
 
 .token-card {
-  padding: 3rem 2rem 3rem 2rem;
+  padding: 3rem 2rem;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+  max-height: 75vh;
+  overflow-y: scroll;
 }
 
-#create-token > c-button {
+#create-button {
   margin-top: -2rem;
 }
 
-c-text-field {
-  margin-top: -1rem;
+#token {
+  width: 70%;
+  padding: 0rem 0.5rem;
+  overflow-wrap: anywhere;
 }
 
+@media screen and (max-width: 1366px) {
+  #token {
+    width: 100%;
+    padding: 0.5rem 0;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .token-card {
+    max-height: 60vh;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .token-card {
+    padding: 1.5rem 1rem;
+  }
+}
 </style>
