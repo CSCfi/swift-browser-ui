@@ -22,16 +22,22 @@ import AllFoldersTable from "@/components/AllFoldersTable.vue";
 import SharedOutTable from "@/components/SharedOutTable.vue";
 import SharedTable from "@/components/SharedTable.vue";
 
+import { markRaw } from "vue";
+
 export default {
   name: "FoldersView",
   components: { FolderTabs },
+
+  // values in the 'data' property are reactive by default
+  // but components shouldn't be reactive, so we use `markRaw`
+  // https://vuejs.org/api/reactivity-advanced.html#markraw
   data: function() {
     return {
       activeRouteName: "",
       folderComponents: [
-        {type: AllFoldersTable, name: "AllFolders"},
-        {type: SharedTable, name: "SharedTo"},
-        {type: SharedOutTable, name: "SharedFrom"},
+        {type: markRaw(AllFoldersTable), name: "AllFolders"},
+        {type: markRaw(SharedTable), name: "SharedTo"},
+        {type: markRaw(SharedOutTable), name: "SharedFrom"},
       ],
     };
   },
