@@ -31,6 +31,7 @@ import {
   swiftDeleteObjects,
   swiftDeleteContainer,
 } from "@/common/api";
+import { getDB } from "@/common/db";
 
 export default {
   name: "DeleteModal",
@@ -93,7 +94,7 @@ export default {
         projectID,
         this.selectedFolderName,
       ).then(async () => {
-        await this.$store.state.db.containers
+        await getDB().containers
           .where({
             projectID,
             name: this.selectedFolderName,
@@ -118,7 +119,7 @@ export default {
         const objIDs = this.selectedObjects.reduce(
           (prev, obj) => [...prev, obj.id], [],
         );
-        this.$store.state.db.objects.bulkDelete(objIDs);
+        getDB().objects.bulkDelete(objIDs);
       }
       swiftDeleteObjects(
         this.$route.params.owner || this.$route.params.project,

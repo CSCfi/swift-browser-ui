@@ -170,6 +170,7 @@ import {
   truncate,
   computeSHA256,
 } from "@/common/conv";
+import { getDB } from "@/common/db";
 
 import {
   getProjectNumber,
@@ -207,7 +208,7 @@ export default {
   },
   computed: {
     containers() {
-      return this.$store.state.db.containers;
+      return getDB().containers;
     },
     res() {
       return this.$store.state.resumableClient;

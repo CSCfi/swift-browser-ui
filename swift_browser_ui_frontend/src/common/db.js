@@ -1,6 +1,7 @@
 import Dexie from "dexie";
+import { DEV } from "@/common/conv";
 
-export function initDB() {
+function initDB() {
   const db = new Dexie("sd-connect");
   db.version(1).stores({
     projects: "&id, name",
@@ -15,4 +16,30 @@ export function initDB() {
   });
   
   return db;
+}
+
+
+// From https://github.com/dexie/Dexie.js/issues/613#issuecomment-841608979
+let DB;
+
+export function getDB() {
+  if (!DB) {
+    DB = initDB();
+  }
+
+  const idb = DB.backendDB();
+
+  if (idb) {
+    try {
+      // Check if if connection to idb did not close in the meantime
+      idb.transaction("preferences").abort();
+      return DB;
+    } catch (e) {
+      if (DEV) console.log("DB error", e);
+    }
+    DB.close();
+    DB = initDB();
+  }
+
+  return DB;
 }
