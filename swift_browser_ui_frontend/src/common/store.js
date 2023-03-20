@@ -11,12 +11,11 @@ import {
   tokenize,
 } from "./conv";
 
-import { initDB } from "@/common/db";
+import { getDB } from "@/common/db";
 import {getSharedContainers} from "./globalFunctions";
 
 const store = createStore({
   state: {
-    db: initDB(),
     projects: [],
     active: {},
     uname: "",
@@ -250,10 +249,10 @@ const store = createStore({
   },
   actions: {
     updateContainers: async function (
-      { state, dispatch },
+      { dispatch },
       { projectID, signal },
     ) {
-      const existingContainers = await state.db.containers
+      const existingContainers = await getDB().containers
         .where({ projectID })
         .toArray();
       let containers;
@@ -288,7 +287,7 @@ const store = createStore({
           cont.count = count;
           cont.name = cont.container;
         }
-        await state.db.containers.bulkPut(sharedContainers).catch(() => {});
+        await getDB().containers.bulkPut(sharedContainers).catch(() => {});
         newContainers = newContainers.concat(sharedContainers);
       }
 
@@ -305,10 +304,10 @@ const store = createStore({
       });
 
       if (toDelete.length) {
-        await state.db.containers.bulkDelete(toDelete);
-        await state.db.objects.where("containerID").anyOf(toDelete).delete();
+        await getDB().containers.bulkDelete(toDelete);
+        await getDB().objects.where("containerID").anyOf(toDelete).delete();
       }
-      const containersFromDB = await state.db.containers
+      const containersFromDB = await getDB().containers
         .where({ projectID })
         .toArray();
 
@@ -323,7 +322,7 @@ const store = createStore({
 
         if (oldContainer !== undefined) {
           key = oldContainer.id;
-          dbObjects = await state.db.objects
+          dbObjects = await getDB().objects
             .where({ containerID: oldContainer.id })
             .count();
         }
@@ -337,13 +336,13 @@ const store = createStore({
           }
           if (container.count === 0) {
             updateObjects = false;
-            await state.db.objects
+            await getDB().objects
               .where({ containerID: oldContainer.id })
               .delete();
           }
-          await state.db.containers.update(oldContainer.id, container);
+          await getDB().containers.update(oldContainer.id, container);
         } else {
-          key = await state.db.containers.put(container);
+          key = await getDB().containers.put(container);
         }
 
         if (updateObjects && !container.owner) {
@@ -358,27 +357,24 @@ const store = createStore({
         }
       }
     },
-    updateContainerTags: function (
-      { state },
-      { projectID, containers, signal },
-    ) {
+    updateContainerTags: function (_, { projectID, containers, signal }) {
       containers.map(async container => {
         const tags =
           (await getTagsForContainer(
             projectID, container.name, signal, container.owner)) ||
           null;
-        await state.db.containers
+        await getDB().containers
           .where({ projectID: container.projectID, name: container.name })
           .modify({ tags });
       });
     },
 
     updateObjects: async function (
-      { state, dispatch },
+      { dispatch },
       { projectID, container, signal },
     ) {
       const isSegmentsContainer = container.name.match("_segments");
-      const existingObjects = await state.db.objects
+      const existingObjects = await getDB().objects
         .where({ containerID: container.id })
         .toArray();
       let newObjects = [];
@@ -404,16 +400,16 @@ const store = createStore({
         }
       });
       if (toDelete.length) {
-        await state.db.objects.bulkDelete(toDelete);
+        await getDB().objects.bulkDelete(toDelete);
       }
 
       newObjects.map(newObj => {
         let oldObj = existingObjects.find(obj => obj.name === newObj.name);
 
         if (oldObj) {
-          state.db.objects.update(oldObj.id, newObj);
+          getDB().objects.update(oldObj.id, newObj);
         } else {
-          state.db.objects.put(newObj);
+          getDB().objects.put(newObj);
         }
       });
       if (!isSegmentsContainer) {
@@ -425,7 +421,7 @@ const store = createStore({
       }
     },
     updateObjectTags: async function (
-      { state, commit },
+      { commit },
       { projectID, container, signal, sharedObjects = undefined, owner },
     ) {
       let objectList = [];
@@ -434,7 +430,7 @@ const store = createStore({
       if (sharedObjects) {
         objects = sharedObjects;
       } else {
-        objects = await state.db.objects
+        objects = await getDB().objects
           .where({ containerID: container.id })
           .toArray();
       }
@@ -477,7 +473,7 @@ const store = createStore({
               });
               commit("updateObjects", objects);
             } else {
-              state.db.objects
+              getDB().objects
                 .where({ containerID: container.id, name: objectName })
                 .modify({ tags });
             }

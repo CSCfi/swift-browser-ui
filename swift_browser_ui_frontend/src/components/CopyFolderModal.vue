@@ -64,6 +64,7 @@ import {
   swiftCopyContainer,
   updateContainerMeta,
 } from "@/common/api";
+import { getDB } from "@/common/db";
 
 import {
   addNewTag,
@@ -123,7 +124,7 @@ export default {
       }
       this.folders = useObservable(
         liveQuery(() =>
-          this.$store.state.db.containers
+          getDB().containers
             .where({ projectID: this.$route.params.project })
             .toArray(),
         ),
@@ -221,7 +222,7 @@ export default {
         updateContainerMeta(this.active.id, this.folderName, metadata)
           .then(
             async () => {
-              await this.$store.state.db.containers
+              await getDB().containers
                 .where({
                   projectID: this.active.id,
                   name: this.folderName,

@@ -47,6 +47,7 @@ import CFooter from "@/components/CFooter.vue";
 
 // Import delay
 import delay from "lodash/delay";
+import { getDB } from "@/common/db";
 
 checkIDB().then(result => {
   if (!result) {
@@ -242,10 +243,10 @@ const app = createApp({
       this.$store.commit("setUname", user);
       this.$store.commit("setProjects", projects);
 
-      const existingProjects = await this.$store.state.db.projects
+      const existingProjects = await getDB().projects
         .toCollection()
         .primaryKeys();
-      await this.$store.state.db.projects.bulkPut(projects);
+      await getDB().projects.bulkPut(projects);
       const toDelete = [];
       existingProjects.map(async oldProj => {
         if (!projects.find(proj => proj.id === oldProj)) {
@@ -253,13 +254,13 @@ const app = createApp({
         }
       });
       if (toDelete.length) {
-        await this.$store.state.db.projects.bulkDelete(toDelete);
-        const containersCollection = this.$store.state.db.containers
+        await getDB().projects.bulkDelete(toDelete);
+        const containersCollection = getDB().containers
           .where("projectID")
           .anyOf(toDelete);
         const containers = await containersCollection.primaryKeys();
         await containersCollection.delete();
-        await this.$store.state.db.objects
+        await getDB().objects
           .where("containerID")
           .anyOf(containers)
           .delete();

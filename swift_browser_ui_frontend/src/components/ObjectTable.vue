@@ -138,6 +138,7 @@ import {
   getAccessDetails,
   toggleDeleteModal,
 } from "@/common/globalFunctions";
+import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
@@ -370,7 +371,7 @@ export default {
         return;
       }
 
-      this.currentContainer = await this.$store.state.db.containers
+      this.currentContainer = await getDB().containers
         .get({
           projectID: this.$route.params.project,
           name: this.containerName,
@@ -378,7 +379,7 @@ export default {
 
       this.oList = useObservable(
         liveQuery(() =>
-          this.$store.state.db.objects
+          getDB().objects
             .where({"containerID": this.currentContainer.id})
             .toArray(),
         ),
@@ -555,7 +556,7 @@ export default {
               ...this.currentContainer,
               displayOptions: {
                 ...displayOptions, renderFolders: this.renderFolders}};
-            await this.$store.state.db.containers.put(newContainer);
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },
@@ -570,7 +571,7 @@ export default {
             const newContainer = {
               ...this.currentContainer,
               displayOptions: { ...displayOptions, hideTags: this.hideTags}};
-            await this.$store.state.db.containers.put(newContainer);
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },
@@ -586,7 +587,7 @@ export default {
               ...this.currentContainer,
               displayOptions: {
                 ...displayOptions, hidePagination: this.hidePagination}};
-            await this.$store.state.db.containers.put(newContainer);
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },

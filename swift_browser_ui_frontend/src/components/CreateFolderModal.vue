@@ -79,6 +79,7 @@ import { swiftCreateContainer } from "@/common/api";
 import {
   tokenize,
 } from "@/common/conv";
+import { getDB } from "@/common/db";
 
 import {
   addNewTag,
@@ -112,7 +113,7 @@ export default {
       let projectID = this.$route.params.project;
       swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
         .then(() => {
-          this.$store.state.db.containers.add({
+          getDB().containers.add({
             projectID: projectID,
             name: this.folderName,
             tokens: tokenize(this.folderName),
