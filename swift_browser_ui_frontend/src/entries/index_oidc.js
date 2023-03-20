@@ -52,7 +52,7 @@ const app = createApp({
   },
   ...IndexOIDCPage,
 });
-  
+
 app.use(i18n);
 app.directive("csc-control", vControl);
 app.config.compilerOptions.isCustomElement = (tag) => tag.startsWith("c-");
