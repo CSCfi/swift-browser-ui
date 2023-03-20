@@ -1,6 +1,5 @@
 import Vue from "vue";
 import App from "@/pages/SelectPage.vue";
-import Buefy from "buefy";
 
 import getLangCookie from "@/common/conv";
 import translations from "@/common/lang";
@@ -13,7 +12,6 @@ import "@/css/prod.scss";
 import VueI18n from "vue-i18n";
 
 Vue.use(VueI18n);
-Vue.use(Buefy);
 
 
 const i18n = new VueI18n({
