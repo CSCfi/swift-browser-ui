@@ -265,32 +265,23 @@ const app = createApp({
           .delete();
       }
 
-      let last_active;
-      if (document.cookie.match("LAST_ACTIVE")) {
-        last_active = document.cookie
-          .split("; ")
-          .find(row => row.startsWith("LAST_ACTIVE"))
-          .split("=")[1];
-      }
-      if (last_active) {
-        active =
-          projects[projects.indexOf(projects.find(e => e.id == last_active))];
-      } else if (!(this.$route.params.user === undefined)) {
-        if (!(this.$route.params.project === undefined)) {
-          active =
-            projects[
-              projects.indexOf(
-                projects.find(e => e.id == this.$route.params.project),
-              )
-            ];
-        }
-      } else {
+      if (
+        this.$route.params.user === undefined 
+        || this.$route.params.project === undefined
+      ) {
         active = projects[0];
+      } else {
+        active =
+          projects[
+            projects.indexOf(
+              projects.find(e => e.id == this.$route.params.project),
+            )
+          ];
       }
       this.$store.commit("setActive", active);
 
       if (document.location.pathname == "/browse") {
-        this.$router.push({
+        this.$router.replace({
           name: "AllFolders",
           params: {
             project: active.id,
