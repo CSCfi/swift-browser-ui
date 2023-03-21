@@ -44,9 +44,7 @@ let pages = {
   "login":         path.resolve(root, "login.html"),
   "login2step":    path.resolve(root, "login2step.html"),
 };
-if (oidcEnabled) {
-  pages["index"] = path.resolve(root, "index_oidc.html");
-}
+
 let proxy = {
   "/static/assets":       proxyTo,
   "/api":                 proxyTo,
@@ -101,6 +99,23 @@ const multipagePlugin = () => ({
   },
 });
 
+const htmlPlugin = (oidc) => {
+  if (oidc) {
+    return {
+      name: "html-transform",
+      transformIndexHtml: {
+        enforce: "pre",
+        transform: (html, {path}) => {
+          if (path.endsWith("index.html")) {
+            return html.replace("index.js", "index_oidc.js");
+          }
+        }
+      },
+    }
+  }
+  
+};
+
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
 
@@ -127,6 +142,7 @@ export default defineConfig(({ command, mode }) => {
   }
   let base = undefined;
   if (command === "build") base = "/static/";
+  
 
   return {
     root,
@@ -143,6 +159,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       multipagePlugin(),
       VueI18nPlugin(),
+      htmlPlugin(oidcEnabled)
     ],
     build: {
       outDir: path.resolve(__dirname, "dist"),
