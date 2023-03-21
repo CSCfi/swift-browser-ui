@@ -87,7 +87,7 @@ celerybeat-schedule
 *.sage.py
 
 # Environments
-.env
+.env*
 .venv
 env/
 venv/
@@ -141,3 +141,10 @@ swift_browser_ui_frontend/wasm/src/libupload.js
 swift_browser_ui_frontend/wasm/src/libupload.wasm
 swift_browser_ui_frontend/public/libupload.js
 swift_browser_ui_frontend/public/libupload.wasm
+
+private
+static
+
+devproxy/swiftui-proxy.*
+Procfile.*
+*.pem
