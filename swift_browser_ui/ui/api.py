@@ -32,7 +32,12 @@ async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
     request.app["Log"].info(
         f"API call for username from {request.remote}, sess: {session} :: {time.ctime()}"
     )
-    return aiohttp_session.web.json_response(session["uname"])
+    try:
+        return aiohttp_session.web.json_response(session["uname"])
+    except KeyError:
+        raise aiohttp.web.HTTPUnauthorized(
+            reason="User not logged in."
+        )
 
 
 async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -42,17 +47,22 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
         "API call for project listing from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    # Filter out the tokens contained in session token
-    return aiohttp.web.json_response(
-        [
-            {
-                "name": v["name"],
-                "id": v["id"],
-                "tainted": v["tainted"],
-            }
-            for _, v in session["projects"].items()
-        ]
-    )
+    try:
+        # Filter out the tokens contained in session token
+        return aiohttp.web.json_response(
+            [
+                {
+                    "name": v["name"],
+                    "id": v["id"],
+                    "tainted": v["tainted"],
+                }
+                for _, v in session["projects"].items()
+            ]
+        )
+    except KeyError:
+        raise aiohttp.web.HTTPForbidden(
+            reason="Account does not have access to the project."
+        )
 
 
 async def swift_list_containers(
