@@ -6,13 +6,13 @@ import router from "@/common/router";
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
-import CreateFolderModal from "@/components/CreateFolderModal";
-import UploadModal from "@/components/UploadModal";
-import EditTagsModal from "@/components/EditTagsModal";
-import ShareModal from "@/components/ShareModal";
-import CopyFolderModal from "@/components/CopyFolderModal";
-import DeleteModal from "@/components/DeleteModal";
-import TokenModal from "@/components/TokenModal";
+import CreateFolderModal from "@/components/CreateFolderModal.vue";
+import UploadModal from "@/components/UploadModal.vue";
+import EditTagsModal from "@/components/EditTagsModal.vue";
+import ShareModal from "@/components/ShareModal.vue";
+import CopyFolderModal from "@/components/CopyFolderModal.vue";
+import DeleteModal from "@/components/DeleteModal.vue";
+import TokenModal from "@/components/TokenModal.vue";
 
 // CSC UI things
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";

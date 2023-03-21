@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
-import SharedObjects from "@/views/SharedObjects";
+import SharedObjects from "@/views/SharedObjects.vue";
 
 export default createRouter({
   history: createWebHistory(),
