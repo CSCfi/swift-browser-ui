@@ -3,7 +3,7 @@
     <div class="toolbar">
       <router-link
         class="navbar-item pl-4"
-        :to="`/browse/${uname}/${active.id}`"
+        :to="{name: 'AllFolders'}"
         :aria-label="$t('label.csclogo')"
       >
         <c-csc-logo alt="CSC_Logo" />
