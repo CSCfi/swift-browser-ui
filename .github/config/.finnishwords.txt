@@ -1,5 +1,6 @@
 ajaksi
 alapuolisesta
+alikansio
 alla
 aloitettiin
 aloitettu
@@ -9,6 +10,8 @@ apin
 apua
 arvot
 asetukset
+asiasana
+asiasanalla
 asiasanat
 asiasanoja
 avaimelle
@@ -55,6 +58,7 @@ halutako
 halutessasi
 haluttu
 halutun
+hetki
 hinnoittelu
 hinnoittelulaskuri
 hyväksy
@@ -125,6 +129,7 @@ kansiot
 kansiota
 kanssa
 kanssasi
+katsele
 kehittänyt
 kelpaa
 kenttää
@@ -167,12 +172,14 @@ kopioinnin
 kopiointi
 kopioitu
 koskevia
+kuin
 kuinka
 kulutuksesta
 kulutus
 kun
 kunnes
 kuvaus
+kyseiselle
 kyseisen
 käynnissä
 käynnistyy
@@ -192,6 +199,7 @@ käyttöliittymä
 käyttöliittymän
 käyttöohje
 käyttöoikeudet
+käyttöoikeus
 käyttörajoista
 käyttöä
 käytä
@@ -333,6 +341,7 @@ painikkeesta
 pakollista
 palaa
 palautus
+paljon
 paloitellaan
 paluu
 palvelu
@@ -354,6 +363,7 @@ poistamista
 poistettava
 poistettiin
 poistettu
+poistut
 polku
 postamista
 poudan
@@ -401,18 +411,6 @@ resurssienkäyttö
 resurssit
 rivinvaihtoa
 saavutettavuus
-<<<<<<< HEAD
-=======
-sähköpostilla
-sähköpostitse
-säiliö
-säiliöitä
-säiliön
-säiliöön
-säiliöt
-säiliötä
-säilön
->>>>>>> 00af924d (Updated word lists)
 salaa
 salaaminen
 salasana
@@ -446,19 +444,12 @@ seuraava
 siirry
 siirto
 sinulle
-<<<<<<< HEAD
-sisällön
-sisältö
-sisään
-sisäänkirjauksen
-=======
 sinun
-sisään
-sisäänkirjauksen
 sisällön
 sisältö
 sisältöä
->>>>>>> 00af924d (Updated word lists)
+sisään
+sisäänkirjauksen
 sivu
 sivua
 sivulla
@@ -480,6 +471,7 @@ synkronoi
 synkronoitavaksi
 synkronoitiin
 syötä
+sähköpostilla
 sähköpostitse
 säiliö
 säiliöitä
@@ -493,6 +485,7 @@ takaisin
 tallenna
 tallennettujen
 tallennustilaan
+tältä
 talteen
 tapauksessa
 tarkastele
@@ -613,11 +606,7 @@ vähintään
 väliaikaiseen
 yhdelle
 yhden
-<<<<<<< HEAD
-=======
 yhdistetty
-yhtään
->>>>>>> 00af924d (Updated word lists)
 yhteenlaskettu
 yhteys
 yhtään
