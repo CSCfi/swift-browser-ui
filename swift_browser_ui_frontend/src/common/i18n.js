@@ -6,4 +6,5 @@ import translations from "@/common/lang";
 export const i18n = createI18n({
   locale: getLangCookie(),
   messages: translations,
+  warnHtmlMessage: false,
 });
