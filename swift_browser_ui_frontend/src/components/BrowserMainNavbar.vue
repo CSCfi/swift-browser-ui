@@ -47,7 +47,7 @@
       <c-sidenavigationitem
         v-for="item of navigationMenuItems"
         :key="item.title"
-      >
+      > 
         <div slot="main">
           <span :class="'mdi ' + item.icon" />
           {{ item.title }}

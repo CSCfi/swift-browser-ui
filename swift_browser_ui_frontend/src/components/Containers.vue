@@ -131,7 +131,7 @@ export default {
   mounted() {
     this.fetchContainers();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.abortController.abort();
   },
   methods: {

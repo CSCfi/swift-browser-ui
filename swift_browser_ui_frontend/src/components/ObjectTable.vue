@@ -267,7 +267,7 @@ export default {
     await this.getFolderSharedStatus();
     this.updateObjects();
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.abortController.abort();
   },
   methods: {
