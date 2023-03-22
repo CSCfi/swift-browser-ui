@@ -10,10 +10,10 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
     </c-button>
     <input
       ref="input"
+      :value="modelValue"
       type="file"
-      v-bind="$attrs"
       multiple 
-      @change="onFileChange"
+      @input="$emit('update:modelValue', $event.target.files)"
     >
   </div>
 </template>
@@ -23,41 +23,12 @@ export default {
   name: "CUploadButton",
   inheritAttrs: false,
   props: {
-    value: {
+    modelValue: {
       type: Array,
       default: () => [],
     },
   },
-  data() {
-    return {
-      newValue: this.value,
-    };
-  },
-  watch: {
-    value(value) {
-      this.newValue = value;
-      if (!value || (Array.isArray(value) && value.length === 0)) {
-        this.$refs.input.value = null;
-      }
-    },
-  },
-  methods: {
-    onFileChange(event) {
-      const value = event.target.files || event.dataTransfer.files;
-      if (value.length === 0) {
-        if (!this.newValue) return;
-      } else {
-        let newValues = false;
-        for (let i = 0; i < value.length; i++) {
-          const file = value[i];
-          this.newValue.push(file);
-          newValues = true;
-        }
-        if (!newValues) return;
-      }
-      this.$emit("input", this.newValue);
-    },
-  },
+  emits: ["update:modelValue"],
 };
 </script>
 
