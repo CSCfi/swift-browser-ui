@@ -20,11 +20,10 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-autocomplete
-          v-model="selectedFolder"
           v-csc-control
           :items.prop="filteredItems"
-          :query="inputFolder"
           :label="$t('message.container_ops.folderName')"
+          :query="inputFolder"
           hide-details
           required
           @changeQuery="onQueryChange"
@@ -190,7 +189,6 @@ export default {
   data() {
     return {
       inputFolder: "",
-      selectedFolder: null,
       filteredItems: [],
       tooLarge: false,
       ownPrivateKey: false,
@@ -357,11 +355,6 @@ export default {
     },
   },
   watch: {
-    selectedFolder: function() {
-      if(this.selectedFolder !== null) {
-        this.inputFolder = this.selectedFolder.name;
-      }
-    },
     currentFolder: function() {
       this.inputFolder = this.currentFolder;
     },
@@ -399,15 +392,12 @@ export default {
     },
   },
   methods: {
-    onQueryChange: function (e) {
-      this.inputFolder = e.detail;
-      this.getFilteredContainers();
-    },
-    getFilteredContainers: async function() {
+    onQueryChange: async function (event) {
+      this.inputFolder = event.detail;
       const result = await this.containers
         .filter(cont => cont.projectID === this.active.id)
         .filter(cont => cont.name.toLowerCase()
-          .includes(this.inputFolder.toLowerCase()))
+          .includes(event.detail.toLowerCase()))
         .limit(1000)
         .toArray();
       this.filteredItems = result;

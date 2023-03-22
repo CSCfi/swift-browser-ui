@@ -1,18 +1,16 @@
 <template>
   <div
     class="search"
-    @focus="event => searchGainedFocus()"
   >
     <c-autocomplete
-      v-model="selectedItem"
       v-csc-control
       :items.prop="searchResults"
-      :query="searchQuery"
       :aria-label="$t('label.searchbox')"
       :placeholder="$t('message.search.searchBy')"
       hide-details
       custom-menu
       :items-per-page="8"
+      @focus="searchGainedFocus"
       @changeQuery="onQueryChange"
     >
       <i
@@ -64,7 +62,6 @@ export default {
       searchArray: [],
       searchResults: [],
       searchElements: [],
-      searchQuery: "",
       selectedItem: null,
       refs: [],
       isSearching: false,
@@ -75,22 +72,12 @@ export default {
       return this.$store.state.active;
     },
   },
-  watch: {
-    selectedItem: function() {
-      if(this.selectedItem !== null) {
-        this.searchQuery = this.selectedItem.name;
-        const path = this.getSearchRoute(this.selectedItem);
-        this.$router.push(path);
-      }
-    },
-  },
   created: function () {
     this.debounceSearch = debounce(this.search, 400);
   },
   methods: {
-    onQueryChange: function (e) {
-      this.searchQuery = e.detail;
-      const safeQuery = escapeRegExp(this.searchQuery);
+    onQueryChange: function (event) {
+      const safeQuery = escapeRegExp(event.detail);
       const query = safeQuery.trim();
       const newSearchArray = tokenize(query, 0);
       // Run debounced search every time the search box input changes
