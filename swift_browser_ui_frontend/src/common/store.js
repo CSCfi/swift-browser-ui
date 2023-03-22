@@ -146,12 +146,6 @@ const store = createStore({
     setUploadEndpoint(state, endpoint) {
       state.uploadEndpoint = endpoint;
     },
-    appendFileTransfer(state, file) {
-      state.transfer.push(file);
-    },
-    eraseTransfer(state) {
-      state.transfer = [];
-    },
     appendDropFiles(state, file) {
       if (
         state.dropFiles.find(

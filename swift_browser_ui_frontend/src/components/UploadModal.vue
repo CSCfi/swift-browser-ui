@@ -214,9 +214,6 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    transfer() {
-      return this.$store.state.transfer;
-    },
     pubkey() {
       return this.$store.state.pubkey;
     },
@@ -365,9 +362,6 @@ export default {
       this.checkUploadSize();
       this.refreshNoUpload();
     },
-    transfer: function () {
-      this.setFiles();
-    },
     ownPrivateKey: function() {
       this.ephemeral = !this.ephemeral;
       this.refreshNoUpload();
@@ -444,9 +438,9 @@ export default {
         }
       }
     },
-    setFiles: function () {
-      if (this.transfer) {
-        for (let file of this.transfer) {
+    setFiles: function (items) {
+      if (items.length > 0) {
+        for (let file of items) {
           let entry = file;
           this.setFile(entry, "");
         }
@@ -499,13 +493,9 @@ export default {
       e.stopPropagation();
       e.preventDefault();
       if (e.dataTransfer && e.dataTransfer.items) {
-        for (let item of e.dataTransfer.items) {
-          this.$store.commit("appendFileTransfer", item);
-        }
+        this.setFiles(e.dataTransfer.items);
       } else if (e.dataTransfer && e.dataTransfer.files) {
-        for (let file of e.dataTransfer.files) {
-          this.$store.commit("appendFileTransfer", file);
-        }
+        this.setFiles(e.dataTransfer.files);
       }
       const el = document.querySelector(".dropArea");
       el.classList.remove("over-dropArea");
