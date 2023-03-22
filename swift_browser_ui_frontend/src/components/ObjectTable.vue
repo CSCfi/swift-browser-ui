@@ -23,7 +23,7 @@
       <ul class="folder-details">
         <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
-          {{ $t(sharedStatus) }}&nbsp;
+          {{ sharedStatus }}&nbsp;
           <c-link
             v-show="!isSharedFolder"
             underline
@@ -305,9 +305,9 @@ export default {
               this.isSharingFolder = true;
               ret.length === 1
                 ? this.sharedStatus
-                  = "message.folderDetails.sharing_to_one_project"
+                  = this.$t("message.folderDetails.sharing_to_one_project")
                 : this.sharedStatus
-                  = "message.folderDetails.sharing_to_many_projects";
+                  = this.$t("message.folderDetails.sharing_to_many_projects");
             }
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
@@ -323,17 +323,17 @@ export default {
                 const accessRights = sharedDetails.access;
                 if (accessRights.length === 1) {
                   this.sharedStatus
-                    = "message.folderDetails.shared_with_read";
+                    = this.$t("message.folderDetails.shared_with_read");
                 }
                 else if (accessRights.length > 1) {
                   this.sharedStatus
-                    = "message.folderDetails.shared_with_read_write";
+                    = this.$t("message.folderDetails.shared_with_read_write");
                 }
                 this.ownerProject = sharedDetails.owner;
                 this.dateOfSharing = sharedDetails.sharingDate;
               }
               else this.sharedStatus
-                = "message.folderDetails.notShared";
+                = this.$t("message.folderDetails.notShared");
             }
           },
         );
