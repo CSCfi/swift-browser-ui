@@ -1,25 +1,23 @@
 """Server object and container download handlers using aiohttp."""
 
 
-import os
-import queue
-import threading
-import typing
-import tarfile
-import time
 import asyncio
 import logging
+import os
+import queue
+import tarfile
+import threading
+import time
+import typing
 
 import aiohttp.web
-
 import requests
 
 from swift_browser_ui.upload.common import (
     generate_download_url,
-    get_path_from_list,
     get_download_host,
+    get_path_from_list,
 )
-
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

@@ -2,15 +2,14 @@
 
 
 import json
-import typing
 import logging
-import aiohttp
-
-import swift_browser_ui.common.signature
-
 import ssl
+import typing
+
+import aiohttp
 import certifi
 
+import swift_browser_ui.common.signature
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())

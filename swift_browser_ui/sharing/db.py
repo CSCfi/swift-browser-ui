@@ -1,14 +1,13 @@
 """Sharing backend database implementation."""
 
 
-import os
-import logging
-import typing
 import asyncio
+import logging
+import os
 import random
+import typing
 
 import asyncpg
-
 
 MODULE_LOGGER = logging.getLogger("db")
 MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

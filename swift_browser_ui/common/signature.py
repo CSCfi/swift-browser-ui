@@ -2,14 +2,13 @@
 
 
 import hmac
-import time
-import os
 import logging
-import typing
+import os
 import secrets
+import time
+import typing
 
 import aiohttp.web
-
 
 LOGGER = logging.getLogger("swift_browser_ui.common.signature")
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

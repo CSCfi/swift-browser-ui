@@ -11,7 +11,6 @@ import swift_browser_ui.ui._convenience
 
 from .settings import setd
 
-
 LOGGER = logging.getLogger("signature")
 
 

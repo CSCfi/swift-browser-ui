@@ -1,14 +1,13 @@
 """Health check endpoint."""
 
 
-import typing
 import time
+import typing
 
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
 
 import swift_browser_ui.common.signature
-
 from swift_browser_ui.ui.settings import setd
 
 

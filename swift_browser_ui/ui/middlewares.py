@@ -4,11 +4,10 @@
 import time
 import typing
 
-from aiohttp import web
 import aiohttp_session
+from aiohttp import web
 
 from swift_browser_ui.ui.settings import setd
-
 
 AiohttpHandler = typing.Callable[
     [web.Request], typing.Coroutine[typing.Awaitable, typing.Any, web.Response]

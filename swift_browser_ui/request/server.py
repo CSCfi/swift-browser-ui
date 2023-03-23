@@ -1,31 +1,29 @@
 """Share request backend module."""
 
 
-import sys
-import logging
 import asyncio
+import logging
+import sys
+import typing
 
 import aiohttp.web
 import uvloop
-import typing
 
-import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_handlers
+import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
-
 from swift_browser_ui.request.api import (
-    handle_share_request_post,
-    handle_user_owned_request_listing,
-    handle_user_made_request_listing,
     handle_container_request_listing,
-    handle_user_share_request_delete,
+    handle_health_check,
+    handle_share_request_post,
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
-    handle_health_check,
+    handle_user_made_request_listing,
+    handle_user_owned_request_listing,
+    handle_user_share_request_delete,
 )
 from swift_browser_ui.request.db import DBConn
-
 
 logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
