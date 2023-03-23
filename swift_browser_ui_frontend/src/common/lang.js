@@ -67,10 +67,14 @@ let default_translations = {
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_read:
-          "This folder is shared with you. (Read access)",
+          "This folder is shared with you. You can copy and download " +
+          "the files in this folder as well as decrypt them. " +
+          "(Copy and download).",
         shared_with_read_write:
-          "This folder is shared with you. You can view, download, upload" +
-          " and edit tags in this folder (Read and write access).",
+          "This folder is shared with you. You can copy and download " +
+          "the files in this folder as well as decrypt them. " +
+          "You can also upload files to this folder. " +
+          "(Copy, download and upload).",
       },
       table: {
         name: "Name",
@@ -638,8 +642,8 @@ let default_translations = {
           "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
         enReady:
-          "Encryption engine is ready. Refresh the " +
-          "window to enable encryption.", //to translate
+          "Salausohjelma on valmiina. Päivitä " +
+          "selainikkuna mahdollistaaksesi salauksen.",
         refresh: "Päivitä",
       },
       search: {

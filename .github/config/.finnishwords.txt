@@ -253,6 +253,7 @@ löytävät
 löytää
 mahdollisia
 mahdollista
+mahdollistaaksesi
 megatavun
 mikä
 mikäli
@@ -419,6 +420,7 @@ salataan
 salattua
 salauksen
 salaus
+salausohjelma
 salausohjelman
 salausratkaisun
 salausvaihtoehtoja
@@ -434,6 +436,7 @@ selailu
 selaimestasi
 selaimet
 selain
+selainikkuna
 selainta
 selatessa
 selaus
@@ -582,6 +585,7 @@ valittu
 valittuja
 valittuna
 valitut
+valmiina
 valmis
 varmasti
 varmistathan
