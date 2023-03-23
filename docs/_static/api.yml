@@ -1523,4 +1523,3 @@ components:
               items:
                 type: string
                 example: database
-
