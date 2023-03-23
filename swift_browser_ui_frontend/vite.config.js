@@ -113,7 +113,7 @@ const htmlPlugin = (oidc) => {
       },
     }
   }
-  
+
 };
 
 // https://vitejs.dev/config/
@@ -122,13 +122,13 @@ export default defineConfig(({ command, mode }) => {
   if (mode === "development") {
     const { execSync } = require("child_process");
     const shell = (cmd) => execSync(cmd, {encoding: "utf8"}).trim();
-  
+
     try {
       const branch = shell("git branch --show-current");
       const version = shell("git describe --always --long --tags");
       const hash = shell("git rev-parse HEAD");
       const url = "https://github.com/CSCfi/swift-browser-ui/commit/";
-  
+
       process.env.VITE_GIT_VERSION = `${branch} | ${version}`;
       process.env.VITE_GIT_LINK = url + hash;
 
@@ -142,7 +142,7 @@ export default defineConfig(({ command, mode }) => {
   }
   let base = undefined;
   if (command === "build") base = "/static/";
-  
+
 
   return {
     root,

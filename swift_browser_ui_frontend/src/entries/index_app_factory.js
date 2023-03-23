@@ -31,7 +31,7 @@ export function newApp(name, data, Component) {
                           i18n.locale +
                           "; path=/; expires="
                           + expiryDate.toUTCString();
-      },  
+      },
     },
     ...Component,
   })

@@ -35,7 +35,7 @@ for the database)
 Sharing functionality back-end
 ------------------------------
 Sharing functionality should be run by running it in a container. Easiest
-way to do this is to use the docker-compose fields provided in the 
+way to do this is to use the docker-compose fields provided in the
 `deployment example repository. <https://github.com/CSCfi/swift-ui-deployment/>`_
 The sharing functionality requires the following environment variables to be
 present in order to work:
@@ -87,7 +87,7 @@ to be present in order to work:
 Upload runner back-end
 ----------------------
 SwiftUI upload runner should be run by running it in a container. Easiest way
-to do this is to use the docker-compose files provided in the 
+to do this is to use the docker-compose files provided in the
 `deployment example repository. <https://github.com/CSCfi/swift-ui-deployment/>`_
 The upload runner requires the following environment variables to be present
 in order to work:

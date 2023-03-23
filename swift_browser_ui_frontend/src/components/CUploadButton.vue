@@ -2,7 +2,7 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
 
 <template>
   <div class="upload-btn-wrapper">
-    <c-button 
+    <c-button
       @click="$refs.input.click()"
       @keyup.enter="$refs.input.click()"
     >
@@ -12,7 +12,7 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
       ref="input"
       :value="modelValue"
       type="file"
-      multiple 
+      multiple
       @input="$emit('update:modelValue', $event.target.files)"
     >
   </div>

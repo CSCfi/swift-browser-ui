@@ -21,15 +21,15 @@ const app = createApp({
     "displayInvalid": function () {
       if (
         document.cookie.split(";")
-          .filter((item) => 
+          .filter((item) =>
             item.trim().startsWith("INVALID_TOKEN=")).length ) {
-        this.formname = 
+        this.formname =
           "Token id: (Invalid characters in previous token.)";
       }
     },
   },
   ...LoginPage,
 });
-  
+
 app.use(i18n);
 app.mount("#app");

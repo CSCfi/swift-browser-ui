@@ -91,7 +91,7 @@ The current frontend can be found at: `127.0.0.1:8080`.
 ### Development
 swift-browser-ui is composed of 4 components: `request`, `sharing`, `ui`, and `upload`.
 All of them must be run to have access to all features.
-They depend on a Redis instance for session cache, Postgres database for the sharing and 
+They depend on a Redis instance for session cache, Postgres database for the sharing and
 request functionality, and the object storage backend.
 You will also need docker with Buildkit to build the keystone-swift docker image.
 
@@ -155,7 +155,7 @@ This guide assumes you're using `devenv` as the domain name. Replace this
 with the domain you're certificate sings, and if necessary, add it to
 `/etc/hosts` so it's resolvable both in docker, and locally.
 
-Additional setup is required in your environment file. You'll need to 
+Additional setup is required in your environment file. You'll need to
 configure the following keys to point to whatever hostname will be used
 to access the service. Additionally you should allow all hosts, assuming
 your machine is in a secure network when developing. In case you trust
@@ -294,7 +294,7 @@ After following the development steps above, `cypress` should already be install
     cd swift_browser_ui_frontend
 
 You can run the tests in headless mode
-  
+
     npx cypress run
 
 Or you can use the interactive version

@@ -167,7 +167,7 @@ ENCRYPT_SESSION *open_session_enc(void) {
 Close and free an upload session
 */
 void close_session(
-    ENCRYPT_SESSION *sess 
+    ENCRYPT_SESSION *sess
 ) {
     if (sess != NULL) {
         if (sess->recv_keys != NULL) {

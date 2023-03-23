@@ -44,7 +44,7 @@ const app = createApp({
   },
   ...LoginPassword,
 });
-  
+
 app.use(i18n);
 app.directive("csc-control", vControl);
 

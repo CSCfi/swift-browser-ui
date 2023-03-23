@@ -6,7 +6,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-let 
+let
   streamController,
   sessionPtr,
   fileName,

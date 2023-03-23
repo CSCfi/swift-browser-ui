@@ -99,7 +99,7 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
         sodium_free(keys);
     }
 
-    if (edit_list != NULL && edit_list_len > 0) {        
+    if (edit_list != NULL && edit_list_len > 0) {
         sodium_free(edit_list);
     }
 

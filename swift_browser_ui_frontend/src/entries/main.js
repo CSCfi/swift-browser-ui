@@ -267,7 +267,7 @@ const app = createApp({
       }
 
       if (
-        this.$route.params.user === undefined 
+        this.$route.params.user === undefined
         || this.$route.params.project === undefined
       ) {
         active = projects[0];

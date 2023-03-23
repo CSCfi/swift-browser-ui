@@ -5,7 +5,7 @@ import "@/css/prod.scss";
 
 const app = newApp(
   "IndexPage",
-  () => { 
+  () => {
     return {
       notindex: false,
       badrequest: false,

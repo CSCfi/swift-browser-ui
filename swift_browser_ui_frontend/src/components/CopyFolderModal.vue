@@ -217,7 +217,7 @@ export default {
             custom: true,
           },
         );
-        
+
         const tags = toRaw(this.tags);
         let metadata = {
           usertags: tags.join(";"),

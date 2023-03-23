@@ -6,15 +6,15 @@ info:
   license:
     name: MIT
 tags:
-  - name: Frontend 
+  - name: Frontend
     description: Endpoints for sharing request "Filtered proxied API from Openstack Swift used for a browser application"
-  - name: Sharing Request 
+  - name: Sharing Request
     description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL share action request information."
-  - name: Sharing Account 
+  - name: Sharing Account
     description: Endpoints for sharing request "Database and API for storing / querying Openstack Swift ACL information"
-  - name: Upload/Download 
+  - name: Upload/Download
     description: Endpoints for uploading and downloading containers/objects
-  
+
 paths:
   /health:
     get:
@@ -33,7 +33,7 @@ paths:
   /request/user/{user}/{container}:
     post:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: Publish a new request for access to a container
       parameters:
       - name: user
@@ -65,7 +65,7 @@ paths:
                 $ref: "#/components/schemas/NewRequest"
     delete:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: Delete an existing request for access
       parameters:
       - name: user
@@ -98,7 +98,7 @@ paths:
                   example: OK
     options:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: Handle preflight for existing request for access
       parameters:
       - name: user
@@ -136,7 +136,7 @@ paths:
   /request/user/{user}:
     get:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: List container share requests made by a user.
       parameters:
       - name: user
@@ -156,7 +156,7 @@ paths:
   /request/owner/{user}:
     get:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: List the requests owned by the user (made for the user).
       parameters:
       - name: user
@@ -176,7 +176,7 @@ paths:
   /request/container/{container}:
     get:
       tags:
-        - Sharing Request 
+        - Sharing Request
       summary: List share requests made for a container.
       parameters:
       - name: container
@@ -193,11 +193,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ContainerRequests"
-  
+
   /access/{user}:
     get:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: List container names that have been shared to the user.
       parameters:
       - name: user
@@ -219,7 +219,7 @@ paths:
   /access/{user}/{container}:
     get:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Get details of a container that has been shared to the user.
       parameters:
       - name: container
@@ -255,7 +255,7 @@ paths:
   /share/{owner}:
     get:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: List container names that the user has shared to someone else.
       parameters:
       - name: owner
@@ -277,7 +277,7 @@ paths:
   /share/{owner}/{container}:
     get:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Get details of a container that the user has shared.
       parameters:
       - name: container
@@ -305,7 +305,7 @@ paths:
           description: Client Error
     post:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Give user / users access rights on a specified container.
       parameters:
       - name: container
@@ -354,7 +354,7 @@ paths:
           description: Client Error
     patch:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Edit specified user's access rights on a specified container.
       parameters:
       - name: container
@@ -396,7 +396,7 @@ paths:
           description: Client Error
     delete:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Revoke specified access to container from the user/users specified in the query.
       parameters:
       - name: container
@@ -429,7 +429,7 @@ paths:
           description: Client Error
     options:
       tags:
-        - Sharing Account 
+        - Sharing Account
       summary: Serve correct response headers to allowed DELETE preflight query.
       parameters:
       - name: container
@@ -465,7 +465,7 @@ paths:
               schema:
                 type: string
                 example: 84600
-  
+
   /token/{project}/{id}:
     post:
       tags:
@@ -572,7 +572,7 @@ paths:
   /api/username:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get Openstack username for the authenticated user.
       responses:
         200:
@@ -586,7 +586,7 @@ paths:
   /api/projects:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get Openstack projects available for the authenticated user.
       responses:
         200:
@@ -600,7 +600,7 @@ paths:
   /api/{project}/acl:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Fetch a compilation of ACL information for sharing discovery.
       parameters:
         - name: project
@@ -622,7 +622,7 @@ paths:
   /api/{project}/address:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get the project specific object storage address.
       parameters:
         - name: project
@@ -645,7 +645,7 @@ paths:
   /api/meta/{project}:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get the filtered project metadata for the currently active project.
       parameters:
         - name: project
@@ -669,7 +669,7 @@ paths:
   /api/{project}:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get the listing for containers for specified project
       parameters:
         - name: project
@@ -702,7 +702,7 @@ paths:
   /api/{project}/{container}:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get the listing for objects in a given container.
       parameters:
         - name: project
@@ -815,7 +815,7 @@ paths:
   /api/meta/{project}/{container}:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Get container metadata.
       parameters:
       - name: project
@@ -902,7 +902,7 @@ paths:
   /api/{project}/{container}/{object}:
     get:
       tags:
-        - Frontend 
+        - Frontend
       summary: Download the object specified in the download link.
       parameters:
       - name: project
@@ -1153,7 +1153,7 @@ paths:
               schema:
                 type: string
                 format: binary
-                
+
   /{project}/{container}:
     post:
       tags:
@@ -1289,7 +1289,7 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/ListedRequest"
-        
+
     ListedContainer:
       type: object
       properties:
@@ -1344,7 +1344,7 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/DetailedContainer"
-        
+
     Username:
       type: string
       example: test_user_name
@@ -1386,24 +1386,24 @@ components:
           type: integer
           example: 4294967296
           description: The total amount of storage usage in bytes for the currently active project.
-    
+
     ProjectAcl:
       type: object
       properties:
-        address: 
+        address:
           type: string
           example: host
         access:
           type: object
           example:
-            containerName1: 
-              ownerID1: 
+            containerName1:
+              ownerID1:
                 read: "*"
                 write: "*"
             containerName2:
-               ownerID2: 
+               ownerID2:
                 read: "*"
-            
+
     Container:
       type: object
       properties:
@@ -1483,7 +1483,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/MetaItem'
-        
+
     Health:
       type: object
       required:
