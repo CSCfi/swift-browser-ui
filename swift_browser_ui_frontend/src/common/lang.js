@@ -601,7 +601,7 @@ let default_translations = {
         name_newFolder: "Nimeä uusi kansio",
       },
       tokens: {
-        empty: "Projektille ei ole luotu API-avaimia",
+        empty: "Tälle projektille ei ole luotu API-avaimia",
         title: "Luo API-avaimet",
         identifier: "Avainten tunnisteet",
         identLabel: "Syötä tunniste uudelle API-avaimelle",

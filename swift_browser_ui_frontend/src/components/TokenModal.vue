@@ -63,10 +63,10 @@
         <p>{{ $t('message.tokens.copyWarning') }}</p>
       </c-alert>
       <c-data-table
-        v-show="tokens.length > 0"
         class="tokenContents"
         sort-by="identifier"
         sort-direction="asc"
+        :no-data-text="$t('message.tokens.empty')"
         :data.prop="tableTokens"
         :headers.prop="headers"
         :pagination.prop="tokenPagination"
@@ -88,6 +88,7 @@ import {
   listTokens,
   removeToken,
 } from "@/common/api";
+
 export default {
   name: "TokenModal",
   data() {
@@ -181,6 +182,7 @@ export default {
           identifier,
         ).then((ret) => {
           this.latest = ret;
+          this.newIdentifier = "";
           this.getTokens();
         }).catch(() => {
           document.querySelector("#token-toasts").addToast(
@@ -257,6 +259,7 @@ export default {
 }
 
 #create-button {
+  width: max-content;
   margin-top: -2rem;
 }
 
