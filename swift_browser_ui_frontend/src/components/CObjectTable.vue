@@ -321,7 +321,11 @@ export default {
       };
     },
     handleSelection(event) {
-      this.$emit("selected-rows", event.detail);
+      if (event.detail.length > 0) {
+        const prefix = this.getPrefix();
+        const selectedRows = event.detail.map(item => prefix.concat(item));
+        this.$emit("selected-rows", selectedRows);
+      }
     },
     beginDownload(object) {
       this.currentDownload = new DecryptedDownloadSession(
