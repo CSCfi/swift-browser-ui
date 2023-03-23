@@ -105,7 +105,7 @@ export default {
 
 span {
   display: inline !important
-};
+}
 
 .hl-1 {
   margin: 0 0.08rem;
