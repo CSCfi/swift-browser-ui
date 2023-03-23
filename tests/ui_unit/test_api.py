@@ -611,13 +611,15 @@ class ProxyFunctionsTestClass(tests.common.mockups.APITestBase):
         """."""
         super().setUp()
         self.mock_request.match_info = {
-            "project": "test-project",
+            "project": "test-id-1",
             "container": "test-container",
             "object": "test-object",
+            "object_name": "test-object-name",
         }
         self.mock_request.query = {
             "from_container": "test-container-2",
             "from_project": "test-project-2",
+            "project": "test-project",
         }
         self.mock_request.query_string = ("&test-query=test-value§",)
         self.mock_request.remote = ("remote",)
@@ -682,3 +684,21 @@ class ProxyFunctionsTestClass(tests.common.mockups.APITestBase):
             )
         self.session_open_mock.assert_awaited_once()
         self.sign_mock.assert_awaited_once()
+
+    async def test_get_crypted_upload_session(self):
+        """Test get crypted upload session."""
+        with self.p_get_sess, self.patch_runner_session, self.patch_setd, self.patch_sign:
+            await swift_browser_ui.ui.api.get_crypted_upload_session(
+                self.mock_request,
+            )
+        self.session_open_mock.assert_awaited_once()
+        self.assertEqual(self.sign_mock.await_count, 2)
+
+    async def test_close_upload_session(self):
+        """Test close upload session."""
+        with self.p_get_sess, self.patch_runner_session, self.patch_setd, self.patch_sign:
+            resp = await swift_browser_ui.ui.api.close_upload_session(
+                self.mock_request,
+            )
+        self.mock_client.delete.assert_called_once()
+        self.assertEqual(200, resp.status)

@@ -3,8 +3,8 @@
 
 from types import SimpleNamespace
 
-
 import unittest
+from unittest import mock
 import aiohttp.web
 
 
@@ -17,6 +17,10 @@ from swift_browser_ui.sharing.api import (
     edit_share_handler,
     delete_share_handler,
     delete_container_shares_handler,
+    handle_user_add_token,
+    handle_user_delete_token,
+    handle_user_list_tokens,
+    handle_health_check
 )
 
 
@@ -31,6 +35,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
                     "db_conn": SimpleNamespace(
                         **{
                             "add_share": unittest.mock.AsyncMock(),
+                            "add_token": unittest.mock.AsyncMock(),
                             "edit_share": unittest.mock.AsyncMock(),
                             "delete_share": unittest.mock.AsyncMock(),
                             "delete_container_shares": unittest.mock.AsyncMock(),
@@ -38,6 +43,9 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
                             "get_shared_list": unittest.mock.AsyncMock(),
                             "get_access_container_details": unittest.mock.AsyncMock(),
                             "get_shared_container_details": unittest.mock.AsyncMock(),
+                            "get_tokens": unittest.mock.AsyncMock([]),
+                            "revoke_token": unittest.mock.AsyncMock(),
+                            "pool": None,
                         }
                     ),
                 },
@@ -47,8 +55,16 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
                     "container": "test-container-1",
                     "access": "r,w,l",
                     "address": "https://placeholder.os:443",
+                    "token": "user_token",
                 },
-                "match_info": {"container": "test", "user": "test", "owner": "test"},
+                "match_info": {
+                    "container": "test", 
+                    "user": "test", 
+                    "owner": "test",
+                    "project": "test",
+                    "id": "test",
+                },
+                "post": unittest.mock.AsyncMock(return_value={}),
             }
         )
 
@@ -100,8 +116,58 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             resp = await delete_share_handler(self.mock_request)
             self.assertEqual(resp.status, 204)
 
+        # Also test delete_share endpoint leads to bulk unshare without user key
+        with self.patch_json_dump:
+            alt_mock_request = self.mock_request
+            del alt_mock_request.query["user"]
+            resp = await delete_share_handler(alt_mock_request)
+            self.assertEqual(resp.status, 204)
+
     async def test_endpoint_delete_container_shares_correct(self):
         """Test the delete_container_shares endpoint for conformity."""
         with self.patch_json_dump:
             resp = await delete_container_shares_handler(self.mock_request)
             self.assertEqual(resp.status, 204)
+
+    async def test_endpoint_handle_user_add_token(self):
+        """Test the handle_user_add_token endpoint for conformity."""
+        with self.patch_json_dump:
+            resp = await handle_user_add_token(self.mock_request)
+            self.assertEqual(resp.status, 200)
+
+        # Also test when no token is present in query
+        del self.mock_request.query["token"]
+        with self.patch_json_dump:
+            with self.assertRaises(aiohttp.web.HTTPBadRequest):
+                await handle_user_add_token(self.mock_request)
+
+    async def test_endpoint_handle_user_delete_token(self):
+        """Test the handle_user_delete_token endpoint for conformity."""
+        with self.patch_json_dump:
+            resp = await handle_user_delete_token(self.mock_request)
+            self.assertEqual(resp.status, 200)
+
+    async def test_endpoint_handle_user_list_tokens(self):
+        """Test the handle_user_list_tokens endpoint for conformity."""
+        with self.patch_json_dump:
+            await handle_user_list_tokens(self.mock_request)
+            self.json_mock.assert_called_once()
+
+    async def test_endpoint_handle_health_check(self):
+        """Test the handle_health_check endpoint for conformity."""
+        with self.patch_json_dump:
+            await handle_health_check(self.mock_request)
+
+        self.mock_request.app["db_conn"].pool = {}
+        with self.patch_json_dump:
+            await handle_health_check(self.mock_request)
+
+        del self.mock_request.app["db_conn"].pool
+        with self.patch_json_dump:
+            await handle_health_check(self.mock_request)
+
+        calls = [
+            unittest.mock.call({'status': 'Ok'}),
+            unittest.mock.call({"status": "Degraded", "degraded": ["database"]})
+        ]
+        self.json_mock.assert_has_calls(calls)
