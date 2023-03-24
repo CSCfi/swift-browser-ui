@@ -81,7 +81,7 @@
       <c-toasts
         id="container-error-toasts"
         vertical="top"
-        horizontal="right"
+        horizontal="center"
       />
     </div>
     <CFooter />
@@ -285,5 +285,9 @@ c-modal {
 .taginput-label {
   font-weight: bold;
   margin-bottom: -2rem;
+}
+
+#container-error-toasts {
+  margin-top: 50vh;
 }
 </style>
