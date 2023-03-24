@@ -36,7 +36,12 @@ import {
   toggleEditTagsModal,
 } from "@/common/globalFunctions";
 
-import { mdiTrayArrowDown, mdiPencilOutline, mdiDeleteOutline } from "@mdi/js";
+import {
+  mdiTrayArrowDown,
+  mdiPencilOutline,
+  mdiDeleteOutline,
+  mdiFolder ,
+} from "@mdi/js";
 
 export default {
   name: "CObjectTable",
@@ -194,6 +199,11 @@ export default {
                   params: {
                     href: "javascript:void(0)",
                     color: "dark-grey",
+                    path: mdiFolder,
+                    iconFill: "primary",
+                    iconStyle: {
+                      marginRight: "1rem",
+                    },
                     onClick: () => this.changeFolder(value),
                   },
                 },
