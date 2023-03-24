@@ -171,6 +171,10 @@ export default {
       this.newIdentifier = "";
       this.latest = undefined;
       this.copied = false;
+      document.querySelector("#token-toasts").removeToast("error-failed");
+      document.querySelector("#token-toasts").removeToast("error-in-use");
+      document.querySelector("#token-toasts").removeToast("success-copied");
+      document.querySelector("#token-toasts").removeToast("success-removed");
     },
     getTokens: function () {
       listTokens(this.activeId).then((ret) => {this.tokens = ret;});
@@ -187,6 +191,7 @@ export default {
         }).catch(() => {
           document.querySelector("#token-toasts").addToast(
             {
+              id: "error-failed",
               type: "error",
               progress: false,
               message: this.$t("message.tokens.creationFailed"),
@@ -197,6 +202,7 @@ export default {
       else {
         document.querySelector("#token-toasts").addToast(
           {
+            id: "error-in-use",
             type: "error",
             progress: false,
             message: this.$t("message.tokens.inUse"),
@@ -215,6 +221,7 @@ export default {
           this.copied = true;
           document.querySelector("#token-toasts").addToast(
             {
+              id: "success-copied",
               type: "success",
               progress: false,
               message: this.$t("message.tokens.tokenCopied"),
@@ -233,6 +240,7 @@ export default {
       ).then(() => {
         document.querySelector("#token-toasts").addToast(
           {
+            id: "success-removed",
             type: "success",
             progress: false,
             message: this.$t("message.tokens.tokenRemoved"),
