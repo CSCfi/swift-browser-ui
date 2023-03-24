@@ -335,6 +335,8 @@ export default {
         const prefix = this.getPrefix();
         const selectedRows = event.detail.map(item => prefix.concat(item));
         this.$emit("selected-rows", selectedRows);
+      } else {
+        this.$emit("selected-rows", event.detail);
       }
     },
     beginDownload(object) {
