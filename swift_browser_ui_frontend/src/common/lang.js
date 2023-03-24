@@ -237,6 +237,7 @@ let default_translations = {
         request_synced: "Successfully synchronized access requests",
         request_not_synced: "No access requests to sync",
         sync_requests: "Synchronize bucket share requests",
+        bad_share_id: "Invalid Share ID(s) entered",
       },
       request: {
         project: "Project",
@@ -722,6 +723,7 @@ let default_translations = {
         request_synced: "Säiliön jakopyyntöjen haku onnistui",
         request_not_synced: "Ei säiliötä koskevia jakopyyntöjä",
         sync_requests: "Synkronoi säiliön jakopyynnöt",
+        bad_share_id: "Invalid Share ID(s) entered", /**TODO: FIN */
       },
       request: {
         project: "Projekti",

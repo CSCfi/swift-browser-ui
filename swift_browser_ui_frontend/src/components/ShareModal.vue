@@ -167,6 +167,9 @@ export default {
     };
   },
   computed: {
+    activeId () {
+      return this.$store.state.active.id;
+    },
     folderName() {
       return this.$store.state.selectedFolderName;
     },
@@ -247,7 +250,6 @@ export default {
         document.querySelector("#shareModal-toasts").addToast(
           {
             type: "error",
-            duration: 5000,
             persistent: false,
             progress: false,
             message: this.$t("message.share.fail_noperm"),
@@ -259,10 +261,21 @@ export default {
         document.querySelector("#shareModal-toasts").addToast(
           {
             type: "error",
-            duration: 5000,
             persistent: false,
             progress: false,
             message: this.$t("message.share.fail_noid"),
+          },
+        );
+        return false;
+      }
+      if (this.tags.includes(this.activeId) ||
+        !this.tags.every(item => this.validateTag(item))) {
+        document.querySelector("#shareModal-toasts").addToast(
+          {
+            type: "error",
+            persistent: false,
+            progress: false,
+            message: this.$t("message.share.bad_share_id"),
           },
         );
         return false;
@@ -281,7 +294,6 @@ export default {
           document.querySelector("#shareModal-toasts").addToast(
             {
               type: "error",
-              duration: 5000,
               persistent: false,
               progress: false,
               message: this.$t("message.share.fail_duplicate"),
@@ -355,6 +367,10 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    validateTag: function (tag) {
+      return tag.length === 32 && 
+        tag.match(/^[a-z0-9]+$/) != null;
     },
   },
 };
