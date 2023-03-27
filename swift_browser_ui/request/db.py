@@ -1,13 +1,13 @@
 """Module for sharing request database interface using postgres."""
 
 
-import asyncio
 import logging
 import os
-import random
 import typing
 
 import asyncpg
+
+from swift_browser_ui.common.common_util import sleep_random
 
 MODULE_LOGGER = logging.getLogger("db")
 MODULE_LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
@@ -45,13 +45,13 @@ class DBConn:
                     "Failed to establish database connection. "
                     "Pool will retry reconnection automatically...",
                 )
-                await asyncio.sleep(random.randint(2, 5))  # nosec
+                await sleep_random()
             except asyncpg.exceptions.InvalidPasswordError:
                 self.log.error("Invalid username or password for database.")
-                await asyncio.sleep(random.randint(2, 5))  # nosec
+                await sleep_random()
             except asyncpg.exceptions.CannotConnectNowError:
                 self.log.error("Database is not ready yet.")
-                await asyncio.sleep(random.randint(2, 5))  # nosec
+                await sleep_random()
 
     async def close(self) -> None:
         """Gracefully close the database."""
