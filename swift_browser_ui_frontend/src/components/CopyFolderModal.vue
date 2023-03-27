@@ -75,6 +75,8 @@ import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 import TagInput from "@/components/TagInput.vue";
 
+import { toRaw } from "vue";
+
 export default {
   name: "CopyFolderModal",
   components: { TagInput },
@@ -215,9 +217,10 @@ export default {
             custom: true,
           },
         );
-
+        
+        const tags = toRaw(this.tags);
         let metadata = {
-          usertags: this.tags.join(";"),
+          usertags: tags.join(";"),
         };
         updateContainerMeta(this.active.id, this.folderName, metadata)
           .then(
@@ -227,7 +230,7 @@ export default {
                   projectID: this.active.id,
                   name: this.folderName,
                 })
-                .modify({ tags: this.tags });
+                .modify({ tags });
             },
           );
         delay(() => {

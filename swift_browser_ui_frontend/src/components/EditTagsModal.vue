@@ -49,6 +49,8 @@ import {
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
 
+import { toRaw } from "vue";
+
 export default {
   name: "EditTagsModal",
   components: { TagInput },
@@ -137,10 +139,11 @@ export default {
       this.$store.commit("setFolderName", "");
     },
     saveObjectTags: function () {
+      const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
         {
-          usertags: this.tags.join(";"),
+          usertags: tags.join(";"),
         },
       ];
       updateObjectMeta(
@@ -151,7 +154,7 @@ export default {
         if (this.$route.name !== "SharedObjects") {
           await getDB().objects
             .where(":id").equals(this.object.id)
-            .modify({tags: this.tags});
+            .modify({ tags });
         } else {
           await this.$store.dispatch("updateSharedObjects", {
             project: this.$route.params.project,
@@ -163,7 +166,7 @@ export default {
       });
     },
     saveContainerTags: function () {
-      const tags = this.tags;
+      const tags = toRaw(this.tags);
       const containerName = this.container.name;
       let meta = {
         usertags: tags.join(";"),

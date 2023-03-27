@@ -88,6 +88,8 @@ import {
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
+import { toRaw } from "vue";
+
 export default {
   name: "CreateFolderModal",
   components: { TagInput },
@@ -111,13 +113,15 @@ export default {
   methods: {
     createContainer: function () {
       let projectID = this.$route.params.project;
-      swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
+      const folderName = toRaw(this.folderName);
+      const tags = toRaw(this.tags);
+      swiftCreateContainer(projectID, folderName, tags.join(";"))
         .then(() => {
           getDB().containers.add({
             projectID: projectID,
-            name: this.folderName,
-            tokens: tokenize(this.folderName),
-            tags: this.tags,
+            name: folderName,
+            tokens: tokenize(folderName),
+            tags: tags,
             count: 0,
             bytes: 0,
           });
