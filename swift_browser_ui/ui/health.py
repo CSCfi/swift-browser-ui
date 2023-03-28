@@ -113,7 +113,7 @@ async def get_upload_runner(
         _set_error_status(request, services, "swiftui-upload-runner")
     except Exception as e:
         request.app["Log"].info(f"Health failed for reason: {e}")
-        _set_error_status(request, services, "sswiftui-upload-runner")
+        _set_error_status(request, services, "swiftui-upload-runner")
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
