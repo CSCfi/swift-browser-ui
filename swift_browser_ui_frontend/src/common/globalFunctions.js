@@ -88,3 +88,16 @@ export function deleteTag (event, tag, currentTags) {
   event.preventDefault();
   return currentTags.filter(el => el !== tag);
 }
+
+export function getPrefix(route) {
+  // Get current pseudofolder prefix
+  if (route.query.prefix == undefined) {
+    return "";
+  }
+  return `${route.query.prefix}/`;
+}
+
+export function isFile(path, route) {
+  // Return true if path represents a file in the active prefix context
+  return path.replace(getPrefix(route), "").match("/") ? false : true;
+}

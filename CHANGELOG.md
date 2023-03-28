@@ -120,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix hiding the pagination of data tables
 - Fix shared objects functionality: visibility, deleting, editing tags
 - URL does not strip the path, when that is present. Also small fixes to make it deployable under the same URL.
-- (GL #933) Fix selecting and mass deleting all files
+- (GL #933) Fix for selecting and mass deleting subfolders and files
 
 ### Removed
 

@@ -34,6 +34,8 @@ import {
 
 import {
   toggleEditTagsModal,
+  isFile,
+  getPrefix,
 } from "@/common/globalFunctions";
 
 import {
@@ -61,9 +63,6 @@ export default {
     renderFolders: {
       type: Boolean,
       default: true,
-    },
-    checkedRows: {
-      default: [],
     },
   },
   data() {
@@ -130,13 +129,9 @@ export default {
     this.setHeaders();
   },
   methods: {
-    isFile: function (path) {
-      // Return true if path represents a file in the active prefix context
-      return path.replace(this.getPrefix(), "").match("/") ? false : true;
-    },
     changeFolder: function (folder) {
       this.$router.push(
-        `${window.location.pathname}?prefix=${this.getPrefix()}${folder}`,
+        `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
       this.componentKey += 1;
       this.getPage();
@@ -144,7 +139,8 @@ export default {
     getFolderName: function (path) {
       // Get the name of the currently displayed pseudofolder
       let endregex = new RegExp("/.*$");
-      return path.replace(this.getPrefix(), "").replace(endregex, "");
+      return path.replace(getPrefix(this.$route), "")
+        .replace(endregex, "");
     },
     getPage: function () {
       let offset = 0;
@@ -163,10 +159,10 @@ export default {
       this.objects = this
         .objs
         .filter((obj) => {
-          return obj.name.startsWith(this.getPrefix());
+          return obj.name.startsWith(getPrefix(this.$route));
         })
         .reduce((items, item) => {
-          if (this.isFile(item.name) || !this.renderFolders) {
+          if (isFile(item.name, this.$route) || !this.renderFolders) {
             items.push(item);
           } else {
             if (items.find(el => {
@@ -193,7 +189,7 @@ export default {
           items.push({
             name: {
               value: value,
-              ...(this.renderFolders && !this.isFile(item.name) ? {
+              ...(this.renderFolders && !isFile(item.name, this.$route) ? {
                 component: {
                   tag: "c-link",
                   params: {
@@ -332,7 +328,7 @@ export default {
     },
     handleSelection(event) {
       if (event.detail.length > 0) {
-        const prefix = this.getPrefix();
+        const prefix = getPrefix(this.$route);
         const selectedRows = event.detail.map(item => prefix.concat(item));
         this.$emit("selected-rows", selectedRows);
       } else {
@@ -352,13 +348,6 @@ export default {
     },
     navDownload(url) {
       window.open(url, "_blank");
-    },
-    getPrefix() {
-      // Get current pseudofolder prefix
-      if (this.$route.query.prefix == undefined) {
-        return "";
-      }
-      return `${this.$route.query.prefix}/`;
     },
     setHeaders() {
       this.headers = [
