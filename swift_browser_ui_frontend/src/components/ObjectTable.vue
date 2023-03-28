@@ -145,6 +145,8 @@ import CObjectTable from "@/components/CObjectTable.vue";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
 
+import { toRaw } from "vue";
+
 export default {
   name: "ObjectTable",
   components: {
@@ -538,10 +540,14 @@ export default {
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
+      const renderFolders = toRaw(this.renderFolders);
+      const hideTags = toRaw(this.hideTags);
+      const hidePagination = toRaw(this.hidePagination);
+      const currentContainer = toRaw(this.currentContainer);
       const displayOptions = {
-        renderFolders: this.renderFolders,
-        hideTags: this.hideTags,
-        hidePagination: this.renderFolders,
+        renderFolders: renderFolders,
+        hideTags: hideTags,
+        hidePagination: hidePagination,
       };
 
       this.tableOptions = [
@@ -551,11 +557,11 @@ export default {
             : this.$t("message.tableOptions.render"),
           action: async () => {
             this.renderFolders = !(this.renderFolders);
+            const renderFolders = toRaw(this.renderFolders);
 
             const newContainer = {
-              ...this.currentContainer,
-              displayOptions: {
-                ...displayOptions, renderFolders: this.renderFolders}};
+              ...currentContainer,
+              displayOptions: {...displayOptions, renderFolders}};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
@@ -567,10 +573,11 @@ export default {
             : this.$t("message.tableOptions.hideTags"),
           action: async () => {
             this.hideTags = !(this.hideTags);
+            const hideTags = toRaw(this.hideTags);
 
             const newContainer = {
-              ...this.currentContainer,
-              displayOptions: { ...displayOptions, hideTags: this.hideTags}};
+              ...currentContainer,
+              displayOptions: { ...displayOptions, hideTags}};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
@@ -582,11 +589,12 @@ export default {
             : this.$t("message.tableOptions.hidePagination"),
           action: async () => {
             this.hidePagination = !(this.hidePagination);
+            const hidePagination = toRaw(this.hidePagination);
 
             const newContainer = {
-              ...this.currentContainer,
+              ...currentContainer,
               displayOptions: {
-                ...displayOptions, hidePagination: this.hidePagination}};
+                ...displayOptions, hidePagination}};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
