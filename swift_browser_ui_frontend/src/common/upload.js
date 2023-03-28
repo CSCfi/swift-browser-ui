@@ -2,6 +2,7 @@ import {
   getUploadCryptedEndpoint,
   killUploadEndpoint,
 } from "@/common/api";
+import { getDB } from "@/common/db";
 
 // Add a private key to the ServiceWorker filesystem
 function addPrivKey(pkey) {
@@ -218,7 +219,7 @@ export default class EncryptedUploadSession {
           );
 
           // Cache the succeeded file metadata to IndexedDB
-          this.$store.state.db.containers.get({
+          getDB().containers.get({
             projectID: this.project,
             name: this.container,
           }).then(async container => {

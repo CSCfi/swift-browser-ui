@@ -23,7 +23,7 @@
       <ul class="folder-details">
         <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
-          {{ $t(sharedStatus) }}&nbsp;
+          {{ sharedStatus }}&nbsp;
           <c-link
             v-show="!isSharedFolder"
             underline
@@ -81,7 +81,8 @@
     >
       <c-text-field
         id="search"
-        v-csc-model="searchQuery"
+        v-model="searchQuery"
+        v-csc-control
         name="search"
         :placeholder="$t('message.objects.filterBy')"
         type="search"
@@ -137,11 +138,14 @@ import {
   getAccessDetails,
   toggleDeleteModal,
 } from "@/common/globalFunctions";
+import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
+
+import { toRaw } from "vue";
 
 export default {
   name: "ObjectTable",
@@ -265,7 +269,7 @@ export default {
     await this.getFolderSharedStatus();
     this.updateObjects();
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.abortController.abort();
   },
   methods: {
@@ -303,9 +307,9 @@ export default {
               this.isSharingFolder = true;
               ret.length === 1
                 ? this.sharedStatus
-                  = "message.folderDetails.sharing_to_one_project"
+                  = this.$t("message.folderDetails.sharing_to_one_project")
                 : this.sharedStatus
-                  = "message.folderDetails.sharing_to_many_projects";
+                  = this.$t("message.folderDetails.sharing_to_many_projects");
             }
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
@@ -321,17 +325,17 @@ export default {
                 const accessRights = sharedDetails.access;
                 if (accessRights.length === 1) {
                   this.sharedStatus
-                    = "message.folderDetails.shared_with_read";
+                    = this.$t("message.folderDetails.shared_with_read");
                 }
                 else if (accessRights.length > 1) {
                   this.sharedStatus
-                    = "message.folderDetails.shared_with_read_write";
+                    = this.$t("message.folderDetails.shared_with_read_write");
                 }
                 this.ownerProject = sharedDetails.owner;
                 this.dateOfSharing = sharedDetails.sharingDate;
               }
               else this.sharedStatus
-                = "message.folderDetails.notShared";
+                = this.$t("message.folderDetails.notShared");
             }
           },
         );
@@ -369,7 +373,7 @@ export default {
         return;
       }
 
-      this.currentContainer = await this.$store.state.db.containers
+      this.currentContainer = await getDB().containers
         .get({
           projectID: this.$route.params.project,
           name: this.containerName,
@@ -377,7 +381,7 @@ export default {
 
       this.oList = useObservable(
         liveQuery(() =>
-          this.$store.state.db.objects
+          getDB().objects
             .where({"containerID": this.currentContainer.id})
             .toArray(),
         ),
@@ -536,10 +540,14 @@ export default {
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
+      const renderFolders = toRaw(this.renderFolders);
+      const hideTags = toRaw(this.hideTags);
+      const hidePagination = toRaw(this.hidePagination);
+      const currentContainer = toRaw(this.currentContainer);
       const displayOptions = {
-        renderFolders: this.renderFolders,
-        hideTags: this.hideTags,
-        hidePagination: this.renderFolders,
+        renderFolders: renderFolders,
+        hideTags: hideTags,
+        hidePagination: hidePagination,
       };
 
       this.tableOptions = [
@@ -549,12 +557,12 @@ export default {
             : this.$t("message.tableOptions.render"),
           action: async () => {
             this.renderFolders = !(this.renderFolders);
+            const renderFolders = toRaw(this.renderFolders);
 
             const newContainer = {
-              ...this.currentContainer,
-              displayOptions: {
-                ...displayOptions, renderFolders: this.renderFolders}};
-            await this.$store.state.db.containers.put(newContainer);
+              ...currentContainer,
+              displayOptions: {...displayOptions, renderFolders}};
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },
@@ -565,11 +573,12 @@ export default {
             : this.$t("message.tableOptions.hideTags"),
           action: async () => {
             this.hideTags = !(this.hideTags);
+            const hideTags = toRaw(this.hideTags);
 
             const newContainer = {
-              ...this.currentContainer,
-              displayOptions: { ...displayOptions, hideTags: this.hideTags}};
-            await this.$store.state.db.containers.put(newContainer);
+              ...currentContainer,
+              displayOptions: { ...displayOptions, hideTags}};
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },
@@ -580,12 +589,13 @@ export default {
             : this.$t("message.tableOptions.hidePagination"),
           action: async () => {
             this.hidePagination = !(this.hidePagination);
+            const hidePagination = toRaw(this.hidePagination);
 
             const newContainer = {
-              ...this.currentContainer,
+              ...currentContainer,
               displayOptions: {
-                ...displayOptions, hidePagination: this.hidePagination}};
-            await this.$store.state.db.containers.put(newContainer);
+                ...displayOptions, hidePagination}};
+            await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
           },

@@ -1,18 +1,16 @@
 <template>
   <div
     class="search"
-    @focus="event => searchGainedFocus()"
   >
     <c-autocomplete
-      v-control
-      v-csc-model="selectedItem"
+      v-csc-control
       :items.prop="searchResults"
-      :query="searchQuery"
       :aria-label="$t('label.searchbox')"
       :placeholder="$t('message.search.searchBy')"
       hide-details
       custom-menu
       :items-per-page="8"
+      @focus="searchGainedFocus"
       @changeQuery="onQueryChange"
     >
       <i
@@ -48,6 +46,7 @@
 
 <script>
 import { tokenize } from "@/common/conv";
+import { getDB } from "@/common/db";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem.vue";
 import debounce from "lodash/debounce";
@@ -63,7 +62,6 @@ export default {
       searchArray: [],
       searchResults: [],
       searchElements: [],
-      searchQuery: "",
       selectedItem: null,
       refs: [],
       isSearching: false,
@@ -74,22 +72,12 @@ export default {
       return this.$store.state.active;
     },
   },
-  watch: {
-    selectedItem: function() {
-      if(this.selectedItem !== null) {
-        this.searchQuery = this.selectedItem.name;
-        const path = this.getSearchRoute(this.selectedItem);
-        this.$router.push(path);
-      }
-    },
-  },
   created: function () {
     this.debounceSearch = debounce(this.search, 400);
   },
   methods: {
-    onQueryChange: function (e) {
-      this.searchQuery = e.detail;
-      const safeQuery = escapeRegExp(this.searchQuery);
+    onQueryChange: function (event) {
+      const safeQuery = escapeRegExp(event.detail);
       const query = safeQuery.trim();
       const newSearchArray = tokenize(query, 0);
       // Run debounced search every time the search box input changes
@@ -142,7 +130,7 @@ export default {
 
       const rankedSort = (a, b) => a.rank - b.rank;
 
-      const containers = await this.$store.state.db.containers
+      const containers = await getDB().containers
         .where("tokens")
         .startsWith(query[0])
         .or("tags")
@@ -157,13 +145,13 @@ export default {
       })).sort(rankedSort).slice(0, 100);
 
       const containerIDs = new Set(
-        await this.$store.state.db.containers
+        await getDB().containers
           .where({ projectID: this.active.id })
           .filter(cont => !cont.name.endsWith("_segments"))
           .primaryKeys(),
       );
 
-      const objects = await this.$store.state.db.objects
+      const objects = await getDB().objects
         .where("tokens")
         .startsWith(query[0])
         .or("tags")
@@ -198,7 +186,7 @@ export default {
       return route;
     },
     searchGainedFocus: async function () {
-      const preferences = await this.$store.state.db.preferences.get(1);
+      const preferences = await getDB().preferences.get(1);
 
       const ojbCount = this.containers.reduce(
         (prev, cont) => prev + cont.count,
@@ -220,7 +208,7 @@ export default {
             message: this.$t("message.search.buildingIndex"),
           },
         );
-        this.$store.state.db.preferences
+        getDB().preferences
           .where(":id")
           .equals(1)
           .modify({ [this.active.id]: { largeProjectNotification: true } });

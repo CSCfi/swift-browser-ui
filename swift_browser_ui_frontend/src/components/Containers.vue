@@ -30,6 +30,7 @@
 
 <script>
 import { liveQuery } from "dexie";
+import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
 import { getSharingContainers } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
@@ -130,7 +131,7 @@ export default {
   mounted() {
     this.fetchContainers();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.abortController.abort();
   },
   methods: {
@@ -154,7 +155,7 @@ export default {
                 hideTags: this.hideTags,
               },
             };
-            await this.$store.state.db.projects.put(newProject);
+            await getDB().projects.put(newProject);
 
             this.updateTableOptions();
           },
@@ -173,7 +174,7 @@ export default {
                 hidePagination: this.hidePagination,
               },
             };
-            await this.$store.state.db.projects.put(newProject);
+            await getDB().projects.put(newProject);
             this.updateTableOptions();
           },
         },
@@ -181,27 +182,23 @@ export default {
       this.optionsKey++;
     },
     fetchContainers: async function () {
-      if (
-        this.active.id === undefined &&
-        this.$route.params.project === undefined
-      ) {
+      if (this.active.id === undefined) {
         return;
       }
 
-      this.currentProject = await this.$store.state.db.projects.get({
+      this.currentProject = await getDB().projects.get({
         id: this.active.id,
       });
-
       this.containers = useObservable(
         liveQuery(() =>
-          this.$store.state.db.containers
-            .where({ projectID: this.$route.params.project })
+          getDB().containers
+            .where({ projectID: this.active.id })
             .toArray(),
         ),
       );
 
       await this.$store.dispatch("updateContainers", {
-        projectID: this.$route.params.project,
+        projectID: this.active.id,
         signal: null,
       });
     },

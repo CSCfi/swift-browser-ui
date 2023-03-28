@@ -1,48 +1,33 @@
-import Vue from "vue";
-import App from "@/pages/LoginPassword.vue";
-import VueI18n from "vue-i18n";
+import { createApp } from "vue";
+import LoginPassword from "@/pages/LoginPassword.vue";
 
-import getLangCookie from "@/common/conv";
-import translations from "@/common/lang";
+import { i18n } from "@/common/i18n";
 
 import CFooter from "@/components/CFooter.vue";
-import cModel from "@/common/csc-ui.js";
 
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControlV2 } from "csc-ui-vue-directive";
+import { vControl } from "@/common/csc-ui-vue-directive";
 
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 // Import project css
 import "@/css/prod.scss";
 
-Vue.config.productiontip = true;
-
-Vue.config.ignoredElements = [/c-\w*/];
-
 applyPolyfills().then(() => {
   defineCustomElements();
 });
 
-Vue.use(VueI18n);
-Vue.directive("control", vControlV2);
-Vue.directive("csc-model", cModel);
-
-const i18n = new VueI18n({
-  locale: getLangCookie(),
-  messages: translations,
-});
-
-new Vue({
+const app = createApp({
   name: "LoginPassword",
-  i18n,
   components: {
     CFooter,
     LanguageSelector,
   },
-  data: {
-    langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
-    idb: true,
+  data: function() {
+    return {
+      langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
+      idb: true,
+    };
   },
   created() {
     document.title = this.$t("message.program_name");
@@ -57,5 +42,10 @@ new Vue({
                         + expiryDate.toUTCString();
     },
   },
-  ...App,
-}).$mount("#app");
+  ...LoginPassword,
+});
+  
+app.use(i18n);
+app.directive("csc-control", vControl);
+
+app.mount("#app");

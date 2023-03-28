@@ -7,10 +7,8 @@
   },
   "extends": [
     "eslint:recommended",
-    "plugin:vue/essential",
     "plugin:vue/base",
-    "plugin:vue/strongly-recommended",
-    "plugin:vue/recommended"
+    "plugin:vue/vue3-recommended"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -60,6 +58,9 @@
         "switchCase": 1
       }
     ],
-    "vue/require-prop-types": [0]
+    "vue/require-prop-types": [0],
+    "vue/no-deprecated-slot-attribute": [0],
+    "vue/v-on-event-hyphenation": [0],
+    "vue/require-explicit-emits": [0]
   }
 }

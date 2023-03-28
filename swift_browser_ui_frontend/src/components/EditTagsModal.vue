@@ -40,6 +40,7 @@ import {
   getTagsForObjects,
   getTagsForContainer,
 } from "@/common/conv";
+import { getDB } from "@/common/db";
 
 import {
   addNewTag,
@@ -47,6 +48,8 @@ import {
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
+
+import { toRaw } from "vue";
 
 export default {
   name: "EditTagsModal",
@@ -88,7 +91,7 @@ export default {
   },
   methods: {
     getObject: async function () {
-      this.container = await this.$store.state.db.containers.get({
+      this.container = await getDB().containers.get({
         projectID: this.$route.params.project,
         name: this.$route.params.container,
       });
@@ -100,7 +103,7 @@ export default {
           }
         });
       } else {
-        this.object = await this.$store.state.db.objects.get({
+        this.object = await getDB().objects.get({
           containerID: this.container.id,
           name: this.selectedObjectName,
         });
@@ -117,7 +120,7 @@ export default {
       }
     },
     getContainer: async function () {
-      this.container = await this.$store.state.db.containers.get({
+      this.container = await getDB().containers.get({
         projectID: this.$route.params.project,
         name: this.selectedFolderName,
       });
@@ -136,10 +139,11 @@ export default {
       this.$store.commit("setFolderName", "");
     },
     saveObjectTags: function () {
+      const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
         {
-          usertags: this.tags.join(";"),
+          usertags: tags.join(";"),
         },
       ];
       updateObjectMeta(
@@ -148,9 +152,9 @@ export default {
         objectMeta,
       ).then(async () => {
         if (this.$route.name !== "SharedObjects") {
-          await this.$store.state.db.objects
+          await getDB().objects
             .where(":id").equals(this.object.id)
-            .modify({tags: this.tags});
+            .modify({ tags });
         } else {
           await this.$store.dispatch("updateSharedObjects", {
             project: this.$route.params.project,
@@ -162,7 +166,7 @@ export default {
       });
     },
     saveContainerTags: function () {
-      const tags = this.tags;
+      const tags = toRaw(this.tags);
       const containerName = this.container.name;
       let meta = {
         usertags: tags.join(";"),
@@ -170,7 +174,7 @@ export default {
       updateContainerMeta(this.$route.params.project, containerName, meta)
         .then(async () => {
           if (this.$route.name !== "SharedObjects") {
-            await this.$store.state.db.containers
+            await getDB().containers
               .where({
                 projectID: this.$route.params.project,
                 name: containerName,

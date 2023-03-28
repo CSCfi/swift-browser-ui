@@ -3,7 +3,7 @@
     <div class="toolbar">
       <router-link
         class="navbar-item pl-4"
-        :to="`/browse/${uname}/${active.id}`"
+        :to="{name: 'AllFolders'}"
         :aria-label="$t('label.csclogo')"
       >
         <c-csc-logo alt="CSC_Logo" />
@@ -47,7 +47,7 @@
       <c-sidenavigationitem
         v-for="item of navigationMenuItems"
         :key="item.title"
-      >
+      > 
         <div slot="main">
           <span :class="'mdi ' + item.icon" />
           {{ item.title }}

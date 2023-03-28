@@ -1,6 +1,7 @@
 
 import { defineConfig } from "vite";
-import { createVuePlugin as vue } from "vite-plugin-vue2";
+import vue from "@vitejs/plugin-vue";
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -43,9 +44,7 @@ let pages = {
   "login":         path.resolve(root, "login.html"),
   "login2step":    path.resolve(root, "login2step.html"),
 };
-if (oidcEnabled) {
-  pages["index"] = path.resolve(root, "index_oidc.html");
-}
+
 let proxy = {
   "/static/assets":       proxyTo,
   "/api":                 proxyTo,
@@ -100,6 +99,23 @@ const multipagePlugin = () => ({
   },
 });
 
+const htmlPlugin = (oidc) => {
+  if (oidc) {
+    return {
+      name: "html-transform",
+      transformIndexHtml: {
+        enforce: "pre",
+        transform: (html, {path}) => {
+          if (path.endsWith("index.html")) {
+            return html.replace("index.js", "index_oidc.js");
+          }
+        }
+      },
+    }
+  }
+  
+};
+
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
 
@@ -126,6 +142,7 @@ export default defineConfig(({ command, mode }) => {
   }
   let base = undefined;
   if (command === "build") base = "/static/";
+  
 
   return {
     root,
@@ -133,8 +150,16 @@ export default defineConfig(({ command, mode }) => {
     publicDir,
     appType: "mpa", // set the dev server as a multi-page app
     plugins: [
-      vue(), 
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith("c-"),
+          },
+        },
+      }),
       multipagePlugin(),
+      VueI18nPlugin(),
+      htmlPlugin(oidcEnabled)
     ],
     build: {
       outDir: path.resolve(__dirname, "dist"),

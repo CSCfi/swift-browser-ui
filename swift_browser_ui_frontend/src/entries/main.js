@@ -1,8 +1,7 @@
 // Project main imports
-import Vue from "vue";
-import App from "@/pages/BrowserPage.vue";
+import { createApp } from "vue";
+import BrowserPage from "@/pages/BrowserPage.vue";
 import router from "@/common/router";
-import VueI18n from "vue-i18n";
 
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
@@ -15,14 +14,11 @@ import CopyFolderModal from "@/components/CopyFolderModal.vue";
 import DeleteModal from "@/components/DeleteModal.vue";
 
 // CSC UI things
-import cModel from "@/common/csc-ui.js";
-
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControlV2 } from "csc-ui-vue-directive";
+import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
-import getLangCookie from "@/common/conv";
-import translations from "@/common/lang";
+import { i18n } from "@/common/i18n";
 import { GET, getUser } from "@/common/api";
 import { getProjects } from "@/common/api";
 
@@ -51,6 +47,7 @@ import CFooter from "@/components/CFooter.vue";
 
 // Import delay
 import delay from "lodash/delay";
+import { getDB } from "@/common/db";
 
 checkIDB().then(result => {
   if (!result) {
@@ -96,34 +93,12 @@ window.addEventListener("rejectionhandled", function (event) {
   event.stopPropagation();
 });
 
-Vue.config.productionTip = false;
-Vue.config.errorHandler = function (err, vm, info) {
-  if (DEV) console.log("Vue error: ", err, vm, info);
-};
-Vue.config.warnHandler = function (msg, vm, info) {
-  if (DEV) console.log("Vue warning: ", msg, vm, info);
-};
-
-Vue.use(VueI18n);
-
 // Configure csc-ui
-Vue.config.ignoredElements = [/c-\w*/];
 applyPolyfills().then(() => {
   defineCustomElements();
 });
 
-Vue.directive("control", vControlV2);
-Vue.directive("csc-model", cModel);
-
-const i18n = new VueI18n({
-  locale: getLangCookie(),
-  messages: translations,
-});
-
-new Vue({
-  i18n,
-  router,
-  store,
+const app = createApp({
   components: {
     CFooter,
     BrowserMainNavbar,
@@ -268,10 +243,10 @@ new Vue({
       this.$store.commit("setUname", user);
       this.$store.commit("setProjects", projects);
 
-      const existingProjects = await this.$store.state.db.projects
+      const existingProjects = await getDB().projects
         .toCollection()
         .primaryKeys();
-      await this.$store.state.db.projects.bulkPut(projects);
+      await getDB().projects.bulkPut(projects);
       const toDelete = [];
       existingProjects.map(async oldProj => {
         if (!projects.find(proj => proj.id === oldProj)) {
@@ -279,44 +254,35 @@ new Vue({
         }
       });
       if (toDelete.length) {
-        await this.$store.state.db.projects.bulkDelete(toDelete);
-        const containersCollection = this.$store.state.db.containers
+        await getDB().projects.bulkDelete(toDelete);
+        const containersCollection = getDB().containers
           .where("projectID")
           .anyOf(toDelete);
         const containers = await containersCollection.primaryKeys();
         await containersCollection.delete();
-        await this.$store.state.db.objects
+        await getDB().objects
           .where("containerID")
           .anyOf(containers)
           .delete();
       }
 
-      let last_active;
-      if (document.cookie.match("LAST_ACTIVE")) {
-        last_active = document.cookie
-          .split("; ")
-          .find(row => row.startsWith("LAST_ACTIVE"))
-          .split("=")[1];
-      }
-      if (last_active) {
-        active =
-          projects[projects.indexOf(projects.find(e => e.id == last_active))];
-      } else if (!(this.$route.params.user === undefined)) {
-        if (!(this.$route.params.project === undefined)) {
-          active =
-            projects[
-              projects.indexOf(
-                projects.find(e => e.id == this.$route.params.project),
-              )
-            ];
-        }
-      } else {
+      if (
+        this.$route.params.user === undefined 
+        || this.$route.params.project === undefined
+      ) {
         active = projects[0];
+      } else {
+        active =
+          projects[
+            projects.indexOf(
+              projects.find(e => e.id == this.$route.params.project),
+            )
+          ];
       }
       this.$store.commit("setActive", active);
 
       if (document.location.pathname == "/browse") {
-        this.$router.push({
+        this.$router.replace({
           name: "AllFolders",
           params: {
             project: active.id,
@@ -557,5 +523,19 @@ new Vue({
       return retl;
     },
   },
-  ...App,
-}).$mount("#app");
+  ...BrowserPage,
+});
+
+app.use(i18n);
+app.use(router);
+app.use(store);
+app.directive("csc-control", vControl);
+
+app.config.errorHandler = function (err, vm, info) {
+  if (DEV) console.log("Vue error: ", err, vm, info);
+};
+app.config.warnHandler = function (msg, vm, info) {
+  if (DEV) console.log("Vue warning: ", msg, vm, info);
+};
+
+router.isReady().then(() => app.mount("#app"));

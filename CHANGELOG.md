@@ -79,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy notifications with c-toasts from `csc-ui`
 - (GL #944) Replace buefy Autocomplete component with c-autocomplete from `csc-ui`
 - (GH #982) Migrate from vue-cli to vite
+- (GH #1034) Migrate to vue3
 
 ### Fixed
 

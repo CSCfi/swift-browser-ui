@@ -17,7 +17,8 @@
         </c-alert>
         <c-text-field
           id="new-copy-folderName"
-          v-csc-model="folderName"
+          v-model="folderName"
+          v-csc-control
           :label="$t('message.replicate.name_newFolder')"
           name="foldername"
           :loading="loadingFoldername"
@@ -63,6 +64,7 @@ import {
   swiftCopyContainer,
   updateContainerMeta,
 } from "@/common/api";
+import { getDB } from "@/common/db";
 
 import {
   addNewTag,
@@ -72,6 +74,8 @@ import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 import TagInput from "@/components/TagInput.vue";
+
+import { toRaw } from "vue";
 
 export default {
   name: "CopyFolderModal",
@@ -122,7 +126,7 @@ export default {
       }
       this.folders = useObservable(
         liveQuery(() =>
-          this.$store.state.db.containers
+          getDB().containers
             .where({ projectID: this.$route.params.project })
             .toArray(),
         ),
@@ -213,19 +217,20 @@ export default {
             custom: true,
           },
         );
-
+        
+        const tags = toRaw(this.tags);
         let metadata = {
-          usertags: this.tags.join(";"),
+          usertags: tags.join(";"),
         };
         updateContainerMeta(this.active.id, this.folderName, metadata)
           .then(
             async () => {
-              await this.$store.state.db.containers
+              await getDB().containers
                 .where({
                   projectID: this.active.id,
                   name: this.folderName,
                 })
-                .modify({ tags: this.tags });
+                .modify({ tags });
             },
           );
         delay(() => {

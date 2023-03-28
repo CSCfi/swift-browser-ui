@@ -19,7 +19,8 @@
         </p>
         <c-text-field
           id="folderName"
-          v-csc-model="folderName"
+          v-model="folderName"
+          v-csc-control
           :label="$t('message.container_ops.folderName')"
           name="foldername"
           aria-required="true"
@@ -78,6 +79,7 @@ import { swiftCreateContainer } from "@/common/api";
 import {
   tokenize,
 } from "@/common/conv";
+import { getDB } from "@/common/db";
 
 import {
   addNewTag,
@@ -85,6 +87,8 @@ import {
   getProjectNumber,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
+
+import { toRaw } from "vue";
 
 export default {
   name: "CreateFolderModal",
@@ -109,13 +113,15 @@ export default {
   methods: {
     createContainer: function () {
       let projectID = this.$route.params.project;
-      swiftCreateContainer(projectID, this.folderName, this.tags.join(";"))
+      const folderName = toRaw(this.folderName);
+      const tags = toRaw(this.tags);
+      swiftCreateContainer(projectID, folderName, tags.join(";"))
         .then(() => {
-          this.$store.state.db.containers.add({
+          getDB().containers.add({
             projectID: projectID,
-            name: this.folderName,
-            tokens: tokenize(this.folderName),
-            tags: this.tags,
+            name: folderName,
+            tokens: tokenize(folderName),
+            tags: tags,
             count: 0,
             bytes: 0,
           });
