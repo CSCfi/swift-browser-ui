@@ -4,7 +4,6 @@ import typing
 
 import aiohttp.web
 import aiohttp_session
-
 from cryptography.fernet import InvalidToken
 
 from swift_browser_ui.ui.settings import setd
@@ -64,7 +63,6 @@ async def index(
     request: typing.Optional[aiohttp.web.Request],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the index page when running without a proxy."""
-
     try:
         if request is not None:
             session = await aiohttp_session.get_session(request)

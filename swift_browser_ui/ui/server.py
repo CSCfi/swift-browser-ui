@@ -1,81 +1,76 @@
 """swift_browser_ui server related convenience functions."""
 
 # Generic imports
+import asyncio
+import base64
 import logging
 import os
-import sys
-import asyncio
-import ssl
-import typing
 import secrets
-import base64
+import ssl
+import sys
+import typing
 
-import cryptography.fernet
-
-import uvloop
 import aiohttp.web
-
 import aiohttp_session
 import aiohttp_session.redis_storage
-
+import cryptography.fernet
+import uvloop
+from oidcrp.rp_handler import RPHandler
 from redis import asyncio as aioredis
 
-from oidcrp.rp_handler import RPHandler
-
-from swift_browser_ui.ui.front import (
-    index,
-    browse,
-    loginpassword,
-    select,
-    swjs,
-    swasm,
-)
-from swift_browser_ui.ui.login import (
-    oidc_start,
-    oidc_end,
-    handle_login,
-    handle_logout,
-    sso_query_begin_oidc,
-    sso_query_begin,
-    sso_query_end,
-    credentials_login_end,
-    handle_project_lock,
-)
+import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui.api import (
-    get_crypted_upload_session,
-    swift_get_metadata_container,
-    swift_list_containers,
-    swift_list_objects,
-    swift_download_object,
-    swift_download_shared_object,
-    swift_download_container,
-    os_list_projects,
-    get_os_user,
-    get_access_control_metadata,
-    remove_container_acl,
     add_project_container_acl,
+    close_upload_session,
+    get_access_control_metadata,
+    get_crypted_upload_session,
+    get_os_user,
     get_shared_container_address,
+    get_upload_session,
+    os_list_projects,
+    remove_container_acl,
+    remove_project_container_acl,
     swift_create_container,
     swift_delete_container,
+    swift_download_container,
+    swift_download_object,
+    swift_download_shared_object,
+    swift_get_metadata_container,
+    swift_get_project_metadata,
+    swift_list_containers,
+    swift_list_objects,
     swift_replicate_container,
     swift_update_container_metadata,
-    swift_get_project_metadata,
-    remove_project_container_acl,
-    get_upload_session,
-    close_upload_session,
+)
+from swift_browser_ui.ui.discover import handle_discover
+from swift_browser_ui.ui.front import (
+    browse,
+    index,
+    loginpassword,
+    select,
+    swasm,
+    swjs,
 )
 from swift_browser_ui.ui.health import handle_health_check
+from swift_browser_ui.ui.login import (
+    credentials_login_end,
+    handle_login,
+    handle_logout,
+    handle_project_lock,
+    oidc_end,
+    oidc_start,
+    sso_query_begin,
+    sso_query_begin_oidc,
+    sso_query_end,
+)
+from swift_browser_ui.ui.misc_handlers import handle_bounce_direct_access_request
 from swift_browser_ui.ui.settings import setd
-import swift_browser_ui.ui.middlewares
-from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.signature import (
-    handle_signature_request,
     handle_ext_token_create,
     handle_ext_token_list,
     handle_ext_token_remove,
+    handle_signature_request,
 )
-from swift_browser_ui.ui.misc_handlers import handle_bounce_direct_access_request
-
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -91,7 +86,7 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
 
 
 async def servinit(
-    inject_middleware: typing.List[typing.Any] = [],
+    inject_middleware: typing.Optional[typing.List] = None,
 ) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     middlewares = [
@@ -334,8 +329,7 @@ def run_server_secure(
     cert_file: str,
     cert_key: str,
 ) -> None:
-    """
-    Run the server securely with a given ssl context.
+    """Run the server securely with a given ssl context.
 
     While this function is incomplete, the project is safe to run in
     production only via a TLS termination proxy with e.g. NGINX.

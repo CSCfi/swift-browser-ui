@@ -8,9 +8,8 @@ import typing
 import aiohttp.web
 import asyncpg.exceptions
 
-import swift_browser_ui.common.types
 import swift_browser_ui.common.signature
-
+import swift_browser_ui.common.types
 
 LOGGER = logging.getLogger("swift_browser_ui.common.common_middleware")
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))

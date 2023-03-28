@@ -1,4 +1,4 @@
-"""Vault c4ghtransit client"""
+"""Vault c4ghtransit client."""
 import asyncio
 import logging
 import os
@@ -262,7 +262,7 @@ class VaultClient:
     async def put_whitelist_key(
         self, project: str, flavor: str, public_key: bytes
     ) -> None:
-        """Updates the project's whitelisted key.
+        """Update the project's whitelisted key.
 
         :param project: Project ID
         :param flavor: Public key flavor: one of crypt4gh or ed25519
@@ -278,7 +278,7 @@ class VaultClient:
         )
 
     async def remove_whitelist_key(self, project: str) -> None:
-        """Deletes the project's whitelisted key.
+        """Delete the project's whitelisted key.
 
         :param project: Project ID
         """
@@ -287,6 +287,12 @@ class VaultClient:
         )
 
     async def get_header(self, project: str, container: str, path: str) -> str:
+        """Retrieve header.
+
+        :param project: Project ID
+        :param container: container name
+        :param path: object path
+        """
         header_response = await self._request(
             "GET",
             f"c4ghtransit/files/{project}/{container}/{path}",
@@ -299,6 +305,13 @@ class VaultClient:
     async def put_header(
         self, project: str, container: str, path: str, header: str
     ) -> None:
+        """Update header.
+
+        :param project: Project ID
+        :param container: container name
+        :param path: object path
+        :param header: header as b64 encoded string
+        """
         await self._request(
             "POST",
             f"c4ghtransit/files/{project}/{container}/{path}",

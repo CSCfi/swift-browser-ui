@@ -2,16 +2,15 @@
 
 
 import logging
-import typing
 import os
-import aiohttp.web
-import aiohttp.client
-
 import ssl
+import typing
+
+import aiohttp.client
+import aiohttp.web
 import certifi
 
 from swift_browser_ui.upload import common
-
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
@@ -261,7 +260,6 @@ class ObjectReplicationProxy:
             self.source_host, container=self.source_container
         )
         LOGGER.debug(f"Container url: {container_url}")
-        objects: typing.Union[typing.List, str]
         async with self.client.get(
             common.generate_download_url(
                 self.source_host,
@@ -275,7 +273,7 @@ class ObjectReplicationProxy:
                 LOGGER.debug(f"Container fetch failed with status {resp.status}")
                 raise aiohttp.web.HTTPBadRequest(reason="Source container fetch failed")
             LOGGER.debug("Got container object listing")
-            objects = await resp.text()
-            objects = objects.rstrip().lstrip().split("\n")
-            for i in objects:
+            objects_text = await resp.text()
+            objects_list = objects_text.rstrip().lstrip().split("\n")
+            for i in objects_list:
                 await self.a_copy_object(i)

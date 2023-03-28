@@ -1,39 +1,38 @@
 """Server initialization functions."""
 
 
+import asyncio
+import logging
 import os
 import sys
-import logging
-import asyncio
 import typing
 
-import aiohttp.web
 import aiohttp.client
-
+import aiohttp.web
 import uvloop
 
 import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
 from swift_browser_ui.common.vault_client import VaultClient
+from swift_browser_ui.upload.api import (
+    handle_delete_project_whitelist,
+    handle_get_container,
+    handle_get_object,
+    handle_health_check,
+    handle_object_header,
+    handle_post_object_chunk,
+    handle_post_object_options,
+    handle_project_key,
+    handle_project_whitelist,
+    handle_upload_encrypted_object,
+    handle_upload_encrypted_object_options,
+    handle_upload_encrypted_object_ws,
+    handle_whitelist_options,
+)
 from swift_browser_ui.upload.auth import (
     handle_login,
     handle_logout,
     handle_validate_authentication,
-)
-from swift_browser_ui.upload.api import (
-    handle_get_object,
-    handle_get_container,
-    handle_post_object_chunk,
-    handle_post_object_options,
-    handle_health_check,
-    handle_upload_encrypted_object_options,
-    handle_whitelist_options,
-    handle_upload_encrypted_object,
-    handle_upload_encrypted_object_ws,
-    handle_project_key,
-    handle_object_header,
-    handle_project_whitelist,
-    handle_delete_project_whitelist,
 )
 from swift_browser_ui.upload.common import VAULT_CLIENT
 

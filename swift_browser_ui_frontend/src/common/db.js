@@ -14,7 +14,7 @@ function initDB() {
       db.preferences.add({id: 1});
     }
   });
-  
+
   return db;
 }
 

@@ -87,8 +87,8 @@
         :placeholder="$t('message.objects.filterBy')"
         type="search"
       >
-        <i 
-          slot="pre" 
+        <i
+          slot="pre"
           class="mdi mdi-filter-variant mdi-24px"
         />
       </c-text-field>

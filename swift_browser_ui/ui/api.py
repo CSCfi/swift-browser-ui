@@ -1,17 +1,15 @@
 """Project functions for handling API requests from front-end."""
 
+import asyncio
 import re
+import ssl
 import time
 import typing
-import asyncio
 import urllib.parse
 
 import aiohttp.web
 import aiohttp_session
-
-import ssl
 import certifi
-
 from swiftclient.utils import generate_temp_url
 
 from swift_browser_ui.ui._convenience import (
@@ -20,7 +18,6 @@ from swift_browser_ui.ui._convenience import (
     sign,
 )
 from swift_browser_ui.ui.settings import setd
-
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
@@ -285,9 +282,9 @@ async def _swift_get_object_metadata_wrapper(
         meta = dict(filter(lambda i: "X-Object-Meta" in i[0], ret.headers.items()))
         meta = {k.replace("X-Object-Meta-", ""): v for k, v in meta.items()}
         if "s3cmd-attrs" in meta.keys():
-            meta["s3cmd-attrs"] = {
-                k: v for k, v in [j.split(":") for j in meta["s3cmd-attrs"].split("/")]
-            }
+            meta["s3cmd-attrs"] = dict(
+                [j.split(":") for j in meta["s3cmd-attrs"].split("/")]
+            )
     return (obj, meta)
 
 

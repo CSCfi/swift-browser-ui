@@ -88,6 +88,3 @@ export function deleteTag (event, tag, currentTags) {
   event.preventDefault();
   return currentTags.filter(el => el !== tag);
 }
-
-
-

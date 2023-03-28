@@ -1,10 +1,11 @@
 """A module for handling the project login related tasks."""
 
 
-import time
-import re
 import base64
 import binascii
+import re
+import time
+import typing
 
 # aiohttp
 import aiohttp.web
@@ -12,14 +13,11 @@ import aiohttp_session
 from multidict import MultiDictProxy
 from oidcrp.exception import OidcServiceError
 
-import typing
-
 from swift_browser_ui.ui._convenience import (
     disable_cache,
     get_availability_from_token,
 )
 from swift_browser_ui.ui.settings import setd
-
 
 HAKA_ENDPOINT = (
     "{endpoint}/auth/OS-FEDERATION/identity_providers"
@@ -50,6 +48,7 @@ async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
 
 
 async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Finalize OIDC login and create a new session with the data from the OIDC provicer."""
     # Response from AAI must have the query params `state` and `code`
     if "state" in request.query and "code" in request.query:
         request.app["Log"].debug("AAI response contained the correct params.")
@@ -414,21 +413,17 @@ async def handle_project_lock(request: aiohttp.web.Request) -> aiohttp.web.Respo
 
     # Ditch all projects that aren't the one specified if project is defined
     if project in session["projects"]:
-        session["projects"] = {
-            k: v
-            for k, v in filter(
+        session["projects"] = dict(
+            filter(
                 lambda val: val[0] == project,
                 session["projects"].items(),
             )
-        }
+        )
     # If the project doesn't exist, allow all untainted projects
     else:
-        session["projects"] = {
-            k: v
-            for k, v in filter(
-                lambda val: not val[1]["tainted"], session["projects"].items()
-            )
-        }
+        session["projects"] = dict(
+            filter(lambda val: not val[1]["tainted"], session["projects"].items())
+        )
 
     if not session["projects"]:
         session.invalidate()

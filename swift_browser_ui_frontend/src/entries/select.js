@@ -23,7 +23,7 @@ const app = createApp({
       idb: true,
       projects: [],
       langs: [
-        {name: "In English", value: "en"}, 
+        {name: "In English", value: "en"},
         {name: "Suomeksi", value: "fi"},
       ],
     };
@@ -47,7 +47,7 @@ const app = createApp({
   },
   ...SelectPage,
 });
-  
+
 app.use(i18n);
 app.directive("csc-control", vControl);
 

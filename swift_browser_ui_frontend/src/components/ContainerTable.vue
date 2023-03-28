@@ -382,7 +382,7 @@ export default {
     confirmDelete: function (container, objects) {
       if (objects > 0) {
         document.querySelector("#container-error-toasts").addToast(
-          { 
+          {
             progress: false,
             type: "error",
             duration: 30000,

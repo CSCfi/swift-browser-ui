@@ -45,7 +45,7 @@ test = [
     "coverage==7.2.1",
     "flake8-docstrings==1.7.0",
     "flake8==6.0.0",
-    "mypy==1.0.1",
+    "mypy==1.1.1",
     "pytest-cov==4.0.0",
     "pytest-xdist==3.2.0",
     "pytest==7.2.1",
@@ -57,7 +57,12 @@ ui_test = [
 ]
 dev = [
     "honcho==1.1.0",
+    "pre-commit==3.2.1",
     "pyspelling==2.8.2",
+    "ruff==0.0.259",
+    "types-certifi",
+    "types-redis",
+    "types-requests",
 ]
 
 [project.scripts]
@@ -72,3 +77,41 @@ Documentation = "https://swift-browser-ui.readthedocs.io"
 
 [tool.hatch.version]
 path = "swift_browser_ui/__init__.py"
+
+[tool.black]
+line-length = 90
+target-version = ['py310']
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 90
+py_version=310
+
+[tool.ruff]
+line-length = 90
+target-version = "py310"
+
+# https://beta.ruff.rs/docs/rules/
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    # "ANN",   # flake8-annotations
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "D",   # pydocstyle
+#    "UP",  # pyupgrade
+    "S",   # Bandit
+]
+
+ignore = [
+    "ANN101",  # Missing type annotation for `self` in method
+    "E501",    # line too long, handled by black
+    "B904",    # do not perform function calls in argument defaults
+    "PLR2004", # magic value used in comparison
+    "S113",    # Probable use of requests call without timeout
+    "D203",    # one-blank-line-before-class
+    "D213",    # multi-line-summary-second-line
+]

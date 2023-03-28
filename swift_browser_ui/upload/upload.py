@@ -1,19 +1,17 @@
 """Server object upload handlers using aiohttp."""
 
 
-import os
-import typing
 import asyncio
 import logging
-
-import aiohttp.web
-import aiohttp.client
-
+import os
 import ssl
+import typing
+
+import aiohttp.client
+import aiohttp.web
 import certifi
 
 from swift_browser_ui.upload import common
-
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())

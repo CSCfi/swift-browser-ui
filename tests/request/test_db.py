@@ -54,7 +54,7 @@ class DBConnTestClass(unittest.IsolatedAsyncioTestCase):
 
         self.asyncio_sleep_mock = unittest.mock.AsyncMock(side_effect=Exception)
         self.patch_asyncio_sleep = unittest.mock.patch(
-            "swift_browser_ui.request.db.asyncio.sleep", new=self.asyncio_sleep_mock
+            "swift_browser_ui.request.db.sleep_random", new=self.asyncio_sleep_mock
         )
 
         self.db = DBConn()

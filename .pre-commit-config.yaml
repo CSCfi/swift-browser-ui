@@ -1,0 +1,83 @@
+repos:
+  - repo: meta
+    hooks:
+    - id: check-hooks-apply
+    - id: check-useless-excludes
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: no-commit-to-branch
+      args: [--branch, devel, --branch, master]
+    - id: check-toml
+    - id: check-yaml
+      exclude: swift_browser_ui_frontend/pnpm-lock.yaml
+    - id: check-ast
+    - id: check-docstring-first
+    - id: check-case-conflict
+    - id: check-merge-conflict
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.259
+    hooks:
+    - id: ruff
+      args: [--fix, --exit-non-zero-on-fix]
+      files: ^swift_browser_ui/
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+    - id: black
+      args: [-l, "90"]
+
+  - repo:  https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+    - id: bandit
+      files: ^swift_browser_ui/
+
+  - repo: local
+    hooks:
+    - id: eslint
+      name: Lint frontend
+      entry: ./scripts/eslint.sh
+      args: [--prefix, swift_browser_ui_frontend, run, lint]
+      files: ^swift_browser_ui_frontend
+      language: system
+      pass_filenames: false
+
+    - id: mypy
+      name: mypy
+      entry: mypy
+      language: system
+      types: [python]
+      files: ^swift_browser_ui/
+      args: [--ignore-missing-imports, --no-namespace-packages]
+      require_serial: true
+
+    - id: sort
+      name: sort dictionaries
+      entry: ./scripts/sort.sh
+      language: script
+      files: ^.github/config/.*.txt
+      require_serial: true
+      pass_filenames: false
+
+    - id: pyspelling-docs
+      name: spellcheck markdown and documentation
+      entry: ./scripts/pyspelling.sh
+      language: script
+      args: [markdown]
+      types_or: [markdown, rst]
+      require_serial: true
+
+    - id: pyspelling-frontend
+      name: spellcheck frontend strings
+      entry: ./scripts/pyspelling.sh
+      language: script
+      args: [frontend]
+      types: [javascript]
+      files: swift_browser_ui_frontend/src/common/lang.js
+      require_serial: true

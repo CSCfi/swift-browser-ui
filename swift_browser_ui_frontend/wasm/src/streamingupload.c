@@ -32,7 +32,7 @@ ENCRYPT_SESSION *open_session_eph() {
 }
 
 
-/* 
+/*
 Open an upload session
 */
 ENCRYPT_SESSION *open_session(

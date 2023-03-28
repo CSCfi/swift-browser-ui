@@ -1,27 +1,23 @@
-"""
-Miscallaneous convenience functions used during the project.
+"""Miscallaneous convenience functions used during the project.
 
 Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
 """
 
 
-import secrets
 import logging
+import secrets
+import ssl
 import typing
 
-import requests
-import aiohttp_session
 import aiohttp
 import aiohttp.web
+import aiohttp_session
+import certifi
+import requests
 
 import swift_browser_ui.common.signature
-
 from swift_browser_ui.ui.settings import setd
-
-import ssl
-import certifi
-
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
@@ -69,8 +65,7 @@ def disable_cache(
 
 
 async def get_availability_from_token(token: str, client: aiohttp.ClientSession) -> dict:
-    """
-    List available domains and projects for the unscoped token specified.
+    """List available domains and projects for the unscoped token specified.
 
     Params:
         token: str
