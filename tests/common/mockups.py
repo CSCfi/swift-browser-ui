@@ -72,8 +72,8 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
             "set_origin_address": "https://localhost/login/websso",
             "has_trust": True,
             "upload_external_endpoint": "http://test-endpoint:9092/",
-            "upload_internal_endpoint": "http://test-endpoint:9093/",
             "oidc_enabled": False,
+            "upload_internal_endpoint": "http://test-endpoint",
         }
         self.patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.api.setd", self.setd_mock
@@ -114,14 +114,14 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
         async def citer(_):
             yield self.mock_iter()
 
-        self.mock_client_json = {}
+        self.mock_client_json = {"status": "Ok"}
         self.mock_client_text = ""
         self.mock_client_response = types.SimpleNamespace(
             **{
                 "status": 200,
                 "headers": {},
                 "cookie": {},
-                "json": None,
+                "json": unittest.mock.AsyncMock(return_value=self.mock_client_json),
                 "content": types.SimpleNamespace(
                     **{
                         "iter_chunked": citer,
