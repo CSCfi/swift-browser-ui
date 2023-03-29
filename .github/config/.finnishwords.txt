@@ -342,8 +342,6 @@ ota
 ottaneesi
 ovat
 oy
-päänäkymään
-pääsy
 paikkaan
 paina
 painikkeella
@@ -495,8 +493,6 @@ säiliöön
 säilön
 tai
 takaisin
-tällä
-tälle
 tallenna
 tallennettujen
 tallennustilaan
@@ -560,7 +556,6 @@ tunti
 tuo
 tuottaa
 turvalliseen
-tyhjä
 tyhjennä
 tyhjä
 tyyppi
@@ -569,6 +564,7 @@ tägejä
 tägillä
 tägit
 tähän
+tälle
 tällä
 tältä
 tämä
