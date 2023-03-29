@@ -277,6 +277,8 @@ muuttaa
 muuttaaksesi
 määrä
 määrästä
+myös
+napilla
 nappi
 nappia
 navigointia
@@ -427,8 +429,8 @@ salausvaihtoehtoja
 salli
 sallittu
 se
-sekä
 sekunnin
+sekä
 selaamiseen
 selaamisesta
 selailla
@@ -488,7 +490,6 @@ takaisin
 tallenna
 tallennettujen
 tallennustilaan
-tältä
 talteen
 tapauksessa
 tarkastele
@@ -510,13 +511,13 @@ tiedostolle
 tiedoston
 tiedostot
 tiedot
-tietää
 tieteen
 tieto
 tietoa
 tietosivulta
 tietotekniikan
 tietotekniikkakeskus
+tietää
 tila
 tilan
 tilankäyttö
@@ -557,6 +558,7 @@ tägillä
 tägit
 tähän
 tällä
+tältä
 tämä
 tämän
 tässä
