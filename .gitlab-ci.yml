@@ -1,0 +1,91 @@
+stages:
+  - build
+  - verify
+  - test
+
+variables:
+  BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/${CI_PROJECT_NAME}-ci
+
+backend-lint:
+  stage: verify
+  tags:
+    - docker-exec
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+  image: $BUILD_IMAGE
+  before_script:
+    - pip install pre-commit tox mypy .[dev]
+  script:
+    - pre-commit run --all-files -c .pre-commit-config.yaml --show-diff-on-failure --color never
+    - tox -e docs
+    - tox -e bandit
+
+frontend-lint:
+  stage: verify
+  tags:
+    - docker-exec
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+  image: $BUILD_IMAGE
+  before_script:
+    - pnpm --prefix swift_browser_ui_frontend install --prod
+  script:
+    - pnpm --prefix swift_browser_ui_frontend lint
+
+backend-test:
+  stage: test
+  tags:
+    - docker-exec
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+  image: $BUILD_IMAGE
+  before_script:
+    - pnpm --prefix swift_browser_ui_frontend install --prod
+    - pip install .[test]
+  script:
+    - pnpm --prefix swift_browser_ui_frontend docker-build
+    - tox -e pytest
+
+build-ci-image:
+  stage: build
+  tags:
+    - sds
+  rules:
+    # when the ci image might have changed, we want to build and push it
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - .gitlab-ci.yml
+        - dockerfiles/Dockerfile-ci
+    # when the ci image might have changed, we want to build it
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - .gitlab-ci.yml
+        - dockerfiles/Dockerfile-ci
+
+    # we don't want to build for git tags or from another pipeline
+    - if: '$CI_COMMIT_TAG !~ "/^$/"'
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
+      when: never
+
+    # otherwise, we can update it manually or on a schedule
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - when: manual
+  script:
+    - >
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        echo Building image;
+        docker build -f dockerfiles/Dockerfile-ci dockerfiles;
+      else
+        echo Building latest;
+        docker build -f dockerfiles/Dockerfile-ci -t $BUILD_IMAGE:latest dockerfiles;
+      fi
+    - >
+      if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]; then
+        echo Pushing latest image;
+        echo "$ARTIFACTORY_USER_PASSWORD" | docker login --username "$ARTIFACTORY_USER" --password-stdin "$ARTIFACTORY_SERVER";
+        docker push $BUILD_IMAGE:latest;
+      fi
