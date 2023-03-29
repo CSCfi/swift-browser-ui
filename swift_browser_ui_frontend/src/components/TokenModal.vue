@@ -22,7 +22,8 @@
     </c-card-actions>
     <c-card-content>
       <c-text-field
-        v-csc-model="newIdentifier"
+        v-model="newIdentifier"
+        v-csc-control
         name="newIdentifier"
         :label="$t('message.tokens.identLabel')"
       />

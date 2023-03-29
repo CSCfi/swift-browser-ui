@@ -57,7 +57,8 @@
         <DeleteModal />
       </c-modal>
       <c-modal
-        v-csc-model="openTokenModal"
+        v-model="openTokenModal"
+        v-csc-control
         width="64vw"
       >
         <TokenModal />
