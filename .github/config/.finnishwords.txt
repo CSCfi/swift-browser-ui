@@ -174,10 +174,7 @@ kopiointi
 kopioitu
 koskevia
 kuin
-<<<<<<< HEAD
 kuinka
-=======
->>>>>>> 71f27bd9 (Added FIN words for spellcheck)
 kulutuksesta
 kulutus
 kun
