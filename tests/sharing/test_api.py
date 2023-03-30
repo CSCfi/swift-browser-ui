@@ -4,7 +4,7 @@
 from types import SimpleNamespace
 
 import unittest
-from unittest import mock
+import unittest.mock
 import aiohttp.web
 
 
@@ -20,7 +20,7 @@ from swift_browser_ui.sharing.api import (
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
-    handle_health_check
+    handle_health_check,
 )
 
 
@@ -58,8 +58,8 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
                     "token": "user_token",
                 },
                 "match_info": {
-                    "container": "test", 
-                    "user": "test", 
+                    "container": "test",
+                    "user": "test",
                     "owner": "test",
                     "project": "test",
                     "id": "test",
@@ -167,7 +167,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
             await handle_health_check(self.mock_request)
 
         calls = [
-            unittest.mock.call({'status': 'Ok'}),
-            unittest.mock.call({"status": "Degraded", "degraded": ["database"]})
+            unittest.mock.call({"status": "Ok"}),
+            unittest.mock.call({"status": "Degraded", "degraded": ["database"]}),
         ]
         self.json_mock.assert_has_calls(calls)
