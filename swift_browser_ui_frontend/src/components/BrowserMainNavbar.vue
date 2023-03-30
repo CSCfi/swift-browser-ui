@@ -4,7 +4,7 @@
       <router-link
         class="navbar-item pl-4"
         :to="{name: 'AllFolders'}"
-        :aria-label="$t('label.csclogo')"
+        :aria-label="$t('label.logo')"
       >
         <c-csc-logo alt="CSC_Logo" />
         <h1 class="app-name">
@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import { getProjectNumber } from "@/common/globalFunctions";
 import { mdiOpenInNew } from "@mdi/js";
 export default {
   name: "BrowserMainNavbar",
@@ -91,37 +92,9 @@ export default {
     return {
       menuVisible: false,
       navigationMenuItems: [],
-      mobileNavigationItems: [
-        {
-          title: "Support",
-          icon: "mdi-help-circle-outline",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-        {
-          title: "Finnish",
-          icon: "mdi-web",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-        {
-          title: "User name",
-          icon: "mdi-account",
-          subs: [
-            {
-              title: "Link to CSC website",
-            },
-          ],
-        },
-      ],
       currentLang: "",
       extLinkIcon: mdiOpenInNew,
+      projectInfoLink: "",
     };
   },
   computed: {
@@ -136,6 +109,11 @@ export default {
     },
   },
   watch: {
+    active () {
+      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+        + getProjectNumber(this.active);
+      this.setNavigationMenu();
+    },
     uname () {
       this.setNavigationMenu();
     },
@@ -171,22 +149,22 @@ export default {
           ariaLabel: this.$t("label.support_menu"),
           subs: [
             {
-              title: this.$t("message.supportMenu.manual"),
-              href: "https://docs.csc.fi/data/sensitive-data/",
+              title: this.$t("message.supportMenu.item1"),
+              href: this.$t("message.supportMenu.itemLink1"),
             },
             {
-              title: this.$t("message.supportMenu.billing"),
-              href: "https://research.csc.fi/pricing#buc",
+              title: this.$t("message.supportMenu.item2"),
+              href: this.$t("message.supportMenu.itemLink2"),
             },
             {
-              title: this.$t("message.supportMenu.sharing"),
+              title: this.$t("message.supportMenu.item3"),
               route: {name: "TokensView", params: {
                 user: this.uname,
                 project: this.active.id}},
             },
             {
-              title: this.$t("message.supportMenu.about"),
-              href: "https://research.csc.fi/sensitive-data",
+              title: this.$t("message.supportMenu.item4"),
+              href: this.$t("message.supportMenu.itemLink4"),
             },
           ],
         },
@@ -197,8 +175,8 @@ export default {
           ariaLabel: this.$t("label.project_info"),
           subs: [
             {
-              title: this.$t("message.dashboard.project_info"),
-              href: `https://my.csc.fi/myProjects/project/${this.active.id}`,
+              title: this.$t("message.dashboard.projectInfo"),
+              href: this.projectInfoLink,
             },
             {
               title: this.$t("message.logOut"),

@@ -44,7 +44,7 @@
           <b>{{ active.name }}</b>.
         </p>
         <c-link
-          :href="`https://my.csc.fi/myProjects/project/${projectNumber}`"
+          :href="projectInfoLink"
           underline
           target="_blank"
         >
@@ -97,7 +97,7 @@ export default {
     return {
       folderName: "",
       tags: [],
-      projectNumber: "",
+      projectInfoLink: "",
     };
   },
   computed: {
@@ -107,7 +107,8 @@ export default {
   },
   watch: {
     active: function () {
-      this.projectNumber = getProjectNumber(this.active);
+      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+        + getProjectNumber(this.active);
     },
   },
   methods: {
