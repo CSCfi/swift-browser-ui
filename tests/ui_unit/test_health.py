@@ -1,11 +1,7 @@
 """Module for testing ``swift_browser_ui.ui.health``."""
 
 
-import json
 import unittest
-import types
-
-import aiohttp.web
 
 import tests.common.mockups
 import swift_browser_ui.ui.health
@@ -26,9 +22,7 @@ class HealthTestClass(tests.common.mockups.APITestBase):
             "sharing_internal_endpoint": "http://test-endpoint",
             "request_internal_endpoint": "http://test-endpoint",
         }
-        self.setd = unittest.mock.patch(
-            "swift_browser_ui.ui.health.setd", self.mock_setd
-        )
+        self.setd = unittest.mock.patch("swift_browser_ui.ui.health.setd", self.mock_setd)
 
     async def test_get_x_account_sharing(self):
         """Test getting x account sharing."""
@@ -54,8 +48,12 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_api_params,
                 self.mock_performance,
             )
-        self.assertEqual(self.mock_services["swift-x-account-sharing"], {"status": "Down"})
-        self.assertNotEqual(first_time, self.mock_performance["swift-x-account-sharing"]["time"])
+        self.assertEqual(
+            self.mock_services["swift-x-account-sharing"], {"status": "Down"}
+        )
+        self.assertNotEqual(
+            first_time, self.mock_performance["swift-x-account-sharing"]["time"]
+        )
 
     async def test_get_swift_sharing(self):
         """Test getting swift sharing."""
@@ -82,7 +80,9 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_performance,
             )
         self.assertEqual(self.mock_services["swift-sharing-request"], {"status": "Down"})
-        self.assertNotEqual(first_time, self.mock_performance["swift-sharing-request"]["time"])
+        self.assertNotEqual(
+            first_time, self.mock_performance["swift-sharing-request"]["time"]
+        )
 
     async def test_get_upload_runner(self):
         """Test getting upload runner."""
@@ -109,7 +109,9 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_performance,
             )
         self.assertEqual(self.mock_services["swiftui-upload-runner"], {"status": "Down"})
-        self.assertNotEqual(first_time, self.mock_performance["swiftui-upload-runner"]["time"])
+        self.assertNotEqual(
+            first_time, self.mock_performance["swiftui-upload-runner"]["time"]
+        )
 
     async def test_some_exception(self):
         """Test that an exception happens when getting one of the service statuses."""
@@ -135,7 +137,9 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_api_params,
                 self.mock_performance,
             )
-        self.assertEqual(self.mock_services["swiftui-upload-runner"], {"status": "Nonexistent"})
+        self.assertEqual(
+            self.mock_services["swiftui-upload-runner"], {"status": "Nonexistent"}
+        )
 
     async def test_handle_health_check(self):
         """Test handling health check."""

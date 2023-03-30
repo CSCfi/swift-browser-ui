@@ -39,7 +39,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                 "token": "test-token-1",
                 "endpoint": "https://test-endpoint-1/v1/AUTH_test-id-1",
                 "tainted": False,
-                "runner": "test-runner"
+                "runner": "test-runner",
             },
         }
         self.aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
