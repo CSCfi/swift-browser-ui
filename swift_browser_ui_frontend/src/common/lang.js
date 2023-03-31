@@ -197,6 +197,7 @@ let default_translations = {
         complete: "Uploading completed",
         cancelled: "Uploading cancelled",
       },
+      close: "Close",
       copy: " Copy",
       copied: "Share ID copied to clipboard",
       copy_failed: "Copying failed",
@@ -242,20 +243,21 @@ let default_translations = {
       },
       tokens: {
         empty: "No API tokens created for the project",
-        identifier: "Identifier",
-        revoke: "Revoke",
-        identLabel: "New token identifier",
-        identMessage: "Insert new token identifier here",
+        title: "Create API-tokens",
+        identifier: "Token identifier",
+        identLabel: "Insert new token identifier",
         createToken: "Create token",
         latestToken: "Latest token: ",
-        copyToken:
-          "The token will be displayed just this once after its " +
-          "creation, and recovering it will not be possible " +
-          "afterwards. Please make sure that you have stored " +
-          "the token somewhere before navigating away from the " +
-          "token page.",
+        copy: "Copy token",
+        copyWarning:
+          "Token will be displayed just this once " +
+          "and recovering it is not be possible. " +
+          "Please store the token somewhere " +
+          "safe before closing this modal.",
         tokenCopied: "Token copied.",
-        back: "Back to all folders",
+        tokenRemoved: "Token removed.",
+        inUse: "Token identifier already in use.",
+        creationFailed: "Token creation failed.",
       },
       encrypt: {
         uploadFiles: "Upload files",
@@ -557,6 +559,7 @@ let default_translations = {
         complete: "Lähetys on valmis",
         cancelled: "Lähetys peruutettu",
       },
+      close: "Sulje",
       copy: " Kopioi",
       copied: "Jakamistunnus kopioitu leikepöydälle.",
       copy_failed: "Kopiointi epäonnistui.",
@@ -598,20 +601,22 @@ let default_translations = {
         name_newFolder: "Nimeä uusi kansio",
       },
       tokens: {
-        empty: "Projektille ei ole luotu API-avaimia",
-        identifier: "Tunniste",
-        revoke: "Mitätöi",
-        identLabel: "Uuden avaimen tunniste",
-        identMessage: "Syötä tunniste uudelle API-avaimelle",
+        empty: "Tälle projektille ei ole luotu API-avaimia",
+        title: "Luo API-avaimet",
+        identifier: "Avainten tunnisteet",
+        identLabel: "Syötä tunniste uudelle API-avaimelle",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",
-        back: "Palaa päänäkymään",
-        copyToken:
-          "Avain näytetään vain kerran luonnin jälkeen, eikä sen " +
-          "kopiointi tai palautus jälkeenpäin ole mahdollista. " +
-          "Kopioi avain talteen ennen kuin " +
-          "poistut tältä sivulta.",
+        copy: "Kopioi avain",
+        copyWarning:
+          "Avain näytetään vain tämän kerran, " +
+          "eikä sen kopiointi tai palautus ole mahdollista jälkeenpäin. " +
+          "Tallenna avain turvalliseen paikkaan " +
+          "ennen kuin suljet tämän ikkunan.",
         tokenCopied: "Avain kopioitu.",
+        tokenRemoved: "Avain poistettu.",
+        creationFailed: "Avaimen luonti epäonnistui.",
+        inUse: "Avaimen tunniste on jo käytössä.",
       },
       encrypt: {
         uploadFiles: "Lataa tiedostoja",

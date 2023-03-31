@@ -12,6 +12,7 @@ import EditTagsModal from "@/components/EditTagsModal.vue";
 import ShareModal from "@/components/ShareModal.vue";
 import CopyFolderModal from "@/components/CopyFolderModal.vue";
 import DeleteModal from "@/components/DeleteModal.vue";
+import TokenModal from "@/components/TokenModal.vue";
 
 // CSC UI things
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
@@ -110,6 +111,7 @@ const app = createApp({
     ShareModal,
     CopyFolderModal,
     DeleteModal,
+    TokenModal,
   },
   data: function () {
     return {
@@ -199,6 +201,12 @@ const app = createApp({
     openShareModal: {
       get() {
         return this.$store.state.openShareModal;
+      },
+      set() { },
+    },
+    openTokenModal: {
+      get() {
+        return this.$store.state.openTokenModal;
       },
       set() { },
     },

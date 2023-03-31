@@ -157,10 +157,8 @@ export default {
               href: this.$t("message.supportMenu.itemLink2"),
             },
             {
-              title: this.$t("message.supportMenu.item3"),
-              route: {name: "TokensView", params: {
-                user: this.uname,
-                project: this.active.id}},
+              title: this.$t("message.supportMenu.sharing"),
+              action: () => this.$store.commit("toggleTokenModal", true),
             },
             {
               title: this.$t("message.supportMenu.item4"),

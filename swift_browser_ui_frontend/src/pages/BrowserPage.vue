@@ -56,6 +56,13 @@
       >
         <DeleteModal />
       </c-modal>
+      <c-modal
+        v-model="openTokenModal"
+        v-csc-control
+        width="64vw"
+      >
+        <TokenModal />
+      </c-modal>
       <router-view class="content-wrapper" />
       <c-toasts id="toasts" />
       <c-toasts

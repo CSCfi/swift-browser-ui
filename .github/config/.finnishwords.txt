@@ -64,6 +64,7 @@ hinnoittelulaskuri
 hyväksy
 hyväksyä
 hyväksyäksesi
+ikkunan
 ilman
 ja
 jaa
@@ -338,6 +339,7 @@ ota
 ottaneesi
 ovat
 oy
+paikkaan
 paina
 painikkeella
 painikkeesta
@@ -464,6 +466,7 @@ sivupyynnössä
 sivutus
 sopimus
 sulje
+suljet
 suodata
 suositellut
 suuren
@@ -549,6 +552,7 @@ tunnus
 tunti
 tuo
 tuottaa
+turvalliseen
 tyhjennä
 tyhjä
 tyyppi
@@ -557,6 +561,7 @@ tägejä
 tägillä
 tägit
 tähän
+tälle
 tällä
 tältä
 tämä
