@@ -107,7 +107,7 @@ let default_translations = {
       tableOptions: {
         displayOptions: "Display options",
         render: "Show as folders",
-        text: "Show as objects",
+        text: "Show as paths",
         hideTags: "Hide tags",
         showTags: "Display tags",
         hidePagination: "Hide pagination",
@@ -469,7 +469,7 @@ let default_translations = {
       tableOptions: {
         displayOptions: "Asetukset",
         render: "Näytä kansioina",
-        text: "Näytä tekstinä",
+        text: "Näytä polkuina",
         hideTags: "Piilota asiasanat",
         showTags: "Näytä asiasanat",
         hidePagination: "Piilota sivutus",

@@ -33,6 +33,8 @@ import {
 } from "@/common/api";
 import { getDB } from "@/common/db";
 
+import { isFile } from "@/common/globalFunctions";
+
 export default {
   name: "DeleteModal",
   data: function () {
@@ -105,18 +107,17 @@ export default {
       });
     },
     deleteObjects: function () {
-      document.querySelector("#objects-toasts").addToast(
-        { progress: false,
-          type: "success",
-          message: this.$t("message.objects.deleteSuccess")},
-      );
-
       let to_remove = new Array;
       for (let object of this.selectedObjects) {
-        to_remove.push(object.name);
+        // Only files are able to delete
+        if (isFile(object.name, this.$route)) {
+          to_remove.push(object.name);
+        }
       }
+
       if(this.$route.name !== "SharedObjects") {
-        const objIDs = this.selectedObjects.reduce(
+        const objIDs = this.selectedObjects.filter(
+          obj => obj.name && to_remove.includes(obj.name)).reduce(
           (prev, obj) => [...prev, obj.id], [],
         );
         getDB().objects.bulkDelete(objIDs);
@@ -141,6 +142,28 @@ export default {
         }
 
         this.toggleDeleteModal();
+
+        const dataTable = document.getElementById("objtable");
+        dataTable.clearSelections();
+
+        // Only files can be deleted
+        // Show warnings when deleting subfolders
+        if (to_remove.length > 0) {
+          document.querySelector("#objects-toasts").addToast(
+            { progress: false,
+              type: "success",
+              message: this.$t("message.objects.deleteSuccess")},
+          );
+        } else {
+          document.querySelector("#container-error-toasts").addToast(
+            {
+              progress: false,
+              type: "error",
+              duration: 30000,
+              message: this.$t("message.container_ops.deleteNote"),
+            },
+          );
+        }
       });
     },
   },

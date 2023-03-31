@@ -42,7 +42,6 @@
         </li>
       </ul>
     </div>
-
     <div
       v-if="checkedRows.length"
       class="selection-bar"
@@ -110,7 +109,7 @@
       :render-folders="renderFolders"
       :checked-rows="checkedRows"
       @selected-rows="handleSelection"
-      @delete-object="toggleDeleteModal([$event])"
+      @delete-object="confirmDelete"
     />
     <c-toasts
       id="objects-toasts"
@@ -137,6 +136,7 @@ import {
   getSharedContainers,
   getAccessDetails,
   toggleDeleteModal,
+  isFile,
 } from "@/common/globalFunctions";
 import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
@@ -345,7 +345,19 @@ export default {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit("setFolderName", this.containerName);
     },
-    toggleDeleteModal,
+    confirmDelete: function(item) {
+      if (isFile(item.name, this.$route)) {
+        toggleDeleteModal([item]);
+      } else {
+        document.querySelector("#container-error-toasts").addToast(
+          {
+            progress: false,
+            type: "error",
+            duration: 30000,
+            message: this.$t("message.container_ops.deleteNote"),
+          });
+      }
+    },
     updateObjects: async function () {
       if (
         this.containerName === undefined
@@ -395,9 +407,6 @@ export default {
           signal: this.abortController.signal,
         },
       );
-    },
-    isRowCheckable: function (row) {
-      return this.renderFolders ? this.isFile(row.name) : true;
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {
@@ -526,14 +535,23 @@ export default {
       this.filteredObjects = this.oList.
         filter(obj => filteredObjectsIds.indexOf(obj.id) === -1);
     },
-    displayTags: function (name) {
-      return this.showTags && !(this.renderFolders && !this.isFile(name));
-    },
     handleSelection(selection) {
       const objects = this.oList;
       this.checkedRows = objects.filter(
         item => selection.indexOf(item.name) > -1,
       );
+
+      /* Subfolders should also be selected and then filtered out from
+        deletableObjects later
+      */
+      if (this.checkedRows.length < selection.length) {
+        for (let i = 0; i < selection.length; i++) {
+          if(!this.checkedRows.some(row => row && row.name === selection[i])) {
+            const obj = objects.find(obj => !this.checkedRows.some(row => row.name === selection[i]) && obj.name.includes(`${selection[i]}/`));
+            this.checkedRows.push(obj);
+          }
+        }
+      }
     },
     clearSelections() {
       const dataTable = document.getElementById("objtable");
@@ -711,5 +729,9 @@ export default {
     flex: 0;
     padding: .5rem 0;
   }
+}
+
+#objects-toasts {
+  bottom: 40vh;
 }
 </style>

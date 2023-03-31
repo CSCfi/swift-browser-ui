@@ -370,6 +370,7 @@ poistettiin
 poistettu
 poistut
 polku
+polkuina
 postamista
 poudan
 profiili

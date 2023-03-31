@@ -389,11 +389,6 @@ export default {
             message: this.$t("message.container_ops.deleteNote"),
           },
         );
-        this.$router.push(
-          this.$route.params.project
-            + "/"
-            + container,
-        );
       } else {
         toggleDeleteModal(null, container);
       }

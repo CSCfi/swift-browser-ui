@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GH #944) Create new Taginput component to replace Buefy's taginput component
 - (GL #944) Replace buefy upload button with a new component: `CUploadButton`
 - (GL #940) Added TokenModal to replace token page
+- (GL #936) Add missing icon for subfolders
 
 ### Changed
 
@@ -119,6 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix hiding the pagination of data tables
 - Fix shared objects functionality: visibility, deleting, editing tags
 - URL does not strip the path, when that is present. Also small fixes to make it deployable under the same URL.
+- (GL #933) Fix for selecting and mass deleting subfolders and files
 
 ### Removed
 
