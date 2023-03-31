@@ -258,6 +258,7 @@ export default {
       if (rights.length < 1) {
         document.querySelector("#shareModal-toasts").addToast(
           {
+            id: "error-noperm",
             type: "error",
             duration: 5000,
             persistent: false,
@@ -270,6 +271,7 @@ export default {
       if (this.tags.length < 1) {
         document.querySelector("#shareModal-toasts").addToast(
           {
+            id: "error-noid",
             type: "error",
             duration: 5000,
             persistent: false,
@@ -292,6 +294,7 @@ export default {
         if (error instanceof TypeError) {
           document.querySelector("#shareModal-toasts").addToast(
             {
+              id: "error-duplicate",
               type: "error",
               duration: 5000,
               persistent: false,
@@ -325,6 +328,10 @@ export default {
       this.tags = [];
       this.isShared = false;
       this.isPermissionRemoved = false;
+      document.querySelector("#shareModal-toasts").removeToast("error-noperm");
+      document.querySelector("#shareModal-toasts").removeToast("error-noid");
+      document.querySelector("#shareModal-toasts")
+        .removeToast("error-duplicate");
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);

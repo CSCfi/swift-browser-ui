@@ -589,6 +589,7 @@ valikossa
 valinnan
 valinnat
 valitse
+valitsemaasi
 valittu
 valittuja
 valittuna

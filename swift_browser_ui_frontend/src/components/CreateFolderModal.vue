@@ -136,7 +136,9 @@ export default {
             errorMessage = this.$t("message.error.invalidName");
           }
           document.querySelector("#createModal-toasts").addToast(
-            { progress: false,
+            {
+              id: "create-toast",
+              progress: false,
               type: "error",
               message: errorMessage },
           );
@@ -147,6 +149,7 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.create = true;
+      document.querySelector("#createModal-toasts").removeToast("create-toast");
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
