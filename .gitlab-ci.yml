@@ -104,4 +104,3 @@ deploy:
   stage: deploy
   trigger:
     project: sds-dev/sd-connect/swift-ui-csc-deployment
-    branch: feature/new-deployment-gitlab
