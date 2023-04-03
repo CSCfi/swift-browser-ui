@@ -2,6 +2,7 @@ stages:
   - build
   - verify
   - test
+  - deploy
 
 variables:
   BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/${CI_PROJECT_NAME}-ci
@@ -55,7 +56,7 @@ build-ci-image:
     - sds
   rules:
     # when the ci image might have changed, we want to build and push it
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
       changes:
         - .gitlab-ci.yml
         - dockerfiles/Dockerfile-ci
@@ -89,3 +90,17 @@ build-ci-image:
         echo "$ARTIFACTORY_USER_PASSWORD" | docker login --username "$ARTIFACTORY_USER" --password-stdin "$ARTIFACTORY_SERVER";
         docker push $BUILD_IMAGE:latest;
       fi
+
+deploy:
+  rules:
+    # until this is https://gitlab.com/groups/gitlab-org/-/epics/4529 is merged
+    # ENVIRONMENT env var will not be sent downstream and it will default to devel branch
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+    - if: '$CI_COMMIT_TAG !~ "/^$/"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+  variables:
+    ENVIRONMENT: $CI_COMMIT_BRANCH
+  stage: deploy
+  trigger:
+    project: sds-dev/sd-connect/swift-ui-csc-deployment
