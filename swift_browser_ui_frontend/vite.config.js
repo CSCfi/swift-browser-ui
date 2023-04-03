@@ -127,7 +127,7 @@ export default defineConfig(({ command, mode }) => {
       const branch = shell("git branch --show-current");
       const version = shell("git describe --always --long --tags");
       const hash = shell("git rev-parse HEAD");
-      const url = "https://github.com/CSCfi/swift-browser-ui/commit/";
+      const url = "https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/commit/";
 
       process.env.VITE_GIT_VERSION = `${branch} | ${version}`;
       process.env.VITE_GIT_LINK = url + hash;
