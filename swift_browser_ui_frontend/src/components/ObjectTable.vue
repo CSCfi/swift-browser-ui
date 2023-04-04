@@ -334,8 +334,8 @@ export default {
           {
             progress: false,
             type: "error",
-            duration: 30000,
-            message: this.$t("message.container_ops.deleteNote"),
+            duration: 6000,
+            message: this.$t("message.subfolders.deleteNote"),
           });
       }
     },

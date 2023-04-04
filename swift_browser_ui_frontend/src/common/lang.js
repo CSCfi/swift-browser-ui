@@ -221,20 +221,27 @@ let default_translations = {
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteConfirm: "Delete folder",
-        deleteNote: "You can only delete empty folders. " +
-        "Please delete all items first.",
+        deleteNote: "Folder must be empty before " +
+        "it can be deleted.",
         deleteConfirmMessage:
           "Are you sure you want to delete this folder?",
-        deleteSuccess: "Folder deleted",
+        deleteSuccess: "Folder was deleted.",
         folderName: "Folder name",
+      },
+      subfolders: {
+        deleteNote: "Subfolders are deleted by deleting all " +
+        "items in them.",
+        deleteSuccess: "Subfolder was deleted.",
       },
       objects: {
         filterBy: "Filter by name or tag",
-        deleteConfirm: "Delete files",
-        deleteObjects: "Delete file(s)",
-        deleteSuccess: "Files deleted",
+        deleteConfirm: "Delete items",
+        deleteObjects: "Delete items",
+        deleteManySuccess: " items deleted",
+        deleteOneSuccess: " item deleted",
         deleteObjectsMessage:
-          "Are you sure you want to delete the file(s)?",
+          "Items can't be restored after being deleted. " +
+          "Are you sure you want to proceed?",
       },
       replicate: {
         destinationExists: "Folder already exists",
@@ -582,18 +589,24 @@ let default_translations = {
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteConfirm: "Poista kansio",
-        deleteNote: "Kansion poistaminen edellyttää kaikkien " +
+        deleteNote: "Kansion poistaminen edellyttää kaikkien " + //TODO
           "tiedostojen poistamista ensin.",
-        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",
-        deleteSuccess: "Kansio poistettu",
+        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",//TODO
+        deleteSuccess: "Kansio poistettu", //TODO
         folderName: "Kansion nimi",
+      },
+      subfolders: {
+        deleteNote: "Subfolders are deleted by deleting all "+ //TODO
+        "items in them.",
+        deleteSuccess: "Subfolder was deleted.", //TODO
       },
       objects: {
         filterBy: "Suodata nimellä tai asiasanalla",
-        deleteConfirm: "Poista tiedostot",
-        deleteObjects: "Poista tiedostot",
-        deleteSuccess: "Tiedostot poistettu",
-        deleteObjectsMessage: "Haluatko varmasti poistaa nämä tiedostot?",
+        deleteConfirm: "Poista tiedostot", //TODO
+        deleteObjects: "Poista tiedostot", //TODO
+        deleteSuccess: "Tiedostot poistettu", //TODO
+        deleteObjectsMessage: //TODO
+          "Haluatko varmasti poistaa nämä tiedostot?", //TODO
       },
       replicate: {
         destinationExists: "Kansio on jo olemassa",

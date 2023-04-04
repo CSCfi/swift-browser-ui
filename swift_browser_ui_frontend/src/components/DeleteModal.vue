@@ -149,10 +149,14 @@ export default {
         // Only files can be deleted
         // Show warnings when deleting subfolders
         if (to_remove.length > 0) {
+          let msg;
+          to_remove.length === 1?
+            msg = this.$t("message.objects.deleteOneSuccess")
+            : msg = this.$t("message.objects.deleteManySuccess");
           document.querySelector("#objects-toasts").addToast(
             { progress: false,
               type: "success",
-              message: this.$t("message.objects.deleteSuccess")},
+              message: to_remove.length + msg},
           );
         } else {
           document.querySelector("#container-error-toasts").addToast(
@@ -160,7 +164,7 @@ export default {
               progress: false,
               type: "error",
               duration: 6000,
-              message: this.$t("message.container_ops.deleteNote"),
+              message: this.$t("message.subfolders.deleteNote"),
             },
           );
         }
@@ -181,4 +185,5 @@ export default {
 .delete-modal {
   padding: 0px;
 }
+
 </style>

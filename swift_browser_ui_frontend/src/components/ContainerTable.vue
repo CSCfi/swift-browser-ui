@@ -30,9 +30,10 @@ import {
   getSharedContainers,
   getAccessDetails,
   toggleCopyFolderModal,
-  toggleDeleteModal,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
+import { swiftDeleteContainer } from "@/common/api";
+import { getDB } from "@/common/db";
 
 export default {
   name: "ContainerTable",
@@ -392,10 +393,27 @@ export default {
             message: this.$t("message.container_ops.deleteNote"),
           },
         );
-      } else {
-        toggleDeleteModal(null, container);
+      } else { //delete empty folder without confirmation
+        this.$store.commit("setFolderName", container);
+        document.querySelector("#container-toasts").addToast(
+          { progress: false,
+            type: "success",
+            message: this.$t("message.container_ops.deleteSuccess")},
+        );
+        const projectID = this.$route.params.project;
+        swiftDeleteContainer(
+          projectID,
+          this.$store.state.selectedFolderName,
+        ).then(async () => {
+          await getDB().containers
+            .where({
+              projectID,
+              name: this.$store.state.selectedFolderName,
+            })
+            .delete();
+        }); 
       }
-    },
+    }, 
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"
         ? this.paginationTextOverrides
