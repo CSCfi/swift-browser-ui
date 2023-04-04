@@ -133,7 +133,11 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate } from "@/common/conv";
+import {
+  getHumanReadableSize,
+  truncate,
+  parseDateTime,
+} from "@/common/conv";
 import {
   getSharedContainers,
   getAccessDetails,
@@ -334,7 +338,8 @@ export default {
                     = this.$t("message.folderDetails.shared_with_read_write");
                 }
                 this.ownerProject = sharedDetails.owner;
-                this.dateOfSharing = sharedDetails.sharingDate;
+                this.dateOfSharing = 
+                  parseDateTime(this.locale, sharedDetails.sharingDate, true);
               }
               else this.sharedStatus
                 = this.$t("message.folderDetails.notShared");
@@ -477,31 +482,6 @@ export default {
     // namespace
     localHumanReadableSize: function ( size ) {
       return getHumanReadableSize( size );
-    },
-    getHumanReadableDate: function ( val ) {
-      let dateVal = new Date(val);
-      let langLocale = "en-GB";
-      var options = {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      };
-      var zone = { timeZone: "EEST" };
-      switch (this.$i18n.locale) {
-        case "en":
-          langLocale = "en-GB";
-          break;
-        case "fi":
-          langLocale = "fi-FI";
-          break;
-        default:
-          langLocale = "en-GB";
-      }
-      return dateVal.toLocaleDateString(langLocale, options, zone);
     },
     getPrefix: function () {
       // Get current pseudofolder prefix

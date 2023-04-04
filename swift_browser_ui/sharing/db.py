@@ -184,7 +184,7 @@ class DBConn:
             {
                 "container": i["container"],
                 "owner": i["container_owner"],
-                "sharingdate": i["sharingdate"].strftime("%d %b %Y"),
+                "sharingdate": i["sharingdate"].isoformat(),
             }
             for i in query
         ]
@@ -242,7 +242,7 @@ class DBConn:
             "sharedTo": query["recipient"],
             "address": query["address"],
             "access": access,
-            "sharingDate": query["sharingdate"].strftime("%d %b %Y"),
+            "sharingDate": query["sharingdate"].isoformat(),
         }
 
     async def get_shared_container_details(
