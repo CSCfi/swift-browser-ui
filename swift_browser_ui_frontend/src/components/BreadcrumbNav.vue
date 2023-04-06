@@ -5,24 +5,25 @@
       align="center"
     >
       <c-link
-        href="#"
+        :href="home.path"
         color="primary"
         :path="mdiHome"
         icon-fill="primary"
         icon-after="false"
         :weight="defaultWeight"
       >
-        {{ home }}
+        {{ home.title }}
       </c-link>
+
       <c-link
-        :href="folder.path"
+        :href="folderPath"
         color="primary"
         :path="mdiChevronRight"
         icon-fill="primary"
         icon-after="false"
         :weight="subfolders === '' ? lastWeight : defaultWeight"
       >
-        {{ folder.title }}
+        {{ folder }}
       </c-link>
       <c-link 
         v-for="item, i in subfolders"
@@ -37,7 +38,6 @@
         {{ item }}
       </c-link>
     </c-row>
-    {{ route }}
   </div>
 </template>
 
@@ -46,24 +46,41 @@ import { mdiHome, mdiChevronRight } from "@mdi/js";
 
 export default {
   name: "BreadcrumbNav",
-  props: ["home"],
+  props: ["sharedFrom", "sharedTo"],
   data() {
     return {
-      lastWeight: 800,
-      defaultWeight: 500,  
+      lastWeight: 700,
+      defaultWeight: 400,  
       mdiHome,
       mdiChevronRight,
     };
   },
   computed: {
-    route() {
-      return this.$route;
+    home() {
+      if (this.sharedFrom) {
+        return {
+          title: this.$t("message.folderTabs.sharedFrom"),
+          path: this.mainPath + "/shared/from"};
+      }
+      else if (this.sharedTo) {
+        return {
+          title: this.$t("message.folderTabs.sharedTo"),
+          path: this.mainPath + "/to" }; // /shared/:owner on main path
+      }
+      else {
+        return {
+          title: this.$t("message.folderTabs.all"),
+          path: this.mainPath }; //when refreshed defaults to this
+      }
     },
-    fullPath() {
-      return this.$route.fullPath;
+    mainPath () {
+      return this.folderPath.slice(0, this.folderPath.lastIndexOf("/"));
     },
     folder() {
-      return { title: this.$route.params.container, path: this.$route.path };
+      return this.$route.params.container;
+    },
+    folderPath() {
+      return this.$route.path;
     },
     subfolders() { //array of subfolder titles
       return this.$route.query.prefix != undefined ? 
@@ -73,11 +90,11 @@ export default {
   methods: {
     getPath(index) {
       if (index === this.subfolders.length-1) {
-        return this.fullPath;
+        return this.$route.fullPath;
       } else {
         let prefixes = this.$route.query.prefix.split("/");
         prefixes = prefixes.slice(index, index+1).join("/");
-        let path = this.folder.path + "?prefix=" + prefixes;
+        let path = this.folderPath + "?prefix=" + prefixes;
         return path;
       }
     },
@@ -89,8 +106,5 @@ export default {
 <style scoped>
 .breadcrumb {
     padding: 1.5rem 0 1rem 0;
-}
-c-link {
-    padding-right: 0rem;
 }
 </style>

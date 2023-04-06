@@ -2,18 +2,10 @@
   <div
     id="object-table"
   >
-    <c-row>
-      <router-link
-        class="back-link"
-        :to="getRedirectRoutes()"
-      >
-        <i class="mdi mdi-chevron-left" />
-        {{ isSharingFolder ? $t("message.table.back_to_sharing_folders")
-          : isSharedFolder ? $t("message.table.back_to_shared_folders")
-            : $t("message.table.back_to_all_folders")
-        }}
-      </router-link>
-    </c-row>
+    <BreadcrumbNav
+      :shared-from="isSharingFolder"
+      :shared-to="isSharedFolder"
+    />
 
     <div class="folder-info">
       <div class="folder-info-heading">
@@ -150,13 +142,14 @@ import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
 import debounce from "lodash/debounce";
 import escapeRegExp from "lodash/escapeRegExp";
-
+import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 
 export default {
   name: "ObjectTable",
   components: {
     CObjectTable,
+    BreadcrumbNav,
   },
   filters: {
     truncate,
@@ -279,26 +272,6 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    getRedirectRoutes: function () {
-      if (this.isSharingFolder) {
-        return {
-          name: "SharedFrom",
-          params: { project: this.$store.state.active.id },
-        };
-      }
-      else if (this.isSharedFolder) {
-        return {
-          name: "SharedTo",
-          params: { project: this.$store.state.active.id },
-        };
-      }
-      else {
-        return {
-          name: "AllFolders",
-          params: { project: this.$store.state.active.id },
-        };
-      }
-    },
     getSharedContainers: async function () {
       this.sharedContainers = await getSharedContainers(this.active.id);
     },
@@ -630,18 +603,6 @@ export default {
 
 #search {
   flex: 0.4;
-}
-
-.back-link {
-  display: flex;
-  padding-bottom: .5rem;
-  color: $csc-primary;
-  font-weight: 600;
-  align-items: center;
-
-  & .mdi {
-    font-size: 2rem;
-  }
 }
 
 .folder-info {
