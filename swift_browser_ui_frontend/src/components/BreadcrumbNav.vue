@@ -65,16 +65,20 @@ export default {
       else if (this.sharedTo) {
         return {
           title: this.$t("message.folderTabs.sharedTo"),
-          path: this.mainPath + "/to" }; // /shared/:owner on main path
+          path: this.mainPath + "/shared/to" };
       }
       else {
         return {
           title: this.$t("message.folderTabs.all"),
-          path: this.mainPath }; //when refreshed defaults to this
+          path: this.mainPath };
       }
     },
     mainPath () {
-      return this.folderPath.slice(0, this.folderPath.lastIndexOf("/"));
+      return [
+        "/browse",
+        this.$route.params.user,
+        this.$route.params.project,
+      ].join("/");
     },
     folder() {
       return this.$route.params.container;
@@ -93,7 +97,7 @@ export default {
         return this.$route.fullPath;
       } else {
         let prefixes = this.$route.query.prefix.split("/");
-        prefixes = prefixes.slice(index, index+1).join("/");
+        prefixes = prefixes.slice(0, index+1).join("/");
         let path = this.folderPath + "?prefix=" + prefixes;
         return path;
       }
