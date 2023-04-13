@@ -6,7 +6,6 @@
       :shared-from="isSharingFolder"
       :shared-to="isSharedFolder"
     />
-
     <div class="folder-info">
       <div class="folder-info-heading">
         <i class="mdi mdi-folder-outline" />
@@ -209,6 +208,11 @@ export default {
   },
   watch: {
     active: async function() {
+      await this.getSharedContainers();
+      await this.getFolderSharedStatus();
+      await this.updateObjects();
+    },
+    client: async function() {
       await this.getSharedContainers();
       await this.getFolderSharedStatus();
       await this.updateObjects();
