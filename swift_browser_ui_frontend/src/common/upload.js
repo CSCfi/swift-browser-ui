@@ -235,6 +235,7 @@ export default class EncryptedUploadSession {
             this.initFileSystem();
           }
           else {
+            this.$store.commit("eraseProgress");
             this.$store.commit("eraseEncryptedProgress");
             this.$store.commit("eraseEncryptedFile");
             this.$store.commit("eraseEncryptedFileProgress");
