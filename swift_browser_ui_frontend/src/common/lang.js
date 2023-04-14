@@ -485,8 +485,8 @@ let default_translations = {
         share_id_copy: "Kopioi jakamistunnus",
         share_id_tooltip:
           "Tällä toiminnolla voit kopioida jakamistunnuksen: uniikin " +
-          "32-numeroisen koodin, joka on yhdistetty projektiisi. " +
-          "Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
+          "32-numeroisen koodin, joka on yhdistetty <b>valitsemaasi</b> " +
+          "projektiin. Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa kansioita sinulle.",
         close: "Sulje",
         instructions: "Kuinka jaan kansion",
@@ -499,7 +499,7 @@ let default_translations = {
         share_guide_step1:
           "1. Syötä jakamistunnus. Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
-          "koodi). Vastaanottaja voi kopioida" +
+          "koodi). Vastaanottaja voi kopioida " +
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",

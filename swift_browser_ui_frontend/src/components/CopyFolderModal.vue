@@ -193,6 +193,7 @@ export default {
       this.$store.commit("setFolderName", "");
       this.folderName = "";
       this.tags = [];
+      document.querySelector("#copyFolder-toasts").removeToast("copy-error");
     },
     replicateContainer: function () {
       // Initiate the container replication operation
@@ -242,6 +243,7 @@ export default {
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
           {
+            id: "copy-error",
             type: "error",
             duration: 5000,
             persistent: false,

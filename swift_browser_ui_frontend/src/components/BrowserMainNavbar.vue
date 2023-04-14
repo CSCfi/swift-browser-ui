@@ -157,7 +157,7 @@ export default {
               href: this.$t("message.supportMenu.itemLink2"),
             },
             {
-              title: this.$t("message.supportMenu.sharing"),
+              title: this.$t("message.supportMenu.item3"),
               action: () => this.$store.commit("toggleTokenModal", true),
             },
             {

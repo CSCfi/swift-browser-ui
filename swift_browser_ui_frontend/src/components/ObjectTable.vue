@@ -27,7 +27,9 @@
           <c-link
             v-show="!isSharedFolder"
             underline
+            tabindex="0"
             @click="toggleShareModal"
+            @keydown.enter="toggleShareModal"
           >
             {{ $t("message.table.edit_sharing") }}
           </c-link>
