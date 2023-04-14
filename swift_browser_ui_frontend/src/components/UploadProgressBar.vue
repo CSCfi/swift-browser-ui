@@ -7,7 +7,7 @@
 
     <c-progress-bar
       v-else-if="isUploading && progress != undefined"
-      :value="(progress * 100).toFixed(1)"
+      :value="(progress * 100).toFixed()"
       single-line
       :label="$t('message.upload.complete')"
     />
