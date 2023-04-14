@@ -90,6 +90,7 @@ build-ci-image:
         echo "$ARTIFACTORY_USER_PASSWORD" | docker login --username "$ARTIFACTORY_USER" --password-stdin "$ARTIFACTORY_SERVER";
         docker push $BUILD_IMAGE:latest;
       fi
+  allow_failure: true
 
 deploy:
   rules:
