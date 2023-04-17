@@ -589,24 +589,26 @@ let default_translations = {
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteConfirm: "Poista kansio",
-        deleteNote: "Kansion poistaminen edellyttää kaikkien " + //TODO
+        deleteNote: "Kansion poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
-        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",//TODO
-        deleteSuccess: "Kansio poistettu", //TODO
+        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",
+        deleteSuccess: "Kansio poistettu",
         folderName: "Kansion nimi",
       },
       subfolders: {
-        deleteNote: "Subfolders are deleted by deleting all "+ //TODO
-        "items in them.",
-        deleteSuccess: "Subfolder was deleted.", //TODO
+        deleteNote: "Alikansion poistaminen edellyttää sen kaikkien " +
+        "tiedostojen poistamista.",
+        deleteSuccess: "Alikansio poistettu.",
       },
       objects: {
         filterBy: "Suodata nimellä tai asiasanalla",
-        deleteConfirm: "Poista tiedostot", //TODO
-        deleteObjects: "Poista tiedostot", //TODO
-        deleteSuccess: "Tiedostot poistettu", //TODO
-        deleteObjectsMessage: //TODO
-          "Haluatko varmasti poistaa nämä tiedostot?", //TODO
+        deleteConfirm: "Poista tiedostot",
+        deleteObjects: "Poista tiedostot",
+        deleteManySuccess: " tiedostot poistettu",
+        deleteOneSuccess: " tiedosto poistettu",
+        deleteObjectsMessage:
+          "Tiedostoja ei voi palauttaa poistamisen jälkeen. " +
+          "Haluatko varmasti poistaa nämä tiedostot?",
       },
       replicate: {
         destinationExists: "Kansio on jo olemassa",
