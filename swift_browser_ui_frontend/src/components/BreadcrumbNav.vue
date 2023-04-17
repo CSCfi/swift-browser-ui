@@ -1,6 +1,6 @@
 
 <template>
-  <div class="breadcrumb"> 
+  <div class="breadcrumb">
     <c-row
       align="center"
     >
@@ -25,7 +25,7 @@
       >
         {{ folder }}
       </c-link>
-      <c-link 
+      <c-link
         v-for="item, i in subfolders"
         :key="item"
         :href="getPath(i)"
@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       lastWeight: 700,
-      defaultWeight: 400,  
+      defaultWeight: 400,
       mdiHome,
       mdiChevronRight,
     };
@@ -87,7 +87,7 @@ export default {
       return this.$route.path;
     },
     subfolders() { //array of subfolder titles
-      return this.$route.query.prefix != undefined ? 
+      return this.$route.query.prefix != undefined ?
         this.$route.query.prefix.split("/") : "";
     },
   },
@@ -103,7 +103,7 @@ export default {
       }
     },
   },
-}; 
+};
 
 </script>
 
