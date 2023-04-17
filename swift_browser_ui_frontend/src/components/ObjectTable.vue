@@ -338,7 +338,7 @@ export default {
                     = this.$t("message.folderDetails.shared_with_read_write");
                 }
                 this.ownerProject = sharedDetails.owner;
-                this.dateOfSharing = 
+                this.dateOfSharing =
                   parseDateTime(this.locale, sharedDetails.sharingDate, true);
               }
               else this.sharedStatus
