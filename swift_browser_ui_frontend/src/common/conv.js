@@ -311,9 +311,10 @@ export function sortObjects(objects, sortBy, sortDirection) {
 }
 
 // Parse date and time into internationalized format
-export function parseDateTime(locale, value) {
+export function parseDateTime(locale, value, shortDate) {
   let dateLocale;
   const date = new Date(value);
+  let dateOptions = {};
 
   switch (locale) {
     case "fi": {
@@ -325,15 +326,22 @@ export function parseDateTime(locale, value) {
     }
   }
 
-  const dateOptions = {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  };
+  shortDate ?
+
+    dateOptions = {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    } :
+    dateOptions = {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
 
   const dateTimeFormat = new Intl.DateTimeFormat(
     dateLocale,

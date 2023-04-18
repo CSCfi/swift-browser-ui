@@ -209,7 +209,7 @@ export default {
               value: getHumanReadableSize(item.bytes),
             },
             last_modified: {
-              value: parseDateTime(this.locale, item.last_modified),
+              value: parseDateTime(this.locale, item.last_modified, false),
             },
             ...(this.hideTags ? {} : {
               tags: {
