@@ -68,6 +68,15 @@ export default {
         ? this.$store.state.selectedFolderName
         : "";
     },
+    multipleSubfolders() {
+      return this.$route.query.prefix.lastIndexOf("/") > -1;
+    },
+    prefix() {
+      return this.$route.query.prefix;
+    },
+    container() {
+      return this.$route.params.container;
+    },
   },
   watch: {
     selectedObjects: function () {
@@ -83,6 +92,16 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
       this.$store.commit("setFolderName", "");
+    },
+    goToParent: function() {
+      let path;
+      if (this.multipleSubfolders) { //parent is subfolder -> go up
+        path = {name: "ObjectsView", query:
+          { prefix: this.prefix.slice(0, this.prefix.lastIndexOf("/"))}};
+      } else { //parent is container
+        path = {name: "ObjectsView"}; //go to container
+      }
+      this.$router.push(path);
     },
     deleteContainer: function() {
       document.querySelector("#container-toasts").addToast(
@@ -142,7 +161,6 @@ export default {
         }
 
         this.toggleDeleteModal();
-
         const dataTable = document.getElementById("objtable");
         dataTable.clearSelections();
 
@@ -151,12 +169,27 @@ export default {
         if (to_remove.length > 0) {
           let msg;
           to_remove.length === 1?
-            msg = this.$t("message.objects.deleteOneSuccess")
-            : msg = this.$t("message.objects.deleteManySuccess");
+            msg = to_remove.length + this.$t("message.objects.deleteOneSuccess")
+            : msg = to_remove.length +
+              this.$t("message.objects.deleteManySuccess");
+
+          if (this.prefix) {
+            //if there are no files with same prefix in same container:
+            //subfolder is empty
+            const samePrefixFiles = await getDB().objects
+              .filter(obj => obj.name.startsWith(this.prefix)
+                && obj.container === this.container)
+              .toArray();
+            console.log(samePrefixFiles, this.container);
+            if (samePrefixFiles.length < 1) {
+              msg = this.$t("message.subfolders.deleteSuccess");
+              this.goToParent();
+            }
+          }
           document.querySelector("#objects-toasts").addToast(
             { progress: false,
               type: "success",
-              message: to_remove.length + msg},
+              message: msg },
           );
         } else {
           document.querySelector("#container-error-toasts").addToast(
