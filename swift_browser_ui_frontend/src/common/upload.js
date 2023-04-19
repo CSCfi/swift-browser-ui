@@ -99,6 +99,9 @@ export default class EncryptedUploadSession {
     this.totalChunks = 0;
 
     for (let f of this.files) {
+      //calculate expected upload chunks to track upload progress
+      //how many chunks we get from each file
+      // + 1 chunk if there's remainder
       this.totalChunks += Math.floor(f.size / 65536);
       if (f.size % 65536) this.totalChunks++;
     }
