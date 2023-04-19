@@ -17,7 +17,7 @@
     "@intlify/unplugin-vue-i18n": "^0.10.0",
     "@mdi/js": "^7.1.96",
     "@vitejs/plugin-vue": "^4.0.0",
-    "@vueuse/rxjs": "^9.13.0",
+    "@vueuse/rxjs": "^10.0.0",
     "bulma": "^0.9.4",
     "cli-highlight": "^2.1.11",
     "csc-ui": "github:hannyle/csc-ui",
