@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy upload button with a new component: `CUploadButton`
 - (GL #940) Added TokenModal to replace token page
 - (GL #936) Add missing icon for subfolders
+- (GL #985) Add breadcrumb component
 
 ### Changed
 
