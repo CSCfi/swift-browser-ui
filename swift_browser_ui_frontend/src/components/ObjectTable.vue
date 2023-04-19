@@ -581,14 +581,14 @@ export default {
     setSelectionActionButtons() {
       this.selectionActionButtons = [
         {
-          label: this.$t("message.table.deleteSelected"),
-          icon: "mdi-trash-can-outline",
-          action: () => toggleDeleteModal(this.checkedRows),
-        },
-        {
           label: this.$t("message.table.clearSelected"),
           icon: "mdi-refresh",
           action: () => this.clearSelections(),
+        },
+        {
+          label: this.$t("message.table.deleteSelected"),
+          icon: "mdi-trash-can-outline",
+          action: () => toggleDeleteModal(this.checkedRows),
         },
       ];
     },

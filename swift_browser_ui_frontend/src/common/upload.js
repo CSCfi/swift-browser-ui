@@ -95,14 +95,17 @@ export default class EncryptedUploadSession {
     this.socket = undefined;
     this.headUrl = undefined;
     this.ingestUrl = undefined;
-
     this.currentChunks = [];
+    this.totalChunks = 0;
 
-    this.totalBytes = 0;
     for (let f of this.files) {
-      this.totalBytes += f.size;
+      //calculate expected upload chunks to track upload progress
+      //how many chunks we get from each file
+      // + 1 chunk if there's remainder
+      this.totalChunks += Math.floor(f.size / 65536);
+      if (f.size % 65536) this.totalChunks++;
     }
-    this.totalUploaded = 0;
+    this.totalUploadedChunks = 0;
 
     this.handleMessage = (e) => {
       e.stopImmediatePropagation();
@@ -203,7 +206,7 @@ export default class EncryptedUploadSession {
           );
           this.$store.commit(
             "updateProgress",
-            this.totalUploaded / this.totalBytes,
+            this.totalUploadedChunks / this.totalChunks,
           );
           // Simplest way found for JS array -> binary conversion
           this.socket.send(JSON.stringify({
@@ -235,6 +238,7 @@ export default class EncryptedUploadSession {
             this.initFileSystem();
           }
           else {
+            this.$store.commit("eraseProgress");
             this.$store.commit("eraseEncryptedProgress");
             this.$store.commit("eraseEncryptedFile");
             this.$store.commit("eraseEncryptedFileProgress");
@@ -276,7 +280,7 @@ export default class EncryptedUploadSession {
           },
         );
         this.currentByte += 65536;
-        this.totalUploaded += 65536;
+        this.totalUploadedChunks += 1;
       });
     });
   }
