@@ -2,10 +2,7 @@
   <div
     id="object-table"
   >
-    <BreadcrumbNav
-      :shared-from="isSharingFolder"
-      :shared-to="isSharedFolder"
-    />
+    <BreadcrumbNav />
     <div class="folder-info">
       <div class="folder-info-heading">
         <i class="mdi mdi-folder-outline" />

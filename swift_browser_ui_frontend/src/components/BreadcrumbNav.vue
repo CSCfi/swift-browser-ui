@@ -4,87 +4,52 @@
     <c-row
       align="center"
     >
-      <c-link
-        :href="home.path"
-        color="primary"
-        :path="mdiHome"
-        icon-fill="primary"
-        icon-after="false"
-        :weight="defaultWeight"
+      <router-link
+        :to="home.path"
       >
-        {{ home.title }}
-      </c-link>
+        <i class="mdi mdi-home" />
+        <p>&nbsp;{{ home.title }}</p>
+      </router-link>
 
-      <c-link
-        :href="folderPath"
-        color="primary"
-        :path="mdiChevronRight"
-        icon-fill="primary"
-        icon-after="false"
-        :weight="subfolders === '' ? lastWeight : defaultWeight"
+      <router-link
+        class="link"
+        :to="{name: 'ObjectsView'}"
       >
-        {{ folder }}
-      </c-link>
-      <c-link
+        <i class="mdi mdi-chevron-right" />
+        <p :class="subfolders === '' ? 'last' : 'default'">
+          &nbsp;{{ folder }}
+        </p>
+      </router-link>
+
+      <router-link
         v-for="item, i in subfolders"
         :key="item"
-        :href="getPath(i)"
-        color="primary"
-        :path="mdiChevronRight"
-        icon-fill="primary"
-        icon-after="false"
-        :weight="i === subfolders.length-1 ? lastWeight: defaultWeight"
+        :to="getPath(i)"
       >
-        {{ item }}
-      </c-link>
+        <i class="mdi mdi-chevron-right" />
+        <p :class="i === subfolders.length-1 ? 'last': 'default'">
+          &nbsp;{{ item }}
+        </p>
+      </router-link>
     </c-row>
   </div>
 </template>
 
 <script>
-import { mdiHome, mdiChevronRight } from "@mdi/js";
 
 export default {
   name: "BreadcrumbNav",
-  props: ["sharedFrom", "sharedTo"],
   data() {
     return {
-      lastWeight: 700,
-      defaultWeight: 400,
-      mdiHome,
-      mdiChevronRight,
+      home: {
+        title: this.$t("message.folderTabs.all"),
+        path: { name: "AllFolders" },
+      },
     };
   },
   computed: {
-    home() {
-      if (this.sharedFrom) {
-        return {
-          title: this.$t("message.folderTabs.sharedFrom"),
-          path: this.mainPath + "/shared/from"};
-      }
-      else if (this.sharedTo) {
-        return {
-          title: this.$t("message.folderTabs.sharedTo"),
-          path: this.mainPath + "/shared/to" };
-      }
-      else {
-        return {
-          title: this.$t("message.folderTabs.all"),
-          path: this.mainPath };
-      }
-    },
-    mainPath () {
-      return [
-        "/browse",
-        this.$route.params.user,
-        this.$route.params.project,
-      ].join("/");
-    },
     folder() {
       return this.$route.params.container;
-    },
-    folderPath() {
-      return this.$route.path;
     },
     subfolders() { //array of subfolder titles
       return this.$route.query.prefix != undefined ?
@@ -94,12 +59,13 @@ export default {
   methods: {
     getPath(index) {
       if (index === this.subfolders.length-1) {
-        return this.$route.fullPath;
+        return { name: "ObjectsView", query:
+          { prefix: this.$route.query.prefix }};
       } else {
         let prefixes = this.$route.query.prefix.split("/");
         prefixes = prefixes.slice(0, index+1).join("/");
-        let path = this.folderPath + "?prefix=" + prefixes;
-        return path;
+        return { name: "ObjectsView", query:
+          { prefix: prefixes }};
       }
     },
   },
@@ -107,8 +73,22 @@ export default {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+i, p {
+  color: $csc-primary;
+}
+c-row > * {
+  margin-left: -1rem;
+}
 .breadcrumb {
     padding: 1.5rem 0 1rem 0;
 }
+.last {
+  font-weight: 700;
+}
+.default {
+  font-weight: 400;
+}
+
 </style>
