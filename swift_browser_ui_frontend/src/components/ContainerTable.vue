@@ -389,7 +389,7 @@ export default {
           {
             progress: false,
             type: "error",
-            duration: 30000,
+            duration: 6000,
             message: this.$t("message.container_ops.deleteNote"),
           },
         );
@@ -411,9 +411,9 @@ export default {
               name: this.$store.state.selectedFolderName,
             })
             .delete();
-        }); 
+        });
       }
-    }, 
+    },
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"
         ? this.paginationTextOverrides

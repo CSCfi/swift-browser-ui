@@ -127,10 +127,14 @@ export default {
     },
     deleteObjects: function () {
       let to_remove = new Array;
+      let selectedSubfolder = false;
       for (let object of this.selectedObjects) {
         // Only files are able to delete
         if (isFile(object.name, this.$route)) {
           to_remove.push(object.name);
+        } else {
+          //flag if user is trying to delete a subfolder
+          selectedSubfolder = true;
         }
       }
 
@@ -180,7 +184,6 @@ export default {
               .filter(obj => obj.name.startsWith(this.prefix)
                 && obj.container === this.container)
               .toArray();
-            console.log(samePrefixFiles, this.container);
             if (samePrefixFiles.length < 1) {
               msg = this.$t("message.subfolders.deleteSuccess");
               this.goToParent();
@@ -191,12 +194,13 @@ export default {
               type: "success",
               message: msg },
           );
-        } else {
-          document.querySelector("#container-error-toasts").addToast(
+        }
+        if (selectedSubfolder) {
+          //if selected files include subfolders
+          document.querySelector("#objects-toasts").addToast(
             {
               progress: false,
               type: "error",
-              duration: 6000,
               message: this.$t("message.subfolders.deleteNote"),
             },
           );
