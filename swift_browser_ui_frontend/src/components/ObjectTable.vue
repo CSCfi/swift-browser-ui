@@ -327,7 +327,8 @@ export default {
       this.$store.commit("setFolderName", this.containerName);
     },
     confirmDelete: function(item) {
-      if (isFile(item.name, this.$route)) {
+
+      if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
       } else {
         document.querySelector("#container-error-toasts").addToast(
@@ -514,6 +515,7 @@ export default {
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
+      this.$store.commit("toggleRenderedFolders", this.renderFolders);
       const renderFolders = toRaw(this.renderFolders);
       const hideTags = toRaw(this.hideTags);
       const hidePagination = toRaw(this.hidePagination);

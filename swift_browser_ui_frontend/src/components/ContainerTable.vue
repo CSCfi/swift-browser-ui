@@ -289,7 +289,7 @@ export default {
                       },
                       {
                         name: this.$t("message.delete"),
-                        action: () => this.confirmDelete(
+                        action: () => this.delete(
                           item.name, item.count,
                         ),
                         disabled: item.owner && item.accessRights.length > 1,
@@ -383,8 +383,8 @@ export default {
         },
       ];
     },
-    confirmDelete: function (container, objects) {
-      if (objects > 0) {
+    delete: function (container, objects) {
+      if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
           {
             progress: false,
@@ -413,6 +413,7 @@ export default {
             .delete();
         });
       }
+      this.$store.commit("setFolderName", "");
     },
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"

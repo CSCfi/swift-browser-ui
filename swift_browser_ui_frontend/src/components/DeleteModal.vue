@@ -2,10 +2,10 @@
   <c-card class="delete-modal">
     <c-alert type="error">
       <div slot="title">
-        {{ title }}
+        {{ $t("message.objects.deleteObjects") }}
       </div>
 
-      {{ message }}
+      {{ $t("message.objects.deleteObjectsMessage") }}
 
       <c-card-actions justify="end">
         <c-button
@@ -16,10 +16,10 @@
           {{ $t("message.cancel") }}
         </c-button>
         <c-button
-          @click="isObject ? deleteObjects() : deleteContainer()"
-          @keyup.enter="isObject ? deleteObjects() : deleteContainer()"
+          @click="deleteObjects()"
+          @keyup.enter="deleteObjects()"
         >
-          {{ confirmText }}
+          {{ $t("message.objects.deleteConfirm") }}
         </c-button>
       </c-card-actions>
     </c-alert>
@@ -27,49 +27,21 @@
 </template>
 
 <script>
-import {
-  swiftDeleteObjects,
-  swiftDeleteContainer,
-} from "@/common/api";
+import { swiftDeleteObjects } from "@/common/api";
 import { getDB } from "@/common/db";
 
 import { isFile } from "@/common/globalFunctions";
 
 export default {
   name: "DeleteModal",
-  data: function () {
-    return {
-      isObject: false,
-    };
-  },
   computed: {
-    title() {
-      return this.isObject
-        ? this.$t("message.objects.deleteObjects")
-        : this.$t("message.container_ops.deleteConfirm");
-    },
-    message() {
-      return this.isObject
-        ? this.$t("message.objects.deleteObjectsMessage")
-        : this.$t("message.container_ops.deleteConfirmMessage");
-    },
-    confirmText() {
-      return this.isObject
-        ? this.$t("message.objects.deleteConfirm")
-        : this.$t("message.container_ops.deleteConfirm");
-    },
     selectedObjects() {
       return this.$store.state.deletableObjects.length > 0
         ? this.$store.state.deletableObjects
         : [];
     },
-    selectedFolderName() {
-      return this.$store.state.selectedFolderName.length > 0
-        ? this.$store.state.selectedFolderName
-        : "";
-    },
     multipleSubfolders() {
-      return this.$route.query.prefix.lastIndexOf("/") > -1;
+      return this.$route.query.prefix.includes("/");
     },
     prefix() {
       return this.$route.query.prefix;
@@ -77,21 +49,14 @@ export default {
     container() {
       return this.$route.params.container;
     },
-  },
-  watch: {
-    selectedObjects: function () {
-      if (this.selectedObjects && this.selectedObjects.length > 0) {
-        this.isObject = true;
-      } else {
-        this.isObject = false;
-      }
+    renderedFolders() {
+      return this.$store.state.renderedFolders;
     },
   },
   methods: {
     toggleDeleteModal: function() {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
-      this.$store.commit("setFolderName", "");
     },
     goToParent: function() {
       let path;
@@ -103,37 +68,18 @@ export default {
       }
       this.$router.push(path);
     },
-    deleteContainer: function() {
-      document.querySelector("#container-toasts").addToast(
-        { progress: false,
-          type: "success",
-          message: this.$t("message.container_ops.deleteSuccess")},
-      );
-
-      const projectID = this.$route.params.project;
-      swiftDeleteContainer(
-        projectID,
-        this.selectedFolderName,
-      ).then(async () => {
-        await getDB().containers
-          .where({
-            projectID,
-            name: this.selectedFolderName,
-          })
-          .delete();
-
-        this.toggleDeleteModal();
-      });
-    },
     deleteObjects: function () {
       let to_remove = new Array;
       let selectedSubfolder = false;
       for (let object of this.selectedObjects) {
         // Only files are able to delete
-        if (isFile(object.name, this.$route)) {
+        //or when objects are shown as paths
+        if (isFile(object.name, this.$route)
+          || !this.renderedFolders) {
           to_remove.push(object.name);
         } else {
           //flag if user is trying to delete a subfolder
+          //when folders rendered
           selectedSubfolder = true;
         }
       }
@@ -177,7 +123,7 @@ export default {
             : msg = to_remove.length +
               this.$t("message.objects.deleteManySuccess");
 
-          if (this.prefix) {
+          if (this.prefix && this.renderedFolders) {
             //if there are no files with same prefix in same container:
             //subfolder is empty
             const samePrefixFiles = await getDB().objects
