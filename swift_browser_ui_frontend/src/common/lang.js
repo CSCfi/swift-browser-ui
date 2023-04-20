@@ -220,11 +220,8 @@ let default_translations = {
         createdFolder:
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
-        deleteConfirm: "Delete folder",
         deleteNote: "Folder must be empty before " +
         "it can be deleted.",
-        deleteConfirmMessage:
-          "Are you sure you want to delete this folder?",
         deleteSuccess: "Folder was deleted.",
         folderName: "Folder name",
       },
@@ -588,10 +585,8 @@ let default_translations = {
           "mutta sen voi kopioida uudella nimellä.",
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        deleteConfirm: "Poista kansio",
         deleteNote: "Kansion poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
-        deleteConfirmMessage: "Haluatko varmasti poistaa tämän kansion?",
         deleteSuccess: "Kansio poistettu",
         folderName: "Kansion nimi",
       },
