@@ -386,6 +386,9 @@ export default {
         + getProjectNumber(this.active);
     },
   },
+  mounted() {
+    if (this.currentFolder) this.inputFolder = this.currentFolder;
+  },
   methods: {
     onQueryChange: async function (event) {
       this.inputFolder = event.detail;
