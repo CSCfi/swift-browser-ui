@@ -26,7 +26,7 @@ better upload and download functionality are in their separate files.
 
 ### Requirements
 
-Python 3.8+ required.
+Python 3.10+ required.
 
 - The dependencies mentioned in `requirements.txt`.
 - A suitable storage backend supporting usage via OpenStack Object Storage API. (e.g. Ceph RGW, OpenStack Swift)
