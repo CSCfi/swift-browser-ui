@@ -105,3 +105,4 @@ deploy:
   stage: deploy
   trigger:
     project: sds-dev/sd-connect/swift-ui-csc-deployment
+  allow_failure: true
