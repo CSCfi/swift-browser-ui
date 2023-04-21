@@ -168,7 +168,7 @@ export default {
             if (items.find(el => {
               return this.getFolderName(
                 el.name,
-              ).match(this.getFolderName(item.name)) ? true : false;
+              ) === this.getFolderName(item.name) ? true : false;
             })) {
               return items;
             } else {
