@@ -30,6 +30,7 @@
 
 <script>
 import { liveQuery } from "dexie";
+import { delay } from "lodash";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
 import { getSharingContainers } from "@/common/globalFunctions";
@@ -68,6 +69,9 @@ export default {
         return this.$store.state.openShareModal;
       },
       set() {},
+    },
+    isFolderUploading() {
+      return this.$store.state.isUploading;
     },
     isFolderCopied() {
       return this.$store.state.isFolderCopied;
@@ -109,6 +113,13 @@ export default {
           this.containers.filter(cont => cont.owner) : [];
       } else {
         this.renderingContainers = this.containers;
+      }
+    },
+    isFolderUploading: function () {
+      if (!this.isFolderUploading) {
+        delay(() => {
+          this.fetchContainers();
+        }, 1000);
       }
     },
     isFolderCopied: function () {
@@ -189,6 +200,7 @@ export default {
       this.currentProject = await getDB().projects.get({
         id: this.active.id,
       });
+
       this.containers = useObservable(
         liveQuery(() =>
           getDB().containers

@@ -107,7 +107,7 @@ export default class EncryptedUploadSession {
     }
     this.totalUploadedChunks = 0;
 
-    this.handleMessage = (e) => {
+    this.handleMessage = async(e) => {
       e.stopImmediatePropagation();
       switch (e.data.eventType) {
         case "wasmFilesystemInitialized":
@@ -222,6 +222,10 @@ export default class EncryptedUploadSession {
           );
 
           // Cache the succeeded file metadata to IndexedDB
+          await this.$store.dispatch("updateContainers", {
+            projectID: this.project,
+            signal: undefined,
+          });
           getDB().containers.get({
             projectID: this.project,
             name: this.container,
