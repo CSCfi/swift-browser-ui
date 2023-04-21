@@ -1,0 +1,21 @@
+
+# Default code owners
+[Default]
+* @sds-dev/sd-connect
+
+# Code Owners sections
+# disabled for now till we have more refined groups
+# [Documentation]
+# /docs/ @sds-dev/sd-connect
+# README.md @sds-dev/sd-connect
+
+# [Backend]
+# /swift_browser_ui/ @sds-dev/sd-connect
+
+# [Frontend]
+# /swift_browser_ui_frontend/ @sds-dev/sd-connect
+
+# [Other]
+# /dockerfiles/ @sds-dev/sd-connect
+# /scripts/ @sds-dev/sd-connect
+# /tests/ @sds-dev/sd-connect
