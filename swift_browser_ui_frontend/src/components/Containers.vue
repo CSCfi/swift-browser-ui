@@ -20,6 +20,7 @@
       :conts="renderingContainers"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
+      @delete-container="fetchContainers"
     />
     <c-toasts
       id="container-toasts"

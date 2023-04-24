@@ -414,6 +414,7 @@ export default {
         });
       }
       this.$store.commit("setFolderName", "");
+      this.$emit("delete-container");
     },
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"
