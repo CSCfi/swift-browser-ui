@@ -9,6 +9,8 @@ import {
   getTagsForObjects,
   makeGetObjectsMetaURL,
   tokenize,
+  addSegmentContainerSize,
+  addSegmentObjectSize,
 } from "./conv";
 
 import { getDB } from "@/common/db";
@@ -311,6 +313,10 @@ const store = createStore({
         .toArray();
 
       for (let i = 0; i < newContainers.length; i++) {
+        addSegmentContainerSize(newContainers[i], newContainers);
+      }
+
+      for (let i = 0; i < newContainers.length; i++) {
         const container = newContainers[i];
         const oldContainer = containersFromDB.find(
           cont => cont.name === container.name,
@@ -400,6 +406,12 @@ const store = createStore({
       });
       if (toDelete.length) {
         await getDB().objects.bulkDelete(toDelete);
+      }
+
+      if (!isSegmentsContainer) {
+        for (let i = 0; i < newObjects.length; i++) {
+          await addSegmentObjectSize(newObjects[i], projectID, container);
+        }
       }
 
       newObjects.map(newObj => {

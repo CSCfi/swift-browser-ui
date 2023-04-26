@@ -352,3 +352,30 @@ export function parseDateTime(locale, value, shortDate) {
   // English version defaults to comma
   return dateTimeFormat.replace(" klo", ", ");
 }
+
+
+// Find the segments container matching a container (if it exists) and
+// correctly update the container size using the size of the segments
+// container.
+export function addSegmentContainerSize(container, containers) {
+  let segments = containers.find(el => el.name.match(`${container.name}_segments`));
+  if (segments !== undefined) {
+    container.bytes = segments.bytes;
+  }
+}
+
+
+// Find the segments of an object and update the original objects size
+// accordingly
+export async function addSegmentObjectSize(object, project, container) {
+  let objUrl = "/download/".concat(
+    encodeURI(project),
+    "/",
+    encodeURI(container.name),
+    "/",
+    encodeURI(object.name),
+  );
+
+  let cont_obj = await fetch(objUrl);
+  object.bytes = cont_obj.headers.get("Content-Length");
+}
