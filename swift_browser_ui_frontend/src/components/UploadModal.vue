@@ -27,6 +27,7 @@
           hide-details
           required
           @changeQuery="onQueryChange"
+          @changeValue="onSelectValue"
         />
         <h3 class="title is-6 has-text-dark">
           2. {{ $t("message.encrypt.upload_step2") }}
@@ -390,6 +391,9 @@ export default {
     if (this.currentFolder) this.inputFolder = this.currentFolder;
   },
   methods: {
+    onSelectValue: function (e) {
+      if (e.detail) this.inputFolder = e.detail.name;
+    },
     onQueryChange: async function (event) {
       this.inputFolder = event.detail;
       const result = await this.containers
@@ -533,7 +537,7 @@ export default {
     },
     toggleUploadModal() {
       this.$store.commit("toggleUploadModal", false);
-      this.folderName = "";
+      this.inputFolder = "";
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
