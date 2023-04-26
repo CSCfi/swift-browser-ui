@@ -126,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #993) Fix for showing correct folder name when refreshing Upload view
 - (GL #979) Fix for creating and uploading to a folder works at the same time
 - (GL #989 #990) Fix sorting in datatable
+- (GL #925) Files can be deleted when shown as paths
 
 ### Removed
 
