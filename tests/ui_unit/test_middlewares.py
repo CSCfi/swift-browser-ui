@@ -57,10 +57,10 @@ class MiddlewareTestClass(tests.common.mockups.APITestBase):
             self.aiohttp_session_get_session_mock,
         )
 
-    async def test_check_session_at(self):
+    async def test_check_session(self):
         """Test session expiration middleware."""
         with self.p_get_sess:
-            ret = await swift_browser_ui.ui.middlewares.check_session_at(
+            ret = await swift_browser_ui.ui.middlewares.check_session(
                 self.mock_request,
                 return_200_handler,
             )
@@ -72,7 +72,7 @@ class MiddlewareTestClass(tests.common.mockups.APITestBase):
         self.session_return["at"] = 0
 
         with self.p_get_sess, self.assertRaises(HTTPUnauthorized):
-            await swift_browser_ui.ui.middlewares.check_session_at(
+            await swift_browser_ui.ui.middlewares.check_session(
                 self.mock_request,
                 return_200_handler,
             )
@@ -81,7 +81,7 @@ class MiddlewareTestClass(tests.common.mockups.APITestBase):
         """Test session expiration middleware with route that shouldn't fail."""
         self.mock_request.path = "/login"
         with self.p_get_sess:
-            ret = await swift_browser_ui.ui.middlewares.check_session_at(
+            ret = await swift_browser_ui.ui.middlewares.check_session(
                 self.mock_request,
                 return_200_handler,
             )

@@ -34,6 +34,7 @@ class FrontendTestCase(
         )
         session_return["at"] = time.time()
         session_return["token"] = "placeholder"
+        session_return["uname"] = "placeholder"
         session_return["projects"] = "placeholder"
         aiohttp_session_get_session_mock = unittest.mock.AsyncMock()
         aiohttp_session_get_session_mock.return_value = session_return
