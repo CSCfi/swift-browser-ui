@@ -409,6 +409,7 @@ export default {
       }
     },
     beginDownload(object) {
+      console.log(object);
       this.currentDownload = new DecryptedDownloadSession(
         this.active,
         this.active.id,

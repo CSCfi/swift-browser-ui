@@ -66,6 +66,11 @@ class EncryptedUploadProxy:
         self.owner = ""
         self.owner_name = ""
 
+        self.host = common.get_download_host(
+            self.endpoint,
+            self.project,
+        )
+
         self.have_closed = False
 
         self.chunk_cache: typing.Dict[
@@ -112,6 +117,9 @@ class EncryptedUploadProxy:
             self.endpoint,
             self.owner if self.owner else self.project,
         )
+
+        if "owner" in request.query:
+            self.owner = request.query["owner"]
 
         await self.a_create_container()
 
