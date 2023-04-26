@@ -63,6 +63,8 @@ class EncryptedUploadProxy:
         self.endpoint: str = session["endpoint"]
         self.token: str = session["token"]
 
+        self.owner = ""
+
         self.host = common.get_download_host(
             self.endpoint,
             self.project,
@@ -111,6 +113,9 @@ class EncryptedUploadProxy:
         self.container = request.match_info["container"]
         self.object_name = request.match_info["object_name"]
 
+        if "owner" in request.query:
+            self.owner = request.query["owner"]
+
         await self.a_create_container()
 
         self.total = int(request.query["total"])
@@ -131,9 +136,14 @@ class EncryptedUploadProxy:
         b64_header = base64.standard_b64encode(header).decode("ascii")
 
         # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
-        await request.app[common.VAULT_CLIENT].put_header(
-            self.project, self.container, self.object_name, b64_header
-        )
+        if self.owner:
+            await request.app[common.VAULT_CLIENT].put_header(
+                self.project, self.container, self.object_name, b64_header, self.owner
+            )
+        else:
+            await request.app[common.VAULT_CLIENT].put_header(
+                self.project, self.container, self.object_name, b64_header
+            )
 
         self.header_uploaded = True
 

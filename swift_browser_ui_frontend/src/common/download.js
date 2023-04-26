@@ -35,6 +35,7 @@ export class DecryptedDownloadSession {
     project = "",
     objects = [],
     container = "",
+    owner = "",
     store,
   ) {
     this.object = "";
@@ -52,6 +53,7 @@ export class DecryptedDownloadSession {
     this.currentFinished = false;
     this.whitelistPath = `/cryptic/${this.active.id}/whitelist`;
     this.endpoint = store.state.uploadEndpoint;
+    this.owner = owner,
 
     this.reader = undefined;
     this.chunk = undefined;
@@ -137,8 +139,9 @@ export class DecryptedDownloadSession {
   }
 
   getFileUrl() {
+    let project = this.owner != "" ? this.owner : this.project;
     let fileURL = new URL(
-      `/download/${this.project}/${this.container}/${this.object}`,
+      `/download/${project}/${this.container}/${this.object}`,
       document.location.origin,
     );
     fileURL.searchParams.append("project", this.active.id);
@@ -172,6 +175,9 @@ export class DecryptedDownloadSession {
     signed = await GET(signatureUrl);
     signed = await signed.json();
     let headerUrl = new URL(this.endpoint.concat(headerPath));
+    if (this.owner != "") {
+      headerUrl.searchParams.append("owner", this.owner);
+    }
     headerUrl.searchParams.append("valid", signed.valid);
     headerUrl.searchParams.append("signature", signed.signature);
     headerUrl.searchParams.append(

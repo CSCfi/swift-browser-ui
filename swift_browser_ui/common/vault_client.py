@@ -294,7 +294,7 @@ class VaultClient:
         :param keystoneid: Receiving project keystone ID
         """
         await self._request(
-            "POST", f"c4ghtransit/sharing/{project}/{container}/{receiver}", json_data={"idkeystone": keystoneid},
+            "POST", f"c4ghtransit/sharing/{project}/{container}", json_data={"id": receiver, "idkeystone": keystoneid},
         )
 
     async def remove_project_whitelist(self, project: str, receiver: str, container: str,) -> None:
@@ -305,27 +305,34 @@ class VaultClient:
         :param container: Container to be shared
         """
         await self._request(
-            "DELETE", f"c4ghtransit/sharing/{project}/{container}/{receiver}",
+            "DELETE", f"c4ghtransit/sharing/{project}/{container}", json_data={"id": receiver},
         )
 
-    async def get_header(self, project: str, container: str, path: str) -> str:
+    async def get_header(self, project: str, container: str, path: str, owner: str = "") -> str:
         """Retrieve header.
 
         :param project: Project ID
         :param container: container name
         :param path: object path
         """
-        header_response = await self._request(
-            "GET",
-            f"c4ghtransit/files/{project}/{container}/{path}",
-            params={"service": self.service, "key": self._key_name},
-        )
+        if owner:
+            header_response = await self._request(
+                "GET",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                params={"service": self.service, "key": self._key_name, "owner": owner},
+            )
+        else:
+            header_response = await self._request(
+                "GET",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                params={"service": self.service, "key": self._key_name},
+            )
         if isinstance(header_response, dict) and "data" in header_response:
             return str(header_response["data"]["headers"]["1"]["header"])
         return ""
 
     async def put_header(
-        self, project: str, container: str, path: str, header: str
+        self, project: str, container: str, path: str, header: str, owner: str = ""
     ) -> None:
         """Update header.
 
@@ -334,8 +341,16 @@ class VaultClient:
         :param path: object path
         :param header: header as b64 encoded string
         """
-        await self._request(
-            "POST",
-            f"c4ghtransit/files/{project}/{container}/{path}",
-            json_data={"header": header},
-        )
+        if owner:
+            await self._request(
+                "POST",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                params={"owner": owner},
+                json_data={"header": header},
+            )
+        else:
+            await self._request(
+                "POST",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                json_data={"header": header},
+            )

@@ -19,7 +19,14 @@
 </template>
 
 <script>
-import { removeAccessControlMeta } from "@/common/api";
+import {
+  removeAccessControlMeta,
+  GET,
+} from "@/common/api";
+
+import {
+  DEV,
+} from "@/common/conv";
 
 export default {
   name: "ShareModalTable",
@@ -137,6 +144,41 @@ export default {
         [sharedProjectId],
         rights,
       );
+      
+      let signatureUrl = new URL("/sign/3600", document.location.origin);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+      let signed = await GET(signatureUrl);
+      signed = await signed.json();
+      let whitelistUrl = new URL(
+        `/cryptic/${this.$route.params.project}/${this.folderName}`,
+        this.$store.state.uploadEndpoint
+      );
+      whitelistUrl.searchParams.append(
+        "valid",
+        signed.valid,
+      );
+      whitelistUrl.searchParams.append(
+        "signature",
+        signed.signature,
+      );
+
+      if (val === "view") {
+        await fetch(
+          whitelistUrl,
+          {
+            method: "DELETE",
+            body: JSON.stringify([sharedProjectId]),
+          },
+        );
+      } else {
+        await fetch(
+          whitelistUrl,
+          {
+            method: "PUT",
+            body: JSON.stringify([sharedProjectId]),
+          }
+        );
+      }
       this.$emit("updateSharedFolder");
     },
     deleteFolderShare: function (folderData) {
@@ -144,11 +186,36 @@ export default {
         this.projectId,
         this.folderName,
       ).then(
-        () => {
+        async () => {
           this.$store.state.client.shareDeleteAccess(
             this.projectId,
             this.folderName,
             [folderData.projectId.value],
+          );
+          let signatureUrl = new URL("/sign/3600", document.location.origin);
+          signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+          let signed = await GET(signatureUrl);
+          signed = await signed.json();
+          let whitelistUrl = new URL(
+            `/cryptic/${this.$route.params.project}/${this.folderName}`,
+            this.$store.state.uploadEndpoint
+          );
+          whitelistUrl.searchParams.append(
+            "valid",
+            signed.valid,
+          );
+          whitelistUrl.searchParams.append(
+            "signature",
+            signed.signature,
+          );
+          await fetch(
+            whitelistUrl,
+            {
+              method: "DELETE",
+              body: JSON.stringify([
+                folderData.projectId.value,
+              ]),
+            },
           );
         },
       );

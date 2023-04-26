@@ -346,11 +346,13 @@ export default {
       }
     },
     beginDownload(object) {
+      console.log(object);
       this.currentDownload = new DecryptedDownloadSession(
         this.active,
         this.active.id,
         [object.name],
         this.$route.params.container,
+        (this.$route.params.owner != undefined) ? this.$route.params.owner : "",
         this.$store,
       );
       this.currentDownload.initServiceWorker();

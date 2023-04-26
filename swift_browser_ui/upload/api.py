@@ -313,7 +313,11 @@ async def handle_object_header(request: aiohttp.web.Request) -> aiohttp.web.Resp
     project = request.match_info["project"]
     container = request.match_info["container"]
     obj = request.match_info["object_name"]
-    header = await vault_client.get_header(project, container, obj)
+    if "owner" in request.query:
+        owner = request.query["owner"]
+        header = await vault_client.get_header(project, container, obj, owner)
+    else:
+        header = await vault_client.get_header(project, container, obj)
 
     return aiohttp.web.Response(
         text=header,

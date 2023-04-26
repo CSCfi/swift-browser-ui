@@ -144,6 +144,7 @@
 
 <script>
 import {
+  GET,
   addAccessControlMeta,
   getSharedContainerAddress,
 } from "@/common/api";
@@ -380,9 +381,9 @@ export default {
       let signatureUrl = new URL("/sign/3600", document.location.origin);
       signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
       let signed = await GET(signatureUrl);
-      signed = signed.json();
+      signed = await signed.json();
       let whitelistUrl = new URL(
-        "/cryptic/${this.$route.params.project}/${this.folderName}",
+        `/cryptic/${this.$route.params.project}/${this.folderName}`,
         this.$store.state.uploadEndpoint
       );
       whitelistUrl.searchParams.append(
@@ -392,7 +393,7 @@ export default {
       whitelistUrl.searchParams.append(
         "signature",
         signed.signature,
-      )
+      );
 
       // Add access to cross-project sharing in case of read or read+write
       if (this.read | this.write) {
