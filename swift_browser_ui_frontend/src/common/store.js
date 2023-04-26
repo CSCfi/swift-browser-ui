@@ -149,19 +149,24 @@ const store = createStore({
       state.uploadEndpoint = endpoint;
     },
     appendDropFiles(state, file) {
+      //Checking for identical path only, not name:
+      //different folders may have same file names
       if (
         state.dropFiles.find(
           ({ relativePath }) => relativePath === String(file.relativePath),
-        ) === undefined &&
-        state.dropFiles.find(({ name }) => name === String(file.name)) ===
-          undefined
+        ) === undefined
       ) {
         state.dropFiles.push(file);
-      } else {
-        // we remove and push the file again to get new size
-        // and if the file exists to referesh dropFiles var
+      } else if (
+        //if same file path but different size
+        // remove old file and push new
+        state.dropFiles.find(
+          (f) => f.relativePath === String(file.relativePath) &&
+          f.size !== file.size))
+      {
+        // we remove and push the file again if its size is different
         state.dropFiles = state.dropFiles.filter(v => {
-          return v.relativePath !== file.relativePath && v.name !== file.name;
+          return v.relativePath !== file.relativePath && v.size !== file.size;
         });
         state.dropFiles.push(file);
       }
