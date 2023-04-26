@@ -130,6 +130,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #965) Only files with unique paths are added for upload
 - (GL #1008) Stop adding files for upload when cancel is pressed
 - (GL #988) Fix for missing translation in some parts of UI
+- (GL #971) Fix broken UI when session doesn't exist in the backend by setting more strict session checks in the backend
 
 ### Removed
 
