@@ -324,8 +324,9 @@ export default {
       },
       set(value) {
         const files = Array.from(value);
-        files.forEach(element => {
-          this.$store.commit("appendDropFiles", element);
+        files.forEach(file => {
+          file.relativePath = file.name;
+          this.$store.commit("appendDropFiles", file);
         });
       },
     },
