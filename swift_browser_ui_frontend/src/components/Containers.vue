@@ -120,7 +120,7 @@ export default {
       if (!this.isFolderUploading) {
         delay(() => {
           this.fetchContainers();
-        }, 1000);
+        }, 3000);
       }
     },
     isFolderCopied: function () {

@@ -10,7 +10,7 @@ import {
   makeGetObjectsMetaURL,
   tokenize,
   addSegmentContainerSize,
-  addSegmentObjectSize,
+  getSegmentObjects,
 } from "./conv";
 
 import { getDB } from "@/common/db";
@@ -256,12 +256,14 @@ const store = createStore({
       const existingContainers = await getDB().containers
         .where({ projectID })
         .toArray();
+
       let containers;
       let marker = "";
       let newContainers = [];
       do {
         containers = [];
         containers = await getContainers(projectID, marker).catch(() => {});
+
         if (containers.length > 0) {
           containers.forEach(cont => {
             cont.tokens = tokenize(cont.name);
@@ -382,11 +384,13 @@ const store = createStore({
       const existingObjects = await getDB().objects
         .where({ containerID: container.id })
         .toArray();
+
       let newObjects = [];
       let objects;
       let marker = "";
       do {
         objects = await getObjects(projectID, container.name, marker, signal);
+
         if (objects.length > 0) {
           objects.forEach(obj => {
             obj.container = container.name;
@@ -409,8 +413,10 @@ const store = createStore({
       }
 
       if (!isSegmentsContainer) {
+        const segment_objects = await getSegmentObjects(projectID, container);
         for (let i = 0; i < newObjects.length; i++) {
-          await addSegmentObjectSize(newObjects[i], projectID, container);
+          if (segment_objects[i])
+            newObjects[i].bytes = segment_objects[i].bytes;
         }
       }
 

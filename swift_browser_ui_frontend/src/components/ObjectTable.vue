@@ -136,8 +136,7 @@ import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
-import debounce from "lodash/debounce";
-import escapeRegExp from "lodash/escapeRegExp";
+import { debounce, delay, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 
@@ -202,6 +201,9 @@ export default {
     locale () {
       return this.$i18n.locale;
     },
+    isFolderUploading() {
+      return this.$store.state.isUploading;
+    },
   },
   watch: {
     active: async function() {
@@ -250,6 +252,18 @@ export default {
     locale () {
       this.setLocalizedContent();
       this.getFolderSharedStatus();
+    },
+    isFolderUploading: function () {
+      if (!this.isFolderUploading) {
+
+        delay(async () => {
+          await this.$store.dispatch("updateContainers", {
+            projectID: this.active.id,
+            signal: null,
+          });
+          //this.updateObjects();
+        }, 3000);
+      }
     },
   },
   created: function () {

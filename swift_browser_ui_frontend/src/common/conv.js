@@ -1,4 +1,5 @@
 import { getContainerMeta, getAccessControlMeta, getObjectsMeta } from "./api";
+import { getDB } from "@/common/db";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -353,7 +354,6 @@ export function parseDateTime(locale, value, shortDate) {
   return dateTimeFormat.replace(" klo", ", ");
 }
 
-
 // Find the segments container matching a container (if it exists) and
 // correctly update the container size using the size of the segments
 // container.
@@ -364,18 +364,15 @@ export function addSegmentContainerSize(container, containers) {
   }
 }
 
+// Find the segments of an object and
+// update the original objects size accordingly
+export async function getSegmentObjects(projectID, container) {
+  const segment_container = await getDB().containers.get({
+    projectID,
+    name: `${container.name}_segments`,
+  });
 
-// Find the segments of an object and update the original objects size
-// accordingly
-export async function addSegmentObjectSize(object, project, container) {
-  let objUrl = "/download/".concat(
-    encodeURI(project),
-    "/",
-    encodeURI(container.name),
-    "/",
-    encodeURI(object.name),
-  );
-
-  let cont_obj = await fetch(objUrl);
-  object.bytes = cont_obj.headers.get("Content-Length");
+  return await getDB()
+    .objects.where({ containerID: segment_container.id })
+    .toArray();
 }
