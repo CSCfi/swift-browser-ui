@@ -145,8 +145,8 @@
       <c-button
         outlined
         size="large"
-        @click="toggleUploadModal"
-        @keyup.enter="toggleUploadModal"
+        @click="cancelUpload"
+        @keyup.enter="cancelUpload"
       >
         {{ $t("message.encrypt.cancel") }}
       </c-button>
@@ -311,9 +311,7 @@ export default {
           type: { value: file.type },
           size: { value: this.localHumanReadableSize(file.size) },
           relativePath: {
-            value:
-              (!file.relativePath ? file.name : file.relativePath) ||
-              truncate(100),
+            value: file.relativePath || truncate(100),
           },
         };
       });
@@ -325,8 +323,10 @@ export default {
       set(value) {
         const files = Array.from(value);
         files.forEach(file => {
-          file.relativePath = file.name;
-          this.$store.commit("appendDropFiles", file);
+          if (this.addFiles) {
+            file.relativePath = file.name;
+            this.$store.commit("appendDropFiles", file);
+          }
         });
       },
     },
@@ -351,6 +351,9 @@ export default {
     },
     currentProjectID() {
       return this.$route.params.project;
+    },
+    addFiles() {
+      return this.$store.state.addUploadFiles;
     },
   },
   watch: {
@@ -409,8 +412,10 @@ export default {
       let entry = undefined;
       if (item.isFile) {
         item.file(file => {
-          file.relativePath = path + file.name;
-          this.$store.commit("appendDropFiles", file);
+          if (this.addFiles) {
+            file.relativePath = path + file.name;
+            this.$store.commit("appendDropFiles", file);
+          } else return;
         });
       } else if (item instanceof File) {
         this.$store.commit("appendDropFiles", item);
@@ -428,16 +433,19 @@ export default {
 
         let readEntries = () => {
           dirReader.readEntries(entries => {
-            if (entries.length) {
-              allEntries = allEntries.concat(entries);
-              return readEntries();
-            }
-            for (let item of allEntries) {
-              this.setFile(item, newPath);
-            }
+            if (this.addFiles) {
+              if (entries.length) {
+                allEntries = allEntries.concat(entries);
+                return readEntries();
+              }
+              for (let item of allEntries) {
+                if (this.addFiles) {
+                  this.setFile(item, newPath);
+                }
+              }
+            } else return; //modal was closed
           });
         };
-
         readEntries();
       } else if ("function" === typeof item.getAsFile) {
         item = item.getAsFile();
@@ -447,9 +455,9 @@ export default {
         }
       }
     },
-    setFiles: function (items) {
-      if (items.length > 0) {
-        for (let file of items) {
+    setFiles: function (files) {
+      if (files.length > 0) {
+        for (let file of files) {
           let entry = file;
           this.setFile(entry, "");
         }
@@ -501,13 +509,14 @@ export default {
     navUpload: function (e) {
       e.stopPropagation();
       e.preventDefault();
+      const el = document.querySelector(".dropArea");
+      el.classList.remove("over-dropArea");
+
       if (e.dataTransfer && e.dataTransfer.items) {
         this.setFiles(e.dataTransfer.items);
       } else if (e.dataTransfer && e.dataTransfer.files) {
         this.setFiles(e.dataTransfer.files);
       }
-      const el = document.querySelector(".dropArea");
-      el.classList.remove("over-dropArea");
     },
     appendPublicKey: async function () {
       if (!this.recvkeys.includes(this.addRecvkey)){
@@ -536,13 +545,17 @@ export default {
         );
       }
     },
+    cancelUpload() {
+      this.$store.commit("setFilesAdded", false);
+      this.toggleUploadModal();
+    },
     toggleUploadModal() {
-      this.$store.commit("toggleUploadModal", false);
-      this.inputFolder = "";
+      this.clearFiles();
+      this.folderName = "";
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
-      this.clearFiles();
+      this.$store.commit("toggleUploadModal", false);
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

@@ -148,6 +148,7 @@ export default {
       toggleCreateFolderModal(folderName);
     },
     toggleUploadModal: function () {
+      this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
     },
     copyProjectId: function () {

@@ -57,6 +57,7 @@ const store = createStore({
     sourceProjectId: "",
     uploadAbort: undefined,
     renderedFolders: true,
+    addUploadFiles: true,
   },
   mutations: {
     updateObjects(state, objects) {
@@ -252,6 +253,9 @@ const store = createStore({
     },
     toggleRenderedFolders(state, payload) {
       state.renderedFolders = payload;
+    }, 
+    setFilesAdded(state, payload) {
+      state.addUploadFiles = payload;
     },
   },
   actions: {
