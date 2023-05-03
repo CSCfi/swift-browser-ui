@@ -21,10 +21,10 @@
 
 <script>
 import {
-  getHumanReadableSize,
   truncate,
   sortObjects,
   parseDateTime,
+  getItemSize,
 } from "@/common/conv";
 import {
   DecryptedDownloadSession,
@@ -34,6 +34,7 @@ import {
 import {
   toggleEditTagsModal,
   isFile,
+  getFolderName,
   getPrefix,
   getPaginationOptions,
 } from "@/common/globalFunctions";
@@ -114,12 +115,6 @@ export default {
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
     },
-    getFolderName: function (path) {
-      // Get the name of the currently displayed pseudofolder
-      let endregex = new RegExp("/.*$");
-      return path.replace(getPrefix(this.$route), "")
-        .replace(endregex, "");
-    },
     getPage: function () {
       let offset = 0;
       let limit = this.objs.length;
@@ -132,20 +127,24 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      let pagedLength = 0;
-
-      this.objects = this.objs
+      // Filtered objects based on prefix
+      const filteredObjs = this
+        .objs
         .filter((obj) => {
           return obj.name.startsWith(getPrefix(this.$route));
-        })
+        });
+
+      let pagedLength = 0;
+
+      this.objects = filteredObjs
         .reduce((items, item) => {
           if (isFile(item.name, this.$route) || !this.renderFolders) {
             items.push(item);
           } else {
             if (items.find(el => {
-              return this.getFolderName(
-                el.name,
-              ) === this.getFolderName(item.name) ? true : false;
+              return getFolderName(
+                el.name, this.$route,
+              ) === getFolderName(item.name, this.$route) ? true : false;
             })) {
               return items;
             } else {
@@ -161,8 +160,11 @@ export default {
           item,
         ) => {
           let value = truncate(
-            this.renderFolders ? this.getFolderName(item.name) : item.name,
+            this.renderFolders ?
+              getFolderName(item.name, this.$route)
+              : item.name,
           );
+
           items.push({
             name: {
               value: value,
@@ -183,7 +185,7 @@ export default {
               } : {}),
             },
             size: {
-              value: getHumanReadableSize(item.bytes),
+              value: getItemSize(item, filteredObjs, this.$route),
             },
             last_modified: {
               value: parseDateTime(this.locale, item.last_modified, false),

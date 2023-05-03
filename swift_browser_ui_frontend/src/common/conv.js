@@ -1,5 +1,6 @@
 import { getContainerMeta, getAccessControlMeta, getObjectsMeta } from "./api";
 import { getDB } from "@/common/db";
+import { getFolderName } from "./globalFunctions";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -375,4 +376,21 @@ export async function getSegmentObjects(projectID, container) {
   return await getDB()
     .objects.where({ containerID: segment_container.id })
     .toArray();
+}
+
+export function getItemSize(currentItem, objects, route) {
+  const currentFoldername = getFolderName(currentItem.name, route);
+  let subfolderSize = currentItem.bytes;
+
+  for (let i = 0; i < objects.length; i++) {
+    const folderName = getFolderName(objects[i].name, route);
+
+    if (
+      folderName === currentFoldername &&
+      objects[i].name !== currentItem.name
+    ) {
+      subfolderSize += objects[i].bytes;
+    }
+  }
+  return getHumanReadableSize(subfolderSize);
 }

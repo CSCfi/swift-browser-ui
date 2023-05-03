@@ -97,6 +97,12 @@ export function getPrefix(route) {
   return `${route.query.prefix}/`;
 }
 
+export function getFolderName(folderName, route) {
+  // Get the name of the currently displayed pseudofolder
+  let endregex = new RegExp("/.*$");
+  return folderName.replace(getPrefix(route), "").replace(endregex, "");
+}
+
 export function isFile(path, route) {
   // Return true if path represents a file in the active prefix context
   return path.replace(getPrefix(route), "").match("/") ? false : true;

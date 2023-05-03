@@ -132,6 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #988) Fix for missing translation in some parts of UI
 - (GL #971) Fix broken UI when session doesn't exist in the backend by setting more strict session checks in the backend
 - (GL #993 #981) Fix upload not starting
+- (GL #978) Fix for folder, subfolder and file's size being zero, hide segment folder from view but get it shared properly
 
 ### Removed
 
