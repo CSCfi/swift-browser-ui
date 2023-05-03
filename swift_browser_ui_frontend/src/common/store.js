@@ -273,8 +273,8 @@ const store = createStore({
           marker = containers[containers.length - 1].name;
         }
       } while (containers.length > 0);
-      const sharedContainers = await getSharedContainers(projectID);
 
+      const sharedContainers = await getSharedContainers(projectID);
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
@@ -380,7 +380,7 @@ const store = createStore({
       { dispatch },
       { projectID, container, signal },
     ) {
-      const isSegmentsContainer = container.name.match("_segments");
+      const isSegmentsContainer = container.name.endsWith("_segments");
       const existingObjects = await getDB().objects
         .where({ containerID: container.id })
         .toArray();
@@ -503,6 +503,7 @@ const store = createStore({
       { commit, dispatch },
       { project, owner, container, signal },
     ) {
+      const isSegmentsContainer = container.name.endsWith("_segments");
       let sharedObjects = [];
       let marker = "";
       let objects = [];
@@ -523,7 +524,24 @@ const store = createStore({
           marker = objects[objects.length - 1].name;
         }
       } while (objects.length > 0);
+
+      if (!isSegmentsContainer) {
+        const segment_objects = await getObjects(
+          project,
+          `${container.name}_segments`,
+          marker,
+          signal,
+          true,
+          owner,
+        );
+        for (let i = 0; i < sharedObjects.length; i++) {
+          if (segment_objects[i])
+            sharedObjects[i].bytes = segment_objects[i].bytes;
+        }
+      }
+
       commit("updateObjects", sharedObjects);
+
       dispatch("updateObjectTags", {
         projectID: project,
         container,
