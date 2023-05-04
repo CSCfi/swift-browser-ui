@@ -164,7 +164,6 @@
 
 <script>
 import EncryptedUploadSession from "@/common/upload";
-import { getUploadEndpoint } from "@/common/api";
 import {
   getHumanReadableSize,
   truncate,
@@ -463,16 +462,6 @@ export default {
         }
       }
     },
-    aBeginUpload: async function (files) {
-      // Upload files to the active folder
-      let uploadInfo = await getUploadEndpoint(
-        this.active.id,
-        this.$route.params.owner ? this.$route.params.owner : this.active.id,
-        this.inputFolder,
-      );
-      this.$store.commit("setUploadInfo", uploadInfo);
-      this.res.addFiles(files, undefined);
-    },
     checkUploadSize() {
       let size = 0;
       for (let file of this.dropFiles) {
@@ -509,14 +498,13 @@ export default {
     navUpload: function (e) {
       e.stopPropagation();
       e.preventDefault();
-      const el = document.querySelector(".dropArea");
-      el.classList.remove("over-dropArea");
-
       if (e.dataTransfer && e.dataTransfer.items) {
         this.setFiles(e.dataTransfer.items);
       } else if (e.dataTransfer && e.dataTransfer.files) {
         this.setFiles(e.dataTransfer.files);
       }
+      const el = document.querySelector(".dropArea");
+      el.classList.remove("over-dropArea");
     },
     appendPublicKey: async function () {
       if (!this.recvkeys.includes(this.addRecvkey)){
@@ -551,7 +539,6 @@ export default {
     },
     toggleUploadModal() {
       this.clearFiles();
-      this.folderName = "";
       this.tags = [];
       this.ephemeral = true;
       this.files = [];

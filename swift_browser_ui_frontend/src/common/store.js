@@ -158,18 +158,6 @@ const store = createStore({
         ) === undefined
       ) {
         state.dropFiles.push(file);
-      } else if (
-        //if same file path but different size
-        // remove old file and push new
-        state.dropFiles.find(
-          (f) => f.relativePath === String(file.relativePath) &&
-          f.size !== file.size))
-      {
-        // we remove and push the file again if its size is different
-        state.dropFiles = state.dropFiles.filter(v => {
-          return v.relativePath !== file.relativePath && v.size !== file.size;
-        });
-        state.dropFiles.push(file);
       }
     },
     eraseDropFile(state, file) {

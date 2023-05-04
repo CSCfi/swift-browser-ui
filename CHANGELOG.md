@@ -127,6 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #979) Fix for creating and uploading to a folder works at the same time
 - (GL #989 #990) Fix sorting in datatable
 - (GL #925) Files can be deleted when shown as paths
+- (GL #965) Only files with unique paths are added for upload
+- (GL #1008) Stop adding files for upload when cancel is pressed
 
 ### Removed
 
