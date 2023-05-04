@@ -23,22 +23,25 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
             "endpoint": "https://test-endpoint-0/v1/AUTH_test-id",
             "token": "test-token1",
         }
-    
+
     def mocked_requests_get(self, *args, **kwargs):
         class MockResponse:
             def __init__(self, headers, status_code):
                 self.status_code = status_code
                 self.headers = headers
+
             def __enter__(self):
                 return self
+
             def __exit__(self, exc_type, exc_value, traceback):
                 pass
+
             def iter_content(self, chunk_size):
                 cont = []
                 for i in range(chunk_size):
                     cont.append(1)
                 return cont
-        
+
         if kwargs["headers"]["X-Auth-Token"] == "test-token1":
             return MockResponse({}, 200)
         elif kwargs["headers"]["X-Auth-Token"] == "test-token2":
@@ -75,7 +78,9 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
 
     def test_parse_archive(self):
         """Test parsing a list of paths."""
-        cont_proxy = ContainerArchiveDownloadProxy(self.mock_session, "project", "container", "object")
+        cont_proxy = ContainerArchiveDownloadProxy(
+            self.mock_session, "project", "container", "object"
+        )
         with self.assertRaises(ValueError):
             cont_proxy._parse_archive_fs([""])
 
@@ -92,7 +97,9 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
 
     def test_download_loop(self):
         """Test loop to initialize downloads."""
-        cont_proxy = ContainerArchiveDownloadProxy(self.mock_session, "project", "container", "object")
+        cont_proxy = ContainerArchiveDownloadProxy(
+            self.mock_session, "project", "container", "object"
+        )
         cont_proxy.archive = tarfile.open(
             name=cont_proxy.container + ".tar",
             mode="w|",
@@ -107,9 +114,9 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
                     "file": {
                         "name": "/file",
                         "type": "file",
-                        "tar_info": tarfile.TarInfo(name="/file")
+                        "tar_info": tarfile.TarInfo(name="/file"),
                     }
-                }
+                },
             }
         }
         cont_proxy.download_init()
@@ -123,7 +130,9 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
     @mock.patch("queue.Queue.get", side_effect=mocked_queue_get)
     def test_tar_archiving_loop(self, mocked_queue):
         """Test end of loop to initialize tarballing."""
-        cont_proxy = ContainerArchiveDownloadProxy(self.mock_session, "project", "container", "object")
+        cont_proxy = ContainerArchiveDownloadProxy(
+            self.mock_session, "project", "container", "object"
+        )
         cont_proxy.archive = tarfile.open(
             name=cont_proxy.container + ".tar",
             mode="w|",
@@ -131,5 +140,5 @@ class DownloadTestClass(tests.common.mockups.APITestBase):
         )
         cont_proxy.tar_archiving_loop()
         with self.assertRaises(OSError):
-            # Archive was closed 
+            # Archive was closed
             cont_proxy.archive.getnames()
