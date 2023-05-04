@@ -49,6 +49,9 @@ backend-test:
   script:
     - pnpm --prefix swift_browser_ui_frontend docker-build
     - tox -e pytest
+    - coverage run -m pytest tests/
+    - coverage report --precision=1
+  coverage: '/TOTAL.*\s+(\d+\%)/'
 
 build-ci-image:
   stage: build
