@@ -57,7 +57,7 @@ const store = createStore({
     sourceProjectId: "",
     uploadAbort: undefined,
     renderedFolders: true,
-    addUploadFiles: true,
+    addUploadFiles: false,
   },
   mutations: {
     updateObjects(state, objects) {
