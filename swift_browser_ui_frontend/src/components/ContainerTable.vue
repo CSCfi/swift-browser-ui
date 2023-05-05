@@ -394,7 +394,6 @@ export default {
           },
         );
       } else { //delete empty folder without confirmation
-        this.$store.commit("setFolderName", container);
         document.querySelector("#container-toasts").addToast(
           { progress: false,
             type: "success",
@@ -403,17 +402,16 @@ export default {
         const projectID = this.$route.params.project;
         swiftDeleteContainer(
           projectID,
-          this.$store.state.selectedFolderName,
+          container,
         ).then(async () => {
           await getDB().containers
             .where({
               projectID,
-              name: this.$store.state.selectedFolderName,
+              name: container,
             })
             .delete();
         });
       }
-      this.$store.commit("setFolderName", "");
       this.$emit("delete-container");
     },
     handlePaginationText() {
