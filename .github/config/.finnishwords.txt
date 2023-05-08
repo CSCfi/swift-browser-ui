@@ -2,6 +2,7 @@ ajaksi
 alapuolisesta
 alikansio
 alikansion
+alikansiot
 alla
 aloitettiin
 aloitettu
