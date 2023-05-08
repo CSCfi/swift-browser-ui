@@ -59,15 +59,33 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
     },
-    deleteObjects: function () {
-      let to_remove = new Array;
+    deleteObjects: async function () {
+      let to_remove = [];
+      let segments_to_remove = []; // Array for segment objects to be deleted
+      let segment_container = null;
       let selectedSubfolder = false;
+
+      const isSegmentsContainer = this.container.endsWith("_segments");
+      if (!isSegmentsContainer) {
+        segment_container = await getDB().containers.get({
+          projectID: this.projectID,
+          name: `${this.selectedObjects[0].container}_segments`,
+        });
+      }
+
       for (let object of this.selectedObjects) {
         // Only files are able to delete
         //or when objects are shown as paths
         if (isFile(object.name, this.$route)
           || !this.renderedFolders) {
           to_remove.push(object.name);
+          if (segment_container) {
+            // Equivalent object from segment container needs to be deleted
+            const segment_obj = await getDB().objects
+              .where({"containerID": segment_container.id})
+              .filter(obj => obj.name.includes(`${object.name}/`)).first();
+            segments_to_remove.push(segment_obj.name);
+          }
         } else {
           //flag if user is trying to delete a subfolder
           //when folders rendered
@@ -82,11 +100,25 @@ export default {
         );
         getDB().objects.bulkDelete(objIDs);
       }
+
       swiftDeleteObjects(
-        this.$route.params.owner || this.$route.params.project,
+        this.$route.params.owner || this.projectID,
         this.$route.params.container,
         to_remove,
       ).then(async () => {
+        if (segments_to_remove.length > 0) {
+          await swiftDeleteObjects(
+            this.$route.params.owner || this.projectID,
+            segment_container.name,
+            segments_to_remove,
+          );
+        }
+
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.projectID,
+          signal: null,
+        });
+
         if (this.$route.name === "SharedObjects") {
           await this.$store.dispatch(
             "updateSharedObjects",

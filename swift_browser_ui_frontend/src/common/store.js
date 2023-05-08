@@ -529,7 +529,7 @@ const store = createStore({
         const segment_objects = await getObjects(
           project,
           `${container.name}_segments`,
-          marker,
+          "",
           signal,
           true,
           owner,
