@@ -308,7 +308,7 @@ export default {
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.conts.length,
+        itemCount: this.containers.length,
       };
     },
     async onSort(event) {

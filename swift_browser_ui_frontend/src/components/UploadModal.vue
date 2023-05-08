@@ -425,6 +425,7 @@ export default {
         .filter(cont => cont.projectID === this.active.id)
         .filter(cont => cont.name.toLowerCase()
           .includes(event.detail.toLowerCase()))
+        .filter(cont => !cont.name.endsWith("_segments"))
         .limit(1000)
         .toArray();
       this.filteredItems = result;
