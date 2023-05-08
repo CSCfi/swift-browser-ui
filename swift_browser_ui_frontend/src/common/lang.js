@@ -228,7 +228,8 @@ let default_translations = {
       subfolders: {
         deleteNote: "Subfolders are deleted by deleting all " +
         "items in them.",
-        deleteSuccess: "Subfolder was deleted.",
+        deleteOneSuccess: "Subfolder was deleted.",
+        deleteManySuccess: "Subfolders were deleted.",
       },
       objects: {
         filterBy: "Filter by name or tag",
@@ -593,7 +594,8 @@ let default_translations = {
       subfolders: {
         deleteNote: "Alikansion poistaminen edellyttää sen kaikkien " +
         "tiedostojen poistamista.",
-        deleteSuccess: "Alikansio poistettu.",
+        deleteOneSuccess: "Alikansio poistettu.",
+        deleteManySuccess: "Alikansiot poistettu.",
       },
       objects: {
         filterBy: "Suodata nimellä tai asiasanalla",
