@@ -158,7 +158,6 @@ export default {
       ownerProject: "",
       dateOfSharing: "",
       oList: [],
-      selected: undefined,
       hidePagination: false,
       renderFolders: true,
       hideTags: false,
@@ -204,6 +203,14 @@ export default {
     isFolderUploading() {
       return this.$store.state.isUploading;
     },
+    openDeleteModal() {
+      return this.$store.state.openDeleteModal;
+    },
+    selectedObjects() {
+      return this.$store.state.deletableObjects.length > 0
+        ? this.$store.state.deletableObjects
+        : [];
+    },
   },
   watch: {
     active: async function() {
@@ -238,31 +245,16 @@ export default {
         this.setTableOptionsMenu();
       }
     },
-    oList: function() {
-      if (this.oList !== undefined && this.$route.query.selected) {
-        const selected = this.$route.query.selected;
-        const obj = this.oList.find(o => {
-          return o.name === selected;
-        });
-        if (obj) {
-          this.selected = obj;
-        }
-      }
-    },
     locale () {
       this.setLocalizedContent();
       this.getFolderSharedStatus();
     },
     isFolderUploading: function () {
-      if (!this.isFolderUploading) {
-
-        delay(async () => {
-          await this.$store.dispatch("updateContainers", {
-            projectID: this.active.id,
-            signal: null,
-          });
-          //this.updateObjects();
-        }, 3000);
+      if (!this.isFolderUploading) this.updateContainers();
+    },
+    openDeleteModal: async function () {
+      if (!this.openDeleteModal && this.selectedObjects.length === 0) {
+        this.updateContainers();
       }
     },
   },
@@ -354,6 +346,14 @@ export default {
             message: this.$t("message.subfolders.deleteNote"),
           });
       }
+    },
+    updateContainers: function() {
+      delay(async () => {
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: null,
+        });
+      }, 3000);
     },
     updateObjects: async function () {
       if (

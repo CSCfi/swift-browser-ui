@@ -114,6 +114,7 @@ export default {
 
         limit = this.paginationOptions.itemsPerPage;
       }
+
       const sharingContainers = await getSharingContainers(this.active.id);
       const sharedContainers = await getSharedContainers(this.active.id);
 
@@ -127,23 +128,25 @@ export default {
         return "";
       };
 
+      // Filter out segment folders for rendering
       // Map the 'accessRights' to the container if it's a shared container
-      const mappedContainers = await Promise.all(this.conts.map(async(cont) => {
-        const sharedDetails = cont.owner ? await getAccessDetails(
-          this.$route.params.project,
-          cont.container,
-          cont.owner) : null;
-        const accessRights = sharedDetails ? sharedDetails.access : null;
-        return sharedDetails && accessRights ?
-          {...cont, accessRights} : {...cont};
-      }));
+      const mappedContainers = await Promise.all(
+        this.conts.filter(cont => !cont.name.endsWith("_segments"))
+          .map(async(cont) => {
+            const sharedDetails = cont.owner ? await getAccessDetails(
+              this.$route.params.project,
+              cont.container,
+              cont.owner) : null;
+            const accessRights = sharedDetails ? sharedDetails.access : null;
+            return sharedDetails && accessRights
+              ? {...cont, accessRights} : {...cont};
+          }));
 
-      this.containers = mappedContainers.slice(offset, offset + limit).reduce((
-        items,
-        item,
-      ) => {
-        // Filter out segment folders for rendering
-        if (!item.name.endsWith("_segments")) {
+      this.containers = mappedContainers
+        .slice(offset, offset + limit).reduce((
+          items,
+          item,
+        ) => {
           items.push({
             name: {
               value: truncate(item.name),
@@ -265,7 +268,8 @@ export default {
                         {
                           name: this.$t("message.copy"),
                           action: item.owner
-                            ? () => toggleCopyFolderModal(item.name, item.owner)
+                            ? () => toggleCopyFolderModal(
+                              item.name, item.owner)
                             : () => toggleCopyFolderModal(item.name),
                           disabled: !item.bytes ? true : false,
                         },
@@ -278,7 +282,8 @@ export default {
                           action: () => this.confirmDelete(
                             item.name, item.count,
                           ),
-                          disabled: item.owner && item.accessRights.length > 1,
+                          disabled: item.owner
+                            && item.accessRights.length > 1,
                         },
                       ],
                       customTrigger: {
@@ -302,13 +307,13 @@ export default {
               ],
             },
           });
-        }
-        return items;
-      }, []);
+
+          return items;
+        }, []);
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.containers.length,
+        itemCount: mappedContainers.length,
       };
     },
     async onSort(event) {

@@ -82,7 +82,7 @@ export default {
           if (segment_container) {
             // Equivalent object from segment container needs to be deleted
             const segment_obj = await getDB().objects
-              .where({"containerID": segment_container.id})
+              .where({containerID: segment_container.id})
               .filter(obj => obj.name.includes(`${object.name}/`)).first();
             segments_to_remove.push(segment_obj.name);
           }
@@ -94,18 +94,26 @@ export default {
       }
 
       if(this.$route.name !== "SharedObjects") {
+        // Delete objects and segment objects from IDB
         const objIDs = this.selectedObjects.filter(
           obj => obj.name && to_remove.includes(obj.name)).reduce(
           (prev, obj) => [...prev, obj.id], [],
         );
-        getDB().objects.bulkDelete(objIDs);
+
+        const segmentObjIDs = await getDB().objects
+          .where({ containerID: segment_container.id })
+          .filter(obj => obj.name && segments_to_remove.includes(obj.name))
+          .primaryKeys();
+
+        getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
       }
 
       swiftDeleteObjects(
         this.$route.params.owner || this.projectID,
-        this.$route.params.container,
+        this.container,
         to_remove,
       ).then(async () => {
+
         if (segments_to_remove.length > 0) {
           await swiftDeleteObjects(
             this.$route.params.owner || this.projectID,
@@ -114,28 +122,24 @@ export default {
           );
         }
 
-        await this.$store.dispatch("updateContainers", {
-          projectID: this.projectID,
-          signal: null,
-        });
-
         if (this.$route.name === "SharedObjects") {
           await this.$store.dispatch(
             "updateSharedObjects",
             {
-              project: this.$route.params.project,
+              project: this.projectID,
               owner: this.$route.params.owner,
               container: {
-                name: this.$route.params.container,
+                name: this.container,
                 id: 0,
               },
             },
           );
         }
 
-        this.toggleDeleteModal();
         const dataTable = document.getElementById("objtable");
         dataTable.clearSelections();
+
+        this.toggleDeleteModal();
 
         // Only files can be deleted
         // Show warnings when deleting subfolders
