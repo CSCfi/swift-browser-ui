@@ -223,6 +223,9 @@ export default {
     currentFolder() {
       return this.$route.params.container;
     },
+    modalVisible() {
+      return this.$store.state.openUploadModal;
+    },
     fileHeaders() {
       return [
         {
@@ -348,16 +351,18 @@ export default {
         currentPage: 1,
       };
     },
-    currentProjectID() {
-      return this.$route.params.project;
-    },
     addFiles() {
       return this.$store.state.addUploadFiles;
     },
   },
   watch: {
-    currentFolder: function() {
-      this.inputFolder = this.currentFolder;
+    modalVisible() {
+      if (this.modalVisible) {
+        this.currentFolder ?
+          this.inputFolder = this.currentFolder
+          :
+          this.inputFolder = "";
+      }
     },
     inputFolder: function() {
       this.refreshNoUpload();
@@ -389,9 +394,6 @@ export default {
       this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
         + getProjectNumber(this.active);
     },
-  },
-  mounted() {
-    if (this.currentFolder) this.inputFolder = this.currentFolder;
   },
   methods: {
     onSelectValue: function (e) {
@@ -474,9 +476,6 @@ export default {
     localHumanReadableSize: function (size) {
       return getHumanReadableSize(size);
     },
-    clearFiles() {
-      this.$store.commit("eraseDropFiles");
-    },
     dragHandler: function (e) {
       e.preventDefault();
       let dt = e.dataTransfer;
@@ -535,14 +534,14 @@ export default {
     },
     cancelUpload() {
       this.$store.commit("setFilesAdded", false);
+      this.$store.commit("eraseDropFiles");
       this.toggleUploadModal();
     },
     toggleUploadModal() {
-      this.clearFiles();
+      this.$store.commit("toggleUploadModal", false);
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
-      this.$store.commit("toggleUploadModal", false);
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

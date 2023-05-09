@@ -43,6 +43,7 @@ export default {
     },
     onCancel() {
       this.$emit("cancel-upload");
+      this.$store.commit("eraseDropFiles");
       this.$store.commit("toggleUploadNotification", false);
     },
     viewContainer() {
