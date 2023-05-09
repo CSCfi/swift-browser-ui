@@ -118,6 +118,7 @@ export default {
         this.container,
         to_remove,
       ).then(async () => {
+
         if (segments_to_remove.length > 0) {
           await swiftDeleteObjects(
             this.$route.params.owner || this.projectID,
