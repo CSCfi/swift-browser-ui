@@ -125,6 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #992) Fix for uploading folder with special chars resulted in multiple copied folders
 - (GL #993) Fix for showing correct folder name when refreshing Upload view
 - (GL #979) Fix for creating and uploading to a folder works at the same time
+- (GL #989 #990) Fix sorting in datatable
 
 ### Removed
 

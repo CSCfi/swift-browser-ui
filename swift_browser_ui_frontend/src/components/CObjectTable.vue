@@ -1,7 +1,6 @@
 <template>
   <c-data-table
     id="objtable"
-    :key="componentKey"
     :data.prop="objects"
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
@@ -44,6 +43,7 @@ import {
   mdiDeleteOutline,
   mdiFolder ,
 } from "@mdi/js";
+import { toRaw } from "vue";
 
 export default {
   name: "CObjectTable",
@@ -81,7 +81,6 @@ export default {
       },
       sortBy: "name",
       sortDirection: "asc",
-      componentKey: 0,
     };
   },
   computed: {
@@ -99,42 +98,24 @@ export default {
     },
   },
   watch: {
-    disablePagination() {
-      this.componentKey += 1;
-      this.getPage();
-    },
-    hideTags() {
-      this.componentKey += 1;
-      this.getPage();
-    },
-    renderFolders() {
-      this.componentKey += 1;
-      this.getPage();
-    },
     prefix() {
-      this.componentKey += 1;
-      this.getPage();
-    },
-    objs() {
-      this.componentKey += 1;
       this.getPage();
     },
     locale() {
-      this.componentKey += 1;
       this.setHeaders();
-      this.getPage();
     },
   },
   created() {
     this.setHeaders();
+  },
+  beforeUpdate() {
+    this.getPage();
   },
   methods: {
     changeFolder: function (folder) {
       this.$router.push(
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
-      this.componentKey += 1;
-      this.getPage();
     },
     getFolderName: function (path) {
       // Get the name of the currently displayed pseudofolder
@@ -156,8 +137,7 @@ export default {
 
       let pagedLength = 0;
 
-      this.objects = this
-        .objs
+      this.objects = this.objs
         .filter((obj) => {
           return obj.name.startsWith(getPrefix(this.$route));
         })
@@ -305,7 +285,9 @@ export default {
     onSort(event) {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
-      sortObjects(this.objs, this.sortBy, this.sortDirection);
+
+      // Use toRaw to mutate the original array, not the proxy
+      sortObjects(toRaw(this.objs), this.sortBy, this.sortDirection);
     },
     getEditRoute: function(containerName, objectName) {
       if (this.$route.name == "SharedObjects") {
