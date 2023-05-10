@@ -152,7 +152,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="noUpload"
+        :disabled="noUpload || addingFiles"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -190,7 +190,7 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      tooLarge: false,
+      //tooLarge: false,
       ownPrivateKey: false,
       ephemeral: true,
       privkey: "",
@@ -203,6 +203,7 @@ export default {
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
+      addingFiles: false,
     };
   },
   computed: {
@@ -324,6 +325,7 @@ export default {
         return this.$store.state.dropFiles.message;
       },
       set(value) {
+        this.addingFiles = true;
         const files = Array.from(value);
         files.forEach(file => {
           if (this.addFiles) {
@@ -331,6 +333,7 @@ export default {
             this.$store.commit("appendDropFiles", file);
           }
         });
+        this.addingFiles = false;
       },
     },
     filesPagination() {
@@ -369,7 +372,7 @@ export default {
       this.refreshNoUpload();
     },
     dropFiles: function () {
-      this.checkUploadSize();
+      //this.checkUploadSize();
       this.refreshNoUpload();
     },
     ownPrivateKey: function() {
@@ -394,6 +397,22 @@ export default {
     active: function () {
       this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
         + getProjectNumber(this.active);
+    },
+    addingFiles() {
+      //see if drag&drop adding of files is done:
+      if (this.addingFiles) {
+        let fileCount = this.dropFiles.length;
+        let check = setInterval(() => {
+          if (this.dropFiles.length === fileCount) {
+            //the amount of dropFiles didn't change
+            //in the interval
+            this.addingFiles = false;
+            clearInterval(check);
+          } else {
+            fileCount = this.dropFiles.length;
+          }
+        }, 200);
+      }
     },
   },
   methods: {
@@ -465,13 +484,6 @@ export default {
         }
       }
     },
-    checkUploadSize() {
-      let size = 0;
-      for (let file of this.dropFiles) {
-        size += file.size;
-      }
-      this.tooLarge = size > 1073741824;
-    },
     // Make human readable translation functions available in instance
     // namespace
     localHumanReadableSize: function (size) {
@@ -496,6 +508,7 @@ export default {
       el.classList.remove("over-dropArea");
     },
     navUpload: function (e) {
+      this.addingFiles = true;
       e.stopPropagation();
       e.preventDefault();
       if (e.dataTransfer && e.dataTransfer.items) {
@@ -540,6 +553,7 @@ export default {
     },
     toggleUploadModal() {
       this.$store.commit("toggleUploadModal", false);
+      this.addingFiles = false;
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
