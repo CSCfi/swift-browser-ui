@@ -32,6 +32,7 @@ import {
   toggleCopyFolderModal,
   toggleDeleteModal,
 } from "@/common/globalFunctions";
+import { toRaw } from "vue";
 
 export default {
   name: "ContainerTable",
@@ -341,7 +342,9 @@ export default {
         this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
       }
 
-      sortObjects(this.conts, this.sortBy, this.sortDirection);
+      // Use toRaw to mutate the original array, not the proxy
+      sortObjects(toRaw(this.conts), this.sortBy, this.sortDirection);
+      this.getPage();
     },
     setHeaders() {
       this.headers = [
