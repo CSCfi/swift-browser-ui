@@ -202,6 +202,7 @@ export default {
       noUpload: true,
       CUploadButton,
       projectInfoLink: "",
+      toastVisible: false,
     };
   },
   computed: {
@@ -566,18 +567,23 @@ export default {
         this.$store,
         this.$el,
       );
-      document.querySelector("#uploadModal-toasts").addToast(
-        {
-          type: "success",
-          progress: false,
-          message: this.$t("message.upload.isStarting"),
-        },
-      );
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
       delay(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
+          if (!this.toastVisible) {
+            this.toastVisible = true;
+            document.querySelector("#container-error-toasts").addToast(
+              {
+                type: "success",
+                progress: false,
+                message: this.$t("message.upload.isStarting"),
+              },
+            );
+            //avoid overlapping toasts
+            setTimeout(() => { this.toastVisible = false; }, 6000);
+          }
           this.beginEncryptedUpload();
         }
       }, 1000);
