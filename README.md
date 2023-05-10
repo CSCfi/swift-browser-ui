@@ -187,6 +187,12 @@ DOCKER_NETWORK_SEGMENT=172.17.0.0/24
 DOCKER_NETWORK_GATEWAY=172.17.0.1
 ```
 
+If you are using MacOS and Docker Desktop, the network can be defined as:
+```
+DOCKER_NETWORK_SEGMENT=host.docker.internal
+DOCKER_NETWORK_GATEWAY=gateway.docker.internal
+```
+
 After this, comment out the commands to run without trusted TLS in the
 `Procfile`, and uncomment the commands to run with trusted TLS.
 
