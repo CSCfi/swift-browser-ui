@@ -281,6 +281,27 @@ export default {
         );
         return false;
       }
+      let invalidTags = this.tags.filter(
+        item => this.validateTag(item) === false);
+
+      if (invalidTags.length) {
+        let msg = invalidTags.join(", ");
+
+        if (invalidTags.length > 1) {
+          msg += this.$t("message.share.invalid_share_ids");
+        } else {
+          msg += this.$t("message.share.invalid_share_id");
+        }
+        document.querySelector("#shareModal-toasts").addToast(
+          {
+            type: "error",
+            persistent: false,
+            progress: false,
+            message: msg,
+          },
+        );
+        return false;
+      }
       try {
         await this.$store.state.client.shareNewAccess(
           this.$store.state.active.id,
@@ -388,6 +409,13 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    validateTag: function (tag) {
+      //tag should be 32 alphanumeric chars
+      //and not own project
+      return tag.length === 32 &&
+        tag !== this.active.id &&
+        tag.match(/^[a-z0-9]+$/) != null;
     },
   },
 };
