@@ -35,6 +35,7 @@ import {
   toggleEditTagsModal,
   isFile,
   getPrefix,
+  getPaginationOptions,
 } from "@/common/globalFunctions";
 
 import {
@@ -72,13 +73,7 @@ export default {
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
-      paginationOptions: {
-        itemCount: 0,
-        itemsPerPage: 10,
-        currentPage: 1,
-        startFrom: 0,
-        endTo: 9,
-      },
+      paginationOptions: {},
       sortBy: "name",
       sortDirection: "asc",
     };
@@ -103,10 +98,12 @@ export default {
     },
     locale() {
       this.setHeaders();
+      this.setPagination();
     },
   },
   created() {
     this.setHeaders();
+    this.setPagination();
   },
   beforeUpdate() {
     this.getPage();
@@ -281,6 +278,10 @@ export default {
         ...this.paginationOptions,
         itemCount: pagedLength,
       };
+    },
+    setPagination: function () {
+      const paginationOptions = getPaginationOptions(this.$t);
+      this.paginationOptions = paginationOptions;
     },
     onSort(event) {
       this.sortBy = event.detail.sortBy;

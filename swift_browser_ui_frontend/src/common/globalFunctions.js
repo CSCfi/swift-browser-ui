@@ -101,3 +101,26 @@ export function isFile(path, route) {
   // Return true if path represents a file in the active prefix context
   return path.replace(getPrefix(route), "").match("/") ? false : true;
 }
+
+export function getPaginationOptions(t) {
+  const itemText = count => count === 1 ? t("message.table.item")
+    : t("message.table.items").toLowerCase();
+
+  const paginationOptions = {
+    itemCount: 0,
+    itemsPerPage: 10,
+    currentPage: 1,
+    startFrom: 0,
+    endTo: 9,
+    textOverrides: {
+      itemsPerPageText: t("message.table.itemsPerPage"),
+      nextPage: t("message.table.nextPage"),
+      prevPage: t("message.table.prevPage"),
+      pageText: ({ start, end, count }) =>
+        start + " - " + end + " / " + count + " " + itemText(count),
+      pageOfText: ({ pageNumber, count }) =>
+        t("message.table.page") + pageNumber + " / " + count + "",
+    },
+  };
+  return paginationOptions;
+}
