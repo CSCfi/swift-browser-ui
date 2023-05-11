@@ -25,7 +25,7 @@ import {
   mdiFolder,
 } from "@mdi/js";
 import {
-
+  toggleEditTagsModal,
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
@@ -367,6 +367,11 @@ export default {
         },
       ];
     },
+    setPagination: function () {
+      const paginationOptions = getPaginationOptions(this.$t);
+      this.paginationOptions = paginationOptions;
+    },
+
     delete: function (container, objects) {
       if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
