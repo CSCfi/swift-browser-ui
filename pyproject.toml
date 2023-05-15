@@ -23,11 +23,11 @@ classifiers = [
 dependencies = [
     "aiohttp-session==2.12.0",
     "aiohttp==3.8.4",
-    "redis==4.5.4",
+    "redis==4.5.5",
     "asyncpg==0.27.0",
-    "certifi==2022.12.7",
+    "certifi==2023.5.7",
     "click==8.1.3",
-    "cryptography==40.0.1",
+    "cryptography==40.0.2",
     "gunicorn==20.1.0",
     "keystoneauth1==5.1.2",
     "oidcrp==2.1.4",
@@ -41,25 +41,25 @@ docs = [
     "sphinx_rtd_theme==1.2.0",
 ]
 test = [
-    "black==23.1.0",
-    "coverage==7.2.1",
+    "black==23.3.0",
+    "coverage==7.2.5",
     "flake8-docstrings==1.7.0",
     "flake8==6.0.0",
-    "mypy==1.1.1",
+    "mypy==1.3.0",
     "pytest-cov==4.0.0",
     "pytest-xdist==3.2.0",
-    "pytest==7.2.1",
-    "tox==4.4.6",
+    "pytest==7.3.1",
+    "tox==4.5.1",
 ]
 ui_test = [
     "pytest-timeout==2.1.0",
-    "pytest==7.2.1",
+    "pytest==7.3.1",
 ]
 dev = [
     "honcho==1.1.0",
-    "pre-commit==3.2.1",
+    "pre-commit==3.2.2",
     "pyspelling==2.8.2",
-    "ruff==0.0.259",
+    "ruff==0.0.267",
     "types-certifi",
     "types-redis",
     "types-requests",
