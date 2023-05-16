@@ -410,9 +410,8 @@ export default {
               name: container,
             })
             .delete();
-        });
+        }).then(() => this.$emit("delete-container"));
       }
-      this.$emit("delete-container");
     },
     handlePaginationText() {
       this.paginationOptions.textOverrides = this.locale === "fi"
