@@ -20,7 +20,7 @@
       :conts="renderingContainers"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
-      @delete-container="fetchContainers"
+      @delete-container="(cont) => removeContainer(cont)"
     />
     <c-toasts
       id="container-toasts"
@@ -214,6 +214,12 @@ export default {
         projectID: this.active.id,
         signal: null,
       });
+    },
+    removeContainer: async function(container) {
+      await getDB().containers.where({
+        projectID: this.active.id,
+        name: container,
+      }).delete();
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link

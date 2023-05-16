@@ -33,7 +33,6 @@ import {
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
-import { getDB } from "@/common/db";
 
 export default {
   name: "ContainerTable",
@@ -394,23 +393,18 @@ export default {
           },
         );
       } else { //delete empty folder without confirmation
-        document.querySelector("#container-toasts").addToast(
-          { progress: false,
-            type: "success",
-            message: this.$t("message.container_ops.deleteSuccess")},
-        );
         const projectID = this.$route.params.project;
         swiftDeleteContainer(
           projectID,
           container,
-        ).then(async () => {
-          await getDB().containers
-            .where({
-              projectID,
-              name: container,
-            })
-            .delete();
-        }).then(() => this.$emit("delete-container"));
+        ).then(() => {
+          document.querySelector("#container-toasts").addToast(
+            { progress: false,
+              type: "success",
+              message: this.$t("message.container_ops.deleteSuccess")},
+          );
+          this.$emit("delete-container", container);
+        });
       }
     },
     handlePaginationText() {
