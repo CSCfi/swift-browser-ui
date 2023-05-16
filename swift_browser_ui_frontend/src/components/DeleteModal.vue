@@ -100,10 +100,10 @@ export default {
           (prev, obj) => [...prev, obj.id], [],
         );
 
-        const segmentObjIDs = await getDB().objects
+        const segmentObjIDs = segment_container ? await getDB().objects
           .where({ containerID: segment_container.id })
           .filter(obj => obj.name && segments_to_remove.includes(obj.name))
-          .primaryKeys();
+          .primaryKeys() : [];
 
         getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
       }
