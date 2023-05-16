@@ -308,6 +308,12 @@ const app = createApp({
             document.location.origin,
           ),
         );
+
+        // Cache id information
+        await this.$store.state.client.projectCacheIDs(
+          this.$store.state.active.id,
+          this.$store.state.active.name,
+        );
       }
       if (discovery.request_endpoint) {
         this.$store.commit(
@@ -323,7 +329,7 @@ const app = createApp({
           "setUploadEndpoint",
           discovery.upload_endpoint,
         );
-        let keyPath = `/cryptic/${this.active.id}/keys`;
+        let keyPath = `/cryptic/${this.active.name}/keys`;
         let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
         signatureUrl.searchParams.append("path", keyPath);
         let signed = await GET(signatureUrl);

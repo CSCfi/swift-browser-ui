@@ -24,10 +24,6 @@ import {
   GET,
 } from "@/common/api";
 
-import {
-  DEV,
-} from "@/common/conv";
-
 export default {
   name: "ShareModalTable",
   props: ["sharedDetails", "folderName", "accessRights"],
@@ -122,7 +118,11 @@ export default {
                     marginTop: "1rem",
                   },
                   items: this.accessRights,
-                  value: item.access.length > 1 ? this.accessRights[1]
+                  value: item.access.length > 0
+                    ? (
+                      item.access.length > 1
+                        ? this.accessRights[2]
+                        : this.accessRights[1])
                     : this.accessRights[0],
                   onChangeValue: (e) => this.editAccessRight(e, item.sharedTo),
                 },
@@ -135,7 +135,8 @@ export default {
     editAccessRight: async function (e, sharedProjectId) {
       const rights = [];
       const val = e.detail.value;
-      if (val === "read") rights.push("r");
+      if (val === "view") rights.push("v");
+      else if (val === "read") rights.push("r");
       else rights.push("r", "w");
 
       await this.$store.state.client.shareEditAccess(
@@ -145,13 +146,17 @@ export default {
         rights,
       );
       
+      let projectIDs = await this.$store.state.client.projectCheckIDs(
+        sharedProjectId,
+      );
+
       let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
       let whitelistUrl = new URL(
-        `/cryptic/${this.$route.params.project}/${this.folderName}`,
-        this.$store.state.uploadEndpoint
+        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        this.$store.state.uploadEndpoint,
       );
       whitelistUrl.searchParams.append(
         "valid",
@@ -162,22 +167,28 @@ export default {
         signed.signature,
       );
 
+      console.log(projectIDs);
+
       if (val === "view") {
         await fetch(
           whitelistUrl,
           {
             method: "DELETE",
-            body: JSON.stringify([sharedProjectId]),
+            body: JSON.stringify([projectIDs]),
           },
-        );
+        ).then(() => {
+          console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
+        });
       } else {
         await fetch(
           whitelistUrl,
           {
             method: "PUT",
-            body: JSON.stringify([sharedProjectId]),
-          }
-        );
+            body: JSON.stringify([projectIDs.name]),
+          },
+        ).then(() => {
+          console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
+        });
       }
       this.$emit("updateSharedFolder");
     },
@@ -192,13 +203,18 @@ export default {
             this.folderName,
             [folderData.projectId.value],
           );
+
+          let projectIDs = await this.$store.state.client.projectCheckIDs(
+            folderData.projectId.value,
+          );
+
           let signatureUrl = new URL("/sign/3600", document.location.origin);
-          signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+          signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
           let signed = await GET(signatureUrl);
           signed = await signed.json();
           let whitelistUrl = new URL(
-            `/cryptic/${this.$route.params.project}/${this.folderName}`,
-            this.$store.state.uploadEndpoint
+            `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+            this.$store.state.uploadEndpoint,
           );
           whitelistUrl.searchParams.append(
             "valid",
@@ -213,10 +229,14 @@ export default {
             {
               method: "DELETE",
               body: JSON.stringify([
-                folderData.projectId.value,
+                projectIDs.name,
               ]),
             },
-          );
+          ).then(() => {
+            console.log(
+              `Deleted sharing whitelist entry for ${folderData.projectId.value}`,
+            );
+          });
         },
       );
     },

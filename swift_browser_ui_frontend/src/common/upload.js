@@ -147,6 +147,9 @@ export default class EncryptedUploadSession {
             "signature",
             this.$store.state.uploadInfo.signature.signature,
           );
+          this.headUrl.searchParams.append(
+            "name", this.active.name,
+          );
           this.headUrl.searchParams.append("total", this.currentTotalBytes);
           this.currentUpload = fetch(this.headUrl, {
             method: "PUT",

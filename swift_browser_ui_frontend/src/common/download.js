@@ -51,7 +51,7 @@ export class DecryptedDownloadSession {
     this.chunks = 0;
     this.chunksLeft = 0;
     this.currentFinished = false;
-    this.whitelistPath = `/cryptic/${this.active.id}/whitelist`;
+    this.whitelistPath = `/cryptic/${this.active.name}/whitelist`;
     this.endpoint = store.state.uploadEndpoint;
     this.owner = owner,
 
@@ -155,6 +155,12 @@ export class DecryptedDownloadSession {
       this.container,
     );
     this.$store.commit("setUploadInfo", upInfo);
+    
+    // Check the shared container owner canonical project name
+    let ids = undefined;
+    if (this.owner !== "") {
+      ids = await this.$store.state.client.projectCheckIDs(this.owner);
+    }
 
     let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
     signatureUrl.searchParams.append("path", this.whitelistPath);
@@ -169,14 +175,14 @@ export class DecryptedDownloadSession {
       this.$store.state.uploadInfo.id,
     );
     let resp = await PUT(whitelistUrl, pubkey);
-    let headerPath = `/header/${this.active.id}/${this.container}/${this.object}`;
+    let headerPath = `/header/${this.active.name}/${this.container}/${this.object}`;
     signatureUrl = new URL(`/sign/${60}`, document.location.origin);
     signatureUrl.searchParams.append("path", headerPath);
     signed = await GET(signatureUrl);
     signed = await signed.json();
     let headerUrl = new URL(this.endpoint.concat(headerPath));
-    if (this.owner != "") {
-      headerUrl.searchParams.append("owner", this.owner);
+    if (this.owner !== "") {
+      headerUrl.searchParams.append("owner", ids.name);
     }
     headerUrl.searchParams.append("valid", signed.valid);
     headerUrl.searchParams.append("signature", signed.signature);

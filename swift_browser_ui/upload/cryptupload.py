@@ -112,6 +112,7 @@ class EncryptedUploadProxy:
         self.project = request.match_info["project"]
         self.container = request.match_info["container"]
         self.object_name = request.match_info["object_name"]
+        self.name = request.query["name"]
 
         if "owner" in request.query:
             self.owner = request.query["owner"]
@@ -138,11 +139,11 @@ class EncryptedUploadProxy:
         # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
         if self.owner:
             await request.app[common.VAULT_CLIENT].put_header(
-                self.project, self.container, self.object_name, b64_header, self.owner
+                self.name, self.container, self.object_name, b64_header, self.owner
             )
         else:
             await request.app[common.VAULT_CLIENT].put_header(
-                self.project, self.container, self.object_name, b64_header
+                self.name, self.container, self.object_name, b64_header
             )
 
         self.header_uploaded = True

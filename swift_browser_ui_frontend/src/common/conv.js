@@ -2,6 +2,7 @@ import {
   getContainerMeta,
   getAccessControlMeta,
   getObjectsMeta,
+  GET,
 } from "@/common/api";
 import { getDB } from "@/common/db";
 import { getFolderName } from "@/common/globalFunctions";
@@ -98,7 +99,33 @@ export async function syncContainerACLs(client, project) {
       }
       let accesslist = [];
       if (aclmeta[container][share].read) {
-        accesslist.push("r");
+        // Check if the shared access only concerns view rights
+        let tmpid = await client.projectCheckIDs(share);
+        
+        let whitelistUrl = new URL(
+          `/cryptic/${this.store.state.active.name}/${container}`,
+          this.$store.state.uploadEndpoint,
+        );
+        let signatureUrl = new URL("/sign/3600", document.location.origin);
+        signatureUrl.searchParams.append("path", `/cryptic/${this.store.state.active.name}/${container}`);
+        let signed = await GET(signatureUrl);
+        signed = await signed.json();
+        whitelistUrl.searchParams.append("valid", signed.valid);
+        whitelistUrl.searchParams.append("signature", signed.signature);
+
+        let whitelisted = await fetch(
+          whitelistUrl,
+          {
+            method: "GET",
+            body: tmpid,
+          },
+        );
+
+        if (whitelisted.status == 204) {
+          accesslist.push("v");
+        } else {
+          accesslist.push("r");
+        }
       }
       if (aclmeta[container][share].write) {
         accesslist.push("w");

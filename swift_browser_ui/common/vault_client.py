@@ -285,7 +285,13 @@ class VaultClient:
             "DELETE", f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}"
         )
 
-    async def put_project_whitelist(self, project: str, receiver: str, container: str, keystoneid: str,) -> None:
+    async def put_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+        keystoneid: str,
+    ) -> None:
         """Add a project to a container whitelist.
 
         :param project: Project ID
@@ -294,10 +300,35 @@ class VaultClient:
         :param keystoneid: Receiving project keystone ID
         """
         await self._request(
-            "POST", f"c4ghtransit/sharing/{project}/{container}", json_data={"id": receiver, "idkeystone": keystoneid},
+            "POST",
+            f"c4ghtransit/sharing/{project}/{container}",
+            json_data={"id": receiver, "idkeystone": keystoneid},
         )
 
-    async def remove_project_whitelist(self, project: str, receiver: str, container: str,) -> None:
+    async def get_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+    ) -> Optional[Dict[Any, Any]]:
+        """Check if a project is in a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container that should be shared
+        """
+        resp = await self._request(
+            "GET",
+            f"c4ghransit/sharing/{project}/{container}/{receiver}",
+        )
+        return resp
+
+    async def remove_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+    ) -> None:
         """Add a project to a container whitelist.
 
         :param project: Project ID
@@ -305,10 +336,15 @@ class VaultClient:
         :param container: Container to be shared
         """
         await self._request(
-            "DELETE", f"c4ghtransit/sharing/{project}/{container}", json_data={"id": receiver},
+            "DELETE",
+            f"c4ghtransit/sharing/{project}/{container}",
+            json_data={"id": receiver},
+            params={"force": "true"},
         )
 
-    async def get_header(self, project: str, container: str, path: str, owner: str = "") -> str:
+    async def get_header(
+        self, project: str, container: str, path: str, owner: str = ""
+    ) -> str:
         """Retrieve header.
 
         :param project: Project ID

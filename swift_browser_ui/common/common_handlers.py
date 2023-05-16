@@ -17,3 +17,16 @@ async def handle_delete_preflight(
         }
     )
     return resp
+
+
+async def handle_put_get_preflight(
+    _: typing.Union[aiohttp.web.Request, None]
+) -> aiohttp.web.Response:
+    """Serve correct response headers to an allowed PUT preflight query."""
+    resp = aiohttp.web.Response(
+        headers={
+            "Access-Control-Allow-Methods": "PUT, GET, OPTIONS",
+            "Access-Control-Max-Age": "84600",
+        }
+    )
+    return resp

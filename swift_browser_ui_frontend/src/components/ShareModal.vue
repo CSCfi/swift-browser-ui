@@ -233,7 +233,7 @@ export default {
       this.accessRights = [
         {
           name: this.$t("message.share.view_perm"),
-          value: "view"
+          value: "view",
         },
         {
           name: this.$t("message.share.read_perm"),
@@ -277,6 +277,9 @@ export default {
     shareContainer: async function () {
       let rights = [];
       if (this.view) {
+        rights.push("v");
+      }
+      if (this.read) {
         rights.push("r");
       }
       if (this.write) {
@@ -364,6 +367,11 @@ export default {
         }
       }
 
+      // Add read rights after the share entry to make the db entry empty
+      if (this.view) {
+        rights.push("r");
+      }
+
       await addAccessControlMeta(
         this.$route.params.project,
         this.folderName,
@@ -379,12 +387,12 @@ export default {
       );
 
       let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$route.params.project}/${this.folderName}`);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
       let whitelistUrl = new URL(
-        `/cryptic/${this.$route.params.project}/${this.folderName}`,
-        this.$store.state.uploadEndpoint
+        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        this.$store.state.uploadEndpoint,
       );
       whitelistUrl.searchParams.append(
         "valid",
@@ -395,21 +403,20 @@ export default {
         signed.signature,
       );
 
+      let toShare = [];
+      for (const item of this.tags) {
+        toShare.push(
+          await this.$store.state.client.projectCheckIDs(item),
+        );
+      }
+
       // Add access to cross-project sharing in case of read or read+write
       if (this.read | this.write) {
-        fetch(
+        await fetch(
           whitelistUrl,
           {
             method: "PUT",
-            body: JSON.stringify(this.tags),
-          },
-        );
-      } else {
-        fetch(
-          whitelistUrl,
-          {
-            method: "DELETE",
-            body: JSON.stringify(this.tags),
+            body: JSON.stringify(toShare),
           },
         );
       }
@@ -451,6 +458,7 @@ export default {
         this.folderName,
       ).then((ret) => {
         this.sharedDetails = ret;
+        console.log(this.sharedDetails);
         this.tags = [];
       });
     },

@@ -360,9 +360,9 @@ async def handle_batch_add_sharing_whitelist(
     for receiver in receivers:
         await vault_client.put_project_whitelist(
             project,
-            receiver,
+            receiver["name"],
             container,
-            "undefined",
+            receiver["id"],
         )
 
     return aiohttp.web.HTTPNoContent()
@@ -385,4 +385,21 @@ async def handle_batch_remove_sharing_whitelist(
             container,
         )
 
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_check_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Check if a project is in the sharing whitelist."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    receiver = await request.text()
+
+    resp = await vault_client.get_project_whitelist(project, receiver, container)
+
+    if resp is not None:
+        return aiohttp.web.json_response(resp)
     return aiohttp.web.HTTPNoContent()

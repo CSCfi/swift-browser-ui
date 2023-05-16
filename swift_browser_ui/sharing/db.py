@@ -361,3 +361,47 @@ class DBConn:
                         token,
                         identifier,
                     )
+
+    async def add_id(self, id: str, name: str) -> None:
+        """Cache identifier information into database."""
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    """
+                    INSERT INTO ids(
+                        name,
+                        id
+                    ) VALUES (
+                        $1, $2
+                    )
+                    ;
+                    """,
+                    name,
+                    id,
+                )
+
+    async def match_id_name(self, id: str) -> list:
+        """Match an id to the correct name."""
+        query = await self.pool.fetch(
+            """
+            SELECT *
+            FROM ids
+            WHERE id = $1
+            ;
+            """,
+            id,
+        )
+        return list(query)
+
+    async def match_name_id(self, name: str) -> list:
+        """Match a name to the correct id."""
+        query = await self.pool.fetch(
+            """
+            SELECT *
+            FROM ids
+            WHERE name = $1
+            ;
+            """,
+            name,
+        )
+        return list(query)
