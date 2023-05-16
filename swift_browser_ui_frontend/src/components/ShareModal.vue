@@ -500,6 +500,7 @@ export default {
         this.folderName,
       ).then((ret) => {
         this.sharedDetails = ret;
+        console.log(this.sharedDetails);
         this.tags = [];
       });
     },

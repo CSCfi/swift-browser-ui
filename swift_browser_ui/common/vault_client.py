@@ -304,6 +304,7 @@ class VaultClient:
             f"c4ghtransit/sharing/{project}/{container}",
             json_data={"id": receiver, "idkeystone": keystoneid},
         )
+        return resp
 
     async def get_project_whitelist(
         self,
