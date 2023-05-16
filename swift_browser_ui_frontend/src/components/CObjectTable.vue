@@ -52,7 +52,7 @@ export default {
   props: {
     objs: {
       type: Array,
-      default: () => {return [];},
+      default: () => [],
     },
     disablePagination: {
       type: Boolean,
@@ -65,6 +65,10 @@ export default {
     renderFolders: {
       type: Boolean,
       default: true,
+    },
+    accessRights: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -247,6 +251,7 @@ export default {
                           toggleEditTagsModal(item.data.name.value, null);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },
@@ -267,6 +272,7 @@ export default {
                           this.$emit("delete-object", item);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },

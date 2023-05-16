@@ -276,6 +276,7 @@ export default {
                         {
                           name: this.$t("message.editTags"),
                           action: () => toggleEditTagsModal(null, item.name),
+                          disabled: item.owner,
                         },
                         {
                           name: this.$t("message.delete"),
