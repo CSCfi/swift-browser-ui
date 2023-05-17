@@ -220,6 +220,11 @@ export default {
         projectID: this.active.id,
         name: container,
       }).delete();
+
+      await getDB().containers.where({
+        projectID: this.active.id,
+        name: `${container}_segments`,
+      }).delete();
     },
     checkPageFromRoute: function () {
       // Check if the pagination number is already specified in the link

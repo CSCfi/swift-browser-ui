@@ -1,6 +1,10 @@
-import { getContainerMeta, getAccessControlMeta, getObjectsMeta } from "./api";
+import {
+  getContainerMeta,
+  getAccessControlMeta,
+  getObjectsMeta,
+} from "@/common/api";
 import { getDB } from "@/common/db";
-import { getFolderName } from "./globalFunctions";
+import { getFolderName } from "@/common/globalFunctions";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -373,9 +377,9 @@ export async function getSegmentObjects(projectID, container) {
     name: `${container.name}_segments`,
   });
 
-  return await getDB()
+  return segment_container ? await getDB()
     .objects.where({ containerID: segment_container.id })
-    .toArray();
+    .toArray() : [];
 }
 
 export function getItemSize(currentItem, objects, route) {
@@ -393,4 +397,13 @@ export function getItemSize(currentItem, objects, route) {
     }
   }
   return getHumanReadableSize(subfolderSize);
+}
+
+export function sortContainer(containers) {
+  // sort "_segments" folder before original folder
+  return containers.sort((a, b) => {
+    if (a.name === `${b.name}_segments`) {
+      return -1;
+    }
+  });
 }

@@ -11,10 +11,11 @@ import {
   tokenize,
   addSegmentContainerSize,
   getSegmentObjects,
-} from "./conv";
+  sortContainer,
+} from "@/common/conv";
 
 import { getDB } from "@/common/db";
-import {getSharedContainers} from "./globalFunctions";
+import { getSharedContainers } from "@/common/globalFunctions";
 
 const store = createStore({
   state: {
@@ -253,8 +254,8 @@ const store = createStore({
       { dispatch },
       { projectID, signal },
     ) {
-      const existingContainers = await getDB().containers
-        .where({ projectID })
+      const existingContainers = await getDB()
+        .containers.where({ projectID })
         .toArray();
 
       let containers;
@@ -290,7 +291,9 @@ const store = createStore({
           cont.count = count;
           cont.name = cont.container;
         }
-        await getDB().containers.bulkPut(sharedContainers).catch(() => {});
+        await getDB()
+          .containers.bulkPut(sharedContainers)
+          .catch(() => {});
         newContainers = newContainers.concat(sharedContainers);
       }
 
@@ -310,9 +313,13 @@ const store = createStore({
         await getDB().containers.bulkDelete(toDelete);
         await getDB().objects.where("containerID").anyOf(toDelete).delete();
       }
-      const containersFromDB = await getDB().containers
-        .where({ projectID })
+      const containersFromDB = await getDB()
+        .containers.where({ projectID })
         .toArray();
+
+      // sort "_segments" folder before original folder
+      // so that "_segments" folder could be updated first
+      newContainers = sortContainer(newContainers);
 
       for (let i = 0; i < newContainers.length; i++) {
         addSegmentContainerSize(newContainers[i], newContainers);
@@ -329,8 +336,8 @@ const store = createStore({
 
         if (oldContainer !== undefined) {
           key = oldContainer.id;
-          dbObjects = await getDB().objects
-            .where({ containerID: oldContainer.id })
+          dbObjects = await getDB()
+            .objects.where({ containerID: oldContainer.id })
             .count();
         }
         if (oldContainer !== undefined) {
@@ -343,8 +350,8 @@ const store = createStore({
           }
           if (container.count === 0) {
             updateObjects = false;
-            await getDB().objects
-              .where({ containerID: oldContainer.id })
+            await getDB()
+              .objects.where({ containerID: oldContainer.id })
               .delete();
           }
           await getDB().containers.update(oldContainer.id, container);

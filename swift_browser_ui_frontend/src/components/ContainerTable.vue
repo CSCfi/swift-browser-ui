@@ -279,7 +279,7 @@ export default {
                         },
                         {
                           name: this.$t("message.delete"),
-                          action: () => this.confirmDelete(
+                          action: () => this.delete(
                             item.name, item.count,
                           ),
                           disabled: item.owner
@@ -395,7 +395,8 @@ export default {
         swiftDeleteContainer(
           projectID,
           container,
-        ).then(() => {
+        ).then(async() => {
+          await swiftDeleteContainer(projectID, `${container}_segments`);
           document.querySelector("#container-toasts").addToast(
             { progress: false,
               type: "success",

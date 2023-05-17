@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import ProgressBar from "./UploadProgressBar.vue";
+import ProgressBar from "@/components/UploadProgressBar.vue";
 
 export default {
   name: "UploadAlert",
