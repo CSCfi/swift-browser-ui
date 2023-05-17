@@ -190,7 +190,6 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      //tooLarge: false,
       ownPrivateKey: false,
       ephemeral: true,
       privkey: "",
