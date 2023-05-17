@@ -30,9 +30,9 @@ import {
   getSharedContainers,
   getAccessDetails,
   toggleCopyFolderModal,
-  toggleDeleteModal,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
+import { swiftDeleteContainer } from "@/common/api";
 
 export default {
   name: "ContainerTable",
@@ -288,7 +288,7 @@ export default {
                       },
                       {
                         name: this.$t("message.delete"),
-                        action: () => this.confirmDelete(
+                        action: () => this.delete(
                           item.name, item.count,
                         ),
                         disabled: item.owner && item.accessRights.length > 1,
@@ -382,18 +382,29 @@ export default {
         },
       ];
     },
-    confirmDelete: function (container, objects) {
-      if (objects > 0) {
+    delete: function (container, objects) {
+      if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
           {
             progress: false,
             type: "error",
-            duration: 30000,
+            duration: 6000,
             message: this.$t("message.container_ops.deleteNote"),
           },
         );
-      } else {
-        toggleDeleteModal(null, container);
+      } else { //delete empty folder without confirmation
+        const projectID = this.$route.params.project;
+        swiftDeleteContainer(
+          projectID,
+          container,
+        ).then(() => {
+          document.querySelector("#container-toasts").addToast(
+            { progress: false,
+              type: "success",
+              message: this.$t("message.container_ops.deleteSuccess")},
+          );
+          this.$emit("delete-container", container);
+        });
       }
     },
     handlePaginationText() {

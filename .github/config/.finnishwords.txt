@@ -1,6 +1,8 @@
 ajaksi
 alapuolisesta
 alikansio
+alikansion
+alikansiot
 alla
 aloitettiin
 aloitettu
@@ -345,6 +347,7 @@ painikkeella
 painikkeesta
 pakollista
 palaa
+palauttaa
 palautus
 paljon
 paloitellaan
@@ -364,6 +367,7 @@ poissa
 poista
 poistaa
 poistaminen
+poistamisen
 poistamista
 poistettava
 poistettiin

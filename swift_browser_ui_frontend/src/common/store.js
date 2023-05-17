@@ -56,6 +56,7 @@ const store = createStore({
     isFolderCopied: false,
     sourceProjectId: "",
     uploadAbort: undefined,
+    renderedFolders: true,
   },
   mutations: {
     updateObjects(state, objects) {
@@ -243,6 +244,9 @@ const store = createStore({
     },
     setSourceProjectId(state, payload) {
       state.sourceProjectId = payload;
+    },
+    toggleRenderedFolders(state, payload) {
+      state.renderedFolders = payload;
     },
   },
   actions: {

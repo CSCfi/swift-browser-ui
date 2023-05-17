@@ -309,7 +309,7 @@ export default {
       };
     },
     handleSelection(event) {
-      if (event.detail.length > 0) {
+      if (event.detail.length > 0 && this.renderFolders) {
         const prefix = getPrefix(this.$route);
         const selectedRows = event.detail.map(item => prefix.concat(item));
         this.$emit("selected-rows", selectedRows);
