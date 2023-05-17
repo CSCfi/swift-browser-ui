@@ -50,6 +50,7 @@ libupload
 localhost
 logfile
 lt
+macos
 matchlabels
 maxdepth
 middlewares
@@ -84,6 +85,8 @@ slo
 ssl
 sso
 subcommands
+subfolder
+subfolders
 svg
 swiftbrowser
 swiftrequest

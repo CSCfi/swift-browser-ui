@@ -182,7 +182,7 @@ class VaultClient:
                         url,
                         response.status,
                     )
-                    if response.status == 204:
+                    if response.status == 204 or response.status == 404:
                         return None
 
                     content = await response.json()
@@ -204,8 +204,7 @@ class VaultClient:
                             response.raise_for_status()
                         await asyncio.sleep(0.2)
                         continue
-                    if response.status == 404:
-                        return None
+
                     if response.status >= 400:
                         message = _process_error(VaultError(**content))
                         raise VaultServerError(text=message, reason=message)

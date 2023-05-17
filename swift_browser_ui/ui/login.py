@@ -308,10 +308,13 @@ async def login_with_token(
         body=None,
     )
     client = request.app["api_client"]
-    if setd["oidc_enabled"]:
-        session = await aiohttp_session.get_session(request)
-    else:
-        session = await aiohttp_session.new_session(request)
+
+    session = (
+        await aiohttp_session.get_session(request)
+        if setd["oidc_enabled"]
+        else await aiohttp_session.new_session(request)
+    )
+
     session["at"] = time.time()
 
     session["referer"] = request.url.host
@@ -381,10 +384,7 @@ async def login_with_token(
     session["token"] = token
     session["uname"] = uname
 
-    if taint:
-        session["taint"] = True
-    else:
-        session["taint"] = False
+    session["taint"] = True if taint else False
 
     session.changed()
 

@@ -22,6 +22,19 @@ backend-lint:
     - tox -e docs
     - tox -e bandit
 
+spellcheck:
+  stage: verify
+  tags:
+    - docker-exec
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+  image: $BUILD_IMAGE
+  before_script:
+    - pip install pyspelling
+  script:
+    - pyspelling
+
 frontend-lint:
   stage: verify
   tags:
