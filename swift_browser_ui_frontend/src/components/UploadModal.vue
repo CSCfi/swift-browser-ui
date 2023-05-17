@@ -43,6 +43,8 @@
           <CUploadButton
             v-model="files"
             v-csc-control
+            @add-files="buttonAddingFiles=true"
+            @cancel="buttonAddingFiles=false"
           >
             <span>
               {{ $t("message.encrypt.dropMsg") }}
@@ -152,7 +154,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="noUpload || addingFiles"
+        :disabled="noUpload || addingFiles || buttonAddingFiles"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -203,6 +205,7 @@ export default {
       projectInfoLink: "",
       toastVisible: false,
       addingFiles: false,
+      buttonAddingFiles: false,
     };
   },
   computed: {
@@ -324,7 +327,6 @@ export default {
         return this.$store.state.dropFiles.message;
       },
       set(value) {
-        this.addingFiles = true;
         const files = Array.from(value);
         files.forEach(file => {
           if (this.addFiles) {
@@ -332,7 +334,7 @@ export default {
             this.$store.commit("appendDropFiles", file);
           }
         });
-        this.addingFiles = false;
+        this.buttonAddingFiles = false;
       },
     },
     filesPagination() {
@@ -371,7 +373,6 @@ export default {
       this.refreshNoUpload();
     },
     dropFiles: function () {
-      //this.checkUploadSize();
       this.refreshNoUpload();
     },
     ownPrivateKey: function() {
