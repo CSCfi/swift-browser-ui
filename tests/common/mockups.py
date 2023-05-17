@@ -208,10 +208,11 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                     "project": "test-id-0",
                     "container": "test-container",
                     "object": "test-object",
+                    "object_name": "test-object1",
                     "receiver": "test-project-1",
                 },
                 "cookies": {},
-                "query": {},
+                "query": {"total": 1},
                 "headers": {},
                 "query_string": "",
                 "remote": "test-remote",
@@ -223,6 +224,11 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                     "Log": unittest.mock.MagicMock(logging.Logger),
                     "test-id": "placeholder",
                     "oidc_client": self.mock_oidc_client,
+                    "vault_client": types.SimpleNamespace(
+                        **{
+                            "put_header": unittest.mock.AsyncMock(),
+                        }
+                    ),
                 },
                 "url": types.SimpleNamespace(
                     **{
@@ -230,6 +236,13 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                     }
                 ),
                 "path": "/",
+                "content": types.SimpleNamespace(
+                    **{
+                        "read": unittest.mock.AsyncMock(
+                            return_value=b"{'header': 'header'}"
+                        )
+                    }
+                ),
             }
         )
         super().setUp()
