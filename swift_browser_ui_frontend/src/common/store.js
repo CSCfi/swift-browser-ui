@@ -57,6 +57,7 @@ const store = createStore({
     sourceProjectId: "",
     uploadAbort: undefined,
     renderedFolders: true,
+    addUploadFiles: false,
   },
   mutations: {
     updateObjects(state, objects) {
@@ -149,20 +150,13 @@ const store = createStore({
       state.uploadEndpoint = endpoint;
     },
     appendDropFiles(state, file) {
+      //Checking for identical path only, not name:
+      //different folders may have same file names
       if (
         state.dropFiles.find(
           ({ relativePath }) => relativePath === String(file.relativePath),
-        ) === undefined &&
-        state.dropFiles.find(({ name }) => name === String(file.name)) ===
-          undefined
+        ) === undefined
       ) {
-        state.dropFiles.push(file);
-      } else {
-        // we remove and push the file again to get new size
-        // and if the file exists to referesh dropFiles var
-        state.dropFiles = state.dropFiles.filter(v => {
-          return v.relativePath !== file.relativePath && v.name !== file.name;
-        });
         state.dropFiles.push(file);
       }
     },
@@ -247,6 +241,9 @@ const store = createStore({
     },
     toggleRenderedFolders(state, payload) {
       state.renderedFolders = payload;
+    },
+    setFilesAdded(state, payload) {
+      state.addUploadFiles = payload;
     },
   },
   actions: {
