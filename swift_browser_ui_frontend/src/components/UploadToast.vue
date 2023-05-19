@@ -3,7 +3,10 @@
     <div class="toast-wrapper">
       <c-row justify="space-between">
         <div class="col">
-          <h3 v-if="!notificationToggled">
+          <h3 v-if="closable">
+            {{ $t("message.upload.complete") }}
+          </h3>
+          <h3 v-else-if="!notificationToggled">
             {{ $t("message.upload.hasStarted") }}
           </h3>
           <h3 v-else>
@@ -28,7 +31,9 @@
 
       <div class="toast-main">
         <p>
-          {{ $t("message.upload.estimate") }}
+          <span v-if="!closable">
+            {{ $t("message.upload.estimate") }}
+          </span>
           <a
             class="link-underline"
             href="javascript:void(0)"
@@ -41,11 +46,20 @@
         <ProgressBar class="progress-bar" />
 
         <c-button
+          v-if="!closable"
           outlined
           @click="cancelUpload"
           @keyup.enter="cancelUpload"
         >
           {{ $t("message.share.cancel") }}
+        </c-button>
+        <c-button
+          v-else
+          outlined
+          @click="closeUpload"
+          @keyup.enter="closeUpload"
+        >
+          {{ $t("message.share.close") }}
         </c-button>
       </div>
     </div>
@@ -64,6 +78,9 @@ export default {
   computed: {
     currentFile() {
       return this.$store.state.encryptedFile;
+    },
+    closable() {
+      return this.$store.state.uploadNotificationClosable;
     },
   },
   mounted() {
@@ -84,6 +101,10 @@ export default {
       setTimeout(() => {
         this.$refs.minimize.focus();
       }, 100);
+    },
+    closeUpload() {
+      this.removeToast();
+      this.$emit("close-upload");
     },
     cancelUpload() {
       this.removeToast();

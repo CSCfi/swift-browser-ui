@@ -6,6 +6,9 @@
       gap="64"
       justify="space-between"
     >
+      <h3 v-if="closable">
+        {{ $t("message.upload.complete") }}
+      </h3>
       <h3>
         {{ $t("message.upload.inProgress") }}
       </h3>
@@ -43,6 +46,11 @@ export default {
   name: "UploadAlert",
   components: {
     ProgressBar,
+  },
+  computed: {
+    closable() {
+      return this.$store.state.uploadNotificationClosable;
+    },
   },
   mounted() {
     setTimeout(() => {

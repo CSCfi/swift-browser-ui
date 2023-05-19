@@ -5,6 +5,7 @@
     @toggle-notification="toggleNotification"
     @view-container="viewContainer"
     @cancel-upload="onCancel"
+    @close-upload="onClosed"
   />
   <UploadAlert
     v-else
@@ -43,6 +44,9 @@ export default {
     },
     onCancel() {
       this.$emit("cancel-upload");
+      this.$store.commit("toggleUploadNotification", false);
+    },
+    onClosed() {
       this.$store.commit("toggleUploadNotification", false);
     },
     viewContainer() {
