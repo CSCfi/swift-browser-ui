@@ -5,10 +5,10 @@
       align="center"
     >
       <router-link
-        :to="home.path"
+        :to="{ name: 'AllFolders'}"
       >
         <i class="mdi mdi-home" />
-        <p>&nbsp;{{ home.title }}</p>
+        <p>&nbsp;{{ $t("message.folderTabs.all") }}</p>
       </router-link>
 
       <router-link
@@ -39,14 +39,6 @@
 
 export default {
   name: "BreadcrumbNav",
-  data() {
-    return {
-      home: {
-        title: this.$t("message.folderTabs.all"),
-        path: { name: "AllFolders" },
-      },
-    };
-  },
   computed: {
     folder() {
       return this.$route.params.container;

@@ -29,6 +29,7 @@ import {
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
+  getPaginationOptions,
   toggleCopyFolderModal,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
@@ -57,25 +58,9 @@ export default {
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
-      paginationOptions: {
-        itemCount: 0,
-        itemsPerPage: 10,
-        currentPage: 1,
-        startFrom: 0,
-        endTo: 9,
-      },
+      paginationOptions: {},
       sortBy: "name",
       sortDirection: "asc",
-      paginationTextOverrides: {
-        itemsPerPageText: this.$t("message.table.itemsPerPage"),
-        nextPage: this.$t("message.table.nextPage"),
-        prevPage: this.$t("message.table.prevPage"),
-        pageText:
-          ({ start, end, count }) => start + " - " + end + " / " + count + "",
-        pageOfText:
-          ({ pageNumber, count }) =>
-            this.$t("message.table.page") + pageNumber + " / " + count + "",
-      },
     };
   },
   computed: {
@@ -98,13 +83,13 @@ export default {
     },
     locale() {
       this.setHeaders();
-      this.handlePaginationText();
       this.getPage();
+      this.setPagination();
     },
   },
   created() {
     this.setHeaders();
-    this.handlePaginationText();
+    this.setPagination();
   },
   methods: {
     async getSharingContainers() {
@@ -382,6 +367,11 @@ export default {
         },
       ];
     },
+    setPagination: function () {
+      const paginationOptions = getPaginationOptions(this.$t);
+      this.paginationOptions = paginationOptions;
+    },
+
     delete: function (container, objects) {
       if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
@@ -406,11 +396,6 @@ export default {
           this.$emit("delete-container", container);
         });
       }
-    },
-    handlePaginationText() {
-      this.paginationOptions.textOverrides = this.locale === "fi"
-        ? this.paginationTextOverrides
-        : {};
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {

@@ -225,32 +225,6 @@ c-modal {
 
 .search {
   flex: 0.4;
-  border: 1px solid #CACACA;
-    border-radius: 4px;
-    background: #FFFFFF;
-
-  input, input::placeholder, .icon {
-    color: $csc-grey !important;
-  }
-
-  input::placeholder {
-    opacity: 0.8;
-  }
-
-  input, input:focus {
-    box-shadow:none;
-  }
-
-  input {
-    border: none;
-    &:focus {
-      outline: 2px solid $csc-primary;
-
-     & + .icon {
-        color: $csc-primary !important;
-      }
-    }
-  }
 }
 
 .display-options-menu {

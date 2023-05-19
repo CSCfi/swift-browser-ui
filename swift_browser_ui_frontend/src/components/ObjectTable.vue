@@ -249,6 +249,7 @@ export default {
     },
     locale () {
       this.setLocalizedContent();
+      this.getFolderSharedStatus();
     },
   },
   created: function () {
