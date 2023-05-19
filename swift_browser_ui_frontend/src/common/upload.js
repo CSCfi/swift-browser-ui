@@ -86,7 +86,7 @@ export default class EncryptedUploadSession {
     this.signal = store.state.uploadAbort.signal;
 
     this.totalFiles = this.files.length;
-    this.finished = false;
+    this.cancelled = false;
     this.currentFile = "";
     this.ptr = 0;
     this.currentTotalBytes = 0;
@@ -197,8 +197,11 @@ export default class EncryptedUploadSession {
           });
           break;
         case "nextChunk":
-          if (this.finished) {
+          if (this.cancelled) {
+            this.socket.close();
+            this.cleanUp();
             break;
+            //delete socket etc in cleanUpDone
           }
           this.$store.commit(
             "updateEncryptedFileProgress",
@@ -216,50 +219,47 @@ export default class EncryptedUploadSession {
           break;
         case "cleanUpDone":
           delete this.socket;
-          this.$store.commit(
-            "updateEncryptedProgress",
-            (this.totalFiles - this.files.length) / this.totalFiles,
-          );
+          if (!this.cancelled) {
+            this.$store.commit(
+              "updateEncryptedProgress",
+              (this.totalFiles - this.files.length) / this.totalFiles,
+            );
 
-          // Cache the succeeded file metadata to IndexedDB
-          await this.$store.dispatch("updateContainers", {
-            projectID: this.project,
-            signal: undefined,
-          });
-          getDB().containers.get({
-            projectID: this.project,
-            name: this.container,
-          }).then(async container => {
-            await this.$store.dispatch("updateObjects", {
+            // Cache the succeeded file metadata to IndexedDB
+            await this.$store.dispatch("updateContainers", {
               projectID: this.project,
-              container: container,
               signal: undefined,
             });
-          }).catch(() => {});
-
-          if (this.files.length > 0) {
+            getDB().containers.get({
+              projectID: this.project,
+              name: this.container,
+            }).then(async container => {
+              await this.$store.dispatch("updateObjects", {
+                projectID: this.project,
+                container: container,
+                signal: undefined,
+              });
+            }).catch(() => {});
+          }
+          if (this.files.length > 0 && !this.cancelled) {
             this.currentFile = undefined;
             this.initFileSystem();
           }
           else {
-            this.$store.commit("eraseProgress");
-            this.$store.commit("eraseEncryptedProgress");
-            this.$store.commit("eraseEncryptedFile");
-            this.$store.commit("eraseEncryptedFileProgress");
-            this.$store.commit("stopUploading");
-            this.$store.commit("stopChunking");
-            killUploadEndpoint(
-              this.active.id,
-              this.project,
-            ).then(() => {})
-              .catch(() => {});
-            document
-              .getElementById("mainContent")
-              .dispatchEvent(new Event("uploadComplete"));
+            //upload completed or cancelled
+            this.endUpload();
             // Try if purging the upload session from inside the upload
             // session doesn't break anything
             this.$store.commit("abortCurrentUpload");
             this.$store.commit("eraseCurrentUpload");
+            if (this.cancelled) {
+              this.$store.commit("eraseDropFiles");
+              this.files = [];
+            } else {
+              document
+                .getElementById("mainContent")
+                .dispatchEvent(new Event("uploadComplete"));
+            }
           }
           break;
       }
@@ -340,10 +340,20 @@ export default class EncryptedUploadSession {
   }
 
   cancelUpload() {
-    this.finished = true;
-    this.files = [];
-    this.socket.close();
-    this.cleanUp();
+    this.cancelled = true;
+  }
+
+  endUpload() {
+    this.$store.commit("eraseProgress");
+    this.$store.commit("eraseEncryptedProgress");
+    this.$store.commit("eraseEncryptedFile");
+    this.$store.commit("eraseEncryptedFileProgress");
+    this.$store.commit("stopUploading");
+    this.$store.commit("stopChunking");
+    killUploadEndpoint(
+      this.active.id,
+      this.project,
+    );
   }
 
   // Initialize the service worker for upload session
