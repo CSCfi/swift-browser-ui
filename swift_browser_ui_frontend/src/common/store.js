@@ -527,6 +527,11 @@ const store = createStore({
         });
 
         if (objects.length > 0) {
+          objects.forEach(obj => {
+            obj.container = container.name;
+            obj.containerID = container.id;
+            obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
+          });
           sharedObjects = sharedObjects.concat(objects);
           marker = objects[objects.length - 1].name;
         }

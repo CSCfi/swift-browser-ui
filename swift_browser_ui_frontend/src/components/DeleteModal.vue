@@ -53,6 +53,9 @@ export default {
     container() {
       return this.$route.params.container;
     },
+    owner() {
+      return this.$route.params.owner;
+    },
     renderedFolders() {
       return this.$store.state.renderedFolders;
     },
@@ -72,7 +75,8 @@ export default {
 
       if (!isSegmentsContainer) {
         segment_container = await getDB().containers.get({
-          projectID: this.projectID,
+          projectID: this.$route.name === "SharedObjects" ?
+            this.owner : this.projectID,
           name: `${this.selectedObjects[0].container}_segments`,
         });
       }
@@ -114,14 +118,13 @@ export default {
       }
 
       swiftDeleteObjects(
-        this.$route.params.owner || this.projectID,
+        this.owner || this.projectID,
         this.container,
         to_remove,
       ).then(async () => {
-
         if (segments_to_remove.length > 0) {
           await swiftDeleteObjects(
-            this.$route.params.owner || this.projectID,
+            this.owner || this.projectID,
             segment_container.name,
             segments_to_remove,
           );
@@ -132,7 +135,7 @@ export default {
             "updateSharedObjects",
             {
               project: this.projectID,
-              owner: this.$route.params.owner,
+              owner: this.owner,
               container: {
                 name: this.container,
                 id: 0,

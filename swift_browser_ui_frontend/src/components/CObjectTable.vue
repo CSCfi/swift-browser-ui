@@ -12,7 +12,7 @@
     :sort-direction="sortDirection"
     selection-property="name"
     external-data
-    selectable
+    :selectable="selectable"
     @selection="handleSelection"
     @paginate="getPage"
     @sort="onSort"
@@ -95,6 +95,10 @@ export default {
     },
     active () {
       return this.$store.state.active;
+    },
+    selectable () {
+      return this.$route.name !== "SharedObjects"
+        || this.accessRights.length === 2;
     },
   },
   watch: {
