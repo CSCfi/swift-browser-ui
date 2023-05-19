@@ -591,12 +591,13 @@ export default {
             document.querySelector("#container-error-toasts").addToast(
               {
                 type: "success",
+                duration: 4000,
                 progress: false,
                 message: this.$t("message.upload.isStarting"),
               },
             );
             //avoid overlapping toasts
-            setTimeout(() => { this.toastVisible = false; }, 6000);
+            setTimeout(() => { this.toastVisible = false; }, 4000);
           }
           this.beginEncryptedUpload();
         }
