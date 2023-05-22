@@ -91,7 +91,7 @@ async def servinit(
     """Create an aiohttp server with the correct arguments and routes."""
     middlewares = [
         swift_browser_ui.ui.middlewares.error_middleware,
-        swift_browser_ui.ui.middlewares.check_session_at,
+        swift_browser_ui.ui.middlewares.check_session,
         swift_browser_ui.ui.middlewares.check_session_taintness,
     ]
     if inject_middleware:

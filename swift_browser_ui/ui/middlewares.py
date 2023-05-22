@@ -33,17 +33,63 @@ def return_error_response(error_code: int) -> web.Response:
 
 
 @web.middleware
-async def check_session_at(
-    request: web.Request,
-    handler: AiohttpHandler,
-) -> web.Response:
-    """Raise on expired sessions."""
-    session = await aiohttp_session.get_session(request)
-    if "at" in session and session["at"] + setd["session_lifetime"] < time.time():
-        session.invalidate()
-        if not ("login" in request.path or request.path == "/"):
-            raise web.HTTPUnauthorized(reason="Token expired.")
+async def check_session(
+    request: web.Request, handler: aiohttp_session.Handler
+) -> web.StreamResponse:
+    """Raise on expired or invalid sessions.
+
+    :param request: A request instance
+    :param handler: A request handler
+    :raises: Reformatted HTTP Exceptions
+    :returns: Successful requests unaffected
+    """
+    try:
+        if request.path == "/" or any(s in request.path for s in {"login", "static"}):
+            return await handler(request)
+
+        session = await aiohttp_session.get_session(request)
+        request.app["Log"].info("Identified session: %r", session)
+
+        if session.empty:
+            request.app["Log"].debug("Empty session")
+            session.invalidate()
+            raise _unauthorized("You must provide authentication.")
+
+        if not all(k in session for k in {"projects", "uname", "at"}):
+            request.app["Log"].error(
+                "Session is invalid %r. This could be a bug or abuse.", session
+            )
+            session.invalidate()
+            raise _unauthorized("Invalid session, authenticate again.")
+
+        if "at" in session and session["at"] + setd["session_lifetime"] < time.time():
+            request.app["Log"].debug("Session expired")
+            session.invalidate()
+            raise _unauthorized("Session expired.")
+
+    except KeyError as error:
+        reason = (
+            f"No valid session. A session was invalidated due to invalid token. {error}"
+        )
+        request.app["Log"].exception(reason)
+        raise _unauthorized(reason) from error
+    except web.HTTPException:
+        # HTTPExceptions are processed in the other middleware
+        raise
+    except Exception as error:
+        reason = (
+            f"No valid session. A session was invalidated due to another reason: {error}"
+        )
+        request.app["Log"].exception(reason)
+        raise _unauthorized(reason) from error
+
     return await handler(request)
+
+
+def _unauthorized(reason: str) -> web.HTTPUnauthorized:
+    return web.HTTPUnauthorized(
+        headers={"WWW-Authenticate": 'OAuth realm="/", charset="UTF-8"'}, reason=reason
+    )
 
 
 @web.middleware
