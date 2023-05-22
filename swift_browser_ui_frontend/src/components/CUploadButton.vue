@@ -3,8 +3,8 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
 <template>
   <div class="upload-btn-wrapper">
     <c-button
-      @click="$refs.input.click()"
-      @keyup.enter="$refs.input.click()"
+      @click="click"
+      @keyup.enter="click"
     >
       <slot />
     </c-button>
@@ -14,6 +14,7 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
       type="file"
       multiple
       @input="$emit('update:modelValue', $event.target.files)"
+      @cancel="$emit('cancel')"
     >
   </div>
 </template>
@@ -28,7 +29,13 @@ export default {
       default: () => [],
     },
   },
-  emits: ["update:modelValue"],
+  emits: ["update:modelValue", "add-files", "cancel"],
+  methods: {
+    click() {
+      this.$refs.input.click();
+      this.$emit("add-files");
+    },
+  },
 };
 </script>
 
