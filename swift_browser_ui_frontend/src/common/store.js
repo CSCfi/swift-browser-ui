@@ -9,10 +9,13 @@ import {
   getTagsForObjects,
   makeGetObjectsMetaURL,
   tokenize,
-} from "./conv";
+  addSegmentContainerSize,
+  getSegmentObjects,
+  sortContainer,
+} from "@/common/conv";
 
 import { getDB } from "@/common/db";
-import {getSharedContainers} from "./globalFunctions";
+import { getSharedContainers } from "@/common/globalFunctions";
 
 const store = createStore({
   state: {
@@ -251,15 +254,17 @@ const store = createStore({
       { dispatch },
       { projectID, signal },
     ) {
-      const existingContainers = await getDB().containers
-        .where({ projectID })
+      const existingContainers = await getDB()
+        .containers.where({ projectID })
         .toArray();
+
       let containers;
       let marker = "";
       let newContainers = [];
       do {
         containers = [];
         containers = await getContainers(projectID, marker).catch(() => {});
+
         if (containers.length > 0) {
           containers.forEach(cont => {
             cont.tokens = tokenize(cont.name);
@@ -269,8 +274,8 @@ const store = createStore({
           marker = containers[containers.length - 1].name;
         }
       } while (containers.length > 0);
-      const sharedContainers = await getSharedContainers(projectID);
 
+      const sharedContainers = await getSharedContainers(projectID);
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
@@ -286,7 +291,9 @@ const store = createStore({
           cont.count = count;
           cont.name = cont.container;
         }
-        await getDB().containers.bulkPut(sharedContainers).catch(() => {});
+        await getDB()
+          .containers.bulkPut(sharedContainers)
+          .catch(() => {});
         newContainers = newContainers.concat(sharedContainers);
       }
 
@@ -306,9 +313,17 @@ const store = createStore({
         await getDB().containers.bulkDelete(toDelete);
         await getDB().objects.where("containerID").anyOf(toDelete).delete();
       }
-      const containersFromDB = await getDB().containers
-        .where({ projectID })
+      const containersFromDB = await getDB()
+        .containers.where({ projectID })
         .toArray();
+
+      // sort "_segments" folder before original folder
+      // so that "_segments" folder could be updated first
+      newContainers = sortContainer(newContainers);
+
+      for (let i = 0; i < newContainers.length; i++) {
+        addSegmentContainerSize(newContainers[i], newContainers);
+      }
 
       for (let i = 0; i < newContainers.length; i++) {
         const container = newContainers[i];
@@ -321,8 +336,8 @@ const store = createStore({
 
         if (oldContainer !== undefined) {
           key = oldContainer.id;
-          dbObjects = await getDB().objects
-            .where({ containerID: oldContainer.id })
+          dbObjects = await getDB()
+            .objects.where({ containerID: oldContainer.id })
             .count();
         }
         if (oldContainer !== undefined) {
@@ -335,8 +350,8 @@ const store = createStore({
           }
           if (container.count === 0) {
             updateObjects = false;
-            await getDB().objects
-              .where({ containerID: oldContainer.id })
+            await getDB()
+              .objects.where({ containerID: oldContainer.id })
               .delete();
           }
           await getDB().containers.update(oldContainer.id, container);
@@ -372,15 +387,17 @@ const store = createStore({
       { dispatch },
       { projectID, container, signal },
     ) {
-      const isSegmentsContainer = container.name.match("_segments");
+      const isSegmentsContainer = container.name.endsWith("_segments");
       const existingObjects = await getDB().objects
         .where({ containerID: container.id })
         .toArray();
+
       let newObjects = [];
       let objects;
       let marker = "";
       do {
         objects = await getObjects(projectID, container.name, marker, signal);
+
         if (objects.length > 0) {
           objects.forEach(obj => {
             obj.container = container.name;
@@ -400,6 +417,14 @@ const store = createStore({
       });
       if (toDelete.length) {
         await getDB().objects.bulkDelete(toDelete);
+      }
+
+      if (!isSegmentsContainer) {
+        const segment_objects = await getSegmentObjects(projectID, container);
+        for (let i = 0; i < newObjects.length; i++) {
+          if (segment_objects[i])
+            newObjects[i].bytes = segment_objects[i].bytes;
+        }
       }
 
       newObjects.map(newObj => {
@@ -485,6 +510,7 @@ const store = createStore({
       { commit, dispatch },
       { project, owner, container, signal },
     ) {
+      const isSegmentsContainer = container.name.endsWith("_segments");
       let sharedObjects = [];
       let marker = "";
       let objects = [];
@@ -505,7 +531,24 @@ const store = createStore({
           marker = objects[objects.length - 1].name;
         }
       } while (objects.length > 0);
+
+      if (!isSegmentsContainer) {
+        const segment_objects = await getObjects(
+          project,
+          `${container.name}_segments`,
+          "",
+          signal,
+          true,
+          owner,
+        );
+        for (let i = 0; i < sharedObjects.length; i++) {
+          if (segment_objects[i])
+            sharedObjects[i].bytes = segment_objects[i].bytes;
+        }
+      }
+
       commit("updateObjects", sharedObjects);
+
       dispatch("updateObjectTags", {
         projectID: project,
         container,

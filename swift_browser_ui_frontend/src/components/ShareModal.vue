@@ -289,6 +289,13 @@ export default {
           rights,
           await getSharedContainerAddress(this.$route.params.project),
         );
+        await this.$store.state.client.shareNewAccess(
+          this.$store.state.active.id,
+          `${this.folderName}_segments`,
+          this.tags,
+          rights,
+          await getSharedContainerAddress(this.$route.params.project),
+        );
       }
       catch(error) {
         if (error instanceof TypeError) {
@@ -312,6 +319,13 @@ export default {
       await addAccessControlMeta(
         this.$route.params.project,
         this.folderName,
+        rights,
+        this.tags,
+      );
+
+      await addAccessControlMeta(
+        this.$route.params.project,
+        `${this.folderName}_segments`,
         rights,
         this.tags,
       );

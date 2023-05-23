@@ -1,4 +1,10 @@
-import { getContainerMeta, getAccessControlMeta, getObjectsMeta } from "./api";
+import {
+  getContainerMeta,
+  getAccessControlMeta,
+  getObjectsMeta,
+} from "@/common/api";
+import { getDB } from "@/common/db";
+import { getFolderName } from "@/common/globalFunctions";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -351,4 +357,53 @@ export function parseDateTime(locale, value, shortDate) {
   // Replace Finnish "at" time indicator with comma
   // English version defaults to comma
   return dateTimeFormat.replace(" klo", ", ");
+}
+
+// Find the segments container matching a container (if it exists) and
+// correctly update the container size using the size of the segments
+// container.
+export function addSegmentContainerSize(container, containers) {
+  let segments = containers.find(el => el.name.match(`${container.name}_segments`));
+  if (segments !== undefined) {
+    container.bytes = segments.bytes;
+  }
+}
+
+// Find the segments of an object and
+// update the original objects size accordingly
+export async function getSegmentObjects(projectID, container) {
+  const segment_container = await getDB().containers.get({
+    projectID,
+    name: `${container.name}_segments`,
+  });
+
+  return segment_container ? await getDB()
+    .objects.where({ containerID: segment_container.id })
+    .toArray() : [];
+}
+
+export function getItemSize(currentItem, objects, route) {
+  const currentFoldername = getFolderName(currentItem.name, route);
+  let subfolderSize = currentItem.bytes;
+
+  for (let i = 0; i < objects.length; i++) {
+    const folderName = getFolderName(objects[i].name, route);
+
+    if (
+      folderName === currentFoldername &&
+      objects[i].name !== currentItem.name
+    ) {
+      subfolderSize += objects[i].bytes;
+    }
+  }
+  return getHumanReadableSize(subfolderSize);
+}
+
+export function sortContainer(containers) {
+  // sort "_segments" folder before original folder
+  return containers.sort((a, b) => {
+    if (a.name === `${b.name}_segments`) {
+      return -1;
+    }
+  });
 }

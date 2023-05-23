@@ -136,8 +136,7 @@ import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
-import debounce from "lodash/debounce";
-import escapeRegExp from "lodash/escapeRegExp";
+import { debounce, delay, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 
@@ -159,7 +158,6 @@ export default {
       ownerProject: "",
       dateOfSharing: "",
       oList: [],
-      selected: undefined,
       hidePagination: false,
       renderFolders: true,
       hideTags: false,
@@ -202,6 +200,17 @@ export default {
     locale () {
       return this.$i18n.locale;
     },
+    isFolderUploading() {
+      return this.$store.state.isUploading;
+    },
+    openDeleteModal() {
+      return this.$store.state.openDeleteModal;
+    },
+    selectedObjects() {
+      return this.$store.state.deletableObjects.length > 0
+        ? this.$store.state.deletableObjects
+        : [];
+    },
   },
   watch: {
     active: async function() {
@@ -236,20 +245,17 @@ export default {
         this.setTableOptionsMenu();
       }
     },
-    oList: function() {
-      if (this.oList !== undefined && this.$route.query.selected) {
-        const selected = this.$route.query.selected;
-        const obj = this.oList.find(o => {
-          return o.name === selected;
-        });
-        if (obj) {
-          this.selected = obj;
-        }
-      }
-    },
     locale () {
       this.setLocalizedContent();
       this.getFolderSharedStatus();
+    },
+    isFolderUploading: function () {
+      if (!this.isFolderUploading) this.updateContainers();
+    },
+    openDeleteModal: async function () {
+      if (!this.openDeleteModal && this.selectedObjects.length === 0) {
+        this.updateContainers();
+      }
     },
   },
   created: function () {
@@ -340,6 +346,14 @@ export default {
             message: this.$t("message.subfolders.deleteNote"),
           });
       }
+    },
+    updateContainers: function() {
+      delay(async () => {
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: null,
+        });
+      }, 3000);
     },
     updateObjects: async function () {
       if (

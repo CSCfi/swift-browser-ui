@@ -114,6 +114,7 @@ export default {
 
         limit = this.paginationOptions.itemsPerPage;
       }
+
       const sharingContainers = await getSharingContainers(this.active.id);
       const sharedContainers = await getSharedContainers(this.active.id);
 
@@ -127,185 +128,192 @@ export default {
         return "";
       };
 
+      // Filter out segment folders for rendering
       // Map the 'accessRights' to the container if it's a shared container
-      const mappedContainers = await Promise.all(this.conts.map(async(cont) => {
-        const sharedDetails = cont.owner ? await getAccessDetails(
-          this.$route.params.project,
-          cont.container,
-          cont.owner) : null;
-        const accessRights = sharedDetails ? sharedDetails.access : null;
-        return sharedDetails && accessRights ?
-          {...cont, accessRights} : {...cont};
-      }));
+      const mappedContainers = await Promise.all(
+        this.conts.filter(cont => !cont.name.endsWith("_segments"))
+          .map(async(cont) => {
+            const sharedDetails = cont.owner ? await getAccessDetails(
+              this.$route.params.project,
+              cont.container,
+              cont.owner) : null;
+            const accessRights = sharedDetails ? sharedDetails.access : null;
+            return sharedDetails && accessRights
+              ? {...cont, accessRights} : {...cont};
+          }));
 
-      this.containers = mappedContainers.slice(offset, offset + limit).reduce((
-        items,
-        item,
-      ) => {
-        items.push({
-          name: {
-            value: truncate(item.name),
-            component: {
-              tag: "c-link",
-              params: {
-                href: "javascript:void(0)",
-                color: "dark-grey",
-                path: mdiFolder,
-                iconFill: "primary",
-                iconStyle: {
-                  marginRight: "1rem",
-                },
-                onClick: () => {
-                  if(item.owner) {
-                    this.$router.push({
-                      name: "SharedObjects",
-                      params: {
-                        container: item.name,
-                        owner: item.owner,
-                      },
-                    });
-                  } else {
-                    this.$router.push({
-                      name: "ObjectsView",
-                      params: {
-                        container: item.name,
-                      },
-                    });
-                  }
+      this.containers = mappedContainers
+        .slice(offset, offset + limit).reduce((
+          items,
+          item,
+        ) => {
+          items.push({
+            name: {
+              value: truncate(item.name),
+              component: {
+                tag: "c-link",
+                params: {
+                  href: "javascript:void(0)",
+                  color: "dark-grey",
+                  path: mdiFolder,
+                  iconFill: "primary",
+                  iconStyle: {
+                    marginRight: "1rem",
+                  },
+                  onClick: () => {
+                    if(item.owner) {
+                      this.$router.push({
+                        name: "SharedObjects",
+                        params: {
+                          container: item.name,
+                          owner: item.owner,
+                        },
+                      });
+                    } else {
+                      this.$router.push({
+                        name: "ObjectsView",
+                        params: {
+                          container: item.name,
+                        },
+                      });
+                    }
+                  },
                 },
               },
             },
-          },
-          items: {
-            value: item.count,
-          },
-          size: {
-            value: getHumanReadableSize(item.bytes),
-          },
-          ...(this.hideTags ? {} : {
-            tags: {
+            items: {
+              value: item.count,
+            },
+            size: {
+              value: getHumanReadableSize(item.bytes),
+            },
+            ...(this.hideTags ? {} : {
+              tags: {
+                value: null,
+                children: [
+                  ...(item.tags || []).map((tag, index) => ({
+                    key: "tag_" + index + "",
+                    value: tag,
+                    component: {
+                      tag: "c-tag",
+                      params: {
+                        flat: true,
+                      },
+                    },
+                  })),
+                  ...(item.tags && !item.tags.length
+                    ? [{ key: "no_tags", value: "-" }]
+                    : []),
+                ],
+              },
+            }),
+            sharing: {
+              value: getSharedStatus(item.name),
+            },
+            actions: {
               value: null,
+              sortable: null,
+              align: "end",
               children: [
-                ...(item.tags || []).map((tag, index) => ({
-                  key: "tag_" + index + "",
-                  value: tag,
+                {
+                  value: this.$t("message.download"),
                   component: {
-                    tag: "c-tag",
+                    tag: "c-button",
                     params: {
-                      flat: true,
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.download"),
+                      href: "/download/".concat(
+                        this.$route.params.project,
+                        "/",
+                        item.name,
+                      ),
+                      target: "_blank",
+                      path: mdiTrayArrowDown,
                     },
-                  },
-                })),
-                ...(item.tags && !item.tags.length
-                  ? [{ key: "no_tags", value: "-" }]
-                  : []),
-              ],
-            },
-          }),
-          sharing: {
-            value: getSharedStatus(item.name),
-          },
-          actions: {
-            value: null,
-            sortable: null,
-            align: "end",
-            children: [
-              {
-                value: this.$t("message.download"),
-                component: {
-                  tag: "c-button",
-                  params: {
-                    text: true,
-                    size: "small",
-                    title: this.$t("message.download"),
-                    href: "/download/".concat(
-                      this.$route.params.project,
-                      "/",
-                      item.name,
-                    ),
-                    target: "_blank",
-                    path: mdiTrayArrowDown,
                   },
                 },
-              },
-              // Share button is disabled for Shared (with you) Folders
-              {
-                value: this.$t("message.share.share"),
-                component: {
-                  tag: "c-button",
-                  params: {
-                    text: true,
-                    size: "small",
-                    title: this.$t("message.share.share"),
-                    path: mdiShareVariantOutline,
-                    onClick: (item) => {
-                      this.$store.commit("toggleShareModal", true);
-                      this.$store.commit(
-                        "setFolderName", item.data.name.value);
-                    },
-                    onKeyUp: (event) => {
-                      if(event.keyCode === 13) {
+                // Share button is disabled for Shared (with you) Folders
+                {
+                  value: this.$t("message.share.share"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.share.share"),
+                      path: mdiShareVariantOutline,
+                      onClick: (item) => {
                         this.$store.commit("toggleShareModal", true);
                         this.$store.commit(
                           "setFolderName", item.data.name.value);
-                      }
+                      },
+                      onKeyUp: (event) => {
+                        if(event.keyCode === 13) {
+                          this.$store.commit("toggleShareModal", true);
+                          this.$store.commit(
+                            "setFolderName", item.data.name.value);
+                        }
+                      },
+                      disabled: item.owner,
                     },
-                    disabled: item.owner,
                   },
                 },
-              },
-              {
-                value: null,
-                component: {
-                  tag: "c-menu",
-                  params: {
-                    items: [
-                      {
-                        name: this.$t("message.copy"),
-                        action: item.owner
-                          ? () => toggleCopyFolderModal(item.name, item.owner)
-                          : () => toggleCopyFolderModal(item.name),
-                        disabled: !item.bytes ? true : false,
-                      },
-                      {
-                        name: this.$t("message.editTags"),
-                        action: () => toggleEditTagsModal(null, item.name),
-                      },
-                      {
-                        name: this.$t("message.delete"),
-                        action: () => this.delete(
-                          item.name, item.count,
-                        ),
-                        disabled: item.owner && item.accessRights.length > 1,
-                      },
-                    ],
-                    customTrigger: {
-                      value: this.$t("message.options"),
-                      disabled: true,
-                      component: {
-                        tag: "c-button",
-                        params: {
-                          text: true,
-                          path: mdiDotsHorizontal,
-                          title: this.$t("message.options"),
-                          size: "small",
+                {
+                  value: null,
+                  component: {
+                    tag: "c-menu",
+                    params: {
+                      items: [
+                        {
+                          name: this.$t("message.copy"),
+                          action: item.owner
+                            ? () => toggleCopyFolderModal(
+                              item.name, item.owner)
+                            : () => toggleCopyFolderModal(item.name),
+                          disabled: !item.bytes ? true : false,
+                        },
+                        {
+                          name: this.$t("message.editTags"),
+                          action: () => toggleEditTagsModal(null, item.name),
+                        },
+                        {
+                          name: this.$t("message.delete"),
+                          action: () => this.delete(
+                            item.name, item.count,
+                          ),
                           disabled: item.owner
-                            && item.accessRights.length === 1,
+                            && item.accessRights.length > 1,
+                        },
+                      ],
+                      customTrigger: {
+                        value: this.$t("message.options"),
+                        disabled: true,
+                        component: {
+                          tag: "c-button",
+                          params: {
+                            text: true,
+                            path: mdiDotsHorizontal,
+                            title: this.$t("message.options"),
+                            size: "small",
+                            disabled: item.owner
+                              && item.accessRights.length === 1,
+                          },
                         },
                       },
                     },
                   },
                 },
-              },
-            ],
-          },
-        });
-        return items;
-      }, []);
+              ],
+            },
+          });
+
+          return items;
+        }, []);
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.conts.length,
+        itemCount: mappedContainers.length,
       };
     },
     async onSort(event) {
@@ -387,7 +395,8 @@ export default {
         swiftDeleteContainer(
           projectID,
           container,
-        ).then(() => {
+        ).then(async() => {
+          await swiftDeleteContainer(projectID, `${container}_segments`);
           document.querySelector("#container-toasts").addToast(
             { progress: false,
               type: "success",
