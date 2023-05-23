@@ -12,7 +12,7 @@
     :sort-direction="sortDirection"
     selection-property="name"
     external-data
-    selectable
+    :selectable="selectable"
     @selection="handleSelection"
     @paginate="getPage"
     @sort="onSort"
@@ -52,7 +52,7 @@ export default {
   props: {
     objs: {
       type: Array,
-      default: () => {return [];},
+      default: () => [],
     },
     disablePagination: {
       type: Boolean,
@@ -65,6 +65,10 @@ export default {
     renderFolders: {
       type: Boolean,
       default: true,
+    },
+    accessRights: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
@@ -91,6 +95,10 @@ export default {
     },
     active () {
       return this.$store.state.active;
+    },
+    selectable () {
+      return this.$route.name !== "SharedObjects"
+        || this.accessRights.length === 2;
     },
   },
   watch: {
@@ -247,6 +255,7 @@ export default {
                           toggleEditTagsModal(item.data.name.value, null);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },
@@ -267,6 +276,7 @@ export default {
                           this.$emit("delete-object", item);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },

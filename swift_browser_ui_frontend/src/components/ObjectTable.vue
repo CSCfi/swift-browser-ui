@@ -13,7 +13,7 @@
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}&nbsp;
           <c-link
-            v-show="!isSharedFolder"
+            v-show="accessRights.length === 0"
             underline
             tabindex="0"
             @click="toggleShareModal"
@@ -22,11 +22,11 @@
             {{ $t("message.table.edit_sharing") }}
           </c-link>
         </li>
-        <li v-show="isSharedFolder">
+        <li v-show="accessRights.length > 0">
           <b>{{ $t("message.table.source_project_id") }}: </b>
           {{ ownerProject }}
         </li>
-        <li v-show="isSharedFolder">
+        <li v-show="accessRights.length > 0">
           <b>{{ $t("message.table.date_of_sharing") }}: </b>
           {{ dateOfSharing }}
         </li>
@@ -97,7 +97,7 @@
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
-      :checked-rows="checkedRows"
+      :access-rights="accessRights"
       @selected-rows="handleSelection"
       @delete-object="confirmDelete"
     />
@@ -151,8 +151,7 @@ export default {
   },
   data: function () {
     return {
-      isSharingFolder: false,
-      isSharedFolder: false,
+      accessRights: [],
       sharedStatus: "",
       sharedContainers: [],
       ownerProject: "",
@@ -291,7 +290,6 @@ export default {
         ).then(
           async (ret) => {
             if (ret.length > 0) {
-              this.isSharingFolder = true;
               ret.length === 1
                 ? this.sharedStatus
                   = this.$t("message.folderDetails.sharing_to_one_project")
@@ -301,7 +299,7 @@ export default {
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
                 cont => cont.container === this.containerName) > -1) {
-                this.isSharedFolder = true;
+
                 const sharedDetails
                   = await getAccessDetails(
                     this.project,
@@ -309,12 +307,14 @@ export default {
                     this.$route.params.owner,
                   );
 
-                const accessRights = sharedDetails.access;
-                if (accessRights.length === 1) {
+                this.accessRights = sharedDetails.access;
+
+                if ( this.accessRights.length === 1
+                  && this.accessRights[0] === "r") {
                   this.sharedStatus
                     = this.$t("message.folderDetails.shared_with_read");
                 }
-                else if (accessRights.length > 1) {
+                else if ( this.accessRights.length === 2) {
                   this.sharedStatus
                     = this.$t("message.folderDetails.shared_with_read_write");
                 }

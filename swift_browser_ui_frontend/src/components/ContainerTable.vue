@@ -276,14 +276,14 @@ export default {
                         {
                           name: this.$t("message.editTags"),
                           action: () => toggleEditTagsModal(null, item.name),
+                          disabled: item.owner,
                         },
                         {
                           name: this.$t("message.delete"),
                           action: () => this.delete(
                             item.name, item.count,
                           ),
-                          disabled: item.owner
-                            && item.accessRights.length > 1,
+                          disabled: item.owner,
                         },
                       ],
                       customTrigger: {
@@ -296,8 +296,6 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
-                            disabled: item.owner
-                              && item.accessRights.length === 1,
                           },
                         },
                       },
