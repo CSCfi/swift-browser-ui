@@ -609,7 +609,7 @@ let default_translations = {
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
-        deleteManySuccess: " tiedostot poistettu",
+        deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",
         deleteObjectsMessage:
           "Tiedostoja ei voi palauttaa poistamisen jälkeen. " +
