@@ -44,7 +44,9 @@ async def check_session(
     :returns: Successful requests unaffected
     """
     try:
-        if request.path == "/" or any(s in request.path for s in {"login", "static"}):
+        if request.path == "/" or any(
+            s in request.path for s in {"login", "static", "health"}
+        ):
             return await handler(request)
 
         session = await aiohttp_session.get_session(request)
