@@ -153,15 +153,7 @@ const store = createStore({
       state.uploadEndpoint = endpoint;
     },
     appendDropFiles(state, file) {
-      //Checking for identical path only, not name:
-      //different folders may have same file names
-      if (
-        state.dropFiles.find(
-          ({ relativePath }) => relativePath === String(file.relativePath),
-        ) === undefined
-      ) {
-        state.dropFiles.push(file);
-      }
+      state.dropFiles.push(file);
     },
     eraseDropFile(state, file) {
       state.dropFiles.splice(

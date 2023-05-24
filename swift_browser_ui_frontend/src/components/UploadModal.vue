@@ -51,6 +51,25 @@
             </span>
           </CUploadButton>
         </div>
+        <c-alert
+          v-show="duplicateFile"
+          type="error"
+        >
+          <div class="duplicate-notification">
+            {{ $t("message.upload.duplicate") }}
+            <c-button
+              text
+              size="small"
+              @click="duplicateFile = false"
+            >
+              <i
+                slot="icon"
+                class="mdi mdi-close"
+              />
+              {{ $t("message.close") }}
+            </c-button>
+          </div>
+        </c-alert>
         <c-data-table
           v-if="dropFiles.length > 0"
           class="files-table"
@@ -204,6 +223,7 @@ export default {
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
+      duplicateFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
     };
@@ -331,7 +351,7 @@ export default {
         files.forEach(file => {
           if (this.addFiles) {
             file.relativePath = file.name;
-            this.$store.commit("appendDropFiles", file);
+            this.appendDropFiles(file);
           }
         });
         this.buttonAddingFiles = false;
@@ -416,6 +436,22 @@ export default {
     },
   },
   methods: {
+    appendDropFiles(file) {
+      //Checking for identical path only, not name:
+      //different folders may have same file names
+      if (
+        this.$store.state.dropFiles.find(
+          ({ relativePath }) => relativePath === String(file.relativePath),
+        ) === undefined
+      ) {
+        this.$store.commit("appendDropFiles", file);
+      } else {
+        if (!this.duplicateFile) {
+          this.duplicateFile = true;
+          setTimeout(() => { this.duplicateFile = false; }, 6000);
+        }
+      }
+    },
     onSelectValue: function (e) {
       if (e.detail) this.inputFolder = e.detail.name;
     },
@@ -436,11 +472,11 @@ export default {
         item.file(file => {
           if (this.addFiles) {
             file.relativePath = path + file.name;
-            this.$store.commit("appendDropFiles", file);
+            this.appendDropFiles(file);
           } else return;
         });
       } else if (item instanceof File) {
-        this.$store.commit("appendDropFiles", item);
+        this.appendDropFiles(item);
       } else if (item.isDirectory) {
         entry = item;
       }
@@ -473,7 +509,7 @@ export default {
         item = item.getAsFile();
         if (item instanceof File) {
           item.relativePath = path + item.name;
-          this.$store.commit("appendDropFiles", item);
+          this.appendDropFiles(item);
         }
       }
     },
@@ -558,6 +594,7 @@ export default {
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
+      this.duplicateFile = false;
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -667,6 +704,12 @@ c-card-actions {
 
 c-data-table.publickey-table {
   margin-top: 1rem;
+}
+
+.duplicate-notification {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 </style>
