@@ -221,6 +221,12 @@ export async function getTagsForObjects(
 }
 
 export function makeGetObjectsMetaURL(project, container, objects) {
+  for (let i = 0; i< objects.length; i++) {
+    if (objects[i].includes(",")) {
+      objects[i] = objects[i].replace(/,/g, "%2C");
+    }
+  }
+
   return new URL(
     "/api/meta/".concat(
       encodeURI(project),
