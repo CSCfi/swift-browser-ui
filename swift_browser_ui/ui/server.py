@@ -180,7 +180,7 @@ async def servinit(
             "/static/",
             path=str(setd["static_directory"]),
             name="static",
-            show_index=True,
+            show_index=False,
         )
 
     app.add_routes(
