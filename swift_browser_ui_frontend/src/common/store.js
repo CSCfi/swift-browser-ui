@@ -267,7 +267,8 @@ const store = createStore({
 
         if (containers.length > 0) {
           containers.forEach(cont => {
-            cont.tokens = tokenize(cont.name);
+            cont.tokens = cont.name.endsWith("_segments") ?
+              [] : tokenize(cont.name);
             cont.projectID = projectID;
           });
           newContainers = newContainers.concat(containers);
@@ -285,7 +286,8 @@ const store = createStore({
             signal,
             cont.owner,
           );
-          cont.tokens = tokenize(cont.container);
+          cont.tokens =  cont.container.endsWith("_segments") ?
+            [] : tokenize(cont.container);
           cont.projectID = projectID;
           cont.bytes = bytes;
           cont.count = count;

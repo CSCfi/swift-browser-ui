@@ -127,13 +127,13 @@ export default {
             bytes: 0,
           });
         }).then(() => {
-          swiftCreateContainer(projectID, `${folderName}_segments`, tags.join(";"))
+          swiftCreateContainer(projectID, `${folderName}_segments`, [])
             .then(() => {
               getDB().containers.add({
                 projectID: projectID,
                 name: `${folderName}_segments`,
-                tokens: tokenize(`${folderName}_segments`),
-                tags: tags,
+                tokens: [],
+                tags: [],
                 count: 0,
                 bytes: 0,
               });

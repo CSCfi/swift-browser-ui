@@ -135,7 +135,6 @@ export default {
         .startsWith(query[0])
         .or("tags")
         .startsWith(query[0])
-        .filter(cont => !cont.name.endsWith("_segments"))
         .filter(multipleQueryWordsAndRank)
         .and(cont => cont.projectID === this.active.id)
         .limit(1000)
@@ -147,7 +146,6 @@ export default {
       const containerIDs = new Set(
         await getDB().containers
           .where({ projectID: this.active.id })
-          .filter(cont => !cont.name.endsWith("_segments"))
           .primaryKeys(),
       );
 
