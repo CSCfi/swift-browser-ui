@@ -90,6 +90,7 @@ jakaminen
 jakamispäivämäärä
 jakamista
 jakamistunnuksen
+jakamistunnuksia
 jakamistunnus
 jakanut
 jako
@@ -135,6 +136,8 @@ kanssasi
 katsele
 kehittänyt
 kelpaa
+kelvollinen
+kelvollisia
 kenttää
 kentällä
 kerran

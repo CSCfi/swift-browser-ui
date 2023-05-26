@@ -82,7 +82,7 @@ export default {
 
 span {
   display: inline-block;
-  max-width: 10rem;
+  max-width: 20rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }

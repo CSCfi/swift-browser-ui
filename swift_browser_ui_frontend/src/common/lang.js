@@ -169,6 +169,8 @@ let default_translations = {
         fail_noperm: "Please select permissions to grant.",
         fail_noid: "Please enter at least one Share ID.",
         fail_duplicate: "The project already has access to the folder.",
+        invalid_share_id: " is not a valid Share ID.",
+        invalid_share_ids: " are not valid Share IDs.",
       },
       download: " Download",
       largeDownMessage:
@@ -536,6 +538,8 @@ let default_translations = {
         fail_noid:
           "Anna vähintään yhden projektin jakamistunnus.",
         fail_duplicate: "Kansio on jo jaettu kyseiselle projektille.",
+        invalid_share_id: " ei ole kelvollinen jakamistunnus.",
+        invalid_share_ids: " eivät ole kelvollisia jakamistunnuksia.",
       },
       download: " Lataa",
       largeDownMessage:
