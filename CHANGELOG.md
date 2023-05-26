@@ -134,6 +134,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #993 #981) Fix upload not starting
 - (GL #978) Fix for folder, subfolder and file's size being zero, hide segment folder from view but get it shared properly
 - (GL #1010) Fix for what actions a shared folder could have with different permissions (Copy, Download & Copy, Download, Upload)
+- (GL #969) Fix not validating ShareID format
 
 ### Removed
 
