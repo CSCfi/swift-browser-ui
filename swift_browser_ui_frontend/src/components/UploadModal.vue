@@ -393,21 +393,14 @@ export default {
     },
   },
   watch: {
-    modalVisible: async function() {
+    modalVisible: function() {
       if (this.modalVisible) {
-        //get once
-        if(!this.noUploadContainers.length) this.getNoUploadContainers();
-        //only show current container as upload destination
-        //if user has the right to upload to it
-        if (this.currentFolder) {
-          if (this.noUploadContainers
-            .find(item => item.container === this.currentFolder)
-            === undefined) {
-            this.inputFolder = this.currentFolder;
-            return;
-          }
-        }
-        this.inputFolder = "";
+        //inputFolder not cleared when modal toggled,
+        //in case there's a delay in upload start
+        //reset when modal visible
+        if(!this.noUploadContainers.length) {
+          this.getNoUploadContainers();
+        } else this.setInputFolder();
       }
     },
     inputFolder: function() {
@@ -475,18 +468,32 @@ export default {
     },   
     getNoUploadContainers: async function () {
       const sharedContainers = await getSharedContainers(this.active.id);
-      if (sharedContainers !== []) {
-        sharedContainers.forEach(async (item) => {
-          let share = await getAccessDetails(
+      if (sharedContainers != []) {
+        for (const item of sharedContainers) {
+          const share = await getAccessDetails(
             this.active.id,
             item.container,
             item.owner,
           );
-          if (share.access.length <= 1) {
+          if (share.access.length < 2) {
             this.noUploadContainers.push(item);
           }
-        });
+        }
       }
+      this.setInputFolder();
+    },
+    setInputFolder() {
+      if (this.currentFolder) {
+        //only show current container as upload destination
+        //if user has the right to upload to it
+        if (this.noUploadContainers
+          .find(item => item.container === this.currentFolder)
+          === undefined) {
+          this.inputFolder = this.currentFolder;
+          return;
+        }
+      }
+      this.inputFolder = "";
     },
     onSelectValue: function (e) {
       if (e.detail) this.inputFolder = e.detail.name;
