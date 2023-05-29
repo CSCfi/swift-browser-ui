@@ -33,11 +33,9 @@ let default_translations = {
           "in, or the log in credentials were incorrect. " +
           "Use the button below to log in.",
         Notfound: "404 – Page Not Found",
-        Notfound_text:
-          "The page you were looking for was not found.",
+        Notfound_text: "The page you were looking for was not found.",
         Forbidden: "403 – Forbidden",
-        Forbidden_text:
-          "Your previous request could not be fulfilled.",
+        Forbidden_text: "Your previous request could not be fulfilled.",
         inUse: "Folder name already in use.",
         invalidName: "Folder name is invalid.",
         createFail: "Folder creation failed.",
@@ -143,17 +141,16 @@ let default_translations = {
           "recipient can copy the Share ID from the user " +
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
-        share_guide_step2:
-          "2. Select the permission rights: ",
+        share_guide_step2: "2. Select the permission rights: ",
         share_guide_step2_list: [
           "View: project members can access the folder's content " +
-          "but can not directly download or copy " +
-          "its content.",
+            "but can not directly download or copy " +
+            "its content.",
           "Copy and download: project members can copy, download " +
-          "and decrypt the folder content.",
+            "and decrypt the folder content.",
           "Copy, download and upload: project members can copy, " +
-          "download and decrypt the folder content. They can also upload " +
-          "new files to the shared folder accessible to both projects.",
+            "download and decrypt the folder content. They can also upload " +
+            "new files to the shared folder accessible to both projects.",
         ],
         permissions: "Select permissions",
         view_perm: "View",
@@ -201,6 +198,7 @@ let default_translations = {
         progressLabel: "complete",
         complete: "Uploading completed",
         cancelled: "Uploading cancelled",
+        uploadedItems: "Uploaded items will be displayed soon",
       },
       close: "Close",
       copy: " Copy",
@@ -225,14 +223,13 @@ let default_translations = {
         createdFolder:
           "Created folder will be shared with all project members in ",
         viewProjectMembers: "View project members",
-        deleteNote: "Folder must be empty before " +
-        "it can be deleted.",
+        deleteNote: "Folder must be empty before " + "it can be deleted.",
         deleteSuccess: "Folder was deleted.",
         folderName: "Folder name",
       },
       subfolders: {
-        deleteNote: "Subfolders are deleted by deleting all " +
-        "items in them.",
+        deleteNote:
+          "Subfolders are deleted by deleting all " + "items in them.",
         deleteOneSuccess: "Subfolder was deleted.",
         deleteManySuccess: "Subfolders were deleted.",
       },
@@ -351,8 +348,8 @@ let default_translations = {
         serviceProviderLink: "#",
         menuItem1: "Item 1",
         menuItemLink1: "#",
-        menuItem2:"Item 2",
-        menuItemLink2:"#",
+        menuItem2: "Item 2",
+        menuItemLink2: "#",
       },
     },
     label: {
@@ -402,16 +399,15 @@ let default_translations = {
         Notfound: "404 – Etsittyä sivua ei löydetty",
         Notfound_text: "Siirry kirjautumissivulle.",
         Forbidden: "403 – Kielletty",
-        Forbidden_text:
-          "Edellinen toiminto on kielletty.",
+        Forbidden_text: "Edellinen toiminto on kielletty.",
         inUse: "Kansion nimi on jo käytössä.",
         invalidName: "Kansion nimi ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
-        "Firefoxin yksityinen selaustila ei ole tuettu." +
-        "Voidaksesi kirjautua vaihda pois yksityisestä selaustilasta " +
-        "tai käytä toista selainta.",
+          "Firefoxin yksityinen selaustila ei ole tuettu." +
+          "Voidaksesi kirjautua vaihda pois yksityisestä selaustilasta " +
+          "tai käytä toista selainta.",
       },
       dropFiles: "Vedä ja pudota kansiot tähän tai ",
       support: "Tuki",
@@ -440,7 +436,7 @@ let default_translations = {
         shared_with_read_write:
           "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
           "tiedostoja, sekä purkaa kansion sisällön salauksen. " +
-          "Voit myös lähettää tiedostoja tähän kansioon. "+
+          "Voit myös lähettää tiedostoja tähän kansioon. " +
           "(Kopioi, lataa ja lähetä).",
       },
       table: {
@@ -505,8 +501,7 @@ let default_translations = {
         share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
         share_other_projects: "Jaa toisen projektin kanssa",
-        share_guide_intro:
-          "Kun haluat jakaa kansion toisen projektin kanssa: ",
+        share_guide_intro: "Kun haluat jakaa kansion toisen projektin kanssa: ",
         share_guide_step1:
           "1. Syötä jakamistunnus. Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
@@ -514,16 +509,15 @@ let default_translations = {
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
-        share_guide_step2:
-          "2. Valitse käyttöoikeudet: ",
+        share_guide_step2: "2. Valitse käyttöoikeudet: ",
         share_guide_step2_list: [
           "Tarkastele: projektin jäsenet voivat tarkastella kansion sisältöä" +
-          ", mutta eivät voi ladata ja kopioida kansion sisältöä.",
+            ", mutta eivät voi ladata ja kopioida kansion sisältöä.",
           "Kopioi ja lataa: projektin jäsenet voivat kopioida ja ladata " +
-          "kansion sisällön sekä purkaa kansion sisällön salauksen.",
+            "kansion sisällön sekä purkaa kansion sisällön salauksen.",
           "Kopioi, lataa ja lähetä: projektin jäsenet voivat kopioida ja " +
-          "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
-          "He voivat myös lähettää tiedostoja jaettuun kansioon.",
+            "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
+            "He voivat myös lähettää tiedostoja jaettuun kansioon.",
         ],
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
@@ -537,8 +531,7 @@ let default_translations = {
         cancel: "Peru",
         confirm: "Jaa",
         fail_noperm: "Valitse käyttöoikeudet.",
-        fail_noid:
-          "Anna vähintään yhden projektin jakamistunnus.",
+        fail_noid: "Anna vähintään yhden projektin jakamistunnus.",
         fail_duplicate: "Kansio on jo jaettu kyseiselle projektille.",
         invalid_share_id: " ei ole kelvollinen jakamistunnus.",
         invalid_share_ids: " eivät ole kelvollisia jakamistunnuksia.",
@@ -573,6 +566,7 @@ let default_translations = {
         progressLabel: "valmis",
         complete: "Lähetys on valmis",
         cancelled: "Lähetys peruutettu",
+        uploadedItems: "Lähetetyt tiedostot näytetään pian",
       },
       close: "Sulje",
       copy: " Kopioi",
@@ -596,14 +590,16 @@ let default_translations = {
           "mutta sen voi kopioida uudella nimellä.",
         createdFolder: "Luotu kansio jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        deleteNote: "Kansion poistaminen edellyttää kaikkien " +
+        deleteNote:
+          "Kansion poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
         deleteSuccess: "Kansio poistettu",
         folderName: "Kansion nimi",
       },
       subfolders: {
-        deleteNote: "Alikansion poistaminen edellyttää sen kaikkien " +
-        "tiedostojen poistamista.",
+        deleteNote:
+          "Alikansion poistaminen edellyttää sen kaikkien " +
+          "tiedostojen poistamista.",
         deleteOneSuccess: "Alikansio poistettu.",
         deleteManySuccess: "Alikansiot poistettu.",
       },

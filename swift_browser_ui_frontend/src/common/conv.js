@@ -221,6 +221,11 @@ export async function getTagsForObjects(
 }
 
 export function makeGetObjectsMetaURL(project, container, objects) {
+  /* encodeURI() doesn't encode comma ",".
+    Therefore, if an object name contains comma ","
+    replace it with URL-encoded "%2C"
+  */
+
   for (let i = 0; i< objects.length; i++) {
     if (objects[i].includes(",")) {
       objects[i] = objects[i].replace(/,/g, "%2C");
@@ -410,6 +415,8 @@ export function sortContainer(containers) {
   return containers.sort((a, b) => {
     if (a.name === `${b.name}_segments`) {
       return -1;
+    } else if (b.name === `${a.name}_segments`) {
+      return 1;
     }
   });
 }

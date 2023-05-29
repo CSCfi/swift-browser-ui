@@ -1,22 +1,27 @@
 <template>
-  <c-data-table
-    id="objtable"
-    :data.prop="objects"
-    :headers.prop="hideTags ?
-      headers.filter(header => header.key !== 'tags'): headers"
-    :pagination.prop="disablePagination ? null : paginationOptions"
-    :hide-footer="disablePagination"
-    :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyContainer')"
-    :sort-by="sortBy"
-    :sort-direction="sortDirection"
-    selection-property="name"
-    external-data
-    :selectable="selectable"
-    @selection="handleSelection"
-    @paginate="getPage"
-    @sort="onSort"
-  />
+  <div class="object-table-wrapper">
+    <c-data-table
+      id="objtable"
+      :data.prop="objects"
+      :headers.prop="hideTags ?
+        headers.filter(header => header.key !== 'tags'): headers"
+      :pagination.prop="disablePagination ? null : paginationOptions"
+      :hide-footer="disablePagination"
+      :footer-options.prop="footerOptions"
+      :no-data-text="$t('message.emptyContainer')"
+      :sort-by="sortBy"
+      :sort-direction="sortDirection"
+      selection-property="name"
+      external-data
+      :selectable="selectable"
+      @selection="handleSelection"
+      @paginate="getPage"
+      @sort="onSort"
+    />
+    <c-loader v-show="isLoaderVisible">
+      {{ $t('message.upload.uploadedItems') }}
+    </c-loader>
+  </div>
 </template>
 
 <script>
@@ -99,6 +104,9 @@ export default {
     selectable () {
       return this.$route.name !== "SharedObjects"
         || this.accessRights.length === 2;
+    },
+    isLoaderVisible() {
+      return this.$store.state.isLoaderVisible;
     },
   },
   watch: {
@@ -379,3 +387,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+ .object-table-wrapper{
+    position: relative;
+  }
+</style>
