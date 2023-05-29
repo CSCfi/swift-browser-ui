@@ -83,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #944) Replace buefy Autocomplete component with c-autocomplete from `csc-ui`
 - (GH #982) Migrate from vue-cli to vite
 - (GH #1034) Migrate to vue3
+- (GL #1032) `_segments` folders no longer have tokens
 
 ### Fixed
 
@@ -135,6 +136,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #978) Fix for folder, subfolder and file's size being zero, hide segment folder from view but get it shared properly
 - (GL #1010) Fix for what actions a shared folder could have with different permissions (Copy, Download & Copy, Download, Upload)
 - (GL #969) Fix not validating ShareID format
+- (GL #1032) Fix `_segments` folder sharing by creating a `_segments` folder when a new folder is created
 
 ### Removed
 
