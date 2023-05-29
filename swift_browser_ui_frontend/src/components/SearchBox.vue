@@ -170,17 +170,28 @@ export default {
       if (!item) {
         return null;
       }
-      let route = {
-        name: "ObjectsView",
-        params: {
-          container: item.container || item.name,
-        },
-      };
+      let route = {};
+      if (item.owner) {
+        route = {
+          name: "SharedObjects",
+          params: {
+            container: item.container,
+            owner: item.owner,
+          },
+        };
+      }
+      else {
+        route = {
+          name: "ObjectsView",
+          params: {
+            container: item.name,
+          },
+        };
+      }
 
       if (item.container) {
         route["query"] = { selected: item.name };
       }
-
       return route;
     },
     searchGainedFocus: async function () {
