@@ -126,6 +126,18 @@ export default {
             count: 0,
             bytes: 0,
           });
+        }).then(() => {
+          swiftCreateContainer(projectID, `${folderName}_segments`, [])
+            .then(() => {
+              getDB().containers.add({
+                projectID: projectID,
+                name: `${folderName}_segments`,
+                tokens: [],
+                tags: [],
+                count: 0,
+                bytes: 0,
+              });
+            });
           this.toggleCreateFolderModal();
         })
         .catch(err => {
