@@ -17,7 +17,7 @@
         </span>
         <br>
         <small>
-          <span v-if="item.container">
+          <span v-if="!isContainer()">
             <b>{{ $t('message.search.container') }}: </b>
             {{ item.container }}
             <br>
