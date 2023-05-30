@@ -464,8 +464,8 @@ export default {
           this.duplicateFile = true;
           setTimeout(() => { this.duplicateFile = false; }, 6000);
         }
-      }  
-    },   
+      }
+    },
     getNoUploadContainers: async function () {
       const sharedContainers = await getSharedContainers(this.active.id);
       if (sharedContainers != []) {
