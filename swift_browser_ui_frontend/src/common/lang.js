@@ -301,10 +301,10 @@ let default_translations = {
       },
       search: {
         container: "Folder",
-        object: "Object",
+        object: "Item",
         folder: "Folder",
         tags: "Tags",
-        objects: "Objects",
+        objects: "Items",
         size: "Size",
         empty: "No results found",
         searchBy: "Search by name or tag",

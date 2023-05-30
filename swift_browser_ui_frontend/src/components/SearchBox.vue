@@ -65,6 +65,8 @@ export default {
       selectedItem: null,
       refs: [],
       isSearching: false,
+      conts: [],
+      sharedConts: [],
     };
   },
   computed: {
@@ -143,11 +145,29 @@ export default {
         ...item, value: item.name,
       })).sort(rankedSort).slice(0, 100);
 
-      const containerIDs = new Set(
+      //put files into search results
+      this.conts =
         await getDB().containers
           .where({ projectID: this.active.id })
-          .primaryKeys(),
-      );
+          .filter(cont => !cont.name.endsWith("_segments"))
+          .toArray();
+
+      //get IDs of containers whose files should be included in results
+      const containerIDs = this.conts.map(({ id }) => id);
+
+      //Objects in shared containers retain IDs from original container
+      this.sharedConts = this.conts.filter(cont => cont.owner);
+
+      //get IDs of original folders
+      for(let i=0; i < this.sharedConts.length; i++) {
+        const folder = await getDB().containers
+          .get({
+            projectID: this.sharedConts[i].owner,
+            name: this.sharedConts[i].container,
+          });
+        this.sharedConts[i] = {...this.sharedConts[i], originalID: folder.id};
+        containerIDs.push(folder.id);
+      }
 
       const objects = await getDB().objects
         .where("tokens")
@@ -155,7 +175,7 @@ export default {
         .or("tags")
         .startsWith(query[0])
         .filter(multipleQueryWordsAndRank)
-        .and(obj => containerIDs.has(obj.containerID))
+        .and(obj => containerIDs.includes(obj.containerID))
         .limit(1000)
         .toArray();
 
@@ -171,26 +191,28 @@ export default {
         return null;
       }
       let route = {};
-      if (item.owner) {
+
+      const index = this.sharedConts
+        .map(cont => cont.originalID)
+        .indexOf(item.containerID);
+
+      if (item.owner || index >= 0) {
         route = {
           name: "SharedObjects",
           params: {
-            container: item.container,
-            owner: item.owner,
+            container: item.container || this.sharedConts[index].container,
+            owner: item.owner || this.sharedConts[index].owner,
           },
         };
       }
       else {
+        //item.container for files, name for containers
         route = {
           name: "ObjectsView",
           params: {
-            container: item.name,
+            container: item.container || item.name,
           },
         };
-      }
-
-      if (item.container) {
-        route["query"] = { selected: item.name };
       }
       return route;
     },

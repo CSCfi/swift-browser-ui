@@ -40,7 +40,7 @@
           </span>
           <span v-if="isContainer()">
             <br>
-            <b># {{ $t('message.search.objects') }}: </b>{{ item.count }}
+            <b>{{ $t('message.search.objects') }}: </b>{{ item.count }}
           </span>
         </small>
       </div>
@@ -64,7 +64,7 @@ export default {
   methods: {
     getHumanReadableSize,
     isContainer: function() {
-      return this.$props.item.container === undefined;
+      return this.$props.item.container === undefined || this.$props.item.owner;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
