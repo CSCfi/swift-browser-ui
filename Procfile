@@ -1,6 +1,7 @@
 redis: docker run --env-file ${PWD}/.env -p ${SWIFT_UI_REDIS_PORT}:${SWIFT_UI_REDIS_PORT} redis:7-bullseye
 db: docker run -v ${PWD}/.github/config/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh --env-file ${PWD}/.env -p 5432:5432 postgres:14-bullseye
 keystone: docker run --init --rm -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
+vault: "${PWD}"/scripts/vault.sh
 
 # Commands to run without trusted TLS
 ui:       gunicorn --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${UI_PORT}      swift_browser_ui.ui.server:servinit
