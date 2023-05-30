@@ -186,6 +186,7 @@ let default_translations = {
       sharing: "Sharing - ",
       containers: "Folders - ",
       upload: {
+        duplicate: "Files with the same paths are not allowed.",
         upfinish: "Finished uploading ",
         upfail: "Failed uploading ",
         upnotsupported: "Uploading is not supported by your browser",
@@ -556,6 +557,7 @@ let default_translations = {
       sharing: "Jako - ",
       containers: "Kansiot - ",
       upload: {
+        duplicate: "Tiedostot, joilla on samat polut, eivät ole sallittuja.",
         upfinish: "Lähetettiin tiedosto ",
         upfail: "Epäonnistuttiin lähettäessä tiedosto ",
         upnotsupported: "Selain ei tue tiedostojen lähettämistä",
@@ -607,7 +609,7 @@ let default_translations = {
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
-        deleteManySuccess: " tiedostot poistettu",
+        deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",
         deleteObjectsMessage:
           "Tiedostoja ei voi palauttaa poistamisen jälkeen. " +

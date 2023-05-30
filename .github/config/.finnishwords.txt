@@ -104,6 +104,7 @@ jne
 jo
 johtaa
 johtua
+joilla
 joka
 joltakin
 jonka
@@ -378,6 +379,7 @@ poistettu
 poistut
 polku
 polkuina
+polut
 postamista
 poudan
 profiili
@@ -438,6 +440,8 @@ salausratkaisun
 salausvaihtoehtoja
 salli
 sallittu
+sallittuja
+samat
 se
 sekunnin
 sekä
