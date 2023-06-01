@@ -57,7 +57,7 @@ ui_test = [
 ]
 dev = [
     "honcho==1.1.0",
-    "pre-commit==3.3.1",
+    "pre-commit==3.3.2",
     "pyspelling==2.8.2",
     "ruff==0.0.267",
     "types-certifi",
