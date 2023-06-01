@@ -194,6 +194,8 @@ import { getDB } from "@/common/db";
 
 import {
   getProjectNumber,
+  getSharedContainers,
+  getAccessDetails,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -226,6 +228,7 @@ export default {
       duplicateFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
+      noUploadContainers: [],
     };
   },
   computed: {
@@ -379,14 +382,25 @@ export default {
     addFiles() {
       return this.$store.state.addUploadFiles;
     },
+    canUpload () {
+      //used to disable upload button
+      //in case disallowed folder name is typed in
+      if (this.noUploadContainers.find(
+        item => item.container === this.inputFolder) === undefined) {
+        return true;
+      }
+      return false;
+    },
   },
   watch: {
-    modalVisible() {
+    modalVisible: function() {
       if (this.modalVisible) {
-        this.currentFolder ?
-          this.inputFolder = this.currentFolder
-          :
-          this.inputFolder = "";
+        //inputFolder not cleared when modal toggled,
+        //in case there's a delay in upload start
+        //reset when modal visible
+        if(!this.noUploadContainers.length) {
+          this.getNoUploadContainers();
+        } else this.setInputFolder();
       }
     },
     inputFolder: function() {
@@ -452,13 +466,47 @@ export default {
         }
       }
     },
+    getNoUploadContainers: async function () {
+      const sharedContainers = await getSharedContainers(this.active.id);
+      if (sharedContainers != []) {
+        for (const item of sharedContainers) {
+          const share = await getAccessDetails(
+            this.active.id,
+            item.container,
+            item.owner,
+          );
+          if (share.access.length < 2) {
+            this.noUploadContainers.push(item);
+          }
+        }
+      }
+      this.setInputFolder();
+    },
+    setInputFolder() {
+      if (this.currentFolder) {
+        //only show current container as upload destination
+        //if user has the right to upload to it
+        if (this.noUploadContainers
+          .find(item => item.container === this.currentFolder)
+          === undefined) {
+          this.inputFolder = this.currentFolder;
+          return;
+        }
+      }
+      this.inputFolder = "";
+    },
     onSelectValue: function (e) {
       if (e.detail) this.inputFolder = e.detail.name;
     },
     onQueryChange: async function (event) {
       this.inputFolder = event.detail;
+      //filter out containers where user has no upload right
       const result = await this.containers
         .filter(cont => cont.projectID === this.active.id)
+        .filter(cont => {
+          return !this.noUploadContainers
+            .some(c => c.container === cont.container);
+        })
         .filter(cont => cont.name.toLowerCase()
           .includes(event.detail.toLowerCase()))
         .filter(cont => !cont.name.endsWith("_segments"))
@@ -571,6 +619,7 @@ export default {
           || !this.inputFolder
           || !this.dropFiles.length
           || (this.currentUpload != undefined)
+          || !this.canUpload
         );
       }
       if (this.ownPrivateKey) {
@@ -580,6 +629,7 @@ export default {
           || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
           || (this.currentUpload != undefined)
+          || !this.canUpload
         );
       }
     },

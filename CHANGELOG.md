@@ -137,6 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1010) Fix for what actions a shared folder could have with different permissions (Copy, Download & Copy, Download, Upload)
 - (GL #969) Fix not validating ShareID format
 - (GL #1032) Fix `_segments` folder sharing by creating a `_segments` folder when a new folder is created
+- (GL #1011) Fix for preventing user from uploading to shared containers without rights
 
 ### Removed
 
