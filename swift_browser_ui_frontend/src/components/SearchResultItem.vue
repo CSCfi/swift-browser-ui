@@ -82,7 +82,11 @@ export default {
       if(this.isContainer() || !this.hasPath()) {
         return filePath;
       }
-      filePath = this.$props.item.name.replace(/\/.*$/, "");
+      const index = this.$props.item.name.lastIndexOf("/");
+      //remove actual file name
+      let str = this.$props.item.name.slice(0, index);
+      //leave last subfolder
+      filePath = str.slice(str.lastIndexOf("/")+1, str.length);
       return this.highlight(filePath);
     },
     highlight: function(text) {
