@@ -132,25 +132,21 @@ export default {
 
       const rankedSort = (a, b) => a.rank - b.rank;
 
-      const containers = await getDB().containers
-        .where("tokens")
-        .startsWith(query[0])
-        .or("tags")
-        .startsWith(query[0])
-        .filter(multipleQueryWordsAndRank)
-        .and(cont => cont.projectID === this.active.id)
-        .limit(1000)
-        .toArray();
-      this.searchResults = containers.map(item => ({
-        ...item, value: item.name,
-      })).sort(rankedSort).slice(0, 100);
-
-      //put files into search results
       this.conts =
         await getDB().containers
           .where({ projectID: this.active.id })
           .filter(cont => !cont.name.endsWith("_segments"))
+          .limit(1000)
           .toArray();
+
+      const foundConts = this.conts
+        .filter(cont => cont.tokens.filter(token => token.startsWith(query[0]))
+          || cont.tags.filter(tag => tag.startsWith(query[0])))
+        .filter(multipleQueryWordsAndRank);
+
+      this.searchResults = foundConts.map(item => ({
+        ...item, value: item.name,
+      })).sort(rankedSort).slice(0, 100);
 
       //get IDs of containers whose files should be included in results
       const containerIDs = this.conts.map(({ id }) => id);
@@ -196,6 +192,10 @@ export default {
         .map(cont => cont.originalID)
         .indexOf(item.containerID);
 
+      const prefix = item.name.includes("/") ?
+        item.name.slice(0, item.name.lastIndexOf("/"))
+        : null;
+
       if (item.owner || index >= 0) {
         route = {
           name: "SharedObjects",
@@ -214,6 +214,7 @@ export default {
           },
         };
       }
+      prefix !== null ? route.query={ prefix: prefix } : "";
       return route;
     },
     searchGainedFocus: async function () {

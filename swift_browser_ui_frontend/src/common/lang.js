@@ -302,7 +302,7 @@ let default_translations = {
       search: {
         container: "Folder",
         object: "Item",
-        folder: "Folder",
+        folder: "Subfolder",
         tags: "Tags",
         objects: "Items",
         size: "Size",
