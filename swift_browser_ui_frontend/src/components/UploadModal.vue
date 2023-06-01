@@ -1,10 +1,5 @@
 <template>
   <c-card class="upload-card">
-    <c-toasts
-      id="uploadModal-toasts"
-      data-testid="uploadModal-toasts"
-      absolute
-    />
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
