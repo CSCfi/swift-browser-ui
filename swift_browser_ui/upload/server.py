@@ -31,16 +31,12 @@ from swift_browser_ui.upload.api import (
     handle_upload_encrypted_object_options,
     handle_upload_encrypted_object_ws,
     handle_whitelist_options,
-    handle_batch_add_sharing_whitelist,
-    handle_batch_remove_sharing_whitelist,
-    handle_check_sharing_whitelist,
 )
 from swift_browser_ui.upload.auth import (
     handle_login,
     handle_logout,
     handle_validate_authentication,
 )
-
 from swift_browser_ui.upload.common import VAULT_CLIENT
 
 # temporarily ignore typecheck from mypy until

@@ -26,8 +26,6 @@ from swift_browser_ui.sharing.api import (
     has_access_handler,
     share_container_handler,
     shared_details_handler,
-    handle_project_add_ids,
-    handle_get_id_cache,
 )
 from swift_browser_ui.sharing.db import DBConn
 
