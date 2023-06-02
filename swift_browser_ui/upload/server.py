@@ -15,6 +15,9 @@ import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.api import (
+    handle_batch_add_sharing_whitelist,
+    handle_batch_remove_sharing_whitelist,
+    handle_check_sharing_whitelist,
     handle_delete_project_whitelist,
     handle_get_container,
     handle_get_object,
@@ -28,16 +31,12 @@ from swift_browser_ui.upload.api import (
     handle_upload_encrypted_object_options,
     handle_upload_encrypted_object_ws,
     handle_whitelist_options,
-    handle_batch_add_sharing_whitelist,
-    handle_batch_remove_sharing_whitelist,
-    handle_check_sharing_whitelist,
 )
 from swift_browser_ui.upload.auth import (
     handle_login,
     handle_logout,
     handle_validate_authentication,
 )
-
 from swift_browser_ui.upload.common import VAULT_CLIENT
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

@@ -329,7 +329,7 @@ class VaultClient:
         receiver: str,
         container: str,
     ) -> None:
-        """Add a project to a container whitelist.
+        """Remove a project from a container whitelist.
 
         :param project: Project ID
         :param receiver: Receiving project ID

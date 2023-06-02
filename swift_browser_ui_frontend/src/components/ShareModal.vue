@@ -422,7 +422,7 @@ export default {
           },
         );
       }
-      
+
       return true;
     },
     toggleShareGuide: function () {

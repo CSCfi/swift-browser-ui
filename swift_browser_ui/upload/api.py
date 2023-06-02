@@ -371,7 +371,7 @@ async def handle_batch_add_sharing_whitelist(
 async def handle_batch_remove_sharing_whitelist(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
-    """Add projects in sharing whitelist in batch."""
+    """Remove projects from sharing whitelist in batch."""
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     container = request.match_info["container"]

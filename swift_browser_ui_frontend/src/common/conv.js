@@ -101,7 +101,7 @@ export async function syncContainerACLs(client, project) {
       if (aclmeta[container][share].read) {
         // Check if the shared access only concerns view rights
         let tmpid = await client.projectCheckIDs(share);
-        
+
         let whitelistUrl = new URL(
           `/cryptic/${this.store.state.active.name}/${container}`,
           this.$store.state.uploadEndpoint,

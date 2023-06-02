@@ -17,15 +17,15 @@ from swift_browser_ui.sharing.api import (
     delete_share_handler,
     edit_share_handler,
     gave_access_handler,
+    handle_get_id_cache,
     handle_health_check,
+    handle_project_add_ids,
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
     has_access_handler,
     share_container_handler,
     shared_details_handler,
-    handle_project_add_ids,
-    handle_get_id_cache,
 )
 from swift_browser_ui.sharing.db import DBConn
 

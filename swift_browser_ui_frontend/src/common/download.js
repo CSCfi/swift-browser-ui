@@ -155,7 +155,7 @@ export class DecryptedDownloadSession {
       this.container,
     );
     this.$store.commit("setUploadInfo", upInfo);
-    
+
     // Check the shared container owner canonical project name
     let ids = undefined;
     if (this.owner !== "") {
