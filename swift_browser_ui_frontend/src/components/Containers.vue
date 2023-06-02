@@ -120,7 +120,7 @@ export default {
       if (!this.isFolderUploading) {
         delay(() => {
           this.fetchContainers();
-        }, 1000);
+        }, 3000);
       }
     },
     isFolderCopied: function () {
@@ -219,6 +219,11 @@ export default {
       await getDB().containers.where({
         projectID: this.active.id,
         name: container,
+      }).delete();
+
+      await getDB().containers.where({
+        projectID: this.active.id,
+        name: `${container}_segments`,
       }).delete();
     },
     checkPageFromRoute: function () {

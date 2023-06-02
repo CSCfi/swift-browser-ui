@@ -91,6 +91,7 @@
       </div>
       <div class="navbar-item">
         <c-button
+          :disabled="isUploading"
           @click="toggleUploadModal"
           @keyup.enter="toggleUploadModal"
         >
@@ -128,6 +129,9 @@ export default {
     // Append value-prop to projects
     mappedProjects() {
       return this.projects.map(project => ({ ...project, value: project.id }));
+    },
+    isUploading() {
+      return this.$store.state.isUploading;
     },
   },
   methods: {

@@ -12,7 +12,7 @@
     :sort-direction="sortDirection"
     selection-property="name"
     external-data
-    selectable
+    :selectable="selectable"
     @selection="handleSelection"
     @paginate="getPage"
     @sort="onSort"
@@ -21,10 +21,10 @@
 
 <script>
 import {
-  getHumanReadableSize,
   truncate,
   sortObjects,
   parseDateTime,
+  getItemSize,
 } from "@/common/conv";
 import {
   DecryptedDownloadSession,
@@ -34,7 +34,9 @@ import {
 import {
   toggleEditTagsModal,
   isFile,
+  getFolderName,
   getPrefix,
+  getPaginationOptions,
 } from "@/common/globalFunctions";
 
 import {
@@ -50,7 +52,7 @@ export default {
   props: {
     objs: {
       type: Array,
-      default: () => {return [];},
+      default: () => [],
     },
     disablePagination: {
       type: Boolean,
@@ -64,6 +66,10 @@ export default {
       type: Boolean,
       default: true,
     },
+    accessRights: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -72,13 +78,7 @@ export default {
       footerOptions: {
         itemsPerPageOptions: [5, 10, 15, 20, 25],
       },
-      paginationOptions: {
-        itemCount: 0,
-        itemsPerPage: 10,
-        currentPage: 1,
-        startFrom: 0,
-        endTo: 9,
-      },
+      paginationOptions: {},
       sortBy: "name",
       sortDirection: "asc",
     };
@@ -96,6 +96,10 @@ export default {
     active () {
       return this.$store.state.active;
     },
+    selectable () {
+      return this.$route.name !== "SharedObjects"
+        || this.accessRights.length === 2;
+    },
   },
   watch: {
     prefix() {
@@ -103,10 +107,12 @@ export default {
     },
     locale() {
       this.setHeaders();
+      this.setPagination();
     },
   },
   created() {
     this.setHeaders();
+    this.setPagination();
   },
   beforeUpdate() {
     this.getPage();
@@ -116,12 +122,6 @@ export default {
       this.$router.push(
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
-    },
-    getFolderName: function (path) {
-      // Get the name of the currently displayed pseudofolder
-      let endregex = new RegExp("/.*$");
-      return path.replace(getPrefix(this.$route), "")
-        .replace(endregex, "");
     },
     getPage: function () {
       let offset = 0;
@@ -135,20 +135,24 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      let pagedLength = 0;
-
-      this.objects = this.objs
+      // Filtered objects based on prefix
+      const filteredObjs = this
+        .objs
         .filter((obj) => {
           return obj.name.startsWith(getPrefix(this.$route));
-        })
+        });
+
+      let pagedLength = 0;
+
+      this.objects = filteredObjs
         .reduce((items, item) => {
           if (isFile(item.name, this.$route) || !this.renderFolders) {
             items.push(item);
           } else {
             if (items.find(el => {
-              return this.getFolderName(
-                el.name,
-              ) === this.getFolderName(item.name) ? true : false;
+              return getFolderName(
+                el.name, this.$route,
+              ) === getFolderName(item.name, this.$route) ? true : false;
             })) {
               return items;
             } else {
@@ -164,8 +168,11 @@ export default {
           item,
         ) => {
           let value = truncate(
-            this.renderFolders ? this.getFolderName(item.name) : item.name,
+            this.renderFolders ?
+              getFolderName(item.name, this.$route)
+              : item.name,
           );
+
           items.push({
             name: {
               value: value,
@@ -186,7 +193,7 @@ export default {
               } : {}),
             },
             size: {
-              value: getHumanReadableSize(item.bytes),
+              value: getItemSize(item, filteredObjs, this.$route),
             },
             last_modified: {
               value: parseDateTime(this.locale, item.last_modified, false),
@@ -248,6 +255,7 @@ export default {
                           toggleEditTagsModal(item.data.name.value, null);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },
@@ -268,6 +276,7 @@ export default {
                           this.$emit("delete-object", item);
                         }
                       },
+                      disabled: this.accessRights.length === 1,
                     },
                   },
                 },
@@ -281,6 +290,10 @@ export default {
         ...this.paginationOptions,
         itemCount: pagedLength,
       };
+    },
+    setPagination: function () {
+      const paginationOptions = getPaginationOptions(this.$t);
+      this.paginationOptions = paginationOptions;
     },
     onSort(event) {
       this.sortBy = event.detail.sortBy;

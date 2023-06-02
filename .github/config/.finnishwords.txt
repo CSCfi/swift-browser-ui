@@ -90,6 +90,7 @@ jakaminen
 jakamispäivämäärä
 jakamista
 jakamistunnuksen
+jakamistunnuksia
 jakamistunnus
 jakanut
 jako
@@ -103,6 +104,7 @@ jne
 jo
 johtaa
 johtua
+joilla
 joka
 joltakin
 jonka
@@ -135,6 +137,8 @@ kanssasi
 katsele
 kehittänyt
 kelpaa
+kelvollinen
+kelvollisia
 kenttää
 kentällä
 kerran
@@ -375,6 +379,7 @@ poistettu
 poistut
 polku
 polkuina
+polut
 postamista
 poudan
 profiili
@@ -435,6 +440,8 @@ salausratkaisun
 salausvaihtoehtoja
 salli
 sallittu
+sallittuja
+samat
 se
 sekunnin
 sekä

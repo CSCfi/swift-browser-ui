@@ -1,10 +1,5 @@
 <template>
   <c-card class="upload-card">
-    <c-toasts
-      id="uploadModal-toasts"
-      data-testid="uploadModal-toasts"
-      absolute
-    />
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
@@ -43,12 +38,33 @@
           <CUploadButton
             v-model="files"
             v-csc-control
+            @add-files="buttonAddingFiles=true"
+            @cancel="buttonAddingFiles=false"
           >
             <span>
               {{ $t("message.encrypt.dropMsg") }}
             </span>
           </CUploadButton>
         </div>
+        <c-alert
+          v-show="duplicateFile"
+          type="error"
+        >
+          <div class="duplicate-notification">
+            {{ $t("message.upload.duplicate") }}
+            <c-button
+              text
+              size="small"
+              @click="duplicateFile = false"
+            >
+              <i
+                slot="icon"
+                class="mdi mdi-close"
+              />
+              {{ $t("message.close") }}
+            </c-button>
+          </div>
+        </c-alert>
         <c-data-table
           v-if="dropFiles.length > 0"
           class="files-table"
@@ -152,7 +168,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="noUpload"
+        :disabled="noUpload || addingFiles || buttonAddingFiles"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -173,6 +189,8 @@ import { getDB } from "@/common/db";
 
 import {
   getProjectNumber,
+  getSharedContainers,
+  getAccessDetails,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -190,7 +208,6 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      tooLarge: false,
       ownPrivateKey: false,
       ephemeral: true,
       privkey: "",
@@ -202,6 +219,11 @@ export default {
       noUpload: true,
       CUploadButton,
       projectInfoLink: "",
+      toastVisible: false,
+      duplicateFile: false,
+      addingFiles: false,
+      buttonAddingFiles: false,
+      noUploadContainers: [],
     };
   },
   computed: {
@@ -222,6 +244,9 @@ export default {
     },
     currentFolder() {
       return this.$route.params.container;
+    },
+    modalVisible() {
+      return this.$store.state.openUploadModal;
     },
     fileHeaders() {
       return [
@@ -324,9 +349,10 @@ export default {
         files.forEach(file => {
           if (this.addFiles) {
             file.relativePath = file.name;
-            this.$store.commit("appendDropFiles", file);
+            this.appendDropFiles(file);
           }
         });
+        this.buttonAddingFiles = false;
       },
     },
     filesPagination() {
@@ -348,22 +374,34 @@ export default {
         currentPage: 1,
       };
     },
-    currentProjectID() {
-      return this.$route.params.project;
-    },
     addFiles() {
       return this.$store.state.addUploadFiles;
     },
+    canUpload () {
+      //used to disable upload button
+      //in case disallowed folder name is typed in
+      if (this.noUploadContainers.find(
+        item => item.container === this.inputFolder) === undefined) {
+        return true;
+      }
+      return false;
+    },
   },
   watch: {
-    currentFolder: function() {
-      this.inputFolder = this.currentFolder;
+    modalVisible: function() {
+      if (this.modalVisible) {
+        //inputFolder not cleared when modal toggled,
+        //in case there's a delay in upload start
+        //reset when modal visible
+        if(!this.noUploadContainers.length) {
+          this.getNoUploadContainers();
+        } else this.setInputFolder();
+      }
     },
     inputFolder: function() {
       this.refreshNoUpload();
     },
     dropFiles: function () {
-      this.checkUploadSize();
       this.refreshNoUpload();
     },
     ownPrivateKey: function() {
@@ -389,20 +427,84 @@ export default {
       this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
         + getProjectNumber(this.active);
     },
-  },
-  mounted() {
-    if (this.currentFolder) this.inputFolder = this.currentFolder;
+    addingFiles() {
+      //see if drag&drop adding of files is done:
+      if (this.addingFiles) {
+        let fileCount = this.dropFiles.length;
+        let check = setInterval(() => {
+          if (this.dropFiles.length === fileCount) {
+            //the amount of dropFiles didn't change
+            //in the interval
+            this.addingFiles = false;
+            clearInterval(check);
+          } else {
+            fileCount = this.dropFiles.length;
+          }
+        }, 200);
+      }
+    },
   },
   methods: {
+    appendDropFiles(file) {
+      //Checking for identical path only, not name:
+      //different folders may have same file names
+      if (
+        this.$store.state.dropFiles.find(
+          ({ relativePath }) => relativePath === String(file.relativePath),
+        ) === undefined
+      ) {
+        this.$store.commit("appendDropFiles", file);
+      } else {
+        if (!this.duplicateFile) {
+          this.duplicateFile = true;
+          setTimeout(() => { this.duplicateFile = false; }, 6000);
+        }
+      }
+    },
+    getNoUploadContainers: async function () {
+      const sharedContainers = await getSharedContainers(this.active.id);
+      if (sharedContainers != []) {
+        for (const item of sharedContainers) {
+          const share = await getAccessDetails(
+            this.active.id,
+            item.container,
+            item.owner,
+          );
+          if (share.access.length < 2) {
+            this.noUploadContainers.push(item);
+          }
+        }
+      }
+      this.setInputFolder();
+    },
+    setInputFolder() {
+      if (this.currentFolder) {
+        //only show current container as upload destination
+        //if user has the right to upload to it
+        if (this.noUploadContainers
+          .find(item => item.container === this.currentFolder)
+          === undefined) {
+          this.inputFolder = this.currentFolder;
+          return;
+        }
+      }
+      this.inputFolder = "";
+    },
     onSelectValue: function (e) {
       if (e.detail) this.inputFolder = e.detail.name;
     },
     onQueryChange: async function (event) {
       this.inputFolder = event.detail;
+      //filter out containers where user has no upload right
       const result = await this.containers
         .filter(cont => cont.projectID === this.active.id)
+        .filter(cont => {
+          return !this.noUploadContainers
+            .some(c => c.container === cont.container);
+        })
         .filter(cont => cont.name.toLowerCase()
           .includes(event.detail.toLowerCase()))
+        .filter(cont => !cont.name.endsWith("_segments"))
         .limit(1000)
         .toArray();
       this.filteredItems = result;
@@ -413,11 +515,11 @@ export default {
         item.file(file => {
           if (this.addFiles) {
             file.relativePath = path + file.name;
-            this.$store.commit("appendDropFiles", file);
+            this.appendDropFiles(file);
           } else return;
         });
       } else if (item instanceof File) {
-        this.$store.commit("appendDropFiles", item);
+        this.appendDropFiles(item);
       } else if (item.isDirectory) {
         entry = item;
       }
@@ -450,7 +552,7 @@ export default {
         item = item.getAsFile();
         if (item instanceof File) {
           item.relativePath = path + item.name;
-          this.$store.commit("appendDropFiles", item);
+          this.appendDropFiles(item);
         }
       }
     },
@@ -462,20 +564,10 @@ export default {
         }
       }
     },
-    checkUploadSize() {
-      let size = 0;
-      for (let file of this.dropFiles) {
-        size += file.size;
-      }
-      this.tooLarge = size > 1073741824;
-    },
     // Make human readable translation functions available in instance
     // namespace
     localHumanReadableSize: function (size) {
       return getHumanReadableSize(size);
-    },
-    clearFiles() {
-      this.$store.commit("eraseDropFiles");
     },
     dragHandler: function (e) {
       e.preventDefault();
@@ -496,6 +588,7 @@ export default {
       el.classList.remove("over-dropArea");
     },
     navUpload: function (e) {
+      this.addingFiles = true;
       e.stopPropagation();
       e.preventDefault();
       if (e.dataTransfer && e.dataTransfer.items) {
@@ -521,6 +614,7 @@ export default {
           || !this.inputFolder
           || !this.dropFiles.length
           || (this.currentUpload != undefined)
+          || !this.canUpload
         );
       }
       if (this.ownPrivateKey) {
@@ -530,19 +624,22 @@ export default {
           || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
           || (this.currentUpload != undefined)
+          || !this.canUpload
         );
       }
     },
     cancelUpload() {
       this.$store.commit("setFilesAdded", false);
+      this.$store.commit("eraseDropFiles");
       this.toggleUploadModal();
     },
     toggleUploadModal() {
-      this.clearFiles();
+      this.$store.commit("toggleUploadModal", false);
+      this.addingFiles = false;
       this.tags = [];
       this.ephemeral = true;
       this.files = [];
-      this.$store.commit("toggleUploadModal", false);
+      this.duplicateFile = false;
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -567,18 +664,24 @@ export default {
         this.$store,
         this.$el,
       );
-      document.querySelector("#uploadModal-toasts").addToast(
-        {
-          type: "success",
-          progress: false,
-          message: this.$t("message.upload.isStarting"),
-        },
-      );
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
       delay(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
+          if (!this.toastVisible) {
+            this.toastVisible = true;
+            document.querySelector("#container-error-toasts").addToast(
+              {
+                type: "success",
+                duration: 4000,
+                progress: false,
+                message: this.$t("message.upload.isStarting"),
+              },
+            );
+            //avoid overlapping toasts
+            setTimeout(() => { this.toastVisible = false; }, 4000);
+          }
           this.beginEncryptedUpload();
         }
       }, 1000);
@@ -659,6 +762,12 @@ c-card-actions {
 
 c-data-table.publickey-table {
   margin-top: 1rem;
+}
+
+.duplicate-notification {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 </style>

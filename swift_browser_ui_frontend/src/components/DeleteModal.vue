@@ -47,8 +47,14 @@ export default {
     prefix() {
       return this.$route.query.prefix;
     },
+    projectID() {
+      return this.$route.params.project;
+    },
     container() {
       return this.$route.params.container;
+    },
+    owner() {
+      return this.$route.params.owner;
     },
     renderedFolders() {
       return this.$store.state.renderedFolders;
@@ -59,15 +65,36 @@ export default {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
     },
-    deleteObjects: function () {
-      let to_remove = new Array;
+    deleteObjects: async function () {
+      let to_remove = [];
+      let segments_to_remove = []; // Array for segment objects to be deleted
+      let segment_container = null;
       let selectedSubfolder = false;
+
+      const isSegmentsContainer = this.container.endsWith("_segments");
+
+      if (!isSegmentsContainer) {
+        segment_container = await getDB().containers.get({
+          projectID: this.$route.name === "SharedObjects" ?
+            this.owner : this.projectID,
+          name: `${this.selectedObjects[0].container}_segments`,
+        });
+      }
+
       for (let object of this.selectedObjects) {
         // Only files are able to delete
         //or when objects are shown as paths
         if (isFile(object.name, this.$route)
           || !this.renderedFolders) {
           to_remove.push(object.name);
+
+          if (segment_container) {
+            // Equivalent object from segment container needs to be deleted
+            const segment_obj = await getDB().objects
+              .where({containerID: segment_container.id})
+              .filter(obj => obj.name.includes(`${object.name}/`)).first();
+            segments_to_remove.push(segment_obj.name);
+          }
         } else {
           //flag if user is trying to delete a subfolder
           //when folders rendered
@@ -76,103 +103,124 @@ export default {
       }
 
       if(this.$route.name !== "SharedObjects") {
+        // Delete objects and segment objects from IDB
         const objIDs = this.selectedObjects.filter(
           obj => obj.name && to_remove.includes(obj.name)).reduce(
           (prev, obj) => [...prev, obj.id], [],
         );
-        getDB().objects.bulkDelete(objIDs);
+
+        const segmentObjIDs = segment_container ? await getDB().objects
+          .where({ containerID: segment_container.id })
+          .filter(obj => obj.name && segments_to_remove.includes(obj.name))
+          .primaryKeys() : [];
+
+        getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
       }
+
       swiftDeleteObjects(
-        this.$route.params.owner || this.$route.params.project,
-        this.$route.params.container,
+        this.owner || this.projectID,
+        this.container,
         to_remove,
       ).then(async () => {
+        if (segments_to_remove.length > 0) {
+          await swiftDeleteObjects(
+            this.owner || this.projectID,
+            segment_container.name,
+            segments_to_remove,
+          );
+        }
+
         if (this.$route.name === "SharedObjects") {
           await this.$store.dispatch(
             "updateSharedObjects",
             {
-              project: this.$route.params.project,
-              owner: this.$route.params.owner,
+              project: this.projectID,
+              owner: this.owner,
               container: {
-                name: this.$route.params.container,
+                name: this.container,
                 id: 0,
               },
             },
           );
         }
 
-        this.toggleDeleteModal();
         const dataTable = document.getElementById("objtable");
         dataTable.clearSelections();
 
-        // Only files can be deleted
-        // Show warnings when deleting subfolders
-        if (to_remove.length > 0) {
-          let msg;
-          to_remove.length === 1?
-            msg = to_remove.length + this.$t("message.objects.deleteOneSuccess")
-            : msg = to_remove.length +
-              this.$t("message.objects.deleteManySuccess");
+        this.toggleDeleteModal();
 
-          if (this.subfolders.length && this.renderedFolders) {
-            //get all files uppermost subfolder contains
-            const folderFiles = await getDB().objects
-              .filter(obj => obj.name.startsWith(this.subfolders[0])
-                && obj.container === this.container)
-              .toArray();
-            if (folderFiles.length < 1) {
-              //if all subfolders empty, go to container
-              //see if more than one subfolder removed
-              this.subfolders.length > 1 ?
-                msg = this.$t("message.subfolders.deleteManySuccess") :
-                msg = this.$t("message.subfolders.deleteOneSuccess");
-              this.$router.push({name: "ObjectsView"});
-            }
-            else {
-              let newPrefix = this.prefix;
-              for (let level=0; level < this.subfolders.length; level++) {
-                let found = folderFiles.find(obj =>
-                  obj.name.startsWith(newPrefix));
-                if (found !== undefined) {
-                  //if file with this prefix found
-                  //go to containing subfolder
-                  //files found at same level: leave "file(s) deleted" ^
-                  //otherwise show "subfolder(s) deleted"
-                  if (level > 0) {
-                    level > 1 ?
-                      msg = this.$t("message.subfolders.deleteManySuccess") :
-                      msg = this.$t("message.subfolders.deleteOneSuccess");
-                    let path =
-                      {name: "ObjectsView", query: { prefix: newPrefix}};
-                    this.$router.push(path);
-                  }
-                  break;
-                } else {
-                  //files with this prefix not found
-                  //go up a subfolder and check again
-                  newPrefix = newPrefix
-                    .substring(0, newPrefix.lastIndexOf("/"));
+        this.getDeleteMessage(to_remove, selectedSubfolder);
+      });
+    },
+    getDeleteMessage: async function(to_remove, selectedSubfolder) {
+      // Only files can be deleted
+      // Show warnings when deleting subfolders
+      if (to_remove.length > 0) {
+        let msg;
+        to_remove.length === 1?
+          msg = to_remove.length + this.$t("message.objects.deleteOneSuccess")
+          : msg = to_remove.length +
+            this.$t("message.objects.deleteManySuccess");
+
+        if (this.subfolders.length && this.renderedFolders) {
+          //get all files uppermost subfolder contains
+          const folderFiles = await getDB().objects
+            .filter(obj => obj.name.startsWith(this.subfolders[0])
+              && obj.container === this.container)
+            .toArray();
+          if (folderFiles.length < 1) {
+            //if all subfolders empty, go to container
+            //see if more than one subfolder removed
+            this.subfolders.length > 1 ?
+              msg = this.$t("message.subfolders.deleteManySuccess") :
+              msg = this.$t("message.subfolders.deleteOneSuccess");
+            this.$router.push({name: "ObjectsView"});
+          }
+          else {
+            let newPrefix = this.prefix;
+            for (let level=0; level < this.subfolders.length; level++) {
+              let found = folderFiles.find(obj =>
+                obj.name.startsWith(newPrefix));
+              if (found !== undefined) {
+                //if file with this prefix found
+                //go to containing subfolder
+                //files found at same level: leave "file(s) deleted" ^
+                //otherwise show "subfolder(s) deleted"
+                if (level > 0) {
+                  level > 1 ?
+                    msg = this.$t("message.subfolders.deleteManySuccess") :
+                    msg = this.$t("message.subfolders.deleteOneSuccess");
+                  let path =
+                    {name: "ObjectsView", query: { prefix: newPrefix}};
+                  this.$router.push(path);
                 }
+                break;
+              } else {
+                //files with this prefix not found
+                //go up a subfolder and check again
+                newPrefix = newPrefix
+                  .substring(0, newPrefix.lastIndexOf("/"));
               }
             }
           }
-          document.querySelector("#objects-toasts").addToast(
-            { progress: false,
-              type: "success",
-              message: msg },
-          );
         }
-        if (selectedSubfolder) {
-          //if selected files include subfolders
-          document.querySelector("#objects-toasts").addToast(
-            {
-              progress: false,
-              type: "error",
-              message: this.$t("message.subfolders.deleteNote"),
-            },
-          );
-        }
-      });
+        document.querySelector("#objects-toasts").addToast(
+          { progress: false,
+            type: "success",
+            message: msg,
+          },
+        );
+      }
+      if (selectedSubfolder) {
+        //if selected files include subfolders
+        document.querySelector("#objects-toasts").addToast(
+          {
+            progress: false,
+            type: "error",
+            message: this.$t("message.subfolders.deleteNote"),
+          },
+        );
+      }
     },
   },
 };
