@@ -11,6 +11,7 @@
     v-else
     @toggle-notification="toggleNotification"
     @view-container="viewContainer"
+    @close-upload="onClosed"
   />
 </template>
 
@@ -67,28 +68,18 @@ export default {
 
 <style lang="scss" scoped>
 
-h3 {
-  color: $csc-grey !important;
+::v-deep(h3) {
+  color: $csc-grey;
+  font-weight: 600;
 }
 
-h3, a, .toggle-notification {
-  font-weight: 600 !important;
+::v-deep(.link-underline){
+  text-decoration: underline;
+  color: $csc-blue;
 }
 
-.link-underline {
-  text-decoration: underline !important;
-  color: $csc-blue !important;
-}
-
-.toggle-notification {
-  font-size: 14px;
-  color: $csc-primary !important;
-  display: inline-block;
-
-  &:focus {
-    border: 2px solid $csc-primary;
-    border-radius: 4px;
-  }
+::v-deep(i) {
+  font-size: 120%;
 }
 
 </style>

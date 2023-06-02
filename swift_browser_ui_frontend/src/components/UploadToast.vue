@@ -10,7 +10,7 @@
             {{ $t("message.upload.hasStarted") }}
           </h3>
           <h3 v-else>
-            {{ $t("message.upload.longProgress") }}{{ currentFile }}
+            {{ $t("message.upload.longProgress") }}
           </h3>
         </div>
         <div class="col">
@@ -20,7 +20,6 @@
             class="toggle-notification"
             @click="minimizeToast"
           >
-            {{ $t("message.upload.minimize") }}
             <i
               slot="icon"
               class="mdi mdi-arrow-collapse"
@@ -30,7 +29,7 @@
       </c-row>
 
       <div class="toast-main">
-        <p>
+        <c-row gap="5px">
           <span v-if="!closable">
             {{ $t("message.upload.estimate") }}
           </span>
@@ -41,7 +40,7 @@
           >
             {{ $t("message.upload.viewDestinationFolder") }}
           </a>
-        </p>
+        </c-row>
 
         <ProgressBar class="progress-bar" />
 
