@@ -1,6 +1,7 @@
 import {
   getUploadCryptedEndpoint,
   killUploadEndpoint,
+  GET,
 } from "@/common/api";
 
 // Add a private key to the ServiceWorker filesystem
@@ -97,6 +98,11 @@ export default class EncryptedUploadSession {
     this.currentChunks = [];
     this.totalChunks = 0;
 
+    this.owner = this.active.id === this.project ?
+      this.active.id
+      : this.project;
+    this.ids = undefined;
+
     for (let f of this.files) {
       //calculate expected upload chunks to track upload progress
       //how many chunks we get from each file
@@ -112,6 +118,29 @@ export default class EncryptedUploadSession {
         case "wasmFilesystemInitialized":
           this.$store.commit("stopChunking");
           this.$store.commit("setUploading");
+
+          // Get the shared project public key
+          if (this.project !== this.active.id) {
+            this.ids = await this.$store.state.client.projectCheckIDs(
+              this.project,
+            );
+
+            let keyPath = `/cryptic/${this.ids.name}/keys`;
+            let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
+            signatureUrl.searchParams.append("path", keyPath);
+            let signed = await GET(signatureUrl);
+            signed = await signed.json();
+            let keyURL = new URL(
+              this.$store.state.uploadEndpoint.concat(keyPath),
+            );
+            keyURL.searchParams.append("valid", signed.valid);
+            keyURL.searchParams.append("signature", signed.signature);
+            let key = await GET(keyURL);
+            key = await key.text();
+            key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
+            this.receivers.push(key);
+          }
+
           if (!this.ephemeral) {
             addPrivKey(this.pkey);
           }
@@ -150,16 +179,33 @@ export default class EncryptedUploadSession {
           this.headUrl.searchParams.append(
             "name", this.active.name,
           );
+
+          if (this.project !== this.active.id) {
+            this.ids = await this.$store.state.client.projectCheckIDs(
+              this.project,
+            );
+            this.headUrl.searchParams.append(
+              "owner_name", this.ids.name,
+            );
+            this.headUrl.searchParams.append(
+              "owner", this.project,
+            );
+          }
+
           this.headUrl.searchParams.append("total", this.currentTotalBytes);
-          this.currentUpload = fetch(this.headUrl, {
-            method: "PUT",
-            mode: "cors",
-            cache: "no-cache",
-            headers: {
-              "Content-Type": "application/octet-stream",
+
+          this.currentUpload = fetch(
+            this.headUrl,
+            {
+              method: "PUT",
+              mode: "cors",
+              cache: "no-cache",
+              headers: {
+                "Content-Type": "application/octet-stream",
+              },
+              body: e.data.header,
             },
-            body: e.data.header,
-          }).then(() => {
+          ).then(() => {
             this.ingestUrl = new URL(this.$store.state.uploadInfo.wsurl);
             this.ingestUrl.searchParams.append(
               "session",
@@ -312,7 +358,7 @@ export default class EncryptedUploadSession {
     }
     getUploadCryptedEndpoint(
       this.active.id,
-      this.project,
+      this.active.id,
       this.container,
       `${this.prefix}${this.currentFile.relativePath ? this.currentFile.relativePath : this.currentFile.name}.c4gh`,
     ).then(resp => {

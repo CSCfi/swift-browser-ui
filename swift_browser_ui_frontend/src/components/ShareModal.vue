@@ -262,19 +262,21 @@ export default {
     },
     shareSubmit: function () {
       this.loading = true;
-      this.shareContainer().then(
+      this.shareContainer(this.folderName).then(
         (ret) => {
+          this.shareContainer(`${this.folderName}_segments`).then(() => {
+            if (ret) {
+              this.getSharedDetails();
+              this.closeSharedNotification();
+              this.isShared = true;
+              this.closeSharedNotificationWithTimeout();
+            }
+          });
           this.loading = false;
-          if (ret) {
-            this.getSharedDetails();
-            this.closeSharedNotification();
-            this.isShared = true;
-            this.closeSharedNotificationWithTimeout();
-          }
         },
       );
     },
-    shareContainer: async function () {
+    shareContainer: async function (folder) {
       let rights = [];
       if (this.view) {
         rights.push("v");
@@ -335,7 +337,7 @@ export default {
       try {
         await this.$store.state.client.shareNewAccess(
           this.$store.state.active.id,
-          this.folderName,
+          folder,
           this.tags,
           rights,
           await getSharedContainerAddress(this.$route.params.project),
@@ -374,7 +376,7 @@ export default {
 
       await addAccessControlMeta(
         this.$route.params.project,
-        this.folderName,
+        folder,
         rights,
         this.tags,
       );
@@ -387,11 +389,11 @@ export default {
       );
 
       let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${folder}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
       let whitelistUrl = new URL(
-        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        `/cryptic/${this.$store.state.active.name}/${folder}`,
         this.$store.state.uploadEndpoint,
       );
       whitelistUrl.searchParams.append(
@@ -458,7 +460,6 @@ export default {
         this.folderName,
       ).then((ret) => {
         this.sharedDetails = ret;
-        console.log(this.sharedDetails);
         this.tags = [];
       });
     },

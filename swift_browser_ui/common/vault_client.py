@@ -338,8 +338,7 @@ class VaultClient:
         await self._request(
             "DELETE",
             f"c4ghtransit/sharing/{project}/{container}",
-            json_data={"id": receiver},
-            params={"force": "true"},
+            params={"id": receiver},
         )
 
     async def get_header(
@@ -364,7 +363,9 @@ class VaultClient:
                 params={"service": self.service, "key": self._key_name},
             )
         if isinstance(header_response, dict) and "data" in header_response:
-            return str(header_response["data"]["headers"]["1"]["header"])
+            return str(header_response["data"]["headers"][
+                str(header_response["data"]["latest_version"])
+            ]["header"])
         return ""
 
     async def put_header(
@@ -376,13 +377,13 @@ class VaultClient:
         :param container: container name
         :param path: object path
         :param header: header as b64 encoded string
+        :param owner: name of the project that owns the container
         """
         if owner:
             await self._request(
                 "POST",
                 f"c4ghtransit/files/{project}/{container}/{path}",
-                params={"owner": owner},
-                json_data={"header": header},
+                json_data={"header": header, "owner": owner},
             )
         else:
             await self._request(
