@@ -27,7 +27,7 @@ dependencies = [
     "asyncpg==0.27.0",
     "certifi==2023.5.7",
     "click==8.1.3",
-    "cryptography==40.0.2",
+    "cryptography==41.0.0",
     "gunicorn==20.1.0",
     "keystoneauth1==5.1.2",
     "oidcrp==2.1.4",
