@@ -36,7 +36,7 @@ export default {
   mounted() {
     this.project = this.$store.state.active.id;
     this.user = this.$store.state.uname;
-    this.container = this.$route.params.container;
+    this.container = this.$store.state.inputFolder;
   },
   methods: {
     toggleNotification() {

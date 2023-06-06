@@ -46,6 +46,7 @@ const store = createStore({
     pubkey: [],
     currentPrefix: "",
     dropFiles: [],
+    inputFolder: "",
     openCreateFolderModal: false,
     selectedFolderName: "",
     openUploadModal: false,
@@ -168,6 +169,9 @@ const store = createStore({
     },
     eraseDropFiles(state) {
       state.dropFiles = [];
+    },
+    setInputFolder(state, folder) {
+      state.inputFolder = folder;
     },
     appendPubKey(state, key) {
       state.pubkey.push(key);

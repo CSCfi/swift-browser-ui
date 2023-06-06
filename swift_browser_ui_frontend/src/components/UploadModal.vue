@@ -649,6 +649,8 @@ export default {
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
 
+      this.$store.commit("setInputFolder", this.inputFolder);
+
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
       let upload = new EncryptedUploadSession(
