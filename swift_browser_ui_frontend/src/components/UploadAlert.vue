@@ -5,6 +5,7 @@
     <c-row
       gap="64"
       justify="space-between"
+      align="center"
     >
       <h3 v-if="closable">
         {{ $t("message.upload.complete") }}

@@ -33,10 +33,22 @@ export default {
       notificationToggled: false,
     };
   },
+  computed: {
+    closable() {
+      return this.$store.state.uploadNotificationClosable;
+    },
+  },
+  watch: {
+    closable: function() {
+      if (!this.closable) {
+        this.container = this.$store.state.selectedFolderName;
+      }
+    },
+  },
   mounted() {
     this.project = this.$store.state.active.id;
     this.user = this.$store.state.uname;
-    this.container = this.$store.state.inputFolder;
+    this.container = this.$store.state.selectedFolderName;
   },
   methods: {
     toggleNotification() {

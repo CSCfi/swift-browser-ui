@@ -649,7 +649,7 @@ export default {
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
 
-      this.$store.commit("setInputFolder", this.inputFolder);
+      this.$store.commit("setFolderName", this.inputFolder);
 
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
