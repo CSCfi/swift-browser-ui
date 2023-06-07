@@ -138,6 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #969) Fix not validating ShareID format
 - (GL #1032) Fix `_segments` folder sharing by creating a `_segments` folder when a new folder is created
 - (GL #1011) Fix for preventing user from uploading to shared containers without rights
+- (GL #1040) Fix for editing tags functionality for subfolder and files
 
 ### Removed
 

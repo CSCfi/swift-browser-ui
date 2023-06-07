@@ -77,13 +77,13 @@ export default {
   },
   watch: {
     selectedObjectName: function () {
-      if (this.selectedObjectName && this.selectedObjectName.length > 0) {
+      if (this.selectedObjectName?.length > 0) {
         this.isObject = true;
         this.getObject();
       }
     },
     selectedFolderName: function () {
-      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
+      if (this.selectedFolderName?.length > 0) {
         this.isObject = false;
         this.getContainer();
       }
@@ -107,7 +107,7 @@ export default {
           containerID: this.container.id,
           name: this.selectedObjectName,
         });
-        if (!this.object.tags.length) {
+        if (!this.object.tags?.length) {
           const tags = await getTagsForObjects(
             this.$route.params.project,
             this.container.name,
@@ -137,6 +137,7 @@ export default {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
+      this.tags = [];
     },
     saveObjectTags: function () {
       const tags = toRaw(this.tags);
