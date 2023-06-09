@@ -6,10 +6,12 @@
         :to="{name: 'AllFolders'}"
         :aria-label="$t('label.logo')"
       >
-        <c-csc-logo alt="CSC_Logo" />
-        <h1 class="app-name">
-          {{ $t("message.program_name") }}
-        </h1>
+        <c-row align="center">
+          <c-csc-logo alt="CSC_Logo" />
+          <h1 class="app-name">
+            {{ $t("message.program_name") }}
+          </h1>
+        </c-row>
       </router-link>
 
       <c-spacer />

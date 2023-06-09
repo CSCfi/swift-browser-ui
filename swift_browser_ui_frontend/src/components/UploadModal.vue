@@ -649,6 +649,8 @@ export default {
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
 
+      this.$store.commit("setFolderName", this.inputFolder);
+
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
       let upload = new EncryptedUploadSession(
@@ -699,14 +701,27 @@ export default {
   top: -5rem;
   left: 0;
   right: 0;
-  max-height: 80vh;
+  max-height: 75vh;
 }
 
-@media screen and (max-width: 992px) {
-  .upload-card {
-    max-height: 50vh;
+@media screen and (max-width: 766px), (max-height: 580px) {
+   .upload-card {
+    top: -5rem;
   }
 }
+
+@media screen and (max-height: 580px) and (max-width: 766px),
+(max-width: 525px) {
+  .upload-card {
+    top: -9rem;
+  }
+}
+
+@media screen and (max-height: 580px) and (max-width: 525px) {
+  .upload-card {
+    top: -13rem;
+   }
+ }
 
 c-card-content {
   padding: 1.5rem 0 0 0;

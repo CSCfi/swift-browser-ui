@@ -38,6 +38,7 @@ const store = createStore({
     encryptedProgress: undefined,
     uploadProgress: undefined,
     uploadNotification: false,
+    uploadNotificationClosable: false,
     altContainer: undefined,
     uploadInfo: undefined,
     uploadEndpoint: "",
@@ -194,11 +195,12 @@ const store = createStore({
     },
     setCurrentUpload(state, cur) {
       state.currentUpload = cur;
+      state.uploadNotificationClosable = false;
     },
     eraseCurrentUpload(state) {
       delete state.currentUpload;
       state.currentUpload = undefined;
-      state.uploadNotification = false;
+      state.uploadNotificationClosable = true;
     },
     createCurrentUploadAbort(state) {
       state.uploadAbort = new AbortController();

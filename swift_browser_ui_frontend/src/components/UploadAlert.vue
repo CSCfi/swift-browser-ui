@@ -5,8 +5,12 @@
     <c-row
       gap="64"
       justify="space-between"
+      align="center"
     >
-      <h3>
+      <h3 v-if="closable">
+        {{ $t("message.upload.complete") }}
+      </h3>
+      <h3 v-else>
         {{ $t("message.upload.inProgress") }}
       </h3>
 
@@ -26,10 +30,20 @@
         class="toggle-notification"
         @click="$emit('toggle-notification')"
       >
-        {{ $t("message.upload.maximize") }}
         <i
           slot="icon"
           class="mdi mdi-arrow-expand"
+        />
+      </a>
+      <a
+        v-if="closable"
+        ref="close"
+        href="javascript:void(0)"
+        @click="$emit('close-upload')"
+      >
+        <i
+          slot="icon"
+          class="mdi mdi-close"
         />
       </a>
     </c-row>
@@ -43,6 +57,11 @@ export default {
   name: "UploadAlert",
   components: {
     ProgressBar,
+  },
+  computed: {
+    closable() {
+      return this.$store.state.uploadNotificationClosable;
+    },
   },
   mounted() {
     setTimeout(() => {
@@ -63,8 +82,10 @@ h3 {
   margin-top: -2px;
 }
 
-.toggle-notification {
-  margin-top: 2px;
-}
+@media screen and (max-width: 840px) {
+    .link-underline {
+      display: none;
+    }
+  }
 
 </style>

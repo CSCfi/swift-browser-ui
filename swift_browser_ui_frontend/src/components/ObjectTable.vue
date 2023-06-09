@@ -256,6 +256,11 @@ export default {
         this.updateContainers();
       }
     },
+    containerName: async function() {
+      await this.getSharedContainers();
+      await this.getFolderSharedStatus();
+      await this.updateObjects();
+    },
   },
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
