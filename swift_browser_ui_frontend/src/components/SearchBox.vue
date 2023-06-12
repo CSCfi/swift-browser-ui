@@ -65,7 +65,6 @@ export default {
       selectedItem: null,
       refs: [],
       isSearching: false,
-      conts: [],
       sharedConts: [],
     };
   },
@@ -132,37 +131,41 @@ export default {
 
       const rankedSort = (a, b) => a.rank - b.rank;
 
-      this.conts =
-        await getDB().containers
-          .where({ projectID: this.active.id })
-          .filter(cont => !cont.name.endsWith("_segments"))
-          .limit(1000)
-          .toArray();
-
-      const foundConts = this.conts
-        .filter(cont => cont.tokens.filter(token => token.startsWith(query[0]))
-          || cont.tags.filter(tag => tag.startsWith(query[0])))
-        .filter(multipleQueryWordsAndRank);
-
-      this.searchResults = foundConts.map(item => ({
+      const containers = await getDB().containers
+        .where("tokens")
+        .startsWith(query[0])
+        .or("tags")
+        .startsWith(query[0])
+        .filter(multipleQueryWordsAndRank)
+        .and(cont => cont.projectID === this.active.id)
+        .limit(1000)
+        .toArray();
+      this.searchResults = containers.map(item => ({
         ...item, value: item.name,
       })).sort(rankedSort).slice(0, 100);
 
-      //get IDs of containers whose files should be included in results
-      const containerIDs = this.conts.map(({ id }) => id);
+
+      const conts = await getDB().containers
+        .where({ projectID: this.active.id })
+        .filter(cont => !cont.name.endsWith("_segments"))
+        .limit(1000)
+        .toArray();
+
+      //get IDs of containers whose objects should be included in results
+      const containerIDs = conts.map(({ id }) => id);
 
       //Objects in shared containers retain IDs from original container
-      this.sharedConts = this.conts.filter(cont => cont.owner);
+      this.sharedConts = conts.filter(cont => cont.owner);
 
-      //get IDs of original folders
+      //get IDs of original containers
       for(let i=0; i < this.sharedConts.length; i++) {
-        const folder = await getDB().containers
+        const cont = await getDB().containers
           .get({
             projectID: this.sharedConts[i].owner,
             name: this.sharedConts[i].container,
           });
-        this.sharedConts[i] = {...this.sharedConts[i], originalID: folder.id};
-        containerIDs.push(folder.id);
+        this.sharedConts[i] = {...this.sharedConts[i], originalID: cont.id};
+        containerIDs.push(cont.id);
       }
 
       const objects = await getDB().objects
@@ -189,8 +192,7 @@ export default {
       let route = {};
 
       const index = this.sharedConts
-        .map(cont => cont.originalID)
-        .indexOf(item.containerID);
+        .findIndex(cont => cont.originalID === item.containerID);
 
       const prefix = item.name.includes("/") ?
         item.name.slice(0, item.name.lastIndexOf("/"))
@@ -206,7 +208,7 @@ export default {
         };
       }
       else {
-        //item.container for files, name for containers
+        //item.container for objects, name for containers
         route = {
           name: "ObjectsView",
           params: {
