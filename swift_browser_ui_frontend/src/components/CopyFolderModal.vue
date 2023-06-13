@@ -223,20 +223,20 @@ export default {
         let metadata = {
           usertags: tags.join(";"),
         };
-        updateContainerMeta(this.active.id, this.folderName, metadata)
-          .then(
-            async () => {
-              await getDB().containers
-                .where({
-                  projectID: this.active.id,
-                  name: this.folderName,
-                })
-                .modify({ tags });
-            },
-          );
-        delay(() => {
+        delay((id, folder, meta, tgs) => {
+          updateContainerMeta(id, folder, meta)
+            .then(
+              async () => {
+                await getDB().containers
+                  .where({
+                    projectID: id,
+                    name: folder,
+                  })
+                  .modify({ tgs });
+              },
+            );
           this.$store.commit("setFolderCopiedStatus", true);
-        }, 10000);
+        }, 10000, this.active.id, this.folderName, metadata, tags);
 
         this.$store.commit("toggleCopyFolderModal", false);
         this.cancelCopy();
