@@ -17,7 +17,7 @@
         </span>
         <br>
         <small>
-          <span v-if="item.container">
+          <span v-if="!isContainer()">
             <b>{{ $t('message.search.container') }}: </b>
             {{ item.container }}
             <br>
@@ -40,7 +40,7 @@
           </span>
           <span v-if="isContainer()">
             <br>
-            <b># {{ $t('message.search.objects') }}: </b>{{ item.count }}
+            <b>{{ $t('message.search.objects') }}: </b>{{ item.count }}
           </span>
         </small>
       </div>
@@ -64,7 +64,7 @@ export default {
   methods: {
     getHumanReadableSize,
     isContainer: function() {
-      return this.$props.item.container === undefined;
+      return this.$props.item.container === undefined || this.$props.item.owner;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
@@ -82,7 +82,11 @@ export default {
       if(this.isContainer() || !this.hasPath()) {
         return filePath;
       }
-      filePath = this.$props.item.name.replace(/\/.*$/, "");
+      const index = this.$props.item.name.lastIndexOf("/");
+      //remove actual file name
+      let str = this.$props.item.name.slice(0, index);
+      //leave last subfolder
+      filePath = str.slice(str.lastIndexOf("/")+1, str.length);
       return this.highlight(filePath);
     },
     highlight: function(text) {
