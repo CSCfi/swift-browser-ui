@@ -25,6 +25,11 @@
           name="foldername"
           aria-required="true"
           data-testid="folder-name"
+          :valid="isValid(folderName) || !interacted"
+          :validation="$t('message.error.tooShort')"
+          required
+          validate-on-blur
+          @changeValue="interacted=true"
         />
         <label
           class="taginput-label"
@@ -65,6 +70,7 @@
       <c-button
         size="large"
         data-testid="save-folder"
+        :disabled="!isValid(folderName)"
         @click="createContainer"
         @keyup.enter="createContainer"
       >
@@ -98,6 +104,7 @@ export default {
       folderName: "",
       tags: [],
       projectInfoLink: "",
+      interacted: false, //don't show error when opening modal
     };
   },
   computed: {
@@ -161,6 +168,7 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.create = true;
+      this.interacted = false;
       document.querySelector("#createModal-toasts").removeToast("create-toast");
     },
     addingTag: function (e, onBlur) {
@@ -168,6 +176,9 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    isValid: function (str) {
+      return str.length > 2;
     },
   },
 };

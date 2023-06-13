@@ -262,6 +262,7 @@ mahdollisia
 mahdollista
 mahdollistaaksesi
 megatavun
+merkkiä
 mikä
 mikäli
 millekään

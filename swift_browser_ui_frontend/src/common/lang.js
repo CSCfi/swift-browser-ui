@@ -39,6 +39,7 @@ let default_translations = {
         inUse: "Folder name already in use.",
         invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
+        tooShort: "Please enter at least 3 characters",
         idb: "Firefox in private mode is not supported.",
         idb_text:
           "Firefox is not supported in private mode. " +
@@ -403,6 +404,7 @@ let default_translations = {
         inUse: "Kansion nimi on jo käytössä.",
         invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
+        tooShort: "Anna vähintään 3 merkkiä",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
           "Firefoxin yksityinen selaustila ei ole tuettu." +
