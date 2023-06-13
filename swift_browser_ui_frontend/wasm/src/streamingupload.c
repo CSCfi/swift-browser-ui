@@ -73,12 +73,22 @@ CHUNK *encrypt_chunk(
 ) {
     CHUNK* ret = allocate_chunk();
     ret->chunk = malloc(CRYPT4GH_CIPHERSEGMENT_SIZE * sizeof(uint8_t));
-    crypt4gh_segment_encrypt(
-        sess->sessionkey,
-        segment,
-        len_segment,
-        ret->chunk,
-        &(ret->len)
-    );
+    if (sess)
+    {
+        crypt4gh_segment_encrypt(
+            sess->sessionkey,
+            segment,
+            len_segment,
+            ret->chunk,
+            &(ret->len)
+        );
+    }
+    else
+    {
+        #ifdef C4GH_WASM_DEV
+        printf("Upload session is NULL. This is expected only when a large upload with >50 files has been cancelled.\n");
+        #endif
+        clean_session(sess);
+    }
     return ret;
 }

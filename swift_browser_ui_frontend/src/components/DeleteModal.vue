@@ -93,7 +93,7 @@ export default {
             const segment_obj = await getDB().objects
               .where({containerID: segment_container.id})
               .filter(obj => obj.name.includes(`${object.name}/`)).first();
-            segments_to_remove.push(segment_obj.name);
+            if (segment_obj) segments_to_remove.push(segment_obj.name);
           }
         } else {
           //flag if user is trying to delete a subfolder
@@ -114,7 +114,7 @@ export default {
           .filter(obj => obj.name && segments_to_remove.includes(obj.name))
           .primaryKeys() : [];
 
-        getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
+        await getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
       }
 
       swiftDeleteObjects(
