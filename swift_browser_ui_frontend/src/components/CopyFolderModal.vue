@@ -7,21 +7,16 @@
         }}
       </h2>
       <c-card-content>
-        <c-alert
-          v-show="folderExists"
-          type="warning"
-        >
-          <p class="has-text-dark">
-            {{ $t("message.replicate.destinationExists") }}
-          </p>
-        </c-alert>
         <c-text-field
           id="new-copy-folderName"
           v-model="folderName"
           v-csc-control
           :label="$t('message.replicate.name_newFolder')"
           name="foldername"
-          :loading="loadingFoldername"
+          :valid="loadingFoldername || isValid(folderName)"
+          :validation="errorMsg"
+          aria-required="true"
+          required
         />
         <label
           class="taginput-label"
@@ -48,7 +43,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="folderExists"
+        :disabled="!isValid(folderName)"
         @click="replicateContainer"
         @keyup.enter="replicateContainer"
       >
@@ -59,7 +54,7 @@
 </template>
 
 <script>
-import { debounce, delay } from "lodash";
+import { delay } from "lodash";
 import {
   swiftCopyContainer,
   updateContainerMeta,
@@ -82,11 +77,11 @@ export default {
   components: { TagInput },
   data() {
     return {
-      folderExists: false,
       folderName: "",
       loadingFoldername: true,
       tags: [],
       folders: [],
+      errorMsg: "",
     };
   },
   computed: {
@@ -112,9 +107,6 @@ export default {
         });
       }
     },
-    folderName: debounce(function () {
-      this.checkSelectedFolder();
-    }, 300),
   },
   methods: {
     fetchFolders: async function () {
@@ -173,26 +165,12 @@ export default {
         this.loadingFoldername = false;
       }
     },
-    checkSelectedFolder: function () {
-      // request parameter should be sanitized first
-      const safeKey = escapeRegExp(this.folderName).trim();
-      let re = new RegExp("^".concat(safeKey, "$"));
-
-      if (this.folders) {
-        for (let folder of this.folders) {
-          if (folder.name.match(re)) {
-            this.folderExists = true;
-            return;
-          }
-        }
-        this.folderExists = false;
-      }
-    },
     cancelCopy: function () {
       this.$store.commit("toggleCopyFolderModal", false);
       this.$store.commit("setFolderName", "");
       this.folderName = "";
       this.tags = [];
+      this.loadingFoldername = true;
       document.querySelector("#copyFolder-toasts").removeToast("copy-error");
     },
     replicateContainer: function () {
@@ -258,6 +236,30 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    isValid: function (str) {
+      if (str.length > 2) {
+        //check if name exists
+        //request parameter should be sanitized first
+        const safeKey = escapeRegExp(str).trim();
+        let re = new RegExp("^".concat(safeKey, "$"));
+
+        if (this.folders) {
+          for (let folder of this.folders) {
+            if (folder.name.match(re)) {
+              this.errorMsg = this.$t("message.replicate.destinationExists");
+              return false;
+            }
+          }
+        }
+      }
+      else {
+        //name too short
+        this.errorMsg = this.$t("message.error.tooShort");
+        return false;
+      }
+      this.errorMsg = "";
+      return true;
     },
   },
 };
