@@ -64,6 +64,7 @@ import { getDB } from "@/common/db";
 import {
   addNewTag,
   deleteTag,
+  isValidFolderName,
 } from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
@@ -238,7 +239,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     isValid: function (str) {
-      if (str.length > 2) {
+      if (isValidFolderName(str)) {
         //check if name exists
         //request parameter should be sanitized first
         const safeKey = escapeRegExp(str).trim();

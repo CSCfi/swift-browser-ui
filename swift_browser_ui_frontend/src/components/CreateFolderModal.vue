@@ -91,6 +91,7 @@ import {
   addNewTag,
   deleteTag,
   getProjectNumber,
+  isValidFolderName,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
@@ -178,7 +179,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     isValid: function (str) {
-      return str.length > 2;
+      return isValidFolderName(str);
     },
   },
 };

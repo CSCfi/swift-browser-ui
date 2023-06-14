@@ -130,3 +130,8 @@ export function getPaginationOptions(t) {
   };
   return paginationOptions;
 }
+
+export function isValidFolderName(str) {
+  //minimum length 3 chars
+  return str.length > 2;
+}
