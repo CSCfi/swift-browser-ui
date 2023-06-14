@@ -507,7 +507,6 @@ export default {
       this.inputFolder = "";
     },
     onSelectValue: function (e) {
-      this.interacted = true; //user selected
       if (e.detail) this.inputFolder = e.detail.name;
     },
     onQueryChange: async function (event) {
