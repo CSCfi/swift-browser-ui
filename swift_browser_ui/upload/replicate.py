@@ -191,38 +191,66 @@ class ObjectReplicationProxy:
 
             headers = {"X-Auth-Token": self.token}
 
+            length = int(resp_g.headers["Content-Length"])
+
             # Copy over metadata headers
             for i in resp_g.headers:
                 if "X-Object-Meta-Usertags" in i:
                     headers[i] = resp_g.headers[i]
 
-            # Ensure the segment container exists, since performing
-            # segmented upload
-            LOGGER.debug(f"Copying object {object_name}")
-            await self.a_create_container(segmented=True)
-
-            manifest = await self.a_sync_object_segments(
-                resp_g.headers["X-Object-Manifest"]
-            )
-
-            LOGGER.debug("Uploading manifest")
-            # Add manifest headers
-            headers["X-Object-Manifest"] = manifest
-            # Create manifest file
-            async with self.client.put(
-                common.generate_download_url(
-                    self.host, container=self.container, object_name=object_name
-                ),
-                data=b"",
-                headers=headers,
-                timeout=REPL_TIMEOUT,
-                ssl=ssl_context,
-            ) as resp:
-                if resp.status != 201:
-                    raise aiohttp.web.HTTPInternalServerError(
-                        reason="Object manifest creation failed"
+            if "X-Object-Manifest" not in resp_g.headers:
+                LOGGER.info(f"Copying object {object_name} in full.")
+                headers["Content-Length"] = str(length)
+                headers["Content-Type"] = resp_g.headers["Content-Type"]
+                if "ETag" in resp_g.headers:
+                    headers["ETag"] = resp_g.headers["ETag"]
+                else:
+                    LOGGER.error("ETag missing, maybe segments file empty")
+                    raise aiohttp.web.HTTPUnprocessableEntity(
+                        reason="ETag missing, maybe segments file empty"
                     )
-            LOGGER.debug(f"Uploaded manifest for {object_name}")
+                async with self.client.put(
+                    common.generate_download_url(self.host, self.container, object_name),
+                    data=self.a_generate_object_from_reader(resp_g),
+                    headers=headers,
+                    timeout=REPL_TIMEOUT,
+                    ssl=ssl_context,
+                ) as resp_p:
+                    if resp_p.status == 408:
+                        raise aiohttp.web.HTTPRequestTimeout()
+                    if resp_p.status not in {201, 202}:
+                        raise aiohttp.web.HTTPBadRequest(
+                            reason="Object segment upload failed"
+                        )
+                LOGGER.debug(f"Success in copying object {object_name}")
+            else:
+                # Ensure the segment container exists, since performing
+                # segmented upload
+                LOGGER.debug(f"Copying object {object_name} in segments.")
+                await self.a_create_container(segmented=True)
+
+                manifest = await self.a_sync_object_segments(
+                    resp_g.headers["X-Object-Manifest"]
+                )
+
+                LOGGER.debug("Uploading manifest")
+                # Add manifest headers
+                headers["X-Object-Manifest"] = manifest
+                # Create manifest file
+                async with self.client.put(
+                    common.generate_download_url(
+                        self.host, container=self.container, object_name=object_name
+                    ),
+                    data=b"",
+                    headers=headers,
+                    timeout=REPL_TIMEOUT,
+                    ssl=ssl_context,
+                ) as resp:
+                    if resp.status != 201:
+                        raise aiohttp.web.HTTPInternalServerError(
+                            reason="Object manifest creation failed"
+                        )
+                LOGGER.debug(f"Uploaded manifest for {object_name}")
 
     async def a_copy_from_container(self) -> None:
         """Copy objects from a source container."""
