@@ -98,7 +98,7 @@ export default {
       },0);
 
       setTimeout(() => {
-        this.$refs.minimize.focus();
+        this.$refs.minimize?.focus();
       }, 100);
     },
     closeUpload() {

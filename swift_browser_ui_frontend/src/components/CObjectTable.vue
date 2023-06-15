@@ -1,22 +1,27 @@
 <template>
-  <c-data-table
-    id="objtable"
-    :data.prop="objects"
-    :headers.prop="hideTags ?
-      headers.filter(header => header.key !== 'tags'): headers"
-    :pagination.prop="disablePagination ? null : paginationOptions"
-    :hide-footer="disablePagination"
-    :footer-options.prop="footerOptions"
-    :no-data-text="$t('message.emptyContainer')"
-    :sort-by="sortBy"
-    :sort-direction="sortDirection"
-    selection-property="name"
-    external-data
-    :selectable="selectable"
-    @selection="handleSelection"
-    @paginate="getPage"
-    @sort="onSort"
-  />
+  <div class="object-table-wrapper">
+    <c-data-table
+      id="objtable"
+      :data.prop="objects"
+      :headers.prop="hideTags ?
+        headers.filter(header => header.key !== 'tags'): headers"
+      :pagination.prop="disablePagination ? null : paginationOptions"
+      :hide-footer="disablePagination"
+      :footer-options.prop="footerOptions"
+      :no-data-text="$t('message.emptyContainer')"
+      :sort-by="sortBy"
+      :sort-direction="sortDirection"
+      selection-property="name"
+      external-data
+      :selectable="selectable"
+      @selection="handleSelection"
+      @paginate="getPage"
+      @sort="onSort"
+    />
+    <c-loader v-show="isLoaderVisible">
+      {{ $t('message.upload.uploadedItems') }}
+    </c-loader>
+  </div>
 </template>
 
 <script>
@@ -100,6 +105,9 @@ export default {
       return this.$route.name !== "SharedObjects"
         || this.accessRights.length === 2;
     },
+    isLoaderVisible() {
+      return this.$store.state.isLoaderVisible;
+    },
   },
   watch: {
     prefix() {
@@ -167,16 +175,19 @@ export default {
           items,
           item,
         ) => {
-          let value = truncate(
+          const value = truncate(
             this.renderFolders ?
               getFolderName(item.name, this.$route)
               : item.name,
           );
 
+          const isSubfolder = this.renderFolders &&
+            !isFile(item.name, this.$route);
+
           items.push({
             name: {
               value: value,
-              ...(this.renderFolders && !isFile(item.name, this.$route) ? {
+              ...(isSubfolder ? {
                 component: {
                   tag: "c-link",
                   params: {
@@ -202,18 +213,17 @@ export default {
               tags: {
                 value: null,
                 children: [
-                  ...(item.tags || []).map((tag, index) => ({
-                    key: "tag_" + index + "",
-                    value: tag,
-                    component: {
-                      tag: "c-tag",
-                      params: {
-                        flat: true,
+                  ...(item.tags?.length && !isSubfolder ?
+                    item.tags.map((tag, index) => ({
+                      key: "tag_" + index + "",
+                      value: tag,
+                      component: {
+                        tag: "c-tag",
+                        params: {
+                          flat: true,
+                        },
                       },
-                    },
-                  })),
-                  ...(item.tags && !item.tags.length ?
-                    [{ key: "no_tags", value: "-" }] : []),
+                    })) : [{ key: "no_tags", value: "-" }]),
                 ],
               },
             }),
@@ -248,14 +258,14 @@ export default {
                       size: "small",
                       title: "Edit tags",
                       path: mdiPencilOutline,
-                      onClick: ({ data }) =>
-                        toggleEditTagsModal(data.name.value, null),
+                      onClick: () =>
+                        toggleEditTagsModal(item.name, null),
                       onKeyUp: (event) => {
                         if(event.keyCode === 13) {
-                          toggleEditTagsModal(item.data.name.value, null);
+                          toggleEditTagsModal(item.name, null);
                         }
                       },
-                      disabled: this.accessRights.length === 1,
+                      disabled: isSubfolder || this.accessRights.length === 1,
                     },
                   },
                 },
@@ -377,3 +387,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+ .object-table-wrapper{
+    position: relative;
+  }
+</style>

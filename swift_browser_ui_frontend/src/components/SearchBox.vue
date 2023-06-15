@@ -65,6 +65,7 @@ export default {
       selectedItem: null,
       refs: [],
       isSearching: false,
+      sharedConts: [],
     };
   },
   computed: {
@@ -143,11 +144,29 @@ export default {
         ...item, value: item.name,
       })).sort(rankedSort).slice(0, 100);
 
-      const containerIDs = new Set(
-        await getDB().containers
-          .where({ projectID: this.active.id })
-          .primaryKeys(),
-      );
+
+      const conts = await getDB().containers
+        .where({ projectID: this.active.id })
+        .filter(cont => !cont.name.endsWith("_segments"))
+        .limit(1000)
+        .toArray();
+
+      //get IDs of containers whose objects should be included in results
+      const containerIDs = conts.map(({ id }) => id);
+
+      //Objects in shared containers retain IDs from original container
+      this.sharedConts = conts.filter(cont => cont.owner);
+
+      //get IDs of original containers
+      for(let i=0; i < this.sharedConts.length; i++) {
+        const cont = await getDB().containers
+          .get({
+            projectID: this.sharedConts[i].owner,
+            name: this.sharedConts[i].container,
+          });
+        this.sharedConts[i] = {...this.sharedConts[i], originalID: cont.id};
+        containerIDs.push(cont.id);
+      }
 
       const objects = await getDB().objects
         .where("tokens")
@@ -155,7 +174,7 @@ export default {
         .or("tags")
         .startsWith(query[0])
         .filter(multipleQueryWordsAndRank)
-        .and(obj => containerIDs.has(obj.containerID))
+        .and(obj => containerIDs.includes(obj.containerID))
         .limit(1000)
         .toArray();
 
@@ -170,17 +189,34 @@ export default {
       if (!item) {
         return null;
       }
-      let route = {
-        name: "ObjectsView",
-        params: {
-          container: item.container || item.name,
-        },
-      };
+      let route = {};
 
-      if (item.container) {
-        route["query"] = { selected: item.name };
+      const index = this.sharedConts
+        .findIndex(cont => cont.originalID === item.containerID);
+
+      const prefix = item.name.includes("/") ?
+        item.name.slice(0, item.name.lastIndexOf("/"))
+        : null;
+
+      if (item.owner || index >= 0) {
+        route = {
+          name: "SharedObjects",
+          params: {
+            container: item.container || this.sharedConts[index].container,
+            owner: item.owner || this.sharedConts[index].owner,
+          },
+        };
       }
-
+      else {
+        //item.container for objects, name for containers
+        route = {
+          name: "ObjectsView",
+          params: {
+            container: item.container || item.name,
+          },
+        };
+      }
+      prefix !== null ? route.query={ prefix: prefix } : "";
       return route;
     },
     searchGainedFocus: async function () {

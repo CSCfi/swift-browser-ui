@@ -202,14 +202,6 @@ export default {
     isFolderUploading() {
       return this.$store.state.isUploading;
     },
-    openDeleteModal() {
-      return this.$store.state.openDeleteModal;
-    },
-    selectedObjects() {
-      return this.$store.state.deletableObjects.length > 0
-        ? this.$store.state.deletableObjects
-        : [];
-    },
   },
   watch: {
     active: async function() {
@@ -250,11 +242,6 @@ export default {
     },
     isFolderUploading: function () {
       if (!this.isFolderUploading) this.updateContainers();
-    },
-    openDeleteModal: async function () {
-      if (!this.openDeleteModal && this.selectedObjects.length === 0) {
-        this.updateContainers();
-      }
     },
     containerName: async function() {
       await this.getSharedContainers();

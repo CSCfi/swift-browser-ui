@@ -244,12 +244,6 @@ export default class EncryptedUploadSession {
                 .dispatchEvent(new Event("uploadComplete"));
             }
           }
-
-          // Cache the succeeded file metadata to IndexedDB
-          await this.$store.dispatch("updateContainers", {
-            projectID: this.project,
-            signal: undefined,
-          });
           break;
       }
     };

@@ -4,6 +4,7 @@ import { createStore } from "vuex";
 import { getContainers } from "@/common/api";
 import { getObjects } from "@/common/api";
 import {
+  DEV,
   getTagsForContainer,
   getMetadataForSharedContainer,
   getTagsForObjects,
@@ -62,6 +63,7 @@ const store = createStore({
     uploadAbort: undefined,
     renderedFolders: true,
     addUploadFiles: false,
+    isLoaderVisible: false,
   },
   mutations: {
     updateObjects(state, objects) {
@@ -103,6 +105,7 @@ const store = createStore({
     },
     stopUploading(state) {
       state.isUploading = false;
+      state.isLoaderVisible = true;
     },
     setChunking(state) {
       state.isChunking = true;
@@ -242,6 +245,9 @@ const store = createStore({
     setFilesAdded(state, payload) {
       state.addUploadFiles = payload;
     },
+    setLoaderVisible(state, payload) {
+      state.isLoaderVisible = payload;
+    },
   },
   actions: {
     updateContainers: async function (
@@ -298,12 +304,14 @@ const store = createStore({
         containers: newContainers,
         signal,
       });
+
       const toDelete = [];
-      existingContainers.map(oldCont => {
+      for (let i = 0; i < existingContainers.length; i++) {
+        const oldCont = existingContainers[i];
         if (!newContainers.find(cont => cont.name == oldCont.name)) {
           toDelete.push(oldCont.id);
         }
-      });
+      }
 
       if (toDelete.length) {
         await getDB().containers.bulkDelete(toDelete);
@@ -321,6 +329,7 @@ const store = createStore({
         addSegmentContainerSize(newContainers[i], newContainers);
       }
 
+      let containers_to_update_objects = [];
       for (let i = 0; i < newContainers.length; i++) {
         const container = newContainers[i];
         const oldContainer = containersFromDB.find(
@@ -356,19 +365,35 @@ const store = createStore({
         }
 
         if (updateObjects && !container.owner) {
-          dispatch("updateObjects", {
+          // Have a separate array contained containers that
+          // their objects should be updated
+          containers_to_update_objects.push({ container, key });
+        }
+      }
+
+      // Updating objects goes sequentially:
+      // Update all objects inside a segment_container first
+      // before updating objects inside original container
+      const dispatchUpdateOjects = async () => {
+        for (let i = 0; i < containers_to_update_objects.length; i++) {
+          const currentContainer = containers_to_update_objects[i];
+
+          await dispatch("updateObjects", {
             projectID: projectID,
             container: {
-              id: key,
-              ...container,
+              id: currentContainer.key,
+              ...currentContainer.container,
             },
             signal: signal,
           });
         }
-      }
+      };
+
+      if (containers_to_update_objects.length > 0) dispatchUpdateOjects();
     },
-    updateContainerTags: function (_, { projectID, containers, signal }) {
-      containers.map(async container => {
+    updateContainerTags: async function (_, { projectID, containers, signal }) {
+      for (let i = 0; i < containers.length; i++) {
+        const container = containers[i];
         const tags =
           (await getTagsForContainer(
             projectID, container.name, signal, container.owner)) ||
@@ -376,11 +401,11 @@ const store = createStore({
         await getDB().containers
           .where({ projectID: container.projectID, name: container.name })
           .modify({ tags });
-      });
+      }
     },
 
     updateObjects: async function (
-      { dispatch },
+      { dispatch, commit, state },
       { projectID, container, signal },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
@@ -391,8 +416,10 @@ const store = createStore({
       let newObjects = [];
       let objects;
       let marker = "";
+
       do {
-        objects = await getObjects(projectID, container.name, marker, signal);
+        objects = await getObjects(
+          projectID, container.name, marker, signal);
 
         if (objects.length > 0) {
           objects.forEach(obj => {
@@ -406,38 +433,63 @@ const store = createStore({
       } while (objects.length > 0);
 
       let toDelete = [];
-      existingObjects.map(oldObj => {
+
+      for (let i = 0; i < existingObjects.length; i++) {
+        const oldObj = existingObjects[i];
         if (!newObjects.find(obj => obj.name === oldObj.name)) {
           toDelete.push(oldObj.id);
         }
-      });
+      }
+
       if (toDelete.length) {
         await getDB().objects.bulkDelete(toDelete);
       }
 
       if (!isSegmentsContainer) {
         const segment_objects = await getSegmentObjects(projectID, container);
+
         for (let i = 0; i < newObjects.length; i++) {
-          if (segment_objects[i])
+          if (segment_objects[i]) {
             newObjects[i].bytes = segment_objects[i].bytes;
+          }
+          else if (!segment_objects[i] && state.isLoaderVisible) {
+            /* When cancelling the upload of large amount of files
+              or big files sizes, the original folder could have
+              more objects than segment folder which results in the
+              last updated file has size 0 (segment folder doesn't have it)
+              Therefore it's better to remove that file.
+            */
+            newObjects.splice(i, 1);
+          }
         }
       }
 
-      newObjects.map(newObj => {
+      for (let i = 0; i < newObjects.length; i++) {
+        const newObj = newObjects[i];
+
         let oldObj = existingObjects.find(obj => obj.name === newObj.name);
 
         if (oldObj) {
-          getDB().objects.update(oldObj.id, newObj);
+          await getDB().objects.update(oldObj.id, newObj);
         } else {
-          getDB().objects.put(newObj);
+          try {
+            await getDB().objects.put(newObj);
+          } catch (e) {
+            if (DEV) console.error("Constraint error: " + e.message);
+          }
         }
-      });
+        if (!isSegmentsContainer && i === newObjects.length - 1) {
+          commit("setLoaderVisible", false);
+        }
+      }
+
       if (!isSegmentsContainer) {
         dispatch("updateObjectTags", {
           projectID,
           container,
           signal,
         });
+
       }
     },
     updateObjectTags: async function (
@@ -482,7 +534,7 @@ const store = createStore({
             signal,
             owner,
           );
-          tags.map(item => {
+          tags.forEach(item => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {

@@ -298,7 +298,7 @@ class VaultClient:
             params={"service": self.service, "key": self._key_name},
         )
         if isinstance(header_response, dict) and "data" in header_response:
-            return header_response["data"]["header"]
+            return header_response["data"]["headers"]["1"]["header"]
         return ""
 
     async def put_header(
