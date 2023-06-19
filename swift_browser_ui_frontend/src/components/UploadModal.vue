@@ -21,7 +21,7 @@
           :query="inputFolder"
           aria-required="true"
           required
-          :valid="isValid(inputFolder) || !interacted"
+          :valid="isValidFolderName(inputFolder) || !interacted"
           :validation="$t('message.error.tooShort')"
           validate-on-blur
           @changeQuery="onQueryChange"
@@ -182,7 +182,7 @@
         :disabled="noUpload
           || addingFiles
           || buttonAddingFiles
-          || !isValid(inputFolder)"
+          || !isValidFolderName(inputFolder)"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -461,6 +461,7 @@ export default {
     },
   },
   methods: {
+    isValidFolderName,
     appendDropFiles(file) {
       //Checking for identical path only, not name:
       //different folders may have same file names
@@ -704,9 +705,6 @@ export default {
         }
       }, 1000);
       this.toggleUploadModal();
-    },
-    isValid(str) {
-      return isValidFolderName(str);
     },
   },
 };

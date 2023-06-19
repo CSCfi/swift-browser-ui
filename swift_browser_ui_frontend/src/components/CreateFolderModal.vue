@@ -25,7 +25,7 @@
           name="foldername"
           aria-required="true"
           data-testid="folder-name"
-          :valid="isValid(folderName) || !interacted"
+          :valid="isValidFolderName(folderName) || !interacted"
           :validation="$t('message.error.tooShort')"
           required
           validate-on-blur
@@ -70,7 +70,7 @@
       <c-button
         size="large"
         data-testid="save-folder"
-        :disabled="!isValid(folderName)"
+        :disabled="!isValidFolderName(folderName)"
         @click="createContainer"
         @keyup.enter="createContainer"
       >
@@ -120,6 +120,7 @@ export default {
     },
   },
   methods: {
+    isValidFolderName,
     createContainer: function () {
       let projectID = this.$route.params.project;
       const folderName = toRaw(this.folderName);
@@ -177,9 +178,6 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
-    },
-    isValid: function (str) {
-      return isValidFolderName(str);
     },
   },
 };
