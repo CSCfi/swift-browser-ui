@@ -178,7 +178,51 @@ export default {
         .limit(1000)
         .toArray();
 
+      let subfolders = [];
+
+      objects.forEach(obj => {
+        const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
+        const subShortName = subName
+          .substring(subName.lastIndexOf("/")+1, subName.length);
+
+        if (subShortName.includes(query[0])) { //query not in other subfolders
+          const index = subfolders.findIndex(sub => sub.name === subName
+            && sub.container === obj.container);
+          if (index < 0) {
+            let count = 0;
+            //add its subfolders' content
+            const size = objects.reduce((result, o) => {
+              if (o.name.startsWith(subName) && o.container === obj.container) {
+                count++;
+                result += o.bytes;
+              }
+              return result;
+            }, 0);
+
+            let subfolder = {
+              container: obj.container, name: subName,
+              subfolder: true, bytes: size, count: count,
+            };
+
+            //if shared, get owner for routing
+            const sharedIndex = this.sharedConts
+              .findIndex(cont => cont.originalID === obj.containerID);
+
+            if (sharedIndex >= 0) {
+              subfolder = {
+                ...subfolder,
+                owner: this.sharedConts[sharedIndex].owner,
+              };
+            }
+            subfolders.push(subfolder);
+          }
+        }
+      });
+
       this.searchResults = this.searchResults
+        .concat(subfolders.map(item => ({
+          ...item, value: item.name,
+        })).sort(rankedSort).slice(0, 100))
         .concat(objects.map(item => ({
           ...item, value: item.name,
         })).sort(rankedSort).slice(0, 100))
@@ -194,9 +238,11 @@ export default {
       const index = this.sharedConts
         .findIndex(cont => cont.originalID === item.containerID);
 
-      const prefix = item.name.includes("/") ?
-        item.name.slice(0, item.name.lastIndexOf("/"))
-        : null;
+      let prefix = null;
+      if (item.subfolder) prefix = item.name;
+      else if (item.name.includes("/")) { //for objects
+        prefix = item.name.slice(0, item.name.lastIndexOf("/"));
+      }
 
       if (item.owner || index >= 0) {
         route = {
