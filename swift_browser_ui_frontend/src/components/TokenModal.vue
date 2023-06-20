@@ -35,7 +35,7 @@
         {{ $t('message.tokens.createToken') }}
       </c-button>
       <c-row
-        v-show="latest"
+        v-show="latest.token"
         align="start"
         justify="space-between"
       >
@@ -43,7 +43,7 @@
           <strong>{{ $t('message.tokens.latestToken') }}</strong>
         </p>
         <div id="token">
-          <p>{{ latest }}</p>
+          <p>{{ latest.token }}</p>
         </div>
         <c-button
           size="small"
@@ -58,7 +58,7 @@
         </c-button>
       </c-row>
       <c-alert
-        v-show="latest"
+        v-show="latest.token"
         type="warning"
       >
         <p>{{ $t('message.tokens.copyWarning') }}</p>
@@ -96,7 +96,10 @@ export default {
     return {
       tokens: [],
       newIdentifier: "",
-      latest: undefined,
+      latest: {
+        token: undefined,
+        id: undefined,
+      },
       copied: false,
       tokensPerPage: 5,
       mdiClose,
@@ -170,7 +173,7 @@ export default {
     closeTokenModal: function () {
       this.$store.commit("toggleTokenModal", false);
       this.newIdentifier = "";
-      this.latest = undefined;
+      this.latest = { token: undefined, id: undefined };
       this.copied = false;
       document.querySelector("#token-toasts").removeToast("error-failed");
       document.querySelector("#token-toasts").removeToast("error-in-use");
@@ -186,7 +189,8 @@ export default {
           this.activeId,
           identifier,
         ).then((ret) => {
-          this.latest = ret;
+          this.latest.token = ret;
+          this.latest.id = this.newIdentifier;
           this.newIdentifier = "";
           this.getTokens();
         }).catch(() => {
@@ -217,7 +221,7 @@ export default {
     copyLatestToken: function () {
       if (!this.copied) {
         navigator.clipboard.writeText(
-          this.latest,
+          this.latest.token,
         ).then(() => {
           this.copied = true;
           document.querySelector("#token-toasts").addToast(
@@ -239,6 +243,9 @@ export default {
         this.activeId,
         identifier,
       ).then(() => {
+        if (identifier === this.latest.id) {
+          this.latest = {token: undefined, id: undefined};
+        }
         document.querySelector("#token-toasts").addToast(
           {
             id: "success-removed",
