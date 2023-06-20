@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #940) Added TokenModal to replace token page
 - (GL #936) Add missing icon for subfolders
 - (GL #985) Add breadcrumb component
+- (GL #1050) Add generic error handling for request, sharing, and upload backend components
 
 ### Changed
 

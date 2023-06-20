@@ -111,3 +111,41 @@ async def handle_validate_authentication(
     )
 
     return await handler(request)
+
+
+@aiohttp.web.middleware
+async def error_handler(
+    req: aiohttp.web.Request, handler: swift_browser_ui.common.types.AiohttpHandler
+) -> aiohttp.web.Response:
+    """Middleware for handling exceptions.
+
+    :param req: A request instance
+    :param handler: A request handler
+    :raises: Reformatted HTTP Exceptions
+    :returns: Successfull requests unaffected
+    """
+    try:
+        response = await handler(req)
+        return response
+    except aiohttp.web.HTTPRedirection:
+        # Catches 300s
+        raise
+    except aiohttp.web.HTTPError as error:
+        # Catch 400s and 500s
+        LOGGER.error(
+            "HTTP %r request to %r raised an HTTP %d exception.",
+            req.method,
+            req.path,
+            error.status,
+        )
+        LOGGER.exception(error)
+        raise error
+    except Exception as exc:
+        # We don't expect any other errors, so we log it and return a nice message instead of letting server crash
+        LOGGER.error(
+            "HTTP %r request to %r raised an unexpected exception. This IS a bug.",
+            req.method,
+            req.path,
+        )
+        LOGGER.exception(exc)
+        raise exc

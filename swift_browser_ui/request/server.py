@@ -50,6 +50,7 @@ async def init_server() -> aiohttp.web.Application:
             swift_browser_ui.common.common_middleware.check_db_conn,  # type: ignore
             swift_browser_ui.common.common_middleware.handle_validate_authentication,  # type: ignore
             swift_browser_ui.common.common_middleware.catch_uniqueness_error,  # type: ignore
+            swift_browser_ui.common.common_middleware.error_handler,  # type: ignore
         ]
     )
 
