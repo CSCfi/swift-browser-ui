@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #936) Add missing icon for subfolders
 - (GL #985) Add breadcrumb component
 - (GL #1050) Add generic error handling for request, sharing, and upload backend components
+- (GL #1051) Filter projects based on response from OIDC provider
 
 ### Changed
 
