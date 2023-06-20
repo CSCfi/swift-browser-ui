@@ -1,5 +1,8 @@
 import { createApp } from "vue";
 import LoginPassword from "@/pages/LoginPassword.vue";
+import LanguageSelector from "@/components/CLanguageSelector.vue";
+
+import bannerUrl from "@/assets/banner_login.png";
 
 import { i18n } from "@/common/i18n";
 
@@ -8,7 +11,6 @@ import CFooter from "@/components/CFooter.vue";
 import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
 import { vControl } from "@/common/csc-ui-vue-directive";
 
-import LanguageSelector from "@/components/CLanguageSelector.vue";
 
 // Import project css
 import "@/css/prod.scss";
@@ -27,6 +29,7 @@ const app = createApp({
     return {
       langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
       idb: true,
+      bannerUrl,
     };
   },
   created() {

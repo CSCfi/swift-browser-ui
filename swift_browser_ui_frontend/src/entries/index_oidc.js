@@ -11,6 +11,8 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 import CFooter from "@/components/CFooter.vue";
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 
+import bannerUrl from "@/assets/banner_login.png";
+
 // Import project css
 import "@/css/prod.scss";
 
@@ -28,6 +30,7 @@ const app = createApp({
     return {
       loading: false,
       idb: true,
+      bannerUrl,
     };
   },
   created() {

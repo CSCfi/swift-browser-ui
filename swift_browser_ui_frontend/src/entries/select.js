@@ -22,10 +22,7 @@ const app = createApp({
       loginformname: "Openstack account:",
       idb: true,
       projects: [],
-      langs: [
-        {name: "In English", value: "en"},
-        {name: "Suomeksi", value: "fi"},
-      ],
+      langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
     };
   },
   created() {

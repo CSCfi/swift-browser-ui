@@ -11,7 +11,7 @@
         <c-container class="padding">
           <form>
             <c-login-card
-              src="/assets/banner_login.png"
+              :src="bannerUrl"
             >
               <c-login-card-title>
                 {{ $t('message.program_name') }}

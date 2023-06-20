@@ -18,7 +18,7 @@
             action="/login/credentials"
           >
             <c-login-card
-              src="/assets/banner_login.png"
+              :src="bannerUrl"
             >
               <c-alert
                 v-if="!idb"
