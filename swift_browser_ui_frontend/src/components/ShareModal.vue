@@ -80,7 +80,10 @@
           @addTag="addingTag"
           @deleteTag="deletingTag"
         />
-        <c-flex>
+        <c-row
+          justify="space-between"
+          align="start"
+        >
           <c-select
             v-model="sharedAccessRight"
             v-csc-control
@@ -97,7 +100,7 @@
           >
             {{ $t('message.share.confirm') }}
           </c-button>
-        </c-flex>
+        </c-row>
       </c-container>
       <c-alert
         v-show="isShared || isPermissionRemoved || isPermissionUpdated"
