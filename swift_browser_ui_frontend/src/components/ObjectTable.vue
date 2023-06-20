@@ -494,10 +494,10 @@ export default {
         return prev;
       }
 
-      const filteredObjectsIds = this.oList.reduce(search, []);
+      const filteredNames = this.oList.reduce(search, []);
 
       this.filteredObjects = this.oList.
-        filter(obj => filteredObjectsIds.indexOf(obj.name) === -1);
+        filter(obj => filteredNames.indexOf(obj.name) === -1);
     },
     handleSelection(selection) {
       const objects = this.oList;
