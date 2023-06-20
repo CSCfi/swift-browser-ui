@@ -198,9 +198,8 @@ class ObjectReplicationProxy:
                 if "X-Object-Meta-Usertags" in i:
                     headers[i] = resp_g.headers[i]
 
-            # If the object fits into the 5GiB limit imposed by Swift
-            if length <= 5368709120:
-                LOGGER.debug(f"Copying object {object_name} in full.")
+            if "X-Object-Manifest" not in resp_g.headers:
+                LOGGER.info(f"Copying object {object_name} in full.")
                 headers["Content-Length"] = str(length)
                 headers["Content-Type"] = resp_g.headers["Content-Type"]
                 if "ETag" in resp_g.headers:
