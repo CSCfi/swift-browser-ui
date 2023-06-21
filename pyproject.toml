@@ -115,3 +115,6 @@ ignore = [
     "D203",    # one-blank-line-before-class
     "D213",    # multi-line-summary-second-line
 ]
+
+[tool.ruff.mccabe]
+max-complexity = 15

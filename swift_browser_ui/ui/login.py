@@ -90,6 +90,13 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
         "state": oidc_result["state"],
         "access_token": oidc_result["token"],
     }
+
+    csc_projects: typing.Optional[typing.List] = _get_projects_from_userinfo(
+        session["userinfo"]
+    )
+    # add entry to session only if the OIDC provider has csc-projects in userinfo
+    if csc_projects is not None:
+        session["csc-projects"] = csc_projects
     request.app["Log"].debug(session["oidc"])
 
     response = aiohttp.web.Response(
@@ -324,9 +331,15 @@ async def login_with_token(
 
     # Check token availability
     avail = await get_availability_from_token(token, client)
+    csc_projects = session.get("csc-projects", None)
     session["projects"] = {}
     # Scope a token for all accessible projects
     for project in avail["projects"]:
+        # Filter out projects without a declared access if the OIDC provider supports it
+        project_without_prefix = project["name"].removeprefix("project_")
+        if isinstance(csc_projects, list) and project_without_prefix not in csc_projects:
+            request.app["Log"].debug("Project %r is not enabled for sd-connect, skipping")
+            continue
         async with client.post(
             f"{setd['auth_endpoint_url']}/auth/tokens",
             json={
@@ -466,3 +479,25 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
     response = aiohttp.web.Response(status=303)
     response.headers["Location"] = "/"
     return response
+
+
+def _get_projects_from_userinfo(userinfo: typing.Dict) -> typing.Optional[typing.List]:
+    """Parse projects from userinfo.
+
+    :param userinfo: dict from userinfo containing user profile
+    :returns: None if userinfo doesn't contain csc-projects, or a list with "project_name"s
+    :raises HTTPUnauthorized in case no projects are available
+    """
+    if "sdConnectsProjects" in userinfo:
+        # Remove the possibly existing "project_" prefix
+        projects = [
+            p.removeprefix("project_") for p in userinfo["sdConnectProjects"].split(" ")
+        ]
+    else:
+        return None
+
+    if len(projects) == 0:
+        # No project group information received, aborting
+        raise aiohttp.web.HTTPUnauthorized(reason="User is not a member of any project.")
+
+    return projects
