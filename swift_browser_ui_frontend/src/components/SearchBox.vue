@@ -182,8 +182,8 @@ export default {
 
       objects.forEach(obj => {
         const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
-        const subShortName = subName
-          .substring(subName.lastIndexOf("/")+1, subName.length);
+        // Get the nearest subfolder name
+        const subShortName = obj.name.split("/").slice(-2, -1)[0];
 
         if (subShortName.includes(query[0])) { //query not in other subfolders
           const index = subfolders.findIndex(sub => sub.name === subName
