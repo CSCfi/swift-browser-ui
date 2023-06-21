@@ -45,7 +45,8 @@ logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server for handling the upload runner API."""
     middlewares: typing.List[typing.Coroutine] = [
-        swift_browser_ui.common.common_middleware.add_cors  # type: ignore
+        swift_browser_ui.common.common_middleware.add_cors,  # type: ignore
+        swift_browser_ui.common.common_middleware.error_handler,  # type: ignore
     ]
 
     if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", None):
