@@ -324,11 +324,12 @@ export async function swiftCreateContainer(
   };
   let ret = await PUT(fetchURL, JSON.stringify(body));
   if (ret.status != 201) {
-    if (ret.status == 409) {
+    if (ret.status == 409 || ret.status == 202) {
+      //name used in other projects or current
       throw new Error("Container name already in use.");
     }
     if (ret.status == 400) {
-      throw new Error("Invalid container or tag name");
+      throw new Error("Invalid container or tag name.");
     }
     throw new Error("Container creation unsuccessful.");
   }

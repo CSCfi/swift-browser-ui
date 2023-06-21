@@ -144,7 +144,7 @@ export default {
           let errorMessage = this.$t("message.error.createFail");
           if (err.message.match("Container name already in use")) {
             errorMessage = this.$t("message.error.inUse");
-          } else if (err.message.match("Invalid container name")) {
+          } else if (err.message.match("Invalid container or tag name")) {
             errorMessage = this.$t("message.error.invalidName");
           }
           document.querySelector("#createModal-toasts").addToast(

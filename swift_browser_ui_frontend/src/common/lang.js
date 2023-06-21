@@ -37,7 +37,7 @@ let default_translations = {
         Forbidden: "403 – Forbidden",
         Forbidden_text: "Your previous request could not be fulfilled.",
         inUse: "Folder name already in use.",
-        invalidName: "Folder name is invalid.",
+        invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
         idb: "Firefox in private mode is not supported.",
         idb_text:
@@ -401,7 +401,7 @@ let default_translations = {
         Forbidden: "403 – Kielletty",
         Forbidden_text: "Edellinen toiminto on kielletty.",
         inUse: "Kansion nimi on jo käytössä.",
-        invalidName: "Kansion nimi ei kelpaa.",
+        invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
