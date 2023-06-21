@@ -100,32 +100,6 @@
           >
             <c-container>
               <c-checkbox
-                v-model="ownPrivateKey"
-                v-csc-control
-                :label="$t('message.encrypt.ephemeral')"
-              />
-              <c-flex v-if="ownPrivateKey">
-                <c-text-field
-                  v-model="privkey"
-                  v-csc-control
-                  :placeholder="$t('message.encrypt.pk_msg')"
-                  :label="$t('message.encrypt.pk')"
-                  type="text"
-                  max="1024"
-                />
-                <c-text-field
-                  v-model="passphrase"
-                  v-csc-control
-                  :placeholder="$t('message.encrypt.phrase_msg')"
-                  :label="$t('message.encrypt.phrase')"
-                  type="text"
-                  max="1024"
-                  rows="5"
-                />
-              </c-flex>
-            </c-container>
-            <c-container>
-              <c-checkbox
                 v-model="multipleReceivers"
                 v-csc-control
                 :label="$t('message.encrypt.multipleReceivers')"
@@ -134,7 +108,6 @@
                 <c-text-field
                   v-model="addRecvkey"
                   v-csc-control
-                  :placeholder="$t('message.encrypt.pubkey_msg')"
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
                   max="1024"
@@ -144,10 +117,6 @@
                   @click="appendPublicKey"
                   @keyup.enter="appendPublicKey"
                 >
-                  <i
-                    slot="icon"
-                    class="mdi mdi-lock-plus"
-                  />
                   {{ $t("message.encrypt.addkey") }}
                 </c-button>
                 <!-- Footer options needs to be in CamelCase,
@@ -223,10 +192,6 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      ownPrivateKey: false,
-      ephemeral: true,
-      privkey: "",
-      passphrase: "",
       multipleReceivers: false,
       addRecvkey: "",
       recvkeys: [],
@@ -420,20 +385,7 @@ export default {
     dropFiles: function () {
       this.refreshNoUpload();
     },
-    ownPrivateKey: function() {
-      this.ephemeral = !this.ephemeral;
-      this.refreshNoUpload();
-    },
-    privkey: function () {
-      this.refreshNoUpload();
-    },
     recvkeys: function () {
-      this.refreshNoUpload();
-    },
-    passphrase: function () {
-      this.refreshNoUpload();
-    },
-    ephemeral: function () {
       this.refreshNoUpload();
     },
     currentUpload: function () {
@@ -626,23 +578,13 @@ export default {
       this.addRecvkey = "";
     },
     refreshNoUpload() {
-      if (this.ephemeral) {
-        this.noUpload = (
-          (!this.pubkey.length && !this.recvkeys.length)
-          || !this.dropFiles.length
-          || (this.currentUpload != undefined)
-          || !this.canUpload
-        );
-      }
-      if (this.ownPrivateKey) {
-        this.noUpload = (
-          (!this.pubkey.length && !this.recvkeys.length)
-          || !this.dropFiles.length
-          || (!this.passphrase && !this.privkey)
-          || (this.currentUpload != undefined)
-          || !this.canUpload
-        );
-      }
+      this.noUpload = (
+        (!this.pubkey.length && !this.recvkeys.length)
+        || !this.inputFolder
+        || !this.dropFiles.length
+        || (this.currentUpload != undefined)
+        || !this.canUpload
+      );
     },
     cancelUpload() {
       this.$store.commit("setFilesAdded", false);
@@ -653,7 +595,6 @@ export default {
       this.$store.commit("toggleUploadModal", false);
       this.addingFiles = false;
       this.tags = [];
-      this.ephemeral = true;
       this.files = [];
       this.duplicateFile = false;
       this.interacted = false;
@@ -675,11 +616,11 @@ export default {
         this.$route.params.owner ? this.$route.params.owner : this.active.id,
         this.$store.state.dropFiles,
         this.recvkeys,
-        this.privkey,
+        null,
         this.inputFolder,
         this.$route.query.prefix,
-        this.passphrase,
-        this.ephemeral,
+        null,
+        true,
         this.$store,
         this.$el,
       );
