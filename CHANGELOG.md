@@ -146,6 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update logic for IndexedDB to handle large upload of >50 files properly
   - Add check for null session in wasm when canceling large upload of >50 files
 - (GL #1034) Fix search not including shared folders or files, and search result routing
+- (GL #1049) Fix for missing banner image from build version
 
 ### Removed
 
