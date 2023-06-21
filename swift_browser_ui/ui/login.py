@@ -92,7 +92,7 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
     }
 
     csc_projects: typing.Optional[typing.List] = _get_projects_from_userinfo(
-        session["userinfo"]
+        session["oidc"]["userinfo"]
     )
     # add entry to session only if the OIDC provider has csc-projects in userinfo
     if csc_projects is not None:
