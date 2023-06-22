@@ -1,6 +1,7 @@
 <template>
   <!-- Footer options needs to be in CamelCase
   because csc-ui wont recognise it othervise. -->
+  <!-- eslint-disable-->
   <c-data-table
     id="contable-tags"
     :data.prop="containers"
@@ -8,7 +9,7 @@
       headers.filter(header => header.key !== 'tags'): headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :hide-footer="disablePagination"
-    :footer-options.prop="footerOptions"
+    :footerOptions.prop="footerOptions"
     :no-data-text="getEmptyText()"
     :sort-by="sortBy"
     :sort-direction="sortDirection"
@@ -16,6 +17,7 @@
     @paginate="getPage"
     @sort="onSort"
   />
+  <!-- eslint-enable-->
 </template>
 
 <script>
