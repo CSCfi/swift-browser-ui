@@ -63,6 +63,9 @@
       >
         <p>{{ $t('message.tokens.copyWarning') }}</p>
       </c-alert>
+      <!-- Footer options needs to be in CamelCase,
+      because csc-ui wont recognise it otherwise. -->
+      <!-- eslint-disable-->
       <c-data-table
         class="tokenContents"
         sort-by="identifier"
@@ -71,9 +74,10 @@
         :data.prop="tableTokens"
         :headers.prop="headers"
         :pagination.prop="tokenPagination"
-        :footer-options.prop="footer"
+        :footerOptions.prop="footer"
         :hide-footer="tokens.length <= tokensPerPage"
       />
+      <!-- eslint-enable-->
       <c-toasts
         id="token-toasts"
         data-testid="token-toasts"

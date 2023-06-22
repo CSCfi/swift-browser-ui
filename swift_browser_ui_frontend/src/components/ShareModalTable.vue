@@ -3,14 +3,18 @@
     <h3 class="title is-5 has-text-dark">
       {{ $t("message.share.shared_table_title") }}
     </h3>
+    <!-- Footer options needs to be in CamelCase,
+    because csc-ui wont recognise it otherwise. -->
+    <!-- eslint-disable-->
     <c-data-table
       v-if="tableData.length > 0"
       :data.prop="tableData"
       :headers.prop="headers"
       :no-data-text="$t('message.encrypt.empty')"
       :pagination.prop="pagination"
-      :footer-options.prop="footer"
+      :footerOptions.prop="footer"
     />
+    <!-- eslint-enable-->
   </c-container>
 </template>
 

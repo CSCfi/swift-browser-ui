@@ -1,5 +1,8 @@
 <template>
   <div class="object-table-wrapper">
+    <!-- Footer options needs to be in CamelCase,
+    because csc-ui wont recognise it otherwise. -->
+    <!-- eslint-disable-->
     <c-data-table
       id="objtable"
       :data.prop="objects"
@@ -7,7 +10,7 @@
         headers.filter(header => header.key !== 'tags'): headers"
       :pagination.prop="disablePagination ? null : paginationOptions"
       :hide-footer="disablePagination"
-      :footer-options.prop="footerOptions"
+      :footerOptions.prop="footerOptions"
       :no-data-text="$t('message.emptyContainer')"
       :sort-by="sortBy"
       :sort-direction="sortDirection"
@@ -18,6 +21,7 @@
       @paginate="getPage"
       @sort="onSort"
     />
+    <!-- eslint-enable-->
     <c-loader v-show="isLoaderVisible">
       {{ $t('message.upload.uploadedItems') }}
     </c-loader>
