@@ -10,10 +10,9 @@
         <i class="mdi mdi-home" />
         <p>&nbsp;{{ $t("message.folderTabs.all") }}</p>
       </router-link>
-
       <router-link
         class="link"
-        :to="{name: 'ObjectsView'}"
+        :to="{name: currentRoute}"
       >
         <i class="mdi mdi-chevron-right" />
         <p :class="subfolders === '' ? 'last' : 'default'">
@@ -47,16 +46,20 @@ export default {
       return this.$route.query.prefix != undefined ?
         this.$route.query.prefix.split("/") : "";
     },
+    currentRoute() {
+      return this.$route.name;
+    },
   },
   methods: {
     getPath(index) {
       if (index === this.subfolders.length-1) {
-        return { name: "ObjectsView", query:
+
+        return { name: this.currentRoute, query:
           { prefix: this.$route.query.prefix }};
       } else {
         let prefixes = this.$route.query.prefix.split("/");
         prefixes = prefixes.slice(0, index+1).join("/");
-        return { name: "ObjectsView", query:
+        return { name: this.currentRoute, query:
           { prefix: prefixes }};
       }
     },

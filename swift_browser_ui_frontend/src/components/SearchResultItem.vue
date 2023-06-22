@@ -8,6 +8,7 @@
       <div class="media-content">
         <span>
           <b>{{
+            isSubfolder() ? $t('message.search.folder') :
             isContainer()
               ? $t('message.search.container')
               : $t('message.search.object')
@@ -22,7 +23,7 @@
             {{ item.container }}
             <br>
           </span>
-          <span v-if="hasPath()">
+          <span v-if="!isSubfolder() && hasPath()">
             <b>{{ $t('message.search.folder') }}: </b>
             <!-- eslint-disable-next-line -->
             <span v-html="getFilePath()"></span>
@@ -38,7 +39,7 @@
             <b>{{ $t('message.search.size') }}: </b>
             <span> {{ getHumanReadableSize(item.bytes) }}</span>
           </span>
-          <span v-if="isContainer()">
+          <span v-if="item.count">
             <br>
             <b>{{ $t('message.search.objects') }}: </b>{{ item.count }}
           </span>
@@ -63,8 +64,11 @@ export default {
   ],
   methods: {
     getHumanReadableSize,
+    isSubfolder: function() {
+      return this.$props.item.subfolder;
+    },
     isContainer: function() {
-      return this.$props.item.container === undefined || this.$props.item.owner;
+      return !this.isSubfolder() && this.$props.item.count;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
