@@ -1,6 +1,6 @@
 <template>
-  <!-- Footer options needs to be in CamelCase
-  because csc-ui wont recognise it othervise. -->
+  <!-- Footer options needs to be in CamelCase,
+  because csc-ui wont recognise it otherwise. -->
   <!-- eslint-disable-->
   <c-data-table
     id="contable-tags"
