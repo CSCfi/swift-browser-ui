@@ -65,6 +65,9 @@
             </c-button>
           </div>
         </c-alert>
+        <!-- Footer options needs to be in CamelCase,
+        because csc-ui wont recognise it otherwise. -->
+        <!-- eslint-disable-->
         <c-data-table
           v-if="dropFiles.length > 0"
           class="files-table"
@@ -72,8 +75,9 @@
           :headers.prop="fileHeaders"
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
-          :footer-options.prop="footer"
+          :footerOptions.prop="footer"
         />
+        <!-- eslint-enable-->
         <p class="info-text is-size-6">
           {{ $t("message.encrypt.uploadedFiles") }}
           <b>{{ active.name }}</b>.
@@ -143,14 +147,18 @@
                   />
                   {{ $t("message.encrypt.addkey") }}
                 </c-button>
+                <!-- Footer options needs to be in CamelCase,
+                because csc-ui wont recognise it otherwise. -->
+                <!-- eslint-disable-->
                 <c-data-table
                   class="publickey-table"
                   :data.prop="recvHashedKeys"
                   :headers.prop="publickeyHeaders"
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
-                  :footer-options.prop="footer"
+                  :footerOptions.prop="footer"
                 />
+                <!-- eslint-enable-->
               </c-flex>
             </c-container>
           </c-accordion-item>
