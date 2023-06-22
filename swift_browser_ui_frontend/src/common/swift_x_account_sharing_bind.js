@@ -160,7 +160,12 @@ class SwiftXAccountSharing {
     let shared = fetch(
       url, { method: "POST" },
     ).then(
-      (resp) => { return resp.json(); },
+      (resp) => {
+        if (resp.status == 409) {
+          throw new Error("Container already shared.");
+        }
+        return resp.json();
+      },
     );
     return shared;
   }

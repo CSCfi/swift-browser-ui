@@ -322,7 +322,7 @@ export default {
         );
       }
       catch(error) {
-        if (error instanceof TypeError) {
+        if (error.message.match("Container already shared.")) {
           document.querySelector("#shareModal-toasts").addToast(
             {
               id: "error-duplicate",
