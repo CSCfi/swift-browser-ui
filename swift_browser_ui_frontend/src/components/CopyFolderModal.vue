@@ -13,7 +13,7 @@
           v-csc-control
           :label="$t('message.replicate.name_newFolder')"
           name="foldername"
-          :valid="loadingFoldername || isValid(folderName)"
+          :valid="loadingFoldername || errorMsg.length === 0"
           :validation="errorMsg"
           aria-required="true"
           required
@@ -43,7 +43,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="!isValid(folderName)"
+        :disabled="errorMsg.length"
         @click="replicateContainer"
         @keyup.enter="replicateContainer"
       >
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { delay } from "lodash";
+import { debounce, delay } from "lodash";
 import {
   swiftCopyContainer,
   updateContainerMeta,
@@ -107,6 +107,9 @@ export default {
           }
         });
       }
+    },
+    folderName() {
+      this.checkValidity();
     },
   },
   methods: {
@@ -172,6 +175,7 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.loadingFoldername = true;
+      this.errorMsg = "";
       document.querySelector("#copyFolder-toasts").removeToast("copy-error");
     },
     replicateContainer: function () {
@@ -238,30 +242,28 @@ export default {
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
     },
-    isValid: function (str) {
-      if (isValidFolderName(str)) {
+    checkValidity: debounce(function () {
+      if (isValidFolderName(this.folderName)) {
         //check if name exists
         //request parameter should be sanitized first
-        const safeKey = escapeRegExp(str).trim();
+        const safeKey = escapeRegExp(this.folderName).trim();
         let re = new RegExp("^".concat(safeKey, "$"));
 
         if (this.folders) {
           for (let folder of this.folders) {
             if (folder.name.match(re)) {
               this.errorMsg = this.$t("message.replicate.destinationExists");
-              return false;
+              return;
             }
           }
         }
+        this.errorMsg = "";
       }
       else {
         //name too short
         this.errorMsg = this.$t("message.error.tooShort");
-        return false;
       }
-      this.errorMsg = "";
-      return true;
-    },
+    }, 300),
   },
 };
 </script>
