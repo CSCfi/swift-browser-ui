@@ -61,7 +61,10 @@ class SwiftXAccountSharing {
       url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
-    );
+    ).catch((err) => {
+      if (signal.aborted) return [];
+      throw new Error(err);
+    });
     return containers;
   }
 
@@ -88,7 +91,10 @@ class SwiftXAccountSharing {
       url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
-    );
+    ).catch((err) => {
+      if (signal.aborted) return [];
+      throw new Error(err);
+    });
     return details;
   }
 
@@ -110,7 +116,10 @@ class SwiftXAccountSharing {
       url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
-    );
+    ).catch((err) => {
+      if (signal.aborted) return [];
+      throw new Error(err);
+    });
     return shared;
   }
 
@@ -135,7 +144,10 @@ class SwiftXAccountSharing {
       url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
-    );
+    ).catch((err) => {
+      if (signal.aborted) return [];
+      throw new Error(err);
+    });
     return details;
   }
 

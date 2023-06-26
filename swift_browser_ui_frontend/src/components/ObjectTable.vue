@@ -269,7 +269,6 @@ export default {
   },
   beforeUnmount () {
     this.abortController.abort();
-    console.log("hero");
   },
   methods: {
     getSharedContainers: async function () {

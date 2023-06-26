@@ -146,7 +146,6 @@ export default {
     this.fetchContainers();
   },
   beforeUnmount() {
-    console.log("heri");
     this.abortController.abort();
   },
   methods: {

@@ -100,7 +100,6 @@ export default {
     this.abortController = new AbortController();
   },
   beforeUnmount () {
-    console.log("her");
     this.abortController.abort();
   },
   methods: {

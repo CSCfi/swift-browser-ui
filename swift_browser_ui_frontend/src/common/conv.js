@@ -216,7 +216,9 @@ export async function getTagsForObjects(
     owner,
   );
 
-  meta.map((item) => (item[1] = extractTags(item)));
+  if (meta) {
+    meta.map((item) => (item[1] = extractTags(item)));
+  }
   return meta;
 }
 

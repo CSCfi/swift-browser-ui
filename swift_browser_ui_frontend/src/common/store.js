@@ -258,6 +258,11 @@ const store = createStore({
         .containers.where({ projectID })
         .toArray();
 
+      if (!signal) {
+        const constroller = new AbortController();
+        signal = constroller.signal;
+      }
+
       let containers;
       let marker = "";
       let newContainers = [];
@@ -418,6 +423,11 @@ const store = createStore({
       let objects;
       let marker = "";
 
+      if (!signal) {
+        const constroller = new AbortController();
+        signal = constroller.signal;
+      }
+
       do {
         objects = await getObjects(
           projectID, container.name, marker, signal);
@@ -563,6 +573,12 @@ const store = createStore({
       let sharedObjects = [];
       let marker = "";
       let objects = [];
+
+      if (!signal) {
+        const constroller = new AbortController();
+        signal = constroller.signal;
+      }
+
       do {
         objects = await getObjects(
           project,
