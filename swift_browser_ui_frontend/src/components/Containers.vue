@@ -100,14 +100,16 @@ export default {
     },
     containers: function() {
       if (this.$route.name === "SharedFrom") {
-        getSharingContainers(this.$route.params.project)
-          .then(sharingContainers => {
-            this.renderingContainers = this.containers.filter(
-              cont => sharingContainers.some(item =>
-                item === cont.name,
-              ),
-            );
-          });
+        getSharingContainers(
+          this.$route.params.project,
+          this.abortController.signal,
+        ).then(sharingContainers => {
+          this.renderingContainers = this.containers.filter(
+            cont => sharingContainers.some(item =>
+              item === cont.name,
+            ),
+          );
+        });
       }
       else if (this.$route.name === "SharedTo") {
         this.renderingContainers = this.containers ?
@@ -144,6 +146,7 @@ export default {
     this.fetchContainers();
   },
   beforeUnmount() {
+    console.log("heri");
     this.abortController.abort();
   },
   methods: {
@@ -212,7 +215,7 @@ export default {
 
       await this.$store.dispatch("updateContainers", {
         projectID: this.active.id,
-        signal: null,
+        signal: this.abortController.signal,
       });
     },
     removeContainer: async function(container) {

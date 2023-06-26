@@ -45,6 +45,7 @@ class SwiftXAccountSharing {
 
   async getAccess(
     username,
+    signal,
   ) {
     // List the containers the user has been given access to.
     let url = new URL(this.address.concat("/access/", username));
@@ -57,7 +58,7 @@ class SwiftXAccountSharing {
     url.searchParams.append("signature", signed.signature);
 
     let containers = fetch(
-      url, { method: "GET" },
+      url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
     );
@@ -68,6 +69,7 @@ class SwiftXAccountSharing {
     username,
     container,
     owner,
+    signal,
   ) {
     // Get details from a container the user has been given access to.
     let url = new URL(
@@ -83,7 +85,7 @@ class SwiftXAccountSharing {
 
     url.searchParams.append("owner", owner);
     let details = fetch(
-      url, { method: "GET" },
+      url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
     );
@@ -92,6 +94,7 @@ class SwiftXAccountSharing {
 
   async getShare(
     username,
+    signal,
   ) {
     // List the containers the user has shared to another user / users.
     let url = new URL(this.address.concat("/share/", username));
@@ -104,7 +107,7 @@ class SwiftXAccountSharing {
     url.searchParams.append("signature", signed.signature);
 
     let shared = fetch(
-      url, { method: "GET" },
+      url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
     );
@@ -114,6 +117,7 @@ class SwiftXAccountSharing {
   async getShareDetails(
     username,
     container,
+    signal,
   ) {
     // Get details from a container the user has given access to.
     let url = new URL(
@@ -128,7 +132,7 @@ class SwiftXAccountSharing {
     url.searchParams.append("signature", signed.signature);
 
     let details = fetch(
-      url, { method: "GET" },
+      url, { method: "GET", signal },
     ).then(
       (resp) => { return resp.json(); },
     );

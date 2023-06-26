@@ -76,6 +76,7 @@ export async function getProjects() {
 export async function getContainers(
   project,
   marker = "",
+  signal,
 ) {
   // List buckets for a given project.
   let getBucketsUrl = new URL(
@@ -84,7 +85,7 @@ export async function getContainers(
   if (marker) {
     getBucketsUrl.searchParams.append("marker", marker);
   }
-  let ret = await GET(getBucketsUrl);
+  let ret = await GET(getBucketsUrl, signal);
   if (ret.status == 200) {
     return await ret.json();
   } else {

@@ -263,7 +263,8 @@ const store = createStore({
       let newContainers = [];
       do {
         containers = [];
-        containers = await getContainers(projectID, marker).catch(() => {});
+        containers = await getContainers(projectID, marker, signal)
+          .catch(() => {});
 
         if (containers.length > 0) {
           containers.forEach(cont => {
@@ -276,7 +277,7 @@ const store = createStore({
         }
       } while (containers.length > 0);
 
-      const sharedContainers = await getSharedContainers(projectID);
+      const sharedContainers = await getSharedContainers(projectID, signal);
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
