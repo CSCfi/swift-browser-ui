@@ -110,10 +110,12 @@
                   v-csc-control
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
-                  max="1024"
-                  rows="3"
+                  rows="2"
+                  :valid="validatePubkey(addRecvkey) || addRecvkey.length === 0"
+                  :validation="$t('message.encrypt.pubkeyError')"
                 />
                 <c-button
+                  :disabled="!validatePubkey(addRecvkey)"
                   @click="appendPublicKey"
                   @keyup.enter="appendPublicKey"
                 >
@@ -374,6 +376,7 @@ export default {
         //inputFolder not cleared when modal toggled,
         //in case there's a delay in upload start
         //reset when modal visible
+        this.recvkeys = [];
         if(!this.noUploadContainers.length) {
           this.getNoUploadContainers();
         } else this.setInputFolder();
@@ -569,6 +572,17 @@ export default {
       const el = document.querySelector(".dropArea");
       el.classList.remove("over-dropArea");
     },
+    validatePubkey(key) {
+      const begin = "-----BEGIN CRYPT4GH PUBLIC KEY-----\n";
+      const end = "\n-----END CRYPT4GH PUBLIC KEY-----";
+
+      if (key.length === begin.length + 44 + end.length) {
+        if (key.startsWith(begin) && key.endsWith(end)) {
+          return true;
+        }
+      }
+      return false;
+    },
     appendPublicKey: async function () {
       if (!this.recvkeys.includes(this.addRecvkey)){
         this.recvkeys.push(this.addRecvkey);
@@ -598,6 +612,9 @@ export default {
       this.files = [];
       this.duplicateFile = false;
       this.interacted = false;
+      this.addRecvkey = "";
+      this.multipleReceivers = false;
+      this.recvHashedKeys = [];
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -728,6 +745,10 @@ c-data-table.publickey-table {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+c-accordion c-button {
+  margin-top: 0.5rem;
 }
 
 </style>
