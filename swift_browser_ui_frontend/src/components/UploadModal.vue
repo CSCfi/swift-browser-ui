@@ -573,15 +573,13 @@ export default {
       el.classList.remove("over-dropArea");
     },
     validatePubkey(key) {
-      const begin = "-----BEGIN CRYPT4GH PUBLIC KEY-----\n";
-      const end = "\n-----END CRYPT4GH PUBLIC KEY-----";
-
-      if (key.length === begin.length + 44 + end.length) {
-        if (key.startsWith(begin) && key.endsWith(end)) {
-          return true;
-        }
-      }
-      return false;
+      const sshed25519 = new RegExp (
+        "^ssh-ed25519 AAAAC3NzaC1lZDI1NTE5" +
+          "[0-9A-Za-z+/]{45,48}[=]{0,3}(\\s.*)?$");
+      const crypt4gh = new RegExp (
+        "^-----BEGIN CRYPT4GH PUBLIC KEY-----\\s[A-Za-z0-9+/]{43}=\\s" +
+          "-----END CRYPT4GH PUBLIC KEY-----$");
+      return (key.match(sshed25519) || key.match(crypt4gh));
     },
     appendPublicKey: async function () {
       if (!this.recvkeys.includes(this.addRecvkey)){
