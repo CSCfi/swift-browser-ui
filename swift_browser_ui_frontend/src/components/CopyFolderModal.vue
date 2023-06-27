@@ -263,7 +263,7 @@ export default {
         //name too short
         this.errorMsg = this.$t("message.error.tooShort");
       }
-    }, 300),
+    }, 300, { leading: true, trailing: false }),
   },
 };
 </script>
