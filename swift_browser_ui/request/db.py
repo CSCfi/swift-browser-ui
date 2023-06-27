@@ -31,7 +31,7 @@ class DBConn:
                     host=os.environ.get("REQUEST_DB_HOST", "localhost"),
                     port=int(os.environ.get("REQUEST_DB_PORT", 5432)),
                     ssl=os.environ.get("REQUEST_DB_SSL", "prefer"),
-                    database=os.environ.get("REQUEST_DB_NAME", "swiftrequest"),
+                    database=os.environ.get("REQUEST_DB_NAME", "swiftbrowserdb"),
                     min_size=os.environ.get("REQUEST_DB_MIN_CONNECTIONS", 0),
                     max_size=os.environ.get("REQUEST_DB_MAX_CONNECTIONS", 49),
                     timeout=os.environ.get("REQUEST_DB_TIMEOUT", 120),
@@ -154,52 +154,3 @@ class DBConn:
                     recipient,
                 )
             return True
-
-    async def get_tokens(self, token_owner: str) -> typing.List[dict]:
-        """Get tokens created for a project."""
-        query = await self.pool.fetch(
-            """
-            SELECT *
-            FROM Tokens
-            WHERE token_owner = $1
-            ;
-            """,
-            token_owner,
-        )
-        return list(query)
-
-    async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
-        """Remove a token from the database."""
-        async with self.pool.acquire() as conn:
-            async with conn.transaction():
-                await conn.execute(
-                    """
-                    DELETE FROM Tokens
-                    WHERE
-                        token_owner = $1 AND
-                        identifier = $2
-                    ;
-                    """,
-                    token_owner,
-                    token_identifier,
-                )
-
-    async def add_token(self, token_owner: str, token: str, identifier: str) -> None:
-        """Add a token to the database."""
-        async with self.pool.acquire() as conn:
-            async with conn.transaction():
-                await conn.execute(
-                    """
-                    INSERT INTO Tokens(
-                        token_owner,
-                        token,
-                        identifier
-                    ) VALUES (
-                        $1, $2, $3
-                    )
-                    ;
-                    """,
-                    token_owner,
-                    token,
-                    identifier,
-                )

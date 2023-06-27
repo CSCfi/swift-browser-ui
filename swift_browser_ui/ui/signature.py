@@ -50,9 +50,8 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
     client: aiohttp.ClientSession = request.app["api_client"]
 
     sharing_api_address = setd["sharing_internal_endpoint"]
-    request_api_address = setd["request_internal_endpoint"]
 
-    if not sharing_api_address or not request_api_address:
+    if not sharing_api_address:
         raise aiohttp.web.HTTPNotFound(reason="External APIs not configured on server")
 
     path = f"/token/{project}/{ident}"
@@ -67,25 +66,13 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
         },
     ) as c_resp:
         resp_sharing = c_resp
-    async with client.post(
-        f"{request_api_address}{path}",
-        data={"token": token},
-        params={
-            "valid": signature["valid"],
-            "signature": signature["signature"],
-        },
-    ) as c_resp:
-        resp_request = c_resp
 
-    if resp_sharing.status != 200 or resp_request.status != 200:
+    if resp_sharing.status != 200:
         resp_sharing_text = await resp_sharing.text()
-        resp_request_text = await resp_request.text()
         LOGGER.debug(
             f"""\
-        Sharing failed with status {resp_sharing.status}
+        Token creation failed with status {resp_sharing.status}
         {resp_sharing_text}{resp_sharing.url}
-        Request failed with status {resp_request.status}
-        {resp_request_text}{resp_request.url}\
         """
         )
         raise aiohttp.web.HTTPInternalServerError(reason="Token creation failed")
@@ -108,9 +95,8 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
     client: aiohttp.ClientSession = request.app["api_client"]
 
     sharing_api_address = setd["sharing_internal_endpoint"]
-    request_api_address = setd["request_internal_endpoint"]
 
-    if not sharing_api_address or not request_api_address:
+    if not sharing_api_address:
         raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}/{ident}"
@@ -118,14 +104,6 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
 
     async with client.delete(
         f"{sharing_api_address}{path}",
-        params={
-            "signature": signature["signature"],
-            "valid": signature["valid"],
-        },
-    ) as _:
-        pass
-    async with client.delete(
-        f"{request_api_address}{path}",
         params={
             "signature": signature["signature"],
             "valid": signature["valid"],
@@ -149,9 +127,8 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
     client: aiohttp.ClientSession = request.app["api_client"]
 
     sharing_api_address = setd["sharing_internal_endpoint"]
-    request_api_address = setd["request_internal_endpoint"]
 
-    if not sharing_api_address or not request_api_address:
+    if not sharing_api_address:
         raise aiohttp.web.HTTPNotFound(reason=("External APIs not configured on server"))
 
     path = f"/token/{project}"
@@ -165,19 +142,8 @@ async def handle_ext_token_list(request: aiohttp.web.Request) -> aiohttp.web.Res
         },
     ) as a_resp:
         sharing_tokens_text = await a_resp.text()
-    async with client.get(
-        f"{request_api_address}{path}",
-        params={
-            "signature": signature["signature"],
-            "valid": signature["valid"],
-        },
-    ) as b_resp:
-        request_tokens_text = await b_resp.text()
-    LOGGER.debug(f"Sharing tokens: {sharing_tokens_text}")
-    LOGGER.debug(f"Request tokens: {request_tokens_text}")
 
-    if sharing_tokens_text != request_tokens_text:
-        raise aiohttp.web.HTTPConflict(reason="API tokens don't match")
+    LOGGER.debug(f"Sharing tokens: {sharing_tokens_text}")
 
     resp = aiohttp.web.Response(text=sharing_tokens_text)
 
