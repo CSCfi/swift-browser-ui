@@ -264,14 +264,12 @@ export default {
       this.loading = true;
       this.shareContainer(this.folderName).then(
         (ret) => {
-          this.shareContainer(`${this.folderName}_segments`).then(() => {
-            if (ret) {
-              this.getSharedDetails();
-              this.closeSharedNotification();
-              this.isShared = true;
-              this.closeSharedNotificationWithTimeout();
-            }
-          });
+          if (ret) {
+            this.getSharedDetails();
+            this.closeSharedNotification();
+            this.isShared = true;
+            this.closeSharedNotificationWithTimeout();
+          }
           this.loading = false;
         },
       );
