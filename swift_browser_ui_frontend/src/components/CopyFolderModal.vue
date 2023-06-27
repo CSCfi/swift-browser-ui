@@ -243,7 +243,8 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     checkValidity: debounce(function () {
-      if (isValidFolderName(this.folderName)) {
+      const result = isValidFolderName(this.folderName, this.$t);
+      if (result.valid) {
         //check if name exists
         //request parameter should be sanitized first
         const safeKey = escapeRegExp(this.folderName).trim();
@@ -260,8 +261,8 @@ export default {
         this.errorMsg = "";
       }
       else {
-        //name too short
-        this.errorMsg = this.$t("message.error.tooShort");
+        //name too short or ends with "_segments"
+        this.errorMsg = result.msg;
       }
     }, 300, { leading: true }),
   },
