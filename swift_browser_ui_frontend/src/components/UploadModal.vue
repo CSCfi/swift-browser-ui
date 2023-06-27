@@ -19,8 +19,11 @@
           :items.prop="filteredItems"
           :label="$t('message.container_ops.folderName')"
           :query="inputFolder"
-          hide-details
+          aria-required="true"
           required
+          :valid="isValidFolderName(inputFolder) || !interacted"
+          :validation="$t('message.error.tooShort')"
+          validate-on-blur
           @changeQuery="onQueryChange"
           @changeValue="onSelectValue"
         />
@@ -176,7 +179,10 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="noUpload || addingFiles || buttonAddingFiles"
+        :disabled="noUpload
+          || addingFiles
+          || buttonAddingFiles
+          || !isValidFolderName(inputFolder)"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -199,6 +205,7 @@ import {
   getProjectNumber,
   getSharedContainers,
   getAccessDetails,
+  isValidFolderName,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -232,6 +239,7 @@ export default {
       addingFiles: false,
       buttonAddingFiles: false,
       noUploadContainers: [],
+      interacted: false,
     };
   },
   computed: {
@@ -453,6 +461,7 @@ export default {
     },
   },
   methods: {
+    isValidFolderName,
     appendDropFiles(file) {
       //Checking for identical path only, not name:
       //different folders may have same file names
@@ -502,6 +511,7 @@ export default {
       if (e.detail) this.inputFolder = e.detail.name;
     },
     onQueryChange: async function (event) {
+      this.interacted = true; //user typed
       this.inputFolder = event.detail;
       //filter out containers where user has no upload right
       const result = await this.containers
@@ -619,7 +629,6 @@ export default {
       if (this.ephemeral) {
         this.noUpload = (
           (!this.pubkey.length && !this.recvkeys.length)
-          || !this.inputFolder
           || !this.dropFiles.length
           || (this.currentUpload != undefined)
           || !this.canUpload
@@ -628,7 +637,6 @@ export default {
       if (this.ownPrivateKey) {
         this.noUpload = (
           (!this.pubkey.length && !this.recvkeys.length)
-          || !this.inputFolder
           || !this.dropFiles.length
           || (!this.passphrase && !this.privkey)
           || (this.currentUpload != undefined)
@@ -648,6 +656,7 @@ export default {
       this.ephemeral = true;
       this.files = [];
       this.duplicateFile = false;
+      this.interacted = false;
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

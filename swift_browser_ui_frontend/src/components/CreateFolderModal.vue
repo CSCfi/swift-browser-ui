@@ -25,6 +25,11 @@
           name="foldername"
           aria-required="true"
           data-testid="folder-name"
+          :valid="isValidFolderName(folderName) || !interacted"
+          :validation="$t('message.error.tooShort')"
+          required
+          validate-on-blur
+          @changeValue="interacted=true"
         />
         <label
           class="taginput-label"
@@ -65,6 +70,7 @@
       <c-button
         size="large"
         data-testid="save-folder"
+        :disabled="!isValidFolderName(folderName)"
         @click="createContainer"
         @keyup.enter="createContainer"
       >
@@ -85,6 +91,7 @@ import {
   addNewTag,
   deleteTag,
   getProjectNumber,
+  isValidFolderName,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
@@ -98,6 +105,7 @@ export default {
       folderName: "",
       tags: [],
       projectInfoLink: "",
+      interacted: false, //don't show error when opening modal
     };
   },
   computed: {
@@ -112,6 +120,7 @@ export default {
     },
   },
   methods: {
+    isValidFolderName,
     createContainer: function () {
       let projectID = this.$route.params.project;
       const folderName = toRaw(this.folderName);
@@ -161,6 +170,7 @@ export default {
       this.folderName = "";
       this.tags = [];
       this.create = true;
+      this.interacted = false;
       document.querySelector("#createModal-toasts").removeToast("create-toast");
     },
     addingTag: function (e, onBlur) {
