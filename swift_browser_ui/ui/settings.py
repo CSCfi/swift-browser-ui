@@ -86,6 +86,10 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "oidc_client_secret": environ.get("OIDC_CLIENT_SECRET", None),
     "oidc_redirect_uris": environ.get("OIDC_REDIRECT_URIS", ""),
     "sdconnect_enabled": environ.get("SDCONNECT_ENABLED", "False") == "True",
+    "redis_host": environ.get("SWIFT_UI_REDIS_HOST", ""),
+    "redis_port": environ.get("SWIFT_UI_REDIS_PORT", ""),
+    "redis_sentinel_host": environ.get("SWIFT_UI_REDIS_SENTINEL_HOST", ""),
+    "redis_sentinel_port": environ.get("SWIFT_UI_REDIS_SENTINEL_PORT", ""),
 }
 
 

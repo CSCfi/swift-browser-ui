@@ -6,6 +6,8 @@ import typing
 
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
+from redis import ConnectionError
+from redis.asyncio import Redis
 
 import swift_browser_ui.common.signature
 from swift_browser_ui.ui.settings import setd
@@ -116,6 +118,46 @@ async def get_upload_runner(
         _set_error_status(request, services, "swiftui-upload-runner")
 
 
+async def get_redis(
+    services: typing.Dict[str, typing.Any],
+    request: aiohttp.web.Request,
+    performance: typing.Dict[str, typing.Any],
+) -> None:
+    """Poll Redis service."""
+    try:
+        start = time.time()
+        if setd["redis_host"] and setd["redis_port"]:
+            connection: Redis = Redis(
+                host=str(setd["redis_host"]), port=int(setd["redis_port"])
+            )
+            await connection.ping()
+            services["redis"] = {"status": "Ok"}
+            performance["redis"] = {"time": time.time() - start}
+            await connection.close()
+        elif setd["redis_sentinel_host"] and setd["redis_sentinel_port"]:
+            connection = Redis(
+                host=str(setd["redis_sentinel_host"]),
+                port=int(setd["redis_sentinel_port"]),
+            )
+            await connection.ping()
+            services["redis"] = {"status": "Ok"}
+            performance["redis"] = {"time": time.time() - start}
+            await connection.close()
+        else:
+            services["redis"] = {"status": "Nonexistent"}
+    except ConnectionError:
+        services["redis"] = {"status": "Down"}
+    except Exception as e:
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "redis")
+
+
+# TBA
+# async def get_vault(services: typing.Dict[str, typing.Any]) -> None:
+#     """Poll Redis service."""
+#     services["vault"] = {"status": "Nonexistent"}
+
+
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a service health check."""
     # Pull all health endpoint information
@@ -139,6 +181,8 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
     await get_swift_sharing(services, request, web_client, api_params, performance)
 
     await get_upload_runner(services, request, web_client, api_params, performance)
+
+    await get_redis(services, request, performance)
 
     status["services"] = services
     status["performance"] = performance
