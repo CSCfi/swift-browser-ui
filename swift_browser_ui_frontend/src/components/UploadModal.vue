@@ -389,7 +389,7 @@ export default {
     },
     inputFolder: function() {
       this.interacted ?
-        this.errorMsg = validateFolderName(this.folderName, this.$t) :
+        this.errorMsg = validateFolderName(this.inputFolder, this.$t) :
         this.errorMsg = "";
       this.refreshNoUpload();
     },

@@ -415,6 +415,7 @@ pyyntö
 päivitä
 päänäkymään
 pääsy
+päättyä
 rajan
 rajattu
 rajatun
@@ -427,6 +428,7 @@ rajoitteiden
 resurssienkäyttö
 resurssit
 rivinvaihtoa
+saa
 saavutettavuus
 salaa
 salaaminen
