@@ -18,7 +18,6 @@ cli
 configs
 containerport
 cp
-crypt4gh
 cryptfiles
 csc
 cscfi
@@ -35,6 +34,7 @@ etag
 fi
 focusable
 frontend
+gh
 gib
 github
 haka
