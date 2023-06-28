@@ -90,6 +90,7 @@ import {
   deleteTag,
   getProjectNumber,
   validateFolderName,
+  getCurrentISOtime,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
@@ -111,6 +112,9 @@ export default {
     active() {
       return this.$store.state.active;
     },
+    controller() {
+      return new AbortController();
+    },
   },
   watch: {
     active: function () {
@@ -131,7 +135,7 @@ export default {
       swiftCreateContainer(projectID, folderName, tags.join(";"))
         .then(async () => {
           const containerTimestamp = await getTimestampForContainer(
-            projectID, folderName);
+            projectID, folderName, this.controller.signal);
 
           getDB().containers.add({
             projectID: projectID,
@@ -140,7 +144,7 @@ export default {
             tags: tags,
             count: 0,
             bytes: 0,
-            last_modified: new Date(containerTimestamp*1000).toISOString(),
+            last_modified: getCurrentISOtime(containerTimestamp*1000),
           });
         }).then(() => {
           swiftCreateContainer(projectID, `${folderName}_segments`, [])

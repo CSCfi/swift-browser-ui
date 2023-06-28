@@ -194,8 +194,8 @@ function extractContainerTimestamp(meta) {
   return "";
 }
 
-export async function getTimestampForContainer(project, containerName) {
-  const meta = await getContainerMeta(project, containerName, null);
+export async function getTimestampForContainer(project, containerName, signal) {
+  const meta = await getContainerMeta(project, containerName, signal);
   return extractContainerTimestamp(meta);
 }
 
@@ -229,8 +229,13 @@ export async function getTagsForObjects(
   );
 
   if (meta) {
-    meta.map((item) => (item[1] = extractTags(item)));
+    meta.map((item) => {
+      item[0] = item[0].includes("%2C") ?
+        item[0].replace(/%2C/g, ",") : item[0];
+      item[1] = extractTags(item);
+    });
   }
+
   return meta;
 }
 
