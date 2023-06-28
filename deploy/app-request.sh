@@ -9,3 +9,4 @@ gunicorn swift_browser_ui.request.server:init_server \
     --bind $THE_HOST:$THE_PORT \
     --worker-class aiohttp.GunicornUVLoopWebWorker \
     --workers 1 \
+    --graceful-timeout 60 --timeout 120
