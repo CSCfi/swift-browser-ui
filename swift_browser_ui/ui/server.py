@@ -355,7 +355,7 @@ def run_server_secure(
     sslcontext.load_cert_chain(cert_file, cert_key)
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=setd["port"],  # type: ignore
         ssl_context=sslcontext,
     )
@@ -367,7 +367,7 @@ def run_server_insecure(
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=(setd["port"]),  # type: ignore
     )
 

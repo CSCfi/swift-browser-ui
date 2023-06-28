@@ -148,7 +148,7 @@ def run_server(
     """Run the server."""
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=int(os.environ.get("SWIFT_UPLOAD_RUNNER_PORT", 9092)),
     )
 
