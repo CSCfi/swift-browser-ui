@@ -18,6 +18,7 @@ cli
 configs
 containerport
 cp
+crypt4gh
 cryptfiles
 csc
 cscfi
