@@ -178,7 +178,7 @@ import {
   getProjectNumber,
   getSharedContainers,
   getAccessDetails,
-  isValidFolderName,
+  validateFolderName,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -388,8 +388,9 @@ export default {
       }
     },
     inputFolder: function() {
-      const result = isValidFolderName(this.inputFolder, this.$t);
-      !this.interacted ? this.errorMsg = "" : this.errorMsg = result.msg;
+      this.interacted ?
+        this.errorMsg = validateFolderName(this.folderName, this.$t) :
+        this.errorMsg = "";
       this.refreshNoUpload();
     },
     dropFiles: function () {

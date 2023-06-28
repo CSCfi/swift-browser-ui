@@ -91,7 +91,7 @@ import {
   addNewTag,
   deleteTag,
   getProjectNumber,
-  isValidFolderName,
+  validateFolderName,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
@@ -120,8 +120,9 @@ export default {
         + getProjectNumber(this.active);
     },
     folderName: function () {
-      const result = isValidFolderName(this.folderName, this.$t);
-      !this.interacted ? this.errorMsg = "" : this.errorMsg = result.msg;
+      this.interacted ?
+        this.errorMsg = validateFolderName(this.folderName, this.$t) :
+        this.errorMsg = "";
     },
   },
   methods: {

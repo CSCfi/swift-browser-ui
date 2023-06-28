@@ -64,7 +64,7 @@ import { getDB } from "@/common/db";
 import {
   addNewTag,
   deleteTag,
-  isValidFolderName,
+  validateFolderName,
 } from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
@@ -243,8 +243,8 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     checkValidity: debounce(function () {
-      const result = isValidFolderName(this.folderName, this.$t);
-      if (result.valid) {
+      const error = validateFolderName(this.folderName, this.$t);
+      if (error.length === 0) {
         //check if name exists
         //request parameter should be sanitized first
         const safeKey = escapeRegExp(this.folderName).trim();
@@ -262,7 +262,7 @@ export default {
       }
       else {
         //name too short or ends with "_segments"
-        this.errorMsg = result.msg;
+        this.errorMsg = error;
       }
     }, 300, { leading: true }),
   },
