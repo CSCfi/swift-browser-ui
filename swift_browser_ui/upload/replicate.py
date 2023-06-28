@@ -31,7 +31,7 @@ class ObjectReplicationProxy:
 
     def __init__(
         self,
-        session: dict,
+        session: typing.Dict[str, typing.Any],
         client: aiohttp.client.ClientSession,
         project: str,
         container: str,
@@ -105,7 +105,7 @@ class ObjectReplicationProxy:
             segments_list = segments_str.lstrip().rstrip().split("\n")
             LOGGER.debug(f"Segments before filtering: {segments_list}")
 
-            def filter_with_prefix(segment):
+            def filter_with_prefix(segment: str) -> bool:
                 return prefix in segment
 
             segments = list(filter(filter_with_prefix, segments_list))

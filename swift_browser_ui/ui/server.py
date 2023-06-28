@@ -86,7 +86,7 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
 
 
 async def servinit(
-    inject_middleware: typing.Optional[typing.List] = None,
+    inject_middleware: typing.List[typing.Any] | None = None,
 ) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     middlewares = [
@@ -96,7 +96,7 @@ async def servinit(
     ]
     if inject_middleware:
         middlewares = middlewares + inject_middleware
-    app = aiohttp.web.Application()  # type: ignore
+    app = aiohttp.web.Application()
 
     async def on_prepare(
         _: aiohttp.web.Request, response: aiohttp.web.StreamResponse

@@ -16,6 +16,6 @@ async def read_in_keys(app: aiohttp.web.Application) -> None:
         app["tokens"] = [token.encode("utf-8") for token in app["tokens"]]
 
 
-async def sleep_random():
+async def sleep_random() -> None:
     """Sleep a random time."""
     return await asyncio.sleep(random.randint(2, 5))  # nosec  # noqa: S311

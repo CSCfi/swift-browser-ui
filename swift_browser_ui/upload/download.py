@@ -30,25 +30,27 @@ LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 class FileDownloadProxy:
     """A class for a single proxied download."""
 
-    def __init__(self, session: dict, chunk_size: int = 128 * 1024) -> None:
+    def __init__(
+        self, session: typing.Dict[str, typing.Any], chunk_size: int = 128 * 1024
+    ) -> None:
         """."""
         # Establish a queue for the proxied file parts
         # Total queue size 128 * 256 * 1024 = 32MiB for now
-        self.q: queue.Queue = queue.Queue(
+        self.q: queue.Queue[typing.Any] = queue.Queue(
             maxsize=int(os.environ.get("SWIFT_UPLOAD_RUNNER_PROXY_Q_SIZE", 256))
         )
         # Save the swift service
         self.token = session["token"]
         self.endpoint = session["endpoint"]
-        self.t_dload: typing.Optional[threading.Thread] = None
-        self.t_write: typing.Optional[threading.Thread] = None
+        self.t_dload: threading.Thread | None = None
+        self.t_write: threading.Thread | None = None
         self.chunk_size: int = chunk_size
         self.content_type: str
         self.size: int
         self.chksum: str
         self.mtime: int
 
-    def get_q(self) -> queue.Queue:
+    def get_q(self) -> queue.Queue[typing.Any]:
         """Return the proxy queue."""
         return self.q
 
@@ -60,7 +62,7 @@ class FileDownloadProxy:
         """Return the incoming file size."""
         return self.size
 
-    def get_chksum(self) -> typing.Optional[str]:
+    def get_chksum(self) -> str:
         """Return the checksum."""
         return self.chksum
 
@@ -80,7 +82,7 @@ class FileDownloadProxy:
             await asyncio.sleep(0.01)
             return await self.a_get_size()
 
-    async def a_get_checksum(self) -> typing.Optional[str]:
+    async def a_get_checksum(self) -> str:
         """Return the eventual checksum."""
         try:
             return self.get_chksum()
@@ -177,7 +179,7 @@ class TarInputWrapper:
 
     def __init__(
         self,
-        session: dict,
+        session: typing.Dict[str, typing.Any],
         project: str,
         container: str,
         object_name: str,
@@ -257,7 +259,7 @@ class ContainerArchiveDownloadProxy:
 
     def __init__(
         self,
-        session: dict,
+        session: typing.Dict[str, typing.Any],
         project: str,
         container: str,
         chunk_size: int = 128 * 1024,
@@ -274,7 +276,7 @@ class ContainerArchiveDownloadProxy:
         self.chunk_size = chunk_size
 
         self.archive: tarfile.TarFile
-        self.fs: dict
+        self.fs: typing.Dict[str, typing.Any]
 
         self.archiving_thread: threading.Thread
         self.downloader_thread: threading.Thread
@@ -291,9 +293,9 @@ class ContainerArchiveDownloadProxy:
     def _parse_archive_fs(
         to_parse: typing.List[typing.List[str]],  # list of file paths
         path_prefix: str = "",
-    ) -> dict:
+    ) -> typing.Dict[str, typing.Any]:
         """Parse a list of paths into a dict representing a filesystem."""
-        ret_fs: dict = {}
+        ret_fs: typing.Dict[str, typing.Any] = {}
         for path in to_parse:
             LOGGER.info(f"working path: {path}")
             # Path of zero means an incorrect input
@@ -367,7 +369,7 @@ class ContainerArchiveDownloadProxy:
                 [i.split("/") for i in req.text.lstrip().rstrip().split("\n")]
             )
 
-    def sync_folders(self, fs: dict) -> None:
+    def sync_folders(self, fs: typing.Dict[str, typing.Any]) -> None:
         """Sycnhronize the folders into the tar archive."""
         if self.archive:
             for i in fs:
@@ -382,7 +384,7 @@ class ContainerArchiveDownloadProxy:
         self.download_init_loop(self.fs)
         self.download_queue.put(None)
 
-    def download_init_loop(self, fs: dict) -> None:
+    def download_init_loop(self, fs: typing.Dict[str, typing.Any]) -> None:
         """Loop to run for initializing downloads."""
         if self.archive:
             for i in fs:

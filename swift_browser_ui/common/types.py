@@ -7,5 +7,5 @@ import aiohttp.web
 
 AiohttpHandler = typing.Callable[
     [aiohttp.web.Request],
-    typing.Coroutine[typing.Awaitable, typing.Any, aiohttp.web.Response],
+    typing.Coroutine[typing.Awaitable[typing.Any], typing.Any, aiohttp.web.Response],
 ]

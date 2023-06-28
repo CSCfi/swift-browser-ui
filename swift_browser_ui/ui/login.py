@@ -91,7 +91,7 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
         "access_token": oidc_result["token"],
     }
 
-    csc_projects: typing.Optional[typing.List] = _get_projects_from_userinfo(
+    csc_projects: typing.List[typing.Any] | None = _get_projects_from_userinfo(
         session["oidc"]["userinfo"]
     )
     # add entry to session only if the OIDC provider has csc-projects in userinfo
@@ -481,7 +481,9 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return response
 
 
-def _get_projects_from_userinfo(userinfo: typing.Dict) -> typing.Optional[typing.List]:
+def _get_projects_from_userinfo(
+    userinfo: typing.Dict[str, typing.Any],
+) -> typing.List[typing.Any] | None:
     """Parse projects from userinfo.
 
     :param userinfo: dict from userinfo containing user profile

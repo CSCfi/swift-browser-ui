@@ -3,7 +3,6 @@
 
 import logging
 import os
-import typing
 
 import aiohttp.web
 import asyncpg.exceptions
@@ -45,7 +44,7 @@ async def catch_uniqueness_error(
 @aiohttp.web.middleware
 async def check_db_conn(
     request: aiohttp.web.Request, handler: swift_browser_ui.common.types.AiohttpHandler
-):
+) -> aiohttp.web.Response:
     """Check if an established database connection exists."""
     if request.path == "/health":
         return await handler(request)
@@ -80,7 +79,7 @@ async def handle_validate_authentication(
             reason="Query string missing validity or signature"
         )
 
-    project: typing.Union[None, str]
+    project: None | str = None
     project_tokens = []
     try:
         project = request.match_info["project"]

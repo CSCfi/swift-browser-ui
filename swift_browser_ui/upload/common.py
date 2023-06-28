@@ -32,12 +32,12 @@ def generate_download_url(
     return f"{host}/{container}/{object_name}"
 
 
-def get_download_host(endpoint, project: str) -> str:
+def get_download_host(endpoint: str, project: str) -> str:
     """Get the actual download host with shared container support."""
     ret = endpoint
     if project not in ret:
         ret = ret.replace(ret.split("/")[-1], f"AUTH_{project}")
-    return ret
+    return str(ret)
 
 
 def get_session_id(request: aiohttp.web.Request) -> str:
@@ -76,13 +76,13 @@ async def get_upload_instance(
     request: aiohttp.web.Request,
     pro: str,
     cont: str,
-    p_query: typing.Optional[dict] = None,
+    p_query: typing.Dict[str, typing.Any] | None = None,
 ) -> upload.ResumableFileUploadProxy:
     """Return the specific upload proxy for the resumable upload."""
     session = get_session_id(request)
 
     if p_query:
-        query: dict = p_query
+        query: typing.Dict[str, typing.Any] = p_query
     else:
         query = request.query  # type: ignore
 

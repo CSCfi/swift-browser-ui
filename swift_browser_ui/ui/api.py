@@ -29,7 +29,7 @@ async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
     request.app["Log"].info(
         f"API call for username from {request.remote}, sess: {session} :: {time.ctime()}"
     )
-    return aiohttp_session.web.json_response(session["uname"])
+    return aiohttp.web.json_response(session["uname"])
 
 
 async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -258,7 +258,7 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
 
 async def _swift_get_object_metadata_wrapper(
     request: aiohttp.web.Request, obj: str
-) -> tuple:
+) -> typing.Tuple[str, typing.Dict[str, typing.Any]]:
     """Get metadata for a single object."""
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
@@ -361,7 +361,7 @@ async def _swift_update_object_meta_wrapper(
         f"{session['projects'][project]['endpoint']}/{container}/{obj}",
         headers=headers,
     ) as ret:
-        return ret.status
+        return int(ret.status)
 
 
 async def swift_batch_update_object_metadata(
@@ -376,7 +376,7 @@ async def swift_batch_update_object_metadata(
     objects = await request.json()
     if not objects:
         raise aiohttp.web.HTTPBadRequest
-    batch = [
+    batch: typing.List[typing.Any] = [
         _swift_update_object_meta_wrapper(
             request,
             name,
@@ -466,7 +466,7 @@ async def get_shared_container_address(
 async def _swift_get_container_acl_wrapper(
     request: aiohttp.web.Request,
     container: str,
-) -> typing.Tuple:
+) -> typing.Tuple[str, typing.Dict[str, typing.Any]]:
     """Return container access control headers."""
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
@@ -522,7 +522,7 @@ async def get_access_control_metadata(
     client = request.app["api_client"]
     project = request.match_info["project"]
 
-    containers: typing.List[dict] = []
+    containers: typing.List[typing.Dict[str, typing.Any]] = []
     while True:
         params = {
             "limit": 10000,
@@ -577,7 +577,7 @@ async def remove_project_container_acl(
     project = request.match_info["project"]
     container = request.match_info["container"]
     receiver = request.match_info["receiver"]
-    headers: dict = {
+    headers: typing.Dict[str, typing.Any] = {
         "X-Auth-Token": session["projects"][project]["token"],
     }
     async with client.head(

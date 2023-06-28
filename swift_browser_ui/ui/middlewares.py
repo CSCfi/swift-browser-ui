@@ -10,7 +10,8 @@ from aiohttp import web
 from swift_browser_ui.ui.settings import setd
 
 AiohttpHandler = typing.Callable[
-    [web.Request], typing.Coroutine[typing.Awaitable, typing.Any, web.Response]
+    [web.Request],
+    typing.Coroutine[typing.Awaitable[typing.Any], typing.Any, web.Response],
 ]
 
 
