@@ -575,10 +575,10 @@ export default {
     validatePubkey(key) {
       const sshed25519 = new RegExp (
         "^ssh-ed25519 AAAAC3NzaC1lZDI1NTE5" +
-          "[0-9A-Za-z+/]{45,48}[=]{0,3}(\\s.*)?$");
+          "[0-9A-Za-z+/]{46,48}[=]{0,2}\\s[^\\s]+$");
       const crypt4gh = new RegExp (
-        "^-----BEGIN CRYPT4GH PUBLIC KEY-----\\s[A-Za-z0-9+/]{43}=\\s" +
-          "-----END CRYPT4GH PUBLIC KEY-----$");
+        "^-----BEGIN CRYPT4GH PUBLIC KEY-----\\s[A-Za-z0-9+/]{42-44}[=]{0,2}" +
+          "\\s-----END CRYPT4GH PUBLIC KEY-----$");
       return (key.match(sshed25519) || key.match(crypt4gh));
     },
     appendPublicKey: async function () {
