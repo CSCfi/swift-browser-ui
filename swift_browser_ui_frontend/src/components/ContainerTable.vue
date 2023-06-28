@@ -21,7 +21,12 @@
 </template>
 
 <script>
-import { getHumanReadableSize, truncate, sortObjects } from "@/common/conv";
+import {
+  getHumanReadableSize,
+  truncate,
+  sortObjects,
+  parseDateTime,
+} from "@/common/conv";
 import {
   mdiTrayArrowDown,
   mdiShareVariantOutline,
@@ -228,6 +233,9 @@ export default {
             sharing: {
               value: getSharedStatus(item.name),
             },
+            last_modified: {
+              value: parseDateTime(this.locale, item.last_modified, false),
+            },
             actions: {
               value: null,
               sortable: null,
@@ -388,6 +396,11 @@ export default {
         {
           key: "sharing",
           value: this.$t("message.table.shared_status"),
+          sortable: true,
+        },
+        {
+          key: "last_modified",
+          value: this.$t("message.table.modified"),
           sortable: true,
         },
         {

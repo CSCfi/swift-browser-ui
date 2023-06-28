@@ -82,9 +82,7 @@
 
 <script>
 import { swiftCreateContainer } from "@/common/api";
-import {
-  tokenize,
-} from "@/common/conv";
+import { tokenize, getTimestampForContainer } from "@/common/conv";
 import { getDB } from "@/common/db";
 
 import {
@@ -131,7 +129,10 @@ export default {
       const folderName = toRaw(this.folderName);
       const tags = toRaw(this.tags);
       swiftCreateContainer(projectID, folderName, tags.join(";"))
-        .then(() => {
+        .then(async () => {
+          const containerTimestamp = await getTimestampForContainer(
+            projectID, folderName);
+
           getDB().containers.add({
             projectID: projectID,
             name: folderName,
@@ -139,6 +140,7 @@ export default {
             tags: tags,
             count: 0,
             bytes: 0,
+            last_modified: new Date(containerTimestamp*1000).toISOString(),
           });
         }).then(() => {
           swiftCreateContainer(projectID, `${folderName}_segments`, [])

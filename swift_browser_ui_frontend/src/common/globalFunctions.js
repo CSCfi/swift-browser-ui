@@ -144,3 +144,15 @@ export function validateFolderName(str, t) {
   }
   return error;
 }
+
+export function getContainerLastmodified(containers, cont) {
+  // Get the current container and its last_modified from IDB
+  const db_cont = containers.find(
+    el => el.name === cont.name && el.last_modified);
+  const db_last_modified = db_cont ? db_cont.last_modified : null;
+  // Compare the last_modified from current container with
+  // IDB container, choose the latest one
+  return db_last_modified &&
+              db_last_modified > cont.last_modified ?
+    db_last_modified : cont.last_modified;
+}

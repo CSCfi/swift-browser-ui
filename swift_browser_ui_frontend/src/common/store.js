@@ -1,8 +1,10 @@
 // Vuex store for the variables that need to be globally available.
 import { createStore } from "vuex";
 
-import { getContainers } from "@/common/api";
-import { getObjects } from "@/common/api";
+import {
+  getContainers,
+  getObjects,
+} from "@/common/api";
 import {
   DEV,
   getTagsForContainer,
@@ -16,7 +18,10 @@ import {
 } from "@/common/conv";
 
 import { getDB } from "@/common/db";
-import { getSharedContainers } from "@/common/globalFunctions";
+import {
+  getSharedContainers,
+  getContainerLastmodified,
+} from "@/common/globalFunctions";
 
 const store = createStore({
   state: {
@@ -276,6 +281,9 @@ const store = createStore({
             cont.tokens = cont.name.endsWith("_segments") ?
               [] : tokenize(cont.name);
             cont.projectID = projectID;
+            cont.last_modified = getContainerLastmodified(
+              existingContainers, cont,
+            );
           });
           newContainers = newContainers.concat(containers);
           marker = containers[containers.length - 1].name;
@@ -298,6 +306,7 @@ const store = createStore({
           cont.bytes = bytes;
           cont.count = count;
           cont.name = cont.container;
+          cont.last_modified = cont.sharingdate;
         }
         await getDB()
           .containers.bulkPut(sharedContainers)
@@ -472,6 +481,25 @@ const store = createStore({
             */
             newObjects.splice(i, 1);
           }
+        }
+        // Declare the latest last_modified of container
+        let cont_last_modified = container.last_modified;
+
+        const last_modified_arr = newObjects.map(obj => obj.last_modified);
+        // Find the latest last_modified among all objects,
+        // compare it with the current last_modified of container,
+        // assign the latest last_modified for container
+        for (let i = 0; i < last_modified_arr.length; i++) {
+          if (last_modified_arr[i] > cont_last_modified) {
+            cont_last_modified = last_modified_arr[i];
+          }
+        }
+
+        // Assign the latest last_modified of objects to parent container
+        if (cont_last_modified) {
+          await getDB().containers
+            .where({ projectID: projectID, name: container.name})
+            .modify({ last_modified: cont_last_modified });
         }
       }
 

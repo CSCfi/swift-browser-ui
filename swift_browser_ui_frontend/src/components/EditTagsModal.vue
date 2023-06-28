@@ -153,9 +153,18 @@ export default {
         objectMeta,
       ).then(async () => {
         if (this.$route.name !== "SharedObjects") {
+          const currentTime = new Date().toISOString();
           await getDB().objects
             .where(":id").equals(this.object.id)
-            .modify({ tags });
+            .modify({ tags, last_modified: currentTime });
+
+          // Also update container's last_modified in IDB
+          await getDB().containers
+            .where({
+              projectID: this.$route.params.project,
+              name: this.$route.params.container,
+            })
+            .modify({ last_modified: currentTime });
         } else {
           await this.$store.dispatch("updateSharedObjects", {
             project: this.$route.params.project,
@@ -180,7 +189,7 @@ export default {
                 projectID: this.$route.params.project,
                 name: containerName,
               })
-              .modify({ tags });
+              .modify({ tags, last_modified: new Date().toISOString() });
           }
         });
       this.toggleEditTagsModal();
