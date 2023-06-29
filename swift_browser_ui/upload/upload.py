@@ -32,9 +32,9 @@ class ResumableFileUploadProxy:
 
     def __init__(
         self,
-        session: dict,
-        query: dict,
-        match: dict,
+        session: typing.Dict[str, typing.Any],
+        query: typing.Dict[str, typing.Any],
+        match: typing.Dict[str, typing.Any],
         client: aiohttp.client.ClientSession,
     ) -> None:
         """."""

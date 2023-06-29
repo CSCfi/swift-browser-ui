@@ -150,6 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1049) Fix for missing banner image from build version
 - (GL #1044) Fix search not including subfolders into results
 - (GL #1050) Fix unified token DB causing HTTP409
+  - fixed `REQUEST_DB_PORT` instead of `SHARING_DB_PORT` in sharing db
+  - fixed typing for python code in db so that ports are int instead of string - required for deployment
 
 ### Removed
 

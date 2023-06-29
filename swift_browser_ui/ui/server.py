@@ -14,9 +14,10 @@ import aiohttp.web
 import aiohttp_session
 import aiohttp_session.redis_storage
 import cryptography.fernet
+import redis.asyncio as redis
 import uvloop
 from oidcrp.rp_handler import RPHandler
-from redis import asyncio as aioredis
+from redis.asyncio.sentinel import Sentinel
 
 import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui.api import (
@@ -86,7 +87,7 @@ async def kill_dload_client(app: aiohttp.web.Application) -> None:
 
 
 async def servinit(
-    inject_middleware: typing.Optional[typing.List] = None,
+    inject_middleware: typing.List[typing.Any] | None = None,
 ) -> aiohttp.web.Application:
     """Create an aiohttp server with the correct arguments and routes."""
     middlewares = [
@@ -96,7 +97,7 @@ async def servinit(
     ]
     if inject_middleware:
         middlewares = middlewares + inject_middleware
-    app = aiohttp.web.Application()  # type: ignore
+    app = aiohttp.web.Application()
 
     async def on_prepare(
         _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
@@ -116,14 +117,14 @@ async def servinit(
     redis_user = str(os.environ.get("SWIFT_UI_REDIS_USER", ""))
     redis_password = str(os.environ.get("SWIFT_UI_REDIS_PASSWORD", ""))
 
-    redis_client: aioredis.Redis
+    redis_client: redis.Redis[typing.Any]
     if sentinel_url and sentinel_port:
         # we forward the auth to redis so no need for auth on sentinel
-        sentinel = aioredis.sentinel.Sentinel([(str(sentinel_url), int(sentinel_port))])
+        sentinel = Sentinel([(str(sentinel_url), int(sentinel_port))])
 
         redis_client = sentinel.master_for(
             service_name=sentinel_master,
-            redis_class=aioredis.Redis,
+            redis_class=redis.Redis,
             password=redis_password,
             username=redis_user,
         )
@@ -134,9 +135,7 @@ async def servinit(
         redis_creds = ""
         if redis_user and redis_password:
             redis_creds = f"{redis_user}:{redis_password}@"
-        redis_client = aioredis.from_url(
-            f"redis://{redis_creds}{redis_host}:{redis_port}"
-        )
+        redis_client = redis.from_url(f"redis://{redis_creds}{redis_host}:{redis_port}")
     storage = aiohttp_session.redis_storage.RedisStorage(
         redis_client,
         cookie_name="SWIFT_UI_SESSION",
@@ -355,7 +354,7 @@ def run_server_secure(
     sslcontext.load_cert_chain(cert_file, cert_key)
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=setd["port"],  # type: ignore
         ssl_context=sslcontext,
     )
@@ -367,7 +366,7 @@ def run_server_insecure(
     """Run the server without https enabled."""
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=(setd["port"]),  # type: ignore
     )
 

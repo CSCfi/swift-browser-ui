@@ -111,9 +111,7 @@ def run_server_devel(
     app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
 ) -> None:
     """Run the server in development mode (without HTTPS)."""
-    aiohttp.web.run_app(
-        app, access_log=aiohttp.web.logging.getLogger("aiohttp.access"), port=9090
-    )
+    aiohttp.web.run_app(app, access_log=logging.getLogger("aiohttp.access"), port=9090)
 
 
 def main() -> None:

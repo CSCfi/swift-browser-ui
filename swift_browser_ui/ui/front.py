@@ -60,7 +60,7 @@ async def select(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def index(
-    request: typing.Optional[aiohttp.web.Request],
+    request: aiohttp.web.Request | None,
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the index page when running without a proxy."""
     try:
@@ -93,7 +93,7 @@ async def index(
 
 
 async def loginpassword(
-    request: typing.Optional[aiohttp.web.Request],
+    request: aiohttp.web.Request | None,
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Serve the username and password login page."""
     try:

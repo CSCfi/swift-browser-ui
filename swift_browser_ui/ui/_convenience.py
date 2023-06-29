@@ -40,7 +40,7 @@ def test_swift_endpoint(endpoint: str) -> None:
 async def sign(
     valid_for: int,
     path: str,
-) -> dict:
+) -> typing.Dict[str, typing.Any]:
     """Perform a general signature."""
     try:
         key = str(setd["sharing_request_token"]).encode("utf-8")
@@ -64,7 +64,9 @@ def disable_cache(
     return response
 
 
-async def get_availability_from_token(token: str, client: aiohttp.ClientSession) -> dict:
+async def get_availability_from_token(
+    token: str, client: aiohttp.ClientSession
+) -> typing.Dict[str, typing.Any]:
     """List available domains and projects for the unscoped token specified.
 
     Params:
@@ -79,8 +81,8 @@ async def get_availability_from_token(token: str, client: aiohttp.ClientSession)
         "X-Auth-Token": token,
     }
 
-    output_projects = None
-    output_domains = None
+    output_projects: typing.Dict[typing.Any, typing.Any] = {}
+    output_domains: typing.Dict[typing.Any, typing.Any] = {}
     # Check projects from the API
     async with client.get(
         f"{setd['auth_endpoint_url']}/OS-FEDERATION/projects",
@@ -112,13 +114,15 @@ async def get_availability_from_token(token: str, client: aiohttp.ClientSession)
     # we need to take the projects that have been enabled for the
     # user, otherwise if the first project is disabled we will
     # get a 401 response when we do initiate_os_service
-    def filter_enabled(project) -> bool:
+    def filter_enabled(project: typing.Dict[str, typing.Any]) -> bool:
         if "enabled" in project:
-            return project["enabled"]
+            return bool(project["enabled"])
         return False
 
-    filtered_projects = list(filter(filter_enabled, output_projects["projects"]))  # type: ignore
-    filtered_domains = output_domains["domains"]  # type: ignore
+    filtered_projects: typing.List[typing.Dict[str, typing.Any]] = list(
+        filter(filter_enabled, output_projects["projects"])
+    )
+    filtered_domains = output_domains["domains"]
 
     if len(filtered_projects) == 0:
         raise aiohttp.web.HTTPForbidden(
@@ -161,7 +165,7 @@ async def get_tempurl_key(request: aiohttp.web.Request) -> str:
         ) as ret:
             if ret.status != 204:
                 raise aiohttp.web.HTTPServerError(reason="TempURL key creation failure.")
-    return temp_url_key
+    return str(temp_url_key)
 
 
 async def open_upload_runner_session(
@@ -173,7 +177,7 @@ async def open_upload_runner_session(
     if not project:
         project = request.match_info["project"]
     try:
-        return session["projects"][project]["runner"]
+        return str(session["projects"][project]["runner"])
     except KeyError:
         client = request.app["api_client"]
         path = f"{setd['upload_internal_endpoint']}/{project}"

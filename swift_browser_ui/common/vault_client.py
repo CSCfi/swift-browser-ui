@@ -5,7 +5,7 @@ import os
 import time
 from base64 import standard_b64encode
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List
 
 from aiohttp import ClientSession, ClientTimeout
 from aiohttp.web import HTTPError, HTTPGatewayTimeout, HTTPInternalServerError
@@ -135,10 +135,10 @@ class VaultClient:
         self,
         method: str = "GET",
         path: str = "",
-        params: Optional[dict] = None,
-        json_data: Union[None, Dict, List[Dict]] = None,
+        params: None | Dict[str, Any] = None,
+        json_data: None | Dict[str, Any] | List[Dict[str, Any]] = None,
         timeout: int = 10,
-    ) -> Optional[dict]:
+    ) -> None | str | Dict[Any, Any]:
         """Request to Vault API with error handling logic, and retries in case of token expiry.
 
         :param method: HTTP method
@@ -185,7 +185,7 @@ class VaultClient:
                     if response.status == 204 or response.status == 404:
                         return None
 
-                    content = await response.json()
+                    content: Dict[str, Any] = await response.json()
                     if response.status == 200:
                         LOGGER.debug("Content: %r", content)
                         return content
@@ -241,7 +241,7 @@ class VaultClient:
             key_json = await self._request("GET", f"c4ghtransit/keys/{project}")
             if isinstance(key_json, dict) and "data" in key_json:
                 latest_version = str(key_json["data"]["latest_version"])
-                return key_json["data"]["keys"][latest_version]["public_key_c4gh_64"]
+                return str(key_json["data"]["keys"][latest_version]["public_key_c4gh_64"])
             return ""
 
         LOGGER.debug("Getting public key for project %r", project)
@@ -298,7 +298,7 @@ class VaultClient:
             params={"service": self.service, "key": self._key_name},
         )
         if isinstance(header_response, dict) and "data" in header_response:
-            return header_response["data"]["headers"]["1"]["header"]
+            return str(header_response["data"]["headers"]["1"]["header"])
         return ""
 
     async def put_header(

@@ -14,7 +14,9 @@ LOGGER = logging.getLogger("swift_browser_ui.common.signature")
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 
-def sign_api_request(path: str, valid_for: int = 3600, key: bytes = b"") -> dict:
+def sign_api_request(
+    path: str, valid_for: int = 3600, key: bytes = b""
+) -> typing.Dict[str, typing.Any]:
     """Handle authentication with a signature."""
     valid_until = str(int(time.time() + valid_for))
     to_sign = (valid_until + path).encode("utf-8")

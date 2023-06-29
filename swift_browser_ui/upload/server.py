@@ -44,15 +44,15 @@ logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 
 async def servinit() -> aiohttp.web.Application:
     """Create an aiohttp server for handling the upload runner API."""
-    middlewares: typing.List[typing.Coroutine] = [
-        swift_browser_ui.common.common_middleware.add_cors,  # type: ignore
-        swift_browser_ui.common.common_middleware.error_handler,  # type: ignore
+    middlewares: typing.List[typing.Any] = [
+        swift_browser_ui.common.common_middleware.add_cors,
+        swift_browser_ui.common.common_middleware.error_handler,
     ]
 
     if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", None):
-        middlewares.append(handle_validate_authentication)  # type: ignore
+        middlewares.append(handle_validate_authentication)
 
-    app = aiohttp.web.Application(middlewares=middlewares)  # type: ignore
+    app = aiohttp.web.Application(middlewares=middlewares)
 
     async def on_prepare(
         _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
@@ -142,11 +142,13 @@ async def kill_client(app: aiohttp.web.Application) -> None:
     await app["client"].close()
 
 
-def run_server(app: typing.Union[typing.Coroutine, aiohttp.web.Application]) -> None:
+def run_server(
+    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
+) -> None:
     """Run the server."""
     aiohttp.web.run_app(
         app,
-        access_log=aiohttp.web.logging.getLogger("aiohttp.access"),
+        access_log=logging.getLogger("aiohttp.access"),
         port=int(os.environ.get("SWIFT_UPLOAD_RUNNER_PORT", 9092)),
     )
 
