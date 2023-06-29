@@ -272,13 +272,15 @@ export default {
   },
   methods: {
     getSharedContainers: async function () {
-      this.sharedContainers = await getSharedContainers(this.active.id);
+      this.sharedContainers =
+        await getSharedContainers(this.active.id, this.abortController.signal);
     },
     getFolderSharedStatus: async function() {
       if (this.client) {
         await this.client.getShareDetails(
           this.project,
           this.containerName,
+          this.abortController.signal,
         ).then(
           async (ret) => {
             if (ret.length > 0) {
@@ -297,6 +299,7 @@ export default {
                     this.project,
                     this.containerName,
                     this.$route.params.owner,
+                    this.abortController.signal,
                   );
 
                 this.accessRights = sharedDetails.access;
@@ -343,7 +346,7 @@ export default {
       delay(async () => {
         await this.$store.dispatch("updateContainers", {
           projectID: this.active.id,
-          signal: null,
+          signal: this.abortController.signal,
         });
       }, 3000);
     },

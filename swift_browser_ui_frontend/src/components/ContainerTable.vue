@@ -65,6 +65,7 @@ export default {
       paginationOptions: {},
       sortBy: "name",
       sortDirection: "asc",
+      abortController: null,
     };
   },
   computed: {
@@ -95,15 +96,25 @@ export default {
     this.setHeaders();
     this.setPagination();
   },
+  beforeMount () {
+    this.abortController = new AbortController();
+  },
+  beforeUnmount () {
+    this.abortController.abort();
+  },
   methods: {
     async getSharingContainers() {
       return this.sharingClient
-        ? this.sharingClient.getShare(this.active.id)
+        ? this.sharingClient.getShare(
+          this.active.id,
+          this.abortController.signal)
         : [];
     },
     getSharedContainers () {
       return this.sharingClient
-        ? this.sharingClient.getAccess(this.$route.params.project)
+        ? this.sharingClient.getAccess(
+          this.$route.params.project,
+          this.abortController.signal)
         : [];
     },
     async getPage () {
@@ -119,8 +130,10 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      const sharingContainers = await getSharingContainers(this.active.id);
-      const sharedContainers = await getSharedContainers(this.active.id);
+      const sharingContainers =
+        await getSharingContainers(this.active.id, this.abortController.signal);
+      const sharedContainers =
+        await getSharedContainers(this.active.id, this.abortController.signal);
 
       const getSharedStatus = (folderName) => {
         if (sharingContainers.indexOf(folderName) > -1) {
@@ -140,7 +153,8 @@ export default {
             const sharedDetails = cont.owner ? await getAccessDetails(
               this.$route.params.project,
               cont.container,
-              cont.owner) : null;
+              cont.owner,
+              this.abortController.signal) : null;
             const accessRights = sharedDetails ? sharedDetails.access : null;
             return sharedDetails && accessRights
               ? {...cont, accessRights} : {...cont};
@@ -323,8 +337,16 @@ export default {
       this.sortDirection = event.detail.direction;
 
       if (this.sortBy === "sharing") {
-        const sharingContainers = await getSharingContainers(this.active.id);
-        const sharedContainers = await getSharedContainers(this.active.id);
+        const sharingContainers =
+          await getSharingContainers(
+            this.active.id,
+            this.abortController.signal,
+          );
+        const sharedContainers =
+          await getSharedContainers(
+            this.active.id,
+            this.abortController.signal,
+          );
 
         let allSharing = this.conts.map(x => sharingContainers.includes(x.name)
           ? this.$t("message.table.sharing") : "");

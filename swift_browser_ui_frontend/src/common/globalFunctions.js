@@ -47,28 +47,30 @@ export function getProjectNumber(project) {
   }
 }
 
-export async function getSharingContainers (projectId) {
+export async function getSharingContainers (projectId, signal) {
   return store.state.client && projectId
-    ? await store.state.client.getShare(projectId)
+    ? await store.state.client.getShare(projectId, signal)
     : [];
 }
 
-export async function getSharedContainers (projectId) {
+export async function getSharedContainers (projectId, signal) {
   return store.state.client
-    ? await store.state.client.getAccess(projectId)
+    ? await store.state.client.getAccess(projectId, signal)
     : [];
 }
 
 export async function getAccessDetails (
   projectId,
   folderName,
-  sourceProjectId)
+  sourceProjectId,
+  signal)
 {
   return store.state.client
     ? await store.state.client.getAccessDetails(
       projectId,
       folderName,
-      sourceProjectId)
+      sourceProjectId,
+      signal)
     : [];
 }
 

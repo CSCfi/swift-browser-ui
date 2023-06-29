@@ -258,12 +258,18 @@ const store = createStore({
         .containers.where({ projectID })
         .toArray();
 
+      if (!signal) {
+        const controller = new AbortController();
+        signal = controller.signal;
+      }
+
       let containers;
       let marker = "";
       let newContainers = [];
       do {
         containers = [];
-        containers = await getContainers(projectID, marker).catch(() => {});
+        containers = await getContainers(projectID, marker, signal)
+          .catch(() => {});
 
         if (containers.length > 0) {
           containers.forEach(cont => {
@@ -276,7 +282,7 @@ const store = createStore({
         }
       } while (containers.length > 0);
 
-      const sharedContainers = await getSharedContainers(projectID);
+      const sharedContainers = await getSharedContainers(projectID, signal);
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
@@ -416,6 +422,11 @@ const store = createStore({
       let newObjects = [];
       let objects;
       let marker = "";
+
+      if (!signal) {
+        const controller = new AbortController();
+        signal = controller.signal;
+      }
 
       do {
         objects = await getObjects(
@@ -562,6 +573,12 @@ const store = createStore({
       let sharedObjects = [];
       let marker = "";
       let objects = [];
+
+      if (!signal) {
+        const controller = new AbortController();
+        signal = controller.signal;
+      }
+
       do {
         objects = await getObjects(
           project,

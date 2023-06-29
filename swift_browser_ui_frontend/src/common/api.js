@@ -26,8 +26,12 @@ async function fetchWithCookie({method, url, body, signal}) {
       return response;
     })
     .catch(error => {
-      if(DEV) console.log("Fetch error. Might be a networking issue", error);
-      throw new Error(error);
+      if (!signal.aborted) {
+        if (DEV) {
+          console.log("Fetch error. Might be a networking issue", error);
+        }
+        throw new Error(error);
+      }
     });
 }
 export async function GET(url, signal) {
@@ -75,7 +79,8 @@ export async function getProjects() {
 
 export async function getContainers(
   project,
-  marker = "",
+  marker,
+  signal,
 ) {
   // List buckets for a given project.
   let getBucketsUrl = new URL(
@@ -84,12 +89,11 @@ export async function getContainers(
   if (marker) {
     getBucketsUrl.searchParams.append("marker", marker);
   }
-  let ret = await GET(getBucketsUrl);
-  if (ret.status == 200) {
+  let ret = await GET(getBucketsUrl, signal);
+  if (ret.status == 200 && !signal.aborted) {
     return await ret.json();
-  } else {
-    return [];
   }
+  return [];
 }
 
 export async function getContainerMeta(
@@ -110,6 +114,9 @@ export async function getContainerMeta(
   }
 
   let ret = await GET(url, signal);
+  if (signal.aborted) {
+    return ["", {}];
+  }
   return await ret.json();
 }
 
@@ -151,7 +158,7 @@ export async function getObjects(
   }
   let objects = await GET(objUrl, signal);
 
-  if (objects.status == 200) {
+  if (objects.status == 200 && !signal.aborted) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
       if (shared) {
@@ -196,6 +203,9 @@ export async function getObjectsMeta (
   }
 
   let ret = await GET(url, signal);
+  if (signal.aborted) {
+    return [];
+  }
   return ret.json();
 }
 
