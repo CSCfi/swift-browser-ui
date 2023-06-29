@@ -259,8 +259,8 @@ const store = createStore({
         .toArray();
 
       if (!signal) {
-        const constroller = new AbortController();
-        signal = constroller.signal;
+        const controller = new AbortController();
+        signal = controller.signal;
       }
 
       let containers;
@@ -424,8 +424,8 @@ const store = createStore({
       let marker = "";
 
       if (!signal) {
-        const constroller = new AbortController();
-        signal = constroller.signal;
+        const controller = new AbortController();
+        signal = controller.signal;
       }
 
       do {
@@ -575,8 +575,8 @@ const store = createStore({
       let objects = [];
 
       if (!signal) {
-        const constroller = new AbortController();
-        signal = constroller.signal;
+        const controller = new AbortController();
+        signal = controller.signal;
       }
 
       do {
