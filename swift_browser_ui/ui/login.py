@@ -338,7 +338,10 @@ async def login_with_token(
         # Filter out projects without a declared access if the OIDC provider supports it
         project_without_prefix = project["name"].removeprefix("project_")
         if isinstance(csc_projects, list) and project_without_prefix not in csc_projects:
-            request.app["Log"].debug("Project %r is not enabled for sd-connect, skipping")
+            request.app["Log"].debug(
+                "Project %r is not enabled for sd-connect, skipping",
+                project["name"],
+            )
             continue
         async with client.post(
             f"{setd['auth_endpoint_url']}/auth/tokens",
@@ -490,7 +493,7 @@ def _get_projects_from_userinfo(
     :returns: None if userinfo doesn't contain csc-projects, or a list with "project_name"s
     :raises HTTPUnauthorized in case no projects are available
     """
-    if "sdConnectsProjects" in userinfo:
+    if "sdConnectProjects" in userinfo:
         # Remove the possibly existing "project_" prefix
         projects = [
             p.removeprefix("project_") for p in userinfo["sdConnectProjects"].split(" ")
