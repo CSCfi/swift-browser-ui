@@ -1,4 +1,6 @@
-"""Server upload propxy using aiohttp."""
+"""Class for session crypt upload/download websocket."""
+
+
 import asyncio
 import base64
 import logging
@@ -8,18 +10,17 @@ import ssl
 import typing
 
 import aiohttp
-import aiohttp.web
 import certifi
+import msgpack
 
+import swift_browser_ui.common.vault_client as vault_client
 import swift_browser_ui.upload.common as common
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
 
-
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
-
 
 UPL_TIMEOUT = 32768
 
@@ -28,59 +29,149 @@ SEGMENT_SIZE = 5368708140
 SEGMENT_CHUNKS = 81885
 CHUNK_SIZE = 65564
 
+CRYPTUPLOAD_Q_DEPTH = int(os.environ.get("SWIFTUI_UPLOAD_RUNNER_Q_DEPTH", 96))
 
-class EncryptedUploadProxy:
-    """A class for an encrypted file upload."""
+
+class FileUpload:
+    """Class for handling the upload of a single file."""
 
     def __init__(
         self,
-        session: dict,
         client: aiohttp.client.ClientSession,
-    ) -> None:
+        vault: vault_client.VaultClient,
+        session: typing.Dict[str, typing.Any],
+        socket: aiohttp.web.WebSocketResponse,
+        project: str,
+        container: str,
+        name: str,
+        path: str,
+        total: int,
+        owner: str = "",
+        owner_name: str = "",
+    ):
         """."""
+        self.session = session
         self.client = client
+        self.vault = vault
+        self.socket = socket
 
-        self.header_uploaded = False
+        self.project = project
+        self.container = container
+        self.path = path
+        self.name = name
+        self.total = total
 
-        self.total_uploaded = 0
-        self.current_uploaded = 0
-        self.current_segment: int = 0
+        self.owner = owner
+        self.owner_name = owner_name
 
-        self.project = ""
-        self.container = ""
-        self.object_name = ""
-        self.total = 0
-        self.total_segments = 0
-
+        # Initialize backend generated values
         self.segment_id = secrets.token_urlsafe(32)
-
         self.done_chunks: typing.Set = set({})
-        self.total_chunks = 0
-        self.remainder_segment = 0
-        self.remainder_chunk = 0
-        self.remainder_chunks = 0
-
-        self.endpoint: str = session["endpoint"]
-        self.token: str = session["token"]
-
-        self.owner = ""
-        self.owner_name = ""
-
+        self.endpoint = self.session["endpoint"]
+        self.token = self.session["token"]
         self.host = common.get_download_host(
             self.endpoint,
-            self.project,
+            self.owner if self.owner else self.project,
+        )
+        self.chunk_cache: typing.Dict[int, bytes] = {}
+        self.failed: bool = False
+        self.finished: bool = False
+
+        # Calculate upload parameters
+        self.total_segments: int = -(self.total // -SEGMENT_SIZE)
+        self.remainder_segment: int = self.total % SEGMENT_SIZE
+        self.total_chunks: int = -(self.total // -CHUNK_SIZE)
+        self.remainder_chunk: int = self.total % CHUNK_SIZE
+        self.remainder_chunks: int = -(self.remainder_segment // -CHUNK_SIZE)
+
+        self.q_cache: typing.List[asyncio.Queue] = [
+            asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)
+        ]
+        self.tasks: typing.List[asyncio.Task] = []
+
+        LOGGER.debug(f"total: {self.total}")
+        LOGGER.debug(f"segments: {self.total_segments}")
+        LOGGER.debug(f"chunks: {self.total_chunks}")
+
+    async def add_header(self, header: bytes) -> None:
+        """Add header for the file."""
+        if not await self.a_create_container():
+            await self.socket.send_bytes(
+                msgpack.dumps(
+                    {
+                        "command": "abort",
+                        "container": self.container,
+                        "object": self.path,
+                        "reason": "Could not create or access the container.",
+                    }
+                )
+            )
+            self.failed = True
+
+        b64_header = base64.standard_b64encode(header).decode("ascii")
+
+        # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
+        await self.vault.put_header(
+            self.name,
+            self.container,
+            self.path,
+            b64_header,
+            owner=self.owner_name,
         )
 
-        self.have_closed = False
+        self.tasks = [
+            asyncio.create_task(self.slice_into_queue(i, self.q_cache[i]))
+            for i in range(0, self.total_segments)
+        ]
+        await asyncio.gather(
+            *[
+                asyncio.create_task(self.get_next_chunk())
+                for _ in range(0, CRYPTUPLOAD_Q_DEPTH)
+            ]
+        )
 
-        self.chunk_cache: typing.Dict[
-            int, typing.Tuple[bytes, aiohttp.web.WebSocketResponse]
-        ] = {}
-        self.q_cache: typing.List[asyncio.Queue] = []
+    async def get_next_chunk(self):
+        """Schedule fetching of the next chunk in order."""
+        if len(self.done_chunks) >= self.total_chunks:
+            return
+        await self.socket.send_bytes(
+            msgpack.dumps(
+                {
+                    "command": "next_chunk",
+                    "container": self.container,
+                    "object": self.path,
+                }
+            )
+        )
 
-        self.ws: aiohttp.web.WebSocketResponse
+    async def retry_chunk(self, order):
+        """Retry a failed chunk."""
+        await self.socket.send_bytes(
+            msgpack.dumps(
+                {
+                    "command": "retry_chunk",
+                    "container": self.container,
+                    "object": self.path,
+                    "order": order,
+                }
+            )
+        )
 
-    async def a_create_container(self) -> None:
+    async def add_to_chunks(
+        self,
+        order: int,
+        data: bytes,
+    ):
+        """Add a chunk to cache."""
+        if order in self.done_chunks or order in self.chunk_cache:
+            try:
+                await self.get_next_chunk()
+            except ConnectionResetError:
+                pass
+            return
+        self.chunk_cache[order] = data
+
+    async def a_create_container(self) -> bool:
         """Create the container required by the upload."""
         for container in {self.container, f"{self.container}_segments"}:
             async with self.client.head(
@@ -95,196 +186,61 @@ class EncryptedUploadProxy:
                         ssl=ssl_context,
                     ) as resp_put:
                         if resp_put.status not in {201, 202}:
-                            raise aiohttp.web.HTTPForbidden(
-                                reason=f'Failed to create container "{container}" for upload.'
-                            )
+                            return False
+        return True
 
-    async def add_header(
-        self,
-        request: aiohttp.web.Request,
-    ) -> aiohttp.web.Response:
-        """Add header for the uploaded file."""
-        self.project = request.match_info["project"]
-        self.container = request.match_info["container"]
-        self.object_name = request.match_info["object_name"]
-        self.name = request.query["name"]
+    async def slice_into_queue(self, segment: int, q: asyncio.Queue):
+        """Slice a ~5GiB segment from queue."""
+        seg_start = segment * SEGMENT_CHUNKS
+        seg_end = seg_start + SEGMENT_CHUNKS
+        if segment == self.total_segments - 1 and self.remainder_chunks:
+            LOGGER.debug(
+                f"Using {self.remainder_chunks} as chunk amount for last segment."
+            )
+            seg_end = seg_start + self.remainder_chunks
 
-        if "owner" in request.query:
-            self.owner = request.query["owner"]
-            self.owner_name = request.query["owner_name"]
+        LOGGER.debug(f"Consuming chunks {seg_start} through {seg_end}")
+        LOGGER.debug(f"Waiting until first chunk in segment {segment} is available.")
 
-        self.host = common.get_download_host(
-            self.endpoint,
-            self.owner if self.owner else self.project,
-        )
+        while (seg_start) not in self.chunk_cache:
+            await asyncio.sleep(0.1)
+        LOGGER.debug(f"Got first chunk for segment {segment}. Starting upload...")
 
-        if "owner" in request.query:
-            self.owner = request.query["owner"]
-
-        await self.a_create_container()
-
-        self.total = int(request.query["total"])
-
-        self.total_segments = -(self.total // -SEGMENT_SIZE)
-        self.remainder_segment = self.total % SEGMENT_SIZE
-        self.total_chunks = -(self.total // -CHUNK_SIZE)
-        self.remainder_chunk = self.total % CHUNK_SIZE
-        self.remainder_chunks = -(self.remainder_segment // -CHUNK_SIZE)
-
-        LOGGER.debug(f"total: {self.total}")
-        LOGGER.debug(f"segments: {self.total_segments}")
-        LOGGER.debug(f"chunks: {self.total_chunks}")
-
-        self.q_cache = [asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)]
-
-        header = await request.content.read()
-        b64_header = base64.standard_b64encode(header).decode("ascii")
-
-        # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
-        await request.app[common.VAULT_CLIENT].put_header(
-            self.name,
-            self.container,
-            self.object_name,
-            b64_header,
-            owner=self.owner_name,
-        )
-
-        self.header_uploaded = True
-
-        return aiohttp.web.Response(
-            status=201,
-        )
-
-    async def add_manifest(
-        self,
-    ) -> aiohttp.web.Response:
-        """Add file DLO manifest."""
-        LOGGER.info(f"Add manifest for {self.object_name}.")
-        async with self.client.put(
-            common.generate_download_url(
-                self.host,
-                container=self.container,
-                object_name=self.object_name,
-            ),
-            data=b"",
-            headers={
-                "X-Auth-Token": self.token,
-                "X-Object-Manifest": f"{self.container}{common.SEGMENTS_CONTAINER}/{self.object_name}/{self.segment_id}/",
-            },
-            ssl=ssl_context,
-        ) as resp:
-            return aiohttp.web.Response(status=resp.status)
-
-    async def get_next_chunk(
-        self,
-        ws: aiohttp.web.WebSocketResponse,
-    ) -> None:
-        """Schedule fetching of the next chunk in order."""
-        if len(self.done_chunks) >= self.total_chunks:
-            return
-        await ws.send_json({"cmd": "nextChunk"})
-
-    async def retry_chunk(
-        self,
-        ws: aiohttp.web.WebSocketResponse,
-        iter: int,
-    ) -> None:
-        """Retry a chunk via websocket."""
-
-    async def add_to_chunks(
-        self,
-        order: int,
-        data: bytes,
-        ws: aiohttp.web.WebSocketResponse,
-    ):
-        """Add a chunk to cache."""
-        if order in self.done_chunks or order in self.chunk_cache:
-            try:
-                await self.get_next_chunk(ws)
-            except ConnectionResetError:
-                pass
-            return
-        self.chunk_cache[order] = (data, ws)
-
-    async def set_ws(self, ws: aiohttp.web.WebSocketResponse):
-        """Add instance WebSocket."""
-        self.ws = ws
-
-    def return_total_segments(self) -> int:
-        """Get total segment amount."""
-        return self.total_segments
-
-    def get_segment_queue(self, i) -> asyncio.Queue:
-        """Create and return an asyncio queue for segment."""
-        return self.q_cache[i]
-
-    async def slice_into_queue(
-        self,
-        segment: int,
-        q: asyncio.Queue,
-    ):
-        """Slice an almost 5GiB segment from queue (short by 980 bytes)."""
-        n_chunk = segment * SEGMENT_CHUNKS
-
-        LOGGER.debug(f"Beginning from chunk {n_chunk}")
-        LOGGER.debug(
-            f"Continuing until chunk {segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS}"
-        )
-        LOGGER.debug(f"Waiting for first chunk in segment {segment} to be available")
-
-        while (segment * SEGMENT_CHUNKS) not in self.chunk_cache:
-            await asyncio.sleep(0.05)
-        LOGGER.debug(f"First segment in {segment} found")
+        # Create a task for segment upload
+        self.tasks.append(asyncio.create_task(self.upload_segment(segment)))
 
         # Start the upload
-        await q.put("BEGIN")
-
-        seg_start = segment * SEGMENT_CHUNKS
-        seg_end = segment * SEGMENT_CHUNKS + SEGMENT_CHUNKS
-        if segment == self.total_segments - 1 and self.remainder_chunks:
-            LOGGER.debug(f"Using {self.remainder_chunks} as chunk amount for last chunk.")
-            seg_end = segment * SEGMENT_CHUNKS + self.remainder_chunks
-
         LOGGER.debug(f"Pushing chunks from {seg_start} until {seg_end} to queue.")
-
         for i in range(seg_start, seg_end):
             wait_count = 0
             while i not in self.chunk_cache:
                 wait_count += 1
                 await asyncio.sleep(0.05)
-                # if handler has waited too long for the next chunk, ask for it again.
-                # 10 seconds is considered too long
+                # If handler has waited for too long for the next chunk, retry
+                # Currently 10 seconds is considered too long
                 if wait_count > 2000:
-                    await self.retry_chunk(self.ws, i)
+                    await self.retry_chunk(i)
                     wait_count = 0
             self.done_chunks.add(i)
-            chunk, ws = self.chunk_cache.pop(i)
+            chunk = self.chunk_cache.pop(i)
             await q.put(chunk)
-            LOGGER.debug(f"Put chunk {i} to the queue.")
             try:
-                await self.get_next_chunk(ws)
+                await self.get_next_chunk()
             except ConnectionResetError:
                 pass
 
-        LOGGER.debug(f"Pushging eof for {self.object_name}.")
+        # Queue EOF
+        await q.put(b"")
 
-        await q.put("EOF")
-
-    async def queue_generator(
-        self,
-        q: asyncio.Queue,
-    ):
+    async def queue_generator(self, q: asyncio.Queue):
         """Consume the upload queue."""
         LOGGER.debug("Starting consumption of the queue.")
         chunk = await q.get()
-        while chunk != "EOF":
+        while chunk:
             yield chunk
             chunk = await q.get()
 
-    async def upload_segment(
-        self,
-        order: int,
-    ) -> int:
+    async def upload_segment(self, order: int) -> int:
         """Upload the segment with given ordering number."""
         # Fetch the queue from storage
         q = self.q_cache[order]
@@ -292,29 +248,185 @@ class EncryptedUploadProxy:
             "X-Auth-Token": self.token,
             "Content-Type": "application/swiftclient-segment",
         }
-        # Wait until queue starts – first item isn't part of the data
-        LOGGER.debug(f"Waiting for queue to start filling for segment {order}")
-        await q.get()
-
-        LOGGER.debug(f"Queue for segment {order} has been started, starting upload")
 
         async with self.client.put(
             common.generate_download_url(
                 self.host,
                 container=f"{self.container}{common.SEGMENTS_CONTAINER}",
-                object_name=f"{self.object_name}/{self.segment_id}/{(order + 1):08d}",
+                object_name=f"{self.path}/{self.segment_id}/{(order + 1):08d}",
             ),
             data=self.queue_generator(q),
             headers=headers,
             timeout=UPL_TIMEOUT,
             ssl=ssl_context,
         ) as resp:
-            LOGGER.info(f"Segment {order} finished with status {resp.status}")
+            LOGGER.info(f"Segment {order} finished with status {resp.status}.")
 
         if self.total_segments - 1 == order:
-            LOGGER.info("Closing websocket after finishing last segment.")
-            self.have_closed = True
-            if self.ws is not None:
-                await self.ws.send_json({"cmd": "canClose"})
+            LOGGER.info("Informing client that file was finished.")
+            self.finished = True
+            await self.socket.send_bytes(
+                msgpack.dumps(
+                    {
+                        "command": "success",
+                        "container": self.container,
+                        "object": self.path,
+                    }
+                )
+            )
 
         return resp.status
+
+    async def finish_upload(self):
+        """Finalize the upload."""
+        await asyncio.gather(*self.tasks)
+
+        LOGGER.info(f"Add manifest for {self.object_name}.")
+        async with self.client.put(
+            common.generate_download_url(
+                self.host,
+                container=self.container,
+                object_name=self.path,
+            ),
+            data=b"",
+            headers={
+                "X-Auth-Token": self.token,
+                "X-Object-Manifest": f"{self.container}{common.SEGMENTS_CONTAINER}/{self.path}/{self.segment_id}/",
+            },
+            ssl=ssl_context,
+        ) as resp:
+            return aiohttp.web.Response(status=resp.status)
+
+    async def abort_upload(self):
+        """Abort the upload."""
+        await self.socket.send_bytes(
+            msgpack.dumps(
+                {
+                    "command": "abort",
+                    "container": self.container,
+                    "object": self.path,
+                    "reason": "cancel",
+                }
+            )
+        )
+
+        for q in self.q_cache:
+            await q.put(b"")
+
+        await asyncio.gather(*self.tasks)
+
+        # Delete segments that might've been uploaded
+        headers = {
+            "X-Auth-Token": self.token,
+            "Content-Type": "application/swiftclient-segment",
+        }
+        delete_tasks = [
+            asyncio.create_task(
+                self.client.delete(
+                    common.generate_download_url(
+                        self.host,
+                        container=f"{self.container}{common.SEGMENTS_CONTAINER}",
+                        object_name=f"{self.path}/{self.segment_id}/{(segment + 1):08d}",
+                    ),
+                    headers=headers,
+                    ssl=ssl_context,
+                )
+            )
+            for segment in range(0, self.total_segments)
+        ]
+        delete_resps = await asyncio.gather(*delete_tasks)
+        delete_results = [resp.status for resp in delete_resps]
+        LOGGER.info(f"Segment deletions finished with statuses: {delete_results}")
+
+
+class UploadSession:
+    """Class for handling upload websocket."""
+
+    def __init__(
+        self, request: aiohttp.web.Request, session: typing.Dict[str, typing.Any]
+    ):
+        """."""
+        self.client: aiohttp.client.ClientSession = request.app["client"]
+        self.vault: vault_client.VaultClient = request.app[common.VAULT_CLIENT]
+        self.project: str = request.match_info["project"]
+        self.session = session
+
+        self.uploads: typing.Dict[str, typing.Dict[str, FileUpload]] = {}
+        self.ws: aiohttp.web.WebSocketResponse | None = None
+
+    def set_ws(self, ws: aiohttp.web.WebSocketResponse):
+        """Set the websocket for the upload session."""
+        self.ws = ws
+
+    async def handle_begin_upload(self, msg: typing.Dict[str, typing.Any]) -> None:
+        """Handle the upload start."""
+        container: str = str(msg["container"])
+        path: str = str(msg["object"])
+        name: str = str(msg["name"])
+        owner: str = ""
+        owner_name: str = ""
+        if "owner" in msg:
+            owner = str(msg["owner"])
+        if "owner_name" in msg:
+            owner_name = str(msg["owner_name"])
+        total = int(msg["total"])
+
+        if container in self.uploads:
+            if path in self.uploads[container]:
+                if self.ws:
+                    await self.ws.send_bytes(
+                        msgpack.dumps(
+                            {
+                                "command": "abort",
+                                "container": container,
+                                "object": path,
+                                "reason": "Object is already being uploaded.",
+                            }
+                        )
+                    )
+                    return
+
+        # We can ignore typing for self.ws, as these functions are only called after messages
+        self.uploads[container][path] = FileUpload(
+            self.client,
+            self.vault,
+            self.session,
+            self.ws,  # type: ignore
+            self.project,
+            container,
+            name,
+            path,
+            total,
+            owner,
+            owner_name,
+        )
+
+        await self.uploads[container][path].add_header(bytes(msg["data"]))
+
+    async def handle_upload_chunk(self, msg: typing.Dict[str, typing.Any]):
+        """Handle the addition of a new chunk."""
+        container: str = str(msg["container"])
+        path: str = str(msg["object"])
+
+        await self.uploads[container][path].add_to_chunks(
+            int(msg["order"]),
+            bytes(msg["data"]),
+        )
+
+    async def handle_finish_upload(self, msg: typing.Dict[str, typing.Any]):
+        """Handle the upload end."""
+        container: str = str(msg["container"])
+        path: str = str(msg["object"])
+
+        await self.uploads[container][path].finish_upload()
+        self.uploads[container].pop(path)
+
+    async def handle_close(self):
+        """Gracefully close all ongoing uploads."""
+        abort_tasks = []
+        for container in self.uploads:
+            for file in self.uploads[container]:
+                abort_tasks.append(
+                    asyncio.create_task(self.uploads[container][file].abort_upload())
+                )
+        await asyncio.gather(*abort_tasks)

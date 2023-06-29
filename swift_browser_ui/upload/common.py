@@ -113,38 +113,21 @@ async def get_upload_instance(
     return upload_session
 
 
-async def get_encrypted_upload_instance(
+def get_encrypted_upload_session(
     request: aiohttp.web.Request,
-) -> cryptupload.EncryptedUploadProxy:
-    """Return the specific encrypted upload proxy for the object."""
+) -> cryptupload.UploadSession:
+    """Return the specific encrypted upload session for the project."""
     session = get_session_id(request)
-
     project = request.match_info["project"]
-    container = request.match_info["container"]
-    object_name = request.match_info["object_name"]
 
-    try:
-        upload_session = request.app[session]["enuploads"][project][container][
-            object_name
-        ]
-        LOGGER.info("Returning an existing upload session.")
-    except KeyError:
-        LOGGER.info("Creating a new upload session.")
-        # Check the existence of the dictionary structure
-        if project not in request.app[session]["enuploads"]:
-            request.app[session]["enuploads"][project] = {}
-        if container not in request.app[session]["enuploads"][project]:
-            request.app[session]["enuploads"][project][container] = {}
-        if object_name not in request.app[session]["enuploads"][project][container]:
-            upload_session = cryptupload.EncryptedUploadProxy(
-                request.app[session],
-                request.app["client"],
-            )
-            request.app[session]["enuploads"][project][container][
-                object_name
-            ] = upload_session
-    LOGGER.info(f"Session object id: {id(upload_session)}")
-    return upload_session
+    if project in request.app[session]["enuploads"]:
+        LOGGER.debug(f"Returning an existing upload session for id {session}.")
+        return request.app[session]["enuploads"][project]
+    else:
+        LOGGER.debug(f"Opening a new upload session for id {session}.")
+        upload_session = cryptupload.UploadSession(request, request.app[session])
+        request.app[session]["enuploads"][project] = upload_session
+        return upload_session
 
 
 def get_path_from_list(to_parse: typing.List[str], path_prefix: str) -> str:

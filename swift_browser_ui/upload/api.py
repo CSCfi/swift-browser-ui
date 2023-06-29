@@ -2,19 +2,19 @@
 
 
 import asyncio
-import base64
-import json
 import logging
 import os
 import time
 import typing
 
 import aiohttp.web
+import msgpack
 
+import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
     VAULT_CLIENT,
-    get_encrypted_upload_instance,
+    get_encrypted_upload_session,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
@@ -195,67 +195,43 @@ async def handle_whitelist_options(
     return resp
 
 
-async def handle_upload_encrypted_object(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.Response:
-    """Handle uploading an object spliced into segments."""
-    upload_session = await get_encrypted_upload_instance(request)
-    return await upload_session.add_header(request)
-
-
-async def handle_upload_encrypted_object_ws(
+async def handle_upload_ws(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.WebSocketResponse:
-    """Handle uploading object data as a websocket."""
-    upload_session = await get_encrypted_upload_instance(request)
-
-    getter_tasks: typing.List[asyncio.Task] = []
-    slicer_tasks: typing.List[asyncio.Task] = []
-    upload_tasks: typing.List[asyncio.Task] = []
+    """Handle parallel file upload data via a websocket."""
+    upload_session: cryptupload.UploadSession = get_encrypted_upload_session(request)
 
     ws = aiohttp.web.WebSocketResponse()
     await ws.prepare(request)
 
-    LOGGER.info(f"Upload websocket opened for {request.url.path}")
-
-    await upload_session.set_ws(ws)
+    LOGGER.info(f"Upload session websocket opened for {request.url.path}")
 
     async for msg in ws:
         if msg.type == "close":
-            await asyncio.gather(*(getter_tasks + slicer_tasks + upload_tasks))
+            await upload_session.handle_close()
             LOGGER.info(f"Closing the websocket for {request.url.path}")
             await ws.close()
-        if msg.data == "startPull":
-            # Pull Q_DEPTH chunks initially
-            LOGGER.debug("Starting upload content pull through websocket.")
-            getter_tasks = [
-                asyncio.create_task(upload_session.get_next_chunk(ws))
-                for _ in range(0, CRYPTUPLOAD_Q_DEPTH)
-            ]
-            slicer_tasks = [
-                asyncio.create_task(
-                    upload_session.slice_into_queue(
-                        i, upload_session.get_segment_queue(i)
-                    )
-                )
-                for i in range(0, upload_session.return_total_segments())
-            ]
-            upload_tasks = [
-                asyncio.create_task(upload_session.upload_segment(i))
-                for i in range(0, upload_session.return_total_segments())
-            ]
-        else:
-            m = json.loads(msg.data)
-            i = m["iter"]
-            c = base64.b64decode(m["chunk"])
-            await upload_session.add_to_chunks(
-                i,
-                c,
-                ws,
-            )
 
-    LOGGER.info(f"Upload finished for {request.url.path} – pushing manifest.")
-    await upload_session.add_manifest()
+        # Open msgpack and handle message
+        try:
+            msg_unpacked: typing.Dict[str, typing.Any] = msgpack.loads(msg.data)
+
+            if msg_unpacked["command"] == "add_header":
+                await upload_session.handle_begin_upload(msg_unpacked)
+            if msg_unpacked["command"] == "add_chunk":
+                await upload_session.handle_upload_chunk(msg_unpacked)
+            if msg_unpacked["command"] == "cancel":
+                await upload_session.handle_close()
+        except ValueError:
+            LOGGER.error("Received an empty message.")
+            LOGGER.debug(msg.data)
+        except msgpack.exceptions.ExtraData:
+            LOGGER.error("Extra data in message.")
+            LOGGER.debug(msg.data)
+        except msgpack.exceptions.FormatError:
+            LOGGER.error("Incorrectly formatted message.")
+            LOGGER.error(msg.data)
+
     return ws
 
 
