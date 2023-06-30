@@ -68,7 +68,7 @@ export default {
       return this.$props.item.subfolder;
     },
     isContainer: function() {
-      return !this.isSubfolder() && this.$props.item.count;
+      return !this.isSubfolder() && this.$props.item.count !== undefined;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
