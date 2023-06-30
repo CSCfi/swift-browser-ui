@@ -100,12 +100,10 @@
             :value="$t('message.encrypt.advancedOptions')"
           >
             <c-container>
-              <c-checkbox
-                v-model="multipleReceivers"
-                v-csc-control
-                :label="$t('message.encrypt.multipleReceivers')"
-              />
-              <c-flex v-if="multipleReceivers">
+              <c-flex>
+                <h3 class="title is-6 has-text-dark">
+                  {{ $t('message.encrypt.multipleReceivers') }}
+                </h3>
                 <c-text-field
                   v-model="addRecvkey"
                   v-csc-control
@@ -196,7 +194,6 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      multipleReceivers: false,
       addRecvkey: "",
       recvkeys: [],
       recvHashedKeys: [],
@@ -624,7 +621,6 @@ export default {
       this.duplicateFile = false;
       this.interacted = false;
       this.addRecvkey = "";
-      this.multipleReceivers = false;
       this.recvHashedKeys = [];
       this.errorMsg = "";
     },
@@ -761,6 +757,9 @@ c-data-table.publickey-table {
 
 c-accordion c-button {
   margin-top: 0.5rem;
+}
+c-accordion h3 {
+  padding: 1rem 0;
 }
 
 </style>
