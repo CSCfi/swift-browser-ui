@@ -209,6 +209,7 @@ käyttöoikeudet
 käyttöoikeus
 käyttörajoista
 käyttöä
+käyttöön
 käytä
 käytössä
 käytöstä

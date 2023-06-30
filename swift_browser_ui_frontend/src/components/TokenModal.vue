@@ -76,6 +76,7 @@
         :pagination.prop="tokenPagination"
         :footerOptions.prop="footer"
         :hide-footer="tokens.length <= tokensPerPage"
+        @click="checkPage"
       />
       <!-- eslint-enable-->
       <c-toasts
@@ -108,6 +109,7 @@ export default {
       tokensPerPage: 5,
       mdiClose,
       mdiDelete,
+      currentPage: 1,
     };
   },
   computed: {
@@ -159,7 +161,7 @@ export default {
       return {
         itemCount: this.tokens.length,
         itemsPerPage: this.tokensPerPage,
-        currentPage: 1,
+        currentPage: this.currentPage,
       };
     },
     footer() {
@@ -174,7 +176,11 @@ export default {
     },
   },
   methods: {
+    checkPage: function(event){
+      this.currentPage = event.target.pagination.currentPage;
+    },
     closeTokenModal: function () {
+      this.currentPage = 1;
       this.$store.commit("toggleTokenModal", false);
       this.newIdentifier = "";
       this.latest = { token: undefined, id: undefined };

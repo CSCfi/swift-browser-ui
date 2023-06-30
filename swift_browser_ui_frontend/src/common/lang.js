@@ -110,8 +110,8 @@ let default_translations = {
         text: "Show as paths",
         hideTags: "Hide tags",
         showTags: "Display tags",
-        hidePagination: "Hide pagination",
-        showPagination: "Display pagination",
+        hidePagination: "Disable pagination",
+        showPagination: "Enable pagination",
       },
       dashboard: {
         projectInfo: "Project information",
@@ -476,8 +476,8 @@ let default_translations = {
         text: "Näytä polkuina",
         hideTags: "Piilota asiasanat",
         showTags: "Näytä asiasanat",
-        hidePagination: "Piilota sivutus",
-        showPagination: "Näytä sivutus",
+        hidePagination: "Poista sivutus",
+        showPagination: "Ota sivutus käyttöön",
       },
       dashboard: {
         projectInfo: "Projektin tiedot",
