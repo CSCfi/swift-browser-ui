@@ -424,7 +424,6 @@ export default {
     },
   },
   methods: {
-    isValidFolderName,
     checkPage(event) {
       this.currentPage = event.target.pagination.currentPage;
     },
