@@ -34,6 +34,7 @@ etag
 fi
 focusable
 frontend
+gh
 gib
 github
 haka
