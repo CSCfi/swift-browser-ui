@@ -85,7 +85,7 @@ export default {
       currentDownload: undefined,
       objects: [],
       footerOptions: {
-        itemsPerPageOptions: [5, 10, 15, 20, 25],
+        itemsPerPageOptions: [5, 10, 25, 50, 100],
       },
       paginationOptions: {},
       sortBy: "name",

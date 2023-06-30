@@ -79,6 +79,7 @@
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
           :footerOptions.prop="footer"
+          @click="checkPage"
         />
         <!-- eslint-enable-->
         <p class="info-text is-size-6">
@@ -131,6 +132,7 @@
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
                   :footerOptions.prop="footer"
+                  @click="checkKeyPage"
                 />
                 <!-- eslint-enable-->
               </c-flex>
@@ -207,6 +209,8 @@ export default {
       buttonAddingFiles: false,
       noUploadContainers: [],
       interacted: false,
+      currentPage: 1,
+      currentKeyPage:1,
     };
   },
   computed: {
@@ -342,7 +346,7 @@ export default {
       return {
         itemCount: this.dropFiles.length,
         itemsPerPage: 20,
-        currentPage: 1,
+        currentPage: this.currentPage,
       };
     },
     footer() {
@@ -354,7 +358,7 @@ export default {
       return {
         itemCount: this.recvHashedKeys.length,
         itemsPerPage: 5,
-        currentPage: 1,
+        currentPage: this.currentKeyPage,
       };
     },
     addFiles() {
@@ -417,6 +421,12 @@ export default {
   },
   methods: {
     isValidFolderName,
+    checkPage(event) {
+      this.currentPage = event.target.pagination.currentPage;
+    },
+    checkKeyPage(event){
+      this.currentKeyPage = event.target.pagination.currentPage;
+    },
     appendDropFiles(file) {
       //Checking for identical path only, not name:
       //different folders may have same file names
