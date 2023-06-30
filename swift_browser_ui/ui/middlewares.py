@@ -70,6 +70,10 @@ async def check_session(
             session.invalidate()
             raise _unauthorized("Session expired.")
 
+        if setd["oidc_enabled"] and "oidc" not in session:
+            session.invalidate()
+            raise _unauthorized("Invalid session, authenticate again.")
+
     except KeyError as error:
         reason = (
             f"No valid session. A session was invalidated due to invalid token. {error}"
