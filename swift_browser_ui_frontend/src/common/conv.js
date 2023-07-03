@@ -300,15 +300,19 @@ export function filterSegments(objects) {
 export const tokenizerRE = "[^\\p{L}\\d]";
 
 export function tokenize(text, ignoreSmallerThan = 2) {
+  // don't use whole path for objects
+  const shortName = text.split("/").slice(-2).join("/").toLowerCase();
   // splits with non-word and non-digit chars
   const re = new RegExp(tokenizerRE, "u");
-  const split = text.toLowerCase().split(re);
+  const split = shortName.split(re);
 
   // filters out small words and duplicates
   const result = split.filter(
     (item, index) =>
       item.length >= ignoreSmallerThan && split.indexOf(item) === index,
   );
+  //if split too small to use, add unsplit name
+  if (result.length === 0) result.push(shortName);
   return result;
 }
 
