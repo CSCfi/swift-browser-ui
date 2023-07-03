@@ -60,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #985) Add breadcrumb component
 - (GL #1050) Add generic error handling for request, sharing, and upload backend components
 - (GL #1051) Filter projects based on response from OIDC provider
+  - introduced `SDCONNECT_ENABLED` environment variable so that we can force the check for `sdConnectProjects` claim when deployed to production
+  - check `oidc_enabled` in middleware in order to invalidate session that don't contain oidc
 - (GL #1043) Add folder name length validation when creating a folder, copying, uploading to a new one
 - (GL #970) Cancel fetch requests when navigating away from page
 - (GL #1013) Restrict users from creating folders with ending `_segments`
