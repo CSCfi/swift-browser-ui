@@ -94,7 +94,14 @@
             <i class="mdi mdi-open-in-new" />
           </c-link>
         </p>
+<<<<<<< HEAD
         <c-accordion value="advancedOptions">
+=======
+        <c-accordion
+          id="accordion"
+          value="advancedOptions"
+        >
+>>>>>>> 4f1eab77 (Fix resetting accordion value)
           <c-accordion-item
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
@@ -613,7 +620,12 @@ export default {
       this.$store.commit("eraseDropFiles");
       this.toggleUploadModal();
     },
+    resetAccordionVal() {
+      let accordion = document.getElementById("accordion");
+      accordion.value = "advancedOptions";
+    },
     toggleUploadModal() {
+      this.resetAccordionVal();
       this.$store.commit("toggleUploadModal", false);
       this.addingFiles = false;
       this.tags = [];
