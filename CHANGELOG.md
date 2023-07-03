@@ -62,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1051) Filter projects based on response from OIDC provider
 - (GL #1043) Add folder name length validation when creating a folder, copying, uploading to a new one
 - (GL #970) Cancel fetch requests when navigating away from page
+- (GL #1013) Restrict users from creating folders with ending `_segments`
 
 ### Changed
 

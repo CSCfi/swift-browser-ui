@@ -21,8 +21,8 @@
           :query="inputFolder"
           aria-required="true"
           required
-          :valid="isValidFolderName(inputFolder) || !interacted"
-          :validation="$t('message.error.tooShort')"
+          :valid="errorMsg.length === 0"
+          :validation="errorMsg"
           validate-on-blur
           @changeQuery="onQueryChange"
           @changeValue="onSelectValue"
@@ -155,7 +155,7 @@
         :disabled="noUpload
           || addingFiles
           || buttonAddingFiles
-          || !isValidFolderName(inputFolder)"
+          || errorMsg.length"
         @click="beginEncryptedUpload"
         @keyup.enter="beginEncryptedUpload"
       >
@@ -178,7 +178,7 @@ import {
   getProjectNumber,
   getSharedContainers,
   getAccessDetails,
-  isValidFolderName,
+  validateFolderName,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -211,6 +211,7 @@ export default {
       interacted: false,
       currentPage: 1,
       currentKeyPage:1,
+      errorMsg: "",
     };
   },
   computed: {
@@ -387,6 +388,9 @@ export default {
       }
     },
     inputFolder: function() {
+      this.interacted ?
+        this.errorMsg = validateFolderName(this.inputFolder, this.$t) :
+        this.errorMsg = "";
       this.refreshNoUpload();
     },
     dropFiles: function () {
@@ -420,7 +424,6 @@ export default {
     },
   },
   methods: {
-    isValidFolderName,
     checkPage(event) {
       this.currentPage = event.target.pagination.currentPage;
     },
@@ -623,6 +626,7 @@ export default {
       this.addRecvkey = "";
       this.multipleReceivers = false;
       this.recvHashedKeys = [];
+      this.errorMsg = "";
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

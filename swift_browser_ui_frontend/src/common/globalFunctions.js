@@ -133,7 +133,14 @@ export function getPaginationOptions(t) {
   return paginationOptions;
 }
 
-export function isValidFolderName(str) {
+export function validateFolderName(str, t) {
   //minimum length 3 chars
-  return str.length > 2;
+  let error = "";
+  if (str.length <= 2) {
+    error = t("message.error.tooShort");
+  }
+  else if (str.endsWith("_segments")) {
+    error= t("message.error.segments");
+  }
+  return error;
 }

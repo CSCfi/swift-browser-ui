@@ -40,6 +40,7 @@ let default_translations = {
         invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
         tooShort: "Please enter at least 3 characters",
+        segments: "Folder name cannot end with '_segments'",
         idb: "Firefox in private mode is not supported.",
         idb_text:
           "Firefox is not supported in private mode. " +
@@ -400,6 +401,7 @@ let default_translations = {
         invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
         tooShort: "Anna vähintään 3 merkkiä",
+        segments: "Kansion nimi ei saa päättyä '_segments'",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
           "Firefoxin yksityinen selaustila ei ole tuettu." +
