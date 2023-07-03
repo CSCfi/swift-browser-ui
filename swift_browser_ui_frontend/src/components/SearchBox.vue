@@ -78,19 +78,22 @@ export default {
   },
   methods: {
     onQueryChange: function (event) {
-      const safeQuery = escapeRegExp(event.detail);
-      const query = safeQuery.trim();
-      const newSearchArray = tokenize(query, 0);
-      // Run debounced search every time the search box input changes
-      if (newSearchArray.length > 0 && newSearchArray[0].length > 1) {
-        this.isSearching = true;
-        this.searchArray = newSearchArray;
-        this.debounceSearch();
-      } else {
-        this.isSearching = false;
-        this.searchResults = [];
-        this.searchArray = [];
+      const minLength = 2; //only search if min chars typed in
+      let query = event.detail.trim();
+      if (query.length >= minLength) {
+        query = escapeRegExp(query);
+        const newSearchArray = tokenize(query, minLength);
+        if (newSearchArray.length > 0) {
+          //at least one search token formed
+          this.isSearching = true;
+          this.searchArray = newSearchArray;
+          this.debounceSearch();
+          return;
+        }
       }
+      this.isSearching = false;
+      this.searchResults = [];
+      this.searchArray = [];
     },
     search: async function () {
       if (this.searchArray.length === 0) {
@@ -130,7 +133,6 @@ export default {
       }
 
       const rankedSort = (a, b) => a.rank - b.rank;
-
       const containers = await getDB().containers
         .where("tokens")
         .startsWith(query[0])
@@ -143,7 +145,6 @@ export default {
       this.searchResults = containers.map(item => ({
         ...item, value: item.name,
       })).sort(rankedSort).slice(0, 100);
-
 
       const conts = await getDB().containers
         .where({ projectID: this.active.id })
