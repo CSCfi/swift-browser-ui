@@ -109,9 +109,11 @@ export default {
         const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
         query.map(q => {
+          const re = new RegExp("^" + q, "i");
+
           if (item.tags !== undefined) {
             item.tags.forEach((tag, i) => {
-              if (tag.startsWith(q)) {
+              if (tag.match(re)) {
                 item.rank = 0.0 + (i + 1) / 10;
                 match.add(q);
                 return;
@@ -119,7 +121,7 @@ export default {
             });
           }
           item.tokens.forEach((token, i) => {
-            if (token.startsWith(q)) {
+            if (token.match(re)) {
               item.rank = rankOffset + (i + 1) / 10;
               match.add(q);
               return;
@@ -133,13 +135,13 @@ export default {
       }
 
       const rankedSort = (a, b) => a.rank - b.rank;
+      const re = new RegExp("^" + query[0], "i");
+
       const containers = await getDB().containers
-        .where("tokens")
-        .startsWith(query[0])
-        .or("tags")
-        .startsWithIgnoreCase(query[0])
+        .where({ projectID: this.active.id })
+        .filter(cont => cont.tokens?.find(t => t.match(re))
+          || cont.tags?.find(t => t.match(re)))
         .filter(multipleQueryWordsAndRank)
-        .and(cont => cont.projectID === this.active.id)
         .limit(1000)
         .toArray();
       this.searchResults = containers.map(item => ({
@@ -170,10 +172,8 @@ export default {
       }
 
       const objects = await getDB().objects
-        .where("tokens")
-        .startsWith(query[0])
-        .or("tags")
-        .startsWithIgnoreCase(query[0])
+        .filter(obj => obj.tokens?.find(t => t.match(re))
+          || obj.tags?.find(t => t.match(re)))
         .filter(multipleQueryWordsAndRank)
         .and(obj => containerIDs.includes(obj.containerID))
         .limit(1000)
