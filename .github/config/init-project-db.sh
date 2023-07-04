@@ -22,7 +22,7 @@ psql -v ON_ERROR_STOP=1 --username "sharing" --dbname "swiftbrowserdb" <<-EOSQL
         address TEXT           NOT NULL,
         PRIMARY KEY(container, container_owner, recipient)
     );
-    CREATE TABLE IF NOT EXISTS ids(
+    CREATE TABLE IF NOT EXISTS ProjectIDs(
         name TEXT,
         id TEXT,
         PRIMARY KEY(id)

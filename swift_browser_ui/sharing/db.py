@@ -368,7 +368,7 @@ class DBConn:
             async with conn.transaction():
                 await conn.execute(
                     """
-                    INSERT INTO ids(
+                    INSERT INTO ProjectIDs(
                         name,
                         id
                     ) VALUES (
@@ -385,7 +385,7 @@ class DBConn:
         query = await self.pool.fetch(
             """
             SELECT *
-            FROM ids
+            FROM ProjectIDs
             WHERE id = $1
             ;
             """,
@@ -398,7 +398,7 @@ class DBConn:
         query = await self.pool.fetch(
             """
             SELECT *
-            FROM ids
+            FROM ProjectIDs
             WHERE name = $1
             ;
             """,
