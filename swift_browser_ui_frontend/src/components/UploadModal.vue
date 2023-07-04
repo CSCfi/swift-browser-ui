@@ -94,18 +94,19 @@
             <i class="mdi mdi-open-in-new" />
           </c-link>
         </p>
-        <c-accordion value="advancedOptions">
+        <c-accordion
+          id="accordion"
+          value="advancedOptions"
+        >
           <c-accordion-item
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
           >
             <c-container>
-              <c-checkbox
-                v-model="multipleReceivers"
-                v-csc-control
-                :label="$t('message.encrypt.multipleReceivers')"
-              />
-              <c-flex v-if="multipleReceivers">
+              <c-flex>
+                <h3 class="title is-6 has-text-dark">
+                  {{ $t('message.encrypt.multipleReceivers') }}
+                </h3>
                 <c-text-field
                   v-model="addRecvkey"
                   v-csc-control
@@ -196,7 +197,6 @@ export default {
     return {
       inputFolder: "",
       filteredItems: [],
-      multipleReceivers: false,
       addRecvkey: "",
       recvkeys: [],
       recvHashedKeys: [],
@@ -616,7 +616,12 @@ export default {
       this.$store.commit("eraseDropFiles");
       this.toggleUploadModal();
     },
+    resetAccordionVal() {
+      let accordion = document.getElementById("accordion");
+      accordion.value = "advancedOptions";
+    },
     toggleUploadModal() {
+      this.resetAccordionVal();
       this.$store.commit("toggleUploadModal", false);
       this.addingFiles = false;
       this.tags = [];
@@ -624,7 +629,6 @@ export default {
       this.duplicateFile = false;
       this.interacted = false;
       this.addRecvkey = "";
-      this.multipleReceivers = false;
       this.recvHashedKeys = [];
       this.errorMsg = "";
     },
@@ -761,6 +765,9 @@ c-data-table.publickey-table {
 
 c-accordion c-button {
   margin-top: 0.5rem;
+}
+c-accordion h3 {
+  padding: 1rem 0;
 }
 
 </style>
