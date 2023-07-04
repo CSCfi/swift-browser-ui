@@ -498,6 +498,10 @@ def _get_projects_from_userinfo(
         projects = [
             p.removeprefix("project_") for p in userinfo["sdConnectProjects"].split(" ")
         ]
+    # we add this check in case the claim `sdConnectProjects does not exist`
+    # and we want to enforce this at deployment
+    elif setd["sdconnect_enabled"] and "sdConnectProjects" not in userinfo:
+        projects = []
     else:
         return None
 

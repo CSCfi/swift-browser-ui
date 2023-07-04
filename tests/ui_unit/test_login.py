@@ -31,6 +31,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
     async def test_oidc_start(self):
         """Test oidc initial request."""
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -42,6 +43,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
     async def test_oidc_end(self):
         """Test oidc initial request."""
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -63,6 +65,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
     async def test_handle_login_oidc_enabled(self):
         """Test login handler with OIDC enabled."""
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -91,6 +94,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             )
 
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -112,6 +116,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
     async def test_sso_query_begin_oidc_enabled(self):
         """Test sso query begin with OIDC enabled."""
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with unittest.mock.patch(
             "swift_browser_ui.ui.login.setd",
             self.setd_mock,
@@ -358,6 +363,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         self.assertEqual(resp.headers["Location"], "/test-nav")
 
         self.setd_mock["oidc_enabled"] = True
+        self.setd_mock["sdconnect_enabled"] = False
         with patch1, patch2, self.p_get_sess:
             resp = await swift_browser_ui.ui.login.login_with_token(
                 self.mock_request,

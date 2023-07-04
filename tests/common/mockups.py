@@ -74,6 +74,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
             "upload_external_endpoint": "http://test-endpoint:9092/",
             "oidc_enabled": False,
             "upload_internal_endpoint": "http://test-endpoint",
+            "sdconnect_enabled": False,
         }
         self.patch_setd = unittest.mock.patch(
             "swift_browser_ui.ui.api.setd", self.setd_mock

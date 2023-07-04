@@ -72,6 +72,7 @@ class FrontendTestCase(
             new={
                 "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist",
                 "oidc_enabled": True,
+                "sdconnect_enabled": False,
             },
         )
         with patch_setd, p_get_sess:
@@ -100,6 +101,7 @@ class FrontendTestCase(
             new={
                 "static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist",
                 "oidc_enabled": True,
+                "sdconnect_enabled": False,
             },
         )
         with patch_setd, p_get_sess:
