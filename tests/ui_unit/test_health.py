@@ -24,8 +24,13 @@ class HealthTestClass(tests.common.mockups.APITestBase):
             "request_internal_endpoint": "http://test-endpoint",
             "redis_host": "http://test-endpoint",
             "redis_port": "6379",
+            "vault_url": "http://test-endpoint",
         }
         self.setd = unittest.mock.patch("swift_browser_ui.ui.health.setd", self.mock_setd)
+
+        self.mock_redis = unittest.mock.AsyncMock()
+        self.mock_redis.ping.return_value = True
+        self.mock_redis_class = unittest.mock.MagicMock(return_value=self.mock_redis)
 
     async def test_get_x_account_sharing(self):
         """Test getting x account sharing."""
@@ -119,23 +124,60 @@ class HealthTestClass(tests.common.mockups.APITestBase):
     async def test_get_redis(self):
         """Test getting redis service."""
         with self.setd:
-            with unittest.mock.patch("redis.Redis.ping") as mock_ping:
-                mock_ping.return_value = True
+            with unittest.mock.patch(
+                "swift_browser_ui.ui.health.Redis", new=self.mock_redis_class
+            ):
                 await swift_browser_ui.ui.health.get_redis(
                     self.mock_services,
                     self.mock_request,
                     self.mock_performance,
                 )
-                # self.assertEqual(self.mock_services, {"redis": {"status": "Ok"}})
+        self.assertEqual(self.mock_services["redis"], {"status": "Ok"})
+        self.assertIn("time", self.mock_performance["redis"])
+        first_time = self.mock_performance["redis"]["time"]
 
-            with unittest.mock.patch("redis.Redis.ping") as mock_ping:
-                mock_ping.side_effect = redis.ConnectionError
+        self.mock_redis.ping.side_effect = redis.ConnectionError
+        self.mock_redis_class = unittest.mock.MagicMock(return_value=self.mock_redis)
+        with self.setd:
+            with unittest.mock.patch(
+                "swift_browser_ui.ui.health.Redis", new=self.mock_redis_class
+            ):
                 await swift_browser_ui.ui.health.get_redis(
                     self.mock_services,
                     self.mock_request,
                     self.mock_performance,
                 )
-                # self.assertEqual(self.mock_services, {"redis": {"status": "Down"}})
+        self.assertEqual(self.mock_services["redis"], {"status": "Down"})
+        self.assertNotEqual(first_time, self.mock_performance["redis"]["time"])
+
+    async def test_get_vault(self):
+        """Test getting vault service."""
+        self.mock_client_response.json.return_value = {
+            "initialized": True,
+            "sealed": False,
+        }
+        with self.setd:
+            await swift_browser_ui.ui.health.get_vault(
+                self.mock_services,
+                self.mock_request,
+                self.mock_client,
+                self.mock_performance,
+            )
+        self.mock_client.get.assert_called_once()
+        self.assertEqual(self.mock_services["vault"], {"status": "Ok"})
+        self.assertIn("time", self.mock_performance["vault"])
+        first_time = self.mock_performance["vault"]["time"]
+
+        self.mock_client_response.status = 503
+        with self.setd:
+            await swift_browser_ui.ui.health.get_vault(
+                self.mock_services,
+                self.mock_request,
+                self.mock_client,
+                self.mock_performance,
+            )
+        self.assertEqual(self.mock_services["vault"], {"status": "Down"})
+        self.assertNotEqual(first_time, self.mock_performance["vault"]["time"])
 
     async def test_some_exception(self):
         """Test that an exception happens when getting one of the service statuses."""
@@ -167,14 +209,22 @@ class HealthTestClass(tests.common.mockups.APITestBase):
 
     async def test_handle_health_check(self):
         """Test handling health check."""
+        self.mock_client_response.json.return_value = {
+            "status": "Ok",
+            "initialized": True,
+            "sealed": False,
+        }
+        redis_mock = unittest.mock.patch(
+            "swift_browser_ui.ui.health.Redis", new=self.mock_redis_class
+        )
+        with self.setd, self.p_json_resp, redis_mock:
+            await swift_browser_ui.ui.health.handle_health_check(self.mock_request)
+        self.aiohttp_json_response_mock.assert_called()
+        status = self.aiohttp_json_response_mock.call_args_list[0][0][0]["status"]
+        self.assertEqual(status, "Ok")
+
+        self.mock_client_response.status = 503
         with self.setd, self.p_json_resp:
             await swift_browser_ui.ui.health.handle_health_check(self.mock_request)
-        # self.aiohttp_json_response_mock.assert_called()
-        # status = self.aiohttp_json_response_mock.call_args_list[0][0][0]["status"]
-        # self.assertEqual(status, "Ok")
-
-        # self.mock_client_response.status = 503
-        # with self.setd, self.p_json_resp:
-        #     await swift_browser_ui.ui.health.handle_health_check(self.mock_request)
-        # status = self.aiohttp_json_response_mock.call_args_list[1][0][0]["status"]
-        # self.assertEqual(status, "Partially down")
+        status = self.aiohttp_json_response_mock.call_args_list[1][0][0]["status"]
+        self.assertEqual(status, "Partially down")
