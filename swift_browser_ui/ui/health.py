@@ -147,15 +147,36 @@ async def get_redis(
             services["redis"] = {"status": "Nonexistent"}
     except ConnectionError:
         services["redis"] = {"status": "Down"}
+        performance["redis"] = {"time": time.time() - start}
     except Exception as e:
         request.app["Log"].info(f"Health failed for reason: {e}")
         _set_error_status(request, services, "redis")
 
 
-# TBA
-# async def get_vault(services: typing.Dict[str, typing.Any]) -> None:
-#     """Poll Redis service."""
-#     services["vault"] = {"status": "Nonexistent"}
+async def get_vault(
+    services: typing.Dict[str, typing.Any],
+    request: aiohttp.web.Request,
+    web_client: aiohttp.ClientSession,
+    performance: typing.Dict[str, typing.Any],
+) -> None:
+    """Poll Vault service."""
+    try:
+        if setd["vault_url"]:
+            start = time.time()
+            services["vault"] = {"status": "Down"}
+            async with web_client.get(str(setd["vault_url"]) + "/sys/health") as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    if data.get("initialized") and data.get("sealed") is False:
+                        services["vault"] = {"status": "Ok"}
+            performance["vault"] = {"time": time.time() - start}
+        else:
+            services["vault"] = {"status": "Nonexistent"}
+    except ServerDisconnectedError:
+        _set_error_status(request, services, "vault")
+    except Exception as e:
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "vault")
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -183,6 +204,8 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
     await get_upload_runner(services, request, web_client, api_params, performance)
 
     await get_redis(services, request, performance)
+
+    await get_vault(services, request, web_client, performance)
 
     status["services"] = services
     status["performance"] = performance

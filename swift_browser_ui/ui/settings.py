@@ -90,6 +90,7 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "redis_port": environ.get("SWIFT_UI_REDIS_PORT", ""),
     "redis_sentinel_host": environ.get("SWIFT_UI_REDIS_SENTINEL_HOST", ""),
     "redis_sentinel_port": environ.get("SWIFT_UI_REDIS_SENTINEL_PORT", ""),
+    "vault_url": environ.get("VAULT_URL", ""),
 }
 
 
