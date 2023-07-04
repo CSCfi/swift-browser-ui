@@ -363,7 +363,7 @@ const app = createApp({
   },
   methods: {
     containerSyncWrapper: function () {
-      syncContainerACLs(this.$store.state.client, this.$store.state.active.id);
+      syncContainerACLs(this.$store);
     },
     // Following are the methods used for resumablejs, as the methods
     // need to have access to the vue instance.

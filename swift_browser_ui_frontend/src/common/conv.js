@@ -59,9 +59,12 @@ function check_stale(detail, access) {
   return check_acl_mismatch(detail, access[detail.sharedTo]);
 }
 
-export async function syncContainerACLs(client, project) {
+export async function syncContainerACLs(store) {
+  let project = store.state.active.id;
+
   let acl = await getAccessControlMeta(project);
 
+  let client = store.state.client;
   let amount = 0;
   let aclmeta = acl.access;
   let currentsharing = await client.getShare(project);
@@ -103,11 +106,14 @@ export async function syncContainerACLs(client, project) {
         let tmpid = await client.projectCheckIDs(share);
 
         let whitelistUrl = new URL(
-          `/cryptic/${this.store.state.active.name}/${container}`,
-          this.$store.state.uploadEndpoint,
+          `/cryptic/${store.state.active.name}/${container}/${tmpid}`,
+          store.state.uploadEndpoint,
         );
         let signatureUrl = new URL("/sign/3600", document.location.origin);
-        signatureUrl.searchParams.append("path", `/cryptic/${this.store.state.active.name}/${container}`);
+        signatureUrl.searchParams.append(
+          "path",
+          `/cryptic/${store.state.active.name}/${container}/${tmpid}`,
+        );
         let signed = await GET(signatureUrl);
         signed = await signed.json();
         whitelistUrl.searchParams.append("valid", signed.valid);
@@ -117,7 +123,6 @@ export async function syncContainerACLs(client, project) {
           whitelistUrl,
           {
             method: "GET",
-            body: tmpid,
           },
         );
 

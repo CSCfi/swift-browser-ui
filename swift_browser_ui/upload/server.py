@@ -134,7 +134,7 @@ async def servinit() -> aiohttp.web.Application:
                 handle_batch_remove_sharing_whitelist,
             ),
             aiohttp.web.get(
-                "/check/{project}/{container}",
+                "/check/{project}/{container}/{receiver}",
                 handle_check_sharing_whitelist,
             ),
             aiohttp.web.options(
