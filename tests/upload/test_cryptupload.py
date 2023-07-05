@@ -1,6 +1,5 @@
 """Unit tests for swift_browser_ui.upload.cryptupload module."""
 
-import asyncio
 import aiohttp.web
 import unittest.mock
 
