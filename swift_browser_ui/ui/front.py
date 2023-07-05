@@ -116,3 +116,84 @@ async def loginpassword(
         return aiohttp.web.FileResponse(
             str(setd["static_directory"]) + "/loginpassword.html"
         )
+
+
+async def unauth(_: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Serve worker js in worker scope."""
+    with open(str(setd["static_directory"]) + "/401.html") as f:
+        resp = aiohttp.web.Response(
+            body="".join(f.readlines()),
+            status=401,
+            content_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"',
+            },
+        )
+    return resp
+
+
+async def forbid(_: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Serve worker js in worker scope."""
+    with open(str(setd["static_directory"]) + "/403.html") as f:
+        resp = aiohttp.web.Response(
+            body="".join(f.readlines()),
+            status=403,
+            content_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
+    return resp
+
+
+async def uidown(_: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Serve worker js in worker scope."""
+    with open(str(setd["static_directory"]) + "/503.html") as f:
+        resp = aiohttp.web.Response(
+            body="".join(f.readlines()),
+            status=503,
+            content_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
+    return resp
+
+
+async def badrequest(_: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Serve worker js in worker scope."""
+    with open(str(setd["static_directory"]) + "/400.html") as f:
+        resp = aiohttp.web.Response(
+            body="".join(f.readlines()),
+            status=400,
+            content_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
+    return resp
+
+
+async def notfound(_: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Serve worker js in worker scope."""
+    with open(str(setd["static_directory"]) + "/404.html") as f:
+        resp = aiohttp.web.Response(
+            body="".join(f.readlines()),
+            status=404,
+            content_type="text/html",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
+    return resp

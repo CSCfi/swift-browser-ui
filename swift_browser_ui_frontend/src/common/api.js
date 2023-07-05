@@ -16,10 +16,13 @@ async function fetchWithCookie({method, url, body, signal}) {
     .then(response => {
       switch (response.status) {
         case 401:
-        case 403:
           window.location.pathname = "/unauth";
           break;
+        case 403:
+          window.location.pathname = "/forbid";
+          break;
         case 500:
+          window.location.pathname = "/uidown";
           break;
       }
 
