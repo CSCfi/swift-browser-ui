@@ -275,8 +275,10 @@ export default {
                   text: true,
                   size: "small",
                   title: this.$t("message.remove"),
-                  onClick: ({ data }) =>
-                    this.$store.commit("eraseDropFile", data),
+                  onClick: ({ data,index }) => {
+                    this.checkListLenght(index);
+                    this.$store.commit("eraseDropFile", data);
+                  },
                 },
               },
             },
@@ -306,6 +308,7 @@ export default {
                   size: "small",
                   title: this.$t("message.remove"),
                   onClick: ({ index }) =>{
+                    this.checkKeyListLength(index);
                     this.recvHashedKeys.splice(index, 1);
                     this.recvkeys.splice(index, 1);
                   },
@@ -424,6 +427,16 @@ export default {
     },
   },
   methods: {
+    checkKeyListLength(index){
+      if(index == 0){
+        this.currentKeyPage--;
+      }
+    },
+    checkListLenght(index){
+      if(index == 0){
+        this.currentPage--;
+      }
+    },
     checkPage(event) {
       this.currentPage = event.target.pagination.currentPage;
     },
