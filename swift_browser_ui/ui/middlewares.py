@@ -127,20 +127,21 @@ async def check_session_taintness(
 async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web.Response:
     """Return the correct HTTP Error page."""
     to_process = {400, 401, 403, 404}
+    container_errors = {405, 409}
 
     try:
         response = await handler(request)
         if response.status in to_process:
             return return_error_response(response.status)
-        if response.status == 409:
+        if response.status in container_errors:
             return response
         return response
     except web.HTTPException as ex:
         if ex.status in to_process:
             return return_error_response(ex.status)
-        if ex.status == 409:
+        if ex.status in container_errors:
             raise ex
-        if ex.status > 404 and ex.status < 500:
+        if ex.status > 405 and ex.status < 500:
             # we forbid all dubious and unauthorized requests
             return return_error_response(403)
         if ex.status > 500:
