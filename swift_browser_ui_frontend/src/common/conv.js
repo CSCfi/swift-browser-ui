@@ -398,7 +398,7 @@ export function parseDateTime(locale, value, shortDate) {
 // correctly update the container size using the size of the segments
 // container.
 export function addSegmentContainerSize(container, containers) {
-  let segments = containers.find(el => el.name.match(`${container.name}_segments`));
+  let segments = containers.find(el => el.name === `${container.name}_segments`);
   if (segments !== undefined) {
     container.bytes = segments.bytes;
   }
