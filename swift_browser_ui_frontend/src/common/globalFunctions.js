@@ -2,11 +2,8 @@ import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
 import { getDB } from "@/common/db";
 
-export function toggleCreateFolderModal(folderName) {
+export function toggleCreateFolderModal() {
   store.commit("toggleCreateFolderModal", true);
-  if (folderName) {
-    store.commit("setFolderName", folderName);
-  }
 }
 
 export function toggleEditTagsModal(objectName, containerName) {
