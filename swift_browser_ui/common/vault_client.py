@@ -310,7 +310,7 @@ class VaultClient:
         project: str,
         receiver: str,
         container: str,
-    ) -> Optional[Dict[Any, Any]]:
+    ) -> Dict[Any, Any] | str | None:
         """Check if a project is in a container whitelist.
 
         :param project: Project ID
@@ -363,9 +363,11 @@ class VaultClient:
                 params={"service": self.service, "key": self._key_name},
             )
         if isinstance(header_response, dict) and "data" in header_response:
-            return str(header_response["data"]["headers"][
-                str(header_response["data"]["latest_version"])
-            ]["header"])
+            return str(
+                header_response["data"]["headers"][
+                    str(header_response["data"]["latest_version"])
+                ]["header"]
+            )
         return ""
 
     async def put_header(
