@@ -106,13 +106,13 @@ export async function syncContainerACLs(store) {
         let tmpid = await client.projectCheckIDs(share);
 
         let whitelistUrl = new URL(
-          `/cryptic/${store.state.active.name}/${container}/${tmpid}`,
+          `/check/${store.state.active.name}/${container}/${tmpid}`,
           store.state.uploadEndpoint,
         );
         let signatureUrl = new URL("/sign/3600", document.location.origin);
         signatureUrl.searchParams.append(
           "path",
-          `/cryptic/${store.state.active.name}/${container}/${tmpid}`,
+          `/check/${store.state.active.name}/${container}/${tmpid}`,
         );
         let signed = await GET(signatureUrl);
         signed = await signed.json();
