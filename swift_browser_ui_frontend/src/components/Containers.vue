@@ -85,11 +85,6 @@ export default {
     active: function () {
       this.fetchContainers();
     },
-    openShareModal: function () {
-      if(!this.openShareModal) {
-        this.fetchContainers();
-      }
-    },
     currentProject: function() {
       const savedDisplayOptions = this.currentProject.displayOptions;
       if (savedDisplayOptions) {
@@ -116,6 +111,13 @@ export default {
           this.containers.filter(cont => cont.owner) : [];
       } else {
         this.renderingContainers = this.containers;
+      }
+    },
+    openShareModal: function () {
+      if(!this.openShareModal) {
+        delay(() => {
+          this.fetchContainers();
+        }, 3000);
       }
     },
     isFolderUploading: function () {

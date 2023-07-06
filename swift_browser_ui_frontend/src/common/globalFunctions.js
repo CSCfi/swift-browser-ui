@@ -1,5 +1,6 @@
 import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
+import { getDB } from "@/common/db";
 
 export function toggleCreateFolderModal(folderName) {
   store.commit("toggleCreateFolderModal", true);
@@ -143,4 +144,52 @@ export function validateFolderName(str, t) {
     error= t("message.error.segments");
   }
   return error;
+}
+
+export function getCurrentISOtime(time) {
+  return time ? new Date(time).toISOString() : new Date().toISOString();
+}
+
+export function getContainerLastmodified(containers, cont) {
+  // Get the current container and its last_modified from IDB
+  const idb_cont = containers.find(
+    el => el.name === cont.name && el.last_modified);
+  const idb_last_modified = idb_cont ? idb_cont.last_modified : null;
+
+  // Compare the last_modified from current container with
+  // IDB container, choose the latest one
+  if (idb_last_modified &&
+    (idb_last_modified > cont.last_modified) ||
+    (!cont.last_modified)
+  ) {
+    return idb_last_modified;
+  }
+  return cont.last_modified;
+}
+
+export async function updateContainerLastmodified(
+  projectID,
+  container,
+  objects,
+) {
+  // Declare the latest last_modified of container
+  let cont_last_modified = container.last_modified;
+
+  const last_modified_arr = objects.map(obj => obj.last_modified);
+
+  // Find the latest last_modified among all objects,
+  // compare it with the current last_modified of container,
+  // assign the latest last_modified for container
+  for (let i = 0; i < last_modified_arr.length; i++) {
+    if (last_modified_arr[i] > cont_last_modified) {
+      cont_last_modified = last_modified_arr[i];
+    }
+  }
+
+  // Assign the latest last_modified of objects to parent container
+  if (cont_last_modified) {
+    await getDB().containers
+      .where({ projectID: projectID, name: container.name})
+      .modify({ last_modified: cont_last_modified });
+  }
 }

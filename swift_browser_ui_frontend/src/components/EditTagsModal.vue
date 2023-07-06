@@ -45,6 +45,7 @@ import { getDB } from "@/common/db";
 import {
   addNewTag,
   deleteTag,
+  getCurrentISOtime,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
@@ -74,6 +75,12 @@ export default {
         ? this.$store.state.selectedFolderName
         : "";
     },
+    projectID() {
+      return this.$route.params.project;
+    },
+    containerName() {
+      return this.$route.params.container;
+    },
   },
   watch: {
     selectedObjectName: function () {
@@ -92,8 +99,8 @@ export default {
   methods: {
     getObject: async function () {
       this.container = await getDB().containers.get({
-        projectID: this.$route.params.project,
-        name: this.$route.params.container,
+        projectID: this.projectID,
+        name: this.containerName,
       });
       if (this.$route.name === "SharedObjects") {
         this.$store.state.objectCache.map(obj => {
@@ -109,7 +116,7 @@ export default {
         });
         if (!this.object.tags?.length) {
           const tags = await getTagsForObjects(
-            this.$route.params.project,
+            this.projectID,
             this.container.name,
             [this.selectedObjectName],
           );
@@ -121,13 +128,14 @@ export default {
     },
     getContainer: async function () {
       this.container = await getDB().containers.get({
-        projectID: this.$route.params.project,
+        projectID: this.projectID,
         name: this.selectedFolderName,
       });
-      if (!this.container.tags) {
+
+      if (!this.container?.tags) {
         this.tags = await getTagsForContainer(
-          this.$route.params.project,
-          this.container.name,
+          this.projectID,
+          this.container?.name,
         );
       } else {
         this.tags = this.container.tags;
@@ -147,19 +155,29 @@ export default {
           usertags: tags.join(";"),
         },
       ];
+
       updateObjectMeta(
-        this.$route.params.owner || this.$route.params.project,
-        this.$route.params.container,
+        this.$route.params.owner || this.projectID,
+        this.containerName,
         objectMeta,
       ).then(async () => {
         if (this.$route.name !== "SharedObjects") {
+          const currentTime = getCurrentISOtime();
           await getDB().objects
             .where(":id").equals(this.object.id)
-            .modify({ tags });
+            .modify({ tags, last_modified: currentTime });
+
+          // Also update container's last_modified in IDB
+          await getDB().containers
+            .where({
+              projectID: this.projectID,
+              name: this.containerName,
+            })
+            .modify({ last_modified: currentTime });
         } else {
           await this.$store.dispatch("updateSharedObjects", {
-            project: this.$route.params.project,
-            container: {name: this.$route.params.container},
+            projectID: this.projectID,
+            container: {name: this.containerName},
             owner: this.$route.params.owner,
           });
         }
@@ -172,15 +190,15 @@ export default {
       let meta = {
         usertags: tags.join(";"),
       };
-      updateContainerMeta(this.$route.params.project, containerName, meta)
+      updateContainerMeta(this.projectID, containerName, meta)
         .then(async () => {
           if (this.$route.name !== "SharedObjects") {
             await getDB().containers
               .where({
-                projectID: this.$route.params.project,
+                projectID: this.projectID,
                 name: containerName,
               })
-              .modify({ tags });
+              .modify({ tags, last_modified: getCurrentISOtime() });
           }
         });
       this.toggleEditTagsModal();

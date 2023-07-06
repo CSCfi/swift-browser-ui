@@ -365,7 +365,7 @@ export default {
         await this.$store.dispatch(
           "updateSharedObjects",
           {
-            project: this.$route.params.project,
+            projectID: this.$route.params.project,
             owner: this.$route.params.owner,
             container: {
               id: 0,

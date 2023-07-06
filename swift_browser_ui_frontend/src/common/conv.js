@@ -187,6 +187,18 @@ function extractObjectCount(meta) {
   return "";
 }
 
+function extractContainerTimestamp(meta) {
+  if ("X-Timestamp" in meta[1]) {
+    return meta[1]["X-Timestamp"];
+  }
+  return "";
+}
+
+export async function getTimestampForContainer(project, containerName, signal) {
+  const meta = await getContainerMeta(project, containerName, signal);
+  return extractContainerTimestamp(meta);
+}
+
 export async function getMetadataForSharedContainer(
   project,
   containerName,
@@ -217,8 +229,13 @@ export async function getTagsForObjects(
   );
 
   if (meta) {
-    meta.map((item) => (item[1] = extractTags(item)));
+    meta.map((item) => {
+      item[0] = item[0].includes("%2C") ?
+        item[0].replace(/%2C/g, ",") : item[0];
+      item[1] = extractTags(item);
+    });
   }
+
   return meta;
 }
 
@@ -332,8 +349,10 @@ export function sortObjects(objects, sortBy, sortDirection) {
 // Parse date and time into internationalized format
 export function parseDateTime(locale, value, shortDate) {
   let dateLocale;
-  const date = new Date(value);
   let dateOptions = {};
+  // In mode DEV, the value of date is not in correct ISO format,
+  // lacking 'Z' at the end after 'seconds'
+  const date = new Date(value.endsWith("Z") ? value : `${value}Z`);
 
   switch (locale) {
     case "fi": {
@@ -346,7 +365,6 @@ export function parseDateTime(locale, value, shortDate) {
   }
 
   shortDate ?
-
     dateOptions = {
       day: "numeric",
       month: "short",

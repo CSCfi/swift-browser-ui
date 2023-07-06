@@ -134,7 +134,7 @@ export default {
           await this.$store.dispatch(
             "updateSharedObjects",
             {
-              project: this.projectID,
+              projectID: this.projectID,
               owner: this.owner,
               container: {
                 name: this.container,

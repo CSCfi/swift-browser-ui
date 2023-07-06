@@ -1,8 +1,10 @@
 // Vuex store for the variables that need to be globally available.
 import { createStore } from "vuex";
 
-import { getContainers } from "@/common/api";
-import { getObjects } from "@/common/api";
+import {
+  getContainers,
+  getObjects,
+} from "@/common/api";
 import {
   DEV,
   getTagsForContainer,
@@ -16,7 +18,12 @@ import {
 } from "@/common/conv";
 
 import { getDB } from "@/common/db";
-import { getSharedContainers } from "@/common/globalFunctions";
+import {
+  getSharingContainers,
+  getSharedContainers,
+  getContainerLastmodified,
+  updateContainerLastmodified,
+} from "@/common/globalFunctions";
 
 const store = createStore({
   state: {
@@ -276,6 +283,9 @@ const store = createStore({
             cont.tokens = cont.name.endsWith("_segments") ?
               [] : tokenize(cont.name);
             cont.projectID = projectID;
+            cont.last_modified =  cont.name.endsWith("_segments") ?
+              cont.last_modified :
+              getContainerLastmodified(existingContainers, cont);
           });
           newContainers = newContainers.concat(containers);
           marker = containers[containers.length - 1].name;
@@ -298,7 +308,14 @@ const store = createStore({
           cont.bytes = bytes;
           cont.count = count;
           cont.name = cont.container;
+
+          const idb_last_modified = getContainerLastmodified(
+            existingContainers, cont);
+          cont.last_modified = !cont.container.endsWith("_segments") &&
+            idb_last_modified  && idb_last_modified > cont.sharingdate ?
+            idb_last_modified : cont.sharingdate;
         }
+
         await getDB()
           .containers.bulkPut(sharedContainers)
           .catch(() => {});
@@ -335,6 +352,7 @@ const store = createStore({
         addSegmentContainerSize(newContainers[i], newContainers);
       }
 
+      const sharingContainers = await getSharingContainers(projectID, signal);
       let containers_to_update_objects = [];
       for (let i = 0; i < newContainers.length; i++) {
         const container = newContainers[i];
@@ -351,6 +369,7 @@ const store = createStore({
             .objects.where({ containerID: oldContainer.id })
             .count();
         }
+
         if (oldContainer !== undefined) {
           if (
             container.count === oldContainer.count &&
@@ -370,7 +389,9 @@ const store = createStore({
           key = await getDB().containers.put(container);
         }
 
-        if (updateObjects && !container.owner) {
+        if (updateObjects ||
+          sharingContainers.some(cont => cont === container.name)
+        ) {
           // Have a separate array contained containers that
           // their objects should be updated
           containers_to_update_objects.push({ container, key });
@@ -384,14 +405,26 @@ const store = createStore({
         for (let i = 0; i < containers_to_update_objects.length; i++) {
           const currentContainer = containers_to_update_objects[i];
 
-          await dispatch("updateObjects", {
-            projectID: projectID,
-            container: {
-              id: currentContainer.key,
-              ...currentContainer.container,
-            },
-            signal: signal,
-          });
+          if (!currentContainer.container.owner) {
+            await dispatch("updateObjects", {
+              projectID: projectID,
+              container: {
+                id: currentContainer.key,
+                ...currentContainer.container,
+              },
+              signal: signal,
+            });
+          } else {
+            await dispatch("updateSharedObjects", {
+              projectID: projectID,
+              owner: currentContainer.container.owner,
+              container: {
+                id: currentContainer.key,
+                ...currentContainer.container,
+              },
+              signal: signal,
+            });
+          }
         }
       };
 
@@ -473,6 +506,7 @@ const store = createStore({
             newObjects.splice(i, 1);
           }
         }
+        updateContainerLastmodified(projectID, container, newObjects);
       }
 
       for (let i = 0; i < newObjects.length; i++) {
@@ -545,6 +579,7 @@ const store = createStore({
             signal,
             owner,
           );
+
           tags.forEach(item => {
             const objectName = item[0];
             const tags = item[1];
@@ -567,7 +602,7 @@ const store = createStore({
     },
     updateSharedObjects: async function (
       { commit, dispatch },
-      { project, owner, container, signal },
+      { projectID, owner, container, signal },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
       let sharedObjects = [];
@@ -581,7 +616,7 @@ const store = createStore({
 
       do {
         objects = await getObjects(
-          project,
+          projectID,
           container.name,
           marker,
           signal,
@@ -604,7 +639,7 @@ const store = createStore({
 
       if (!isSegmentsContainer) {
         const segment_objects = await getObjects(
-          project,
+          projectID,
           `${container.name}_segments`,
           "",
           signal,
@@ -619,8 +654,10 @@ const store = createStore({
 
       commit("updateObjects", sharedObjects);
 
+      updateContainerLastmodified(projectID, container, sharedObjects);
+
       dispatch("updateObjectTags", {
-        projectID: project,
+        projectID: projectID,
         container,
         signal,
         sharedObjects,
