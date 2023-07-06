@@ -187,36 +187,38 @@ export default {
         .toArray();
 
       objects.forEach(obj => {
-        const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
-        const index = subfolders.findIndex(sub => sub.name === subName
-          && sub.container === obj.container);
-        if (index < 0) {
-          let count = 0;
-          //add its subfolders' content
-          const size = objForCount.reduce((result, o) => {
-            if (o.name.startsWith(subName) && o.container === obj.container) {
-              count++;
-              result += o.bytes;
-            }
-            return result;
-          }, 0);
+        if (obj.name.includes("/")) {
+          const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
+          const index = subfolders.findIndex(sub => sub.name === subName
+            && sub.container === obj.container);
+          if (index < 0) {
+            let count = 0;
+            //add its subfolders' content
+            const size = objForCount.reduce((result, o) => {
+              if (o.name.startsWith(subName) && o.container === obj.container) {
+                count++;
+                result += o.bytes;
+              }
+              return result;
+            }, 0);
 
-          let subfolder = {
-            container: obj.container, name: subName,
-            subfolder: true, bytes: size, count: count,
-          };
-
-          //if shared, get owner for routing
-          const sharedIndex = this.sharedConts
-            .findIndex(cont => cont.originalID === obj.containerID);
-
-          if (sharedIndex >= 0) {
-            subfolder = {
-              ...subfolder,
-              owner: this.sharedConts[sharedIndex].owner,
+            let subfolder = {
+              container: obj.container, name: subName,
+              subfolder: true, bytes: size, count: count,
             };
+
+            //if shared, get owner for routing
+            const sharedIndex = this.sharedConts
+              .findIndex(cont => cont.originalID === obj.containerID);
+
+            if (sharedIndex >= 0) {
+              subfolder = {
+                ...subfolder,
+                owner: this.sharedConts[sharedIndex].owner,
+              };
+            }
+            subfolders.push(subfolder);
           }
-          subfolders.push(subfolder);
         }
       });
 
