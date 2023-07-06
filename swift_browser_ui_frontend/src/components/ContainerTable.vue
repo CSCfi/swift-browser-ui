@@ -116,6 +116,12 @@ export default {
     this.abortController.abort();
   },
   methods: {
+    checkListLenght(event){
+      console.log(event.index);
+      if(event.index == 0) {
+        this.paginationOptions.currentPage--;
+      }
+    },
     async getSharingContainers() {
       return this.sharingClient
         ? this.sharingClient.getShare(
@@ -322,6 +328,9 @@ export default {
                           disabled: item.owner,
                         },
                       ],
+                      onClick: (event) =>  {
+                        this.checkListLenght(event);
+                      },
                       customTrigger: {
                         value: this.$t("message.options"),
                         disabled: true,
