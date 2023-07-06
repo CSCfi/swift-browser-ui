@@ -23,6 +23,7 @@ import {
   removeAccessControlMeta,
   GET,
 } from "@/common/api";
+import { DEV } from "@/common/conv";
 
 export default {
   name: "ShareModalTable",
@@ -167,8 +168,6 @@ export default {
         signed.signature,
       );
 
-      console.log(projectIDs);
-
       if (val === "view") {
         await fetch(
           whitelistUrl,
@@ -177,7 +176,7 @@ export default {
             body: JSON.stringify([projectIDs]),
           },
         ).then(() => {
-          console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
+          if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
         });
       } else {
         await fetch(
@@ -187,7 +186,7 @@ export default {
             body: JSON.stringify([projectIDs.name]),
           },
         ).then(() => {
-          console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
+          if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
         });
       }
       this.$emit("updateSharedFolder");
@@ -198,7 +197,7 @@ export default {
         this.folderName,
       ).then(
         async () => {
-          this.$store.state.client.shareDeleteAccess(
+          await this.$store.state.client.shareDeleteAccess(
             this.projectId,
             this.folderName,
             [folderData.projectId.value],
@@ -233,12 +232,16 @@ export default {
               ]),
             },
           ).then(() => {
-            console.log(
+            if (DEV) console.log(
               `Deleted sharing whitelist entry for ${folderData.projectId.value}`,
             );
           });
         },
-      );
+      ).then(() => {
+        if (DEV) console.log(
+          `Share deletion for ${folderData.projectId.value} finished.`,
+        );
+      });
     },
   },
 };
