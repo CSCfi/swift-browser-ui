@@ -338,7 +338,7 @@ export async function swiftCreateContainer(
       //name used in other projects or current
       throw new Error("Container name already in use.");
     }
-    if (ret.status == 400) {
+    if (ret.status == 400 || ret.status == 405) {
       throw new Error("Invalid container or tag name.");
     }
     throw new Error("Container creation unsuccessful.");
