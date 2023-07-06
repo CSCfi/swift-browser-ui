@@ -53,7 +53,7 @@
 import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
 
 const highlightTemplate =
-  "$1<span class='has-background-primary-dark has-text-light hl-1'>$2</span>";
+  "$1<span class='has-background-primary-dark has-text-light hl-1'>$2$3</span>";
 
 export default {
   name: "SearchResultItem",
@@ -68,7 +68,7 @@ export default {
       return this.$props.item.subfolder;
     },
     isContainer: function() {
-      return !this.isSubfolder() && this.$props.item.count;
+      return !this.isSubfolder() && this.$props.item.count !== undefined;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
@@ -95,7 +95,8 @@ export default {
     },
     highlight: function(text) {
       const searchFor = this.searchArray.join("|");
-      const re = new RegExp(`(${tokenizerRE}|\\b)(${searchFor})`, "igu");
+      const re = new RegExp(`(${tokenizerRE})(${searchFor})|(^${searchFor})`, "igu");
+
       if(re.test(text)) {
         text = text.replace(re, highlightTemplate);
       }

@@ -78,19 +78,22 @@ export default {
   },
   methods: {
     onQueryChange: function (event) {
-      const safeQuery = escapeRegExp(event.detail);
-      const query = safeQuery.trim();
-      const newSearchArray = tokenize(query, 0);
-      // Run debounced search every time the search box input changes
-      if (newSearchArray.length > 0 && newSearchArray[0].length > 1) {
-        this.isSearching = true;
-        this.searchArray = newSearchArray;
-        this.debounceSearch();
-      } else {
-        this.isSearching = false;
-        this.searchResults = [];
-        this.searchArray = [];
+      const minLength = 2; //only search if min chars typed in
+      let query = event.detail.trim();
+      if (query.length >= minLength) {
+        query = escapeRegExp(query);
+        const newSearchArray = tokenize(query, minLength);
+        if (newSearchArray.length > 0) {
+          //at least one search token formed
+          this.isSearching = true;
+          this.searchArray = newSearchArray;
+          this.debounceSearch();
+          return;
+        }
       }
+      this.isSearching = false;
+      this.searchResults = [];
+      this.searchArray = [];
     },
     search: async function () {
       if (this.searchArray.length === 0) {
@@ -106,9 +109,11 @@ export default {
         const rankOffset = item.container ? 2.0 : 1.0;
         let match = new Set();
         query.map(q => {
+          const re = new RegExp("^" + q, "i");
+
           if (item.tags !== undefined) {
             item.tags.forEach((tag, i) => {
-              if (tag.startsWith(q)) {
+              if (tag.match(re)) {
                 item.rank = 0.0 + (i + 1) / 10;
                 match.add(q);
                 return;
@@ -116,7 +121,7 @@ export default {
             });
           }
           item.tokens.forEach((token, i) => {
-            if (token.startsWith(q)) {
+            if (token.match(re)) {
               item.rank = rankOffset + (i + 1) / 10;
               match.add(q);
               return;
@@ -130,20 +135,18 @@ export default {
       }
 
       const rankedSort = (a, b) => a.rank - b.rank;
+      const re = new RegExp("^" + query[0], "i");
 
       const containers = await getDB().containers
-        .where("tokens")
-        .startsWith(query[0])
-        .or("tags")
-        .startsWith(query[0])
+        .where({ projectID: this.active.id })
+        .filter(cont => cont.tokens?.find(t => t.match(re))
+          || cont.tags?.find(t => t.match(re)))
         .filter(multipleQueryWordsAndRank)
-        .and(cont => cont.projectID === this.active.id)
         .limit(1000)
         .toArray();
       this.searchResults = containers.map(item => ({
         ...item, value: item.name,
       })).sort(rankedSort).slice(0, 100);
-
 
       const conts = await getDB().containers
         .where({ projectID: this.active.id })
@@ -169,10 +172,8 @@ export default {
       }
 
       const objects = await getDB().objects
-        .where("tokens")
-        .startsWith(query[0])
-        .or("tags")
-        .startsWith(query[0])
+        .filter(obj => obj.tokens?.find(t => t.match(re))
+          || obj.tags?.find(t => t.match(re)))
         .filter(multipleQueryWordsAndRank)
         .and(obj => containerIDs.includes(obj.containerID))
         .limit(1000)
@@ -180,17 +181,20 @@ export default {
 
       let subfolders = [];
 
-      objects.forEach(obj => {
-        const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
-        const subShortName = subName.split("/").slice(-1)[0];
+      const objForCount = await getDB().objects
+        .filter(obj => containerIDs.includes(obj.containerID))
+        .limit(1000)
+        .toArray();
 
-        if (subShortName.includes(query[0])) { //query not in other subfolders
+      objects.forEach(obj => {
+        if (obj.name.includes("/")) {
+          const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
           const index = subfolders.findIndex(sub => sub.name === subName
             && sub.container === obj.container);
           if (index < 0) {
             let count = 0;
             //add its subfolders' content
-            const size = objects.reduce((result, o) => {
+            const size = objForCount.reduce((result, o) => {
               if (o.name.startsWith(subName) && o.container === obj.container) {
                 count++;
                 result += o.bytes;
