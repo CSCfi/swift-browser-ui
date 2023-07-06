@@ -142,8 +142,8 @@ export default {
                   title: this.$t("message.remove"),
                   type: "error",
                   path: mdiDelete,
-                  onClick: ({ data: { identifier } }) =>
-                    this.deleteToken(identifier.value),
+                  onClick: ({ data: { identifier }, index }) =>
+                    this.deleteToken(identifier.value, index),
                 },
               },
             },
@@ -251,7 +251,7 @@ export default {
         });
       }
     },
-    deleteToken: function (identifier) {
+    deleteToken: function (identifier, index) {
       removeToken(
         this.activeId,
         identifier,
@@ -269,6 +269,10 @@ export default {
         );
         this.getTokens();
       });
+      console.log(index);
+      if(index == 0){
+        this.currentPage--;
+      }
     },
   },
 };
