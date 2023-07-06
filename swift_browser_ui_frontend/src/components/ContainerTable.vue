@@ -116,8 +116,7 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    checkListLenght(event){
-      console.log(event.index);
+    checkListLength(event){
       if(event.index == 0) {
         this.paginationOptions.currentPage--;
       }
@@ -329,7 +328,7 @@ export default {
                         },
                       ],
                       onClick: (event) =>  {
-                        this.checkListLenght(event);
+                        this.checkListLength(event);
                       },
                       customTrigger: {
                         value: this.$t("message.options"),

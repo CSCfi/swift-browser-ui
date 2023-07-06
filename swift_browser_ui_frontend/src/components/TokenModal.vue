@@ -269,7 +269,6 @@ export default {
         );
         this.getTokens();
       });
-      console.log(index);
       if(index == 0){
         this.currentPage--;
       }
