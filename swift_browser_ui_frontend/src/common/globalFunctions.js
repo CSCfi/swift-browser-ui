@@ -7,33 +7,33 @@ export function toggleCreateFolderModal() {
 }
 
 export function toggleEditTagsModal(objectName, containerName) {
-  store.commit("toggleEditTagsModal", true);
   if (objectName) {
     store.commit("setObjectName", objectName);
   }
   if (containerName) {
     store.commit("setFolderName", containerName);
   }
+  store.commit("toggleEditTagsModal", true);
 }
 
 export function toggleCopyFolderModal(folderName, sourceProjectId) {
-  store.commit("toggleCopyFolderModal", true);
   if (folderName) {
     store.commit("setFolderName", folderName);
   }
   if(sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
+  store.commit("toggleCopyFolderModal", true);
 }
 
 export function toggleDeleteModal(objects, containerName) {
-  store.commit("toggleDeleteModal", true);
   if (objects) {
     store.commit("setDeletableObjects", objects);
   }
   if (containerName) {
     store.commit("setFolderName", containerName);
   }
+  store.commit("toggleDeleteModal", true);
 }
 
 export function getProjectNumber(project) {
