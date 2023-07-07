@@ -276,7 +276,7 @@ export default {
                   size: "small",
                   title: this.$t("message.remove"),
                   onClick: ({ data,index }) => {
-                    this.checkListLenght(index);
+                    this.checkListLength(index);
                     this.$store.commit("eraseDropFile", data);
                   },
                 },
@@ -432,7 +432,7 @@ export default {
         this.currentKeyPage--;
       }
     },
-    checkListLenght(index){
+    checkListLength(index){
       if(index == 0){
         this.currentPage--;
       }
