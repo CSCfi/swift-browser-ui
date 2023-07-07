@@ -173,7 +173,7 @@ export default {
           whitelistUrl,
           {
             method: "DELETE",
-            body: JSON.stringify([projectIDs]),
+            body: JSON.stringify([projectIDs.name]),
           },
         ).then(() => {
           if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
@@ -183,7 +183,7 @@ export default {
           whitelistUrl,
           {
             method: "PUT",
-            body: JSON.stringify([projectIDs.name]),
+            body: JSON.stringify([projectIDs]),
           },
         ).then(() => {
           if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
