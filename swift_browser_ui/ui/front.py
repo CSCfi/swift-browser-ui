@@ -118,82 +118,67 @@ async def loginpassword(
         )
 
 
-async def unauth(_: aiohttp.web.Request) -> aiohttp.web.Response:
+async def unauth(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
-    with open(str(setd["static_directory"]) + "/401.html") as f:
-        resp = aiohttp.web.Response(
-            body="".join(f.readlines()),
-            status=401,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-                "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"',
-            },
-        )
-    return resp
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/401.html"),
+        status=401,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"',
+        },
+    )
 
 
-async def forbid(_: aiohttp.web.Request) -> aiohttp.web.Response:
+async def forbid(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
-    with open(str(setd["static_directory"]) + "/403.html") as f:
-        resp = aiohttp.web.Response(
-            body="".join(f.readlines()),
-            status=403,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
-    return resp
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/403.html"),
+        status=403,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
-async def uidown(_: aiohttp.web.Request) -> aiohttp.web.Response:
+async def uidown(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
-    with open(str(setd["static_directory"]) + "/503.html") as f:
-        resp = aiohttp.web.Response(
-            body="".join(f.readlines()),
-            status=503,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
-    return resp
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/503.html"),
+        status=503,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
-async def badrequest(_: aiohttp.web.Request) -> aiohttp.web.Response:
+async def badrequest(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
-    with open(str(setd["static_directory"]) + "/400.html") as f:
-        resp = aiohttp.web.Response(
-            body="".join(f.readlines()),
-            status=400,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
-    return resp
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/400.html"),
+        status=400,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
-async def notfound(_: aiohttp.web.Request) -> aiohttp.web.Response:
+async def notfound(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
-    with open(str(setd["static_directory"]) + "/404.html") as f:
-        resp = aiohttp.web.Response(
-            body="".join(f.readlines()),
-            status=404,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
-    return resp
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/404.html"),
+        status=404,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )

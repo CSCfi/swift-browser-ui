@@ -15,19 +15,17 @@ AiohttpHandler = typing.Callable[
 ]
 
 
-def return_error_response(error_code: int) -> web.Response:
+def return_error_response(error_code: int) -> web.FileResponse:
     """Return the correct error page with correct status code."""
-    with open(str(setd["static_directory"]) + "/" + str(error_code) + ".html") as f:
-        resp = web.Response(
-            body="".join(f.readlines()),
-            status=error_code,
-            content_type="text/html",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
+    resp = web.FileResponse(
+        path=str(f"{setd['static_directory']}/{str(error_code)}.html"),
+        status=error_code,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
     if error_code == 401:
         resp.headers["WWW-Authenticate"] = 'Bearer realm="/", charset="UTF-8"'
     return resp
@@ -124,7 +122,9 @@ async def check_session_taintness(
 
 
 @web.middleware
-async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web.Response:
+async def error_middleware(
+    request: web.Request, handler: AiohttpHandler
+) -> web.Response | web.FileResponse:
     """Return the correct HTTP Error page."""
     to_process = {400, 401, 403, 404}
     container_errors = {405, 409}
