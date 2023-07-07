@@ -270,7 +270,7 @@ export default {
                           toggleEditTagsModal(item.name, null);
                         }
                       },
-                      disabled: isSubfolder || this.accessRights.length === 1,
+                      disabled: isSubfolder || this.accessRights.length <= 1,
                     },
                   },
                 },
@@ -291,7 +291,7 @@ export default {
                           this.$emit("delete-object", item);
                         }
                       },
-                      disabled: this.accessRights.length === 1,
+                      disabled: this.accessRights.length <= 1,
                     },
                   },
                 },
