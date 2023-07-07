@@ -161,7 +161,7 @@ export async function getObjects(
   }
   let objects = await GET(objUrl, signal);
 
-  if (objects.status == 200 && !signal?.aborted) {
+  if (objects?.status == 200 && !signal?.aborted) {
     objects = await objects.json();
     for (let i = 0; i < objects.length; i++) {
       if (shared) {
