@@ -395,8 +395,7 @@ async def handle_check_sharing_whitelist(
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     container = request.match_info["container"]
-
-    receiver = request.query["receiver"]
+    receiver = request.match_info["receiver"]
 
     resp = await vault_client.get_project_whitelist(project, receiver, container)
 
