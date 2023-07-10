@@ -275,8 +275,7 @@ export default {
                   text: true,
                   size: "small",
                   title: this.$t("message.remove"),
-                  onClick: ({ data,index }) => {
-                    this.checkListLength(index);
+                  onClick: ({ data }) => {
                     this.$store.commit("eraseDropFile", data);
                   },
                 },
@@ -308,7 +307,6 @@ export default {
                   size: "small",
                   title: this.$t("message.remove"),
                   onClick: ({ index }) =>{
-                    this.checkKeyListLength(index);
                     this.recvHashedKeys.splice(index, 1);
                     this.recvkeys.splice(index, 1);
                   },
@@ -427,21 +425,21 @@ export default {
     },
   },
   methods: {
-    checkKeyListLength(index){
-      if(index == 0){
-        this.currentKeyPage--;
-      }
-    },
-    checkListLength(index){
-      if(index == 0){
+    checkPage(event) {
+      this.currentPage = event.target.pagination.currentPage;
+      if((event.target.pagination.currentPage - 1) *
+        event.target.pagination.itemsPerPage
+        == event.target.pagination.itemCount){
         this.currentPage--;
       }
     },
-    checkPage(event) {
-      this.currentPage = event.target.pagination.currentPage;
-    },
     checkKeyPage(event){
       this.currentKeyPage = event.target.pagination.currentPage;
+      if((event.target.pagination.currentPage - 1) *
+        event.target.pagination.itemsPerPage
+        == event.target.pagination.itemCount){
+        this.currentPage--;
+      }
     },
     appendDropFiles(file) {
       //Checking for identical path only, not name:

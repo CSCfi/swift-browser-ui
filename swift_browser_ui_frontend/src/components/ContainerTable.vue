@@ -116,8 +116,10 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    checkListLength(event){
-      if(event.index == 0) {
+    checkListLength(){
+      if(this.paginationOptions.itemCount -1 ==
+        (this.paginationOptions.currentPage - 1)
+        * this.paginationOptions.itemsPerPage){
         this.paginationOptions.currentPage--;
       }
     },
@@ -321,15 +323,19 @@ export default {
                         },
                         {
                           name: this.$t("message.delete"),
+                          onClick: (event) =>  {
+                            console.log("here");
+                            this.checkListLength(event);
+                          },
                           action: () => this.delete(
-                            item.name, item.count,
+                            item.name, item.count,this.checkListLength(),
+
                           ),
                           disabled: item.owner,
                         },
+
                       ],
-                      onClick: (event) =>  {
-                        this.checkListLength(event);
-                      },
+
                       customTrigger: {
                         value: this.$t("message.options"),
                         disabled: true,
