@@ -142,9 +142,8 @@ export default {
                   title: this.$t("message.remove"),
                   type: "error",
                   path: mdiDelete,
-                  onClick: ({ data: { identifier }}) => {
-                    this.deleteToken(identifier.value);
-                  },
+                  onClick: ({ data: { identifier }}) =>
+                    this.deleteToken(identifier.value),
                 },
               },
             },

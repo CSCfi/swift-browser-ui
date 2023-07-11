@@ -180,6 +180,7 @@ import {
   getSharedContainers,
   getAccessDetails,
   validateFolderName,
+  checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -275,9 +276,8 @@ export default {
                   text: true,
                   size: "small",
                   title: this.$t("message.remove"),
-                  onClick: ({ data }) => {
-                    this.$store.commit("eraseDropFile", data);
-                  },
+                  onClick: ({ data }) =>
+                    this.$store.commit("eraseDropFile", data),
                 },
               },
             },
@@ -427,19 +427,21 @@ export default {
   methods: {
     checkPage(event) {
       this.currentPage = event.target.pagination.currentPage;
-      if((event.target.pagination.currentPage - 1) *
-        event.target.pagination.itemsPerPage
-        == event.target.pagination.itemCount){
-        this.currentPage--;
-      }
+      this.currentPage = checkIfItemIsLastOnPage(
+        {
+          currentPage: event.target.pagination.currentPage ,
+          itemsPerPage: event.target.pagination.itemsPerPage,
+          itemCount: (event.target.pagination.itemCount + 1),
+        });
     },
     checkKeyPage(event){
       this.currentKeyPage = event.target.pagination.currentPage;
-      if((event.target.pagination.currentPage - 1) *
-        event.target.pagination.itemsPerPage
-        == event.target.pagination.itemCount){
-        this.currentPage--;
-      }
+      this.currentKeyPage = checkIfItemIsLastOnPage(
+        {
+          currentPage: event.target.pagination.currentPage,
+          temsPerPage: event.target.pagination.itemsPerPage,
+          itemCount: event.target.pagination.itemCount + 1,
+        });
     },
     appendDropFiles(file) {
       //Checking for identical path only, not name:

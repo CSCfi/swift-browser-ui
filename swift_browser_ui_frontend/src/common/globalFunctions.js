@@ -190,3 +190,13 @@ export async function updateContainerLastmodified(
       .modify({ last_modified: cont_last_modified });
   }
 }
+
+export function checkIfItemIsLastOnPage(paginationOptions){
+  //Checks if item is last on page and reverts to previous page
+  if(paginationOptions.itemCount -1 ==
+    (paginationOptions.currentPage - 1)
+    * paginationOptions.itemsPerPage){
+    return paginationOptions.currentPage-=1;
+  }
+  return paginationOptions.currentPage;
+}

@@ -47,6 +47,7 @@ import {
   getFolderName,
   getPrefix,
   getPaginationOptions,
+  checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
 
 import {
@@ -291,6 +292,8 @@ export default {
                       path: mdiDeleteOutline,
                       onClick: () => {
                         this.$emit("delete-object", item);
+                        this.paginationOptions.currentPage =
+                          checkIfItemIsLastOnPage(this.paginationOptions);
                       },
                       onKeyUp: (event) => {
                         if(event.keyCode === 13) {

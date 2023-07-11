@@ -41,6 +41,7 @@ import {
   getAccessDetails,
   getPaginationOptions,
   toggleCopyFolderModal,
+  checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
@@ -116,13 +117,6 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    checkListLength(){
-      if(this.paginationOptions.itemCount -1 ==
-        (this.paginationOptions.currentPage - 1)
-        * this.paginationOptions.itemsPerPage){
-        this.paginationOptions.currentPage--;
-      }
-    },
     async getSharingContainers() {
       return this.sharingClient
         ? this.sharingClient.getShare(
@@ -323,12 +317,10 @@ export default {
                         },
                         {
                           name: this.$t("message.delete"),
-                          onClick: (event) =>  {
-                            console.log("here");
-                            this.checkListLength(event);
-                          },
                           action: () => this.delete(
-                            item.name, item.count,this.checkListLength(),
+                            item.name, item.count,
+                            this.paginationOptions.currentPage =
+                              checkIfItemIsLastOnPage(this.paginationOptions),
 
                           ),
                           disabled: item.owner,
