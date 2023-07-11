@@ -65,23 +65,23 @@ describe("Switch Languages after login", function () {
 
 describe("Display mobile navigation on small resolution", function () {
   beforeEach(function () {
-    cy.viewport(720, 1280)
+    cy.viewport(720, 1280);
     cy.visit(Cypress.config().baseUrl);
     cy.login(" Log In with SSO ");
   });
 
   afterEach(function () {
-    cy.get('c-navigationbutton').click();
-    cy.get('c-sidenavigationitem').contains(Cypress.env('username')).click();
+    cy.get("c-navigationbutton").click();
+    cy.get("c-sidenavigationitem").contains(Cypress.env("username")).click();
     cy.get('[data-testid="logout"]').click();
   });
 
   it("should change language within mobile navigation", function () {
-    cy.get('c-navigationbutton').click();
-    cy.get('c-sidenavigationitem').contains('In English').click();
-    cy.get('c-subnavigationitem').contains('Suomeksi').click();
+    cy.get("c-navigationbutton").click();
+    cy.get("c-sidenavigationitem").contains("In English").click();
+    cy.get("c-subnavigationitem").contains("Suomeksi").click();
     cy.get('[data-testid="project-selector"]')
       .find("label")
       .contains("Valitse projekti");
-  })
+  });
 });

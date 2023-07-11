@@ -20,12 +20,16 @@ module.exports = defineConfig({
       // eslint-disable-next-line
       return require("./../tests/cypress/plugins/index.js")(on, config);
     },
-    baseUrl: "http://localhost:8000",
+    // baseUrl: "https://172.17.0.1:8081/",
+    baseUrl: "https://sd-connect.dev:8081/",
+
     specPattern: "../tests/cypress/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "../tests/cypress/support/index.js",
   },
   env: {
     username: "swift",
     password: "veryfast",
+    wrongusername: "swif11t",
+    wrongpassword: "very11fast",
   },
 });

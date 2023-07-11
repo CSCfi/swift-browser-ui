@@ -92,6 +92,7 @@
       <div class="navbar-item">
         <c-button
           :disabled="isUploading"
+          data-testid="upload-file"
           @click="toggleUploadModal"
           @keyup.enter="toggleUploadModal"
         >
@@ -103,9 +104,7 @@
 </template>
 
 <script>
-import {
-  toggleCreateFolderModal,
-} from "@/common/globalFunctions";
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
 import { mdiInformationOutline } from "@mdi/js";
 
 export default {
@@ -128,7 +127,10 @@ export default {
     // C-select component handles options by name and value props
     // Append value-prop to projects
     mappedProjects() {
-      return this.projects.map(project => ({ ...project, value: project.id }));
+      return this.projects.map((project) => ({
+        ...project,
+        value: project.id,
+      }));
     },
     isUploading() {
       return this.$store.state.isUploading;
@@ -141,7 +143,7 @@ export default {
       if (item.id !== this.active.id) {
         const navigationParams = {
           name: "AllFolders",
-          params: {user: this.uname, project: item.id},
+          params: { user: this.uname, project: item.id },
         };
         // Updates URL, and then refreshes the page
         this.$router.push(navigationParams).then(() => {
@@ -160,27 +162,32 @@ export default {
         progress: false,
       };
       if (!this.copy) {
-        navigator.clipboard.writeText(this.active.id).then(() => {
-          this.copy = true;
-          document.querySelector("#copy-toasts").addToast(
-            { ...toastMessage,
+        navigator.clipboard.writeText(this.active.id).then(
+          () => {
+            this.copy = true;
+            document.querySelector("#copy-toasts").addToast({
+              ...toastMessage,
               type: "success",
-              message: this.$t("message.copied")},
-          );
-          // avoid multiple clicks of copy button
-          // that can stack up the toasts
-          // by setting the value for 'copy'
-          setTimeout(() => { this.copy = false; }, 6000);
-        },() => {
-          document.querySelector("#copy-toasts").addToast(
-            { ...toastMessage,
+              message: this.$t("message.copied"),
+            });
+            // avoid multiple clicks of copy button
+            // that can stack up the toasts
+            // by setting the value for 'copy'
+            setTimeout(() => {
+              this.copy = false;
+            }, 6000);
+          },
+          () => {
+            document.querySelector("#copy-toasts").addToast({
+              ...toastMessage,
               type: "error",
-              message: this.$t("message.copy_failed")},
-          );
-        });
+              message: this.$t("message.copy_failed"),
+            });
+          },
+        );
       }
     },
-    handleRefreshClick: function() {
+    handleRefreshClick: function () {
       document.querySelector("#refresh-toasts").removeToast("refresh-toast");
       location.reload();
     },
@@ -189,109 +196,111 @@ export default {
 </script>
 
 <style scoped lang="scss">
+#secondary-navbar {
+  border-bottom: 6px solid $csc-primary-light;
+}
 
-  #secondary-navbar {
-    border-bottom: 6px solid $csc-primary-light;
-  }
+.container {
+  display: flex;
+  padding: 0.5rem 1rem !important;
+  flex-wrap: wrap;
+}
 
-  .container {
-    display: flex;
-    padding: 0.5rem 1rem !important;
-    flex-wrap: wrap;
-  }
+.navbar-item {
+  height: 100%;
+  align-self: center;
+}
 
-  .navbar-item {
-    height: 100%;
-    align-self: center;
-  }
+c-toasts {
+  width: fit-content;
+}
 
-  c-toasts {
-    width: fit-content;
-  }
+.select-project,
+.column {
+  min-width: 15rem;
+  flex: 0.5;
+}
 
-  .select-project, .column {
-    min-width: 15rem;
-    flex: 0.5;
-  }
+c-select {
+  flex: 1;
+}
 
-  c-select {
-    flex: 1;
-  }
-
-  @media screen and (max-width: 767px) {
-    .select-project, .column {
-      width: 100%;
-      flex: auto;
-    }
-  }
-
-  .tooltip {
-    position: relative;
-    display: inline-block;
-  }
-
-  c-icon {
-    margin-left: 0.5rem;
-  }
-
-  .tooltip-content {
-    visibility: hidden;
-    text-align: left;
-    width: 20rem;
-    background-color: $white;
-    color: $text;
-    border: 1px solid $csc-primary;
-    border-radius: 0.375rem;
-    padding: 1rem;
-    font-size: 14px;
-    line-height: 16px;
-
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 5;
-    top: 150%;
-    left: 50%;
-    margin-left: -10rem;
-  }
-
-  .tooltip:hover .tooltip-content, .tooltip:focus-within .tooltip-content {
-    visibility: visible;
-  }
-
-  .tooltip-content::before {
-    content: " ";
-    position: absolute;
-    left: 48%;
-    bottom: 100%;
-    width: 0;
-    height: 0;
-    border: 0.7rem solid transparent;
-    border-bottom-color: $csc-primary;
-  }
-  .tooltip-content::after {
-    content: " ";
-    position: absolute;
-    left: 52%;
-    bottom: 100%;
-    width: 0;
-    height: 0;
-    margin-left: -0.75rem;
-    border: 0.65rem solid transparent;
-    border-bottom-color: $white;
-  }
-
+@media screen and (max-width: 767px) {
+  .select-project,
   .column {
-    flex-direction: column;
-    padding: 0 0 0 1.5rem;
-    color: var(--csc-dark-grey);
+    width: 100%;
+    flex: auto;
   }
+}
 
-  .project-number {
-    font-size: 0.875rem;
-  }
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
 
-  .label {
-    font-weight: 400;
-    font-size: 0.75rem;
-  }
-  </style>
+c-icon {
+  margin-left: 0.5rem;
+}
+
+.tooltip-content {
+  visibility: hidden;
+  text-align: left;
+  width: 20rem;
+  background-color: $white;
+  color: $text;
+  border: 1px solid $csc-primary;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  font-size: 14px;
+  line-height: 16px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 5;
+  top: 150%;
+  left: 50%;
+  margin-left: -10rem;
+}
+
+.tooltip:hover .tooltip-content,
+.tooltip:focus-within .tooltip-content {
+  visibility: visible;
+}
+
+.tooltip-content::before {
+  content: " ";
+  position: absolute;
+  left: 48%;
+  bottom: 100%;
+  width: 0;
+  height: 0;
+  border: 0.7rem solid transparent;
+  border-bottom-color: $csc-primary;
+}
+.tooltip-content::after {
+  content: " ";
+  position: absolute;
+  left: 52%;
+  bottom: 100%;
+  width: 0;
+  height: 0;
+  margin-left: -0.75rem;
+  border: 0.65rem solid transparent;
+  border-bottom-color: $white;
+}
+
+.column {
+  flex-direction: column;
+  padding: 0 0 0 1.5rem;
+  color: var(--csc-dark-grey);
+}
+
+.project-number {
+  font-size: 0.875rem;
+}
+
+.label {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+</style>
