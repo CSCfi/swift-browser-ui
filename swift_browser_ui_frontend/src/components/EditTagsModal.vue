@@ -65,6 +65,9 @@ export default {
     };
   },
   computed: {
+    visible() {
+      return this.$store.state.openEditTagsModal;
+    },
     selectedObjectName() {
       return this.$store.state.selectedObjectName.length > 0
         ? this.$store.state.selectedObjectName
@@ -83,16 +86,16 @@ export default {
     },
   },
   watch: {
-    selectedObjectName: function () {
-      if (this.selectedObjectName?.length > 0) {
-        this.isObject = true;
-        this.getObject();
-      }
-    },
-    selectedFolderName: function () {
-      if (this.selectedFolderName?.length > 0) {
-        this.isObject = false;
-        this.getContainer();
+    visible: function () {
+      if (this.visible) {
+        if (this.selectedObjectName?.length > 0) {
+          this.isObject = true;
+          this.getObject();
+        }
+        else if (this.selectedFolderName?.length > 0) {
+          this.isObject = false;
+          this.getContainer();
+        }
       }
     },
   },

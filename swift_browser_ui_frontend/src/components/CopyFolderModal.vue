@@ -97,19 +97,26 @@ export default {
     sourceProjectId() {
       return this.$store.state.sourceProjectId;
     },
+    visible() {
+      return this.$store.state.openCopyFolderModal;
+    },
   },
   watch: {
-    selectedFolderName: function () {
-      if (this.selectedFolderName && this.selectedFolderName.length > 0) {
-        this.fetchFolders().then(() => {
-          if(this.folders && this.folders.length > 0) {
-            this.getCopyFolder(this.selectedFolderName);
-          }
-        });
+    visible: function () {
+      if (this.visible) {
+        if (this.selectedFolderName && this.selectedFolderName.length > 0) {
+          this.fetchFolders().then(() => {
+            if(this.folders && this.folders.length > 0) {
+              this.getCopyFolder(this.selectedFolderName);
+            }
+          });
+        }
       }
     },
     folderName() {
-      this.checkValidity();
+      if (this.folderName) {
+        this.checkValidity();
+      }
     },
   },
   methods: {

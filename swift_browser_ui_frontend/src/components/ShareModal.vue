@@ -188,13 +188,16 @@ export default {
     locale () {
       return this.$i18n.locale;
     },
+    visible() {
+      return this.$store.state.openShareModal;
+    },
   },
   watch: {
     locale: function () {
       this.setAccessRights();
     },
-    folderName: function () {
-      if (this.folderName) this.getSharedDetails();
+    visible: function () {
+      if (this.visible && this.folderName) this.getSharedDetails();
     },
     read: function () {
       if(!this.read) {

@@ -135,6 +135,7 @@ export default {
     },
   },
   methods: {
+    toggleCreateFolderModal,
     changeActive(event) {
       const item = event.target.value;
       if (item.id !== this.active.id) {
@@ -147,9 +148,6 @@ export default {
           this.$router.go(0);
         });
       }
-    },
-    toggleCreateFolderModal: function (folderName) {
-      toggleCreateFolderModal(folderName);
     },
     toggleUploadModal: function () {
       this.$store.commit("setFilesAdded", true);

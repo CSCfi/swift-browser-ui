@@ -113,6 +113,9 @@ export default {
     };
   },
   computed: {
+    visible() {
+      return this.$store.state.openTokenModal;
+    },
     activeId() {
       return this.$store.state.active.id;
     },
@@ -171,8 +174,8 @@ export default {
     },
   },
   watch: {
-    activeId () {
-      this.getTokens(this.activeId);
+    visible () {
+      if (this.visible) this.getTokens(this.activeId);
     },
   },
   methods: {
