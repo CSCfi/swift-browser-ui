@@ -439,7 +439,7 @@ export default {
       this.currentKeyPage = checkIfItemIsLastOnPage(
         {
           currentPage: event.target.pagination.currentPage,
-          temsPerPage: event.target.pagination.itemsPerPage,
+          itemsPerPage: event.target.pagination.itemsPerPage,
           itemCount: event.target.pagination.itemCount + 1,
         });
     },
