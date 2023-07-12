@@ -234,7 +234,8 @@ export default {
               value: getSharedStatus(item.name),
             },
             last_modified: {
-              value: parseDateTime(this.locale, item.last_modified, false),
+              value: parseDateTime(
+                this.locale, item.last_modified, this.$t, false),
             },
             actions: {
               value: null,

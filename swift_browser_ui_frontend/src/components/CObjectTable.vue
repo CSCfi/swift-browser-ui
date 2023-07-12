@@ -211,7 +211,8 @@ export default {
               value: getItemSize(item, filteredObjs, this.$route),
             },
             last_modified: {
-              value: parseDateTime(this.locale, item.last_modified, false),
+              value: parseDateTime(
+                this.locale, item.last_modified, this.$t, false),
             },
             ...(this.hideTags ? {} : {
               tags: {

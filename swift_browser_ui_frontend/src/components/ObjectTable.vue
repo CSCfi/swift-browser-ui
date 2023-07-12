@@ -315,7 +315,8 @@ export default {
                 }
                 this.ownerProject = sharedDetails.owner;
                 this.dateOfSharing =
-                  parseDateTime(this.locale, sharedDetails.sharingDate, true);
+                  parseDateTime(
+                    this.locale, sharedDetails.sharingDate, this.$t, true);
               }
               else this.sharedStatus
                 = this.$t("message.folderDetails.notShared");

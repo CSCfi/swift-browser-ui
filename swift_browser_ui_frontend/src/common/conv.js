@@ -351,7 +351,8 @@ export function sortObjects(objects, sortBy, sortDirection) {
 }
 
 // Parse date and time into internationalized format
-export function parseDateTime(locale, value, shortDate) {
+export function parseDateTime(locale, value, t, shortDate) {
+  if (!value) return t("message.table.unknown_date");
   let dateLocale;
   let dateOptions = {};
   // In mode DEV, the value of date is not in correct ISO format,
