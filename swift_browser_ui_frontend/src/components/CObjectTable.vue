@@ -135,6 +135,10 @@ export default {
   beforeUpdate() {
     this.getPage();
   },
+  updated(){
+    this.paginationOptions.currentPage =
+      checkIfItemIsLastOnPage(this.paginationOptions);
+  },
   methods: {
     changeFolder: function (folder) {
       this.$router.push(
@@ -292,8 +296,6 @@ export default {
                       path: mdiDeleteOutline,
                       onClick: () => {
                         this.$emit("delete-object", item);
-                        this.paginationOptions.currentPage =
-                          checkIfItemIsLastOnPage(this.paginationOptions);
                       },
                       onKeyUp: (event) => {
                         if(event.keyCode === 13) {

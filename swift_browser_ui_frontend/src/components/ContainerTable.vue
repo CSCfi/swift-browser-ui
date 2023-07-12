@@ -320,7 +320,14 @@ export default {
                           action: () => this.delete(
                             item.name, item.count,
                             this.paginationOptions.currentPage =
-                              checkIfItemIsLastOnPage(this.paginationOptions),
+                              checkIfItemIsLastOnPage({
+                                currentPage:
+                                  this.paginationOptions.currentPage,
+                                itemsPerPage:
+                                  this.paginationOptions.itemsPerPage,
+                                itemCount:
+                                  this.paginationOptions.itemCount - 1,
+                              }),
 
                           ),
                           disabled: item.owner,

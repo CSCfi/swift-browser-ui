@@ -193,8 +193,12 @@ export async function updateContainerLastmodified(
 
 export function checkIfItemIsLastOnPage(paginationOptions){
   //Checks if item is last on page and reverts to previous page
-  if(paginationOptions.itemCount -1 ==
-    (paginationOptions.currentPage - 1)
+  var currentPage = paginationOptions.currentPage - 1;
+  if(currentPage == 0){
+    return 1;
+  }
+  if(paginationOptions.itemCount ==
+    (currentPage)
     * paginationOptions.itemsPerPage){
     return paginationOptions.currentPage-=1;
   }

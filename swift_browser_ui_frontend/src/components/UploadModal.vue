@@ -431,7 +431,7 @@ export default {
         {
           currentPage: event.target.pagination.currentPage ,
           itemsPerPage: event.target.pagination.itemsPerPage,
-          itemCount: (event.target.pagination.itemCount + 1),
+          itemCount: event.target.pagination.itemCount,
         });
     },
     checkKeyPage(event){
@@ -440,7 +440,7 @@ export default {
         {
           currentPage: event.target.pagination.currentPage,
           itemsPerPage: event.target.pagination.itemsPerPage,
-          itemCount: event.target.pagination.itemCount + 1,
+          itemCount: event.target.pagination.itemCount,
         });
     },
     appendDropFiles(file) {
