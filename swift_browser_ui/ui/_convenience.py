@@ -126,8 +126,7 @@ async def get_availability_from_token(
 
     if len(filtered_projects) == 0:
         raise aiohttp.web.HTTPForbidden(
-            reason="Thre is no project available for this user.",
-            headers={"WWW-Authenticate": 'Bearer realm="/", charset="UTF-8"'},
+            reason="There are no projects available for this user.",
         )
 
     # Return all project names and domain names inside a dictionary
