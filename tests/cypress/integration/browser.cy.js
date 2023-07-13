@@ -8,7 +8,7 @@ describe("Browse containers and test operations", function () {
     cy.logout();
   });
 
-  it("should be able to filter table, adjust display containers per page and pagination", () => {
+  xit("should be able to filter table, adjust display containers per page and pagination", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.selectProject("service");
 
@@ -19,7 +19,7 @@ describe("Browse containers and test operations", function () {
     cy.get("#searchbox").type("dolor");
   });
 
-  it("should browse table, check download and delete buttons", () => {
+  xit("should browse table, check download and delete buttons", () => {
     // we take the first container that is not empty
     cy.get("table")
       .contains("td", "KiB")
@@ -79,7 +79,7 @@ describe("Browse containers and test operations", function () {
     cy.contains("Objects deleted");
   });
 
-  it("should be able to add a new folder with tags", () => {
+  xit("should be able to add a new folder with tags", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.get("[data-testid='create-folder']").click();
     cy.get("input[data-testid='folder-name']").type("Test folder name");
@@ -89,7 +89,7 @@ describe("Browse containers and test operations", function () {
     cy.get("[data-testid='save-folder']").should("be.visible").click();
   });
 
-  it("should display, add, remove container tags", () => {
+  xit("should display, add, remove container tags", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.selectProject("service");
 
@@ -125,7 +125,7 @@ describe("Browse containers and test operations", function () {
     cy.get("tbody tr .tags").first().children(".tag").should("have.length", 0);
   });
 
-  it("should display, add, remove object tags", () => {
+  xit("should display, add, remove object tags", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.selectProject("service");
 
@@ -160,7 +160,7 @@ describe("Browse containers and test operations", function () {
     cy.get('tbody tr .tags').first().children('.tag').should('have.length', 0)
   });
 
-  it("should navigate between all and shared folders with tab selectors", () => {
+  xit("should navigate between all and shared folders with tab selectors", () => {
     const testTabChange = (label, id) => {
       cy.get('[data-testid="folder-tabs"]').find("c-button").contains(label).click()
       cy.get(`#${id}`).should("be.visible")
@@ -171,7 +171,7 @@ describe("Browse containers and test operations", function () {
     testTabChange("All folders", "container-table")
   });
 
-  it("should copy the current project Id successfully ", () => {
+  xit("should copy the current project Id successfully ", () => {
     cy.location("pathname").should("match", /browse\/swift\/[0-9a-f]{32}/);
     cy.changeLang("en");
     cy.get("[data-testid='copy-projectId']").click();

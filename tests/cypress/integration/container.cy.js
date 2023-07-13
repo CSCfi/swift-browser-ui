@@ -11,7 +11,8 @@ describe("Creates and shows a container with unique name, checks existence", fun
 
     // add new folder with a unique name and show it
     cy.addFolder(randomName);
-    cy.contains(randomName, { timeout: 45000 }).should("exist");
+    cy.wait(45000)
+    cy.contains(randomName).should("exist");
 
     // delete folder after checking it is there
     cy.deleteFolder(randomName);
