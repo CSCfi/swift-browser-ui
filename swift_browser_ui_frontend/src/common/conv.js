@@ -355,11 +355,22 @@ export const DEV = import.meta.env.MODE === "development";
 
 export function sortObjects(objects, sortBy, sortDirection) {
   sortBy = sortBy === "size" ? "bytes"
-    : sortBy === "items" ? "count" : sortBy;
+    : sortBy === "items" ? "count"
+      : sortBy === "last_activity" ? "last_modified" : sortBy;
 
   objects.sort((a, b) => {
     let valueA = a[sortBy];
     let valueB = b[sortBy];
+
+    if (sortBy === "last_modified") {
+      //get timestamp from string
+      valueA = Date.parse(valueA.endsWith("Z") ? valueA : `${valueA}Z`);
+      valueB = Date.parse(valueB.endsWith("Z") ? valueB : `${valueB}Z`);
+      if (sortDirection === "asc") {
+        return valueA - valueB;
+      }
+      return valueB - valueA;
+    }
 
     // Handle tags as single string
     if (Array.isArray(valueA)) {
