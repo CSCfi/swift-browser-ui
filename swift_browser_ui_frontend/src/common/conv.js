@@ -6,6 +6,9 @@ import {
 } from "@/common/api";
 import { getDB } from "@/common/db";
 import { getFolderName } from "@/common/globalFunctions";
+import moment from "moment";
+import "moment/dist/locale/fi";
+import "moment/dist/locale/en-gb";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -425,6 +428,12 @@ export function parseDateTime(locale, value, t, shortDate) {
   // Replace Finnish "at" time indicator with comma
   // English version defaults to comma
   return dateTimeFormat.replace(" klo", ", ");
+}
+
+export function parseDateFromNow(locale, value) {
+  moment.locale(locale);
+  const date = new Date(value.endsWith("Z") ? value : `${value}Z`);
+  return moment(date).locale(locale).fromNow();
 }
 
 // Find the segments container matching a container (if it exists) and

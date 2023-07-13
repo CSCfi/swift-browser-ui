@@ -97,6 +97,7 @@
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
       :render-folders="renderFolders"
+      :show-timestamp="showTimestamp"
       :access-rights="accessRights"
       @selected-rows="handleSelection"
       @delete-object="confirmDelete"
@@ -157,6 +158,7 @@ export default {
       ownerProject: "",
       dateOfSharing: "",
       oList: [],
+      showTimestamp: false,
       hidePagination: false,
       renderFolders: true,
       hideTags: false,
@@ -231,6 +233,7 @@ export default {
       const savedDisplayOptions = this.currentContainer.displayOptions;
       if (savedDisplayOptions) {
         this.renderFolders = savedDisplayOptions.renderFolders;
+        this.showTimestamp = savedDisplayOptions.showTimestamp;
         this.hideTags = savedDisplayOptions.hideTags;
         this.hidePagination = savedDisplayOptions.hidePagination;
         this.setTableOptionsMenu();
@@ -528,11 +531,13 @@ export default {
     setTableOptionsMenu() {
       this.$store.commit("toggleRenderedFolders", this.renderFolders);
       const renderFolders = toRaw(this.renderFolders);
+      const showTimestamp = toRaw(this.showTimestamp);
       const hideTags = toRaw(this.hideTags);
       const hidePagination = toRaw(this.hidePagination);
       const currentContainer = toRaw(this.currentContainer);
       const displayOptions = {
         renderFolders: renderFolders,
+        showTimestamp: showTimestamp,
         hideTags: hideTags,
         hidePagination: hidePagination,
       };
@@ -549,6 +554,22 @@ export default {
             const newContainer = {
               ...currentContainer,
               displayOptions: {...displayOptions, renderFolders}};
+            await getDB().containers.put(newContainer);
+
+            this.setTableOptionsMenu();
+          },
+        },
+        {
+          name: this.showTimestamp
+            ? this.$t("message.tableOptions.fromNow")
+            : this.$t("message.tableOptions.timestamp"),
+          action: async () => {
+            this.showTimestamp = !(this.showTimestamp);
+            const showTimestamp = toRaw(this.showTimestamp);
+
+            const newContainer = {
+              ...currentContainer,
+              displayOptions: { ...displayOptions, showTimestamp}};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
