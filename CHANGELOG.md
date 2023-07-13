@@ -160,6 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - fixed typing for python code in db so that ports are int instead of string - required for deployment
 - (GL #1056) Fix creating a pseudo-container (forward slash) returning 403 and logging user out
 - (GL #1050) fixed missing paths in backend: `unauth`, `forbid`, `uidown`, `badrequest`, `notfound` and front-end api responses
+- (GL #1074) Fix for error when last_modified date is null/undefined
 
 ### Removed
 

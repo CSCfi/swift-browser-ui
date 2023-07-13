@@ -566,6 +566,7 @@ tunnukselle
 tunnuksen
 tunnuksista
 tunnus
+tuntematon
 tunti
 tuo
 tuottaa
