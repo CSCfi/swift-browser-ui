@@ -43,6 +43,9 @@ import {
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
+import moment from "moment";
+import "moment/dist/locale/fi";
+import "moment/dist/locale/en-gb";
 
 export default {
   name: "ContainerTable",
@@ -92,6 +95,7 @@ export default {
       this.getPage();
     },
     locale() {
+      moment.locale(this.locale);
       this.setHeaders();
       this.getPage();
       this.setPagination();
@@ -103,6 +107,7 @@ export default {
   },
   beforeMount () {
     this.abortController = new AbortController();
+    moment.locale(this.locale);
   },
   beforeUnmount () {
     this.abortController.abort();
@@ -233,9 +238,16 @@ export default {
             sharing: {
               value: getSharedStatus(item.name),
             },
-            last_modified: {
-              value: parseDateTime(
-                this.locale, item.last_modified, this.$t, false),
+            last_activity: {
+              value: moment(item.last_modified).locale(this.locale)
+                .fromNow(),
+              children: [{
+                value: parseDateTime(
+                  this.locale, item.last_modified, false),
+                component: {
+                  tag: "span",
+                },
+              }],
             },
             actions: {
               value: null,
@@ -400,8 +412,8 @@ export default {
           sortable: true,
         },
         {
-          key: "last_modified",
-          value: this.$t("message.table.modified"),
+          key: "last_activity",
+          value: this.$t("message.table.activity"),
           sortable: true,
         },
         {
