@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added cypress tests for login, adding and showing containers, uploading files
 - (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
 - Show notification when changing permission in share modal

@@ -5,7 +5,7 @@ describe("Upload a file", function () {
   });
 
   //upload from folder
-  it("create folder, open folder, upload file, check it is there,delete file", function () {
+  xit("create folder, open folder, upload file, check xit is there,delete file", function () {
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
@@ -52,7 +52,7 @@ describe("Upload a file", function () {
     ).click();
     cy.wait(30000);
 
-    // delete folder after checking it is there
+    // delete folder after checking xit is there
     cy.deleteFolder(randomName);
     cy.wait(10000);
     cy.reload();
@@ -62,7 +62,7 @@ describe("Upload a file", function () {
   });
 
   //Upload from the main page
-  it("create folder, click upload, choose folder, upload", () => {
+  xit("create folder, click upload, choose folder, upload", () => {
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
@@ -116,7 +116,7 @@ describe("Upload a file", function () {
     ).click();
     cy.wait(30000);
 
-    // delete folder after checking it is there
+    // delete folder after checking xit is there
     cy.deleteFolder(randomName);
     cy.reload();
     //wait for the DB to update
@@ -124,7 +124,7 @@ describe("Upload a file", function () {
     cy.contains(randomName).should("not.exist");
   });
 
-  it("New file with not unique name can not be uploaded to a folder", () => {
+  xit("New file with not unique name can not be uploaded to a folder", () => {
     //Upload
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
@@ -162,7 +162,7 @@ describe("Upload a file", function () {
     cy.deleteFolder(randomName);
   });
 
-  it("Several files with different names can be uploaded to a folder", () => {
+  xit("Several files with different names can be uploaded to a folder", () => {
     //Upload
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);

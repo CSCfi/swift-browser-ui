@@ -132,6 +132,8 @@ dictionary.dic
 
 swift_browser_ui_frontend/cypress
 
+!swift_browser_ui_frontend/cypress/fixtures/text-files
+
 # Node files
 **/node_modules/
 **/.node_modules/
