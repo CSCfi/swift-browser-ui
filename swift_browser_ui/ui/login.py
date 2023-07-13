@@ -400,6 +400,15 @@ async def login_with_token(
     session["token"] = token
     session["uname"] = uname
 
+    # the intersection of sdConnectProjects and Allas projects is empty
+    # in practice this might happen if there are sd connect projects that
+    # don't have Allas enabled
+    if not session["projects"]:
+        request.app["Log"].debug("possible sdConnectProjects and Allas projects mismatch")
+        raise aiohttp.web.HTTPForbidden(
+            reason="There are no projects available for this user."
+        )
+
     session["taint"] = True if taint else False
 
     session.changed()
