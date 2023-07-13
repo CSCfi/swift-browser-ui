@@ -139,21 +139,13 @@ class EncryptedUploadProxy:
         b64_header = base64.standard_b64encode(header).decode("ascii")
 
         # Upload the header both to Vault and to Swift storage as failsafe during Vault introduction period
-        if self.owner_name:
-            await request.app[common.VAULT_CLIENT].put_header(
-                self.name,
-                self.container,
-                self.object_name,
-                b64_header,
-                owner=self.owner_name,
-            )
-        else:
-            await request.app[common.VAULT_CLIENT].put_header(
-                self.name,
-                self.container,
-                self.object_name,
-                b64_header,
-            )
+        await request.app[common.VAULT_CLIENT].put_header(
+            self.name,
+            self.container,
+            self.object_name,
+            b64_header,
+            owner=self.owner_name,
+        )
 
         self.header_uploaded = True
 
