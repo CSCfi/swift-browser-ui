@@ -218,7 +218,7 @@ export default {
             last_modified: {
               value: this.showTimestamp? parseDateTime(
                 this.locale, item.last_modified, this.$t, false) :
-                parseDateFromNow(this.locale, item.last_modified),
+                parseDateFromNow(this.locale, item.last_modified, this.$t),
             },
             ...(this.hideTags ? {} : {
               tags: {

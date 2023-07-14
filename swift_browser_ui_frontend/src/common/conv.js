@@ -441,7 +441,8 @@ export function parseDateTime(locale, value, t, shortDate) {
   return dateTimeFormat.replace(" klo", ", ");
 }
 
-export function parseDateFromNow(locale, value) {
+export function parseDateFromNow(locale, value, t) {
+  if (!value) return t("message.table.unknown_date");
   moment.locale(locale);
   const date = new Date(value.endsWith("Z") ? value : `${value}Z`);
   return moment(date).locale(locale).fromNow();

@@ -244,7 +244,7 @@ export default {
             last_activity: {
               value: this.showTimestamp? parseDateTime(
                 this.locale, item.last_modified, this.$t, false) :
-                parseDateFromNow(this.locale, item.last_modified),
+                parseDateFromNow(this.locale, item.last_modified, this.$t),
             },
             actions: {
               value: null,
