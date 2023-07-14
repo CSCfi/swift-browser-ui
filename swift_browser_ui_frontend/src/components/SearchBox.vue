@@ -12,6 +12,7 @@
       :items-per-page="8"
       @focus="searchGainedFocus"
       @changeQuery="onQueryChange"
+      @changeValue="goToResult"
     >
       <i
         slot="pre"
@@ -94,6 +95,12 @@ export default {
       this.isSearching = false;
       this.searchResults = [];
       this.searchArray = [];
+    },
+    goToResult: function (event) {
+      if (event.detail) {
+        const route = this.getSearchRoute(event.detail);
+        this.$router.push(route);
+      }
     },
     search: async function () {
       if (this.searchArray.length === 0) {
