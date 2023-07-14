@@ -362,10 +362,17 @@ export function sortObjects(objects, sortBy, sortDirection) {
     let valueA = a[sortBy];
     let valueB = b[sortBy];
 
+    function getTimestamp(str) {
+      if (str) {
+        return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
+      } else return -1; //if null last_modified
+    }
+
     if (sortBy === "last_modified") {
       //get timestamp from string
-      valueA = Date.parse(valueA.endsWith("Z") ? valueA : `${valueA}Z`);
-      valueB = Date.parse(valueB.endsWith("Z") ? valueB : `${valueB}Z`);
+      valueA = getTimestamp(valueA);
+      valueB = getTimestamp(valueB);
+
       if (sortDirection === "asc") {
         return valueA - valueB;
       }
