@@ -547,6 +547,7 @@ tilankäyttö
 tilapäinen
 tilapäisesti
 toiminnolla
+toiminta
 toiminto
 toiseen
 toiselle
@@ -626,6 +627,7 @@ vastaanottajien
 vastaanottavan
 vastaanottimien
 vedä
+viimeinen
 viimeisin
 viimeksi
 virhe
