@@ -6,9 +6,7 @@ import {
 } from "@/common/api";
 import { getDB } from "@/common/db";
 import { getFolderName } from "@/common/globalFunctions";
-import moment from "moment";
-import "moment/dist/locale/fi";
-import "moment/dist/locale/en-gb";
+import { DateTime } from "luxon";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -450,9 +448,7 @@ export function parseDateTime(locale, value, t, shortDate) {
 
 export function parseDateFromNow(locale, value, t) {
   if (!value) return t("message.table.unknown_date");
-  moment.locale(locale);
-  const date = new Date(value.endsWith("Z") ? value : `${value}Z`);
-  return moment(date).locale(locale).fromNow();
+  return DateTime.fromISO(value.endsWith("Z") ? value : `${value}Z`).toRelative({ locale });
 }
 
 // Find the segments container matching a container (if it exists) and

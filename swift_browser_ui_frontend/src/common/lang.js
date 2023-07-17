@@ -447,7 +447,7 @@ let default_translations = {
         objects: "Objekteja",
         size: "Koko",
         modified: "Muokattu viimeksi",
-        activity: "Viimeinen toiminta",
+        activity: "Viimeisin toiminta",
         paginated: "Sivutus",
         pageNb: "sivulla",
         fileHash: "Tarkistussumma",

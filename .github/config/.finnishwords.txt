@@ -627,7 +627,6 @@ vastaanottajien
 vastaanottavan
 vastaanottimien
 vedä
-viimeinen
 viimeisin
 viimeksi
 virhe
