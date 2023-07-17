@@ -7,9 +7,9 @@ import typing
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
 from redis import ConnectionError
-from redis.asyncio import Redis
 
 import swift_browser_ui.common.signature
+from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.settings import setd
 
 
@@ -126,25 +126,11 @@ async def get_redis(
     """Poll Redis service."""
     try:
         start = time.time()
-        if setd["redis_host"] and setd["redis_port"]:
-            connection: Redis = Redis(
-                host=str(setd["redis_host"]), port=int(setd["redis_port"])
-            )
-            await connection.ping()
-            services["redis"] = {"status": "Ok"}
-            performance["redis"] = {"time": time.time() - start}
-            await connection.close()
-        elif setd["redis_sentinel_host"] and setd["redis_sentinel_port"]:
-            connection = Redis(
-                host=str(setd["redis_sentinel_host"]),
-                port=int(setd["redis_sentinel_port"]),
-            )
-            await connection.ping()
-            services["redis"] = {"status": "Ok"}
-            performance["redis"] = {"time": time.time() - start}
-            await connection.close()
-        else:
-            services["redis"] = {"status": "Nonexistent"}
+        redis_client = await get_redis_client()
+        await redis_client.ping()
+        services["redis"] = {"status": "Ok"}
+        performance["redis"] = {"time": time.time() - start}
+        await redis_client.close()
     except ConnectionError:
         services["redis"] = {"status": "Down"}
         performance["redis"] = {"time": time.time() - start}
