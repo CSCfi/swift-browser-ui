@@ -38,7 +38,7 @@ and the tests are developed for both Firefox and Chrome web browsers.
 .. code-block:: console
 
     $ cd swift_browser_ui_frontend/
-    $ npm install -g pnpm@7
+    $ npm install -g pnpm@8
     $ pnpm install
     $ pnpm run build
     $ cd  ..

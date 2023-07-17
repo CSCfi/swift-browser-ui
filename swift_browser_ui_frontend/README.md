@@ -2,7 +2,7 @@
 
 ## Project setup
 ```
-npm install -g pnpm@7
+npm install -g pnpm@8
 pnpm install
 ```
 
