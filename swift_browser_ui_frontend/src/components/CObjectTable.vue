@@ -309,6 +309,7 @@ export default {
               ],
             },
           });
+          this.$router.replace({"query": null});
           return items;
         }, []);
 
@@ -316,6 +317,17 @@ export default {
         ...this.paginationOptions,
         itemCount: pagedLength,
       };
+      this.setPageByFileName(this.$route.query.file);
+    },
+    setPageByFileName: function(file){
+      if(file != undefined){
+        var index = this.objs.findIndex(item => item.name == file);
+        if(index <= 0){
+          index = 1;
+        }
+        this.paginationOptions.currentPage =
+          Math.floor(index  / this.paginationOptions.itemsPerPage) + 1;
+      }
     },
     setPagination: function () {
       const paginationOptions = getPaginationOptions(this.$t);
