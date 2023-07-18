@@ -82,7 +82,7 @@ class ObjectReplicationProxy:
             if resp.status == 404:
                 pass
             else:
-                raise aiohttp.web.HTTPForbidden(reason="No access to container.")
+                raise aiohttp.web.HTTPBadRequest(reason="No access to container.")
 
         async with self.client.put(
             common.generate_download_url(self.host, container),
@@ -94,7 +94,7 @@ class ObjectReplicationProxy:
                 raise aiohttp.web.HTTPConflict(reason="Container name already in use.")
             if resp.status not in {201, 202, 204, 200}:
                 LOGGER.info(f"Container name '{container}' couldn't be created.")
-                raise aiohttp.web.HTTPForbidden(reason="Copy container creation failed.")
+                raise aiohttp.web.HTTPBadRequest(reason="Copy container creation failed.")
 
         LOGGER.info(f"Created container '{container}'.")
 

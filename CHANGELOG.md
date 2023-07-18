@@ -162,6 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1056) Fix creating a pseudo-container (forward slash) returning 403 and logging user out
 - (GL #1050) fixed missing paths in backend: `unauth`, `forbid`, `uidown`, `badrequest`, `notfound` and front-end api responses
 - (GL #1074) Fix for error when last_modified date is null/undefined
+- (GL #1068) Fix copy request failing silently if container name is already in use
 
 ### Removed
 
