@@ -309,7 +309,11 @@ export default {
               ],
             },
           });
-          this.$router.replace({"query": null});
+          let queryWithOutFile = {
+            ...this.$route.query,
+            file: null,
+          };
+          this.$router.replace({"query": queryWithOutFile});
           return items;
         }, []);
 
