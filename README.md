@@ -52,7 +52,7 @@ Getting started:
 git clone git@github.com:CSCfi/swift-browser-ui.git
 cd swift-browser-ui
 cd swift_browser_ui_frontend
-npm install -g pnpm@7
+npm install -g pnpm@8
 pnpm install
 pnpm run build
 cd ..

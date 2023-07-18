@@ -19,7 +19,7 @@ jobs:
           cache-dependency-path: swift_browser_ui_frontend/pnpm-lock.yaml
       - uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 8
       - name: Install dependencies and run tests
         run: |
           pushd swift_browser_ui_frontend

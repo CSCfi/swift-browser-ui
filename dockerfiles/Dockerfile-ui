@@ -7,7 +7,7 @@ COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift_ui/swift_browser_ui_fr
 
 RUN --mount=type=cache,target=/root/.pnpm-store \
     cd /root/swift_ui/swift_browser_ui_frontend \
-    && npm install -g pnpm@7 \
+    && npm install -g pnpm@8 \
     && pnpm install --prod
 
 COPY swift_browser_ui_frontend /root/swift_ui/swift_browser_ui_frontend

@@ -14,7 +14,7 @@
     "docker-build-devel": "vite build --mode development"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^0.12.1",
+    "@intlify/unplugin-vue-i18n": "^0.12.2",
     "@mdi/js": "^7.2.96",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/rxjs": "^10.2.1",
@@ -22,14 +22,14 @@
     "cli-highlight": "^2.1.11",
     "csc-ui": "github:hannyle/csc-ui",
     "dexie": "^3.2.4",
-    "eslint": "^8.44.0",
+    "eslint": "^8.45.0",
     "eslint-plugin-vue": "^9.15.1",
     "eslint-utils": "^3.0.0",
     "lodash": "^4.17.21",
     "resumablejs": "^1.1.0",
     "rxjs": "^7.8.1",
     "sass": "^1.63.6",
-    "vite": "^4.4.2",
+    "vite": "^4.4.4",
     "vue": "^3.3.4",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.4",
@@ -41,7 +41,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@testing-library/vue": "^7.0.0",
     "@vue/compiler-sfc": "^3.3.4",
-    "cypress": "^12.17.0",
+    "cypress": "^12.17.1",
     "jest": "^29.6.1"
   },
   "eslintConfig": {
