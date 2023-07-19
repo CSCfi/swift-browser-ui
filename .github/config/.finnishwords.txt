@@ -1,3 +1,4 @@
+aika
 ajaksi
 alapuolisesta
 alikansio
@@ -60,6 +61,7 @@ halutako
 halutessasi
 haluttu
 halutun
+hetkestä
 hetki
 hinnoittelu
 hinnoittelulaskuri
@@ -517,6 +519,7 @@ tarkastella
 tarkat
 tarkistathan
 tarkistussumma
+tarkka
 tarkoittaen
 tarvitset
 taustalla
@@ -544,6 +547,7 @@ tilankäyttö
 tilapäinen
 tilapäisesti
 toiminnolla
+toiminta
 toiminto
 toiseen
 toiselle
@@ -585,6 +589,7 @@ tältä
 tämä
 tämän
 tässä
+tästä
 tätä
 täytyy
 ulos

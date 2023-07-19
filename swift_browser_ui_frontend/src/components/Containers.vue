@@ -18,6 +18,7 @@
     </c-row>
     <ContainerTable
       :conts="renderingContainers"
+      :show-timestamp="showTimestamp"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
       @delete-container="(cont) => removeContainer(cont)"
@@ -47,6 +48,7 @@ export default {
   data: function () {
     return {
       currentProject: {},
+      showTimestamp: false,
       hidePagination: false,
       hideTags: false,
       selected: undefined,
@@ -153,10 +155,30 @@ export default {
   methods: {
     updateTableOptions: function () {
       const displayOptions = {
+        showTimestamp: this.showTimestamp,
         hideTags: this.hideTags,
         hidePagination: this.renderFolders,
       };
       this.tableOptions = [
+        {
+          name: this.showTimestamp
+            ? this.$t("message.tableOptions.fromNow")
+            : this.$t("message.tableOptions.timestamp"),
+          action: async () => {
+            this.showTimestamp = !(this.showTimestamp);
+
+            const newProject = {
+              ...this.currentProject,
+              displayOptions: {
+                ...displayOptions,
+                showTimestamp: this.showTimestamp,
+              },
+            };
+            await getDB().projects.put(newProject);
+
+            this.updateTableOptions();
+          },
+        },
         {
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")

@@ -6,6 +6,7 @@ import {
 } from "@/common/api";
 import { getDB } from "@/common/db";
 import { getFolderName } from "@/common/globalFunctions";
+import { DateTime } from "luxon";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -352,11 +353,29 @@ export const DEV = import.meta.env.MODE === "development";
 
 export function sortObjects(objects, sortBy, sortDirection) {
   sortBy = sortBy === "size" ? "bytes"
-    : sortBy === "items" ? "count" : sortBy;
+    : sortBy === "items" ? "count"
+      : sortBy === "last_activity" ? "last_modified" : sortBy;
 
   objects.sort((a, b) => {
     let valueA = a[sortBy];
     let valueB = b[sortBy];
+
+    function getTimestamp(str) {
+      if (str) {
+        return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
+      } else return -1; //if null last_modified
+    }
+
+    if (sortBy === "last_modified") {
+      //get timestamp from string
+      valueA = getTimestamp(valueA);
+      valueB = getTimestamp(valueB);
+
+      if (sortDirection === "asc") {
+        return valueA - valueB;
+      }
+      return valueB - valueA;
+    }
 
     // Handle tags as single string
     if (Array.isArray(valueA)) {
@@ -425,6 +444,11 @@ export function parseDateTime(locale, value, t, shortDate) {
   // Replace Finnish "at" time indicator with comma
   // English version defaults to comma
   return dateTimeFormat.replace(" klo", ", ");
+}
+
+export function parseDateFromNow(locale, value, t) {
+  if (!value) return t("message.table.unknown_date");
+  return DateTime.fromISO(value.endsWith("Z") ? value : `${value}Z`).toRelative({ locale });
 }
 
 // Find the segments container matching a container (if it exists) and

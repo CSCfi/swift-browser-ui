@@ -26,6 +26,7 @@ import {
   truncate,
   sortObjects,
   parseDateTime,
+  parseDateFromNow,
 } from "@/common/conv";
 import {
   mdiTrayArrowDown,
@@ -50,6 +51,10 @@ export default {
     conts: {
       type: Array,
       default: () => {return [];},
+    },
+    showTimestamp: {
+      type: Boolean,
+      default: false,
     },
     disablePagination: {
       type: Boolean,
@@ -89,6 +94,9 @@ export default {
       this.getPage();
     },
     conts() {
+      this.getPage();
+    },
+    showTimestamp() {
       this.getPage();
     },
     locale() {
@@ -233,9 +241,10 @@ export default {
             sharing: {
               value: getSharedStatus(item.name),
             },
-            last_modified: {
-              value: parseDateTime(
-                this.locale, item.last_modified, this.$t, false),
+            last_activity: {
+              value: this.showTimestamp? parseDateTime(
+                this.locale, item.last_modified, this.$t, false) :
+                parseDateFromNow(this.locale, item.last_modified, this.$t),
             },
             actions: {
               value: null,
@@ -400,8 +409,8 @@ export default {
           sortable: true,
         },
         {
-          key: "last_modified",
-          value: this.$t("message.table.modified"),
+          key: "last_activity",
+          value: this.$t("message.table.activity"),
           sortable: true,
         },
         {

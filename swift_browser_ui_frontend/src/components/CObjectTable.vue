@@ -33,6 +33,7 @@ import {
   truncate,
   sortObjects,
   parseDateTime,
+  parseDateFromNow,
   getItemSize,
 } from "@/common/conv";
 import {
@@ -74,6 +75,10 @@ export default {
     renderFolders: {
       type: Boolean,
       default: true,
+    },
+    showTimestamp: {
+      type: Boolean,
+      default: false,
     },
     accessRights: {
       type: Array,
@@ -211,8 +216,9 @@ export default {
               value: getItemSize(item, filteredObjs, this.$route),
             },
             last_modified: {
-              value: parseDateTime(
-                this.locale, item.last_modified, this.$t, false),
+              value: this.showTimestamp? parseDateTime(
+                this.locale, item.last_modified, this.$t, false) :
+                parseDateFromNow(this.locale, item.last_modified, this.$t),
             },
             ...(this.hideTags ? {} : {
               tags: {
