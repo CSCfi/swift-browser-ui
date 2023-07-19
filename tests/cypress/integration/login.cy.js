@@ -5,12 +5,12 @@ describe("Login a user", function () {
     cy.visit(Cypress.config().baseUrl);
   });
 
-  xit("login button clicked redirect to login page", () => {
+  it("Login button redirects to login page", () => {
     cy.get("c-login-card-actions.hydrated > .hydrated").click();
     cy.url().should("include", "/login/");
   });
 
-  xit("login credentials entered redirect to project browsing page", () => {
+  it("Login with correct credentials redirects to project browsing page", () => {
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.url().should("include", "browse");
     cy.get(".select-project").contains("Select");
@@ -22,7 +22,7 @@ describe("Login a user", function () {
 // successful login with changing languages before pressing 'Login with SSO'
 
 describe("Switch language EN (default) to FI upon selection before login", function () {
-  xit("on login languages can be switched, visible in cookies", () => {
+  it("Upon login languages can be switched, visible in cookies", () => {
     cy.visit(Cypress.config().baseUrl);
     cy.getCookie("OBJ_UI_LANG").should("have.property", "value", "en");
     cy.get('[data-testid="language-selector"]').click();
@@ -43,7 +43,7 @@ describe("Displays errors if login goes wrong", function () {
     cy.visit(Cypress.config().baseUrl);
   });
 
-  xit("username is incorrect", () => {
+  it("username is incorrect", () => {
     cy.login(Cypress.env("wrongusername"), Cypress.env("password"));
     cy.url().should("include", "credentials");
     cy.get("c-card-title.hydrated").should("contain", "401");
@@ -53,7 +53,7 @@ describe("Displays errors if login goes wrong", function () {
     );
   });
 
-  xit("password is incorrect", () => {
+  it("password is incorrect", () => {
     cy.login(Cypress.env("username"), Cypress.env("wrongpassword"));
     cy.url().should("include", "credentials");
     cy.get("c-card-title.hydrated").should("contain", "401");
@@ -63,7 +63,7 @@ describe("Displays errors if login goes wrong", function () {
     );
   });
 
-  xit("username is empty", () => {
+  it("username is empty", () => {
     cy.get("c-login-card-actions.hydrated > .hydrated").click();
     cy.url().should("include", "/login/");
     cy.get('[type="password"]').type(Cypress.env("password"));
@@ -76,7 +76,7 @@ describe("Displays errors if login goes wrong", function () {
     );
   });
 
-  xit("password is empty", () => {
+  it("password is empty", () => {
     cy.get("c-login-card-actions.hydrated > .hydrated").click();
     cy.url().should("include", "/login/");
     cy.get('#classicform > [type="text"]').type(Cypress.env("username"));
@@ -89,7 +89,7 @@ describe("Displays errors if login goes wrong", function () {
     );
   });
 
-  xit("both input fields empty", () => {
+  it("both input fields empty ", () => {
     cy.get("c-login-card-actions.hydrated > .hydrated").click();
     cy.url().should("include", "/login/");
     cy.get('#classicform > [type="submit"]').click();

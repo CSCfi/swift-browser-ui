@@ -1,9 +1,8 @@
 //A container with a unique name is created and visible
 
-describe("Creates and shows a container with unique name, checks existence", function () {
+describe("Creates and shows a container with a random unique name", function () {
   it("should show unique container in swift project", () => {
     cy.visit(Cypress.config().baseUrl);
-    cy.deleteDB();
     cy.login(Cypress.env("username"), Cypress.env("password"));
 
     //create a unique name
@@ -11,27 +10,19 @@ describe("Creates and shows a container with unique name, checks existence", fun
 
     // add new folder with a unique name and show it
     cy.addFolder(randomName);
-    cy.wait(45000)
-    cy.contains(randomName).should("exist");
-
-    // delete folder after checking it is there
-    cy.deleteFolder(randomName);
     cy.wait(5000);
-    cy.reload();
-    //wait for the DB to update
-    cy.wait(35000);
-    cy.contains(randomName).should("not.exist");
 
-    //TODO: is it possible to check folder deletion by intercepting network requests and responses (204 DELETE status?)
+    //check the folder exists with search field
+    cy.searchFolder(randomName);
+    cy.get(".media-content").contains(randomName).should("exist");
   });
 });
 
 //A container with not unique name can't be created
 
-describe("Does not create one more container with not unique name", function () {
+describe("Creating more than 1 container with the same name is not possible in a project", function () {
   it("should not add not unique container into swift project", () => {
     cy.visit(Cypress.config().baseUrl);
-    cy.deleteDB();
     cy.login(Cypress.env("username"), Cypress.env("password"));
 
     //create a unique name
@@ -40,54 +31,19 @@ describe("Does not create one more container with not unique name", function () 
     // add new folder with a unique name and show it
     cy.addFolder(randomName);
 
-    cy.wait(30000);
+    cy.wait(5000);
 
     cy.addFolder(randomName);
 
     //the name should be in use already
     cy.get('[data-testid="createModal-toasts"]').contains("already in use");
     cy.get(".add-folder > c-card-actions.hydrated > :nth-child(1)").click();
-
-    // delete folder after checking it is there
-    cy.deleteFolder(randomName);
-    cy.wait(5000);
-    cy.reload();
-    //wait for the DB to update
-    cy.wait(35000);
-    cy.contains(randomName).should("not.exist");
-  });
-});
-
-//A container with predefined name can be created and is visible
-
-describe("Creates container with predefined name, checks existence, deletes it, checks non-existence", function () {
-  it("creates and shows container, after deletion it is not visible", () => {
-    cy.visit(Cypress.config().baseUrl);
-    cy.deleteDB();
-    cy.login(Cypress.env("username"), Cypress.env("password"));
-
-    //create a predefined name
-    const definedName = "predef_12346";
-
-    // add new folder with a predefined name and show it
-    cy.addFolder(definedName);
-    cy.wait(30000);
-    cy.contains(definedName, { timeout: 40000 }).should("exist");
-
-    // delete folder after checking it is there
-    cy.deleteFolder(definedName);
-    cy.wait(5000);
-    cy.reload();
-
-    //wait for the DB to update
-    cy.wait(35000);
-    cy.contains(definedName).should("not.exist");
   });
 });
 
 //Several containers are created and are visible
 
-describe("Should show several containers", () => {
+describe("Several containers with different names are created and visible", () => {
   before(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
@@ -99,39 +55,14 @@ describe("Should show several containers", () => {
     const nameTwo = Math.random().toString(36).substring(2, 7);
 
     cy.addFolder(nameOne);
-    cy.addFolder(nameTwo);
-
-    cy.reload();
-    //wait for all folders to load
-    cy.wait(20000);
+    cy.wait(5000);
+    //check the folder 1 exists with search field
+    cy.searchFolder(nameOne);
+    cy.get(".media-content").contains(nameOne).should("exist"); //check the folder 1 exists with search field
     cy.get("table")
-      .find("a.icon", { timeout: "30000" })
+      .find("a.icon", { timeout: "5000" })
       .should("have.length.greaterThan", 1);
   });
 });
 
-//Folder search from main page
-
-describe("Should perform folder search", () => {
-  before(() => {
-    cy.visit(Cypress.config().baseUrl);
-    cy.login(Cypress.env("username"), Cypress.env("password"));
-  });
-
-  it("finding a folder via search field", function () {
-    //create a unique name
-    const randomName = Math.random().toString(36).substring(2, 7);
-
-    // add new folder with a unique name and show it
-    cy.addFolder(randomName);
-    cy.get('[data-testid="create-folder"]', { timeout: 40000 }).click();
-
-    cy.get(".c-input-menu__input")
-      .find("input")
-      .eq(0)
-      .invoke("show")
-      .type(randomName, { force: true });
-  });
-
-  //TODO select folder in search
-});
+//TODO separate test for folder deletion

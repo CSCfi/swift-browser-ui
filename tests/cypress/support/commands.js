@@ -23,6 +23,9 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+import { faker } from "../../../swift_browser_ui_frontend/node_modules/@faker-js/faker";
+
 Cypress.Commands.add("login", (username, password) => {
   cy.get("c-login-card-actions.hydrated > .hydrated").click();
   cy.url().should("include", "/login/");
@@ -91,8 +94,11 @@ Cypress.Commands.add("navigateTableRowMenu", (index, menuItem) => {
 
 Cypress.Commands.add("addFolder", (folderName) => {
   cy.get('[data-testid="create-folder"]').click();
+  cy.wait(3000);
+  cy.get('[data-testid="folder-name"]').click({ force: true });
   cy.get('[data-testid="folder-name"]').click({ force: true }).type(folderName);
-  cy.get('[data-testid="save-folder"]').click();
+  cy.wait(3000);
+  cy.get('[data-testid="save-folder"]').click({ force: true });
 });
 
 Cypress.Commands.add("deleteFolder", (folderName) => {
@@ -124,4 +130,31 @@ Cypress.Commands.add("deleteFile", (fileName) => {
     .eq(2)
     .find("button")
     .click();
+});
+
+Cypress.Commands.add("searchFolder", (folderName) => {
+  cy.get(".c-input--text")
+    .eq(1)
+    .children()
+    .eq(0)
+    .children()
+    .eq(0)
+    .children()
+    .eq(1)
+    .children()
+    .eq(1)
+    .children()
+    .eq(0)
+    .find("input")
+    .eq(0)
+    .type(folderName, { force: true });
+  cy.wait(5000);
+});
+
+Cypress.Commands.add("generateFixture", (name) => {
+  cy.writeFile(`cypress/fixtures/text-files/${name}.txt`, {
+    hits: Cypress._.times(20, () => {
+      return faker.lorem.paragraphs(50);
+    }),
+  });
 });

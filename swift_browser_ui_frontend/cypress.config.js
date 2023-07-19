@@ -1,5 +1,6 @@
 // eslint-disable-next-line
 const { defineConfig } = require("cypress");
+const { cloudPlugin } = require("cypress-cloud/plugin");
 
 // eslint-disable-next-line
 module.exports = defineConfig({
@@ -18,10 +19,10 @@ module.exports = defineConfig({
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
       // eslint-disable-next-line
-      return require("./../tests/cypress/plugins/index.js")(on, config);
+      return cloudPlugin(on, config);
     },
     // baseUrl: "https://172.17.0.1:8081/",
-    baseUrl: "https://sd-connect.dev:8081/",
+    baseUrl: "https://sd-connect.dev:8000/",
 
     specPattern: "../tests/cypress/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "../tests/cypress/support/index.js",
