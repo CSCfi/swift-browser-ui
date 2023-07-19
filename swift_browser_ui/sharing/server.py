@@ -17,7 +17,9 @@ from swift_browser_ui.sharing.api import (
     delete_share_handler,
     edit_share_handler,
     gave_access_handler,
+    handle_get_id_cache,
     handle_health_check,
+    handle_project_add_ids,
     handle_user_add_token,
     handle_user_delete_token,
     handle_user_list_tokens,
@@ -84,6 +86,12 @@ async def init_server() -> aiohttp.web.Application:
             aiohttp.web.options(
                 "/share/{owner}/{container}",
                 swift_browser_ui.common.common_handlers.handle_delete_preflight,
+            ),
+            aiohttp.web.get("/ids/{project}", handle_get_id_cache),
+            aiohttp.web.put("/ids/{project}", handle_project_add_ids),
+            aiohttp.web.options(
+                "/ids/{project}",
+                swift_browser_ui.common.common_handlers.handle_put_get_preflight,
             ),
         ]
     )

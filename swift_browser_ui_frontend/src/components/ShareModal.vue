@@ -144,6 +144,7 @@
 
 <script>
 import {
+  GET,
   addAccessControlMeta,
   getSharedContainerAddress,
 } from "@/common/api";
@@ -216,11 +217,24 @@ export default {
   methods: {
     onSelectPermission: function(e) {
       const val = e.target.value.value;
-      if (val === "read") this.giveReadAccess();
-      else this.giveReadWriteAccess();
+      switch (val) {
+        case "view":
+          this.giveViewAccess();
+          break;
+        case "read":
+          this.giveReadAccess();
+          break;
+        case "read and write":
+          this.giveReadWriteAccess();
+          break;
+      }
     },
     setAccessRights: function () {
       this.accessRights = [
+        {
+          name: this.$t("message.share.view_perm"),
+          value: "view",
+        },
         {
           name: this.$t("message.share.read_perm"),
           value: "read",
@@ -231,30 +245,40 @@ export default {
         },
       ];
     },
+    giveViewAccess: function () {
+      this.view = true;
+      this.read = false;
+      this.write = false;
+    },
     giveReadAccess: function () {
+      this.view = true;
       this.read = true;
       this.write = false;
     },
     giveReadWriteAccess: function () {
+      this.view = true;
       this.read = true;
       this.write = true;
     },
     shareSubmit: function () {
       this.loading = true;
-      this.shareContainer().then(
+      this.shareContainer(this.folderName).then(
         (ret) => {
-          this.loading = false;
           if (ret) {
             this.getSharedDetails();
             this.closeSharedNotification();
             this.isShared = true;
             this.closeSharedNotificationWithTimeout();
           }
+          this.loading = false;
         },
       );
     },
-    shareContainer: async function () {
+    shareContainer: async function (folder) {
       let rights = [];
+      if (this.view) {
+        rights.push("v");
+      }
       if (this.read) {
         rights.push("r");
       }
@@ -311,7 +335,7 @@ export default {
       try {
         await this.$store.state.client.shareNewAccess(
           this.$store.state.active.id,
-          this.folderName,
+          folder,
           this.tags,
           rights,
           await getSharedContainerAddress(this.$route.params.project),
@@ -343,9 +367,14 @@ export default {
         }
       }
 
+      // Add read rights after the share entry to make the db entry empty
+      if (this.view) {
+        rights.push("r");
+      }
+
       await addAccessControlMeta(
         this.$route.params.project,
-        this.folderName,
+        folder,
         rights,
         this.tags,
       );
@@ -356,6 +385,42 @@ export default {
         rights,
         this.tags,
       );
+
+      let signatureUrl = new URL("/sign/3600", document.location.origin);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${folder}`);
+      let signed = await GET(signatureUrl);
+      signed = await signed.json();
+      let whitelistUrl = new URL(
+        `/cryptic/${this.$store.state.active.name}/${folder}`,
+        this.$store.state.uploadEndpoint,
+      );
+      whitelistUrl.searchParams.append(
+        "valid",
+        signed.valid,
+      );
+      whitelistUrl.searchParams.append(
+        "signature",
+        signed.signature,
+      );
+
+      let toShare = [];
+      for (const item of this.tags) {
+        toShare.push(
+          await this.$store.state.client.projectCheckIDs(item),
+        );
+      }
+
+      // Add access to cross-project sharing in case of read or read+write
+      if (this.read | this.write) {
+        await fetch(
+          whitelistUrl,
+          {
+            method: "PUT",
+            body: JSON.stringify(toShare),
+          },
+        );
+      }
+
       return true;
     },
     toggleShareGuide: function () {

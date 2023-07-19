@@ -2,6 +2,7 @@ import {
   getContainerMeta,
   getAccessControlMeta,
   getObjectsMeta,
+  GET,
 } from "@/common/api";
 import { getDB } from "@/common/db";
 import { getFolderName } from "@/common/globalFunctions";
@@ -58,9 +59,12 @@ function check_stale(detail, access) {
   return check_acl_mismatch(detail, access[detail.sharedTo]);
 }
 
-export async function syncContainerACLs(client, project) {
+export async function syncContainerACLs(store) {
+  let project = store.state.active.id;
+
   let acl = await getAccessControlMeta(project);
 
+  let client = store.state.client;
   let amount = 0;
   let aclmeta = acl.access;
   let currentsharing = await client.getShare(project);
@@ -98,7 +102,35 @@ export async function syncContainerACLs(client, project) {
       }
       let accesslist = [];
       if (aclmeta[container][share].read) {
-        accesslist.push("r");
+        // Check if the shared access only concerns view rights
+        let tmpid = await client.projectCheckIDs(share);
+
+        let whitelistUrl = new URL(
+          `/check/${store.state.active.name}/${container}/${tmpid.name}`,
+          store.state.uploadEndpoint,
+        );
+        let signatureUrl = new URL("/sign/3600", document.location.origin);
+        signatureUrl.searchParams.append(
+          "path",
+          `/check/${store.state.active.name}/${container}/${tmpid.name}`,
+        );
+        let signed = await GET(signatureUrl);
+        signed = await signed.json();
+        whitelistUrl.searchParams.append("valid", signed.valid);
+        whitelistUrl.searchParams.append("signature", signed.signature);
+
+        let whitelisted = await fetch(
+          whitelistUrl,
+          {
+            method: "GET",
+          },
+        );
+
+        if (whitelisted.status == 204) {
+          accesslist.push("v");
+        } else {
+          accesslist.push("r");
+        }
       }
       if (aclmeta[container][share].write) {
         accesslist.push("w");

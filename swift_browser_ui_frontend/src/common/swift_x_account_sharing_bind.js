@@ -269,6 +269,66 @@ class SwiftXAccountSharing {
     );
     return deleted;
   }
+
+  async projectCacheIDs(
+    id,
+    name,
+  ) {
+    // Cache the identifier information of a project
+    let url = new URL(
+      this.address.concat("/ids/", id),
+    );
+
+    let signed = await this._getSignature(
+      60,
+      "/ids/".concat(id),
+    );
+
+    url.searchParams.append("valid", signed.valid);
+    url.searchParams.append("signature", signed.signature);
+
+    let added = fetch(
+      url, {
+        method: "PUT",
+        body: name,
+      },
+    ).then(
+      (resp) => {
+        return resp.status == 204 ? true : false;
+      },
+    );
+
+    return added;
+  }
+
+  async projectCheckIDs(
+    id,
+  ) {
+    // Check a cached ID
+    let url = new URL(
+      this.address.concat("/ids/", id),
+    );
+
+    let signed = await this._getSignature(
+      60,
+      "/ids/".concat(id),
+    );
+
+    url.searchParams.append("valid", signed.valid);
+    url.searchParams.append("signature", signed.signature);
+
+    let check = fetch(
+      url, {
+        method: "GET",
+      },
+    ).then(
+      (resp) => {
+        return resp.json();
+      },
+    );
+
+    return check;
+  }
 }
 
 export default SwiftXAccountSharing;

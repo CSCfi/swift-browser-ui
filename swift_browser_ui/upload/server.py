@@ -15,6 +15,9 @@ import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.api import (
+    handle_batch_add_sharing_whitelist,
+    handle_batch_remove_sharing_whitelist,
+    handle_check_sharing_whitelist,
     handle_delete_project_whitelist,
     handle_get_container,
     handle_get_object,
@@ -121,6 +124,22 @@ async def servinit() -> aiohttp.web.Application:
             aiohttp.web.delete(
                 "/cryptic/{project}/whitelist",
                 handle_delete_project_whitelist,
+            ),
+            aiohttp.web.put(
+                "/cryptic/{project}/{container}",
+                handle_batch_add_sharing_whitelist,
+            ),
+            aiohttp.web.delete(
+                "/cryptic/{project}/{container}",
+                handle_batch_remove_sharing_whitelist,
+            ),
+            aiohttp.web.get(
+                "/check/{project}/{container}/{receiver}",
+                handle_check_sharing_whitelist,
+            ),
+            aiohttp.web.options(
+                "/cryptic/{project}/{container}",
+                handle_whitelist_options,
             ),
         ]
     )

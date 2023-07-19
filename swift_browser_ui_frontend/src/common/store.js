@@ -601,7 +601,7 @@ const store = createStore({
       }
     },
     updateSharedObjects: async function (
-      { commit, dispatch },
+      { commit, dispatch, state },
       { projectID, owner, container, signal },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
@@ -626,7 +626,7 @@ const store = createStore({
           commit("updateObjects", []);
         });
 
-        if (objects.length > 0) {
+        if (objects?.length > 0) {
           objects.forEach(obj => {
             obj.container = container.name;
             obj.containerID = container.id;
@@ -635,7 +635,7 @@ const store = createStore({
           sharedObjects = sharedObjects.concat(objects);
           marker = objects[objects.length - 1].name;
         }
-      } while (objects.length > 0);
+      } while (objects?.length > 0);
 
       if (!isSegmentsContainer) {
         const segment_objects = await getObjects(
@@ -647,12 +647,16 @@ const store = createStore({
           owner,
         );
         for (let i = 0; i < sharedObjects.length; i++) {
-          if (segment_objects[i])
+          if (segment_objects[i]) {
             sharedObjects[i].bytes = segment_objects[i].bytes;
+          }
+          if (!isSegmentsContainer && i === sharedObjects.length - 1) {
+            commit("setLoaderVisible", false);
+          }
         }
       }
 
-      commit("updateObjects", sharedObjects);
+      commit("updateObjects", [...state.objectCache, sharedObjects]);
 
       updateContainerLastmodified(projectID, container, sharedObjects);
 

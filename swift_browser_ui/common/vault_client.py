@@ -285,24 +285,94 @@ class VaultClient:
             "DELETE", f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}"
         )
 
-    async def get_header(self, project: str, container: str, path: str) -> str:
+    async def put_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+        keystoneid: str,
+    ) -> None:
+        """Add a project to a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container to be shared
+        :param keystoneid: Receiving project keystone ID
+        """
+        await self._request(
+            "POST",
+            f"c4ghtransit/sharing/{project}/{container}",
+            json_data={"id": receiver, "idkeystone": keystoneid},
+        )
+
+    async def get_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+    ) -> Dict[Any, Any] | str | None:
+        """Check if a project is in a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container that should be shared
+        """
+        resp = await self._request(
+            "GET",
+            f"c4ghransit/sharing/{project}/{container}",
+            params={"id": receiver},
+        )
+        return resp
+
+    async def remove_project_whitelist(
+        self,
+        project: str,
+        receiver: str,
+        container: str,
+    ) -> None:
+        """Remove a project from a container whitelist.
+
+        :param project: Project ID
+        :param receiver: Receiving project ID
+        :param container: Container to be shared
+        """
+        await self._request(
+            "DELETE",
+            f"c4ghtransit/sharing/{project}/{container}",
+            params={"id": receiver},
+        )
+
+    async def get_header(
+        self, project: str, container: str, path: str, owner: str = ""
+    ) -> str:
         """Retrieve header.
 
         :param project: Project ID
         :param container: container name
         :param path: object path
         """
-        header_response = await self._request(
-            "GET",
-            f"c4ghtransit/files/{project}/{container}/{path}",
-            params={"service": self.service, "key": self._key_name},
-        )
+        if owner:
+            header_response = await self._request(
+                "GET",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                params={"service": self.service, "key": self._key_name, "owner": owner},
+            )
+        else:
+            header_response = await self._request(
+                "GET",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                params={"service": self.service, "key": self._key_name},
+            )
         if isinstance(header_response, dict) and "data" in header_response:
-            return str(header_response["data"]["headers"]["1"]["header"])
+            return str(
+                header_response["data"]["headers"][
+                    str(header_response["data"]["latest_version"])
+                ]["header"]
+            )
         return ""
 
     async def put_header(
-        self, project: str, container: str, path: str, header: str
+        self, project: str, container: str, path: str, header: str, owner: str = ""
     ) -> None:
         """Update header.
 
@@ -310,9 +380,17 @@ class VaultClient:
         :param container: container name
         :param path: object path
         :param header: header as b64 encoded string
+        :param owner: name of the project that owns the container
         """
-        await self._request(
-            "POST",
-            f"c4ghtransit/files/{project}/{container}/{path}",
-            json_data={"header": header},
-        )
+        if owner:
+            await self._request(
+                "POST",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                json_data={"header": header, "owner": owner},
+            )
+        else:
+            await self._request(
+                "POST",
+                f"c4ghtransit/files/{project}/{container}/{path}",
+                json_data={"header": header},
+            )

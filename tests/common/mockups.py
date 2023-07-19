@@ -213,7 +213,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                     "receiver": "test-project-1",
                 },
                 "cookies": {},
-                "query": {"total": 1},
+                "query": {"total": 1, "name": "swift-project"},
                 "headers": {},
                 "query_string": "",
                 "remote": "test-remote",

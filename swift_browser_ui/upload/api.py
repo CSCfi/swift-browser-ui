@@ -313,7 +313,11 @@ async def handle_object_header(request: aiohttp.web.Request) -> aiohttp.web.Resp
     project = request.match_info["project"]
     container = request.match_info["container"]
     obj = request.match_info["object_name"]
-    header = await vault_client.get_header(project, container, obj)
+    if "owner" in request.query:
+        owner = request.query["owner"]
+        header = await vault_client.get_header(project, container, obj, owner)
+    else:
+        header = await vault_client.get_header(project, container, obj)
 
     return aiohttp.web.Response(
         text=header,
@@ -340,4 +344,61 @@ async def handle_delete_project_whitelist(
     project = request.match_info["project"]
     await vault_client.remove_whitelist_key(project)
 
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_batch_add_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Add projects in sharing whitelist in batch."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    receivers = await request.json()
+
+    for receiver in receivers:
+        await vault_client.put_project_whitelist(
+            project,
+            receiver["name"],
+            container,
+            receiver["id"],
+        )
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_batch_remove_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Remove projects from sharing whitelist in batch."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    receivers = await request.json()
+
+    for receiver in receivers:
+        await vault_client.remove_project_whitelist(
+            project,
+            receiver,
+            container,
+        )
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_check_sharing_whitelist(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Check if a project is in the sharing whitelist."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    receiver = request.match_info["receiver"]
+
+    resp = await vault_client.get_project_whitelist(project, receiver, container)
+
+    if resp is not None:
+        return aiohttp.web.json_response(resp)
     return aiohttp.web.HTTPNoContent()

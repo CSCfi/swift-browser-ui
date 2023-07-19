@@ -187,6 +187,41 @@ async def handle_user_list_tokens(request: aiohttp.web.Request) -> aiohttp.web.R
     return aiohttp.web.json_response([rec["identifier"] for rec in tokens])
 
 
+async def handle_project_add_ids(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Add project ID information to database."""
+    project = request.match_info["project"]
+    name = await request.text()
+
+    if not await request.app["db_conn"].match_id_name(project):
+        await request.app["db_conn"].add_id(project, name)
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Get project ID information from database."""
+    key = request.match_info["project"]
+
+    # Try with key as identifier
+    ret = await request.app["db_conn"].match_id_name(key)
+    if ret:
+        return aiohttp.web.json_response(
+            {
+                "id": ret[0]["id"],
+                "name": ret[0]["name"],
+            }
+        )
+
+    # Try with key as name
+    ret = await request.app["db_conn"].match_name_id(key)
+    return aiohttp.web.json_response(
+        {
+            "id": ret[0]["id"],
+            "name": ret[0]["name"],
+        }
+    )
+
+
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Answer a service health check."""
     # Case degraded
