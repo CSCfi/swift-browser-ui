@@ -67,18 +67,36 @@ class ObjectReplicationProxy:
             number += 1
         LOGGER.debug("Response stream complete.")
 
-    async def a_create_container(self, segmented: bool = False) -> None:
-        """Create the container required by the upload."""
+    async def a_ensure_container(self, segmented: bool = False) -> None:
+        """Ensure that the container required for copying exists."""
         container = f"{self.container}_segments" if segmented else self.container
-        LOGGER.debug(f"Creating container {container}")
-        async with self.client.put(
+        LOGGER.debug(f"Checking container {container}.")
+        async with self.client.head(
             common.generate_download_url(self.host, container),
-            headers={"Content-Length": str(0), "X-Auth-Token": self.token},
+            headers={"X-Auth-Token": self.token},
             ssl=ssl_context,
         ) as resp:
-            if resp.status not in {201, 202}:
-                raise aiohttp.web.HTTPForbidden(reason="Upload container creation failed")
-        LOGGER.debug(f"Created container {container}")
+            if resp.status in {200, 201, 202, 204}:
+                LOGGER.info(f"Container '{container}' already exists.")
+                raise aiohttp.web.HTTPConflict(reason="Container already exists.")
+            if resp.status == 404:
+                pass
+            else:
+                raise aiohttp.web.HTTPBadRequest(reason="No access to container.")
+
+        async with self.client.put(
+            common.generate_download_url(self.host, container),
+            headers={"X-Auth-Token": self.token},
+            ssl=ssl_context,
+        ) as resp:
+            if resp.status == 409:
+                LOGGER.info(f"Container name '{container}' already in use.")
+                raise aiohttp.web.HTTPConflict(reason="Container name already in use.")
+            if resp.status not in {201, 202, 204, 200}:
+                LOGGER.info(f"Container name '{container}' couldn't be created.")
+                raise aiohttp.web.HTTPBadRequest(reason="Copy container creation failed.")
+
+        LOGGER.info(f"Created container '{container}'.")
 
     async def a_sync_object_segments(self, manifest: str) -> str:
         """Get object segments."""
@@ -184,9 +202,6 @@ class ObjectReplicationProxy:
                 raise aiohttp.web.HTTPBadRequest(reason="Source object fetch failed")
             LOGGER.debug(f"Got stream handle for {object_name}")
 
-            # Ensure that the upload container exists
-            await self.a_create_container()
-
             LOGGER.debug(f"Got headers: {resp_g.headers}")
 
             headers = {"X-Auth-Token": self.token}
@@ -227,7 +242,6 @@ class ObjectReplicationProxy:
                 # Ensure the segment container exists, since performing
                 # segmented upload
                 LOGGER.debug(f"Copying object {object_name} in segments.")
-                await self.a_create_container(segmented=True)
 
                 manifest = await self.a_sync_object_segments(
                     resp_g.headers["X-Object-Manifest"]

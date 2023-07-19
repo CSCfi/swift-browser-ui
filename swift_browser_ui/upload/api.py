@@ -80,6 +80,10 @@ async def handle_replicate_container(
         source_container,
     )
 
+    # Ensure that both containers exist
+    await replicator.a_ensure_container()
+    await replicator.a_ensure_container(segmented=True)
+
     asyncio.ensure_future(replicator.a_copy_from_container())
 
     return aiohttp.web.Response(status=202)
@@ -104,6 +108,10 @@ async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.R
         source_project,
         source_container,
     )
+
+    # Ensure that both containers exist
+    await replicator.a_ensure_container()
+    await replicator.a_ensure_container(segmented=True)
 
     asyncio.ensure_future(replicator.a_copy_object(source_object))
 

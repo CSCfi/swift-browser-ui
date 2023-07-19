@@ -92,8 +92,12 @@ class APITestClass(tests.common.mockups.APITestBase):
     async def test_handle_replicate_container(self):
         """Test swift_browser_ui.upload.api.handle_replicate_container."""
         mock_copy_from_container = unittest.mock.AsyncMock()
+        mock_ensure_container = unittest.mock.AsyncMock()
         mock_replicator = types.SimpleNamespace(
-            **{"a_copy_from_container": mock_copy_from_container}
+            **{
+                "a_copy_from_container": mock_copy_from_container,
+                "a_ensure_container": mock_ensure_container,
+            }
         )
         mock_init_replicator = unittest.mock.Mock(return_value=mock_replicator)
         patch_replicator = unittest.mock.patch(
@@ -121,11 +125,18 @@ class APITestClass(tests.common.mockups.APITestBase):
             "source-container",
         )
         mock_copy_from_container.assert_called_once()
+        mock_ensure_container.assert_called()
 
     async def test_handle_replicate_object(self):
         """Test swift_brwser_ui.upload.api.handle_replicate_object."""
         mock_copy_object = unittest.mock.AsyncMock()
-        mock_replicator = types.SimpleNamespace(**{"a_copy_object": mock_copy_object})
+        mock_ensure_container = unittest.mock.AsyncMock()
+        mock_replicator = types.SimpleNamespace(
+            **{
+                "a_copy_object": mock_copy_object,
+                "a_ensure_container": mock_ensure_container,
+            }
+        )
         mock_init_replicator = unittest.mock.Mock(return_value=mock_replicator)
         patch_replicator = unittest.mock.patch(
             "swift_browser_ui.upload.api.ObjectReplicationProxy", mock_init_replicator
@@ -153,6 +164,7 @@ class APITestClass(tests.common.mockups.APITestBase):
             "source-container",
         )
         mock_copy_object.assert_called_once_with("source-object")
+        mock_ensure_container.assert_called()
 
     async def test_handle_post_object_chunk(self):
         """Test swift_browser_ui.upload.api.handle_post_object_chunk."""
