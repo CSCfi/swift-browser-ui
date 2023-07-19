@@ -426,7 +426,6 @@ export default {
   },
   methods: {
     checkPage(event) {
-      this.currentPage = event.target.pagination.currentPage;
       this.currentPage = checkIfItemIsLastOnPage(
         {
           currentPage: event.target.pagination.currentPage ,
