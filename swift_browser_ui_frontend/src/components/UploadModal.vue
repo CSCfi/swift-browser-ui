@@ -432,10 +432,9 @@ export default {
           itemsPerPage: event.target.pagination.itemsPerPage,
           itemCount: event.target.pagination.itemCount,
         });
-      if(isKey){
+      if (isKey) {
         this.currentKeyPage = page;
-      }else {
-        console.log(isKey);
+      } else {
         this.currentPage = page;
       }
     },
