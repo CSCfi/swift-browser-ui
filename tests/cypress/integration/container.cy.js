@@ -49,16 +49,30 @@ describe("Several containers with different names are created and visible", () =
     cy.login(Cypress.env("username"), Cypress.env("password"));
   });
 
-  it("Several containers are visible", function () {
+  it.only("Several containers are visible", function () {
     //create two folders
     const nameOne = Math.random().toString(36).substring(2, 7);
     const nameTwo = Math.random().toString(36).substring(2, 7);
 
     cy.addFolder(nameOne);
     cy.wait(5000);
+
     //check the folder 1 exists with search field
     cy.searchFolder(nameOne);
-    cy.get(".media-content").contains(nameOne).should("exist"); //check the folder 1 exists with search field
+    cy.wait(5000);
+    cy.get(".media-content").contains(nameOne).should("exist");
+
+    cy.addFolder(nameTwo);
+    cy.wait(5000);
+
+    cy.reload();
+
+    //check the folder 2 exists with search field
+    cy.searchFolder(nameTwo);
+    cy.wait(5000);
+    cy.get(".media-content").contains(nameTwo).should("exist");
+
+    //check there are multiple folders in the project
     cy.get("table")
       .find("a.icon", { timeout: "5000" })
       .should("have.length.greaterThan", 1);

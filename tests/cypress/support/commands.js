@@ -130,16 +130,6 @@ Cypress.Commands.add("deleteFile", (fileName) => {
     .eq(2)
     .find("button")
     .click();
-});
-
-Cypress.Commands.add("deleteFile", (fileName) => {
-  cy.contains(fileName)
-    .parent()
-    .parent()
-    .find("td")
-    .eq(2)
-    .find("button")
-    .click();
   cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
     force: true,
   });
