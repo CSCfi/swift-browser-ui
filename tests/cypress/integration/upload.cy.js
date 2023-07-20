@@ -36,7 +36,24 @@ describe("Upload a file", function () {
     //check if the file name is on the page
     cy.contains("text-file").should("exist");
 
-    //delete the file
+    //delete
+
+    // cy.contains("text-file")
+    //   .parent()
+    //   .parent()
+    //   .find("td")
+    //   .eq(5)
+    //   .find("button")
+    //   .eq(2)
+    //   .click();
+
+    // //confirm deletion
+    // cy.get(
+    //   "c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)"
+    // ).click();
+
+    //delete the file by checkbox
+
     cy.contains("text-file")
       .parent()
       .parent()
@@ -44,12 +61,11 @@ describe("Upload a file", function () {
       .eq(5)
       .find("button")
       .eq(2)
-      .click();
+      .click({ force: true });
+    cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
 
-    //confirm deletion
-    cy.get(
-      "c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)"
-    ).click();
     cy.wait(15000);
     cy.contains("This folder has no content.").should("exist");
   });
@@ -90,19 +106,8 @@ describe("Upload a file", function () {
     cy.contains("text-file").should("exist");
 
     //delete the file
-    cy.contains("text-file")
-      .parent()
-      .parent()
-      .find("td")
-      .eq(5)
-      .find("button")
-      .eq(2)
-      .click();
+    cy.deleteFileCheckbox("text-file");
 
-    //confirm deletion
-    cy.get(
-      "c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)"
-    ).click();
     cy.wait(10000);
     cy.contains("This folder has no content.").should("exist");
   });
@@ -183,39 +188,17 @@ describe("Upload a file", function () {
     cy.contains("text-file").should("exist");
     cy.contains("text-file-v2").should("exist");
 
-    //TODO delete with checkboxes
-
     //delete the first file
-    cy.contains("text-file-v2")
-      .parent()
-      .parent()
-      .find("td")
-      .eq(5)
-      .find("button")
-      .eq(2)
-      .click({ force: true });
-    cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
-      force: true,
-    });
+    cy.deleteFileCheckbox("text-file-v2");
 
     cy.wait(10000);
 
     //delete the second file
-    cy.contains("text-file")
-      .parent()
-      .parent()
-      .find("td")
-      .eq(5)
-      .find("button")
-      .eq(2)
-      .click({ force: true });
-    cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
-      force: true,
-    });
+    cy.deleteFileCheckbox("text-file");
 
     cy.wait(15000);
     cy.contains("This folder has no content.").should("exist");
   });
 });
 
-//TODO: test for uploading files with the same path one by one (two different upload modalsc)
+//TODO: test for uploading files with the same path one by one (two different upload modals)
