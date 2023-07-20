@@ -7,25 +7,25 @@ ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN \
-  apt-get update \
-  && apt-get upgrade -yqq -o Dpkg::Options::="--force-confold" \
-  && apt-get install -yqq \
-        # for adding a repository
-        apt-transport-https \
-        ca-certificates \
-        gnupg-agent \
-        curl \
-  && apt-get install -yqq aspell aspell-en libaspell-dev \
-  && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/node.gpg >/dev/null \
-  && echo "deb [signed-by=/usr/share/keyrings/node.gpg] https://deb.nodesource.com/node_18.x bullseye main" > /etc/apt/sources.list.d/node.list \
-  && apt-get update -yqq \
-  && apt-get install -yqq --no-install-recommends \
-        nodejs \
-        git \
-  && python3 -m pip install --no-cache --upgrade pip \
-  && corepack enable \
-  && corepack prepare pnpm@latest-7 --activate \
-  && pnpm config set store-dir /.pnpm-store \
-  && rm -rf /var/lib/apt/lists/*
+      apt-get update \
+      && apt-get upgrade -yqq -o Dpkg::Options::="--force-confold" \
+      && apt-get install -yqq \
+      # for adding a repository
+      apt-transport-https \
+      ca-certificates \
+      gnupg-agent \
+      curl \
+      && apt-get install -yqq aspell aspell-en libaspell-dev \
+      && curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/node.gpg >/dev/null \
+      && echo "deb [signed-by=/usr/share/keyrings/node.gpg] https://deb.nodesource.com/node_18.x bullseye main" > /etc/apt/sources.list.d/node.list \
+      && apt-get update -yqq \
+      && apt-get install -yqq --no-install-recommends \
+      nodejs \
+      git \
+      && python3 -m pip install --no-cache --upgrade pip \
+      && corepack enable \
+      && corepack prepare pnpm@latest-8 --activate \
+      && pnpm config set store-dir /.pnpm-store \
+      && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /venv && . /venv/bin/activate
