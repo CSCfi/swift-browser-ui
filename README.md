@@ -301,15 +301,15 @@ After following the development steps above, `cypress` should already be install
 
 You can run the tests in headless mode
 
-    npx cypress run
+    pnpm cypress run
 
 Or you can use the interactive version
 
-    npx cypress open
+    pnpm cypress open
 
 It's possible to set the host to run against by using the environment variable `CYPRESS_BASE_URL`, so that it may run against the development frontend server, for e.g.
 
-    CYPRESS_BASE_URL=http://localhost:8081 npx cypress open
+    CYPRESS_BASE_URL=http://localhost:8081 pnpm cypress open
 
 ### License
 

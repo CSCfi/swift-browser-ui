@@ -67,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1013) Restrict users from creating folders with ending `_segments`
 - (GL #923) Add `Last modified` column for Container Table
 - (GL #999) Add three level sharing with view option
+- (GL #947) Added cypress tests for login, adding and showing containers, uploading files
 
 ### Changed
 

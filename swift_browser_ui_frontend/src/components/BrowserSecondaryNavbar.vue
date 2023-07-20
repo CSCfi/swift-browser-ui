@@ -92,6 +92,7 @@
       <div class="navbar-item">
         <c-button
           :disabled="isUploading"
+          data-testid="upload-file"
           @click="toggleUploadModal"
           @keyup.enter="toggleUploadModal"
         >
