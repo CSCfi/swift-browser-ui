@@ -79,7 +79,7 @@
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
           :footerOptions.prop="footer"
-          @click="checkPage"
+          @click="checkPage(false)"
         />
         <!-- eslint-enable-->
         <p class="info-text is-size-6">
@@ -133,7 +133,7 @@
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
                   :footerOptions.prop="footer"
-                  @click="checkKeyPage"
+                  @click="checkPage(true)"
                 />
                 <!-- eslint-enable-->
               </c-flex>
@@ -425,23 +425,21 @@ export default {
     },
   },
   methods: {
-    checkPage(event) {
-      this.currentPage = checkIfItemIsLastOnPage(
+    checkPage(isKey) {
+      var page = checkIfItemIsLastOnPage(
         {
           currentPage: event.target.pagination.currentPage ,
           itemsPerPage: event.target.pagination.itemsPerPage,
           itemCount: event.target.pagination.itemCount,
         });
+      if(isKey){
+        this.currentKeyPage = page;
+      }else {
+        console.log(isKey);
+        this.currentPage = page;
+      }
     },
-    checkKeyPage(event){
-      this.currentKeyPage = event.target.pagination.currentPage;
-      this.currentKeyPage = checkIfItemIsLastOnPage(
-        {
-          currentPage: event.target.pagination.currentPage,
-          itemsPerPage: event.target.pagination.itemsPerPage,
-          itemCount: event.target.pagination.itemCount,
-        });
-    },
+
     appendDropFiles(file) {
       //Checking for identical path only, not name:
       //different folders may have same file names
