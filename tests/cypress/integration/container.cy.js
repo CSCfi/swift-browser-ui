@@ -65,4 +65,23 @@ describe("Several containers with different names are created and visible", () =
   });
 });
 
-//TODO separate test for folder deletion
+describe("A container can be deleted", () => {
+  before(() => {
+    cy.visit(Cypress.config().baseUrl);
+    cy.login(Cypress.env("username"), Cypress.env("password"));
+  });
+
+  it("creates and deletes a container", function () {
+    //create a folder
+    cy.addFolder("1111aaaa");
+    cy.wait(5000);
+    cy.contains("1111aaaa").should("exist");
+
+    //check the folder exists, then delete
+    cy.deleteFolder("1111aaaa");
+    cy.wait(5000);
+
+    //check it was deleted
+    cy.contains("1111aaaa").should("not.exist");
+  });
+});
