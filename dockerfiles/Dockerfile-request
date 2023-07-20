@@ -18,7 +18,7 @@ LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCFI/swift-sharing-request"
 
-COPY --from=BACKEND /usr/local/lib/python3.10 /usr/local/lib/python3.10/
+COPY --from=BACKEND /usr/local/lib/python3.11 /usr/local/lib/python3.11/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 
