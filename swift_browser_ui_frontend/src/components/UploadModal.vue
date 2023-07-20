@@ -79,7 +79,7 @@
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
           :footerOptions.prop="footer"
-          @click="checkPage(false)"
+          @click="checkPage($event,false)"
         />
         <!-- eslint-enable-->
         <p class="info-text is-size-6">
@@ -133,7 +133,7 @@
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
                   :footerOptions.prop="footer"
-                  @click="checkPage(true)"
+                  @click="checkPage($event,true)"
                 />
                 <!-- eslint-enable-->
               </c-flex>
@@ -425,7 +425,7 @@ export default {
     },
   },
   methods: {
-    checkPage(isKey) {
+    checkPage  (event, isKey){
       var page = checkIfItemIsLastOnPage(
         {
           currentPage: event.target.pagination.currentPage ,
