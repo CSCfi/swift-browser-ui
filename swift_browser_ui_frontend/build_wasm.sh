@@ -2,7 +2,7 @@
 
 set -e
 
-[[ ! -x "$(command -v docker)" ]] && echo "Docker is used to build the javascript WebAssembly dependencies, but it's not installed." && exit;
+[ ! -x "$(command -v docker)" ] && echo "Docker is used to build the javascript WebAssembly dependencies, but it's not installed." && exit;
 if ! docker version > /dev/null 2>&1; then echo "Docker is installed, but it seems like there's an error."; exit 1; fi
 
 SCRIPT="$(realpath $0)"
