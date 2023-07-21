@@ -35,6 +35,7 @@ import {
   parseDateTime,
   parseDateFromNow,
   getItemSize,
+  getTimestamp,
 } from "@/common/conv";
 import {
   DecryptedDownloadSession,
@@ -181,6 +182,21 @@ export default {
             })) {
               return items;
             } else {
+              //filter objs that would belong to subfolder
+              let subfolderObjs = filteredObjs.filter(obj => {
+                if (getFolderName(obj.name, this.$route) ===
+                  getFolderName(item.name, this.$route)) {
+                  return obj;
+                }
+              });
+              //get latest last_modified of all objs in subfolder
+              let dates = subfolderObjs.map(obj => obj.last_modified);
+              const latest = dates.reduce((a, b) => {
+                if (getTimestamp(a) > getTimestamp(b)) return a;
+                return b;
+              }, "");
+              //assign latest last_modified
+              item.last_modified = latest;
               items.push(item);
             }
           }

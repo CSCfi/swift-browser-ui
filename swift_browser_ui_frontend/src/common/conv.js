@@ -351,6 +351,12 @@ export function tokenize(text, ignoreSmallerThan = 2) {
 
 export const DEV = import.meta.env.MODE === "development";
 
+export function getTimestamp(str) {
+  if (str) {
+    return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
+  } else return -1; //if null last_modified
+}
+
 export function sortObjects(objects, sortBy, sortDirection) {
   sortBy = sortBy === "size" ? "bytes"
     : sortBy === "items" ? "count"
@@ -359,12 +365,6 @@ export function sortObjects(objects, sortBy, sortDirection) {
   objects.sort((a, b) => {
     let valueA = a[sortBy];
     let valueB = b[sortBy];
-
-    function getTimestamp(str) {
-      if (str) {
-        return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
-      } else return -1; //if null last_modified
-    }
 
     if (sortBy === "last_modified") {
       //get timestamp from string
