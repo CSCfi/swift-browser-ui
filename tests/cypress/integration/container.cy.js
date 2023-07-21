@@ -49,7 +49,7 @@ describe("Several containers with different names are created and visible", () =
     cy.login(Cypress.env("username"), Cypress.env("password"));
   });
 
-  it.only("Several containers are visible", function () {
+  it("Several containers are visible", function () {
     //create two folders
     const nameOne = Math.random().toString(36).substring(2, 7);
     const nameTwo = Math.random().toString(36).substring(2, 7);
@@ -87,15 +87,18 @@ describe("A container can be deleted", () => {
 
   it("creates and deletes a container", function () {
     //create a folder
-    cy.addFolder("1111aaaa");
+    cy.addFolder("000aaa");
     cy.wait(5000);
-    cy.contains("1111aaaa").should("exist");
+    cy.contains("000aaa").should("exist");
 
     //check the folder exists, then delete
-    cy.deleteFolder("1111aaaa");
+    cy.deleteFolder("000aaa");
+    cy.contains("Folder was deleted").should("exist");
     cy.wait(5000);
 
     //check it was deleted
-    cy.contains("1111aaaa").should("not.exist");
+    cy.reload();
+    cy.wait(10000);
+    cy.contains("000aaa").should("not.exist");
   });
 });
