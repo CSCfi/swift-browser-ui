@@ -102,20 +102,30 @@ async def get_upload_runner(
             ) as resp:
                 request.app["Log"].debug(resp)
                 if resp.status != 200:
-                    services["swiftui-upload-runner"] = {
-                        "status": "Down",
-                    }
+                    services["swiftui-upload-runner"] = {"status": "Down"}
+                    services["vault"] = {"status": "Down"}
+                    end = time.time() - start
+                    performance["swiftui-upload-runner"] = {"time": end}
+                    performance["vault"] = {"time": end}
                 else:
-                    upload_status = await resp.json()
-                    services["swiftui-upload-runner"] = upload_status
-            performance["swiftui-upload-runner"] = {"time": time.time() - start}
+                    status = await resp.json()
+                    services["swiftui-upload-runner"] = status["upload-runner"]
+                    services["vault"] = status["vault-instance"]
+                    performance["swiftui-upload-runner"] = {
+                        "time": status["start-time"] - start
+                    }
+                    performance["vault"] = {
+                        "time": status["end-time"] - status["start-time"]
+                    }
         else:
             services["swiftui-upload-runner"] = {"status": "Nonexistent"}
     except ServerDisconnectedError:
         _set_error_status(request, services, "swiftui-upload-runner")
+        _set_error_status(request, services, "vault")
     except Exception as e:
         request.app["Log"].info(f"Health failed for reason: {e}")
         _set_error_status(request, services, "swiftui-upload-runner")
+        _set_error_status(request, services, "vault")
 
 
 async def get_redis(
@@ -137,32 +147,6 @@ async def get_redis(
     except Exception as e:
         request.app["Log"].info(f"Health failed for reason: {e}")
         _set_error_status(request, services, "redis")
-
-
-async def get_vault(
-    services: typing.Dict[str, typing.Any],
-    request: aiohttp.web.Request,
-    web_client: aiohttp.ClientSession,
-    performance: typing.Dict[str, typing.Any],
-) -> None:
-    """Poll Vault service."""
-    try:
-        if setd["vault_url"]:
-            start = time.time()
-            services["vault"] = {"status": "Down"}
-            async with web_client.get(str(setd["vault_url"]) + "/sys/health") as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    if data.get("initialized") and data.get("sealed") is False:
-                        services["vault"] = {"status": "Ok"}
-            performance["vault"] = {"time": time.time() - start}
-        else:
-            services["vault"] = {"status": "Nonexistent"}
-    except ServerDisconnectedError:
-        _set_error_status(request, services, "vault")
-    except Exception as e:
-        request.app["Log"].info(f"Health failed for reason: {e}")
-        _set_error_status(request, services, "vault")
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -190,8 +174,6 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
     await get_upload_runner(services, request, web_client, api_params, performance)
 
     await get_redis(services, request, performance)
-
-    await get_vault(services, request, web_client, performance)
 
     status["services"] = services
     status["performance"] = performance

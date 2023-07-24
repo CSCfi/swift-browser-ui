@@ -86,7 +86,6 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "oidc_client_secret": environ.get("OIDC_CLIENT_SECRET", None),
     "oidc_redirect_uris": environ.get("OIDC_REDIRECT_URIS", ""),
     "sdconnect_enabled": environ.get("SDCONNECT_ENABLED", "False") == "True",
-    "vault_url": environ.get("VAULT_URL", ""),
 }
 
 

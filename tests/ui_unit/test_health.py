@@ -22,9 +22,6 @@ class HealthTestClass(tests.common.mockups.APITestBase):
             "upload_internal_endpoint": "http://test-endpoint",
             "sharing_internal_endpoint": "http://test-endpoint",
             "request_internal_endpoint": "http://test-endpoint",
-            "redis_host": "http://test-endpoint",
-            "redis_port": "6379",
-            "vault_url": "http://test-endpoint",
         }
         self.setd = unittest.mock.patch("swift_browser_ui.ui.health.setd", self.mock_setd)
 
@@ -94,6 +91,10 @@ class HealthTestClass(tests.common.mockups.APITestBase):
 
     async def test_get_upload_runner(self):
         """Test getting upload runner."""
+        self.mock_client_json["upload-runner"] = {"status": "Ok"}
+        self.mock_client_json["vault-instance"] = {"status": "Ok"}
+        self.mock_client_json["start-time"] = 0.1
+        self.mock_client_json["end-time"] = 0.2
         with self.setd:
             await swift_browser_ui.ui.health.get_upload_runner(
                 self.mock_services,
@@ -102,10 +103,13 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_api_params,
                 self.mock_performance,
             )
+
         self.mock_client.get.assert_called_once()
         self.assertEqual(self.mock_services["swiftui-upload-runner"], {"status": "Ok"})
+        self.assertEqual(self.mock_services["vault"], {"status": "Ok"})
         self.assertIn("time", self.mock_performance["swiftui-upload-runner"])
-        first_time = self.mock_performance["swiftui-upload-runner"]["time"]
+        first_time_upload = self.mock_performance["swiftui-upload-runner"]["time"]
+        first_time_vault = self.mock_performance["vault"]["time"]
 
         self.mock_client_response.status = 503
         with self.setd:
@@ -117,9 +121,11 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 self.mock_performance,
             )
         self.assertEqual(self.mock_services["swiftui-upload-runner"], {"status": "Down"})
+        self.assertEqual(self.mock_services["vault"], {"status": "Down"})
         self.assertNotEqual(
-            first_time, self.mock_performance["swiftui-upload-runner"]["time"]
+            first_time_upload, self.mock_performance["swiftui-upload-runner"]["time"]
         )
+        self.assertNotEqual(first_time_vault, self.mock_performance["vault"]["time"])
 
     async def test_get_redis(self):
         """Test getting redis service."""
@@ -149,35 +155,6 @@ class HealthTestClass(tests.common.mockups.APITestBase):
                 )
         self.assertEqual(self.mock_services["redis"], {"status": "Down"})
         self.assertNotEqual(first_time, self.mock_performance["redis"]["time"])
-
-    async def test_get_vault(self):
-        """Test getting vault service."""
-        self.mock_client_response.json.return_value = {
-            "initialized": True,
-            "sealed": False,
-        }
-        with self.setd:
-            await swift_browser_ui.ui.health.get_vault(
-                self.mock_services,
-                self.mock_request,
-                self.mock_client,
-                self.mock_performance,
-            )
-        self.mock_client.get.assert_called_once()
-        self.assertEqual(self.mock_services["vault"], {"status": "Ok"})
-        self.assertIn("time", self.mock_performance["vault"])
-        first_time = self.mock_performance["vault"]["time"]
-
-        self.mock_client_response.status = 503
-        with self.setd:
-            await swift_browser_ui.ui.health.get_vault(
-                self.mock_services,
-                self.mock_request,
-                self.mock_client,
-                self.mock_performance,
-            )
-        self.assertEqual(self.mock_services["vault"], {"status": "Down"})
-        self.assertNotEqual(first_time, self.mock_performance["vault"]["time"])
 
     async def test_some_exception(self):
         """Test that an exception happens when getting one of the service statuses."""
@@ -211,8 +188,10 @@ class HealthTestClass(tests.common.mockups.APITestBase):
         """Test handling health check."""
         self.mock_client_response.json.return_value = {
             "status": "Ok",
-            "initialized": True,
-            "sealed": False,
+            "upload-runner": {"status": "Ok"},
+            "vault-instance": {"status": "Ok"},
+            "start-time": 0.1,
+            "end-time": 0.2,
         }
         redis_mock = unittest.mock.patch(
             "swift_browser_ui.ui.health.get_redis_client", new=self.mock_redis_client
