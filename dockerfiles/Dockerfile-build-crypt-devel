@@ -1,5 +1,5 @@
 # Build wasm encryption
-FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.1.0 AS WASMCRYPT
+FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.2.0 AS WASMCRYPT
 
 COPY swift_browser_ui_frontend/wasm/ /src/
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
+  - use `CSCfi/docker-emscripten-crypt4gh` image `1.2.0`
 - Show notification when changing permission in share modal
 - Use OIDC as the default Keystone login provider for SSO
 - (GH #864) Vault c4ghtransit integration - Uploads object headers to Vault in addition to Object Storage
