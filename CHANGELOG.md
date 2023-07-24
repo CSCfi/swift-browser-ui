@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
+- (GH #1059) Fixed item deletion bug in which deleting last item on a page left open an empty page
 - (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
   - use `CSCfi/docker-emscripten-crypt4gh` image `1.2.0`
