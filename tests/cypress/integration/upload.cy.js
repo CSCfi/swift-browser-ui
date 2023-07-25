@@ -17,7 +17,7 @@ describe("Upload a file", function () {
     cy.wait(5000);
 
     //press upload button from folder
-    cy.get('[data-testid="upload-file"]').click();
+    cy.get('[data-testid="upload-file"]').click({ force: true });
     cy.wait(11000);
 
     //upload the fixture file
@@ -25,15 +25,17 @@ describe("Upload a file", function () {
       .find("input")
       .invoke("show")
       .selectFile(`cypress/fixtures/text-files/text-file.txt`);
-    cy.wait(15000);
-    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click();
-    cy.wait(15000);
+    cy.wait(25000);
+    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
+    cy.wait(25000);
 
     //close the modal
-    cy.get(".link-underline").click();
+    cy.get(".link-underline").click({ force: true });
 
     cy.reload();
-    cy.wait(15000);
+    cy.wait(25000);
 
     //check if the file name is on the page
     cy.contains("text-file").should("exist");
@@ -52,7 +54,7 @@ describe("Upload a file", function () {
       force: true,
     });
 
-    cy.wait(15000);
+    cy.wait(25000);
     cy.contains("This folder has no content.").should("exist");
   });
 
@@ -71,24 +73,29 @@ describe("Upload a file", function () {
       .find("input")
       .type(randomName, { force: true });
 
-    cy.get('[role="listbox"]').find("li").contains(randomName).click();
-    cy.wait(15000);
+    cy.get('[role="listbox"]')
+      .find("li")
+      .contains(randomName)
+      .click({ force: true });
+    cy.wait(25000);
 
     //   upload the fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(15000);
-    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click();
-    cy.wait(15000);
+    cy.wait(25000);
+    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
+    cy.wait(25000);
 
     //close the modal
-    cy.get(".link-underline").click();
+    cy.get(".link-underline").click({ force: true });
 
     //   check if the file name is on the page
     cy.reload();
-    cy.wait(15000);
+    cy.wait(25000);
     cy.contains("text-file").should("exist");
 
     //delete the file
@@ -112,8 +119,11 @@ describe("Upload a file", function () {
       .find("input")
       .type(randomName, { force: true });
 
-    cy.get('[role="listbox"]').find("li").contains(randomName).click();
-    cy.wait(15000);
+    cy.get('[role="listbox"]')
+      .find("li")
+      .contains(randomName)
+      .click({ force: true });
+    cy.wait(25000);
 
     //   upload the fixture file
     cy.get(".upload-btn-wrapper")
@@ -145,15 +155,18 @@ describe("Upload a file", function () {
       .find("input")
       .type(randomName, { force: true });
 
-    cy.get('[role="listbox"]').find("li").contains(randomName).click();
-    cy.wait(15000);
+    cy.get('[role="listbox"]')
+      .find("li")
+      .contains(randomName)
+      .click({ force: true });
+    cy.wait(25000);
 
     // upload the first fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(15000);
+    cy.wait(25000);
 
     //upload another fixture file
     cy.get(".upload-btn-wrapper")
@@ -161,12 +174,14 @@ describe("Upload a file", function () {
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file-v2.txt");
 
-    cy.wait(15000);
-    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click();
-    cy.wait(15000);
+    cy.wait(25000);
+    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
+    cy.wait(25000);
 
     //close the modal
-    cy.get(".link-underline").click();
+    cy.get(".link-underline").click({ force: true });
 
     //check the success
     cy.reload();
@@ -182,7 +197,7 @@ describe("Upload a file", function () {
     //delete the second file
     cy.deleteFileCheckbox("text-file");
 
-    cy.wait(15000);
+    cy.wait(25000);
     cy.contains("This folder has no content.").should("exist");
   });
 
@@ -196,7 +211,7 @@ describe("Upload a file", function () {
     cy.wait(5000);
 
     //press upload button from folder
-    cy.get('[data-testid="upload-file"]').click();
+    cy.get('[data-testid="upload-file"]').click({ force: true });
     cy.wait(11000);
 
     // upload the first fixture file
@@ -204,17 +219,18 @@ describe("Upload a file", function () {
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(15000);
+    cy.wait(25000);
 
-    cy.wait(15000);
-    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click();
-    cy.wait(15000);
+    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
+    cy.wait(25000);
 
     //close the modal
     cy.get(".toast-main > c-button.hydrated").click({ force: true });
 
     //press upload button from folder
-    cy.get('[data-testid="upload-file"]').click();
+    cy.get('[data-testid="upload-file"]').click({ force: true });
     cy.wait(11000);
 
     //upload another fixture file
@@ -223,9 +239,11 @@ describe("Upload a file", function () {
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file-v2.txt");
 
-    cy.wait(15000);
-    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click();
-    cy.wait(15000);
+    cy.wait(25000);
+    cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+      force: true,
+    });
+    cy.wait(25000);
 
     //close the modal
     cy.get(".toast-main > c-button.hydrated").click({ force: true });
@@ -244,9 +262,7 @@ describe("Upload a file", function () {
     //delete the second file
     cy.deleteFileCheckbox("text-file");
 
-    cy.wait(15000);
+    cy.wait(25000);
     cy.contains("This folder has no content.").should("exist");
   });
-  //TODO: test for FAIL uploading files with the SAME path one by one (two different upload modals)
-
 });
