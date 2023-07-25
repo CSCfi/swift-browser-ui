@@ -118,6 +118,9 @@ export default {
     isLoaderVisible() {
       return this.$store.state.isLoaderVisible;
     },
+    owner() {
+      return this.$route.params.owner;
+    },
   },
   watch: {
     prefix() {
@@ -281,7 +284,9 @@ export default {
                           toggleEditTagsModal(item.name, null);
                         }
                       },
-                      disabled: isSubfolder || this.accessRights.length <= 1,
+                      disabled: isSubfolder ||
+                        (this.owner != undefined &&
+                          this.accessRights.length <= 1),
                     },
                   },
                 },
@@ -302,7 +307,8 @@ export default {
                           this.$emit("delete-object", item);
                         }
                       },
-                      disabled: this.accessRights.length <= 1,
+                      disabled: this.owner != undefined &&
+                        this.accessRights.length <= 1,
                     },
                   },
                 },
@@ -335,7 +341,7 @@ export default {
           params: {
             container: containerName,
             object: objectName,
-            owner: this.$route.params.owner,
+            owner: this.owner,
           },
         };
       }
@@ -363,7 +369,7 @@ export default {
         this.active.id,
         [object.name],
         this.$route.params.container,
-        (this.$route.params.owner != undefined) ? this.$route.params.owner : "",
+        (this.owner != undefined) ? this.owner : "",
         this.$store,
       );
       this.currentDownload.initServiceWorker();
