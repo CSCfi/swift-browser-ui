@@ -142,7 +142,7 @@ export default {
                   title: this.$t("message.remove"),
                   type: "error",
                   path: mdiDelete,
-                  onClick: ({ data: { identifier } }) =>
+                  onClick: ({ data: { identifier }}) =>
                     this.deleteToken(identifier.value),
                 },
               },
@@ -269,6 +269,11 @@ export default {
         );
         this.getTokens();
       });
+
+      if(this.tokens.length - 1 == (this.currentPage - 1)
+        * this.tokensPerPage) {
+        this.currentPage--;
+      }
     },
   },
 };

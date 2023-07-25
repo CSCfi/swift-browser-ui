@@ -47,6 +47,7 @@ import {
   getFolderName,
   getPrefix,
   getPaginationOptions,
+  checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
 
 import {
@@ -133,6 +134,10 @@ export default {
   },
   beforeUpdate() {
     this.getPage();
+  },
+  updated(){
+    this.paginationOptions.currentPage =
+      checkIfItemIsLastOnPage(this.paginationOptions);
   },
   methods: {
     changeFolder: function (folder) {

@@ -41,6 +41,7 @@ import {
   getAccessDetails,
   getPaginationOptions,
   toggleCopyFolderModal,
+  checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
@@ -321,7 +322,9 @@ export default {
                           ),
                           disabled: item.owner,
                         },
+
                       ],
+
                       customTrigger: {
                         value: this.$t("message.options"),
                         disabled: true,
@@ -452,6 +455,15 @@ export default {
           this.$emit("delete-container", container);
         });
       }
+      this.paginationOptions.currentPage =
+        checkIfItemIsLastOnPage({
+          currentPage:
+            this.paginationOptions.currentPage,
+          itemsPerPage:
+            this.paginationOptions.itemsPerPage,
+          itemCount:
+            this.paginationOptions.itemCount - 1,
+        });
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {
