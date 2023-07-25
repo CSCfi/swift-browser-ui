@@ -511,9 +511,9 @@ export default {
 }
 
 c-card-content  {
-  overflow-y: scroll;
+  overflow-y: visible;
   scrollbar-width: 0.5rem;
-  padding: 0 1rem 6rem 1rem;
+  padding: 0 1rem 3rem 1rem;
   &::-webkit-scrollbar {
     width: 0.5rem;
   }
