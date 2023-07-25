@@ -273,7 +273,7 @@ export default {
         };
       }
       prefix !== null ? route.query={ prefix: prefix } : "";
-      item.name !== null ? route.query={ file: item.name } : "";
+      item.name !== null ? route.query={...route.query, file: item.name } : "";
       return route;
     },
     searchGainedFocus: async function () {
