@@ -141,6 +141,7 @@ export default {
   },
   methods: {
     changeFolder: function (folder) {
+      this.paginationOptions.currentPage = 1;
       this.$router.push(
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
@@ -325,7 +326,17 @@ export default {
     },
     setPageByFileName: function(file){
       if(file != undefined){
-        var index = this.objs.findIndex(item => item.name == file);
+        var objectList = this.objs;
+        if(file.includes("/")){
+          var subfolderItems = [];
+          objectList.forEach(element => {
+            if(element.name.replace(/\/.*/,"") === file.replace(/\/.*/,"")){
+              subfolderItems.push(element);
+            }
+          });
+          objectList = subfolderItems;
+        }
+        var index = objectList.findIndex(item => item.name == file);
         if(index <= 0){
           index = 1;
         }
