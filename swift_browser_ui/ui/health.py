@@ -6,8 +6,10 @@ import typing
 
 import aiohttp.web
 from aiohttp.client_exceptions import ServerDisconnectedError
+from redis import ConnectionError
 
 import swift_browser_ui.common.signature
+from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.settings import setd
 
 
@@ -100,20 +102,51 @@ async def get_upload_runner(
             ) as resp:
                 request.app["Log"].debug(resp)
                 if resp.status != 200:
-                    services["swiftui-upload-runner"] = {
-                        "status": "Down",
-                    }
+                    services["swiftui-upload-runner"] = {"status": "Down"}
+                    services["vault"] = {"status": "Down"}
+                    end = time.time() - start
+                    performance["swiftui-upload-runner"] = {"time": end}
+                    performance["vault"] = {"time": end}
                 else:
-                    upload_status = await resp.json()
-                    services["swiftui-upload-runner"] = upload_status
-            performance["swiftui-upload-runner"] = {"time": time.time() - start}
+                    status = await resp.json()
+                    services["swiftui-upload-runner"] = status["upload-runner"]
+                    services["vault"] = status["vault-instance"]
+                    performance["swiftui-upload-runner"] = {
+                        "time": status["start-time"] - start
+                    }
+                    performance["vault"] = {
+                        "time": status["end-time"] - status["start-time"]
+                    }
         else:
             services["swiftui-upload-runner"] = {"status": "Nonexistent"}
     except ServerDisconnectedError:
         _set_error_status(request, services, "swiftui-upload-runner")
+        _set_error_status(request, services, "vault")
     except Exception as e:
         request.app["Log"].info(f"Health failed for reason: {e}")
         _set_error_status(request, services, "swiftui-upload-runner")
+        _set_error_status(request, services, "vault")
+
+
+async def get_redis(
+    services: typing.Dict[str, typing.Any],
+    request: aiohttp.web.Request,
+    performance: typing.Dict[str, typing.Any],
+) -> None:
+    """Poll Redis service."""
+    try:
+        start = time.time()
+        redis_client = await get_redis_client()
+        await redis_client.ping()
+        services["redis"] = {"status": "Ok"}
+        performance["redis"] = {"time": time.time() - start}
+        await redis_client.close()
+    except ConnectionError:
+        services["redis"] = {"status": "Down"}
+        performance["redis"] = {"time": time.time() - start}
+    except Exception as e:
+        request.app["Log"].info(f"Health failed for reason: {e}")
+        _set_error_status(request, services, "redis")
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -139,6 +172,8 @@ async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Respo
     await get_swift_sharing(services, request, web_client, api_params, performance)
 
     await get_upload_runner(services, request, web_client, api_params, performance)
+
+    await get_redis(services, request, performance)
 
     status["services"] = services
     status["performance"] = performance

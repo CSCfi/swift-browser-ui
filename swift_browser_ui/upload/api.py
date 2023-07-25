@@ -6,6 +6,7 @@ import base64
 import json
 import logging
 import os
+import time
 import typing
 
 import aiohttp.web
@@ -292,14 +293,22 @@ async def handle_get_container(
     return resp
 
 
-async def handle_health_check(_: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Answer a service health check."""
-    # Case degraded
+async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Answer a service health check for the upload runner and vault client."""
+    start_time = time.time()
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    try:
+        vault_status = await vault_client.get_sys_health()
+    except Exception:
+        vault_status = "Error"
+    end_time = time.time()
 
-    # Case nominal
     return aiohttp.web.json_response(
         {
-            "status": "Ok",
+            "upload-runner": {"status": "Ok"},
+            "vault-instance": {"status": vault_status},
+            "start-time": start_time,
+            "end-time": end_time,
         }
     )
 

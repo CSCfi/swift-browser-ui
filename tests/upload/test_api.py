@@ -67,6 +67,12 @@ class APITestClass(tests.common.mockups.APITestBase):
         )
         self.mock_init_download = unittest.mock.Mock(return_value=self.mock_download)
 
+        self.mock_get_sys_health = unittest.mock.AsyncMock(return_value=True)
+        self.mock_vault_client = types.SimpleNamespace(
+            **{"get_sys_health": self.mock_get_sys_health}
+        )
+        self.mock_init_vault = unittest.mock.Mock(return_value=self.mock_vault_client)
+
     async def test_handle_get_object(self):
         """Test swift_browser_ui.upload.api.handle_get_object."""
         self.mock_request.match_info["project"] = "test-project"
@@ -277,7 +283,13 @@ class APITestClass(tests.common.mockups.APITestBase):
 
     async def test_handle_health_check(self):
         """Test swift_browser_ui.upload.api.handle_health_check."""
-        resp = await swift_browser_ui.upload.api.handle_health_check(
-            tests.common.mockups.Mock_Request()
+        patch_init_vault = unittest.mock.patch(
+            "swift_browser_ui.upload.api.VaultClient",
+            self.mock_init_vault,
         )
+        self.mock_request.app["vault_client"] = patch_init_vault
+        with patch_init_vault:
+            resp = await swift_browser_ui.upload.api.handle_health_check(
+                self.mock_request
+            )
         self.assertIsInstance(resp, aiohttp.web.Response)
