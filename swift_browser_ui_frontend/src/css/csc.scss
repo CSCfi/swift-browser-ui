@@ -1,6 +1,7 @@
 @charset "utf-8";
-// CSS file for integrating CSC brand colors
 
+// CSS file for integrating CSC brand colors
+/*! purgecss start ignore */
 :root {
   --csc-border-radius: 4px;
   --csc-dark-grey: rgb(89, 89, 89);
@@ -20,7 +21,8 @@
   --csc-warning: #ff5800;
 }
 
-@import "bulma/sass/utilities/_all.sass";
+/*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
+@import "external.sass";
 @import "csc-ui/dist/styles/variables.scss";
 
 $csc-primary: #006778;
@@ -37,7 +39,7 @@ $csc-light-green: #c9e2ae;
 $csc-grey: #595959;
 $csc-light-grey: #757575;
 $csc-lighter-grey: #d2d3d5;
-$csc-lightest-grey:#dfe1e3;
+$csc-lightest-grey: #dfe1e3;
 $csc-grey-blue: #8196b9;
 $csc-light-grey-blue: #f8f9fc;
 $csc-yellow: #ffd534;
@@ -74,66 +76,53 @@ $custom-shades: null !default;
 // specific bulma variable overrides
 $menu-item-active-background-color: $csc-primary;
 
-$colors: mergeColorMaps(
-  (
-    "white": (
-      $white,
-      $black,
+$colors: mergeColorMaps(("white": ($white,
+        $black,
+      ),
+      "black": ($black,
+        $white,
+      ),
+      "light": ($light,
+        $light-invert,
+      ),
+      "dark": ($dark,
+        $dark-invert,
+      ),
+      "primary": ($primary,
+        $primary-invert,
+        $primary-light,
+        $primary-dark,
+      ),
+      "link": ($link,
+        $link-invert,
+        $link-light,
+        $link-dark,
+      ),
+      "info": ($info,
+        $info-invert,
+        $info-light,
+        $info-dark,
+      ),
+      "success": ($success,
+        $success-invert,
+        $success-light,
+        $success-dark,
+      ),
+      "warning": ($warning,
+        $warning-invert,
+        $warning-light,
+        $warning-dark,
+      ),
+      "danger": ($danger,
+        $danger-invert,
+        $danger-light,
+        $danger-dark,
+      ),
     ),
-    "black": (
-      $black,
-      $white,
-    ),
-    "light": (
-      $light,
-      $light-invert,
-    ),
-    "dark": (
-      $dark,
-      $dark-invert,
-    ),
-    "primary": (
-      $primary,
-      $primary-invert,
-      $primary-light,
-      $primary-dark,
-    ),
-    "link": (
-      $link,
-      $link-invert,
-      $link-light,
-      $link-dark,
-    ),
-    "info": (
-      $info,
-      $info-invert,
-      $info-light,
-      $info-dark,
-    ),
-    "success": (
-      $success,
-      $success-invert,
-      $success-light,
-      $success-dark,
-    ),
-    "warning": (
-      $warning,
-      $warning-invert,
-      $warning-light,
-      $warning-dark,
-    ),
-    "danger": (
-      $danger,
-      $danger-invert,
-      $danger-light,
-      $danger-dark,
-    ),
-  ),
-  $custom-colors
-);
+    $custom-colors);
 
 // Links
 $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
-@import "bulma/bulma.sass";
+/*! purgecss end ignore */

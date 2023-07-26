@@ -18,7 +18,6 @@
     "@mdi/js": "^7.2.96",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/rxjs": "^10.2.1",
-    "bulma": "^0.9.4",
     "cli-highlight": "^2.1.11",
     "csc-ui": "github:hannyle/csc-ui",
     "dexie": "^3.2.4",
