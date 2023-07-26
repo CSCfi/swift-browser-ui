@@ -1,9 +1,9 @@
 <template>
   <div id="secondary-navbar">
-    <div class="container is-fluid">
+    <div class="container-fluid">
       <div
         v-if="multipleProjects"
-        class="navbar-item select-project"
+        class="nav-item select-project"
       >
         <c-select
           v-csc-control
@@ -19,7 +19,7 @@
       </div>
       <div
         v-if="!multipleProjects"
-        class="navbar-item column"
+        class="nav-item column"
       >
         <p class="label">
           {{ $t("message.currentProj") }}
@@ -28,7 +28,7 @@
           {{ active.name }}
         </p>
       </div>
-      <div class="navbar-item">
+      <div class="nav-item">
         <c-button
           ghost
           data-testid="copy-projectId"
@@ -79,7 +79,7 @@
         </c-button>
       </c-toasts>
       <c-spacer />
-      <div class="navbar-item">
+      <div class="nav-item">
         <c-button
           outlined
           data-testid="create-folder"
@@ -89,7 +89,7 @@
           {{ $t("message.createFolder") }}
         </c-button>
       </div>
-      <div class="navbar-item">
+      <div class="nav-item">
         <c-button
           :disabled="isUploading"
           data-testid="upload-file"
@@ -190,19 +190,24 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 #secondary-navbar {
   border-bottom: 6px solid $csc-primary-light;
 }
 
-.container {
+.container-fluid {
   display: flex;
   padding: 0.5rem 1rem !important;
   flex-wrap: wrap;
 }
 
-.nav-item {
+#secondary-navbar .nav-item {
   height: 100%;
   align-self: center;
+  flex-grow: 0;
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  position: relative;
 }
 
 c-toasts {
