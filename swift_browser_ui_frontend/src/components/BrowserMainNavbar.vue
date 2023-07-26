@@ -2,7 +2,6 @@
   <div id="main-navigation">
     <div class="toolbar">
       <router-link
-        class="navbar-item pl-4"
         :to="{name: 'AllFolders'}"
         :aria-label="$t('label.logo')"
       >
