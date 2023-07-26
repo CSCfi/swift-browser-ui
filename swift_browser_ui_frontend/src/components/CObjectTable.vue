@@ -30,11 +30,11 @@
 
 <script>
 import {
-  truncate,
   sortObjects,
   parseDateTime,
   parseDateFromNow,
   getItemSize,
+  getHumanReadableSize,
   getTimestamp,
 } from "@/common/conv";
 import {
@@ -149,6 +149,124 @@ export default {
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
     },
+    formatItem: function (item) {
+      const name = this.renderFolders ? getFolderName(item.name, this.$route)
+        : item.name;
+
+      return {
+        name: {
+          value: name,
+          ...(item?.subfolder ? {
+            component: {
+              tag: "c-link",
+              params: {
+                href: "javascript:void(0)",
+                color: "dark-grey",
+                path: mdiFolder,
+                iconFill: "primary",
+                iconStyle: {
+                  marginRight: "1rem",
+                },
+                onClick: () => this.changeFolder(name),
+              },
+            },
+          } : {}),
+        },
+        size: {
+          value: getHumanReadableSize(item.bytes),
+        },
+        last_modified: {
+          value: this.showTimestamp? parseDateTime(
+            this.locale, item.last_modified, this.$t, false) :
+            parseDateFromNow(this.locale, item.last_modified, this.$t),
+        },
+        ...(this.hideTags ? {} : {
+          tags: {
+            value: null,
+            children: [
+              ...(item.tags?.length ?
+                item.tags.map((tag, index) => ({
+                  key: "tag_" + index + "",
+                  value: tag,
+                  component: {
+                    tag: "c-tag",
+                    params: {
+                      flat: true,
+                    },
+                  },
+                })) : [{ key: "no_tags", value: "-" }]),
+            ],
+          },
+        }),
+        actions: {
+          value: null,
+          sortable: null,
+          align: "end",
+          children: [
+            {
+              value: this.$t("message.download"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: "Download",
+                  onClick: () => {
+                    item.name.match(".c4gh")
+                      ? this.beginDownload(item)
+                      : this.navDownload(item.url);
+                  },
+                  path: mdiTrayArrowDown,
+                },
+              },
+            },
+            {
+              value: this.$t("message.table.editTags"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: "Edit tags",
+                  path: mdiPencilOutline,
+                  onClick: () =>
+                    toggleEditTagsModal(item.name, null),
+                  onKeyUp: (event) => {
+                    if(event.keyCode === 13) {
+                      toggleEditTagsModal(item.name, null);
+                    }
+                  },
+                  disabled: item?.subfolder ||
+                    (this.owner != undefined && this.accessRights.length <= 1),
+                },
+              },
+            },
+            {
+              value: this.$t("message.delete"),
+              component: {
+                tag: "c-button",
+                params: {
+                  text: true,
+                  size: "small",
+                  title: "Delete object",
+                  path: mdiDeleteOutline,
+                  onClick: () => {
+                    this.$emit("delete-object", item);
+                  },
+                  onKeyUp: (event) => {
+                    if(event.keyCode === 13) {
+                      this.$emit("delete-object", item);
+                    }
+                  },
+                  disabled: 
+                    this.owner != undefined && this.accessRights.length <= 1,
+                },
+              },
+            },
+          ],
+        },
+      };
+    },
     getPage: function () {
       let offset = 0;
       let limit = this.objs.length;
@@ -168,176 +286,55 @@ export default {
           return obj.name.startsWith(getPrefix(this.$route));
         });
 
-      let pagedLength = 0;
-
-      this.objects = filteredObjs
-        .reduce((items, item) => {
-          if (isFile(item.name, this.$route) || !this.renderFolders) {
+      if(!this.renderFolders) {
+        this.objects = filteredObjs.slice(offset, offset + limit)
+          .map(item => this.formatItem(item));
+      } else {
+        this.objects = filteredObjs.reduce((items, item) => {
+          if (isFile(item.name, this.$route)) {
             items.push(item);
           } else {
+            let subName = getFolderName(item.name, this.$route);
+            //check if subfolder already added
             if (items.find(el => {
               return getFolderName(
                 el.name, this.$route,
-              ) === getFolderName(item.name, this.$route) ? true : false;
+              ) === subName ? true : false;
             })) {
               return items;
             } else {
               //filter objs that would belong to subfolder
               let subfolderObjs = filteredObjs.filter(obj => {
                 if (getFolderName(obj.name, this.$route) ===
-                  getFolderName(item.name, this.$route)) {
+                  subName) {
                   return obj;
                 }
               });
               //get latest last_modified of all objs in subfolder
-              let dates = subfolderObjs.map(obj => obj.last_modified);
-              const latest = dates.reduce((a, b) => {
-                if (getTimestamp(a) > getTimestamp(b)) return a;
+              const latest = subfolderObjs.reduce((a, b) => {
+                if (getTimestamp(a.last_modified) > getTimestamp(
+                  b.last_modified)) return a;
                 return b;
-              }, "");
-              //assign latest last_modified
-              item.last_modified = latest;
-              items.push(item);
+              }, {});
+              let subSize = getItemSize(item, filteredObjs, this.$route);
+              //add new subfolder
+              let subfolder = {
+                container: item.container, name: item.name,
+                bytes: subSize, last_modified: latest.last_modified,
+                subfolder: true,
+              };
+              items.push(subfolder);
             }
           }
-          pagedLength = items.length;
           return items;
         }, [])
-        .slice(offset, offset + limit)
-        .reduce((
-          items,
-          item,
-        ) => {
-          const value = truncate(
-            this.renderFolders ?
-              getFolderName(item.name, this.$route)
-              : item.name,
-          );
-
-          const isSubfolder = this.renderFolders &&
-            !isFile(item.name, this.$route);
-
-          items.push({
-            name: {
-              value: value,
-              ...(isSubfolder ? {
-                component: {
-                  tag: "c-link",
-                  params: {
-                    href: "javascript:void(0)",
-                    color: "dark-grey",
-                    path: mdiFolder,
-                    iconFill: "primary",
-                    iconStyle: {
-                      marginRight: "1rem",
-                    },
-                    onClick: () => this.changeFolder(value),
-                  },
-                },
-              } : {}),
-            },
-            size: {
-              value: getItemSize(item, filteredObjs, this.$route),
-            },
-            last_modified: {
-              value: this.showTimestamp? parseDateTime(
-                this.locale, item.last_modified, this.$t, false) :
-                parseDateFromNow(this.locale, item.last_modified, this.$t),
-            },
-            ...(this.hideTags ? {} : {
-              tags: {
-                value: null,
-                children: [
-                  ...(item.tags?.length && !isSubfolder ?
-                    item.tags.map((tag, index) => ({
-                      key: "tag_" + index + "",
-                      value: tag,
-                      component: {
-                        tag: "c-tag",
-                        params: {
-                          flat: true,
-                        },
-                      },
-                    })) : [{ key: "no_tags", value: "-" }]),
-                ],
-              },
-            }),
-            actions: {
-              value: null,
-              sortable: null,
-              align: "end",
-              children: [
-                {
-                  value: this.$t("message.download"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      text: true,
-                      size: "small",
-                      title: "Download",
-                      onClick: () => {
-                        item.name.match(".c4gh")
-                          ? this.beginDownload(item)
-                          : this.navDownload(item.url);
-                      },
-                      path: mdiTrayArrowDown,
-                    },
-                  },
-                },
-                {
-                  value: this.$t("message.table.editTags"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      text: true,
-                      size: "small",
-                      title: "Edit tags",
-                      path: mdiPencilOutline,
-                      onClick: () =>
-                        toggleEditTagsModal(item.name, null),
-                      onKeyUp: (event) => {
-                        if(event.keyCode === 13) {
-                          toggleEditTagsModal(item.name, null);
-                        }
-                      },
-                      disabled: isSubfolder ||
-                        (this.owner != undefined &&
-                          this.accessRights.length <= 1),
-                    },
-                  },
-                },
-                {
-                  value: this.$t("message.delete"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      text: true,
-                      size: "small",
-                      title: "Delete object",
-                      path: mdiDeleteOutline,
-                      onClick: () => {
-                        this.$emit("delete-object", item);
-                      },
-                      onKeyUp: (event) => {
-                        if(event.keyCode === 13) {
-                          this.$emit("delete-object", item);
-                        }
-                      },
-                      disabled: this.owner != undefined &&
-                        this.accessRights.length <= 1,
-                    },
-                  },
-                },
-              ],
-            },
-          });
-
-          return items;
-        }, []);
+          .slice(offset, offset + limit)
+          .map(item => this.formatItem(item));
+      }
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: pagedLength,
+        itemCount: this.objects.length,
       };
       if (this.objs.length > 0) this.setPageByFileName(this.$route.query.file);
     },

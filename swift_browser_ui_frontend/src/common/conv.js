@@ -488,7 +488,7 @@ export function getItemSize(currentItem, objects, route) {
       subfolderSize += objects[i].bytes;
     }
   }
-  return getHumanReadableSize(subfolderSize);
+  return subfolderSize;
 }
 
 export function sortContainer(containers) {
