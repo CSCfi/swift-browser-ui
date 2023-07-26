@@ -190,109 +190,108 @@ export default {
 </script>
 
 <style scoped lang="scss">
+#secondary-navbar {
+  border-bottom: 6px solid $csc-primary-light;
+}
 
-  #secondary-navbar {
-    border-bottom: 6px solid $csc-primary-light;
-  }
+.container {
+  display: flex;
+  padding: 0.5rem 1rem !important;
+  flex-wrap: wrap;
+}
 
-  .container {
-    display: flex;
-    padding: 0.5rem 1rem !important;
-    flex-wrap: wrap;
-  }
+.nav-item {
+  height: 100%;
+  align-self: center;
+}
 
-  .navbar-item {
-    height: 100%;
-    align-self: center;
-  }
+c-toasts {
+  width: fit-content;
+}
 
-  c-toasts {
-    width: fit-content;
-  }
+.select-project, .column {
+  min-width: 15rem;
+  flex: 0.5;
+}
 
+c-select {
+  flex: 1;
+}
+
+@media screen and (max-width: 767px) {
   .select-project, .column {
-    min-width: 15rem;
-    flex: 0.5;
+    width: 100%;
+    flex: auto;
   }
+}
 
-  c-select {
-    flex: 1;
-  }
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
 
-  @media screen and (max-width: 767px) {
-    .select-project, .column {
-      width: 100%;
-      flex: auto;
-    }
-  }
+c-icon {
+  margin-left: 0.5rem;
+}
 
-  .tooltip {
-    position: relative;
-    display: inline-block;
-  }
+.tooltip-content {
+  visibility: hidden;
+  text-align: left;
+  width: 20rem;
+  background-color: $white;
+  color: $text;
+  border: 1px solid $csc-primary;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  font-size: 14px;
+  line-height: 16px;
 
-  c-icon {
-    margin-left: 0.5rem;
-  }
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 5;
+  top: 150%;
+  left: 50%;
+  margin-left: -10rem;
+}
 
-  .tooltip-content {
-    visibility: hidden;
-    text-align: left;
-    width: 20rem;
-    background-color: $white;
-    color: $text;
-    border: 1px solid $csc-primary;
-    border-radius: 0.375rem;
-    padding: 1rem;
-    font-size: 14px;
-    line-height: 16px;
+.tooltip:hover .tooltip-content, .tooltip:focus-within .tooltip-content {
+  visibility: visible;
+}
 
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 5;
-    top: 150%;
-    left: 50%;
-    margin-left: -10rem;
-  }
+.tooltip-content::before {
+  content: " ";
+  position: absolute;
+  left: 48%;
+  bottom: 100%;
+  width: 0;
+  height: 0;
+  border: 0.7rem solid transparent;
+  border-bottom-color: $csc-primary;
+}
+.tooltip-content::after {
+  content: " ";
+  position: absolute;
+  left: 52%;
+  bottom: 100%;
+  width: 0;
+  height: 0;
+  margin-left: -0.75rem;
+  border: 0.65rem solid transparent;
+  border-bottom-color: $white;
+}
 
-  .tooltip:hover .tooltip-content, .tooltip:focus-within .tooltip-content {
-    visibility: visible;
-  }
+.column {
+  flex-direction: column;
+  padding: 0 0 0 1.5rem;
+  color: var(--csc-dark-grey);
+}
 
-  .tooltip-content::before {
-    content: " ";
-    position: absolute;
-    left: 48%;
-    bottom: 100%;
-    width: 0;
-    height: 0;
-    border: 0.7rem solid transparent;
-    border-bottom-color: $csc-primary;
-  }
-  .tooltip-content::after {
-    content: " ";
-    position: absolute;
-    left: 52%;
-    bottom: 100%;
-    width: 0;
-    height: 0;
-    margin-left: -0.75rem;
-    border: 0.65rem solid transparent;
-    border-bottom-color: $white;
-  }
+.project-number {
+  font-size: 0.875rem;
+}
 
-  .column {
-    flex-direction: column;
-    padding: 0 0 0 1.5rem;
-    color: var(--csc-dark-grey);
-  }
-
-  .project-number {
-    font-size: 0.875rem;
-  }
-
-  .label {
-    font-weight: 400;
-    font-size: 0.75rem;
-  }
-  </style>
+.label {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+</style>

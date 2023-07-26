@@ -227,6 +227,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 @import "@/css/prod.scss";
 
 .mdi-alert-circle {

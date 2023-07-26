@@ -114,6 +114,7 @@ export default {
 </script>
 
 <style>
+
 c-main {
   height: unset;
   min-height: 100vh;

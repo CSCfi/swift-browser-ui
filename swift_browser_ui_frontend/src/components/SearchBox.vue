@@ -309,6 +309,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+
  @import "@/css/prod.scss";
 .empty-search {
   height: 2rem;
@@ -317,4 +318,5 @@ export default {
 div[aria-selected='true'], div[slot="customMenu"]:hover {
   background-color: $csc-primary-lighter;
 }
+
 </style>

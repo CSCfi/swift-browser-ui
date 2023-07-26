@@ -55,6 +55,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
 @import "@/css/prod.scss";
 
 .tags-list {
@@ -86,4 +87,5 @@ span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 </style>

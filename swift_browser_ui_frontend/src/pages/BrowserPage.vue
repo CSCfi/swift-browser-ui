@@ -264,4 +264,5 @@ c-modal {
 #container-error-toasts {
   margin-top: 50vh;
 }
+
 </style>

@@ -69,6 +69,7 @@
 </template>
 
 <style>
+
 c-main {
   height: unset;
   min-height: 100vh;
@@ -82,4 +83,5 @@ c-login-card {
 c-button {
   margin-top: 2rem;
 }
+
 </style>

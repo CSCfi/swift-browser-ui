@@ -44,6 +44,7 @@
 </template>
 
 <style>
+
 html, body {
   height: 100%;
 }
@@ -60,4 +61,5 @@ html, body {
   width: 50%;
   margin: auto;
 }
+
 </style>
