@@ -71,6 +71,7 @@ const store = createStore({
     renderedFolders: true,
     addUploadFiles: false,
     isLoaderVisible: false,
+    prevActiveEl: null,
   },
   mutations: {
     updateObjects(state, objects) {
@@ -254,6 +255,9 @@ const store = createStore({
     },
     setLoaderVisible(state, payload) {
       state.isLoaderVisible = payload;
+    },
+    setPreviousActiveEl(state, payload) {
+      state.prevActiveEl = payload;
     },
   },
   actions: {

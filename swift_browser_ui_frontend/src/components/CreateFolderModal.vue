@@ -1,5 +1,9 @@
 <template>
-  <c-card class="add-folder">
+  <c-card
+    ref="modalContainer"
+    class="add-folder"
+    @keydown="handleKeyDown"
+  >
     <div
       id="createFolder-modal-content"
       class="modal-content-wrapper"
@@ -115,6 +119,9 @@ export default {
     controller() {
       return new AbortController();
     },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
+    },
   },
   watch: {
     active: function () {
@@ -184,12 +191,48 @@ export default {
       this.interacted = false;
       this.errorMsg = "";
       document.querySelector("#createModal-toasts").removeToast("create-toast");
+
+      const nav = document.querySelector("nav");
+      Array.from(nav.children).forEach((child) => {
+        child.removeAttribute("inert");
+      });
+
+      this.prevActiveEl.tabIndex = "0";
+      this.prevActiveEl.focus();
+      if (this.prevActiveEl === document.activeElement) {
+        this.prevActiveEl.classList.add("button-focus");
+      }
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.modalContainer.querySelectorAll(
+        "input, c-link, c-button",
+      );
+
+      const first = focusableList[0];
+      const last = focusableList[focusableList.length - 1];
+
+      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (e.target === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            last.classList.add("button-focus");
+          }
+        } else if (e.target === last) {
+          last.removeAttribute("tabIndex");
+          last.classList.remove("button-focus");
+        }
+      }
     },
   },
 };
@@ -241,4 +284,5 @@ c-card-actions > c-button {
 c-link {
   margin-top: -1rem;
 }
+
 </style>

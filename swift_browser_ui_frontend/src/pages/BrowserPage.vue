@@ -12,6 +12,7 @@
       role="main"
     >
       <c-modal
+        id="create-modal"
         v-model="openCreateFolderModal"
         v-csc-control
         width="64vw"
@@ -265,4 +266,9 @@ c-modal {
   margin-top: 50vh;
 }
 
+.button-focus {
+  outline: 2px var(--csc-primary) solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 </style>

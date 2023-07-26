@@ -140,7 +140,6 @@ export default {
     },
   },
   methods: {
-    toggleCreateFolderModal,
     changeActive(event) {
       const item = event.target.value;
       if (item.id !== this.active.id) {
@@ -153,6 +152,28 @@ export default {
           this.$router.go(0);
         });
       }
+    },
+    toggleCreateFolderModal: function () {
+      toggleCreateFolderModal();
+      const prevActiveEl = document.activeElement;
+
+      this.$store.commit("setPreviousActiveEl", prevActiveEl);
+
+      const nav = document.querySelector("nav");
+      //const mainContent = document.getElementById("mainContent");
+      //const footer = document.querySelector("footer");
+
+      //const modal = document.getElementById("create-modal");
+
+      Array.from(nav.children).forEach((child) =>
+        child.setAttribute("inert", "true"));
+
+      //Array.from(mainContent.children).forEach((child) => {
+      //  if (child !== modal) child.setAttribute("inert", "true");
+      //});
+
+      //Array.from(footer.children).forEach((child) =>
+      //  child.setAttribute("inert", "true"));
     },
     toggleUploadModal: function () {
       this.$store.commit("setFilesAdded", true);

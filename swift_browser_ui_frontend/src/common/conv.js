@@ -295,7 +295,7 @@ export function makeGetObjectsMetaURL(project, container, objects) {
   );
 }
 
-export const taginputConfirmKeys = ["Tab", "Enter", " ", ",", ";", ".", ":"];
+export const taginputConfirmKeys = ["Enter", " ", ",", ";", ".", ":"];
 
 export function truncate(value, length) {
   if (!value) {

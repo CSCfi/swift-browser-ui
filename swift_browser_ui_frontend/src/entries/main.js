@@ -210,6 +210,9 @@ const app = createApp({
       },
       set() { },
     },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
+    },
   },
   watch: {
     openCreateFolderModal: function () {
@@ -360,6 +363,10 @@ const app = createApp({
           message: this.$t("message.upload.complete")},
         );
       });
+
+    document
+      .getElementById("mainContainer")
+      .addEventListener("keydown", this.onKeydown);
   },
   methods: {
     containerSyncWrapper: function () {
@@ -535,6 +542,16 @@ const app = createApp({
       }
 
       return retl;
+    },
+    onKeydown: function (e) {
+      if (e.key === "Tab" && this.prevActiveEl &&
+        e.target === this.prevActiveEl) {
+        if(this.prevActiveEl.classList.contains("button-focus")) {
+          this.prevActiveEl.removeAttribute("tabIndex");
+          this.prevActiveEl.classList.remove("button-focus");
+          this.$store.commit("setPreviousActiveEl", null);
+        }
+      }
     },
   },
   ...BrowserPage,
