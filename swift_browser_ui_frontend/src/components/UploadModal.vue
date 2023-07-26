@@ -659,7 +659,7 @@ export default {
         this.recvkeys,
         null,
         this.inputFolder,
-        this.$route.query.prefix,
+        "",
         null,
         true,
         this.$store,
