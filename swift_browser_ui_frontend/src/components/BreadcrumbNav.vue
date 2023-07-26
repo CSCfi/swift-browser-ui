@@ -8,16 +8,16 @@
         :to="{ name: 'AllFolders'}"
       >
         <i class="mdi mdi-home" />
-        <p>&nbsp;{{ $t("message.folderTabs.all") }}</p>
+        <span>&nbsp;{{ $t("message.folderTabs.all") }}</span>
       </router-link>
       <router-link
         class="link"
         :to="{name: currentRoute}"
       >
         <i class="mdi mdi-chevron-right" />
-        <p :class="subfolders === '' ? 'last' : 'default'">
+        <span :class="subfolders === '' ? 'last' : 'default'">
           &nbsp;{{ folder }}
-        </p>
+        </span>
       </router-link>
 
       <router-link
@@ -26,9 +26,9 @@
         :to="getPath(i)"
       >
         <i class="mdi mdi-chevron-right" />
-        <p :class="i === subfolders.length-1 ? 'last': 'default'">
+        <span :class="i === subfolders.length-1 ? 'last': 'default'">
           &nbsp;{{ item }}
-        </p>
+        </span>
       </router-link>
     </c-row>
   </div>
@@ -73,12 +73,19 @@ export default {
 i, p {
   color: $csc-primary;
 }
-c-row > * {
-  margin-left: -1rem;
-}
+
 .breadcrumb {
-    padding: 1.5rem 0 1rem 0;
+  padding: 1.5rem 0 1rem 0;
 }
+
+.breadcrumb a {
+  align-items: center;
+  color: $csc-primary;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+
 .last {
   font-weight: 700;
 }
