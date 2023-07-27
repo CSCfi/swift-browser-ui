@@ -1,5 +1,9 @@
 <template>
-  <c-card class="upload-card">
+  <c-card
+    ref="uploadContainer"
+    class="upload-card"
+    @keydown="handleKeyDown"
+  >
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
@@ -180,6 +184,9 @@ import {
   getAccessDetails,
   validateFolderName,
   checkIfItemIsLastOnPage,
+  getFocusableElements,
+  removeFocusClass,
+  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
 import CUploadButton from "@/components/CUploadButton.vue";
 
@@ -277,6 +284,19 @@ export default {
                   title: this.$t("message.remove"),
                   onClick: ({ data }) =>
                     this.$store.commit("eraseDropFile", data),
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the row element of item that is to be removed
+                      const row = e.target.closest("tr");
+                      if (row !== undefined) {
+                        const data = {
+                          name: row.children[0]?.innerText,
+                          relativePath: row.children[3]?.innerText,
+                        };
+                        this.$store.commit("eraseDropFile", data);
+                      }
+                    }
+                  },
                 },
               },
             },
@@ -305,9 +325,21 @@ export default {
                   text: true,
                   size: "small",
                   title: this.$t("message.remove"),
-                  onClick: ({ index }) =>{
+                  onClick: ({ index }) => {
                     this.recvHashedKeys.splice(index, 1);
                     this.recvkeys.splice(index, 1);
+                  },
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the text value of item that is to be removed
+                      const keyText = e.target.closest("tr")?.innerText;
+                      // Find its index in key list
+                      const index = this.recvHashedKeys.indexOf(keyText);
+                      if (index !== undefined) {
+                        this.recvHashedKeys.splice(index - 2, 1);
+                        this.recvkeys.splice(index - 2, 1);
+                      }
+                    }
                   },
                 },
               },
@@ -373,6 +405,9 @@ export default {
         return true;
       }
       return false;
+    },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
     },
   },
   watch: {
@@ -639,6 +674,8 @@ export default {
       this.addRecvkey = "";
       this.recvHashedKeys = [];
       this.errorMsg = "";
+
+      moveFocusOutOfModal(this.prevActiveEl);
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -687,6 +724,30 @@ export default {
         }
       }, 1000);
       this.toggleUploadModal();
+    },
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.uploadContainer.querySelectorAll(
+        "c-link, c-button, textarea, c-autocomplete, c-data-table",
+      );
+
+      const { first, last } = getFocusableElements(focusableList);
+
+      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
+        first.tabIndex = "0";
+        first.focus();
+        if (last.classList.contains("button-focus")) removeFocusClass(last);
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (e.target === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            last.classList.add("button-focus");
+          }
+        } else if (e.target === last) {
+          removeFocusClass(last);
+        }
+      }
     },
   },
 };

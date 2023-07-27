@@ -1,6 +1,6 @@
 <template>
   <c-card
-    ref="modalContainer"
+    ref="createFolderContainer"
     class="add-folder"
     @keydown="handleKeyDown"
   >
@@ -95,6 +95,10 @@ import {
   getProjectNumber,
   validateFolderName,
   getCurrentISOtime,
+  getFocusableElements,
+  addFocusClass,
+  removeFocusClass,
+  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 
@@ -192,16 +196,7 @@ export default {
       this.errorMsg = "";
       document.querySelector("#createModal-toasts").removeToast("create-toast");
 
-      const nav = document.querySelector("nav");
-      Array.from(nav.children).forEach((child) => {
-        child.removeAttribute("inert");
-      });
-
-      this.prevActiveEl.tabIndex = "0";
-      this.prevActiveEl.focus();
-      if (this.prevActiveEl === document.activeElement) {
-        this.prevActiveEl.classList.add("button-focus");
-      }
+      moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
@@ -210,12 +205,10 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.modalContainer.querySelectorAll(
+      const focusableList = this.$refs.createFolderContainer.querySelectorAll(
         "input, c-link, c-button",
       );
-
-      const first = focusableList[0];
-      const last = focusableList[focusableList.length - 1];
+      const { first, last } = getFocusableElements(focusableList);
 
       if (e.key === "Tab" && !e.shiftKey && e.target === last) {
         e.preventDefault();
@@ -226,11 +219,10 @@ export default {
           last.tabIndex = "0";
           last.focus();
           if (last === document.activeElement) {
-            last.classList.add("button-focus");
+            addFocusClass(last);
           }
         } else if (e.target === last) {
-          last.removeAttribute("tabIndex");
-          last.classList.remove("button-focus");
+          removeFocusClass(last);
         }
       }
     },

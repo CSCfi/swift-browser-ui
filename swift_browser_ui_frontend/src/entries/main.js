@@ -50,6 +50,9 @@ import CFooter from "@/components/CFooter.vue";
 import delay from "lodash/delay";
 import { getDB } from "@/common/db";
 
+// Import global functions
+import { removeFocusClass } from "@/common/globalFunctions";
+
 checkIDB().then(result => {
   if (!result) {
     window.location.pathname = "/";
@@ -547,8 +550,7 @@ const app = createApp({
       if (e.key === "Tab" && this.prevActiveEl &&
         e.target === this.prevActiveEl) {
         if(this.prevActiveEl.classList.contains("button-focus")) {
-          this.prevActiveEl.removeAttribute("tabIndex");
-          this.prevActiveEl.classList.remove("button-focus");
+          removeFocusClass(this.prevActiveEl);
           this.$store.commit("setPreviousActiveEl", null);
         }
       }

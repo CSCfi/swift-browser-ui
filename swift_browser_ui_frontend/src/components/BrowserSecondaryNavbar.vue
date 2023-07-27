@@ -178,6 +178,9 @@ export default {
     toggleUploadModal: function () {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
+      const prevActiveEl = document.activeElement;
+
+      this.$store.commit("setPreviousActiveEl", prevActiveEl);
     },
     copyProjectId: function () {
       const toastMessage = {

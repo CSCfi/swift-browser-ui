@@ -208,3 +208,32 @@ export function checkIfItemIsLastOnPage(paginationOptions){
   }
   return paginationOptions.currentPage;
 }
+
+export function getFocusableElements(focusableList) {
+  const first = focusableList[0];
+  let last = focusableList[focusableList.length - 1];
+  if (last.disabled) last = focusableList[focusableList.length - 2];
+  return { first, last };
+}
+
+export function addFocusClass(element) {
+  element.classList.add("button-focus");
+}
+
+export function removeFocusClass(element) {
+  element.removeAttribute("tabIndex");
+  element.classList.remove("button-focus");
+}
+
+export function moveFocusOutOfModal(prevActiveEl) {
+  const nav = document.querySelector("nav");
+  Array.from(nav.children).forEach((child) => {
+    child.removeAttribute("inert");
+  });
+
+  prevActiveEl.tabIndex = "0";
+  prevActiveEl.focus();
+  if (prevActiveEl === document.activeElement) {
+    addFocusClass(prevActiveEl);
+  }
+}
