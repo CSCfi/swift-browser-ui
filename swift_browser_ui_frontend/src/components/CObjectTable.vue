@@ -30,10 +30,9 @@
 
 <script>
 import {
-  sortObjects,
+  sortItems,
   parseDateTime,
   parseDateFromNow,
-  getItemSize,
   getHumanReadableSize,
   getTimestamp,
 } from "@/common/conv";
@@ -57,7 +56,6 @@ import {
   mdiDeleteOutline,
   mdiFolder ,
 } from "@mdi/js";
-import { toRaw } from "vue";
 
 export default {
   name: "CObjectTable",
@@ -259,7 +257,7 @@ export default {
                       this.$emit("delete-object", item);
                     }
                   },
-                  disabled: 
+                  disabled:
                     this.owner != undefined && this.accessRights.length <= 1,
                 },
               },
@@ -268,6 +266,7 @@ export default {
         },
       };
     },
+
     getPage: function () {
       let offset = 0;
       let limit = this.objs.length;
@@ -295,7 +294,7 @@ export default {
         } else {
           let subName = getFolderName(item.name, this.$route);
           //check if subfolder already added
-          if (items.find(el => el.name === subName ? true : false)) {
+          if (items.find(el => el.name === subName)) {
             return items;
           } else {
             //filter objs that would belong to subfolder
@@ -311,12 +310,14 @@ export default {
                 b.last_modified)) return a;
               return b;
             }, {});
-            let subSize = getItemSize(item, filteredObjs, this.$route);
+            const subSize = subfolderObjs.reduce((sum, obj) => {
+              return sum += obj.bytes;
+            }, 0);
             //add new subfolder
             let subfolder = {
               container: item.container, name: subName,
               bytes: subSize, last_modified: latest.last_modified,
-              subfolder: true,
+              tags: [], subfolder: true,
             };
             items.push(subfolder);
           }
@@ -324,6 +325,7 @@ export default {
         pagedLength = items.length;
         return items;
       }, [])
+        .sort((a, b) => sortItems(a, b, this.sortBy, this.sortDirection))
         .slice(offset, offset + limit)
         .map(item => this.formatItem(item));
 
@@ -367,9 +369,7 @@ export default {
     onSort(event) {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
-
-      // Use toRaw to mutate the original array, not the proxy
-      sortObjects(toRaw(this.objs), this.sortBy, this.sortDirection);
+      //sorted in getPage()
     },
     getEditRoute: function(containerName, objectName) {
       if (this.$route.name == "SharedObjects") {
