@@ -1,12 +1,14 @@
 """Unit tests for swift_browser_ui.upload.api module."""
 
 
+import json
 import types
 import unittest
 
 import aiohttp.web
 
 import swift_browser_ui.upload.api
+from swift_browser_ui.upload.common import VAULT_CLIENT
 
 import tests.common.mockups
 
@@ -66,12 +68,6 @@ class APITestClass(tests.common.mockups.APITestBase):
             }
         )
         self.mock_init_download = unittest.mock.Mock(return_value=self.mock_download)
-
-        self.mock_get_sys_health = unittest.mock.AsyncMock(return_value=True)
-        self.mock_vault_client = types.SimpleNamespace(
-            **{"get_sys_health": self.mock_get_sys_health}
-        )
-        self.mock_init_vault = unittest.mock.Mock(return_value=self.mock_vault_client)
 
     async def test_handle_get_object(self):
         """Test swift_browser_ui.upload.api.handle_get_object."""
@@ -283,13 +279,124 @@ class APITestClass(tests.common.mockups.APITestBase):
 
     async def test_handle_health_check(self):
         """Test swift_browser_ui.upload.api.handle_health_check."""
-        patch_init_vault = unittest.mock.patch(
-            "swift_browser_ui.upload.api.VaultClient",
-            self.mock_init_vault,
-        )
-        self.mock_request.app["vault_client"] = patch_init_vault
-        with patch_init_vault:
-            resp = await swift_browser_ui.upload.api.handle_health_check(
-                self.mock_request
-            )
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.get_sys_health = unittest.mock.AsyncMock(return_value="Ok")
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        resp = await swift_browser_ui.upload.api.handle_health_check(self.mock_request)
         self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 200)
+        resp_json = json.loads(resp.body)
+        self.assertEqual(resp_json["vault-instance"]["status"], "Ok")
+
+    async def test_handle_project_key(self):
+        """Test swift_browser_ui.upload.api.handle_project_key."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.get_public_key = unittest.mock.AsyncMock(
+            return_value="test-key"
+        )
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        resp = await swift_browser_ui.upload.api.handle_project_key(self.mock_request)
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 200)
+        self.assertEqual(resp.text, "test-key")
+
+    async def test_handle_object_header(self):
+        """Test swift_browser_ui.upload.api.handle_object_header."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.get_header = unittest.mock.AsyncMock(return_value="test-header")
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        resp = await swift_browser_ui.upload.api.handle_object_header(self.mock_request)
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 200)
+        self.assertEqual(resp.text, "test-header")
+
+        self.mock_request.query["owner"] = "test-owner"
+        resp = await swift_browser_ui.upload.api.handle_object_header(self.mock_request)
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        mock_vault_client.get_header.assert_called_with(
+            "test-id-0", "test-container", "test-object1", "test-owner"
+        )
+
+    async def test_handle_project_whitelist(self):
+        """Test swift_browser_ui.upload.api.handle_project_whitelist."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.put_whitelist_key = unittest.mock.AsyncMock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        resp = await swift_browser_ui.upload.api.handle_project_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 204)
+
+    async def test_handle_delete_project_whitelist(self):
+        """Test swift_browser_ui.upload.api.handle_delete_project_whitelist."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.remove_whitelist_key = unittest.mock.AsyncMock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        resp = await swift_browser_ui.upload.api.handle_delete_project_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 204)
+
+    async def test_handle_batch_add_sharing_whitelist(self):
+        """Test swift_browser_ui.upload.api.handle_batch_add_sharing_whitelist."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.put_project_whitelist = unittest.mock.AsyncMock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+        self.mock_request.json = unittest.mock.AsyncMock(
+            return_value=[{"name": "name", "id": "1"}]
+        )
+
+        resp = await swift_browser_ui.upload.api.handle_batch_add_sharing_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 204)
+        mock_vault_client.put_project_whitelist.assert_called_with(
+            "test-id-0", "name", "test-container", "1"
+        )
+
+    async def test_handle_batch_remove_sharing_whitelist(self):
+        """Test swift_browser_ui.upload.api.handle_batch_remove_sharing_whitelist."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.remove_project_whitelist = unittest.mock.AsyncMock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+        self.mock_request.json = unittest.mock.AsyncMock(
+            return_value=[{"name": "name", "id": "1"}]
+        )
+
+        resp = await swift_browser_ui.upload.api.handle_batch_remove_sharing_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 204)
+        mock_vault_client.remove_project_whitelist.assert_called_with(
+            "test-id-0", {"name": "name", "id": "1"}, "test-container"
+        )
+
+    async def test_handle_check_sharing_whitelist(self):
+        """Test swift_browser_ui.upload.api.handle_check_sharing_whitelist."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.get_project_whitelist = unittest.mock.AsyncMock(
+            return_value=None
+        )
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+        resp = await swift_browser_ui.upload.api.handle_check_sharing_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.status, 204)
+
+        mock_vault_client.get_project_whitelist = unittest.mock.AsyncMock(return_value={})
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+        resp = await swift_browser_ui.upload.api.handle_check_sharing_whitelist(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.Response)
+        self.assertEqual(resp.text, "{}")
