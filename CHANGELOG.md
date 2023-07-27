@@ -173,7 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1059) Fixed item deletion bug in which deleting last item on a page left open an empty page
 - (GL #1081) Fix for objects' tag editings and deletion being disabled in a normal container
 - (GL #1092) Fix display options' persistence for individual containers and container table
-- (GL #1080) Fix subfolders changing last_modified dates when sorting and sorting by size
+- (GL #1080 #1086) Fix subfolders changing last_modified dates when sorting and sorting by size
 
 ### Removed
 
