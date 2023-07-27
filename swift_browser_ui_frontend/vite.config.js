@@ -164,6 +164,7 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,
+      cssMinify: true,
       reportCompressedSize: false,
       rollupOptions: {
         input: pages,
