@@ -1,6 +1,6 @@
 <template>
   <c-container>
-    <h3 class="title is-5 has-text-dark">
+    <h3 class="title is-5">
       {{ $t("message.share.shared_table_title") }}
     </h3>
     <!-- Footer options needs to be in CamelCase,

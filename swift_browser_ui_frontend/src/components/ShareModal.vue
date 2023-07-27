@@ -3,7 +3,7 @@
     <c-card-actions
       justify="space-between"
     >
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
       </h2>
@@ -26,7 +26,7 @@
           justify="space-between"
           align="center"
         >
-          <h3 class="title is-5 has-text-dark">
+          <h3 class="title is-5">
             {{ $t("message.share.share_other_projects") }}
           </h3>
           <c-flex

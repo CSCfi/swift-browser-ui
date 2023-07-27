@@ -4,7 +4,7 @@
       justify="space-between"
       align="center"
     >
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t("message.tokens.title") }}
       </h2>
       <c-button

@@ -70,10 +70,10 @@
         vertical="top"
       >
         <div class="toasts-wrapper">
-          <h5 class="title is-5 has-text-dark">
+          <h5 class="title is-5">
             {{ $t("message.copysuccess") }}
           </h5>
-          <p class="has-text-weight-semibold has-text-dark">
+          <p class="has-text-weight-semibold">
             {{ $t("message.copytime") }}
           </p>
         </div>

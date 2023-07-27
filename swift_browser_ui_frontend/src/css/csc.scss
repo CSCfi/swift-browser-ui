@@ -137,17 +137,17 @@ $link-hover: #363636;
   color: #f5f5f5 !important;
 }
 
-/*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
-
 a {
-  color: $csc-dark-blue;
+  color: $csc-link;
   cursor: pointer;
   text-decoration: none;
 }
 
 a:hover {
-  color: $link-hover;
+  color: $csc-link;
 }
+
+/*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
 
 .pr-3 {
   padding-right: 0.75rem !important;
@@ -159,15 +159,6 @@ a:hover {
 
 .has-text-weight-semibold {
   font-weight: 600 !important;
-}
-
-.has-text-dark {
-  color: #595959 !important
-}
-
-a.has-text-dark:hover,
-a.has-text-dark:focus {
-  color: #404040 !important
 }
 
 $body-background-color: $scheme-main !default;
