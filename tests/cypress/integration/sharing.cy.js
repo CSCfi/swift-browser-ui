@@ -5,9 +5,7 @@ describe("A folder is shared from project A to project B", function () {
   });
 
   it("copy share id, switch project, share folder, switch project, check if shared folder is visible", function () {
-    //click to copy sharing ID
-    cy.get('[data-testid="copy-projectId"]').click({ force: true });
-    cy.wait(9000);
+    cy.wait(5000);
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -17,7 +15,7 @@ describe("A folder is shared from project A to project B", function () {
       //add folder
       const randomName = Math.random().toString(36).substring(2, 7);
       cy.addFolder(randomName);
-      cy.wait(12000);
+      cy.wait(7000);
       //access folder
       cy.searchFolder(randomName);
       cy.get(".media-content").contains(randomName).click({ force: true });
@@ -53,9 +51,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
   });
 
   it("switch project, try to share folder without share ID, fail", function () {
-    //click to copy sharing ID
-    cy.get('[data-testid="copy-projectId"]').click({ force: true });
-    cy.wait(7000);
+    cy.wait(5000);
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -65,7 +61,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       //add folder
       const randomName = Math.random().toString(36).substring(2, 7);
       cy.addFolder(randomName);
-      cy.wait(9000);
+      cy.wait(5000);
       //access folder
       cy.searchFolder(randomName);
       cy.get(".media-content").contains(randomName).click({ force: true });
@@ -89,9 +85,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
   });
 
   it("copy shareID, switch project, try to share folder without selecting rights, fail", function () {
-    //click to copy sharing ID
-    cy.get('[data-testid="copy-projectId"]').click({ force: true });
-    cy.wait(7000);
+    cy.wait(5000);
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -101,7 +95,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       //add folder
       const randomName = Math.random().toString(36).substring(2, 7);
       cy.addFolder(randomName);
-      cy.wait(9000);
+      cy.wait(5000);
       //access folder
       cy.searchFolder(randomName);
       cy.get(".media-content").contains(randomName).click({ force: true });
@@ -130,9 +124,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
   });
 
   it("switch project, try to share folder without the same ID twice, fail", function () {
-    //click to copy sharing ID
-    cy.get('[data-testid="copy-projectId"]').click({ force: true });
-    cy.wait(7000);
+    cy.wait(5000);
 
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
@@ -145,7 +137,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
       //add folder
       const randomName = Math.random().toString(36).substring(2, 7);
       cy.addFolder(randomName);
-      cy.wait(9000);
+      cy.wait(5000);
 
       //access folder
       cy.searchFolder(randomName);
@@ -204,11 +196,7 @@ describe("A folder cannot be shared with the invalid ID", function () {
   });
 
   it("switch project, try to share folder with invalid share ID, fail", function () {
-    //click to copy sharing ID
-    cy.get('[data-testid="copy-projectId"]').click({ force: true });
-    cy.wait(7000);
-
-    //take the ID appearing as the last part of url
+    cy.wait(5000);
 
     //switch project
     cy.selectProject("service");
@@ -216,7 +204,7 @@ describe("A folder cannot be shared with the invalid ID", function () {
     //add folder
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
-    cy.wait(9000);
+    cy.wait(5000);
 
     //access folder
     cy.searchFolder(randomName);
