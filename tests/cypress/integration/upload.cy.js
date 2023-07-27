@@ -11,31 +11,31 @@ describe("Upload a file", function () {
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(folderName);
-    cy.wait(11000);
+    cy.wait(5000);
     cy.searchFolder(folderName);
     cy.get(".media-content").contains(folderName).click({ force: true });
-    cy.wait(5000);
+    cy.wait(3000);
 
     //press upload button from folder
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(11000);
+    cy.wait(5000);
 
     //upload the fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile(`cypress/fixtures/text-files/text-file.txt`);
-    cy.wait(25000);
+    cy.wait(8000);
     cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
       force: true,
     });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //close the modal
     cy.get(".link-underline").click({ force: true });
 
     cy.reload();
-    cy.wait(25000);
+    cy.wait(8000);
 
     //check if the file name is on the page
     cy.contains("text-file").should("exist");
@@ -54,7 +54,7 @@ describe("Upload a file", function () {
       force: true,
     });
 
-    cy.wait(25000);
+    cy.wait(8000);
     cy.contains("This folder has no content.").should("exist");
   });
 
@@ -63,9 +63,9 @@ describe("Upload a file", function () {
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
-    cy.wait(10000);
+    cy.wait(5000);
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(10000);
+    cy.wait(5000);
 
     //trying to avoid '0x0' effective width and height error and type into input field
     cy.contains("Folder name")
@@ -77,31 +77,31 @@ describe("Upload a file", function () {
       .find("li")
       .contains(randomName)
       .click({ force: true });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //   upload the fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(25000);
+    cy.wait(8000);
     cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
       force: true,
     });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //close the modal
     cy.get(".link-underline").click({ force: true });
 
     //   check if the file name is on the page
     cy.reload();
-    cy.wait(25000);
+    cy.wait(8000);
     cy.contains("text-file").should("exist");
 
     //delete the file
     cy.deleteFileCheckbox("text-file");
 
-    cy.wait(10000);
+    cy.wait(5000);
     cy.contains("This folder has no content.").should("exist");
   });
 
@@ -109,9 +109,9 @@ describe("Upload a file", function () {
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
-    cy.wait(10000);
+    cy.wait(5000);
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(10000);
+    cy.wait(5000);
 
     //trying to avoid '0x0' effective width and height error and type into input field
     cy.contains("Folder name")
@@ -123,21 +123,21 @@ describe("Upload a file", function () {
       .find("li")
       .contains(randomName)
       .click({ force: true });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //   upload the fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(10000);
+    cy.wait(5000);
 
     //try to upload the same file second time
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(10000);
+    cy.wait(5000);
     cy.get(".duplicate-notification").should("exist");
   });
 
@@ -145,9 +145,9 @@ describe("Upload a file", function () {
     //create a unique name
     const randomName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(randomName);
-    cy.wait(10000);
+    cy.wait(5000);
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(10000);
+    cy.wait(5000);
 
     //trying to avoid '0x0' effective width and height error and type into input field
     cy.contains("Folder name")
@@ -159,14 +159,14 @@ describe("Upload a file", function () {
       .find("li")
       .contains(randomName)
       .click({ force: true });
-    cy.wait(25000);
+    cy.wait(8000);
 
     // upload the first fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(25000);
+    cy.wait(8000);
 
     //upload another fixture file
     cy.get(".upload-btn-wrapper")
@@ -174,30 +174,30 @@ describe("Upload a file", function () {
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file-v2.txt");
 
-    cy.wait(25000);
+    cy.wait(8000);
     cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
       force: true,
     });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //close the modal
     cy.get(".link-underline").click({ force: true });
 
     //check the success
     cy.reload();
-    cy.wait(13000);
+    cy.wait(5000);
     cy.contains("text-file").should("exist");
     cy.contains("text-file-v2").should("exist");
 
     //delete the first file
     cy.deleteFileCheckbox("text-file-v2");
 
-    cy.wait(10000);
+    cy.wait(5000);
 
     //delete the second file
     cy.deleteFileCheckbox("text-file");
 
-    cy.wait(25000);
+    cy.wait(8000);
     cy.contains("This folder has no content.").should("exist");
   });
 
@@ -205,33 +205,33 @@ describe("Upload a file", function () {
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(folderName);
-    cy.wait(11000);
+    cy.wait(5000);
     cy.searchFolder(folderName);
     cy.get(".media-content").contains(folderName).click({ force: true });
-    cy.wait(5000);
+    cy.wait(3000);
 
     //press upload button from folder
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(11000);
+    cy.wait(5000);
 
     // upload the first fixture file
     cy.get(".upload-btn-wrapper")
       .find("input")
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file.txt");
-    cy.wait(25000);
+    cy.wait(8000);
 
     cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
       force: true,
     });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //close the modal
     cy.get(".toast-main > c-button.hydrated").click({ force: true });
 
     //press upload button from folder
     cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(11000);
+    cy.wait(5000);
 
     //upload another fixture file
     cy.get(".upload-btn-wrapper")
@@ -239,30 +239,30 @@ describe("Upload a file", function () {
       .invoke("show")
       .selectFile("cypress/fixtures/text-files/text-file-v2.txt");
 
-    cy.wait(25000);
+    cy.wait(8000);
     cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
       force: true,
     });
-    cy.wait(25000);
+    cy.wait(8000);
 
     //close the modal
     cy.get(".toast-main > c-button.hydrated").click({ force: true });
 
     //check the success
     cy.reload();
-    cy.wait(13000);
+    cy.wait(5000);
     cy.contains("text-file").should("exist");
     cy.contains("text-file-v2").should("exist");
 
     //delete the first file
     cy.deleteFileCheckbox("text-file-v2");
 
-    cy.wait(10000);
+    cy.wait(5000);
 
     //delete the second file
     cy.deleteFileCheckbox("text-file");
 
-    cy.wait(25000);
+    cy.wait(8000);
     cy.contains("This folder has no content.").should("exist");
   });
 });
