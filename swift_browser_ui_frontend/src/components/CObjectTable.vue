@@ -150,7 +150,8 @@ export default {
       );
     },
     formatItem: function (item) {
-      const name = this.renderFolders ? getFolderName(item.name, this.$route)
+      const name = this.renderFolders && !item?.subfolder ?
+        getFolderName(item.name, this.$route)
         : item.name;
 
       return {
@@ -286,55 +287,49 @@ export default {
           return obj.name.startsWith(getPrefix(this.$route));
         });
 
-      if(!this.renderFolders) {
-        this.objects = filteredObjs.slice(offset, offset + limit)
-          .map(item => this.formatItem(item));
-      } else {
-        this.objects = filteredObjs.reduce((items, item) => {
-          if (isFile(item.name, this.$route)) {
-            items.push(item);
+      let pagedLength = 0;
+
+      this.objects = filteredObjs.reduce((items, item) => {
+        if (isFile(item.name, this.$route) || !this.renderFolders) {
+          items.push(item);
+        } else {
+          let subName = getFolderName(item.name, this.$route);
+          //check if subfolder already added
+          if (items.find(el => el.name === subName ? true : false)) {
+            return items;
           } else {
-            let subName = getFolderName(item.name, this.$route);
-            //check if subfolder already added
-            if (items.find(el => {
-              return getFolderName(
-                el.name, this.$route,
-              ) === subName ? true : false;
-            })) {
-              return items;
-            } else {
-              //filter objs that would belong to subfolder
-              let subfolderObjs = filteredObjs.filter(obj => {
-                if (getFolderName(obj.name, this.$route) ===
-                  subName) {
-                  return obj;
-                }
-              });
-              //get latest last_modified of all objs in subfolder
-              const latest = subfolderObjs.reduce((a, b) => {
-                if (getTimestamp(a.last_modified) > getTimestamp(
-                  b.last_modified)) return a;
-                return b;
-              }, {});
-              let subSize = getItemSize(item, filteredObjs, this.$route);
-              //add new subfolder
-              let subfolder = {
-                container: item.container, name: item.name,
-                bytes: subSize, last_modified: latest.last_modified,
-                subfolder: true,
-              };
-              items.push(subfolder);
-            }
+            //filter objs that would belong to subfolder
+            let subfolderObjs = filteredObjs.filter(obj => {
+              if (getFolderName(obj.name, this.$route) ===
+                subName) {
+                return obj;
+              }
+            });
+            //get latest last_modified of all objs in subfolder
+            const latest = subfolderObjs.reduce((a, b) => {
+              if (getTimestamp(a.last_modified) > getTimestamp(
+                b.last_modified)) return a;
+              return b;
+            }, {});
+            let subSize = getItemSize(item, filteredObjs, this.$route);
+            //add new subfolder
+            let subfolder = {
+              container: item.container, name: subName,
+              bytes: subSize, last_modified: latest.last_modified,
+              subfolder: true,
+            };
+            items.push(subfolder);
           }
-          return items;
-        }, [])
-          .slice(offset, offset + limit)
-          .map(item => this.formatItem(item));
-      }
+        }
+        pagedLength = items.length;
+        return items;
+      }, [])
+        .slice(offset, offset + limit)
+        .map(item => this.formatItem(item));
 
       this.paginationOptions = {
         ...this.paginationOptions,
-        itemCount: this.objects.length,
+        itemCount: pagedLength,
       };
       if (this.objs.length > 0) this.setPageByFileName(this.$route.query.file);
     },
