@@ -62,6 +62,7 @@ import { debounce, delay } from "lodash";
 import {
   swiftCopyContainer,
   updateContainerMeta,
+  getObjects,
 } from "@/common/api";
 import { getDB } from "@/common/db";
 
@@ -91,6 +92,7 @@ export default {
       loadingFoldername: true,
       tags: [],
       folders: [],
+      checkpointsCompleted: 0,
       errorMsg: "",
     };
   },
@@ -125,6 +127,13 @@ export default {
     folderName() {
       if (this.folderName) {
         this.checkValidity();
+      }
+    },
+    checkpointsCompleted() {
+      if (this.checkpointsCompleted > 1) {
+        this.$store.commit("setFolderCopiedStatus", true);
+        document.querySelector("#copyFolder-toasts")
+          .removeToast("copy-in-progress");
       }
     },
   },
@@ -206,6 +215,17 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
+      this.$store.commit("toggleCopyFolderModal", false);
+      document.querySelector("#copyFolder-toasts").addToast(
+        {
+          id: "copy-in-progress",
+          type: "success",
+          indeterminate: true,
+          message: "",
+          custom: true,
+        },
+      );
+
       // Initiate the container replication operation
       swiftCopyContainer(
         this.active.id,
@@ -218,16 +238,7 @@ export default {
           signal: null,
         });
 
-        document.querySelector("#copyFolder-toasts").addToast(
-          {
-            type: "success",
-            duration: 10000,
-            persistent: false,
-            progress: true,
-            message: "",
-            custom: true,
-          },
-        );
+        this.checkpointsCompleted = 0;
 
         const tags = toRaw(this.tags);
         let metadata = {
@@ -245,9 +256,25 @@ export default {
                   .modify({ tgs });
               },
             );
-          this.$store.commit("setFolderCopiedStatus", true);
-        }, 10000, this.active.id, this.folderName, metadata, tags);
 
+          this.checkpointsCompleted++;
+        }, 5000, this.active.id, this.folderName, metadata, tags);
+
+        let objects, objectsPrev = undefined;
+        const sleep = time => new Promise(resolve => setTimeout(resolve, time));
+
+        while (objectsPrev === undefined ||
+          objects.length != objectsPrev.length) {
+          const task = await getObjects(this.active.id, this.folderName)
+            .then((obj) => {
+              objectsPrev = objects;
+              objects = obj;
+            });
+
+          await Promise.all([task, sleep(1000)]);
+        }
+
+        this.checkpointsCompleted++;
         this.cancelCopy(keypress);
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
