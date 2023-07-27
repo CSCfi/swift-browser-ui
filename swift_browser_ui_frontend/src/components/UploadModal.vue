@@ -31,8 +31,7 @@
           2. {{ $t("message.encrypt.upload_step2") }}
         </h3>
         <div
-          class="dropArea is-flex
-                is-align-items-center is-justify-content-center"
+          class="dropArea"
           @dragover="dragHandler"
           @dragleave="dragLeaveHandler"
           @drop="navUpload"
@@ -747,6 +746,9 @@ c-autocomplete {
   & > span:first-of-type {
     margin-right: 1rem;
   }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .over-dropArea {
