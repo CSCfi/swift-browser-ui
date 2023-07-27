@@ -53,7 +53,7 @@
 import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
 
 const highlightTemplate =
-  "$1<span class='has-background-primary-dark has-text-light hl-1'>$2$3</span>";
+  "$1<span class='hl-1'>$2$3</span>";
 
 export default {
   name: "SearchResultItem",
@@ -114,10 +114,6 @@ export default {
 
 span {
   display: inline !important
-}
-
-.hl-1 {
-  margin: 0 0.08rem;
 }
 
 </style>

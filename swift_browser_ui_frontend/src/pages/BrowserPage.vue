@@ -104,7 +104,7 @@ export default {
 <style lang="scss">
 
 html, body {
-  height: 100%;
+  height: 100vh;
 }
 
 body {

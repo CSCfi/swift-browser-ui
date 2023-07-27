@@ -1,4 +1,4 @@
-/*! purgecss start ignore */
+
 
 /* Selected styles from bulma for compatibility */
 /*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
@@ -112,8 +112,6 @@ $red:          hsl(348, 86%, 61%) !default
 
 // Typography
 
-$family-sans-serif: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !default
-$family-monospace: monospace !default
 $render-mode: optimizeLegibility !default
 
 $size-1: 3rem !default
@@ -134,36 +132,7 @@ $weight-bold: 700 !default
 
 $block-spacing: 1.5rem !default
 
-// Responsiveness
-
-// The container horizontal gap, which acts as the offset for breakpoints
-$gap: 32px !default
-// 960, 1152, and 1344 have been chosen because they are divisible by both 12 and 16
-$tablet: 769px !default
-// 960px container + 4rem
-$desktop: 960px + (2 * $gap) !default
-// 1152px container + 4rem
-$widescreen: 1152px + (2 * $gap) !default
-$widescreen-enabled: true !default
-// 1344px container + 4rem
-$fullhd: 1344px + (2 * $gap) !default
-$fullhd-enabled: true !default
-$breakpoints: ("mobile": ("until": $tablet), "tablet": ("from": $tablet), "tablet-only": ("from": $tablet, "until": $desktop), "touch": ("from": $desktop), "desktop": ("from": $desktop), "desktop-only": ("from": $desktop, "until": $widescreen), "until-widescreen": ("until": $widescreen), "widescreen": ("from": $widescreen), "widescreen-only": ("from": $widescreen, "until": $fullhd), "until-fullhd": ("until": $fullhd), "fullhd": ("from": $fullhd)) !default
-
-// Miscellaneous
-
-$easing: ease-out !default
-$radius-small: 2px !default
-$radius: 4px !default
-$radius-large: 6px !default
-$radius-rounded: 9999px !default
-$speed: 86ms !default
-
-// Flags
-
-$variable-columns: true !default
-$rtl: false !default
-
+// Functions
 
 @function mergeColorMaps($bulma-colors, $custom-colors)
   // We return at least Bulma's hard-coded colors
@@ -264,21 +233,6 @@ $rtl: false !default
     $target-l: round($base-l + ($luminance-delta * 53))
     @return change-color($color, $lightness: max($base-l, $target-l))
   @return $text-strong
-
-@function bulmaRgba($color, $alpha)
-  @if type-of($color) != 'color'
-    @return $color
-  @return rgba($color, $alpha)
-
-@function bulmaDarken($color, $amount)
-  @if type-of($color) != 'color'
-    @return $color
-  @return darken($color, $amount)
-
-@function bulmaLighten($color, $amount)
-  @if type-of($color) != 'color'
-    @return $color
-  @return lighten($color, $amount)
 
 // Custom divide function by @mdo from https://github.com/twbs/bootstrap/pull/34245
 // Replaces old slash division deprecated in Dart Sass
@@ -383,10 +337,6 @@ $link-active-border: $grey-dark !default
 
 // Typography
 
-$family-primary: $family-sans-serif !default
-$family-secondary: $family-sans-serif !default
-$family-code: $family-monospace !default
-
 $size-small: $size-7 !default
 $size-normal: $size-6 !default
 $size-medium: $size-5 !default
@@ -394,468 +344,29 @@ $size-large: $size-4 !default
 
 // Effects
 
-$shadow: 0 0.5em 1em -0.125em rgba($scheme-invert, 0.1), 0 0px 0 1px rgba($scheme-invert, 0.02) !default
-
 // Lists and maps
-$custom-colors: null !default
-$custom-shades: null !default
-
-$colors: mergeColorMaps(("white": ($white, $black), "black": ($black, $white), "light": ($light, $light-invert), "dark": ($dark, $dark-invert), "primary": ($primary, $primary-invert, $primary-light, $primary-dark), "link": ($link, $link-invert, $link-light, $link-dark), "info": ($info, $info-invert, $info-light, $info-dark), "success": ($success, $success-invert, $success-light, $success-dark), "warning": ($warning, $warning-invert, $warning-light, $warning-dark), "danger": ($danger, $danger-invert, $danger-light, $danger-dark)), $custom-colors) !default
-
-$shades: mergeColorMaps(("black-bis": $black-bis, "black-ter": $black-ter, "grey-darker": $grey-darker, "grey-dark": $grey-dark, "grey": $grey, "grey-light": $grey-light, "grey-lighter": $grey-lighter, "white-ter": $white-ter, "white-bis": $white-bis), $custom-shades) !default
 
 $sizes: $size-1 $size-2 $size-3 $size-4 $size-5 $size-6 $size-7 !default
-
-=clearfix
-  &::after
-    clear: both
-    content: " "
-    display: table
-
-=center($width, $height: 0)
-  position: absolute
-  @if $height != 0
-    left: calc(50% - (#{$width} * 0.5))
-    top: calc(50% - (#{$height} * 0.5))
-  @else
-    left: calc(50% - (#{$width} * 0.5))
-    top: calc(50% - (#{$width} * 0.5))
-
-=fa($size, $dimensions)
-  display: inline-block
-  font-size: $size
-  height: $dimensions
-  line-height: $dimensions
-  text-align: center
-  vertical-align: top
-  width: $dimensions
 
 =overflow-touch
   -webkit-overflow-scrolling: touch
 
-=placeholder
-  $placeholders: ':-moz' ':-webkit-input' '-moz' '-ms-input'
-  @each $placeholder in $placeholders
-    &:#{$placeholder}-placeholder
-      @content
-
-=reset
-  -moz-appearance: none
-  -webkit-appearance: none
-  appearance: none
-  background: none
-  border: none
-  color: currentColor
-  font-family: inherit
-  font-size: 1em
-  margin: 0
-  padding: 0
-
-// Responsiveness
-
-=from($device)
-  @media screen and (min-width: $device)
-    @content
-
-=until($device)
-  @media screen and (max-width: $device - 1px)
-    @content
-
-=between($from, $until)
-  @media screen and (min-width: $from) and (max-width: $until - 1px)
-    @content
-
-=mobile
-  @media screen and (max-width: $tablet - 1px)
-    @content
-
-=tablet
-  @media screen and (min-width: $tablet), print
-    @content
-
-=tablet-only
-  @media screen and (min-width: $tablet) and (max-width: $desktop - 1px)
-    @content
-
-=touch
-  @media screen and (max-width: $desktop - 1px)
-    @content
-
-=desktop
-  @media screen and (min-width: $desktop)
-    @content
-
-=desktop-only
-  @if $widescreen-enabled
-    @media screen and (min-width: $desktop) and (max-width: $widescreen - 1px)
-      @content
-
-=until-widescreen
-  @if $widescreen-enabled
-    @media screen and (max-width: $widescreen - 1px)
-      @content
-
-=widescreen
-  @if $widescreen-enabled
-    @media screen and (min-width: $widescreen)
-      @content
-
-=widescreen-only
-  @if $widescreen-enabled and $fullhd-enabled
-    @media screen and (min-width: $widescreen) and (max-width: $fullhd - 1px)
-      @content
-
-=until-fullhd
-  @if $fullhd-enabled
-    @media screen and (max-width: $fullhd - 1px)
-      @content
-
-=fullhd
-  @if $fullhd-enabled
-    @media screen and (min-width: $fullhd)
-      @content
-
-=breakpoint($name)
-  $breakpoint: map-get($breakpoints, $name)
-  @if $breakpoint
-    $from: map-get($breakpoint, "from")
-    $until: map-get($breakpoint, "until")
-    @if $from and $until
-      +between($from, $until)
-        @content
-    @else if $from
-      +from($from)
-        @content
-    @else if $until
-      +until($until)
-        @content
-
-=ltr
-  @if not $rtl
-    @content
-
-=rtl
-  @if $rtl
-    @content
-
-=ltr-property($property, $spacing, $right: true)
-  $normal: if($right, "right", "left")
-  $opposite: if($right, "left", "right")
-  @if $rtl
-    #{$property}-#{$opposite}: $spacing
-  @else
-    #{$property}-#{$normal}: $spacing
-
-=ltr-position($spacing, $right: true)
-  $normal: if($right, "right", "left")
-  $opposite: if($right, "left", "right")
-  @if $rtl
-    #{$opposite}: $spacing
-  @else
-    #{$normal}: $spacing
-
 // Placeholders
-
-=unselectable
-  -webkit-touch-callout: none
-  -webkit-user-select: none
-  -moz-user-select: none
-  -ms-user-select: none
-  user-select: none
-
-=arrow($color: transparent)
-  border: 3px solid $color
-  border-radius: 2px
-  border-right: 0
-  border-top: 0
-  content: " "
-  display: block
-  height: 0.625em
-  margin-top: -0.4375em
-  pointer-events: none
-  position: absolute
-  top: 50%
-  transform: rotate(-45deg)
-  transform-origin: center
-  width: 0.625em
 
 =block($spacing: $block-spacing)
   &:not(:last-child)
     margin-bottom: $spacing
 
-=delete
-  +unselectable
-  -moz-appearance: none
-  -webkit-appearance: none
-  background-color: bulmaRgba($scheme-invert, 0.2)
-  border: none
-  border-radius: $radius-rounded
-  cursor: pointer
-  pointer-events: auto
-  display: inline-block
-  flex-grow: 0
-  flex-shrink: 0
-  font-size: 0
-  height: 20px
-  max-height: 20px
-  max-width: 20px
-  min-height: 20px
-  min-width: 20px
-  outline: none
-  position: relative
-  vertical-align: top
-  width: 20px
-  &::before,
-  &::after
-    background-color: $scheme-main
-    content: ""
-    display: block
-    left: 50%
-    position: absolute
-    top: 50%
-    transform: translateX(-50%) translateY(-50%) rotate(45deg)
-    transform-origin: center center
-  &::before
-    height: 2px
-    width: 50%
-  &::after
-    height: 50%
-    width: 2px
-  &:hover,
-  &:focus
-    background-color: bulmaRgba($scheme-invert, 0.3)
-  &:active
-    background-color: bulmaRgba($scheme-invert, 0.4)
-  // Sizes
-  &.is-small
-    height: 16px
-    max-height: 16px
-    max-width: 16px
-    min-height: 16px
-    min-width: 16px
-    width: 16px
-  &.is-medium
-    height: 24px
-    max-height: 24px
-    max-width: 24px
-    min-height: 24px
-    min-width: 24px
-    width: 24px
-  &.is-large
-    height: 32px
-    max-height: 32px
-    max-width: 32px
-    min-height: 32px
-    min-width: 32px
-    width: 32px
-
-=loader
-  animation: spinAround 500ms infinite linear
-  border: 2px solid $grey-lighter
-  border-radius: $radius-rounded
-  border-right-color: transparent
-  border-top-color: transparent
-  content: ""
-  display: block
-  height: 1em
-  position: relative
-  width: 1em
-
-=overlay($offset: 0)
-  bottom: $offset
-  left: $offset
-  position: absolute
-  right: $offset
-  top: $offset
-
-
-$control-radius: $radius !default
-$control-radius-small: $radius-small !default
-
-$control-border-width: 1px !default
-
-$control-height: 2.5em !default
-$control-line-height: 1.5 !default
-
-$control-padding-vertical: calc(0.5em - #{$control-border-width}) !default
-$control-padding-horizontal: calc(0.75em - #{$control-border-width}) !default
-
-=control
-  -moz-appearance: none
-  -webkit-appearance: none
-  align-items: center
-  border: $control-border-width solid transparent
-  border-radius: $control-radius
-  box-shadow: none
-  display: inline-flex
-  font-size: $size-normal
-  height: $control-height
-  justify-content: flex-start
-  line-height: $control-line-height
-  padding-bottom: $control-padding-vertical
-  padding-left: $control-padding-horizontal
-  padding-right: $control-padding-horizontal
-  padding-top: $control-padding-vertical
-  position: relative
-  vertical-align: top
-  // States
-  &:focus,
-  &.is-focused,
-  &:active,
-  &.is-active
-    outline: none
-  &[disabled],
-  fieldset[disabled] &
-    cursor: not-allowed
-
-// The controls sizes use mixins so they can be used at different breakpoints
-=control-small
-  border-radius: $control-radius-small
-  font-size: $size-small
-=control-medium
-  font-size: $size-medium
-=control-large
-  font-size: $size-large
-
-
-%control
-  +control
-
-%unselectable
-  +unselectable
-
-%arrow
-  +arrow
-
 %block
   +block
 
-%delete
-  +delete
-
-%loader
-  +loader
-
-%overlay
-  +overlay
-
-%reset
-  +reset
-
-
-$body-background-color: $scheme-main !default
-$body-size: 16px !default
-$body-min-width: 300px !default
-$body-rendering: optimizeLegibility !default
-$body-family: $family-primary !default
-$body-overflow-x: hidden !default
-$body-overflow-y: scroll !default
-
-$body-color: $text !default
-$body-font-size: 1em !default
-$body-weight: $weight-normal !default
-$body-line-height: 1.5 !default
-
-$code-family: $family-code !default
-$code-padding: 0.25em 0.5em 0.25em !default
-$code-weight: normal !default
-$code-size: 0.875em !default
-
 $small-font-size: 0.875em !default
-
-$hr-background-color: $background !default
-$hr-height: 2px !default
-$hr-margin: 1.5rem 0 !default
 
 $strong-color: $text-strong !default
 $strong-weight: $weight-bold !default
 
-$pre-font-size: 0.875em !default
-$pre-padding: 1.25rem 1.5rem !default
-$pre-code-font-size: 1em !default
-
-html
-  background-color: $body-background-color
-  font-size: $body-size
-  -moz-osx-font-smoothing: grayscale
-  -webkit-font-smoothing: antialiased
-  min-width: $body-min-width
-  overflow-x: $body-overflow-x
-  overflow-y: $body-overflow-y
-  text-rendering: $body-rendering
-  text-size-adjust: 100%
-
-article,
-aside,
-figure,
-footer,
-header,
-hgroup,
-section
-  display: block
-
-body,
-button,
-input,
-optgroup,
-select,
-textarea
-  font-family: $body-family
-
-code,
-pre
-  -moz-osx-font-smoothing: auto
-  -webkit-font-smoothing: auto
-  font-family: $code-family
-
-body
-  color: $body-color
-  font-size: $body-font-size
-  font-weight: $body-weight
-  line-height: $body-line-height
-
-// Inline
-
-a
-  color: $link
-  cursor: pointer
-  text-decoration: none
-  strong
-    color: currentColor
-  &:hover
-    color: $link-hover
-
-hr
-  background-color: $hr-background-color
-  border: none
-  display: block
-  height: $hr-height
-  margin: $hr-margin
-
-img
-  height: auto
-  max-width: 100%
-
-input[type="checkbox"],
-input[type="radio"]
-  vertical-align: baseline
-
-small
-  font-size: $small-font-size
-
-span
-  font-style: inherit
-  font-weight: inherit
-
-strong
-  color: $strong-color
-  font-weight: $strong-weight
 
 // Block
-
-fieldset
-  border: none
-
 
 $title-color: $text-strong !default
 $title-family: false !default
@@ -866,7 +377,6 @@ $title-strong-color: inherit !default
 $title-strong-weight: inherit !default
 $title-sub-size: 0.75em !default
 $title-sup-size: 0.75em !default
-
 
 .title
   @extend %block
@@ -896,46 +406,3 @@ $title-sup-size: 0.75em !default
     $i: index($sizes, $size)
     &.is-#{$i}
       font-size: $size
-
-
-
-@each $name, $pair in $colors
-  $color: nth($pair, 1)
-  .has-text-#{$name}
-    color: $color !important
-  a.has-text-#{$name}
-    &:hover,
-    &:focus
-      color: bulmaDarken($color, 10%) !important
-  .has-background-#{$name}
-    background-color: $color !important
-  @if length($pair) >= 4
-    $color-light: nth($pair, 3)
-    $color-dark: nth($pair, 4)
-    // Light
-    .has-text-#{$name}-light
-      color: $color-light !important
-    a.has-text-#{$name}-light
-      &:hover,
-      &:focus
-        color: bulmaDarken($color-light, 10%) !important
-    .has-background-#{$name}-light
-      background-color: $color-light !important
-    // Dark
-    .has-text-#{$name}-dark
-      color: $color-dark !important
-    a.has-text-#{$name}-dark
-      &:hover,
-      &:focus
-        color: bulmaLighten($color-dark, 10%) !important
-    .has-background-#{$name}-dark
-      background-color: $color-dark !important
-
-@each $name, $shade in $shades
-  .has-text-#{$name}
-    color: $shade !important
-  .has-background-#{$name}
-    background-color: $shade !important
-
-
-/*! purgecss end ignore */
