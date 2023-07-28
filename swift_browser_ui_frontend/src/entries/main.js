@@ -261,6 +261,26 @@ const app = createApp({
         .toCollection()
         .primaryKeys();
       await getDB().projects.bulkPut(projects);
+
+      if(this.$route.params.project != undefined
+         && !existingProjects.includes(this.$route.params.project)){
+        return this.$router.push("/404.html").then(() => { this.$router.go();});
+      }
+      if(this.$route.params.container != undefined){
+        const containersFromDB = await getDB()
+          .containers.where({projectID: this.$route.params.project} )
+          .toArray();
+
+        let val = containersFromDB.find(item =>
+          item.name === this.$route.params.container);
+
+        if(val === undefined){
+          return this.$router.push("/404.html")
+            .then(() => { this.$router.go();});
+        }
+
+      }
+
       const toDelete = [];
       existingProjects.map(async oldProj => {
         if (!projects.find(proj => proj.id === oldProj)) {

@@ -73,7 +73,7 @@
               {{ $t('message.error.Unauthorized_text') }}
             </c-card-content>
             <c-card-content v-else-if="forbid">
-              {{ $t('message.error.Forbidden_text') }}
+              {{ getParams() }}
             </c-card-content>
             <c-card-content v-else-if="notfound">
               {{ $t('message.error.Notfound_text') }}
@@ -81,12 +81,20 @@
             <c-card-content v-else-if="uidown">
               {{ $t('message.error.UIdown_text') }}
             </c-card-content>
-            <c-card-actions>
+            <c-card-actions v-if="notfound || forbid || badrequest">
               <c-button
-                href="/"
+                href="/browse"
                 target="_self"
               >
                 {{ $t('message.error.frontPage') }}
+              </c-button>
+            </c-card-actions>
+            <c-card-actions v-else-if="unauth">
+              <c-button
+                href="/login/kill"
+                target="_self"
+              >
+                {{ $t('message.error.login') }}
               </c-button>
             </c-card-actions>
           </c-card>
@@ -109,6 +117,12 @@ export default {
   },
   mounted: function () {
     checkIDB().then(result => this.idb = result);
+  },
+  methods: {
+    getParams: function(){
+      const url = new URL(window.location.href);
+      return url.searchParams.get("error");
+    },
   },
 };
 </script>

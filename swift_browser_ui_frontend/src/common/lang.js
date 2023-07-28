@@ -20,6 +20,7 @@ let default_translations = {
       },
       error: {
         frontPage: "Go to front page",
+        login: "Log in",
         BadRequest: "400 – Bad Request",
         BadRequest_text:
           "Something was wrong with the request. This can " +
