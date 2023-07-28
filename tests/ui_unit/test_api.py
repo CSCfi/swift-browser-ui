@@ -47,7 +47,11 @@ class APITestClass(tests.common.mockups.APITestBase):
 
     async def test_swift_list_containers(self):
         """Test container listing fetch from Openstack."""
-        with self.p_get_sess, self.p_sresp:
+        mock_check = unittest.mock.AsyncMock(return_value={})
+        patch_mock_check = unittest.mock.patch(
+            "swift_browser_ui.ui.api.check_last_modified", mock_check
+        )
+        with self.p_get_sess, self.p_sresp, patch_mock_check:
             await swift_browser_ui.ui.api.swift_list_containers(
                 self.mock_request,
             )
@@ -77,6 +81,40 @@ class APITestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.ui.api.swift_list_containers(
                 self.mock_request,
             )
+
+    async def test_check_last_modified(self):
+        """Test different scenarios for container list last_modified value."""
+        # If container in the list already has last_modified key and value
+        data = json.dumps([{"last_modified": "Unknown"}]).encode()
+        with self.p_get_sess:
+            ret = await swift_browser_ui.ui.api.check_last_modified(
+                self.mock_request,
+                data,
+            )
+        self.mock_client.head.assert_not_called()
+
+        # If head request response doesn't have Last-Modified value
+        data = json.dumps([{"name": "folder"}]).encode()
+        with self.p_get_sess:
+            ret = await swift_browser_ui.ui.api.check_last_modified(
+                self.mock_request,
+                data,
+            )
+        self.mock_client.head.assert_called_once()
+        self.assertEqual(json.loads(ret)[0]["last_modified"], "Unknown")
+
+        # If head request response has a value for Last-Modified
+        self.mock_client_response.headers = {
+            "Last-Modified": "Thu, 1 Jan 1970 13:37:00 GMT",
+        }
+        with self.p_get_sess:
+            ret = await swift_browser_ui.ui.api.check_last_modified(
+                self.mock_request,
+                data,
+            )
+        self.assertEqual(
+            json.loads(ret)[0]["last_modified"], "1970-01-01T13:37:00.000000"
+        )
 
     async def test_swift_list_objects(self):
         """Test object listing fetch from Openstack."""
