@@ -394,3 +394,13 @@ class VaultClient:
                 f"c4ghtransit/files/{project}/{container}/{path}",
                 json_data={"header": header},
             )
+
+    async def get_sys_health(self) -> str:
+        """Check Vault client health."""
+        resp = await self._request("GET", "sys/health", timeout=5)
+        if isinstance(resp, Dict):
+            data: Dict = resp
+        if data["initialized"] and data["sealed"] is False:
+            return "Ok"
+        else:
+            return "Down"

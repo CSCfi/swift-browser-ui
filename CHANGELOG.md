@@ -68,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #923) Add `Last modified` column for Container Table
 - (GL #999) Add three level sharing with view option
 - (GL #947) Added cypress tests for login, adding and showing containers, uploading files
+- (GL #1047) Added redis and vault monitoring to `/health` endpoint
 
 ### Changed
 
@@ -166,6 +167,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1074) Fix for error when last_modified date is null/undefined
 - (GL #1068) Fix copy request failing silently if container name is already in use
 - (GL #1059) Fixed item deletion bug in which deleting last item on a page left open an empty page
+- (GL #1081) Fix for objects' tag editings and deletion being disabled in a normal container
 
 ### Removed
 
