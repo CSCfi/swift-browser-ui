@@ -315,6 +315,7 @@ export default {
               ],
             },
           });
+
           return items;
         }, []);
 
@@ -322,6 +323,34 @@ export default {
         ...this.paginationOptions,
         itemCount: pagedLength,
       };
+      if (this.objs.length > 0) this.setPageByFileName(this.$route.query.file);
+    },
+    setPageByFileName: function(file){
+      if(file != undefined){
+        let objectList = this.objs;
+        // check if file is in subfolder
+        if(file.includes("/")){
+          let subfolderItems = [];
+          objectList.forEach(element => {
+            if(element.name.substr(0, element.name.lastIndexOf("/") + 1)
+              === file.substr(0, file.lastIndexOf("/") + 1)){
+              subfolderItems.push(element);
+            }
+          });
+          objectList = subfolderItems;
+        }
+        let index = objectList.findIndex(item => item.name == file);
+        if(index <= 0){
+          index = 1;
+        }
+        this.paginationOptions.currentPage =
+          Math.floor(index  / this.paginationOptions.itemsPerPage) + 1;
+        let queryWithOutFile = {
+          ...this.$route.query,
+          file: null,
+        };
+        this.$router.replace({"query": queryWithOutFile});
+      }
     },
     setPagination: function () {
       const paginationOptions = getPaginationOptions(this.$t);
