@@ -1,11 +1,13 @@
 """Project functions for handling API requests from front-end."""
 
 import asyncio
+import json
 import re
 import ssl
 import time
 import typing
 import urllib.parse
+from datetime import datetime
 
 import aiohttp.web
 import aiohttp_session
@@ -77,6 +79,7 @@ async def swift_list_containers(
             await resp.prepare(request)
             if ret.status == 200:
                 async for chunk in ret.content.iter_chunked(65535):
+                    chunk = await check_last_modified(request, chunk)
                     await resp.write(chunk)
             await resp.write_eof()
         return resp
@@ -84,6 +87,51 @@ async def swift_list_containers(
         raise aiohttp.web.HTTPForbidden(
             reason="Account does not have access to the project."
         )
+
+
+async def check_last_modified(request: aiohttp.web.Request, data: bytes) -> bytes:
+    """Ensure container list data includes 'last_modified' keys and values.
+
+    :param request: A request instance
+    :param data: List of containers with basic info
+    """
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    request.app["Log"].info(
+        "API call for project listing from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    project = request.match_info["project"]
+    if "owner" in request.query:
+        owner: str = request.query["owner"]
+    else:
+        owner = ""
+    endpoint = session["projects"][project]["endpoint"]
+
+    # If last_modified is not part of container basic info list,
+    # head request is made to check container metadata and add
+    # last modified data from there. Otherwise it is marked "Unknown".
+    modified_data = []
+    for folder in json.loads(data):
+        if "last_modified" not in folder.keys():
+            name = folder["name"]
+            async with client.head(
+                f"{endpoint.replace(project, owner) if owner else endpoint}/{name}",
+                headers={
+                    "X-Auth-Token": session["projects"][project]["token"],
+                },
+            ) as ret:
+                headers = ret.headers
+                try:
+                    date_str = headers["Last-Modified"]
+                    # Convert the date string to the ISO 8601 format
+                    date_obj = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
+                    iso_8601_str = date_obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
+                    folder["last_modified"] = iso_8601_str
+                except KeyError:
+                    folder["last_modified"] = "Unknown"
+        modified_data.append(folder)
+    return json.dumps(modified_data).encode()
 
 
 async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -294,7 +342,7 @@ async def swift_get_batch_object_metadata(
     """Batch get metadata for objects."""
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
-        "API cal for batch object metadata listing "
+        "API call for batch object metadata listing "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     batch = []
@@ -313,7 +361,7 @@ async def swift_get_metadata_container(
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
     request.app["Log"].info(
-        "API cal for project listing from "
+        "API call for project listing from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     project = request.match_info["project"]
@@ -370,7 +418,7 @@ async def swift_batch_update_object_metadata(
     """Update metadata for an object."""
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
-        "API cal for updating container metadata from "
+        "API call for updating container metadata from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     objects = await request.json()
@@ -400,7 +448,7 @@ async def swift_update_container_metadata(
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
     request.app["Log"].info(
-        "API cal for updating container metadata from "
+        "API call for updating container metadata from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     project = request.match_info["project"]
@@ -489,7 +537,6 @@ async def _swift_get_container_acl_wrapper(
                 r_meta,
             )
             r_meta = r_meta.lstrip(",").rstrip(",").split(",")
-            print(r_meta)
             try:
                 acl = {k: {"read": v} for k, v in [i.split(":") for i in r_meta]}
             except ValueError:
@@ -537,7 +584,6 @@ async def get_access_control_metadata(
                 "X-Auth-Token": session["projects"][project]["token"],
             },
         ) as ret:
-            print(ret.status)
             if ret.status == 204:
                 break
             page = await ret.json()
