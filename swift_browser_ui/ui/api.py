@@ -79,7 +79,12 @@ async def swift_list_containers(
             await resp.prepare(request)
             if ret.status == 200:
                 async for chunk in ret.content.iter_chunked(65535):
-                    chunk = await check_last_modified(request, chunk)
+                    tasks = [
+                        _check_last_modified(request, container)
+                        for container in json.loads(chunk)
+                    ]
+                    ret = await asyncio.gather(*tasks)
+                    chunk = json.dumps(ret).encode()
                     await resp.write(chunk)
             await resp.write_eof()
         return resp
@@ -89,11 +94,13 @@ async def swift_list_containers(
         )
 
 
-async def check_last_modified(request: aiohttp.web.Request, data: bytes) -> bytes:
-    """Ensure container list data includes 'last_modified' keys and values.
+async def _check_last_modified(
+    request: aiohttp.web.Request, container: typing.Dict
+) -> typing.Dict:
+    """Ensure container data includes 'last_modified' key and value.
 
     :param request: A request instance
-    :param data: List of containers with basic info
+    :param data: Containers basic info
     """
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
@@ -108,13 +115,12 @@ async def check_last_modified(request: aiohttp.web.Request, data: bytes) -> byte
         owner = ""
     endpoint = session["projects"][project]["endpoint"]
 
-    # If last_modified is not part of container basic info list,
-    # head request is made to check container metadata and add
-    # last modified data from there. Otherwise it is marked "Unknown".
-    modified_data = []
-    for folder in json.loads(data):
-        if "last_modified" not in folder.keys():
-            name = folder["name"]
+    # If last_modified is not part of container basic info,
+    # head request is made to check container metadata
+    # and add last modified data from there.
+    if "last_modified" not in container.keys():
+        try:
+            name = container["name"]
             async with client.head(
                 f"{endpoint.replace(project, owner) if owner else endpoint}/{name}",
                 headers={
@@ -122,16 +128,15 @@ async def check_last_modified(request: aiohttp.web.Request, data: bytes) -> byte
                 },
             ) as ret:
                 headers = ret.headers
-                try:
-                    date_str = headers["Last-Modified"]
-                    # Convert the date string to the ISO 8601 format
-                    date_obj = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
-                    iso_8601_str = date_obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
-                    folder["last_modified"] = iso_8601_str
-                except KeyError:
-                    folder["last_modified"] = "Unknown"
-        modified_data.append(folder)
-    return json.dumps(modified_data).encode()
+                date_str = headers["Last-Modified"]
+                # Convert the date string to the ISO 8601 format
+                date_obj = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
+                iso_8601_str = date_obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
+                container["last_modified"] = iso_8601_str
+        except Exception:
+            # If anything goes wrong, set last_modified key anyway with null value
+            container["last_modified"] = "Unknown"
+    return container
 
 
 async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
