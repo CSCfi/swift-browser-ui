@@ -398,6 +398,7 @@ let default_translations = {
       },
       error: {
         frontPage: "Etusivulle",
+        login: "Kirjaudu sisään",
         BadRequest: "400 – Virheellinen pyyntö",
         BadRequest_text:
           "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
