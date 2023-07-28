@@ -34,7 +34,6 @@ import {
   parseDateTime,
   parseDateFromNow,
   getHumanReadableSize,
-  getTimestamp,
 } from "@/common/conv";
 import {
   DecryptedDownloadSession,
@@ -148,7 +147,7 @@ export default {
       );
     },
     formatItem: function (item) {
-      const name = this.renderFolders && !item?.subfolder ?
+      const name = this.renderFolders ?
         getFolderName(item.name, this.$route)
         : item.name;
 
@@ -294,7 +293,8 @@ export default {
         } else {
           let subName = getFolderName(item.name, this.$route);
           //check if subfolder already added
-          if (items.find(el => el.name === subName)) {
+          if (items.find(el => getFolderName(el.name, this.$route)
+            === subName)) {
             return items;
           } else {
             //filter objs that would belong to subfolder
@@ -304,19 +304,17 @@ export default {
                 return obj;
               }
             });
-            //get latest last_modified of all objs in subfolder
-            const latest = subfolderObjs.reduce((a, b) => {
-              if (getTimestamp(a.last_modified) > getTimestamp(
-                b.last_modified)) return a;
-              return b;
-            }, {});
+            //sort by latest last_modified
+            subfolderObjs.sort((a, b) => sortItems(
+              a, b, "last_modified", "desc"));
             const subSize = subfolderObjs.reduce((sum, obj) => {
               return sum += obj.bytes;
             }, 0);
+            const fullSubName = getPrefix(this.$route) + subName + "/";
             //add new subfolder
-            let subfolder = {
-              container: item.container, name: subName,
-              bytes: subSize, last_modified: latest.last_modified,
+            const subfolder = {
+              container: item.container, name: fullSubName,
+              bytes: subSize, last_modified: subfolderObjs[0].last_modified,
               tags: [], subfolder: true,
             };
             items.push(subfolder);
