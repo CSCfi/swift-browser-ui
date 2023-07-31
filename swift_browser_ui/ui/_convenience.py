@@ -16,7 +16,6 @@ import aiohttp.web
 import aiohttp_session
 import certifi
 import redis.asyncio as redis
-import requests
 from redis.asyncio.sentinel import Sentinel
 
 import swift_browser_ui.common.signature
@@ -24,20 +23,6 @@ from swift_browser_ui.ui.settings import setd
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
-
-
-def test_swift_endpoint(endpoint: str) -> None:
-    """Test swift endpoint connectivity."""
-    try:
-        requests.head(endpoint, timeout=5)
-    except requests.exceptions.ConnectionError as e:
-        logging.debug(f"The {endpoint} couldn't fulfill the request.")
-        logging.debug(f"Error code: {e}")
-        raise aiohttp.web.HTTPServiceUnavailable(
-            reason="Cannot get Swift endpoint connection."
-        )
-    else:
-        logging.info("Swift endpoint accessible.")
 
 
 async def sign(

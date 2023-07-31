@@ -75,12 +75,6 @@ class EncryptedUploadProxy:
 
         self.ws: aiohttp.web.WebSocketResponse
 
-    def check_header(
-        self,
-    ) -> bool:
-        """Return wether the header has been uploaded."""
-        return self.header_uploaded
-
     async def a_create_container(self) -> None:
         """Create the container required by the upload."""
         for container in {self.container, f"{self.container}_segments"}:

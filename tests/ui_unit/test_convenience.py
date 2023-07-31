@@ -4,8 +4,6 @@ import unittest
 
 import aiohttp.web
 
-from requests.exceptions import ConnectionError  # type: ignore
-
 import swift_browser_ui.ui._convenience
 
 import tests.common.mockups
@@ -20,24 +18,6 @@ class TestConvenienceFunctions(
     def setUp(self):
         """Test that the logging setup function works."""
         super().setUp()
-
-    def test_test_swift_endpoint(self):
-        """Test that the swift endpoint check works as it should."""
-        mock_get = unittest.mock.Mock(
-            side_effect=[
-                ConnectionError,
-                None,
-            ]
-        )
-        p_get = unittest.mock.patch(
-            "swift_browser_ui.ui._convenience.requests.head",
-            mock_get,
-        )
-        with self.assertRaises(aiohttp.web.HTTPServiceUnavailable), p_get:
-            swift_browser_ui.ui._convenience.test_swift_endpoint("test-endpoint")
-        with p_get:
-            swift_browser_ui.ui._convenience.test_swift_endpoint("test-endpoint")
-        mock_get.assert_called_with("test-endpoint", timeout=5)
 
     async def test_sign(self):
         """Test the signature generation."""
