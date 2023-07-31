@@ -230,7 +230,7 @@ export default {
       this.currentPage = this.queryPage;
     },
     currentContainer: function() {
-      const savedDisplayOptions = this.currentContainer.displayOptions;
+      const savedDisplayOptions = toRaw(this.currentContainer.displayOptions);
       if (savedDisplayOptions) {
         this.renderFolders = savedDisplayOptions.renderFolders;
         this.showTimestamp = savedDisplayOptions.showTimestamp;
@@ -245,11 +245,6 @@ export default {
     },
     isFolderUploading: function () {
       if (!this.isFolderUploading) this.updateContainers();
-    },
-    containerName: async function() {
-      await this.getSharedContainers();
-      await this.getFolderSharedStatus();
-      await this.updateObjects();
     },
   },
   created: function () {
@@ -530,16 +525,11 @@ export default {
     },
     setTableOptionsMenu() {
       this.$store.commit("toggleRenderedFolders", this.renderFolders);
-      const renderFolders = toRaw(this.renderFolders);
-      const showTimestamp = toRaw(this.showTimestamp);
-      const hideTags = toRaw(this.hideTags);
-      const hidePagination = toRaw(this.hidePagination);
-      const currentContainer = toRaw(this.currentContainer);
       const displayOptions = {
-        renderFolders: renderFolders,
-        showTimestamp: showTimestamp,
-        hideTags: hideTags,
-        hidePagination: hidePagination,
+        renderFolders: this.renderFolders,
+        showTimestamp: this.showTimestamp,
+        hideTags: this.hideTags,
+        hidePagination: this.hidePagination,
       };
 
       this.tableOptions = [
@@ -549,11 +539,11 @@ export default {
             : this.$t("message.tableOptions.render"),
           action: async () => {
             this.renderFolders = !(this.renderFolders);
-            const renderFolders = toRaw(this.renderFolders);
 
             const newContainer = {
-              ...currentContainer,
-              displayOptions: {...displayOptions, renderFolders}};
+              ...toRaw(this.currentContainer),
+              displayOptions: {
+                ...displayOptions, renderFolders: this.renderFolders }};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
@@ -565,11 +555,11 @@ export default {
             : this.$t("message.tableOptions.timestamp"),
           action: async () => {
             this.showTimestamp = !(this.showTimestamp);
-            const showTimestamp = toRaw(this.showTimestamp);
 
             const newContainer = {
-              ...currentContainer,
-              displayOptions: { ...displayOptions, showTimestamp}};
+              ...toRaw(this.currentContainer),
+              displayOptions: {
+                ...displayOptions, showTimestamp: this.showTimestamp }};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
@@ -581,11 +571,11 @@ export default {
             : this.$t("message.tableOptions.hideTags"),
           action: async () => {
             this.hideTags = !(this.hideTags);
-            const hideTags = toRaw(this.hideTags);
 
             const newContainer = {
-              ...currentContainer,
-              displayOptions: { ...displayOptions, hideTags}};
+              ...toRaw(this.currentContainer),
+              displayOptions: {
+                ...displayOptions, hideTags: this.hideTags }};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
@@ -597,12 +587,11 @@ export default {
             : this.$t("message.tableOptions.hidePagination"),
           action: async () => {
             this.hidePagination = !(this.hidePagination);
-            const hidePagination = toRaw(this.hidePagination);
 
             const newContainer = {
-              ...currentContainer,
+              ...toRaw(this.currentContainer),
               displayOptions: {
-                ...displayOptions, hidePagination}};
+                ...displayOptions, hidePagination: this.hidePagination }};
             await getDB().containers.put(newContainer);
 
             this.setTableOptionsMenu();
