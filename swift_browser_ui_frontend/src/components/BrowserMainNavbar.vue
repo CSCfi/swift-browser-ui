@@ -136,13 +136,15 @@ export default {
           icon: "mdi-web",
           testid: "language-selector",
           ariaLabel: this.$t("label.language_menu"),
-          subs: this.langs.map(lang => ({
-            title: lang.ph,
-            action: () => {
-              this.$i18n.locale = lang.value;
-              this.currentLang = lang.ph;
-              this.setCookieLang();
-            }})),
+          subs: this.langs
+            .filter(lang => lang.ph != this.currentLang)
+            .map(lang => ({
+              title: lang.ph,
+              action: () => {
+                this.$i18n.locale = lang.value;
+                this.currentLang = lang.ph;
+                this.setCookieLang();
+              }})),
         },
         {
           title: this.$t("message.support"),

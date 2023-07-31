@@ -1,6 +1,6 @@
 <template>
   <c-menu
-    :items.prop="langItems"
+    :items.prop="langItems.filter(lang => lang.name != current)"
     data-testid="language-selector"
   >
     <span class="menu-active">{{ current }}</span>
