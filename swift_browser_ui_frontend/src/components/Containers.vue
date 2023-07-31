@@ -92,6 +92,7 @@ export default {
       if (savedDisplayOptions) {
         this.hideTags = savedDisplayOptions.hideTags;
         this.hidePagination = savedDisplayOptions.hidePagination;
+        this.showTimestamp = savedDisplayOptions.showTimestamp;
         this.updateTableOptions();
       }
     },
