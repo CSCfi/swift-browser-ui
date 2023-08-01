@@ -56,13 +56,49 @@ describe("Several containers with different names are created and visible", () =
 
     cy.addFolder(nameOne);
     cy.wait(5000);
+
     //check the folder 1 exists with search field
     cy.searchFolder(nameOne);
-    cy.get(".media-content").contains(nameOne).should("exist"); //check the folder 1 exists with search field
+    cy.wait(5000);
+    cy.get(".media-content").contains(nameOne).should("exist");
+
+    cy.addFolder(nameTwo);
+    cy.wait(5000);
+
+    cy.reload();
+
+    //check the folder 2 exists with search field
+    cy.searchFolder(nameTwo);
+    cy.wait(5000);
+    cy.get(".media-content").contains(nameTwo).should("exist");
+
+    //check there are multiple folders in the project
     cy.get("table")
       .find("a.icon", { timeout: "5000" })
       .should("have.length.greaterThan", 1);
   });
 });
 
-//TODO separate test for folder deletion
+describe("A container can be deleted", () => {
+  before(() => {
+    cy.visit(Cypress.config().baseUrl);
+    cy.login(Cypress.env("username"), Cypress.env("password"));
+  });
+
+  it("creates and deletes a container", function () {
+    //create a folder
+    cy.addFolder("000aaa");
+    cy.wait(5000);
+    cy.contains("000aaa").should("exist");
+
+    //check the folder exists, then delete
+    cy.deleteFolder("000aaa");
+    cy.contains("Folder was deleted").should("exist");
+    cy.wait(5000);
+
+    //check it was deleted
+    cy.reload();
+    cy.wait(10000);
+    cy.contains("000aaa").should("not.exist");
+  });
+});
