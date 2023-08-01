@@ -4,7 +4,7 @@
       justify="space-between"
       align="center"
     >
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t("message.tokens.title") }}
       </h2>
       <c-button
@@ -280,6 +280,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 @import "@/css/prod.scss";
 
 .token-card {
@@ -321,4 +322,5 @@ export default {
     padding: 1.5rem 1rem;
   }
 }
+
 </style>

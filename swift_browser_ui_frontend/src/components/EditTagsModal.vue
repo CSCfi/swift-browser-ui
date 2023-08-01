@@ -1,6 +1,6 @@
 <template>
   <c-card class="edit-tags">
-    <h2 class="title is-4 has-text-dark">
+    <h2 class="title is-4">
       {{ $t('message.editTags') }}
     </h2>
     <c-card-content>

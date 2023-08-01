@@ -442,7 +442,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
  .object-table-wrapper{
     position: relative;
   }
+
 </style>

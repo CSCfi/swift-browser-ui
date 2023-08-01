@@ -3,7 +3,7 @@
     <c-card-actions
       justify="space-between"
     >
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t('message.share.share_title') }}
         {{ folderName }}
       </h2>
@@ -26,7 +26,7 @@
           justify="space-between"
           align="center"
         >
-          <h3 class="title is-5 has-text-dark">
+          <h3 class="title is-5">
             {{ $t("message.share.share_other_projects") }}
           </h3>
           <c-flex
@@ -503,94 +503,95 @@ export default {
   max-height: 75vh;
 }
 
-  @media screen and (max-height: 720px) {
-    .share-card {
-      max-height: 70vh;
-      top: -30vh;
+@media screen and (max-height: 720px) {
+  .share-card {
+    max-height: 70vh;
+    top: -30vh;
+  }
+}
+
+c-card-content  {
+  overflow-y: scroll;
+  scrollbar-width: 0.5rem;
+  padding: 0 1rem 6rem 1rem;
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--csc-mid-grey);
+    border-radius: 10px;
+    &:hover {
+      background: var(--csc-dark-grey);
     }
   }
 
-  c-card-content  {
-    overflow-y: scroll;
-    scrollbar-width: 0.5rem;
-    padding: 0 1rem 6rem 1rem;
-    &::-webkit-scrollbar {
-      width: 0.5rem;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: var(--csc-mid-grey);
-      border-radius: 10px;
-      &:hover {
-        background: var(--csc-dark-grey);
-      }
-    }
-
-    & > * {
-      margin: 0 !important;
-    };
-  }
-
-  c-card-actions > h2 {
+  & > * {
     margin: 0 !important;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  };
+}
 
-  .toggle-instructions {
-    justify-content: flex-end;
-    align-items: center;
-  }
+c-card-actions > h2 {
+  margin: 0 !important;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  h3 {
-    margin: 0 !important;
-  }
+.toggle-instructions {
+  justify-content: flex-end;
+  align-items: center;
+}
 
-  .guide-content {
-    margin-top: 1rem;
-    background-color: $csc-primary-lighter;
-    justify-content: space-between;
-    padding: 1rem;
-  }
+h3 {
+  margin: 0 !important;
+}
 
-  .guide-content > li {
-    font-size: 0.875rem;
-  }
+.guide-content {
+  margin-top: 1rem;
+  background-color: $csc-primary-lighter;
+  justify-content: space-between;
+  padding: 1rem;
+}
 
-  c-select {
-    color: $csc-dark-grey;
-  }
+.guide-content > li {
+  font-size: 0.875rem;
+}
 
-  c-link > span {
-    font-size: 0.875rem;
-  }
+c-select {
+  color: $csc-dark-grey;
+}
 
-  c-flex, .shared-notification {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
+c-link > span {
+  font-size: 0.875rem;
+}
 
-  c-alert[type="success"] {
-    align-items: center;
-    & > .shared-notification {
-      color: var(--csc-dark-grey);
-    };
-    margin-bottom: 1.5rem;
-    box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
-  }
+c-flex, .shared-notification {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
 
-  c-toasts {
-    width: fit-content;
-  }
+c-alert[type="success"] {
+  align-items: center;
+  & > .shared-notification {
+    color: var(--csc-dark-grey);
+  };
+  margin-bottom: 1.5rem;
+  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
+}
 
-  c-alert[type="success"] {
-    align-items: center;
-    & > .shared-notification {
-      color: var(--csc-dark-grey);
-    };
-    margin-bottom: 1.5rem;
-    box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
-  }
+c-toasts {
+  width: fit-content;
+}
+
+c-alert[type="success"] {
+  align-items: center;
+  & > .shared-notification {
+    color: var(--csc-dark-grey);
+  };
+  margin-bottom: 1.5rem;
+  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
+}
+
 </style>

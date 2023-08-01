@@ -2,7 +2,6 @@
   <div id="main-navigation">
     <div class="toolbar">
       <router-link
-        class="navbar-item pl-4"
         :to="{name: 'AllFolders'}"
         :aria-label="$t('label.logo')"
       >
@@ -215,42 +214,42 @@ export default {
 
 <style lang="scss" scoped>
 
-  .toolbar {
-    z-index: 31;
-    color: $csc-grey;
-    height: 71px;
-    display: flex;
-    column-gap: 12px;
-    align-items: center;
-    padding: 0 1rem;
-    box-shadow: rgba(0, 0, 0, 0.16) 2px 4px 10px;
-  }
+.toolbar {
+  z-index: 31;
+  color: $csc-grey;
+  height: 71px;
+  display: flex;
+  column-gap: 12px;
+  align-items: center;
+  padding: 0 1rem;
+  box-shadow: rgba(0, 0, 0, 0.16) 2px 4px 10px;
+}
 
-  .app-name {
-    color: $csc-grey;
-    font-size: 1.25rem;
-    margin-left: 2rem;
-  }
+.app-name {
+  color: $csc-grey;
+  font-size: 1.25rem;
+  margin-left: 2rem;
+}
 
+.desktop-menu {
+  display: flex;
+  align-items: center;
+}
+
+c-menu {
+  z-index: 1;
+}
+
+@media screen and (max-width: 767px) {
   .desktop-menu {
-    display: flex;
-    align-items: center;
+    display: none;
   }
+}
 
-  c-menu {
-    z-index: 1;
+@media screen and (min-width: 768px) {
+  c-navigationbutton {
+    display: none;
   }
+}
 
-  @media screen and (max-width: 767px) {
-    .desktop-menu {
-      display: none;
-    }
-  }
-
-  @media screen and (min-width: 768px) {
-    c-navigationbutton {
-      display: none;
-    }
-  }
-
-  </style>
+</style>

@@ -78,6 +78,7 @@
 </template>
 
 <style>
+
 #loginwindow {
   width: 70ch;
   margin-left: auto;
@@ -125,4 +126,5 @@ form {
 .formField {
   width: 40ch;
 }
+
 </style>

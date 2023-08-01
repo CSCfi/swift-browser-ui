@@ -74,6 +74,7 @@ export default {
 
 
 <style scoped>
+
 c-tab-buttons {
   display: block;
   padding-top: 1rem;
@@ -82,4 +83,5 @@ c-tab-buttons {
 .tab-button {
   flex-basis: 0;
 }
+
 </style>

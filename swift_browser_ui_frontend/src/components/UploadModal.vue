@@ -4,11 +4,11 @@
       id="upload-modal-content"
       class="modal-content-wrapper"
     >
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t("message.encrypt.uploadFiles") }}
       </h2>
       <c-card-content>
-        <h3 class="title is-6 has-text-dark">
+        <h3 class="title is-6">
           1. {{ $t("message.encrypt.upload_step1") }}
         </h3>
         <p class="info-text is-size-6">
@@ -27,12 +27,11 @@
           @changeQuery="onQueryChange"
           @changeValue="onSelectValue"
         />
-        <h3 class="title is-6 has-text-dark">
+        <h3 class="title is-6">
           2. {{ $t("message.encrypt.upload_step2") }}
         </h3>
         <div
-          class="dropArea is-flex
-                is-align-items-center is-justify-content-center"
+          class="dropArea"
           @dragover="dragHandler"
           @dragleave="dragLeaveHandler"
           @drop="navUpload"
@@ -104,7 +103,7 @@
           >
             <c-container>
               <c-flex>
-                <h3 class="title is-6 has-text-dark">
+                <h3 class="title is-6">
                   {{ $t('message.encrypt.multipleReceivers') }}
                 </h3>
                 <c-text-field
@@ -747,6 +746,9 @@ c-autocomplete {
   & > span:first-of-type {
     margin-right: 1rem;
   }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .over-dropArea {

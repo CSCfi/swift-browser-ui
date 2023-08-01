@@ -1,6 +1,6 @@
 <template>
   <div class="selectpage">
-    <div class="content has-text-centered">
+    <div class="content">
       <h2>{{ $t("message.select.heading" ) }}</h2>
       <p class="maintext">
         {{ $t("message.select.description") }}
@@ -44,6 +44,7 @@
 </template>
 
 <style>
+
 html, body {
   height: 100%;
 }
@@ -60,4 +61,5 @@ html, body {
   width: 50%;
   margin: auto;
 }
+
 </style>

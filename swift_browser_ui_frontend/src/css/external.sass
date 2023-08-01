@@ -1,0 +1,408 @@
+
+
+/* Selected styles from bulma for compatibility */
+/*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
+
+/*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */
+// Blocks
+html,
+body,
+p,
+ol,
+ul,
+li,
+dl,
+dt,
+dd,
+blockquote,
+figure,
+fieldset,
+legend,
+textarea,
+pre,
+iframe,
+hr,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+  margin: 0
+  padding: 0
+
+// Headings
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+  font-size: 100%
+  font-weight: normal
+
+// List
+ul
+  list-style: none
+
+// Form
+button,
+input,
+select,
+textarea
+  margin: 0
+
+// Box sizing
+html
+  box-sizing: border-box
+
+*
+  &,
+  &::before,
+  &::after
+    box-sizing: inherit
+
+// Media
+img,
+video
+  height: auto
+  max-width: 100%
+
+// Iframe
+iframe
+  border: 0
+
+// Table
+table
+  border-collapse: collapse
+  border-spacing: 0
+
+td,
+th
+  padding: 0
+  &:not([align])
+    text-align: inherit
+
+
+// Colors
+
+$black:        hsl(0, 0%, 4%) !default
+$black-bis:    hsl(0, 0%, 7%) !default
+$black-ter:    hsl(0, 0%, 14%) !default
+
+$grey-darker:  hsl(0, 0%, 21%) !default
+$grey-dark:    hsl(0, 0%, 29%) !default
+$grey:         hsl(0, 0%, 48%) !default
+$grey-light:   hsl(0, 0%, 71%) !default
+$grey-lighter: hsl(0, 0%, 86%) !default
+$grey-lightest: hsl(0, 0%, 93%) !default
+
+$white-ter:    hsl(0, 0%, 96%) !default
+$white-bis:    hsl(0, 0%, 98%) !default
+$white:        hsl(0, 0%, 100%) !default
+
+$orange:       hsl(14,  100%, 53%) !default
+$yellow:       hsl(44,  100%, 77%) !default
+$green:        hsl(153, 53%,  53%) !default
+$turquoise:    hsl(171, 100%, 41%) !default
+$cyan:         hsl(207, 61%,  53%) !default
+$blue:         hsl(229, 53%,  53%) !default
+$purple:       hsl(271, 100%, 71%) !default
+$red:          hsl(348, 86%, 61%) !default
+
+// Typography
+
+$render-mode: optimizeLegibility !default
+
+$size-1: 3rem !default
+$size-2: 2.5rem !default
+$size-3: 2rem !default
+$size-4: 1.5rem !default
+$size-5: 1.25rem !default
+$size-6: 1rem !default
+$size-7: 0.75rem !default
+
+$weight-light: 300 !default
+$weight-normal: 400 !default
+$weight-medium: 500 !default
+$weight-semibold: 600 !default
+$weight-bold: 700 !default
+
+// Spacing
+
+$block-spacing: 1.5rem !default
+
+// Functions
+
+@function mergeColorMaps($bulma-colors, $custom-colors)
+  // We return at least Bulma's hard-coded colors
+  $merged-colors: $bulma-colors
+
+  // We want a map as input
+  @if type-of($custom-colors) == 'map'
+    @each $name, $components in $custom-colors
+      // The color name should be a string
+      // and the components either a single color
+      // or a colors list with at least one element
+      @if type-of($name) == 'string' and (type-of($components) == 'list' or type-of($components) == 'color') and length($components) >= 1
+        $color-base: null
+        $color-invert: null
+        $color-light: null
+        $color-dark: null
+        $value: null
+
+        // The param can either be a single color
+        // or a list of 2 colors
+        @if type-of($components) == 'color'
+          $color-base: $components
+          $color-invert: findColorInvert($color-base)
+          $color-light: findLightColor($color-base)
+          $color-dark: findDarkColor($color-base)
+        @else if type-of($components) == 'list'
+          $color-base: nth($components, 1)
+          // If Invert, Light and Dark are provided
+          @if length($components) > 3
+            $color-invert: nth($components, 2)
+            $color-light: nth($components, 3)
+            $color-dark: nth($components, 4)
+            // If only Invert and Light are provided
+          @else if length($components) > 2
+            $color-invert: nth($components, 2)
+            $color-light: nth($components, 3)
+            $color-dark: findDarkColor($color-base)
+            // If only Invert is provided
+          @else
+            $color-invert: nth($components, 2)
+            $color-light: findLightColor($color-base)
+            $color-dark: findDarkColor($color-base)
+
+        $value: ($color-base, $color-invert, $color-light, $color-dark)
+
+        // We only want to merge the map if the color base is an actual color
+        @if type-of($color-base) == 'color'
+          // We merge this colors elements as map with Bulma's colors map
+          // (we can override them this way, no multiple definition for the same name)
+          // $merged-colors: map_merge($merged-colors, ($name: ($color-base, $color-invert, $color-light, $color-dark)))
+          $merged-colors: map_merge($merged-colors, ($name: $value))
+
+  @return $merged-colors
+
+@function powerNumber($number, $exp)
+  $value: 1
+  @if $exp > 0
+    @for $i from 1 through $exp
+      $value: $value * $number
+  @else if $exp < 0
+    @for $i from 1 through -$exp
+      $value: divide($value, $number)
+  @return $value
+
+@function colorLuminance($color)
+  @if type-of($color) != 'color'
+    @return 0.55
+  $color-rgb: ('red': red($color),'green': green($color),'blue': blue($color))
+  @each $name, $value in $color-rgb
+    $adjusted: 0
+    $value: divide($value, 255)
+    @if $value < 0.03928
+      $value: divide($value, 12.92)
+    @else
+      $value: divide(($value + .055), 1.055)
+      $value: powerNumber($value, 2)
+    $color-rgb: map-merge($color-rgb, ($name: $value))
+  @return (map-get($color-rgb, 'red') * .2126) + (map-get($color-rgb, 'green') * .7152) + (map-get($color-rgb, 'blue') * .0722)
+
+@function findColorInvert($color)
+  @if (colorLuminance($color) > 0.55)
+    @return rgba(#000, 0.7)
+  @else
+    @return #fff
+
+@function findLightColor($color, $l: 96%)
+  @if type-of($color) == 'color'
+    $l: 96%
+    @if lightness($color) > 96%
+      $l: lightness($color)
+    @return change-color($color, $lightness: $l)
+  @return $background
+
+@function findDarkColor($color, $base-l: 29%)
+  @if type-of($color) == 'color'
+    $luminance: colorLuminance($color)
+    $luminance-delta: (0.53 - $luminance)
+    $target-l: round($base-l + ($luminance-delta * 53))
+    @return change-color($color, $lightness: max($base-l, $target-l))
+  @return $text-strong
+
+// Custom divide function by @mdo from https://github.com/twbs/bootstrap/pull/34245
+// Replaces old slash division deprecated in Dart Sass
+@function divide($dividend, $divisor, $precision: 10)
+  $sign: if($dividend > 0 and $divisor > 0, 1, -1)
+  $dividend: abs($dividend)
+  $divisor: abs($divisor)
+  $quotient: 0
+  $remainder: $dividend
+  @if $dividend == 0
+    @return 0
+  @if $divisor == 0
+    @error "Cannot divide by 0"
+  @if $divisor == 1
+    @return $dividend
+  @while $remainder >= $divisor
+    $quotient: $quotient + 1
+    $remainder: $remainder - $divisor
+  @if $remainder > 0 and $precision > 0
+    $remainder: divide($remainder * 10, $divisor, $precision - 1) * .1
+  @return ($quotient + $remainder) * $sign
+
+
+$primary: $turquoise !default
+
+$info: $cyan !default
+$success: $green !default
+$warning: $yellow !default
+$danger: $red !default
+
+$light: $white-ter !default
+$dark: $grey-darker !default
+
+// Invert colors
+
+$orange-invert: findColorInvert($orange) !default
+$yellow-invert: findColorInvert($yellow) !default
+$green-invert: findColorInvert($green) !default
+$turquoise-invert: findColorInvert($turquoise) !default
+$cyan-invert: findColorInvert($cyan) !default
+$blue-invert: findColorInvert($blue) !default
+$purple-invert: findColorInvert($purple) !default
+$red-invert: findColorInvert($red) !default
+
+$primary-invert: findColorInvert($primary) !default
+$primary-light: findLightColor($primary) !default
+$primary-dark: findDarkColor($primary) !default
+$info-invert: findColorInvert($info) !default
+$info-light: findLightColor($info) !default
+$info-dark: findDarkColor($info) !default
+$success-invert: findColorInvert($success) !default
+$success-light: findLightColor($success) !default
+$success-dark: findDarkColor($success) !default
+$warning-invert: findColorInvert($warning) !default
+$warning-light: findLightColor($warning) !default
+$warning-dark: findDarkColor($warning) !default
+$danger-invert: findColorInvert($danger) !default
+$danger-light: findLightColor($danger) !default
+$danger-dark: findDarkColor($danger) !default
+$light-invert: findColorInvert($light) !default
+$dark-invert: findColorInvert($dark) !default
+
+// General colors
+
+$scheme-main: $white !default
+$scheme-main-bis: $white-bis !default
+$scheme-main-ter: $white-ter !default
+$scheme-invert: $black !default
+$scheme-invert-bis: $black-bis !default
+$scheme-invert-ter: $black-ter !default
+
+$background: $white-ter !default
+
+$border: $grey-lighter !default
+$border-hover: $grey-light !default
+$border-light: $grey-lightest !default
+$border-light-hover: $grey-light !default
+
+// Text colors
+
+$text: $grey-dark !default
+$text-invert: findColorInvert($text) !default
+$text-light: $grey !default
+$text-strong: $black !default
+
+// Link colors
+
+$link: $blue !default
+$link-invert: findColorInvert($link) !default
+$link-light: findLightColor($link) !default
+$link-dark: findDarkColor($link) !default
+$link-visited: $purple !default
+
+$link-hover: $grey-darker !default
+$link-hover-border: $grey-light !default
+
+$link-focus: $grey-darker !default
+$link-focus-border: $blue !default
+
+$link-active: $grey-darker !default
+$link-active-border: $grey-dark !default
+
+// Typography
+
+$size-small: $size-7 !default
+$size-normal: $size-6 !default
+$size-medium: $size-5 !default
+$size-large: $size-4 !default
+
+// Effects
+
+// Lists and maps
+
+$sizes: $size-1 $size-2 $size-3 $size-4 $size-5 $size-6 $size-7 !default
+
+=overflow-touch
+  -webkit-overflow-scrolling: touch
+
+// Placeholders
+
+=block($spacing: $block-spacing)
+  &:not(:last-child)
+    margin-bottom: $spacing
+
+%block
+  +block
+
+$small-font-size: 0.875em !default
+
+$strong-color: $text-strong !default
+$strong-weight: $weight-bold !default
+
+
+// Block
+
+$title-color: $text-strong !default
+$title-family: false !default
+$title-size: $size-3 !default
+$title-weight: $weight-semibold !default
+$title-line-height: 1.125 !default
+$title-strong-color: inherit !default
+$title-strong-weight: inherit !default
+$title-sub-size: 0.75em !default
+$title-sup-size: 0.75em !default
+
+.title
+  @extend %block
+  word-break: break-word
+  em,
+  span
+    font-weight: inherit
+  sub
+    font-size: $title-sub-size
+  sup
+    font-size: $title-sup-size
+  .tag
+    vertical-align: middle
+
+.title
+  color: $title-color
+  @if $title-family
+    font-family: $title-family
+  font-size: $title-size
+  font-weight: $title-weight
+  line-height: $title-line-height
+  strong
+    color: $title-strong-color
+    font-weight: $title-strong-weight
+  // Sizes
+  @each $size in $sizes
+    $i: index($sizes, $size)
+    &.is-#{$i}
+      font-size: $size

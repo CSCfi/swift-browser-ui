@@ -289,4 +289,5 @@ export default {
   margin: 0.5em 0;
   background: #fff;
 }
+
 </style>

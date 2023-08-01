@@ -10,7 +10,7 @@
         vertical="bottom"
         absolute
       />
-      <h2 class="title is-4 has-text-dark">
+      <h2 class="title is-4">
         {{ $t("message.container_ops.addContainer") }}
       </h2>
       <c-card-content>

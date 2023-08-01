@@ -1,43 +1,40 @@
 <template>
   <footer :aria-label="$t('label.footer')">
-    <div class="navbar-menu is-active">
-      <div class="navbar-start">
-        <div class="col-3">
-          <div class="row navbar-item ">
-            <span class="largetext">
-              {{ $t("message.footerMenu.title") }}
-            </span>
-          </div>
-          <div class="row navbar-item smalltext">
-            <a
-              class="linktext"
-              target="_blank"
-              :href="$t('message.footerMenu.serviceProviderLink')"
-              :alt="$t('message.footerMenu.serviceProvider')"
-            >
-              {{ $t("message.footerMenu.serviceProvider") }}
-            </a>
-          </div>
-          <div
-            v-if="dev"
-            class="row navbar-item smalltext"
+    <div class="footer">
+      <div class="footer-start">
+        <div>
+          <span class="largetext">
+            {{ $t("message.footerMenu.title") }}
+          </span>
+        </div>
+        <div class=" smalltext">
+          <a
+            class="linktext"
+            target="_blank"
+            :href="$t('message.footerMenu.serviceProviderLink')"
+            :alt="$t('message.footerMenu.serviceProvider')"
           >
-            <a
-              class="linktext"
-              target="_blank"
-              :href="gitLink"
-            >
-              {{ gitVersion }}
-            </a>
-          </div>
+            {{ $t("message.footerMenu.serviceProvider") }}
+          </a>
+        </div>
+        <div
+          v-if="dev"
+          class="smalltext"
+        >
+          <a
+            class="linktext"
+            target="_blank"
+            :href="gitLink"
+          >
+            {{ gitVersion }}
+          </a>
         </div>
       </div>
 
       <div
-        id="rightmenu"
-        class="navbar-end"
+        class="footer-end"
       >
-        <div class="navbar-item smalltext">
+        <div class="smalltext">
           <a
             class="linktext"
             target="_blank"
@@ -47,7 +44,7 @@
             {{ $t("message.footerMenu.menuItem1") }}
           </a>
         </div>
-        <div class="navbar-item smalltext">
+        <div class="smalltext">
           <a
             class="linktext"
             target="_blank"
@@ -87,15 +84,36 @@ footer, footer > * div {
   background-color: $csc-lightest-grey !important;
 }
 
-.navbar-menu{
+.footer{
   width: 100%;
   height: 100%;
   box-shadow: none;
   padding: 0;
+  display: flex;
 }
 
-#leftmenu{
-  padding-left: 10px;
+
+.footer-start {
+  justify-content: flex-start;
+  margin-right: auto;
+}
+
+.footer-start div {
+  padding: 0.5rem 0.75rem;
+}
+
+.footer-end {
+  justify-content: flex-end;
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.footer-end div {
+  align-items: center;
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  position: relative;
 }
 
 .largetext{
@@ -123,4 +141,5 @@ a:hover {
   background-color: #CCF4F0;
   text-decoration: underline;
 }
+
 </style>
