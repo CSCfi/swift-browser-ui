@@ -73,7 +73,8 @@
               {{ $t('message.error.Unauthorized_text') }}
             </c-card-content>
             <c-card-content v-else-if="forbid">
-              {{ getParams() }}
+              <div>{{ $t('message.error.Forbidden_text') }}</div>
+              {{ $t('message.error.Forbidden_error') }} {{ getParams() }}
             </c-card-content>
             <c-card-content v-else-if="notfound">
               {{ $t('message.error.Notfound_text') }}
@@ -81,20 +82,20 @@
             <c-card-content v-else-if="uidown">
               {{ $t('message.error.UIdown_text') }}
             </c-card-content>
-            <c-card-actions v-if="notfound || forbid || badrequest">
-              <c-button
-                href="/browse"
-                target="_self"
-              >
-                {{ $t('message.error.frontPage') }}
-              </c-button>
-            </c-card-actions>
-            <c-card-actions v-else-if="unauth">
+            <c-card-actions v-if="unauth">
               <c-button
                 href="/login/kill"
                 target="_self"
               >
                 {{ $t('message.error.login') }}
+              </c-button>
+            </c-card-actions>
+            <c-card-actions v-else>
+              <c-button
+                href="/browse"
+                target="_self"
+              >
+                {{ $t('message.error.frontPage') }}
               </c-button>
             </c-card-actions>
           </c-card>

@@ -19,7 +19,8 @@ let default_translations = {
         ],
       },
       error: {
-        frontPage: "Go to front page",
+        Forbidden_error: "Error message: ",
+        frontPage: "Return to front page",
         login: "Log in",
         BadRequest: "400 – Bad Request",
         BadRequest_text:
@@ -397,7 +398,8 @@ let default_translations = {
         ],
       },
       error: {
-        frontPage: "Etusivulle",
+        Forbidden_error: "Virheviesti: ",
+        frontPage: "Palaa etusivulle",
         login: "Kirjaudu sisään",
         BadRequest: "400 – Virheellinen pyyntö",
         BadRequest_text:
