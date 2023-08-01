@@ -43,6 +43,7 @@ from swift_browser_ui.ui.api import (
 )
 from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.front import (
+    badrequest,
     browse,
     forbid,
     index,
@@ -173,7 +174,7 @@ async def servinit(
             aiohttp.web.get("/unauth", unauth),
             aiohttp.web.get("/forbid", forbid),
             aiohttp.web.get("/uidown", uidown),
-            aiohttp.web.get("/badrequest", uidown),
+            aiohttp.web.get("/badrequest", badrequest),
             aiohttp.web.get("/notfound", notfound),
         ]
     )
