@@ -12,7 +12,6 @@
       role="main"
     >
       <c-modal
-        id="create-modal"
         v-model="openCreateFolderModal"
         v-csc-control
         width="64vw"
@@ -38,6 +37,7 @@
         <EditTagsModal />
       </c-modal>
       <c-modal
+        id="share-modal"
         v-model="openShareModal"
         v-csc-control
         width="64vw"

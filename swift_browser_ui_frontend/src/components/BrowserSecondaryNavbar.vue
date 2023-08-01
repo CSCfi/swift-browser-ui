@@ -107,6 +107,7 @@
 <script>
 import {
   toggleCreateFolderModal,
+  setPrevActiveElement,
 } from "@/common/globalFunctions";
 import { mdiInformationOutline } from "@mdi/js";
 
@@ -155,32 +156,17 @@ export default {
     },
     toggleCreateFolderModal: function () {
       toggleCreateFolderModal();
-      const prevActiveEl = document.activeElement;
-
-      this.$store.commit("setPreviousActiveEl", prevActiveEl);
+      setPrevActiveElement();
 
       const nav = document.querySelector("nav");
-      //const mainContent = document.getElementById("mainContent");
-      //const footer = document.querySelector("footer");
-
-      //const modal = document.getElementById("create-modal");
 
       Array.from(nav.children).forEach((child) =>
         child.setAttribute("inert", "true"));
-
-      //Array.from(mainContent.children).forEach((child) => {
-      //  if (child !== modal) child.setAttribute("inert", "true");
-      //});
-
-      //Array.from(footer.children).forEach((child) =>
-      //  child.setAttribute("inert", "true"));
     },
     toggleUploadModal: function () {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
-      const prevActiveEl = document.activeElement;
-
-      this.$store.commit("setPreviousActiveEl", prevActiveEl);
+      setPrevActiveElement();
     },
     copyProjectId: function () {
       const toastMessage = {

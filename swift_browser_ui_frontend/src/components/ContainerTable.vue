@@ -42,6 +42,8 @@ import {
   getPaginationOptions,
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
+  setPrevActiveElement,
+  disableFocusOutsideModal,
 } from "@/common/globalFunctions";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
@@ -289,8 +291,8 @@ export default {
                       onKeyUp: (event) => {
                         if(event.keyCode === 13) {
                           this.$store.commit(
-                            "setFolderName", item.data.name.value);
-                          this.$store.commit("toggleShareModal", true);
+                            "setFolderName", item.name);
+                          this.onOpenShareModal();
                         }
                       },
                       disabled: item.owner,
@@ -431,7 +433,6 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-
     delete: function (container, objects) {
       if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
@@ -477,6 +478,18 @@ export default {
       }
 
       return this.$t("message.emptyProject.all");
+    },
+    onOpenShareModal() {
+      this.$store.commit("toggleShareModal", true);
+      setPrevActiveElement();
+
+      const shareModal = document.getElementById("share-modal");
+      disableFocusOutsideModal(shareModal);
+
+      setTimeout(() => {
+        const shareIDsInput = document.getElementById("share-ids")?.children[0];
+        shareIDsInput.focus();
+      }, 300);
     },
   },
 };

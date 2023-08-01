@@ -1,5 +1,9 @@
 <template>
-  <c-card class="share-card">
+  <c-card
+    ref="shareContainer"
+    class="share-card"
+    @keydown="handleKeyDown"
+  >
     <c-card-actions
       justify="space-between"
     >
@@ -8,6 +12,7 @@
         {{ folderName }}
       </h2>
       <c-button
+        id="close-share-modal-btn"
         text
         @click="toggleShareModal"
         @keyup.enter="toggleShareModal"
@@ -78,6 +83,7 @@
             </ul>
           </div>
           <TagInput
+            id="share-ids"
             :tags="tags"
             aria-label="label.list_of_shareids"
             placeholder="message.share.field_placeholder"
@@ -157,6 +163,9 @@ import {
 import {
   addNewTag,
   deleteTag,
+  moveFocusOutOfModal,
+  addFocusClass,
+  removeFocusClass,
 } from "@/common/globalFunctions";
 
 import ShareModalTable from "@/components/ShareModalTable.vue";
@@ -196,6 +205,9 @@ export default {
     },
     visible() {
       return this.$store.state.openShareModal;
+    },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
     },
   },
   watch: {
@@ -443,6 +455,8 @@ export default {
       document.querySelector("#shareModal-toasts").removeToast("error-noid");
       document.querySelector("#shareModal-toasts")
         .removeToast("error-duplicate");
+
+      moveFocusOutOfModal(this.prevActiveEl);
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);
@@ -492,6 +506,86 @@ export default {
       return tag.length === 32 &&
         tag !== this.active.id &&
         tag.match(/^[a-z0-9]+$/) != null;
+    },
+    handleKeyDown: function (e) {
+      const eTarget = e.target;
+      const shadowDomTarget = eTarget.shadowRoot?.activeElement;
+
+      const first = document.getElementById("close-share-modal-btn");
+
+      // last element is different between with or without shared list
+      let last = null;
+
+      // The real DOM's active element is nested under shadowDOM
+      // and cannot be accessed if using event target alone
+      let shadowRootActiveEl = null;
+
+      // If there is no shared projects, there is no data table,
+      // the last element is Share button
+      if (this.sharedDetails.length === 0) {
+        last = document.getElementById("share-btn");
+      } else {
+        /*
+          If there is shared list table, the last element in the modal
+          would be inside c-pagination and
+          it is the last arrow icon used to move to Next page
+        */
+        if (eTarget.tagName.toLowerCase() === "c-data-table") {
+          const pagination = eTarget.shadowRoot.querySelector("c-pagination");
+          //  Assign the "last" element when the focus is on pagination
+          if (e.composedPath().includes(pagination)) {
+            last = pagination.shadowRoot?.querySelectorAll("li")[2];
+            shadowRootActiveEl = shadowDomTarget?.shadowRoot?.activeElement;
+          }
+        }
+      }
+
+      if (e.key === "Tab" && !e.shiftKey) {
+        // Check if "Tab" is on Share button or the last data-table's arrow
+        if (eTarget === last ||
+          (last && shadowRootActiveEl === last?.firstChild)) {
+          first.tabIndex="0";
+          first.focus();
+        }
+        /*
+          If the focus is on the whole data-table, there is no
+          specific active shadowDOM element. Therefore, we could remove
+          the focus class on table when doing "Tab".
+        */
+        else if (eTarget.tagName.toLowerCase() === "c-data-table" &&
+          shadowDomTarget === null) {
+          if (eTarget.classList.contains("button-focus")) {
+            removeFocusClass(eTarget);
+          }
+        }
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (eTarget === first) {
+          e.preventDefault();
+          /*
+            When shiftTab is on "first" element, originally the focus
+            should move to the previous "last" element -
+            which is table's arrow icon for Next page.
+            But it is difficult to get that el when the focus is not
+            on the table, we focus on the whole table itself instead.
+          */
+          if (this.sharedDetails.length > 0) {
+            last = document.getElementById("shared-projects-table");
+          }
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            addFocusClass(last);
+          }
+        }
+        // Remove focus class if either the "last" el is
+        // Share button or the whole data-table
+        else if (eTarget === last ||
+          (eTarget.tagName.toLowerCase() === "c-data-table" &&
+            shadowDomTarget === null)
+        ) {
+          removeFocusClass(last ? last : eTarget);
+        }
+      }
     },
   },
 };

@@ -209,6 +209,11 @@ export function checkIfItemIsLastOnPage(paginationOptions){
   return paginationOptions.currentPage;
 }
 
+export function setPrevActiveElement() {
+  const prevActiveEl = document.activeElement;
+  store.commit("setPreviousActiveEl", prevActiveEl);
+}
+
 export function getFocusableElements(focusableList) {
   const first = focusableList[0];
   let last = focusableList[focusableList.length - 1];
@@ -225,11 +230,35 @@ export function removeFocusClass(element) {
   element.classList.remove("button-focus");
 }
 
+export function disableFocusOutsideModal (modal) {
+  const nav = document.querySelector("nav");
+  Array.from(nav.children).forEach((child) =>
+    child.setAttribute("inert", "true"));
+
+  const mainContent = document.getElementById("mainContent");
+  Array.from(mainContent.children).forEach((child) => {
+    if (child !== modal) child.setAttribute("inert", "true");
+  });
+
+  const footer = document.querySelector("footer");
+  Array.from(footer.children).forEach((child) =>
+    child.setAttribute("inert", "true"));
+}
+
 export function moveFocusOutOfModal(prevActiveEl) {
   const nav = document.querySelector("nav");
   Array.from(nav.children).forEach((child) => {
     child.removeAttribute("inert");
   });
+
+  const mainContent = document.getElementById("mainContent");
+  Array.from(mainContent.children).forEach((child) => {
+    child.removeAttribute("inert");
+  });
+
+  const footer = document.querySelector("footer");
+  Array.from(footer.children).forEach((child) =>
+    child.removeAttribute("inert"));
 
   prevActiveEl.tabIndex = "0";
   prevActiveEl.focus();
