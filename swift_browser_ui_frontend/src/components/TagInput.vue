@@ -10,11 +10,13 @@
     >
       <span>{{ tag }}</span>
       <c-icon
+        tabindex="0"
         :path="mdiClose"
         :alt="$t('label.delete_tag')"
         color="white"
         size="16"
         @click="$emit('deleteTag', $event, tag)"
+        @keyup.enter="$emit('deleteTag', $event, tag)"
       />
     </c-tag>
     <input

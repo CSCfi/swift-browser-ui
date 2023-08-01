@@ -30,6 +30,7 @@
         @cancel-upload="currentUpload.cancelUpload()"
       />
       <c-modal
+        id="edit-tags-modal"
         v-model="openEditTagsModal"
         v-csc-control
         width="64vw"

@@ -3,7 +3,7 @@
   because csc-ui wont recognise it otherwise. -->
   <!-- eslint-disable-->
   <c-data-table
-    id="contable-tags"
+    id="container-table"
     :data.prop="containers"
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
@@ -315,7 +315,7 @@ export default {
                         },
                         {
                           name: this.$t("message.editTags"),
-                          action: () => toggleEditTagsModal(null, item.name),
+                          action: () => this.openEditTagsModal(item.name),
                           disabled: item.owner,
                         },
                         {
@@ -325,9 +325,7 @@ export default {
                           ),
                           disabled: item.owner,
                         },
-
                       ],
-
                       customTrigger: {
                         value: this.$t("message.options"),
                         component: {
@@ -490,6 +488,13 @@ export default {
         const shareIDsInput = document.getElementById("share-ids")?.children[0];
         shareIDsInput.focus();
       }, 300);
+    },
+    openEditTagsModal(itemName) {
+      toggleEditTagsModal(null, itemName);
+      setPrevActiveElement();
+
+      const editTagsModal = document.getElementById("edit-tags-modal");
+      disableFocusOutsideModal(editTagsModal);
     },
   },
 };

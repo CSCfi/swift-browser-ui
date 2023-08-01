@@ -1,6 +1,10 @@
 <template>
-  <c-card class="edit-tags">
-    <h2 class="title is-4">
+  <c-card
+    ref="editTagsContainer"
+    class="edit-tags"
+    @keydown="handleKeyDown"
+  >
+    <h2 class="title is-4 has-text-dark">
       {{ $t('message.editTags') }}
     </h2>
     <c-card-content>
@@ -46,6 +50,10 @@ import {
   addNewTag,
   deleteTag,
   getCurrentISOtime,
+  getFocusableElements,
+  addFocusClass,
+  removeFocusClass,
+  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
@@ -83,6 +91,9 @@ export default {
     },
     containerName() {
       return this.$route.params.container;
+    },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
     },
   },
   watch: {
@@ -149,6 +160,20 @@ export default {
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
       this.tags = [];
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Edit Tags Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      const prevActiveElParent = document.getElementById("container-table");
+      if (document.body.contains(this.prevActiveEl)) {
+        moveFocusOutOfModal(this.prevActiveEl);
+      } else {
+        moveFocusOutOfModal(prevActiveElParent);
+      }
+
     },
     saveObjectTags: function () {
       const tags = toRaw(this.tags);
@@ -211,6 +236,28 @@ export default {
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    handleKeyDown: function(e) {
+      const focusableList = this.$refs.editTagsContainer.querySelectorAll(
+        "input, c-icon, c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+
+      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (e.target === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            addFocusClass(last);
+          }
+        } else if (e.target === last) {
+          removeFocusClass(last);
+        }
+      }
     },
   },
 };
