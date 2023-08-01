@@ -307,10 +307,8 @@ export default {
                       items: [
                         {
                           name: this.$t("message.copy"),
-                          action: item.owner
-                            ? () => toggleCopyFolderModal(
-                              item.name, item.owner)
-                            : () => toggleCopyFolderModal(item.name),
+                          action: () =>
+                            this.openCopyFolderModal(item.name, item.owner),
                           disabled: !item.bytes ? true : false,
                         },
                         {
@@ -495,6 +493,15 @@ export default {
 
       const editTagsModal = document.getElementById("edit-tags-modal");
       disableFocusOutsideModal(editTagsModal);
+    },
+    openCopyFolderModal(itemName, itemOwner) {
+      itemOwner
+        ? toggleCopyFolderModal(itemName, itemOwner)
+        : toggleCopyFolderModal(itemName);
+      setPrevActiveElement();
+
+      const copyFolderModal = document.getElementById("copy-folder-modal");
+      disableFocusOutsideModal(copyFolderModal);
     },
   },
 };

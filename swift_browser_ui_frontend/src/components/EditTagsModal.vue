@@ -173,7 +173,6 @@ export default {
       } else {
         moveFocusOutOfModal(prevActiveElParent);
       }
-
     },
     saveObjectTags: function () {
       const tags = toRaw(this.tags);

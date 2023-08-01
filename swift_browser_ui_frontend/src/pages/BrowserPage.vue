@@ -46,6 +46,7 @@
         <ShareModal />
       </c-modal>
       <c-modal
+        id="copy-folder-modal"
         v-model="openCopyFolderModal"
         v-csc-control
         width="64vw"

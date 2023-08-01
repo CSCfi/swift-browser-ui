@@ -1,5 +1,9 @@
 <template>
-  <c-card class="copy-folder">
+  <c-card
+    ref="copyFolderContainer"
+    class="copy-folder"
+    @keydown="handleKeyDown"
+  >
     <div class="modal-content-wrapper">
       <h2 class="title is-4">
         {{
@@ -65,6 +69,10 @@ import {
   addNewTag,
   deleteTag,
   validateFolderName,
+  getFocusableElements,
+  addFocusClass,
+  removeFocusClass,
+  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
@@ -184,6 +192,19 @@ export default {
       this.loadingFoldername = true;
       this.errorMsg = "";
       document.querySelector("#copyFolder-toasts").removeToast("copy-error");
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Copy Folder Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      const prevActiveElParent = document.getElementById("container-table");
+      if (document.body.contains(this.prevActiveEl)) {
+        moveFocusOutOfModal(this.prevActiveEl);
+      } else {
+        moveFocusOutOfModal(prevActiveElParent);
+      }
     },
     replicateContainer: function () {
       // Initiate the container replication operation
@@ -228,7 +249,6 @@ export default {
           this.$store.commit("setFolderCopiedStatus", true);
         }, 10000, this.active.id, this.folderName, metadata, tags);
 
-        this.$store.commit("toggleCopyFolderModal", false);
         this.cancelCopy();
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
@@ -272,6 +292,28 @@ export default {
         this.errorMsg = error;
       }
     }, 300, { leading: true }),
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.copyFolderContainer.querySelectorAll(
+        "input, c-icon, c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+
+      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (e.target === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            addFocusClass(last);
+          }
+        } else if (e.target === last) {
+          removeFocusClass(last);
+        }
+      }
+    },
   },
 };
 </script>
