@@ -144,7 +144,7 @@ export default {
           );
         }
 
-        const dataTable = document.getElementById("objtable");
+        const dataTable = document.getElementById("obj-table");
         dataTable.clearSelections();
 
         this.toggleDeleteModal();

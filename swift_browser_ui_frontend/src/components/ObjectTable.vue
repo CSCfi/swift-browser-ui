@@ -527,7 +527,7 @@ export default {
       }
     },
     clearSelections() {
-      const dataTable = document.getElementById("objtable");
+      const dataTable = document.getElementById("obj-table");
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {

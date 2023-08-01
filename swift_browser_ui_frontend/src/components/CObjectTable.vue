@@ -4,7 +4,7 @@
     because csc-ui wont recognise it otherwise. -->
     <!-- eslint-disable-->
     <c-data-table
-      id="objtable"
+      id="obj-table"
       :data.prop="objects"
       :headers.prop="hideTags ?
         headers.filter(header => header.key !== 'tags'): headers"
@@ -47,6 +47,8 @@ import {
   getPrefix,
   getPaginationOptions,
   checkIfItemIsLastOnPage,
+  setPrevActiveElement,
+  disableFocusOutsideModal,
 } from "@/common/globalFunctions";
 
 import {
@@ -446,6 +448,19 @@ export default {
           sortable: false,
         },
       ];
+    },
+    openEditTagsModal(itemName) {
+      toggleEditTagsModal(itemName, null);
+      setPrevActiveElement();
+
+      const editTagsModal = document.getElementById("edit-tags-modal");
+      disableFocusOutsideModal(editTagsModal);
+
+      setTimeout(() => {
+        const editTagsInput = document.getElementById("edit-tags-input")
+          ?.children[0];
+        editTagsInput.focus();
+      }, 300);
     },
   },
 };

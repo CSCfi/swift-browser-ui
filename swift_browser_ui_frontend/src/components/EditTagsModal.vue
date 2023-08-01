@@ -9,6 +9,7 @@
     </h2>
     <c-card-content>
       <TagInput
+        id="edit-tags-input"
         :tags="tags"
         @addTag="addingTag"
         @deleteTag="deletingTag"
@@ -167,7 +168,9 @@ export default {
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
-      const prevActiveElParent = document.getElementById("container-table");
+      const prevActiveElParent = this.containerName ?
+        document.getElementById("obj-table") :
+        document.getElementById("container-table");
       if (document.body.contains(this.prevActiveEl)) {
         moveFocusOutOfModal(this.prevActiveEl);
       } else {
