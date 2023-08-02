@@ -1,5 +1,9 @@
 <template>
-  <c-card class="delete-modal">
+  <c-card
+    ref="deleteObjsModal"
+    class="delete-modal"
+    @keydown="handleKeyDown"
+  >
     <c-alert type="error">
       <div slot="title">
         {{ $t("message.objects.deleteObjects") }}
@@ -16,6 +20,7 @@
           {{ $t("message.cancel") }}
         </c-button>
         <c-button
+          id="delete-objs-btn"
           @click="deleteObjects()"
           @keyup.enter="deleteObjects()"
         >
@@ -30,7 +35,13 @@
 import { swiftDeleteObjects } from "@/common/api";
 import { getDB } from "@/common/db";
 
-import { isFile } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  isFile,
+  addFocusClass,
+  removeFocusClass,
+  moveFocusOutOfModal,
+} from "@/common/globalFunctions";
 
 export default {
   name: "DeleteModal",
@@ -64,6 +75,19 @@ export default {
     toggleDeleteModal: function() {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Delete Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      const prevActiveElParent = document.getElementById("obj-table");
+      if (document.body.contains(this.prevActiveEl)) {
+        moveFocusOutOfModal(this.prevActiveEl);
+      } else {
+        moveFocusOutOfModal(prevActiveElParent);
+      }
     },
     deleteObjects: async function () {
       let to_remove = [];
@@ -220,6 +244,38 @@ export default {
             message: this.$t("message.subfolders.deleteNote"),
           },
         );
+      }
+    },
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.deleteObjsModal.querySelectorAll(
+        "c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+
+      if (e.key === "Tab" && !e.shiftKey) {
+        if (e.target === last) {
+          removeFocusClass(last);
+          first.tabIndex="0";
+          first.focus();
+          addFocusClass(first);
+        } else if (e.target === first) {
+          removeFocusClass(first);
+          last.tabIndex="0";
+          last.focus();
+          addFocusClass(last);
+        }
+      }
+      else if (e.key === "Tab" && e.shiftKey) {
+        if (e.target === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          if (last === document.activeElement) {
+            addFocusClass(last);
+          }
+        } else if (e.target === last) {
+          removeFocusClass(last);
+        }
       }
     },
   },

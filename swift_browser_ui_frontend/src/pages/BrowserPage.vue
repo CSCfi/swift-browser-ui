@@ -54,6 +54,7 @@
         <CopyFolderModal />
       </c-modal>
       <c-modal
+        id="delete-objs-modal"
         v-model="openDeleteModal"
         v-csc-control
       >

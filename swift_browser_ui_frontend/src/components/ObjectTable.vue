@@ -132,6 +132,9 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
+  setPrevActiveElement,
+  disableFocusOutsideModal,
+  addFocusClass,
 } from "@/common/globalFunctions";
 import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
@@ -335,9 +338,19 @@ export default {
       this.$store.commit("setFolderName", this.containerName);
     },
     confirmDelete: function(item) {
-
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
+
+        setPrevActiveElement();
+        const deleteObjsModal = document.getElementById("delete-objs-modal");
+        disableFocusOutsideModal(deleteObjsModal);
+
+        setTimeout(() => {
+          const deleteObjsBtn = document.getElementById("delete-objs-btn");
+          deleteObjsBtn.tabIndex = "0";
+          deleteObjsBtn.focus();
+          addFocusClass(deleteObjsBtn);
+        }, 300);
       } else {
         document.querySelector("#container-error-toasts").addToast(
           {
