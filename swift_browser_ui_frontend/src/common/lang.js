@@ -487,7 +487,7 @@ let default_translations = {
         render: "Näytä tiedostot kansioina",
         text: "Näytä tiedostot polkuina",
         timestamp: "Näytä viimeisimmän toiminnan aika",
-        fromNow: "Näytä aika viiseimmästä toiminnasta",
+        fromNow: "Näytä aika viimeisimmästä toiminnasta",
         hideTags: "Piilota asiasanat",
         showTags: "Näytä asiasanat",
         hidePagination: "Piilota sivutus",
