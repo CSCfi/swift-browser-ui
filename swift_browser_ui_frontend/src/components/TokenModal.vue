@@ -1,5 +1,9 @@
 <template>
-  <c-card class="token-card">
+  <c-card
+    ref="tokenContainer"
+    class="token-card"
+    @keydown="handleKeyDown"
+  >
     <c-card-actions
       justify="space-between"
       align="center"
@@ -8,6 +12,7 @@
         {{ $t("message.tokens.title") }}
       </h2>
       <c-button
+        id="close-token-modal-btn"
         text
         @click="closeTokenModal"
         @keyup.enter="closeTokenModal"
@@ -22,13 +27,14 @@
     </c-card-actions>
     <c-card-content>
       <c-text-field
+        id="token-input"
         v-model="newIdentifier"
         v-csc-control
         name="newIdentifier"
         :label="$t('message.tokens.identLabel')"
       />
       <c-button
-        id="create-button"
+        id="create-token-button"
         @click="addToken(newIdentifier)"
         @keyup.enter="addToken(newIdentifier)"
       >
@@ -67,7 +73,6 @@
       because csc-ui wont recognise it otherwise. -->
       <!-- eslint-disable-->
       <c-data-table
-        class="tokenContents"
         sort-by="identifier"
         sort-direction="asc"
         :no-data-text="$t('message.tokens.empty')"
@@ -94,6 +99,11 @@ import {
   listTokens,
   removeToken,
 } from "@/common/api";
+import {
+  removeFocusClass,
+  addFocusClass,
+  moveFocusOutOfModal,
+} from "@/common/globalFunctions";
 
 export default {
   name: "TokenModal",
@@ -144,6 +154,16 @@ export default {
                   path: mdiDelete,
                   onClick: ({ data: { identifier }}) =>
                     this.deleteToken(identifier.value),
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the row element of item that is to be removed
+                      const row = e.target.closest("tr");
+                      if (row !== undefined) {
+                        const identifierValue = row.children[0]?.innerText;
+                        this.deleteToken(identifierValue);
+                      }
+                    }
+                  },
                 },
               },
             },
@@ -172,6 +192,9 @@ export default {
         hideDetails: true,
       };
     },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
+    },
   },
   watch: {
     visible () {
@@ -192,6 +215,17 @@ export default {
       document.querySelector("#token-toasts").removeToast("error-in-use");
       document.querySelector("#token-toasts").removeToast("success-copied");
       document.querySelector("#token-toasts").removeToast("success-removed");
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Token Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      const prevActiveElParent = document
+        .querySelector("[data-testid='support-menu']");
+      this.$store.commit("setPreviousActiveEl", prevActiveElParent);
+      moveFocusOutOfModal(prevActiveElParent);
     },
     getTokens: function () {
       listTokens(this.activeId).then((ret) => {this.tokens = ret;});
@@ -275,6 +309,39 @@ export default {
         this.currentPage--;
       }
     },
+    handleKeyDown: function (e) {
+      const eTarget = e.target;
+      const shadowDomTarget = eTarget.shadowRoot?.activeElement;
+
+      const first = document.getElementById("close-token-modal-btn");
+
+      // last element is different between with or without token list
+      let last = null;
+
+      if (this.tableTokens.length === 0) {
+        last = document.getElementById("create-token-button");
+      } else {
+        const table = this.$refs.tokenContainer.querySelector("c-data-table");
+        const removeButtons = table.shadowRoot.querySelectorAll("c-button");
+        last = removeButtons[removeButtons.length -1];
+      }
+
+      if (e.key === "Tab" && !e.shiftKey &&
+        (eTarget === last || (shadowDomTarget === last))
+      ) {
+        first.tabIndex = "0";
+        first.focus();
+      } else if (e.key === "Tab" && e.shiftKey) {
+        if (eTarget === first) {
+          e.preventDefault();
+          last.tabIndex = "0";
+          last.focus();
+          addFocusClass(last);
+        } else if (eTarget === last || shadowDomTarget === last) {
+          removeFocusClass(last);
+        }
+      }
+    },
   },
 };
 </script>
@@ -293,7 +360,7 @@ export default {
   overflow-y: scroll;
 }
 
-#create-button {
+#create-token-button {
   width: max-content;
   margin-top: -2rem;
 }

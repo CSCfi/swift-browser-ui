@@ -82,7 +82,11 @@
 </template>
 
 <script>
-import { getProjectNumber } from "@/common/globalFunctions";
+import {
+  getProjectNumber,
+  setPrevActiveElement,
+  disableFocusOutsideModal,
+} from "@/common/globalFunctions";
 import { mdiOpenInNew } from "@mdi/js";
 export default {
   name: "BrowserMainNavbar",
@@ -148,6 +152,7 @@ export default {
         {
           title: this.$t("message.support"),
           icon: "mdi-help-circle-outline",
+          id: "support-menu",
           testid: "support-menu",
           ariaLabel: this.$t("label.support_menu"),
           subs: [
@@ -161,7 +166,7 @@ export default {
             },
             {
               title: this.$t("message.supportMenu.item3"),
-              action: () => this.$store.commit("toggleTokenModal", true),
+              action: () => this.openTokenModal(),
             },
             {
               title: this.$t("message.supportMenu.item4"),
@@ -207,6 +212,20 @@ export default {
       } else if (item.href) {
         window.open(item.href, "_blank");
       }
+    },
+    openTokenModal() {
+      this.$store.commit("toggleTokenModal", true);
+      setPrevActiveElement();
+
+      const tokenModal = document.getElementById("token-modal");
+      disableFocusOutsideModal(tokenModal);
+
+      // Focus on token input field first when opening token modal
+      setTimeout(() => {
+        const tokenInput = document.getElementById("token-input")
+          .getElementsByTagName("input")[0];
+        tokenInput.focus();
+      }, 300);
     },
   },
 };
