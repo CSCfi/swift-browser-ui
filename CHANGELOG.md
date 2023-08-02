@@ -70,6 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #947) Added cypress tests for login, adding and showing containers, uploading files
 - (GL #1047) Added redis and vault monitoring to `/health` endpoint
 - (GL #947) Added cypress tests for sharing folders
+- (GL #987) Added keyboard navigation for all modals in the UI
 
 ### Changed
 
