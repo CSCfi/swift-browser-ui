@@ -95,8 +95,8 @@ async def swift_list_containers(
 
 
 async def _check_last_modified(
-    request: aiohttp.web.Request, container: typing.Dict
-) -> typing.Dict:
+    request: aiohttp.web.Request, container: typing.Dict[str, typing.Any]
+) -> typing.Dict[str, typing.Any]:
     """Ensure container data includes 'last_modified' key and value.
 
     :param request: A request instance
@@ -109,11 +109,9 @@ async def _check_last_modified(
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     project = request.match_info["project"]
-    if "owner" in request.query:
-        owner: str = request.query["owner"]
-    else:
-        owner = ""
     endpoint = session["projects"][project]["endpoint"]
+    if "owner" in request.query:
+        endpoint = endpoint.replace(project, request.query["owner"])
 
     # If last_modified is not part of container basic info,
     # head request is made to check container metadata
@@ -122,20 +120,21 @@ async def _check_last_modified(
         try:
             name = container["name"]
             async with client.head(
-                f"{endpoint.replace(project, owner) if owner else endpoint}/{name}",
+                f"{endpoint}/{name}",
                 headers={
                     "X-Auth-Token": session["projects"][project]["token"],
                 },
             ) as ret:
-                headers = ret.headers
-                date_str = headers["Last-Modified"]
+                date_str = ret.headers["Last-Modified"]
                 # Convert the date string to the ISO 8601 format
                 date_obj = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
                 iso_8601_str = date_obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
                 container["last_modified"] = iso_8601_str
-        except Exception:
+        # we expect either the header Last Modified to be missing or
+        # the value is not what we expect for str to date conversion
+        except (KeyError, ValueError):
             # If anything goes wrong, set last_modified key anyway with null value
-            container["last_modified"] = "Unknown"
+            container["last_modified"] = None
     return container
 
 
@@ -232,10 +231,6 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     client = request.app["api_client"]
     project = request.match_info["project"]
     container = request.match_info["container"]
-    if "owner" in request.query:
-        owner: str = request.query["owner"]
-    else:
-        owner = ""
 
     request.app["Log"].info(
         "API call for list objects from "
@@ -246,10 +241,12 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
     query["format"] = "json"
 
     endpoint = session["projects"][project]["endpoint"]
+    if "owner" in request.query:
+        endpoint = endpoint.replace(project, request.query["owner"])
 
     # TODO: MOVE UNICODE NULL HANDLING TO FRONTEND
     async with client.get(
-        f"{endpoint.replace(project, owner) if owner else endpoint}/{container}",
+        f"{endpoint}/{container}",
         headers={
             "X-Auth-Token": session["projects"][project]["token"],
         },

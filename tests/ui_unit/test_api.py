@@ -102,7 +102,7 @@ class APITestClass(tests.common.mockups.APITestBase):
                 container,
             )
         self.mock_client.head.assert_called_once()
-        self.assertEqual(ret["last_modified"], "Unknown")
+        self.assertEqual(ret["last_modified"], None)
 
         # If head request response has a value for Last-Modified
         self.mock_client_response.headers = {
