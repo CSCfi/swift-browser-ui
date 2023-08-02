@@ -312,6 +312,7 @@ nämä
 näytetyistä
 näytetään
 näyttäminen
+näyttöasetukset
 näytä
 objekteja
 objekti
@@ -550,6 +551,8 @@ tilan
 tilankäyttö
 tilapäinen
 tilapäisesti
+toiminnan
+toiminnasta
 toiminnolla
 toiminta
 toiminto
@@ -631,6 +634,8 @@ vastaanottajien
 vastaanottavan
 vastaanottimien
 vedä
+viimeisimmän
+viimeisimmästä
 viimeisin
 viimeksi
 viiva
