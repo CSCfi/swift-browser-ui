@@ -184,10 +184,12 @@ import {
   getAccessDetails,
   validateFolderName,
   checkIfItemIsLastOnPage,
-  getFocusableElements,
-  removeFocusClass,
-  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 
 import delay from "lodash/delay";
@@ -729,25 +731,8 @@ export default {
       const focusableList = this.$refs.uploadContainer.querySelectorAll(
         "c-link, c-button, textarea, c-autocomplete, c-data-table",
       );
-
       const { first, last } = getFocusableElements(focusableList);
-
-      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
-        first.tabIndex = "0";
-        first.focus();
-        if (last.classList.contains("button-focus")) removeFocusClass(last);
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (e.target === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            last.classList.add("button-focus");
-          }
-        } else if (e.target === last) {
-          removeFocusClass(last);
-        }
-      }
+      keyboardNavigationInsideModal(e, first, last, true);
     },
   },
 };

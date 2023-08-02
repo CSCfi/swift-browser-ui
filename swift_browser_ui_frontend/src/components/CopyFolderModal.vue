@@ -69,11 +69,12 @@ import {
   addNewTag,
   deleteTag,
   validateFolderName,
-  getFocusableElements,
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
@@ -200,11 +201,7 @@ export default {
         to be focused instead after we close the modal.
       */
       const prevActiveElParent = document.getElementById("container-table");
-      if (document.body.contains(this.prevActiveEl)) {
-        moveFocusOutOfModal(this.prevActiveEl);
-      } else {
-        moveFocusOutOfModal(prevActiveElParent);
-      }
+      moveFocusOutOfModal(prevActiveElParent, true);
     },
     replicateContainer: function () {
       // Initiate the container replication operation
@@ -297,22 +294,7 @@ export default {
         "input, c-icon, c-button",
       );
       const { first, last } = getFocusableElements(focusableList);
-
-      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
-        e.preventDefault();
-        first.focus();
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (e.target === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            addFocusClass(last);
-          }
-        } else if (e.target === last) {
-          removeFocusClass(last);
-        }
-      }
+      keyboardNavigationInsideModal(e, first, last);
     },
   },
 };

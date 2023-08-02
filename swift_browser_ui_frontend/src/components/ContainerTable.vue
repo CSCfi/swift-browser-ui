@@ -42,9 +42,11 @@ import {
   getPaginationOptions,
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
+} from "@/common/globalFunctions";
+import {
   setPrevActiveElement,
   disableFocusOutsideModal,
-} from "@/common/globalFunctions";
+} from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
 

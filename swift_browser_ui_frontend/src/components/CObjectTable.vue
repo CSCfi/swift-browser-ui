@@ -47,10 +47,11 @@ import {
   getPrefix,
   getPaginationOptions,
   checkIfItemIsLastOnPage,
+} from "@/common/globalFunctions";
+import {
   setPrevActiveElement,
   disableFocusOutsideModal,
-} from "@/common/globalFunctions";
-
+} from "@/common/keyboardNavigation";
 import {
   mdiTrayArrowDown,
   mdiPencilOutline,

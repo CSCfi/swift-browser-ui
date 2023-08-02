@@ -132,10 +132,12 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
+} from "@/common/globalFunctions";
+import {
   setPrevActiveElement,
   disableFocusOutsideModal,
   addFocusClass,
-} from "@/common/globalFunctions";
+} from "@/common/keyboardNavigation";
 import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
@@ -340,17 +342,7 @@ export default {
     confirmDelete: function(item) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
-
-        setPrevActiveElement();
-        const deleteObjsModal = document.getElementById("delete-objs-modal");
-        disableFocusOutsideModal(deleteObjsModal);
-
-        setTimeout(() => {
-          const deleteObjsBtn = document.getElementById("delete-objs-btn");
-          deleteObjsBtn.tabIndex = "0";
-          deleteObjsBtn.focus();
-          addFocusClass(deleteObjsBtn);
-        }, 300);
+        this.moveFocusToDeleteModal();
       } else {
         document.querySelector("#container-error-toasts").addToast(
           {
@@ -631,13 +623,29 @@ export default {
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
-          action: () => toggleDeleteModal(this.checkedRows),
+          action: () => this.openDeleteModal(this.checkedRows),
         },
       ];
     },
     setLocalizedContent() {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
+    },
+    openDeleteModal(checkedRows) {
+      toggleDeleteModal(checkedRows);
+      this.moveFocusToDeleteModal();
+    },
+    moveFocusToDeleteModal() {
+      const deleteObjsModal = document.getElementById("delete-objs-modal");
+      setPrevActiveElement();
+      disableFocusOutsideModal(deleteObjsModal);
+
+      setTimeout(() => {
+        const deleteObjsBtn = document.getElementById("delete-objs-btn");
+        deleteObjsBtn.tabIndex = "0";
+        deleteObjsBtn.focus();
+        addFocusClass(deleteObjsBtn);
+      }, 300);
     },
   },
 };

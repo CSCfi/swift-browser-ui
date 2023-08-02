@@ -82,12 +82,13 @@
 </template>
 
 <script>
+import { getProjectNumber } from "@/common/globalFunctions";
 import {
-  getProjectNumber,
   setPrevActiveElement,
   disableFocusOutsideModal,
-} from "@/common/globalFunctions";
+} from "@/common/keyboardNavigation";
 import { mdiOpenInNew } from "@mdi/js";
+
 export default {
   name: "BrowserMainNavbar",
   props: [

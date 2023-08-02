@@ -105,10 +105,8 @@
 </template>
 
 <script>
-import {
-  toggleCreateFolderModal,
-  setPrevActiveElement,
-} from "@/common/globalFunctions";
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import { mdiInformationOutline } from "@mdi/js";
 
 export default {

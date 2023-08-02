@@ -95,11 +95,12 @@ import {
   getProjectNumber,
   validateFolderName,
   getCurrentISOtime,
-  getFocusableElements,
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 
 import { toRaw } from "vue";
@@ -209,22 +210,7 @@ export default {
         "input, c-link, c-button",
       );
       const { first, last } = getFocusableElements(focusableList);
-
-      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
-        e.preventDefault();
-        first.focus();
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (e.target === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            addFocusClass(last);
-          }
-        } else if (e.target === last) {
-          removeFocusClass(last);
-        }
-      }
+      keyboardNavigationInsideModal(e, first, last);
     },
   },
 };

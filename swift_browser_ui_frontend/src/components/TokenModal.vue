@@ -100,11 +100,10 @@ import {
   removeToken,
 } from "@/common/api";
 import {
-  removeFocusClass,
   addFocusClass,
+  removeFocusClass,
   moveFocusOutOfModal,
-} from "@/common/globalFunctions";
-
+} from "@/common/keyboardNavigation";
 export default {
   name: "TokenModal",
   data() {
@@ -224,8 +223,7 @@ export default {
       */
       const prevActiveElParent = document
         .querySelector("[data-testid='support-menu']");
-      this.$store.commit("setPreviousActiveEl", prevActiveElParent);
-      moveFocusOutOfModal(prevActiveElParent);
+      moveFocusOutOfModal(prevActiveElParent, true);
     },
     getTokens: function () {
       listTokens(this.activeId).then((ret) => {this.tokens = ret;});

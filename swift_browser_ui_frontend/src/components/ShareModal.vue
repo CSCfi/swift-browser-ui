@@ -163,11 +163,12 @@ import {
 import {
   addNewTag,
   deleteTag,
-  moveFocusOutOfModal,
+} from "@/common/globalFunctions";
+import {
   addFocusClass,
   removeFocusClass,
-} from "@/common/globalFunctions";
-
+  moveFocusOutOfModal,
+} from "@/common/keyboardNavigation";
 import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose, mdiInformationOutline } from "@mdi/js";

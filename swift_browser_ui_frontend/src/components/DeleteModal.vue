@@ -35,13 +35,13 @@
 import { swiftDeleteObjects } from "@/common/api";
 import { getDB } from "@/common/db";
 
+import { isFile } from "@/common/globalFunctions";
 import {
   getFocusableElements,
-  isFile,
   addFocusClass,
   removeFocusClass,
   moveFocusOutOfModal,
-} from "@/common/globalFunctions";
+} from "@/common/keyboardNavigation";
 
 export default {
   name: "DeleteModal",
@@ -83,11 +83,7 @@ export default {
         to be focused instead after we close the modal.
       */
       const prevActiveElParent = document.getElementById("obj-table");
-      if (document.body.contains(this.prevActiveEl)) {
-        moveFocusOutOfModal(this.prevActiveEl);
-      } else {
-        moveFocusOutOfModal(prevActiveElParent);
-      }
+      moveFocusOutOfModal(prevActiveElParent, true);
     },
     deleteObjects: async function () {
       let to_remove = [];

@@ -51,11 +51,12 @@ import {
   addNewTag,
   deleteTag,
   getCurrentISOtime,
-  getFocusableElements,
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
 
@@ -171,11 +172,7 @@ export default {
       const prevActiveElParent = this.containerName ?
         document.getElementById("obj-table") :
         document.getElementById("container-table");
-      if (document.body.contains(this.prevActiveEl)) {
-        moveFocusOutOfModal(this.prevActiveEl);
-      } else {
-        moveFocusOutOfModal(prevActiveElParent);
-      }
+      moveFocusOutOfModal(prevActiveElParent, true);
     },
     saveObjectTags: function () {
       const tags = toRaw(this.tags);
@@ -244,22 +241,7 @@ export default {
         "input, c-icon, c-button",
       );
       const { first, last } = getFocusableElements(focusableList);
-
-      if (e.key === "Tab" && !e.shiftKey && e.target === last) {
-        e.preventDefault();
-        first.focus();
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (e.target === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            addFocusClass(last);
-          }
-        } else if (e.target === last) {
-          removeFocusClass(last);
-        }
-      }
+      keyboardNavigationInsideModal(e, first, last);
     },
   },
 };

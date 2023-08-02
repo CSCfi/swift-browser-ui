@@ -51,7 +51,7 @@ import delay from "lodash/delay";
 import { getDB } from "@/common/db";
 
 // Import global functions
-import { removeFocusClass } from "@/common/globalFunctions";
+import { removeFocusClass } from "@/common/keyboardNavigation";
 
 checkIDB().then(result => {
   if (!result) {
