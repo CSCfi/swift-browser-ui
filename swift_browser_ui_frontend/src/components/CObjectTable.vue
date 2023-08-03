@@ -313,9 +313,12 @@ export default {
             const fullSubName = getPrefix(this.$route) + subName + "/";
             //add new subfolder
             const subfolder = {
-              container: item.container, name: fullSubName,
-              bytes: subSize, last_modified: subfolderObjs[0].last_modified,
-              tags: [], subfolder: true,
+              container: item.container,
+              name: fullSubName,
+              bytes: subSize,
+              last_modified: subfolderObjs[0].last_modified,
+              tags: [],
+              subfolder: true,
             };
             items.push(subfolder);
           }
