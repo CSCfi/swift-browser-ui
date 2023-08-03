@@ -83,6 +83,7 @@
         <c-button
           outlined
           data-testid="create-folder"
+          :disabled="inContainer"
           @click="toggleCreateFolderModal"
           @keyup.enter="toggleCreateFolderModal"
         >
@@ -133,6 +134,9 @@ export default {
     },
     isUploading() {
       return this.$store.state.isUploading;
+    },
+    inContainer() {
+      return this.$route.params.container !== undefined;
     },
   },
   methods: {

@@ -98,6 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1032) `_segments` folders no longer have tokens
 - (GL #1027) Update advanced encryption options, remove private key option
 - (GL #1072) Relative time (from now) made default display option for last_modified dates
+- (GL #1083) Disabled `create folder` when inside containers to avoid user confusion that they can create subfolders
 
 ### Fixed
 

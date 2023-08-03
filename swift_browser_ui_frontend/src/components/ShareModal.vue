@@ -21,119 +21,124 @@
       </c-button>
     </c-card-actions>
     <c-card-content id="share-card-modal-content">
-      <c-container>
-        <c-row
-          justify="space-between"
-          align="center"
-        >
-          <h3 class="title is-5">
-            {{ $t("message.share.share_other_projects") }}
-          </h3>
-          <c-flex
-            class="toggle-instructions"
-            :aria-label="$t('label.shareid_instructions')"
-            @click="toggleShareGuide"
-            @keyup.enter="toggleShareGuide"
-          >
-            <c-icon
-              :path="mdiInformationOutline"
-              alt=""
-              aria-hidden="true"
-            />
-            <c-link
-              underline
-              tabindex="0"
-            >
-              {{ openShareGuide ? $t("message.share.close_instructions")
-                : $t("message.share.instructions")
-              }}
-            </c-link>
-          </c-flex>
-        </c-row>
-        <div
-          v-show="openShareGuide"
-          class="content guide-content"
-        >
-          <p>
-            {{ $t("message.share.share_guide_intro") }}
-          </p>
-          <p>
-            {{ $t("message.share.share_guide_step1") }}
-          </p>
-          <p>
-            {{ $t("message.share.share_guide_step2") }}
-          </p>
-          <ul>
-            <li
-              v-for="(item, i) in
-                $tm('message.share.share_guide_step2_list')"
-              :key="i"
-            >
-              {{ item }}
-            </li>
-          </ul>
-        </div>
-        <TagInput
-          :tags="tags"
-          aria-label="label.list_of_shareids"
-          placeholder="message.share.field_placeholder"
-          @addTag="addingTag"
-          @deleteTag="deletingTag"
-        />
-        <c-row
-          justify="space-between"
-          align="start"
-        >
-          <c-select
-            v-model="sharedAccessRight"
-            v-csc-control
-            shadow="false"
-            :label="$t('message.share.permissions')"
-            :items.prop="accessRights"
-            :placeholder="$t('message.share.permissions')"
-            @changeValue="onSelectPermission($event)"
-          />
-          <c-button
-            :loading="loading"
-            @click="shareSubmit"
-            @keyup.enter="shareSubmit"
-          >
-            {{ $t('message.share.confirm') }}
-          </c-button>
-        </c-row>
-      </c-container>
-      <c-alert
-        v-show="isShared || isPermissionRemoved || isPermissionUpdated"
-        type="success"
+      <div
+        id="overflow-div"
+        :class="{ 'scroll': sharedDetails.length > 0 }"
       >
-        <div class="shared-notification">
-          {{ isShared ? $t('message.share.shared_successfully')
-            : isPermissionUpdated ? $t('message.share.update_permission')
-              : $t('message.share.remove_permission')
-          }}
-          <c-button
-            text
-            size="small"
-            @click="closeSharedNotification"
+        <c-container>
+          <c-row
+            justify="space-between"
+            align="center"
           >
-            <c-icon
-              :path="mdiClose"
-              alt=""
-              aria-hidden="true"
+            <h3 class="title is-5 has-text-dark">
+              {{ $t("message.share.share_other_projects") }}
+            </h3>
+            <c-flex
+              class="toggle-instructions"
+              :aria-label="$t('label.shareid_instructions')"
+              @click="toggleShareGuide"
+              @keyup.enter="toggleShareGuide"
+            >
+              <c-icon
+                :path="mdiInformationOutline"
+                alt=""
+                aria-hidden="true"
+              />
+              <c-link
+                underline
+                tabindex="0"
+              >
+                {{ openShareGuide ? $t("message.share.close_instructions")
+                  : $t("message.share.instructions")
+                }}
+              </c-link>
+            </c-flex>
+          </c-row>
+          <div
+            v-show="openShareGuide"
+            class="content guide-content"
+          >
+            <p>
+              {{ $t("message.share.share_guide_intro") }}
+            </p>
+            <p>
+              {{ $t("message.share.share_guide_step1") }}
+            </p>
+            <p>
+              {{ $t("message.share.share_guide_step2") }}
+            </p>
+            <ul>
+              <li
+                v-for="(item, i) in
+                  $tm('message.share.share_guide_step2_list')"
+                :key="i"
+              >
+                {{ item }}
+              </li>
+            </ul>
+          </div>
+          <TagInput
+            :tags="tags"
+            aria-label="label.list_of_shareids"
+            placeholder="message.share.field_placeholder"
+            @addTag="addingTag"
+            @deleteTag="deletingTag"
+          />
+          <c-row
+            justify="space-between"
+            align="start"
+          >
+            <c-select
+              v-model="sharedAccessRight"
+              v-csc-control
+              shadow="false"
+              :label="$t('message.share.permissions')"
+              :items.prop="accessRights"
+              :placeholder="$t('message.share.permissions')"
+              @changeValue="onSelectPermission($event)"
             />
-            {{ $t("message.share.close") }}
-          </c-button>
-        </div>
-      </c-alert>
-      <c-container v-show="sharedDetails.length > 0">
-        <ShareModalTable
-          :shared-details="sharedDetails"
-          :folder-name="folderName"
-          :access-rights="accessRights"
-          @removeSharedFolder="removeSharedFolder"
-          @updateSharedFolder="updateSharedFolder"
-        />
-      </c-container>
+            <c-button
+              :loading="loading"
+              @click="shareSubmit"
+              @keyup.enter="shareSubmit"
+            >
+              {{ $t('message.share.confirm') }}
+            </c-button>
+          </c-row>
+        </c-container>
+        <c-alert
+          v-show="isShared || isPermissionRemoved || isPermissionUpdated"
+          type="success"
+        >
+          <div class="shared-notification">
+            {{ isShared ? $t('message.share.shared_successfully')
+              : isPermissionUpdated ? $t('message.share.update_permission')
+                : $t('message.share.remove_permission')
+            }}
+            <c-button
+              text
+              size="small"
+              @click="closeSharedNotification"
+            >
+              <c-icon
+                :path="mdiClose"
+                alt=""
+                aria-hidden="true"
+              />
+              {{ $t("message.share.close") }}
+            </c-button>
+          </div>
+        </c-alert>
+        <c-container v-show="sharedDetails.length > 0">
+          <ShareModalTable
+            :shared-details="sharedDetails"
+            :folder-name="folderName"
+            :access-rights="accessRights"
+            @removeSharedFolder="removeSharedFolder"
+            @updateSharedFolder="updateSharedFolder"
+          />
+        </c-container>
+      </div>
     </c-card-content>
     <c-toasts
       id="shareModal-toasts"
@@ -500,20 +505,28 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  max-height: 75vh;
+}
+
+#overflow-div {
+  max-height: 60vh;
+  padding-bottom: 3rem;
+}
+.scroll {
+  overflow-y: scroll;
+  padding-right: 1rem;
 }
 
 @media screen and (max-height: 720px) {
   .share-card {
-    max-height: 70vh;
     top: -30vh;
+  }
+  .scroll {
+    max-height: 55vh;
   }
 }
 
 c-card-content  {
-  overflow-y: scroll;
   scrollbar-width: 0.5rem;
-  padding: 0 1rem 6rem 1rem;
   &::-webkit-scrollbar {
     width: 0.5rem;
   }
@@ -583,15 +596,6 @@ c-alert[type="success"] {
 
 c-toasts {
   width: fit-content;
-}
-
-c-alert[type="success"] {
-  align-items: center;
-  & > .shared-notification {
-    color: var(--csc-dark-grey);
-  };
-  margin-bottom: 1.5rem;
-  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
 }
 
 </style>

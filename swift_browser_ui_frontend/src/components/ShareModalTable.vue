@@ -249,8 +249,8 @@ export default {
 
 <style lang="scss" scoped>
 
-h5 {
-   margin: 0 !important;
+h3 {
+   margin-top: 1rem;
 }
 
 c-data-table {
