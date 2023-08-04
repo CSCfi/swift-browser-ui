@@ -3,6 +3,7 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
 <template>
   <div class="upload-btn-wrapper">
     <c-button
+      outlined
       @click="click"
       @keyup.enter="click"
     >

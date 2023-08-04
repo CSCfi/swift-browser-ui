@@ -92,7 +92,6 @@ footer, footer > * div {
   display: flex;
 }
 
-
 .footer-start {
   justify-content: flex-start;
   margin-right: auto;
@@ -121,7 +120,7 @@ footer, footer > * div {
   font-weight: 600;
   font-size: 16px;
   line-height: 19px;
-  color: $csc-grey;
+  color: $csc-dark;
 }
 
 .smalltext{
@@ -130,6 +129,10 @@ footer, footer > * div {
   font-size: 14px;
   line-height: 18px;
   color: $csc-grey;
+}
+
+.footer-start .smalltext a {
+  color: $csc-dark;
 }
 
 .linktext {

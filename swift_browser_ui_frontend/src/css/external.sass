@@ -255,7 +255,6 @@ $block-spacing: 1.5rem !default
     $remainder: divide($remainder * 10, $divisor, $precision - 1) * .1
   @return ($quotient + $remainder) * $sign
 
-
 $primary: $turquoise !default
 
 $info: $cyan !default
@@ -297,23 +296,11 @@ $dark-invert: findColorInvert($dark) !default
 
 // General colors
 
-$scheme-main: $white !default
-$scheme-main-bis: $white-bis !default
-$scheme-main-ter: $white-ter !default
-$scheme-invert: $black !default
-$scheme-invert-bis: $black-bis !default
-$scheme-invert-ter: $black-ter !default
-
 $background: $white-ter !default
-
-$border: $grey-lighter !default
-$border-hover: $grey-light !default
-$border-light: $grey-lightest !default
-$border-light-hover: $grey-light !default
 
 // Text colors
 
-$text: $grey-dark !default
+$text: $black !default
 $text-invert: findColorInvert($text) !default
 $text-light: $grey !default
 $text-strong: $black !default
@@ -326,24 +313,6 @@ $link-light: findLightColor($link) !default
 $link-dark: findDarkColor($link) !default
 $link-visited: $purple !default
 
-$link-hover: $grey-darker !default
-$link-hover-border: $grey-light !default
-
-$link-focus: $grey-darker !default
-$link-focus-border: $blue !default
-
-$link-active: $grey-darker !default
-$link-active-border: $grey-dark !default
-
-// Typography
-
-$size-small: $size-7 !default
-$size-normal: $size-6 !default
-$size-medium: $size-5 !default
-$size-large: $size-4 !default
-
-// Effects
-
 // Lists and maps
 
 $sizes: $size-1 $size-2 $size-3 $size-4 $size-5 $size-6 $size-7 !default
@@ -353,18 +322,10 @@ $sizes: $size-1 $size-2 $size-3 $size-4 $size-5 $size-6 $size-7 !default
 
 // Placeholders
 
-=block($spacing: $block-spacing)
-  &:not(:last-child)
-    margin-bottom: $spacing
-
-%block
-  +block
-
 $small-font-size: 0.875em !default
 
 $strong-color: $text-strong !default
 $strong-weight: $weight-bold !default
-
 
 // Block
 
@@ -373,34 +334,16 @@ $title-family: false !default
 $title-size: $size-3 !default
 $title-weight: $weight-semibold !default
 $title-line-height: 1.125 !default
-$title-strong-color: inherit !default
-$title-strong-weight: inherit !default
-$title-sub-size: 0.75em !default
-$title-sup-size: 0.75em !default
 
 .title
-  @extend %block
+  margin-bottom: $block-spacing
   word-break: break-word
-  em,
-  span
-    font-weight: inherit
-  sub
-    font-size: $title-sub-size
-  sup
-    font-size: $title-sup-size
-  .tag
-    vertical-align: middle
 
 .title
   color: $title-color
-  @if $title-family
-    font-family: $title-family
   font-size: $title-size
   font-weight: $title-weight
   line-height: $title-line-height
-  strong
-    color: $title-strong-color
-    font-weight: $title-strong-weight
   // Sizes
   @each $size in $sizes
     $i: index($sizes, $size)

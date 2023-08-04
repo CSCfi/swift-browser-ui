@@ -254,7 +254,7 @@ h3 {
 }
 
 c-data-table {
-  color: var(--csc-dark-grey);
+  color: var(--csc-dark);
   margin-top: 1rem;
 }
 

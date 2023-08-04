@@ -5,6 +5,7 @@
 :root {
   --csc-border-radius: 4px;
   --csc-dark-grey: rgb(89, 89, 89);
+  --csc-dark: #2E3438;
   --csc-error: #e71d32;
   --csc-font-family: 'museo-sans', sans-serif;
   --csc-light-grey: rgb(223, 225, 227);
@@ -46,6 +47,7 @@ $csc-light-grey-blue: #f8f9fc;
 $csc-yellow: #ffd534;
 $csc-green: #51a808;
 $csc-orange: #ff5800;
+$csc-dark: #2E3438;
 
 //Font Setting
 $family-primary: $csc-font-family;
@@ -133,7 +135,7 @@ $link-hover: #363636;
 
 .hl-1 {
   margin: 0 0.08rem;
-  background-color: #00947e !important;
+  background-color: #006778 !important;
   color: #f5f5f5 !important;
 }
 
@@ -161,7 +163,7 @@ a:hover {
   font-weight: 600 !important;
 }
 
-$body-background-color: $scheme-main !default;
+$body-background-color: $white !default;
 $body-size: 16px !default;
 $body-min-width: 300px !default;
 $body-rendering: optimizeLegibility !default;
@@ -190,6 +192,16 @@ header,
 hgroup,
 section {
   display: block;
+}
+
+.content ul {
+  list-style: disc outside;
+  margin-left: 2em;
+  margin-top: 1em;
+}
+
+.content p {
+  margin-bottom: 1em;
 }
 
 /* end bulma */

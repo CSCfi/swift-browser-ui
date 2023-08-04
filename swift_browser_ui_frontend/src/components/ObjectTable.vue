@@ -667,7 +667,7 @@ export default {
 }
 
 .folder-details {
-  color: $csc-grey;
+  color: $csc-dark;
 
   & li {
     padding: .25rem 0;

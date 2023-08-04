@@ -572,7 +572,7 @@ h3 {
 }
 
 c-select {
-  color: $csc-dark-grey;
+  color: var(--csc-dark);
 }
 
 c-link > span {
@@ -588,7 +588,7 @@ c-flex, .shared-notification {
 c-alert[type="success"] {
   align-items: center;
   & > .shared-notification {
-    color: var(--csc-dark-grey);
+    color: var(--csc-dark);
   };
   margin-bottom: 1.5rem;
   box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
@@ -596,6 +596,15 @@ c-alert[type="success"] {
 
 c-toasts {
   width: fit-content;
+}
+
+c-alert[type="success"] {
+  align-items: center;
+  & > .shared-notification {
+    color: var(--csc-dark);
+  };
+  margin-bottom: 1.5rem;
+  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
 }
 
 </style>

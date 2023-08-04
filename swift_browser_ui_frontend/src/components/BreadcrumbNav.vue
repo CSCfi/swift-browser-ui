@@ -86,6 +86,10 @@ i, p {
   padding: 0;
 }
 
+.breadcrumb a span {
+  padding: 0 0.5em;
+}
+
 .last {
   font-weight: 700;
 }
