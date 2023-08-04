@@ -226,7 +226,7 @@ export default {
  }
 
 c-card-content {
-  color: var(--csc-dark-grey);
+  color: var(--csc-dark);
   padding: 1.5rem 0 0 0;
 }
 

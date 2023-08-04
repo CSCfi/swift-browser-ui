@@ -230,7 +230,7 @@ export default {
 h2 { margin: 0 !important; }
 
 c-card-content {
-  color: var(--csc-dark-grey);
+  color: var(--csc-dark);
   padding: 0;
 }
 

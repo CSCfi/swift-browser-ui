@@ -124,7 +124,7 @@ export default {
 
 .toast-wrapper {
   padding: 1rem;
-  color: $csc-grey;
+  color: $csc-dark;
 }
 
 .progress-bar {

@@ -292,7 +292,7 @@ c-icon {
 .column {
   flex-direction: column;
   padding: 0 0 0 1.5rem;
-  color: var(--csc-dark-grey);
+  color: var(--csc-dark);
 }
 
 .project-number {

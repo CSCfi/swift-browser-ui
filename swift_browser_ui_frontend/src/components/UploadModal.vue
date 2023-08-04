@@ -724,7 +724,7 @@ export default {
 
 c-card-content {
   padding: 1.5rem 0 0 0;
-  color: var(--csc-dark-grey);
+  color: var(--csc-dark);
 }
 
 c-autocomplete {

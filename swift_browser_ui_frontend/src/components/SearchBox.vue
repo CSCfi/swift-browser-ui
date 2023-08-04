@@ -315,6 +315,10 @@ export default {
   height: 2rem;
 }
 
+.search a {
+  color: #2E3438;
+}
+
 div[aria-selected='true'], div[slot="customMenu"]:hover {
   background-color: $csc-primary-lighter;
 }

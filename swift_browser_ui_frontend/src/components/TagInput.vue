@@ -61,7 +61,7 @@ export default {
 .tags-list {
   min-height: 3rem;
   background: transparent;
-  border: 1px solid $csc-dark-grey;
+  border: 1px solid var(--csc-dark);
   margin: 1rem 0;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;

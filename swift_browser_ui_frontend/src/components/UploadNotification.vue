@@ -81,7 +81,7 @@ export default {
 <style lang="scss" scoped>
 
 ::v-deep(h3) {
-  color: $csc-grey;
+  color: $csc-dark;
   font-weight: 600;
 }
 
