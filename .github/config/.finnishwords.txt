@@ -1,6 +1,7 @@
 aika
 ajaksi
 alapuolisesta
+alaviiva
 alikansio
 alikansion
 alikansiot
@@ -37,6 +38,7 @@ ensin
 epäonnistui
 epäonnistunut
 epäonnistuttiin
+erikoismerkkejä
 erikseen
 erillinen
 erissä
@@ -369,6 +371,7 @@ pian
 pienemmissä
 pienennä
 piilota
+piste
 poiketa
 pois
 poissa
@@ -472,6 +475,7 @@ siirto
 sinulle
 sinun
 sisällön
+sisältää
 sisältö
 sisältöä
 sisään
@@ -629,6 +633,7 @@ vastaanottimien
 vedä
 viimeisin
 viimeksi
+viiva
 virhe
 virheellinen
 voi

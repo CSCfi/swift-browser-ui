@@ -40,6 +40,8 @@ let default_translations = {
         invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
         tooShort: "Please enter at least 3 characters",
+        forbiddenChars: "Folder name cannot contain special " +
+        "characters other than dot(.), hyphen(-), and underscore(_)",
         segments: "Folder name cannot end with '_segments'",
         idb: "Firefox in private mode is not supported.",
         idb_text:
@@ -405,6 +407,8 @@ let default_translations = {
         invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
         tooShort: "Anna vähintään 3 merkkiä",
+        forbiddenChars: "Kansion nimi ei voi sisältää muita " +
+        "erikoismerkkejä kuin piste(.), viiva(-) ja alaviiva(_)",
         segments: "Kansion nimi ei saa päättyä '_segments'",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:

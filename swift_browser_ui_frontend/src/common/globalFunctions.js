@@ -134,8 +134,13 @@ export function getPaginationOptions(t) {
 export function validateFolderName(str, t) {
   //minimum length 3 chars
   let error = "";
+  //forbid !"#$%&'()*+,/:;<=>?@[\]^`{|}~  allow .-_
+  const re = new RegExp("[!-,/:-@\\[-\\^`\\{-~]");
   if (str.length <= 2) {
     error = t("message.error.tooShort");
+  }
+  else if (str.match(re)) {
+    error= t("message.error.forbiddenChars");
   }
   else if (str.endsWith("_segments")) {
     error= t("message.error.segments");
