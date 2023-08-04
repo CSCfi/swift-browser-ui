@@ -142,13 +142,13 @@ export default {
           sortable: false,
           children: [
             {
-              value: this.$t("message.remove"),
+              value: this.$t("message.delete"),
               component: {
                 tag: "c-button",
                 params: {
                   text: true,
                   size: "small",
-                  title: this.$t("message.remove"),
+                  title: this.$t("message.delete"),
                   type: "error",
                   path: mdiDelete,
                   onClick: ({ data: { identifier }}) =>

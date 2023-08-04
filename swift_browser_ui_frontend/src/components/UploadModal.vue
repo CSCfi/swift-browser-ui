@@ -207,6 +207,8 @@ import {
 import CUploadButton from "@/components/CUploadButton.vue";
 
 import { delay, debounce } from "lodash";
+import { mdiDelete } from "@mdi/js";
+
 
 export default {
   name: "UploadModal",
@@ -282,18 +284,19 @@ export default {
           sortable: this.dropFiles.length > 1,
         },
         {
-          key: "remove",
+          key: "delete",
           value: null,
           sortable: false,
           children: [
             {
-              value: this.$t("message.remove"),
+              value: this.$t("message.delete"),
               component: {
                 tag: "c-button",
                 params: {
                   text: true,
                   size: "small",
-                  title: this.$t("message.remove"),
+                  title: this.$t("message.delete"),
+                  path: mdiDelete,
                   onClick: ({ data }) =>
                     this.$store.commit("eraseDropFile", data),
                   onKeyUp: (e) => {
@@ -325,19 +328,20 @@ export default {
           sortable: this.recvHashedKeys.length > 1,
         },
         {
-          key: "remove",
+          key: "delete",
           value: null,
           sortable: false,
           children: [
             {
-              value: this.$t("message.remove"),
+              value: this.$t("message.delete"),
               component: {
                 tag: "c-button",
                 params: {
                   text: true,
                   size: "small",
-                  title: this.$t("message.remove"),
-                  onClick: ({ index }) => {
+                  title: this.$t("message.delete"),
+                  path: mdiDelete,
+                  onClick: ({ index }) =>{
                     this.recvHashedKeys.splice(index, 1);
                     this.recvkeys.splice(index, 1);
                   },
