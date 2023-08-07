@@ -74,7 +74,6 @@
             </c-card-content>
             <c-card-content v-else-if="forbid">
               <div>{{ $t('message.error.Forbidden_text') }}</div>
-              {{ $t('message.error.Forbidden_error') }} {{ getParams() }}
             </c-card-content>
             <c-card-content v-else-if="notfound">
               {{ $t('message.error.Notfound_text') }}
@@ -118,12 +117,6 @@ export default {
   },
   mounted: function () {
     checkIDB().then(result => this.idb = result);
-  },
-  methods: {
-    getParams: function(){
-      const url = new URL(window.location.href);
-      return url.searchParams.get("error");
-    },
   },
 };
 </script>

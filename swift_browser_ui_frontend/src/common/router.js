@@ -2,8 +2,41 @@ import { createRouter, createWebHistory } from "vue-router";
 import FoldersView from "@/views/Folders.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
+import {getProjects, getContainers} from "@/common/api.js";
+import { getDB } from "@/common/db";
+// import store from "./vuex/store";
+
+
+async function checkProject (to,from,next){
+  const projects = await getProjects();
+
+  const val = projects.find(item =>
+    item.id === to.params.project);
+
+  if(val !== undefined) {
+    next();
+  } else {
+    window.location.pathname = "/notfound";
+  }
+
+}
+async function checkContainer (to){
+
+  var containers = await getDB()
+    .containers.where({projectID: to.params.project} )
+    .toArray();
+  if(containers.length === 0){
+    containers = await getContainers();
+  }
+  const val = containers.find(item =>
+    item.name === to.params.container);
+  if(val === undefined) {
+    window.location.pathname = "/notfound";
+  }
+}
 
 export default createRouter({
+
   history: createWebHistory(),
   routes: [
     {
@@ -18,6 +51,7 @@ export default createRouter({
     },
     {
       path: "/browse/:user/:project",
+      beforeEnter: checkProject,
       name: "AllFolders",
       component: FoldersView,
     },
@@ -33,6 +67,7 @@ export default createRouter({
     },
     {
       path: "/browse/:user/:project/:container",
+      beforeEnter: checkContainer,
       name: "ObjectsView",
       component: ObjectsView,
     },
