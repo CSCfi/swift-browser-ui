@@ -132,8 +132,11 @@ async def _check_last_modified(
                 container["last_modified"] = iso_8601_str
         # we expect either the header Last Modified to be missing or
         # the value is not what we expect for str to date conversion
-        except (KeyError, ValueError):
+        except (KeyError, ValueError) as e:
             # If anything goes wrong, set last_modified key anyway with null value
+            request.app["Log"].exception(
+                f"something happened when retrieving last modified {e}"
+            )
             container["last_modified"] = None
     return container
 
