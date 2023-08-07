@@ -132,12 +132,6 @@ export default {
   mounted: function () {
     checkIDB().then(result => this.idb = result);
   },
-  methods: {
-    getParams: function(){
-      const url = new URL(window.location.href);
-      return url.searchParams.get("error");
-    },
-  },
 };
 </script>
 

@@ -19,7 +19,7 @@ async function fetchWithCookie({method, url, body, signal}) {
           window.location.pathname = "/unauth";
           break;
         case 403:
-          window.location.pathname = "/forbid?error=" + response.statusText;
+          window.location.pathname = "/forbid";
           break;
         case 503:
           window.location.pathname = "/uidown";
