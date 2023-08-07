@@ -265,7 +265,7 @@ export default {
 
         while (objectsPrev === undefined ||
           objects.length != objectsPrev.length) {
-          const task = await getObjects(this.active.id, this.folderName)
+          const task = getObjects(this.active.id, this.folderName)
             .then((obj) => {
               objectsPrev = objects;
               objects = obj;
