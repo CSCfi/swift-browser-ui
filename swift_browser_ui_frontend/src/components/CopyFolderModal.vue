@@ -47,7 +47,7 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="errorMsg.length"
+        :disabled="folderName.length === 0 || errorMsg.length"
         @click="replicateContainer(false)"
         @keyup.enter="replicateContainer(true)"
       >
@@ -260,22 +260,25 @@ export default {
           this.checkpointsCompleted++;
         }, 5000, this.active.id, this.folderName, metadata, tags);
 
-        let objects, objectsPrev = undefined;
-        const sleep = time => new Promise(resolve => setTimeout(resolve, time));
+        getObjects(
+          this.sourceProjectId ? this.sourceProjectId : this.active.id,
+          this.selectedFolderName,
+        ).then(async (objects) => {
+          const sleep =
+            time => new Promise(resolve => setTimeout(resolve, time));
 
-        while (objectsPrev === undefined ||
-          objects.length != objectsPrev.length) {
-          const task = getObjects(this.active.id, this.folderName)
-            .then((obj) => {
-              objectsPrev = objects;
-              objects = obj;
-            });
+          let copiedObjects = undefined;
+          while (copiedObjects === undefined ||
+            copiedObjects.length < objects.length) {
+            const task = getObjects(this.active.id, this.folderName)
+              .then((obj) => copiedObjects = obj );
 
-          await Promise.all([task, sleep(1000)]);
-        }
+            await Promise.all([task, sleep(2000)]);
+          }
 
-        this.checkpointsCompleted++;
-        this.cancelCopy(keypress);
+          this.checkpointsCompleted++;
+          this.cancelCopy(keypress);
+        });
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
           {
