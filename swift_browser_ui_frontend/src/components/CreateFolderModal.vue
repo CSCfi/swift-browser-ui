@@ -66,8 +66,8 @@
       <c-button
         outlined
         size="large"
-        @click="toggleCreateFolderModal"
-        @keyup.enter="toggleCreateFolderModal"
+        @click="toggleCreateFolderModal(false)"
+        @keyup.enter="toggleCreateFolderModal(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
@@ -75,8 +75,8 @@
         size="large"
         data-testid="save-folder"
         :disabled="errorMsg.length"
-        @click="createContainer"
-        @keyup.enter="createContainer"
+        @click="createContainer(false)"
+        @keyup.enter="createContainer(true)"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -140,7 +140,7 @@ export default {
     },
   },
   methods: {
-    createContainer: function () {
+    createContainer: function (keypress) {
       let projectID = this.$route.params.project;
       const folderName = toRaw(this.folderName);
       const tags = toRaw(this.tags);
@@ -170,7 +170,7 @@ export default {
                 bytes: 0,
               });
             });
-          this.toggleCreateFolderModal();
+          this.toggleCreateFolderModal(keypress);
         })
         .catch(err => {
           let errorMessage = this.$t("message.error.createFail");
@@ -188,7 +188,7 @@ export default {
           );
         });
     },
-    toggleCreateFolderModal: function () {
+    toggleCreateFolderModal: function (keypress) {
       this.$store.commit("toggleCreateFolderModal", false);
       this.folderName = "";
       this.tags = [];
@@ -197,7 +197,7 @@ export default {
       this.errorMsg = "";
       document.querySelector("#createModal-toasts").removeToast("create-toast");
 
-      moveFocusOutOfModal(this.prevActiveEl);
+      if (keypress )moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);

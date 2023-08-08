@@ -19,6 +19,7 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-autocomplete
+          id="upload-folder-input"
           v-csc-control
           :items.prop="filteredItems"
           :label="$t('message.container_ops.folderName')"

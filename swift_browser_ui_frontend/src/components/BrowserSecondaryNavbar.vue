@@ -84,8 +84,8 @@
           outlined
           data-testid="create-folder"
           :disabled="inContainer"
-          @click="toggleCreateFolderModal"
-          @keyup.enter="toggleCreateFolderModal"
+          @click="toggleCreateFolderModal(false)"
+          @keyup.enter="toggleCreateFolderModal(true)"
         >
           {{ $t("message.createFolder") }}
         </c-button>
@@ -94,8 +94,8 @@
         <c-button
           :disabled="isUploading"
           data-testid="upload-file"
-          @click="toggleUploadModal"
-          @keyup.enter="toggleUploadModal"
+          @click="toggleUploadModal(false)"
+          @keyup.enter="toggleUploadModal(true)"
         >
           {{ $t("message.uploadSecondaryNav") }}
         </c-button>
@@ -152,19 +152,28 @@ export default {
         });
       }
     },
-    toggleCreateFolderModal: function () {
+    toggleCreateFolderModal: function (keypress) {
       toggleCreateFolderModal();
-      setPrevActiveElement();
+      if (keypress) {
+        setPrevActiveElement();
+        const nav = document.querySelector("nav");
 
-      const nav = document.querySelector("nav");
-
-      Array.from(nav.children).forEach((child) =>
-        child.setAttribute("inert", "true"));
+        Array.from(nav.children).forEach((child) =>
+          child.setAttribute("inert", "true"));
+      }
     },
-    toggleUploadModal: function () {
+    toggleUploadModal: function (keypress) {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
-      setPrevActiveElement();
+      if (keypress) {
+        setPrevActiveElement();
+        setTimeout(() => {
+          const uploadFolderInput = document
+            .querySelector("#upload-folder-input")
+            .shadowRoot.querySelector("input");
+          uploadFolderInput.focus();
+        }, 300);
+      }
     },
     copyProjectId: function () {
       const toastMessage = {

@@ -19,15 +19,15 @@
       <c-button
         outlined
         size="large"
-        @click="toggleEditTagsModal"
-        @keyup.enter="toggleEditTagsModal"
+        @click="toggleEditTagsModal(false)"
+        @keyup.enter="toggleEditTagsModal(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
-        @click="isObject ? saveObjectTags() : saveContainerTags()"
-        @keyup.enter="isObject ? saveObjectTags() : saveContainerTags()"
+        @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
+        @keyup.enter="isObject ? saveObjectTags(true) : saveContainerTags(true)"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -157,7 +157,7 @@ export default {
         this.tags = this.container.tags;
       }
     },
-    toggleEditTagsModal: function () {
+    toggleEditTagsModal: function (keypress) {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
@@ -169,12 +169,14 @@ export default {
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
-      const prevActiveElParent = this.containerName ?
-        document.getElementById("obj-table") :
-        document.getElementById("container-table");
-      moveFocusOutOfModal(prevActiveElParent, true);
+      if (keypress) {
+        const prevActiveElParent = this.containerName ?
+          document.getElementById("obj-table") :
+          document.getElementById("container-table");
+        moveFocusOutOfModal(prevActiveElParent, true);
+      }
     },
-    saveObjectTags: function () {
+    saveObjectTags: function (keypress) {
       const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
@@ -208,10 +210,10 @@ export default {
             owner: this.$route.params.owner,
           });
         }
-        this.toggleEditTagsModal();
+        this.toggleEditTagsModal(keypress);
       });
     },
-    saveContainerTags: function () {
+    saveContainerTags: function (keypress) {
       const tags = toRaw(this.tags);
       const containerName = this.container.name;
       let meta = {
@@ -228,7 +230,7 @@ export default {
               .modify({ tags, last_modified: getCurrentISOtime() });
           }
         });
-      this.toggleEditTagsModal();
+      this.toggleEditTagsModal(keypress);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);

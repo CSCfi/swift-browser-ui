@@ -309,13 +309,32 @@ export default {
                       items: [
                         {
                           name: this.$t("message.copy"),
-                          action: () =>
-                            this.openCopyFolderModal(item.name, item.owner),
+                          action: () => {
+                            this.openCopyFolderModal(item.name, item.owner);
+                            const menuItems = document
+                              .querySelector("c-menu-items");
+                            menuItems.addEventListener("keydown", (e) =>{
+                              if (e.keyCode === 13) {
+                                this.openCopyFolderModal(
+                                  item.name, item.owner, true,
+                                );
+                              }
+                            });
+                          },
                           disabled: !item.bytes ? true : false,
                         },
                         {
                           name: this.$t("message.editTags"),
-                          action: () => this.openEditTagsModal(item.name),
+                          action: () => {
+                            this.openEditTagsModal(item.name);
+                            const menuItems = document
+                              .querySelector("c-menu-items");
+                            menuItems.addEventListener("keydown", (e) =>{
+                              if (e.keyCode === 13) {
+                                this.openEditTagsModal(item.name, true);
+                              }
+                            });
+                          },
                           disabled: item.owner,
                         },
                         {
@@ -489,21 +508,35 @@ export default {
         shareIDsInput.focus();
       }, 300);
     },
-    openEditTagsModal(itemName) {
+    openEditTagsModal(itemName, keypress) {
       toggleEditTagsModal(null, itemName);
-      setPrevActiveElement();
+      if (keypress) {
+        setPrevActiveElement();
+        const editTagsModal = document.getElementById("edit-tags-modal");
+        disableFocusOutsideModal(editTagsModal);
 
-      const editTagsModal = document.getElementById("edit-tags-modal");
-      disableFocusOutsideModal(editTagsModal);
+        setTimeout(() => {
+          const editTagsInput = document.getElementById("edit-tags-input")
+            ?.children[0];
+          editTagsInput.focus();
+        }, 300);
+      }
     },
-    openCopyFolderModal(itemName, itemOwner) {
+    openCopyFolderModal(itemName, itemOwner, keypress) {
       itemOwner
         ? toggleCopyFolderModal(itemName, itemOwner)
         : toggleCopyFolderModal(itemName);
-      setPrevActiveElement();
 
-      const copyFolderModal = document.getElementById("copy-folder-modal");
-      disableFocusOutsideModal(copyFolderModal);
+      if (keypress) {
+        setPrevActiveElement();
+        const copyFolderModal = document.getElementById("copy-folder-modal");
+        disableFocusOutsideModal(copyFolderModal);
+        setTimeout(() => {
+          const copyFolderInput = document
+            .querySelector("#new-copy-folderName input");
+          copyFolderInput.focus();
+        }, 300);
+      }
     },
   },
 };

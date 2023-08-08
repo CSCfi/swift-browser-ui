@@ -40,16 +40,16 @@
       <c-button
         outlined
         size="large"
-        @click="cancelCopy"
-        @keyup.enter="cancelCopy"
+        @click="cancelCopy(false)"
+        @keyup.enter="cancelCopy(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
         :disabled="errorMsg.length"
-        @click="replicateContainer"
-        @keyup.enter="replicateContainer"
+        @click="replicateContainer(false)"
+        @keyup.enter="replicateContainer(true)"
       >
         {{ $t("message.copy") }}
       </c-button>
@@ -185,7 +185,7 @@ export default {
         this.loadingFoldername = false;
       }
     },
-    cancelCopy: function () {
+    cancelCopy: function (keypress) {
       this.$store.commit("toggleCopyFolderModal", false);
       this.$store.commit("setFolderName", "");
       this.folderName = "";
@@ -200,10 +200,12 @@ export default {
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
-      const prevActiveElParent = document.getElementById("container-table");
-      moveFocusOutOfModal(prevActiveElParent, true);
+      if (keypress) {
+        const prevActiveElParent = document.getElementById("container-table");
+        moveFocusOutOfModal(prevActiveElParent, true);
+      }
     },
-    replicateContainer: function () {
+    replicateContainer: function (keypress) {
       // Initiate the container replication operation
       swiftCopyContainer(
         this.active.id,
@@ -246,7 +248,7 @@ export default {
           this.$store.commit("setFolderCopiedStatus", true);
         }, 10000, this.active.id, this.folderName, metadata, tags);
 
-        this.cancelCopy();
+        this.cancelCopy(keypress);
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
           {

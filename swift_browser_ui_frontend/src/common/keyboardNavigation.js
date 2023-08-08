@@ -55,10 +55,12 @@ export function moveFocusOutOfModal(prevActiveEl, isParentEl = false) {
   Array.from(footer.children).forEach((child) =>
     child.removeAttribute("inert"));
 
-  prevActiveEl.tabIndex = "0";
-  prevActiveEl.focus();
-  if (prevActiveEl === document.activeElement) {
-    addFocusClass(prevActiveEl);
+  if (prevActiveEl) {
+    prevActiveEl.tabIndex = "0";
+    prevActiveEl?.focus();
+    if (prevActiveEl === document.activeElement) {
+      addFocusClass(prevActiveEl);
+    }
   }
 }
 
