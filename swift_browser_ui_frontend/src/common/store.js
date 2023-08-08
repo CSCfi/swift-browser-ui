@@ -605,7 +605,7 @@ const store = createStore({
       }
     },
     updateSharedObjects: async function (
-      { commit, dispatch, state },
+      { commit, dispatch },
       { projectID, owner, container, signal },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
@@ -660,7 +660,7 @@ const store = createStore({
         }
       }
 
-      commit("updateObjects", [...state.objectCache, sharedObjects]);
+      commit("updateObjects", sharedObjects);
 
       updateContainerLastmodified(projectID, container, sharedObjects);
 
