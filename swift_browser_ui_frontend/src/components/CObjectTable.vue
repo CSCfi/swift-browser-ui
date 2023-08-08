@@ -209,12 +209,14 @@ export default {
                   text: true,
                   size: "small",
                   title: "Download",
+                  path: mdiTrayArrowDown,
                   onClick: () => {
                     item.name.match(".c4gh")
                       ? this.beginDownload(item)
                       : this.navDownload(item.url);
                   },
-                  path: mdiTrayArrowDown,
+                  disabled: this.owner != undefined &&
+                    this.accessRights.length === 0,
                 },
               },
             },
