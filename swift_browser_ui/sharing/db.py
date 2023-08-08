@@ -247,6 +247,9 @@ class DBConn:
                 user,
             )
 
+            if query is None:
+                return {}
+
             access = []
 
             if query["r_read"]:
