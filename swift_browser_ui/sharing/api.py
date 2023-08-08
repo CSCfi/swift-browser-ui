@@ -214,12 +214,15 @@ async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Respo
 
     # Try with key as name
     ret = await request.app["db_conn"].match_name_id(key)
-    return aiohttp.web.json_response(
-        {
-            "id": ret[0]["id"],
-            "name": ret[0]["name"],
-        }
-    )
+    if ret:
+        return aiohttp.web.json_response(
+            {
+                "id": ret[0]["id"],
+                "name": ret[0]["name"],
+            }
+        )
+    
+    return aiohttp.web.HTTPNotFound()
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
