@@ -13,7 +13,7 @@
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}&nbsp;
           <c-link
-            v-show="accessRights.length === 0"
+            v-show="!owner"
             underline
             tabindex="0"
             @click="toggleShareModal"
@@ -22,11 +22,11 @@
             {{ $t("message.table.edit_sharing") }}
           </c-link>
         </li>
-        <li v-show="accessRights.length > 0">
+        <li v-show="owner">
           <b>{{ $t("message.table.source_project_id") }}: </b>
           {{ ownerProject }}
         </li>
-        <li v-show="accessRights.length > 0">
+        <li v-show="owner">
           <b>{{ $t("message.table.date_of_sharing") }}: </b>
           {{ dateOfSharing }}
         </li>
@@ -204,6 +204,9 @@ export default {
     isFolderUploading() {
       return this.$store.state.isUploading;
     },
+    owner() {
+      return this.$route.params.owner;
+    },
   },
   watch: {
     active: async function() {
@@ -301,15 +304,19 @@ export default {
                   );
 
                 this.accessRights = sharedDetails.access;
-
-                if ( this.accessRights.length === 1
-                  && this.accessRights[0] === "r") {
-                  this.sharedStatus
-                    = this.$t("message.folderDetails.shared_with_read");
-                }
-                else if ( this.accessRights.length === 2) {
-                  this.sharedStatus
-                    = this.$t("message.folderDetails.shared_with_read_write");
+                switch (this.accessRights.length) {
+                  case 0:
+                    this.sharedStatus
+                      = this.$t("message.folderDetails.shared_with_view");
+                    break;
+                  case 1:
+                    this.sharedStatus
+                      = this.$t("message.folderDetails.shared_with_read");
+                    break;
+                  case 2:
+                    this.sharedStatus
+                      = this.$t("message.folderDetails.shared_with_read_write");
+                    break;
                 }
                 this.ownerProject = sharedDetails.owner;
                 this.dateOfSharing =
