@@ -5,7 +5,6 @@ import {
   GET,
 } from "@/common/api";
 import { getDB } from "@/common/db";
-import { getFolderName } from "@/common/globalFunctions";
 import { DateTime } from "luxon";
 
 export default function getLangCookie() {
@@ -351,54 +350,56 @@ export function tokenize(text, ignoreSmallerThan = 2) {
 
 export const DEV = import.meta.env.MODE === "development";
 
-export function sortObjects(objects, sortBy, sortDirection) {
+export function getTimestamp(str) {
+  if (str) {
+    return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
+  } else return -1; //if null last_modified
+}
+
+export function sortItems(a, b, sortBy, sortDirection) {
   sortBy = sortBy === "size" ? "bytes"
     : sortBy === "items" ? "count"
       : sortBy === "last_activity" ? "last_modified" : sortBy;
 
-  objects.sort((a, b) => {
-    let valueA = a[sortBy];
-    let valueB = b[sortBy];
+  let valueA = a[sortBy];
+  let valueB = b[sortBy];
 
-    function getTimestamp(str) {
-      if (str) {
-        return Date.parse(str.endsWith("Z") ? str : `${str}Z`);
-      } else return -1; //if null last_modified
+  if (sortBy === "last_modified") {
+    //get timestamp from string
+    valueA = getTimestamp(valueA);
+    valueB = getTimestamp(valueB);
+
+    if (sortDirection === "asc") {
+      return valueA - valueB;
     }
+    return valueB - valueA;
+  }
 
-    if (sortBy === "last_modified") {
-      //get timestamp from string
-      valueA = getTimestamp(valueA);
-      valueB = getTimestamp(valueB);
+  // Handle tags as single string
+  if (Array.isArray(valueA)) {
+    valueA = valueA.join(" ");
+    valueB = valueB.join(" ");
+  }
 
-      if (sortDirection === "asc") {
-        return valueA - valueB;
-      }
-      return valueB - valueA;
+  if (typeof valueA === "string") {
+    valueA = valueA.toLowerCase();
+    valueB = valueB.toLowerCase();
+    if (sortDirection === "asc") {
+      return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
     }
+    return valueB < valueA ? -1 : valueB > valueA ? 1 : 0;
+  }
 
-    // Handle tags as single string
-    if (Array.isArray(valueA)) {
-      valueA = valueA.join(" ");
-      valueB = valueB.join(" ");
+  if (typeof valueA === "number") {
+    if (sortDirection === "asc") {
+      return valueA - valueB;
     }
+    return valueB - valueA;
+  }
+}
 
-    if (typeof valueA === "string") {
-      valueA = valueA.toLowerCase();
-      valueB = valueB.toLowerCase();
-      if (sortDirection === "asc") {
-        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-      }
-      return valueB < valueA ? -1 : valueB > valueA ? 1 : 0;
-    }
-
-    if (typeof valueA === "number") {
-      if (sortDirection === "asc") {
-        return valueA - valueB;
-      }
-      return valueB - valueA;
-    }
-  });
+export function sortObjects(objects, sortBy, sortDirection) {
+  objects.sort((a, b) => sortItems(a, b, sortBy, sortDirection));
 }
 
 // Parse date and time into internationalized format
@@ -472,23 +473,6 @@ export async function getSegmentObjects(projectID, container) {
   return segment_container ? await getDB()
     .objects.where({ containerID: segment_container.id })
     .toArray() : [];
-}
-
-export function getItemSize(currentItem, objects, route) {
-  const currentFoldername = getFolderName(currentItem.name, route);
-  let subfolderSize = currentItem.bytes;
-
-  for (let i = 0; i < objects.length; i++) {
-    const folderName = getFolderName(objects[i].name, route);
-
-    if (
-      folderName === currentFoldername &&
-      objects[i].name !== currentItem.name
-    ) {
-      subfolderSize += objects[i].bytes;
-    }
-  }
-  return getHumanReadableSize(subfolderSize);
 }
 
 export function sortContainer(containers) {
