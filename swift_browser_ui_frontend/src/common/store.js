@@ -263,7 +263,7 @@ const store = createStore({
   actions: {
     updateContainers: async function (
       { dispatch },
-      { projectID, signal },
+      { projectID, signal, routeContainer },
     ) {
       const existingContainers = await getDB()
         .containers.where({ projectID })
@@ -393,6 +393,15 @@ const store = createStore({
           key = await getDB().containers.put(container);
         }
 
+        if (container.owner) {
+          if (container.name !== routeContainer &&
+            container.name !== `${routeContainer}_segments`) {
+          //Update the object cache only for shared container and segments
+          //in current route to avoid objects flashing in UI
+            updateObjects = false;
+          }
+        }
+
         if (updateObjects ||
           sharingContainers.some(cont => cont === container.name)
         ) {
@@ -401,11 +410,10 @@ const store = createStore({
           containers_to_update_objects.push({ container, key });
         }
       }
-
       // Updating objects goes sequentially:
       // Update all objects inside a segment_container first
       // before updating objects inside original container
-      const dispatchUpdateOjects = async () => {
+      const dispatchUpdateObjects = async () => {
         for (let i = 0; i < containers_to_update_objects.length; i++) {
           const currentContainer = containers_to_update_objects[i];
 
@@ -432,7 +440,7 @@ const store = createStore({
         }
       };
 
-      if (containers_to_update_objects.length > 0) dispatchUpdateOjects();
+      if (containers_to_update_objects.length > 0) dispatchUpdateObjects();
     },
     updateContainerTags: async function (_, { projectID, containers, signal }) {
       for (let i = 0; i < containers.length; i++) {

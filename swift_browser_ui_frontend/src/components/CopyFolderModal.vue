@@ -156,6 +156,7 @@ export default {
       await this.$store.dispatch("updateContainers", {
         projectID: this.$route.params.project,
         signal: null,
+        routeContainer: undefined,
       });
     },
     getCopyFolder: function (origFolderName) {
