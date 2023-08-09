@@ -240,7 +240,6 @@ export default {
       await this.$store.dispatch("updateContainers", {
         projectID: this.active.id,
         signal: this.abortController.signal,
-        routeContainer: undefined,
       });
     },
     removeContainer: async function(container) {

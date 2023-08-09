@@ -263,7 +263,7 @@ const store = createStore({
   actions: {
     updateContainers: async function (
       { dispatch },
-      { projectID, signal, routeContainer },
+      { projectID, signal, routeContainer = undefined },
     ) {
       const existingContainers = await getDB()
         .containers.where({ projectID })
@@ -393,7 +393,7 @@ const store = createStore({
           key = await getDB().containers.put(container);
         }
 
-        if (container.owner) {
+        if (routeContainer && container.owner) {
           if (container.name !== routeContainer &&
             container.name !== `${routeContainer}_segments`) {
           //Update the object cache only for shared container and segments
