@@ -267,6 +267,7 @@ export default {
                       ),
                       target: "_blank",
                       path: mdiTrayArrowDown,
+                      disabled: item.owner && item.accessRights.length === 0,
                     },
                   },
                 },
@@ -327,7 +328,6 @@ export default {
 
                       customTrigger: {
                         value: this.$t("message.options"),
-                        disabled: true,
                         component: {
                           tag: "c-button",
                           params: {
@@ -335,6 +335,8 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
+                            disabled: item.owner &&
+                              item.accessRights.length === 0,
                           },
                         },
                       },

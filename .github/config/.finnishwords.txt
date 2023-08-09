@@ -465,6 +465,7 @@ selaimet
 selain
 selainikkuna
 selainta
+selata
 selatessa
 selaus
 selaustila
