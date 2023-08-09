@@ -285,17 +285,11 @@ export default {
                       size: "small",
                       title: this.$t("message.share.share"),
                       path: mdiShareVariantOutline,
-                      onClick: (item) => {
-                        this.$store.commit("toggleShareModal", true);
-                        this.$store.commit(
-                          "setFolderName", item.data.name.value);
-                      },
+                      onClick: (item) =>
+                        this.onOpenShareModal(item.data.name.value),
                       onKeyUp: (event) => {
-                        if(event.keyCode === 13) {
-                          this.$store.commit(
-                            "setFolderName", item.name);
-                          this.onOpenShareModal();
-                        }
+                        if(event.keyCode === 13)
+                          this.onOpenShareModal(item.name, true);
                       },
                       disabled: item.owner,
                     },
@@ -496,13 +490,16 @@ export default {
 
       return this.$t("message.emptyProject.all");
     },
-    onOpenShareModal() {
+    onOpenShareModal(itemName, keypress) {
       this.$store.commit("toggleShareModal", true);
-      setPrevActiveElement();
+      this.$store.commit(
+        "setFolderName", itemName);
 
-      const shareModal = document.getElementById("share-modal");
-      disableFocusOutsideModal(shareModal);
-
+      if (keypress) {
+        setPrevActiveElement();
+        const shareModal = document.getElementById("share-modal");
+        disableFocusOutsideModal(shareModal);
+      }
       setTimeout(() => {
         const shareIDsInput = document.getElementById("share-ids")?.children[0];
         shareIDsInput.focus();
@@ -514,29 +511,27 @@ export default {
         setPrevActiveElement();
         const editTagsModal = document.getElementById("edit-tags-modal");
         disableFocusOutsideModal(editTagsModal);
-
-        setTimeout(() => {
-          const editTagsInput = document.getElementById("edit-tags-input")
-            ?.children[0];
-          editTagsInput.focus();
-        }, 300);
       }
+      setTimeout(() => {
+        const editTagsInput = document.getElementById("edit-tags-input")
+          ?.children[0];
+        editTagsInput.focus();
+      }, 300);
     },
     openCopyFolderModal(itemName, itemOwner, keypress) {
       itemOwner
         ? toggleCopyFolderModal(itemName, itemOwner)
         : toggleCopyFolderModal(itemName);
-
       if (keypress) {
         setPrevActiveElement();
         const copyFolderModal = document.getElementById("copy-folder-modal");
         disableFocusOutsideModal(copyFolderModal);
-        setTimeout(() => {
-          const copyFolderInput = document
-            .querySelector("#new-copy-folderName input");
-          copyFolderInput.focus();
-        }, 300);
       }
+      setTimeout(() => {
+        const copyFolderInput = document
+          .querySelector("#new-copy-folderName input");
+        copyFolderInput.focus();
+      }, 300);
     },
   },
 };

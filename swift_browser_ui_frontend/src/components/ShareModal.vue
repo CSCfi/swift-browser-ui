@@ -104,6 +104,7 @@
               @changeValue="onSelectPermission($event)"
             />
             <c-button
+              id="share-btn"
               :loading="loading"
               @click="shareSubmit"
               @keyup.enter="shareSubmit"
@@ -531,6 +532,7 @@ export default {
           would be inside c-pagination and
           it is the last arrow icon used to move to Next page
         */
+
         if (eTarget.tagName.toLowerCase() === "c-data-table") {
           const pagination = eTarget.shadowRoot.querySelector("c-pagination");
           //  Assign the "last" element when the focus is on pagination

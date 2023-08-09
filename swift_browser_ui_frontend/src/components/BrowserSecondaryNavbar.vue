@@ -161,19 +161,22 @@ export default {
         Array.from(nav.children).forEach((child) =>
           child.setAttribute("inert", "true"));
       }
+      setTimeout(() => {
+        const newFolderInput = document
+          .querySelector("#newFolder-input input");
+        newFolderInput.focus();
+      }, 300);
     },
     toggleUploadModal: function (keypress) {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
-      if (keypress) {
-        setPrevActiveElement();
-        setTimeout(() => {
-          const uploadFolderInput = document
-            .querySelector("#upload-folder-input")
-            .shadowRoot.querySelector("input");
-          uploadFolderInput.focus();
-        }, 300);
-      }
+      if (keypress) setPrevActiveElement();
+      setTimeout(() => {
+        const uploadFolderInput = document
+          .querySelector("#upload-folder-input")
+          .shadowRoot.querySelector("input");
+        uploadFolderInput.focus();
+      }, 300);
     },
     copyProjectId: function () {
       const toastMessage = {

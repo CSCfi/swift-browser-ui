@@ -49,6 +49,7 @@
       <div class="action-buttons">
         <c-button
           v-for="button in selectionActionButtons"
+          :id="`${button.label.toLowerCase()}-selections`"
           :key="button.label"
           inverted
           text
@@ -339,10 +340,10 @@ export default {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit("setFolderName", this.containerName);
     },
-    confirmDelete: function(item) {
+    confirmDelete: function(item, keypress) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
-        this.moveFocusToDeleteModal();
+        if (keypress) this.moveFocusToDeleteModal();
       } else {
         document.querySelector("#container-error-toasts").addToast(
           {
@@ -623,7 +624,16 @@ export default {
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
-          action: () => this.openDeleteModal(this.checkedRows),
+          action: () => {
+            this.onOpenDeleteModal(this.checkedRows);
+            const deleteSelectionsBtn = document
+              .querySelector("#delete-selections");
+            deleteSelectionsBtn.addEventListener("keydown", (e) =>{
+              if (e.keyCode === 13) {
+                this.onOpenDeleteModal(this.checkedRows, true);
+              }
+            });
+          },
         },
       ];
     },
@@ -631,9 +641,9 @@ export default {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
     },
-    openDeleteModal(checkedRows) {
+    onOpenDeleteModal(checkedRows, keypress) {
       toggleDeleteModal(checkedRows);
-      this.moveFocusToDeleteModal();
+      if (keypress) this.moveFocusToDeleteModal();
     },
     moveFocusToDeleteModal() {
       const deleteObjsModal = document.getElementById("delete-objs-modal");

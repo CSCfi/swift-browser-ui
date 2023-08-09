@@ -22,7 +22,7 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-text-field
-          id="folderName"
+          id="newFolder-input"
           v-model="folderName"
           v-csc-control
           :label="$t('message.container_ops.folderName')"

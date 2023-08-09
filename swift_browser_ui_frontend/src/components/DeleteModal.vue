@@ -14,8 +14,8 @@
       <c-card-actions justify="end">
         <c-button
           outlined
-          @click="toggleDeleteModal"
-          @keyup.enter="toggleDeleteModal"
+          @click="toggleDeleteModal(false)"
+          @keyup.enter="toggleDeleteModal(true)"
         >
           {{ $t("message.cancel") }}
         </c-button>
@@ -72,7 +72,7 @@ export default {
     },
   },
   methods: {
-    toggleDeleteModal: function() {
+    toggleDeleteModal: function(keypress) {
       this.$store.commit("toggleDeleteModal", false);
       this.$store.commit("setDeletableObjects", []);
 
@@ -82,8 +82,10 @@ export default {
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
-      const prevActiveElParent = document.getElementById("obj-table");
-      moveFocusOutOfModal(prevActiveElParent, true);
+      if (keypress) {
+        const prevActiveElParent = document.getElementById("obj-table");
+        moveFocusOutOfModal(prevActiveElParent, true);
+      }
     },
     deleteObjects: async function () {
       let to_remove = [];

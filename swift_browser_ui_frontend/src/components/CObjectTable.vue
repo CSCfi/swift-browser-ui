@@ -233,10 +233,10 @@ export default {
                   title: "Edit tags",
                   path: mdiPencilOutline,
                   onClick: () =>
-                    toggleEditTagsModal(item.name, null),
+                    this.onOpenEditTagsModal(item.name),
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      toggleEditTagsModal(item.name, null);
+                      this.onOpenEditTagsModal(item.name, true);
                     }
                   },
                   disabled: item?.subfolder ||
@@ -258,7 +258,7 @@ export default {
                   },
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      this.$emit("delete-object", item);
+                      this.$emit("delete-object", item, true);
                     }
                   },
                   disabled:
@@ -450,13 +450,13 @@ export default {
         },
       ];
     },
-    openEditTagsModal(itemName) {
+    onOpenEditTagsModal(itemName, keypress) {
       toggleEditTagsModal(itemName, null);
-      setPrevActiveElement();
-
-      const editTagsModal = document.getElementById("edit-tags-modal");
-      disableFocusOutsideModal(editTagsModal);
-
+      if (keypress) {
+        setPrevActiveElement();
+        const editTagsModal = document.getElementById("edit-tags-modal");
+        disableFocusOutsideModal(editTagsModal);
+      }
       setTimeout(() => {
         const editTagsInput = document.getElementById("edit-tags-input")
           ?.children[0];
