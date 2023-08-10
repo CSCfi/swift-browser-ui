@@ -1,5 +1,9 @@
 <template>
-  <c-card class="add-folder">
+  <c-card
+    ref="createFolderContainer"
+    class="add-folder"
+    @keydown="handleKeyDown"
+  >
     <div
       id="createFolder-modal-content"
       class="modal-content-wrapper"
@@ -18,7 +22,7 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-text-field
-          id="folderName"
+          id="newFolder-input"
           v-model="folderName"
           v-csc-control
           :label="$t('message.container_ops.folderName')"
@@ -62,8 +66,8 @@
       <c-button
         outlined
         size="large"
-        @click="toggleCreateFolderModal"
-        @keyup.enter="toggleCreateFolderModal"
+        @click="toggleCreateFolderModal(false)"
+        @keyup.enter="toggleCreateFolderModal(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
@@ -71,8 +75,8 @@
         size="large"
         data-testid="save-folder"
         :disabled="errorMsg.length"
-        @click="createContainer"
-        @keyup.enter="createContainer"
+        @click="createContainer(false)"
+        @keyup.enter="createContainer(true)"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -92,6 +96,11 @@ import {
   validateFolderName,
   getCurrentISOtime,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 
 import { toRaw } from "vue";
@@ -115,6 +124,9 @@ export default {
     controller() {
       return new AbortController();
     },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
+    },
   },
   watch: {
     active: function () {
@@ -128,7 +140,7 @@ export default {
     },
   },
   methods: {
-    createContainer: function () {
+    createContainer: function (keypress) {
       let projectID = this.$route.params.project;
       const folderName = toRaw(this.folderName);
       const tags = toRaw(this.tags);
@@ -158,7 +170,7 @@ export default {
                 bytes: 0,
               });
             });
-          this.toggleCreateFolderModal();
+          this.toggleCreateFolderModal(keypress);
         })
         .catch(err => {
           let errorMessage = this.$t("message.error.createFail");
@@ -176,7 +188,7 @@ export default {
           );
         });
     },
-    toggleCreateFolderModal: function () {
+    toggleCreateFolderModal: function (keypress) {
       this.$store.commit("toggleCreateFolderModal", false);
       this.folderName = "";
       this.tags = [];
@@ -184,12 +196,21 @@ export default {
       this.interacted = false;
       this.errorMsg = "";
       document.querySelector("#createModal-toasts").removeToast("create-toast");
+
+      if (keypress )moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.createFolderContainer.querySelectorAll(
+        "input, c-link, c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+      keyboardNavigationInsideModal(e, first, last);
     },
   },
 };
@@ -241,4 +262,5 @@ c-card-actions > c-button {
 c-link {
   margin-top: -1rem;
 }
+
 </style>

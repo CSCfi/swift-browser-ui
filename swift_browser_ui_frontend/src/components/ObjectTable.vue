@@ -49,6 +49,7 @@
       <div class="action-buttons">
         <c-button
           v-for="button in selectionActionButtons"
+          :id="`${button.label.toLowerCase()}-selections`"
           :key="button.label"
           inverted
           text
@@ -133,6 +134,11 @@ import {
   toggleDeleteModal,
   isFile,
 } from "@/common/globalFunctions";
+import {
+  setPrevActiveElement,
+  disableFocusOutsideModal,
+  addFocusClass,
+} from "@/common/keyboardNavigation";
 import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
@@ -334,10 +340,10 @@ export default {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit("setFolderName", this.containerName);
     },
-    confirmDelete: function(item) {
-
+    confirmDelete: function(item, keypress) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
+        if (keypress) this.moveFocusToDeleteModal();
       } else {
         document.querySelector("#container-error-toasts").addToast(
           {
@@ -527,7 +533,7 @@ export default {
       }
     },
     clearSelections() {
-      const dataTable = document.getElementById("objtable");
+      const dataTable = document.getElementById("obj-table");
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
@@ -618,13 +624,38 @@ export default {
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
-          action: () => toggleDeleteModal(this.checkedRows),
+          action: () => {
+            this.onOpenDeleteModal(this.checkedRows);
+            const deleteSelectionsBtn = document
+              .querySelector("#delete-selections");
+            deleteSelectionsBtn.addEventListener("keydown", (e) =>{
+              if (e.keyCode === 13) {
+                this.onOpenDeleteModal(this.checkedRows, true);
+              }
+            });
+          },
         },
       ];
     },
     setLocalizedContent() {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
+    },
+    onOpenDeleteModal(checkedRows, keypress) {
+      toggleDeleteModal(checkedRows);
+      if (keypress) this.moveFocusToDeleteModal();
+    },
+    moveFocusToDeleteModal() {
+      const deleteObjsModal = document.getElementById("delete-objs-modal");
+      setPrevActiveElement();
+      disableFocusOutsideModal(deleteObjsModal);
+
+      setTimeout(() => {
+        const deleteObjsBtn = document.getElementById("delete-objs-btn");
+        deleteObjsBtn.tabIndex = "0";
+        deleteObjsBtn.focus();
+        addFocusClass(deleteObjsBtn);
+      }, 300);
     },
   },
 };

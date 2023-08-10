@@ -50,6 +50,9 @@ import CFooter from "@/components/CFooter.vue";
 import delay from "lodash/delay";
 import { getDB } from "@/common/db";
 
+// Import global functions
+import { removeFocusClass } from "@/common/keyboardNavigation";
+
 checkIDB().then(result => {
   if (!result) {
     window.location.pathname = "/";
@@ -210,6 +213,9 @@ const app = createApp({
       },
       set() { },
     },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
+    },
   },
   watch: {
     openCreateFolderModal: function () {
@@ -360,6 +366,10 @@ const app = createApp({
           message: this.$t("message.upload.complete")},
         );
       });
+
+    document
+      .getElementById("mainContainer")
+      .addEventListener("keydown", this.onKeydown);
   },
   methods: {
     containerSyncWrapper: function () {
@@ -535,6 +545,15 @@ const app = createApp({
       }
 
       return retl;
+    },
+    onKeydown: function (e) {
+      if (e.key === "Tab" && this.prevActiveEl &&
+        e.target === this.prevActiveEl) {
+        if(this.prevActiveEl.classList.contains("button-focus")) {
+          removeFocusClass(this.prevActiveEl);
+          this.$store.commit("setPreviousActiveEl", null);
+        }
+      }
     },
   },
   ...BrowserPage,

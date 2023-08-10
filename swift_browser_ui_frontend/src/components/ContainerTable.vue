@@ -3,7 +3,7 @@
   because csc-ui wont recognise it otherwise. -->
   <!-- eslint-disable-->
   <c-data-table
-    id="contable-tags"
+    id="container-table"
     :data.prop="containers"
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"
@@ -43,6 +43,10 @@ import {
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
+import {
+  setPrevActiveElement,
+  disableFocusOutsideModal,
+} from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import { swiftDeleteContainer } from "@/common/api";
 
@@ -281,17 +285,11 @@ export default {
                       size: "small",
                       title: this.$t("message.share.share"),
                       path: mdiShareVariantOutline,
-                      onClick: (item) => {
-                        this.$store.commit("toggleShareModal", true);
-                        this.$store.commit(
-                          "setFolderName", item.data.name.value);
-                      },
+                      onClick: (item) =>
+                        this.onOpenShareModal(item.data.name.value),
                       onKeyUp: (event) => {
-                        if(event.keyCode === 13) {
-                          this.$store.commit(
-                            "setFolderName", item.data.name.value);
-                          this.$store.commit("toggleShareModal", true);
-                        }
+                        if(event.keyCode === 13)
+                          this.onOpenShareModal(item.name, true);
                       },
                       disabled: item.owner,
                     },
@@ -305,15 +303,32 @@ export default {
                       items: [
                         {
                           name: this.$t("message.copy"),
-                          action: item.owner
-                            ? () => toggleCopyFolderModal(
-                              item.name, item.owner)
-                            : () => toggleCopyFolderModal(item.name),
+                          action: () => {
+                            this.openCopyFolderModal(item.name, item.owner);
+                            const menuItems = document
+                              .querySelector("c-menu-items");
+                            menuItems.addEventListener("keydown", (e) =>{
+                              if (e.keyCode === 13) {
+                                this.openCopyFolderModal(
+                                  item.name, item.owner, true,
+                                );
+                              }
+                            });
+                          },
                           disabled: !item.bytes ? true : false,
                         },
                         {
                           name: this.$t("message.editTags"),
-                          action: () => toggleEditTagsModal(null, item.name),
+                          action: () => {
+                            this.openEditTagsModal(item.name);
+                            const menuItems = document
+                              .querySelector("c-menu-items");
+                            menuItems.addEventListener("keydown", (e) =>{
+                              if (e.keyCode === 13) {
+                                this.openEditTagsModal(item.name, true);
+                              }
+                            });
+                          },
                           disabled: item.owner,
                         },
                         {
@@ -323,9 +338,7 @@ export default {
                           ),
                           disabled: item.owner,
                         },
-
                       ],
-
                       customTrigger: {
                         value: this.$t("message.options"),
                         component: {
@@ -431,7 +444,6 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-
     delete: function (container, objects) {
       if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
@@ -477,6 +489,49 @@ export default {
       }
 
       return this.$t("message.emptyProject.all");
+    },
+    onOpenShareModal(itemName, keypress) {
+      this.$store.commit("toggleShareModal", true);
+      this.$store.commit(
+        "setFolderName", itemName);
+
+      if (keypress) {
+        setPrevActiveElement();
+        const shareModal = document.getElementById("share-modal");
+        disableFocusOutsideModal(shareModal);
+      }
+      setTimeout(() => {
+        const shareIDsInput = document.getElementById("share-ids")?.children[0];
+        shareIDsInput.focus();
+      }, 300);
+    },
+    openEditTagsModal(itemName, keypress) {
+      toggleEditTagsModal(null, itemName);
+      if (keypress) {
+        setPrevActiveElement();
+        const editTagsModal = document.getElementById("edit-tags-modal");
+        disableFocusOutsideModal(editTagsModal);
+      }
+      setTimeout(() => {
+        const editTagsInput = document.getElementById("edit-tags-input")
+          ?.children[0];
+        editTagsInput.focus();
+      }, 300);
+    },
+    openCopyFolderModal(itemName, itemOwner, keypress) {
+      itemOwner
+        ? toggleCopyFolderModal(itemName, itemOwner)
+        : toggleCopyFolderModal(itemName);
+      if (keypress) {
+        setPrevActiveElement();
+        const copyFolderModal = document.getElementById("copy-folder-modal");
+        disableFocusOutsideModal(copyFolderModal);
+      }
+      setTimeout(() => {
+        const copyFolderInput = document
+          .querySelector("#new-copy-folderName input");
+        copyFolderInput.focus();
+      }, 300);
     },
   },
 };

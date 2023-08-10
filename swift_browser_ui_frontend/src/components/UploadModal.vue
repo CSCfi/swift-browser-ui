@@ -1,5 +1,9 @@
 <template>
-  <c-card class="upload-card">
+  <c-card
+    ref="uploadContainer"
+    class="upload-card"
+    @keydown="handleKeyDown"
+  >
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
@@ -15,6 +19,7 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-autocomplete
+          id="upload-folder-input"
           v-csc-control
           :items.prop="filteredItems"
           :label="$t('message.container_ops.folderName')"
@@ -181,6 +186,11 @@ import {
   validateFolderName,
   checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 
 import delay from "lodash/delay";
@@ -277,6 +287,19 @@ export default {
                   title: this.$t("message.remove"),
                   onClick: ({ data }) =>
                     this.$store.commit("eraseDropFile", data),
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the row element of item that is to be removed
+                      const row = e.target.closest("tr");
+                      if (row !== undefined) {
+                        const data = {
+                          name: row.children[0]?.innerText,
+                          relativePath: row.children[3]?.innerText,
+                        };
+                        this.$store.commit("eraseDropFile", data);
+                      }
+                    }
+                  },
                 },
               },
             },
@@ -305,9 +328,21 @@ export default {
                   text: true,
                   size: "small",
                   title: this.$t("message.remove"),
-                  onClick: ({ index }) =>{
+                  onClick: ({ index }) => {
                     this.recvHashedKeys.splice(index, 1);
                     this.recvkeys.splice(index, 1);
+                  },
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the text value of item that is to be removed
+                      const keyText = e.target.closest("tr")?.innerText;
+                      // Find its index in key list
+                      const index = this.recvHashedKeys.indexOf(keyText);
+                      if (index !== undefined) {
+                        this.recvHashedKeys.splice(index - 2, 1);
+                        this.recvkeys.splice(index - 2, 1);
+                      }
+                    }
                   },
                 },
               },
@@ -373,6 +408,9 @@ export default {
         return true;
       }
       return false;
+    },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
     },
   },
   watch: {
@@ -639,6 +677,8 @@ export default {
       this.addRecvkey = "";
       this.recvHashedKeys = [];
       this.errorMsg = "";
+
+      moveFocusOutOfModal(this.prevActiveEl);
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -687,6 +727,13 @@ export default {
         }
       }, 1000);
       this.toggleUploadModal();
+    },
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.uploadContainer.querySelectorAll(
+        "c-link, c-button, textarea, c-autocomplete, c-data-table",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+      keyboardNavigationInsideModal(e, first, last, true);
     },
   },
 };

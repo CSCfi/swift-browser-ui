@@ -1,10 +1,15 @@
 <template>
-  <c-card class="edit-tags">
-    <h2 class="title is-4">
+  <c-card
+    ref="editTagsContainer"
+    class="edit-tags"
+    @keydown="handleKeyDown"
+  >
+    <h2 class="title is-4 has-text-dark">
       {{ $t('message.editTags') }}
     </h2>
     <c-card-content>
       <TagInput
+        id="edit-tags-input"
         :tags="tags"
         @addTag="addingTag"
         @deleteTag="deletingTag"
@@ -14,15 +19,15 @@
       <c-button
         outlined
         size="large"
-        @click="toggleEditTagsModal"
-        @keyup.enter="toggleEditTagsModal"
+        @click="toggleEditTagsModal(false)"
+        @keyup.enter="toggleEditTagsModal(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
-        @click="isObject ? saveObjectTags() : saveContainerTags()"
-        @keyup.enter="isObject ? saveObjectTags() : saveContainerTags()"
+        @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
+        @keyup.enter="isObject ? saveObjectTags(true) : saveContainerTags(true)"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -47,6 +52,11 @@ import {
   deleteTag,
   getCurrentISOtime,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
 
@@ -83,6 +93,9 @@ export default {
     },
     containerName() {
       return this.$route.params.container;
+    },
+    prevActiveEl() {
+      return this.$store.state.prevActiveEl;
     },
   },
   watch: {
@@ -144,13 +157,26 @@ export default {
         this.tags = this.container.tags;
       }
     },
-    toggleEditTagsModal: function () {
+    toggleEditTagsModal: function (keypress) {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
       this.$store.commit("setFolderName", "");
       this.tags = [];
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Edit Tags Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      if (keypress) {
+        const prevActiveElParent = this.containerName ?
+          document.getElementById("obj-table") :
+          document.getElementById("container-table");
+        moveFocusOutOfModal(prevActiveElParent, true);
+      }
     },
-    saveObjectTags: function () {
+    saveObjectTags: function (keypress) {
       const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
@@ -184,10 +210,10 @@ export default {
             owner: this.$route.params.owner,
           });
         }
-        this.toggleEditTagsModal();
+        this.toggleEditTagsModal(keypress);
       });
     },
-    saveContainerTags: function () {
+    saveContainerTags: function (keypress) {
       const tags = toRaw(this.tags);
       const containerName = this.container.name;
       let meta = {
@@ -204,13 +230,20 @@ export default {
               .modify({ tags, last_modified: getCurrentISOtime() });
           }
         });
-      this.toggleEditTagsModal();
+      this.toggleEditTagsModal(keypress);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
     },
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
+    },
+    handleKeyDown: function(e) {
+      const focusableList = this.$refs.editTagsContainer.querySelectorAll(
+        "input, c-icon, c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+      keyboardNavigationInsideModal(e, first, last);
     },
   },
 };

@@ -4,7 +4,7 @@
     because csc-ui wont recognise it otherwise. -->
     <!-- eslint-disable-->
     <c-data-table
-      id="objtable"
+      id="obj-table"
       :data.prop="objects"
       :headers.prop="hideTags ?
         headers.filter(header => header.key !== 'tags'): headers"
@@ -48,7 +48,10 @@ import {
   getPaginationOptions,
   checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
-
+import {
+  setPrevActiveElement,
+  disableFocusOutsideModal,
+} from "@/common/keyboardNavigation";
 import {
   mdiTrayArrowDown,
   mdiPencilOutline,
@@ -230,10 +233,10 @@ export default {
                   title: "Edit tags",
                   path: mdiPencilOutline,
                   onClick: () =>
-                    toggleEditTagsModal(item.name, null),
+                    this.onOpenEditTagsModal(item.name),
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      toggleEditTagsModal(item.name, null);
+                      this.onOpenEditTagsModal(item.name, true);
                     }
                   },
                   disabled: item?.subfolder ||
@@ -255,7 +258,7 @@ export default {
                   },
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      this.$emit("delete-object", item);
+                      this.$emit("delete-object", item, true);
                     }
                   },
                   disabled:
@@ -403,7 +406,6 @@ export default {
       }
     },
     beginDownload(object) {
-      console.log(object);
       this.currentDownload = new DecryptedDownloadSession(
         this.active,
         this.active.id,
@@ -447,6 +449,19 @@ export default {
           sortable: false,
         },
       ];
+    },
+    onOpenEditTagsModal(itemName, keypress) {
+      toggleEditTagsModal(itemName, null);
+      if (keypress) {
+        setPrevActiveElement();
+        const editTagsModal = document.getElementById("edit-tags-modal");
+        disableFocusOutsideModal(editTagsModal);
+      }
+      setTimeout(() => {
+        const editTagsInput = document.getElementById("edit-tags-input")
+          ?.children[0];
+        editTagsInput.focus();
+      }, 300);
     },
   },
 };

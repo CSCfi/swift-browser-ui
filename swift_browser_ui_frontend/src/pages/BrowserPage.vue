@@ -30,6 +30,7 @@
         @cancel-upload="currentUpload.cancelUpload()"
       />
       <c-modal
+        id="edit-tags-modal"
         v-model="openEditTagsModal"
         v-csc-control
         width="64vw"
@@ -37,6 +38,7 @@
         <EditTagsModal />
       </c-modal>
       <c-modal
+        id="share-modal"
         v-model="openShareModal"
         v-csc-control
         width="64vw"
@@ -44,6 +46,7 @@
         <ShareModal />
       </c-modal>
       <c-modal
+        id="copy-folder-modal"
         v-model="openCopyFolderModal"
         v-csc-control
         width="64vw"
@@ -51,12 +54,14 @@
         <CopyFolderModal />
       </c-modal>
       <c-modal
+        id="delete-objs-modal"
         v-model="openDeleteModal"
         v-csc-control
       >
         <DeleteModal />
       </c-modal>
       <c-modal
+        id="token-modal"
         v-model="openTokenModal"
         v-csc-control
         width="64vw"
@@ -265,4 +270,9 @@ c-modal {
   margin-top: 50vh;
 }
 
+.button-focus {
+  outline: 2px var(--csc-primary) solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 </style>

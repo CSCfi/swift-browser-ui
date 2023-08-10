@@ -1,5 +1,9 @@
 <template>
-  <c-card class="copy-folder">
+  <c-card
+    ref="copyFolderContainer"
+    class="copy-folder"
+    @keydown="handleKeyDown"
+  >
     <div class="modal-content-wrapper">
       <h2 class="title is-4">
         {{
@@ -36,16 +40,16 @@
       <c-button
         outlined
         size="large"
-        @click="cancelCopy"
-        @keyup.enter="cancelCopy"
+        @click="cancelCopy(false)"
+        @keyup.enter="cancelCopy(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
         :disabled="errorMsg.length"
-        @click="replicateContainer"
-        @keyup.enter="replicateContainer"
+        @click="replicateContainer(false)"
+        @keyup.enter="replicateContainer(true)"
       >
         {{ $t("message.copy") }}
       </c-button>
@@ -66,6 +70,11 @@ import {
   deleteTag,
   validateFolderName,
 } from "@/common/globalFunctions";
+import {
+  getFocusableElements,
+  moveFocusOutOfModal,
+  keyboardNavigationInsideModal,
+} from "@/common/keyboardNavigation";
 import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
@@ -176,7 +185,7 @@ export default {
         this.loadingFoldername = false;
       }
     },
-    cancelCopy: function () {
+    cancelCopy: function (keypress) {
       this.$store.commit("toggleCopyFolderModal", false);
       this.$store.commit("setFolderName", "");
       this.folderName = "";
@@ -184,8 +193,19 @@ export default {
       this.loadingFoldername = true;
       this.errorMsg = "";
       document.querySelector("#copyFolder-toasts").removeToast("copy-error");
+
+      /*
+        Prev Active element is a popup menu and it is removed from DOM
+        when we click it to open Copy Folder Modal.
+        Therefore, we need to make its focusable parent
+        to be focused instead after we close the modal.
+      */
+      if (keypress) {
+        const prevActiveElParent = document.getElementById("container-table");
+        moveFocusOutOfModal(prevActiveElParent, true);
+      }
     },
-    replicateContainer: function () {
+    replicateContainer: function (keypress) {
       // Initiate the container replication operation
       swiftCopyContainer(
         this.active.id,
@@ -228,8 +248,7 @@ export default {
           this.$store.commit("setFolderCopiedStatus", true);
         }, 10000, this.active.id, this.folderName, metadata, tags);
 
-        this.$store.commit("toggleCopyFolderModal", false);
-        this.cancelCopy();
+        this.cancelCopy(keypress);
       }).catch(() => {
         document.querySelector("#copyFolder-toasts").addToast(
           {
@@ -272,6 +291,13 @@ export default {
         this.errorMsg = error;
       }
     }, 300, { leading: true }),
+    handleKeyDown: function (e) {
+      const focusableList = this.$refs.copyFolderContainer.querySelectorAll(
+        "input, c-icon, c-button",
+      );
+      const { first, last } = getFocusableElements(focusableList);
+      keyboardNavigationInsideModal(e, first, last);
+    },
   },
 };
 </script>

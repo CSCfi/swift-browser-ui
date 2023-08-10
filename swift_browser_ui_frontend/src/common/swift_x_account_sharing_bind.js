@@ -145,7 +145,7 @@ class SwiftXAccountSharing {
     ).then(
       (resp) => { return resp.json(); },
     ).catch((err) => {
-      if (signal.aborted) return [];
+      if (signal?.aborted) return [];
       throw new Error(err);
     });
     return details;

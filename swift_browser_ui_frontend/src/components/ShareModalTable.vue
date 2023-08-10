@@ -7,6 +7,7 @@
     because csc-ui wont recognise it otherwise. -->
     <!-- eslint-disable-->
     <c-data-table
+      id="shared-projects-table"
       v-if="tableData.length > 0"
       :data.prop="tableData"
       :headers.prop="headers"
@@ -77,6 +78,19 @@ export default {
                   onClick: ({ data }) => {
                     this.$emit("removeSharedFolder", data);
                     this.deleteFolderShare(data);
+                  },
+                  onKeyUp: (e) => {
+                    if(e.keyCode === 13) {
+                      // Get the row element of item that is to be removed
+                      const row = e.target.closest("tr");
+                      if (row !== undefined) {
+                        const data = {
+                          projectId: {value: row.children[0]?.innerText},
+                        };
+                        this.$emit("removeSharedFolder", data);
+                        this.deleteFolderShare(data);
+                      }
+                    }
                   },
                 },
               },
