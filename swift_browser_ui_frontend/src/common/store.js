@@ -36,6 +36,7 @@ const store = createStore({
     client: undefined,
     requestClient: undefined,
     resumableClient: undefined,
+    socket: undefined,
     isUploading: false,
     isChunking: false,
     encryptedFile: "",
@@ -212,6 +213,9 @@ const store = createStore({
       }
       delete state.uploadAbort;
       state.uploadAbort = undefined;
+    },
+    setSocket(state, payload) {
+      state.socket = payload;
     },
     toggleEditTagsModal(state, payload) {
       state.openEditTagsModal = payload;

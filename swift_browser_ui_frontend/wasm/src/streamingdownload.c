@@ -72,11 +72,13 @@ char *get_session_key(ENCRYPT_SESSION *sess) {
 
 
 /*
-Open crypt4gh header opening for access in JS side.
+Open crypt4gh header for file decryption.
 */
-void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
+uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header) {
+    uint8_t *sessionkey;
+
     int ret = 0;
-    int fd = open("header", O_RDONLY);
+    int fd = open(header, O_RDONLY);
 
     uint8_t* keys = NULL;
     unsigned int nkeys = 0;
@@ -85,8 +87,8 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
 
     ret = crypt4gh_header_parse(
         fd,
-        sess->seckey,
-        sess->pubkey,
+        kp->private,
+        kp->public,
         &keys,
         &nkeys,
         &edit_list,
@@ -94,17 +96,19 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
     );
 
     if (keys != NULL && nkeys > 0) {
-        sess->sessionkey = sodium_malloc(sizeof(uint8_t) * crypto_kx_SECRETKEYBYTES);
-        memcpy(sess->sessionkey, keys, crypto_kx_SECRETKEYBYTES);
+        sessionkey = sodium_malloc(sizeof(uint8_t) * crypto_kx_SECRETKEYBYTES);
+        memcpy(sessionkey, keys, crypto_kx_SECRETKEYBYTES);
         sodium_free(keys);
+    }
+    else {
+        return NULL;
     }
 
     if (edit_list != NULL && edit_list_len > 0) {
         sodium_free(edit_list);
     }
 
-    close(fd);
-    return;
+    return sessionkey;
 }
 
 
@@ -112,18 +116,19 @@ void open_crypt4gh_header(ENCRYPT_SESSION *sess) {
 Decrypt a 64KiB + 22 chunk of data.
 */
 CHUNK *decrypt_chunk(
-    ENCRYPT_SESSION *sess,
+    const uint8_t *session_key,
     uint8_t *segment,
     size_t len_segment
 ) {
-    CHUNK* ret = allocate_chunk();
+    CHUNK *ret = allocate_chunk();
     ret->chunk = malloc(65535 * sizeof(uint8_t));
     int retc = crypt4gh_segment_decrypt(
-        sess->sessionkey,
+        session_key,
         segment,
         len_segment,
         ret->chunk,
         &(ret->len)
     );
+
     return ret;
 }

@@ -1,7 +1,62 @@
-all: src/libupload.js src/libupload.wasm
+all: upload download
 
-src/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c src/streamingdownload.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -fsanitize=undefined -sERROR_ON_UNDEFINED_SYMBOLS=0 -sWARN_UNALIGNED=1 -sALLOW_MEMORY_GROWTH -sASSERTIONS=1 -g3 -sTOTAL_MEMORY=268435456 -sEXPORTED_FUNCTIONS='["_allocate_chunk","_free_chunk","_wrap_chunk_len","_wrap_chunk_content","_open_session","_open_session_eph","_open_session_enc","_wrap_crypt4gh_header","_encrypt_chunk","_clean_session","_rmrf","_open_decrypt_session","_get_session_public_key","_get_session_private_key","_get_session_key","_open_crypt4gh_header","_decrypt_chunk", "_libinit"]' -s LLD_REPORT_UNDEFINED -s FORCE_FILESYSTEM=1 -s EXPORTED_RUNTIME_METHODS='["ccall"]' -O3 -o $@ $^ -lcrypt4gh -lc4gh-keys -lssl -lcrypto -lsodium --post-js js/crypt-post.js --pre-js js/crypt-pre.js
+upload: build/libupload.js src/libupload.wasm
+
+download: build/libdownload.js src/libdownload.wasm
+
+build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
+	mkdir -p build ; \
+	$(CC) $(CFLAGS) $(LDFLAGS) \
+		-fsanitize=undefined \
+		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+		-s WARN_UNALIGNED=1 \
+		-s ALLOW_MEMORY_GROWTH \
+		-s ASSERTIONS=1 \
+		-g3 \
+		-s TOTAL_MEMORY=268435456 \
+		-s LLD_REPORT_UNDEFINED \
+		-s FORCE_FILESYSTEM=1 \
+		-s ENVIRONMENT=worker \
+		-s EXPORTED_RUNTIME_METHODS=ccall \
+		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_create_session_key,_get_keypair_private_key,_create_crypt4gh_header,_free_chunk,_free_keypair,_encrypt_chunk \
+		-O3 \
+		-o \
+		$@ \
+		$^ \
+		-lcrypt4gh \
+		-lc4gh-keys \
+		-lssl \
+		-lcrypto \
+		-lsodium \
+		--post-js js/crypt-post-upworker.js \
+		--pre-js js/crypt-pre.js
+
+build/libdownload.js: src/upinit.c src/streamingdownload.c src/upcommon.c
+	mkdir -p build ; \
+	$(CC) $(CFLAGS) $(LDFLAGS) \
+		-fsanitize=undefined \
+		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+		-s WARN_UNALIGNED=1 \
+		-s ALLOW_MEMORY_GROWTH \
+		-s ASSERTIONS=1 \
+		-g3 \
+		-s TOTAL_MEMORY=268435456 \
+		-s LLD_REPORT_UNDEFINED \
+		-s FORCE_FILESYSTEM=1 \
+		-s ENVIRONMENT=worker \
+		-s EXPORTED_RUNTIME_METHODS=ccall \
+		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_get_session_key_from_header,_get_keypair_public_key,_free_chunk,_free_keypair,_decrypt_chunk,_clean_session \
+		-O3 \
+		-o \
+		$@ \
+		$^ \
+		-lcrypt4gh \
+		-lc4gh-keys \
+		-lssl \
+		-lcrypto \
+		-lsodium \
+		--post-js js/crypt-post-downworker.js \
+		--pre-js js/crypt-pre.js
 
 clean:
-	rm -f src/libupload.wasm src/libupload.js
+	rm -rf build

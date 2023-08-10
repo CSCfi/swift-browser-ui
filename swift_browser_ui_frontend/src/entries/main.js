@@ -47,6 +47,7 @@ import UploadNotification from "@/components/UploadNotification.vue";
 import CFooter from "@/components/CFooter.vue";
 
 import { getDB } from "@/common/db";
+import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
@@ -350,6 +351,10 @@ const app = createApp({
         key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
         this.$store.commit("appendPubKey", key);
       }
+
+      this.initSocket().then(
+        () => {console.log("Initialized the websocket.");},
+      );
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
@@ -376,6 +381,40 @@ const app = createApp({
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
+    initSocket: async function () {
+      // Open the upload and download webworkers
+      let available = await navigator.storage.estimate();
+      // If there's less than 50GiB of storage available, try getting more.
+      // We're probably on Firefox, persisting should grant us more.
+      if (available.quota < 53687091200) {
+        await navigator.storage.persist();
+        if (await navigator.storage.persisted()) {
+          console.log("Storage persisted.");
+          // Update the quotas
+          available = await navigator.storage.estimate();
+        } else {
+          console.log(
+            "Couldn't persist storage, "
+            + "possible limited save space for downloads.",
+          );
+        }
+      }
+
+      console.log(
+        `${available.usage}/${available.quota} of available storage used.`,
+      );
+      console.log(
+        "Any downloads need to fit under this size when downloading.",
+      );
+
+      let workers = new UploadSocket(
+        this.$store.state.active,
+        this.$store.state.active.id,
+        this.$store,
+      );
+      workers.openSocket();
+      this.$store.commit("setSocket", workers);
+    },
     containerSyncWrapper: function () {
       syncContainerACLs(this.$store);
     },

@@ -498,6 +498,25 @@ export async function killUploadEndpoint(
   }
 }
 
+export async function getUploadSocket(
+  project,
+  owner,
+) {
+  let fetchURL = new URL(
+    "/enupload/".concat(encodeURI(owner)),
+    document.location.origin,
+  );
+
+  fetchURL.searchParams.append("project", project);
+  let ret = await GET(fetchURL);
+
+  if (ret.status != 200) {
+    throw new Error("Failed to get upload socket information.");
+  }
+
+  return ret.json();
+}
+
 export async function getUploadCryptedEndpoint(
   project,
   owner,

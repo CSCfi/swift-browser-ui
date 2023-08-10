@@ -17,6 +17,48 @@ Common upload and download related functions
 
 
 /*
+Generate download keypair
+*/
+KEYPAIR *create_keypair() {
+    KEYPAIR *ret = malloc(sizeof(KEYPAIR));
+
+    crypto_kx_keypair(
+        ret->public,
+        ret->private
+    );
+
+    return ret;
+}
+
+
+/*
+Free a keypair
+*/
+void free_keypair(KEYPAIR *kp) {
+    sodium_free(kp->private);
+    sodium_free(kp->public);
+    free(kp);
+    return;
+}
+
+
+/*
+Get crypt4gh public key
+*/
+uint8_t *get_keypair_public_key(KEYPAIR *kp) {
+    return kp->public;
+}
+
+
+/*
+Get crypt4gh private key
+*/
+uint8_t *get_keypair_private_key(KEYPAIR *kp) {
+    return kp->private;
+}
+
+
+/*
 Key init function, copied over from libcrypt4gh
 */
 uint8_t *crypt4gh_session_key_new(void){
@@ -50,6 +92,21 @@ int nftwremove(
         return unlink(path);
     }
     return 0;
+}
+
+/*
+Wipe the temporary receiver keys used for building the receiver list.
+*/
+int rmrecv(const char *keypath) {
+    int ret;
+    ret = nftw(
+        "keypath",
+        &nftwremove,
+        5, // use at most 5 file descriptors
+        0
+    );
+
+    return ret;
 }
 
 /*

@@ -1,3 +1,5 @@
+import msgpack from "@ygoe/msgpack";
+
 var moduleStartComplete = false;
 
 var Module = {

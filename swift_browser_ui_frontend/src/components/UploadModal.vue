@@ -232,7 +232,6 @@
 </template>
 
 <script>
-import EncryptedUploadSession from "@/common/upload";
 import {
   getHumanReadableSize,
   truncate,
@@ -316,6 +315,9 @@ export default {
     },
     owner() {
       return this.$route.params.owner;
+    },
+    socket() {
+      return this.$store.state.socket;
     },
     fileHeaders() {
       return [
@@ -846,10 +848,8 @@ export default {
         this.$store,
         this.$el,
       );
-      upload.initServiceWorker();
-      this.$store.commit("setCurrentUpload", upload);
-      upload.cleanUp();
-      setTimeout(() => {
+
+      delay(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
           if (!this.toastVisible) {
             this.toastVisible = true;

@@ -23,6 +23,7 @@ from swift_browser_ui.ui.api import (
     close_upload_session,
     get_access_control_metadata,
     get_crypted_upload_session,
+    get_crypted_upload_socket_info,
     get_os_user,
     get_shared_container_address,
     get_upload_session,
@@ -271,6 +272,10 @@ async def servinit(
             aiohttp.web.get(
                 "/enupload/{project}/{container}/{object_name:.*}",
                 get_crypted_upload_session,
+            ),
+            aiohttp.web.get(
+                "/enupload/{project}",
+                get_crypted_upload_socket_info,
             ),
         ]
     )

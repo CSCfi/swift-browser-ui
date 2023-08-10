@@ -33,6 +33,15 @@ ENCRYPT_SESSION *open_session_eph() {
 
 
 /*
+Create a session key for single upload.
+*/
+uint8_t *create_session_key() {
+    uint8_t *ret = crypt4gh_session_key_new();
+    return ret;
+}
+
+
+/*
 Open an upload session
 */
 ENCRYPT_SESSION *open_session(
@@ -43,6 +52,30 @@ ENCRYPT_SESSION *open_session(
         passphrase,
         ret);
     ret->sessionkey = crypt4gh_session_key_new();
+    return ret;
+}
+
+
+/*
+Create crypt4gh header
+*/
+CHUNK *create_crypt4gh_header(
+    const uint8_t *session_key,
+    const uint8_t *secret_key,
+    const uint8_t *receivers,
+    const unsigned int len_receivers
+) {
+    CHUNK *ret = allocate_chunk();
+
+    crypt4gh_header_build(
+        session_key,
+        secret_key,
+        receivers,
+        len_receivers,
+        &(ret->chunk),
+        &(ret->len)
+    );
+
     return ret;
 }
 
@@ -67,28 +100,18 @@ CHUNK *wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
 Encrypt a 64KiB chunk of data.
 */
 CHUNK *encrypt_chunk(
-    ENCRYPT_SESSION *sess,
+    const uint8_t *session_key,
     uint8_t *segment,
     size_t len_segment
 ) {
     CHUNK* ret = allocate_chunk();
     ret->chunk = malloc(CRYPT4GH_CIPHERSEGMENT_SIZE * sizeof(uint8_t));
-    if (sess)
-    {
-        crypt4gh_segment_encrypt(
-            sess->sessionkey,
-            segment,
-            len_segment,
-            ret->chunk,
-            &(ret->len)
-        );
-    }
-    else
-    {
-        #ifdef C4GH_WASM_DEV
-        printf("Upload session is NULL. This is expected only when a large upload with >50 files has been cancelled.\n");
-        #endif
-        clean_session(sess);
-    }
+    crypt4gh_segment_encrypt(
+        session_key,
+        segment,
+        len_segment,
+        ret->chunk,
+        &(ret->len)
+    );
     return ret;
 }

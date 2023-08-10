@@ -27,4 +27,25 @@ typedef struct CHUNK
     size_t len;
 } CHUNK;
 
+
+/*
+Struct for a keypair
+*/
+typedef struct KEYPAIR
+{
+    uint8_t private[crypto_kx_SECRETKEYBYTES];
+    uint8_t public[crypto_kx_PUBLICKEYBYTES];
+} KEYPAIR;
+
+
+/*
+Struct for receivers
+*/
+typedef struct RECEIVERS
+{
+    uint8_t *receivers;
+    unsigned int receiver_amount;
+} RECEIVERS;
+
+
 #endif

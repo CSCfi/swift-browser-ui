@@ -19,6 +19,13 @@ Init functions for folder upload
 ENCRYPT_SESSION *current = NULL;
 
 /*
+Read a public key from ftw entry
+*/
+uint8_t *recv_keys = NULL;
+unsigned int recv_key_amount;
+
+
+/*
 Add a public key from ftw entry
 */
 int add_recv_key(
@@ -47,30 +54,30 @@ int add_recv_key(
             goto finalAddRecv;
         }
         // We need space for the new key inside encrypt session
-        if (!current->recv_key_amount || !current->recv_keys)
+        if (!recv_key_amount || !recv_keys)
         {
-            current->recv_keys = malloc(
+            recv_keys = malloc(
                 sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES);
         }
         else
         {
-            current->recv_keys = realloc(
-                current->recv_keys,
-                sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (current->recv_key_amount + 1));
+            recv_keys = realloc(
+                recv_keys,
+                sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (recv_key_amount + 1));
         }
         amount = crypt4gh_public_key_from_blob(
             fout,
             amount,
-            current->recv_keys + (sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * current->recv_key_amount));
+            recv_keys + (sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * recv_key_amount));
         if (amount)
         {
-            current->recv_keys = realloc(
-                current->recv_keys,
-                sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (current->recv_key_amount));
+            recv_keys = realloc(
+                recv_keys,
+                sizeof(unsigned char) * crypto_kx_PUBLICKEYBYTES * (recv_key_amount));
         }
         else
         {
-            current->recv_key_amount++;
+            recv_key_amount++;
         }
     }
 finalAddRecv:
@@ -89,6 +96,31 @@ void libinit() {
 
     // Main reason for init, only stir once to not run out of entropy
     randombytes_stir();
+}
+
+/*
+Read in the receiver keys from a path
+*/
+CHUNK *read_in_recv_keys_path(const char *keypath) {
+    int ret = nftw(
+        keypath,
+        &add_recv_key,
+        5, // Use at most 5 file descriptors
+        FTW_PHYS
+    );
+
+    if (ret) {
+        return NULL;
+    }
+
+    CHUNK *retbuf = malloc(sizeof(CHUNK));
+
+    retbuf->chunk = recv_keys;
+    retbuf->len = recv_key_amount;
+    recv_keys = NULL;
+    recv_key_amount = 0;
+
+    return retbuf;
 }
 
 /*

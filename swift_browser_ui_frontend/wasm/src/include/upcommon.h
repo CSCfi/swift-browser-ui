@@ -11,6 +11,15 @@ Upload process common functions
 #define SWIFT_UI_UPLOAD_COMMON
 
 
+KEYPAIR *create_keypair();
+
+void free_keypair(KEYPAIR *kp);
+
+uint8_t *get_keypair_public_key(KEYPAIR *kp);
+
+uint8_t *get_keypair_private_key(KEYPAIR *kp);
+
+
 /*
 Key init function, from libcrypt4gh
 */

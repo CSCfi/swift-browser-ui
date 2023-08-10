@@ -11,5 +11,12 @@ WASM_ROOT="${SCRIPT_ROOT}"/wasm/
 
 docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh clean
 docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh all
-cp "${WASM_ROOT}"/src/libupload* "${SCRIPT_ROOT}"/public/
-cp "${WASM_ROOT}"/src/libupload* "${SCRIPT_ROOT}"/dist/
+
+sudo chown -R $USER:$USER "${WASM_ROOT}"/build/
+
+cp "${WASM_ROOT}"/src/libupload.wasm "${SCRIPT_ROOT}"/public/
+cp "${WASM_ROOT}"/src/libupload.wasm "${SCRIPT_ROOT}"/dist/
+cp "${WASM_ROOT}"/src/libupload.js "${SCRIPT_ROOT}"/src/common/
+cp "${WASM_ROOT}"/src/libdownload.wasm "${SCRIPT_ROOT}"/public/
+cp "${WASM_ROOT}"/src/libdownload.wasm "${SCRIPT_ROOT}"/dist/
+cp "${WASM_ROOT}"/src/libdownload.js "${SCRIPT_ROOT}"/src/common/

@@ -891,6 +891,34 @@ async def get_crypted_upload_session(
     )
 
 
+async def get_crypted_upload_socket_info(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Return a pre-signed upload socket for specified project."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call for upload socket signature from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    project = ""
+    if "project" in request.query:
+        project = request.query["project"]
+
+    runner_id = await open_upload_runner_session(request, project=project)
+    path = f"/cryptic/{request.match_info['project']}"
+    signature = await sign(28800, path)
+
+    return aiohttp.web.json_response(
+        {
+            "id": runner_id,
+            "wsurl": f"{setd['upload_external_endpoint']}{path}".replace("https", "wss"),
+            "host": setd["upload_external_endpoint"],
+            "wssignature": signature,
+        }
+    )
+
+
 async def close_upload_session(
     request: aiohttp.web.Request,
     project: str = "",
