@@ -8,7 +8,7 @@ export default createRouter({
   routes: [
     {
       path: "/browse",
-      name: "AllFolders",
+      name: "Browse",
       component: FoldersView,
     },
     {
