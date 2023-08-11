@@ -221,7 +221,7 @@ async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Respo
                 "name": ret[0]["name"],
             }
         )
-    
+
     return aiohttp.web.HTTPNotFound()
 
 
