@@ -302,6 +302,7 @@ self.addEventListener("message", (e) => {
       createDownloadSession(e.data.container, e.data.handle, false);
       postMessage({
         eventType: "getHeaders",
+        container: e.data.container,
         files: [
           e.data.file,
         ],

@@ -5,7 +5,7 @@ upload: build/libupload.js src/libupload.wasm
 download: build/libdownload.js src/libdownload.wasm
 
 build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
-	mkdir -p build ; \
+	mkdir --mode=777 -p build ; \
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 		-fsanitize=undefined \
 		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
@@ -32,7 +32,7 @@ build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
 		--pre-js js/crypt-pre.js
 
 build/libdownload.js: src/upinit.c src/streamingdownload.c src/upcommon.c
-	mkdir -p build ; \
+	mkdir --mode=777 -p build ; \
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 		-fsanitize=undefined \
 		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \

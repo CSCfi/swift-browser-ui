@@ -14,7 +14,6 @@ import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
     VAULT_CLIENT,
-    get_encrypted_upload_session,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
@@ -199,7 +198,9 @@ async def handle_upload_ws(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.WebSocketResponse:
     """Handle parallel file upload data via a websocket."""
-    upload_session: cryptupload.UploadSession = get_encrypted_upload_session(request)
+    upload_session: cryptupload.UploadSession = cryptupload.get_encrypted_upload_session(
+        request
+    )
 
     ws = aiohttp.web.WebSocketResponse()
     await ws.prepare(request)

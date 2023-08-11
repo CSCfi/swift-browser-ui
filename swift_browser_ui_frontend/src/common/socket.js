@@ -1,6 +1,6 @@
 // Functions for handling interfacing between workers and upload API socket
 
-import { getUploadSocket } from "./api";
+import { GET, PUT, getUploadEndpoint, getUploadSocket } from "./api";
 import { DEV } from "./conv";
 
 
@@ -67,6 +67,13 @@ export default class UploadSocket {
   handleDownWorker(e) {
     switch(e.data.eventType) {
       case "getHeaders":
+        this.getHeaders(
+          e.data.container,
+          e.data.files,
+          e.data.pubkey,
+        ).then(() => {
+          console.log("Got headers.");
+        });
         break;
       case "finished":
         console.log("download finished");
@@ -77,8 +84,58 @@ export default class UploadSocket {
         console.log(e.data);
         break;
       case "downloadSessionRemoved":
+        console.log("Download session removed.");
+        console.log(e.data);
         break;
     }
+  }
+
+  // Get headers for download
+  async getHeaders(container, files, pubkey) {
+    let headers = {};
+    let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
+
+    let upInfo = await getUploadEndpoint(
+      this.active.id,
+      this.project,
+      this.container,
+    );
+
+    let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
+    signatureUrl.searchParams.append("path", this.whitelistPath);
+    let signed = await GET(signatureUrl);
+    signed = await signed.json();
+    let whitelistUrl = new URL(
+      this.$store.state.uploadEndpoint.concat(whitelistPath),
+    );
+    whitelistUrl.searchParams.append("valid", signed.valid);
+    whitelistUrl.searchParams.append("signature", signed.signature);
+    whitelistUrl.searchParams.append("flavor", "crypt4gh");
+    whitelistUrl.searchParams.append("session", upInfo.id);
+    await PUT(whitelistUrl, pubkey);
+
+    for (const file of files) {
+      let headerPath = `/header/${this.active.name}/${this.container}/${file}`;
+      signatureUrl = new URL(`/sign/${60}`, document.location.origin);
+      signatureUrl.searchParams.append("path", headerPath);
+      signed = await GET(signatureUrl);
+      signed = await signed.json();
+      let headerUrl = new URL(
+        this.$store.state.uploadEndpoint.concat(headerPath),
+      );
+      headerUrl.searchParams.append("valid", signed.valid);
+      headerUrl.searchParams.append("signature", signed.signature);
+      headerUrl.searchParams.append("session", upInfo.id);
+      let resp = await GET(headerUrl);
+      let header = await resp.text();
+      headers[file] = Uint8Array.from(atob(header), c => c.charCodeAt(0));
+    }
+
+    this.upWorker.postMessage({
+      command: "addHeaders",
+      container: container,
+      headers: headers,
+    });
   }
 
   // Get the latest upload endpoint

@@ -430,3 +430,20 @@ class UploadSession:
                     asyncio.create_task(self.uploads[container][file].abort_upload())
                 )
         await asyncio.gather(*abort_tasks)
+
+
+def get_encrypted_upload_session(
+    request: aiohttp.web.Request,
+) -> UploadSession:
+    """Return the specific encrypted upload session for the project."""
+    session = common.get_session_id(request)
+    project = request.match_info["project"]
+
+    if project in request.app[session]["enuploads"]:
+        LOGGER.debug(f"Returning an existing upload session for id {session}.")
+        return request.app[session]["enuploads"][project]
+    else:
+        LOGGER.debug(f"Opening a new upload session for id {session}.")
+        upload_session = UploadSession(request, request.app[session])
+        request.app[session]["enuploads"][project] = upload_session
+        return upload_session

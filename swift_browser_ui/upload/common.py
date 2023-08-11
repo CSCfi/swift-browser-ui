@@ -7,7 +7,6 @@ import typing
 
 import aiohttp.web
 
-import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.upload import upload
 
 LOGGER = logging.getLogger(__name__)
@@ -111,23 +110,6 @@ async def get_upload_instance(
         request.app[session]["uploads"][pro][cont][ident] = upload_session
 
     return upload_session
-
-
-def get_encrypted_upload_session(
-    request: aiohttp.web.Request,
-) -> cryptupload.UploadSession:
-    """Return the specific encrypted upload session for the project."""
-    session = get_session_id(request)
-    project = request.match_info["project"]
-
-    if project in request.app[session]["enuploads"]:
-        LOGGER.debug(f"Returning an existing upload session for id {session}.")
-        return request.app[session]["enuploads"][project]
-    else:
-        LOGGER.debug(f"Opening a new upload session for id {session}.")
-        upload_session = cryptupload.UploadSession(request, request.app[session])
-        request.app[session]["enuploads"][project] = upload_session
-        return upload_session
 
 
 def get_path_from_list(to_parse: typing.List[str], path_prefix: str) -> str:
