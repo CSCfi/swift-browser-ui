@@ -271,7 +271,8 @@ export default {
                       ),
                       target: "_blank",
                       path: mdiTrayArrowDown,
-                      disabled: item.owner && item.accessRights.length === 0,
+                      disabled: item.owner && item.accessRights.length === 0
+                        || item.bytes === 0,
                     },
                   },
                 },
