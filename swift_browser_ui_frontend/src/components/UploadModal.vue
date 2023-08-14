@@ -192,7 +192,6 @@
       <c-button
         size="large"
         :loading="addingFiles || buttonAddingFiles"
-        :disabled="errorMsg.length"
         @click="onUploadClick"
         @keyup.enter="onUploadClick"
       >
@@ -651,16 +650,20 @@ export default {
       if (this.dropFiles.length === 0) {
         return this.$t("message.upload.addFiles");
       }
-      else if (!this.pubkey.length || !this.recvkeys.length) {
+      else if (!this.pubkey.length && !this.recvkeys.length) {
         return this.$t("message.upload.error");
       }
       else return "";
     },
     onUploadClick() {
       this.toastMsg = this.checkIfCanUpload();
-      //In case user does not interact with input field before click
-      this.errorMsg = validateFolderName(this.inputFolder, this.$t);
-      if (this.errorMsg) return;
+      if (!this.currentFolder) {
+        //In case user does not interact with input field before click
+        this.errorMsg = validateFolderName(this.inputFolder, this.$t);
+      }
+      if (this.errorMsg) {
+        return;
+      }
       else if (this.toastMsg) {
         document.querySelector("#uploadModal-toasts").addToast(
           {
