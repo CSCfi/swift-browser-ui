@@ -8,33 +8,47 @@
       id="upload-modal-content"
       class="modal-content-wrapper"
     >
+      <c-toasts
+        id="uploadModal-toasts"
+        data-testid="uploadModal-toasts"
+        vertical="bottom"
+        absolute
+      />
       <h2 class="title is-4">
         {{ $t("message.encrypt.uploadFiles") }}
       </h2>
       <c-card-content>
-        <h3 class="title is-6">
-          1. {{ $t("message.encrypt.upload_step1") }}
-        </h3>
-        <p class="info-text is-size-6">
-          {{ $t("message.container_ops.norename") }}
-        </p>
-        <c-autocomplete
-          id="upload-folder-input"
-          v-csc-control
-          :items.prop="filteredItems"
-          :label="$t('message.container_ops.folderName')"
-          :query="inputFolder"
-          aria-required="true"
-          required
-          :valid="errorMsg.length === 0"
-          :validation="errorMsg"
-          validate-on-blur
-          @changeQuery="onQueryChange"
-          @changeValue="onSelectValue"
-        />
-        <h3 class="title is-6">
-          2. {{ $t("message.encrypt.upload_step2") }}
-        </h3>
+        <div
+          v-if="!currentFolder"
+          id="upload-to-root"
+        >
+          <h3 class="title is-6">
+            1. {{ $t("message.encrypt.upload_step1") }}
+          </h3>
+          <p class="info-text is-size-6">
+            {{ $t("message.container_ops.norename") }}
+          </p>
+          <c-text-field
+            id="upload-folder-input"
+            v-model="inputFolder"
+            v-csc-control
+            :label="$t('message.container_ops.folderName')"
+            aria-required="true"
+            required
+            :valid="errorMsg.length === 0"
+            :validation="errorMsg"
+            @changeValue="interacted = true"
+          />
+          <h3 class="title is-6">
+            2. {{ $t("message.encrypt.upload_step2") }}
+          </h3>
+        </div>
+        <div v-else>
+          <p>
+            <b>{{ $t("message.encrypt.uploadDestination") }}</b>
+            {{ currentFolder }}
+          </p>
+        </div>
         <div
           class="dropArea"
           @dragover="dragHandler"
@@ -86,7 +100,10 @@
           @click="checkPage($event,false)"
         />
         <!-- eslint-enable-->
-        <p class="info-text is-size-6">
+        <p
+          v-if="!owner"
+          class="info-text is-size-6"
+        >
           {{ $t("message.encrypt.uploadedFiles") }}
           <b>{{ active.name }}</b>.
           <c-link
@@ -97,6 +114,23 @@
             {{ $t("message.container_ops.viewProjectMembers") }}
             <i class="mdi mdi-open-in-new" />
           </c-link>
+        </p>
+        <p
+          v-else
+          class="info-text is-size-6"
+        >
+          {{ $t("message.encrypt.uploadedFiles") }}
+          <b>{{ active.name }}</b> (
+          <c-link
+            :href="projectInfoLink"
+            underline
+            target="_blank"
+          >
+            {{ $t("message.container_ops.viewProjectMembers") }}
+            <i class="mdi mdi-open-in-new" />
+          </c-link>
+          )
+          {{ $t("message.encrypt.uploadedToShared") }}
         </p>
         <c-accordion
           id="accordion"
@@ -157,12 +191,10 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="noUpload
-          || addingFiles
-          || buttonAddingFiles
-          || errorMsg.length"
-        @click="beginEncryptedUpload"
-        @keyup.enter="beginEncryptedUpload"
+        :loading="addingFiles || buttonAddingFiles"
+        :disabled="errorMsg.length"
+        @click="onUploadClick"
+        @keyup.enter="onUploadClick"
       >
         {{ $t("message.encrypt.normup") }}
       </c-button>
@@ -181,8 +213,6 @@ import { getDB } from "@/common/db";
 
 import {
   getProjectNumber,
-  getSharedContainers,
-  getAccessDetails,
   validateFolderName,
   checkIfItemIsLastOnPage,
 } from "@/common/globalFunctions";
@@ -193,7 +223,7 @@ import {
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 
-import delay from "lodash/delay";
+import { delay, debounce } from "lodash";
 
 export default {
   name: "UploadModal",
@@ -206,28 +236,24 @@ export default {
   data() {
     return {
       inputFolder: "",
-      filteredItems: [],
       addRecvkey: "",
       recvkeys: [],
       recvHashedKeys: [],
-      noUpload: true,
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
       duplicateFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
-      noUploadContainers: [],
       interacted: false,
       currentPage: 1,
       currentKeyPage:1,
       errorMsg: "",
+      toastMsg : "",
+      containers: [],
     };
   },
   computed: {
-    containers() {
-      return getDB().containers;
-    },
     res() {
       return this.$store.state.resumableClient;
     },
@@ -237,14 +263,14 @@ export default {
     pubkey() {
       return this.$store.state.pubkey;
     },
-    currentUpload() {
-      return this.$store.state.uploadState;
-    },
     currentFolder() {
       return this.$route.params.container;
     },
     modalVisible() {
       return this.$store.state.openUploadModal;
+    },
+    owner() {
+      return this.$route.params.owner;
     },
     fileHeaders() {
       return [
@@ -400,45 +426,27 @@ export default {
     addFiles() {
       return this.$store.state.addUploadFiles;
     },
-    canUpload () {
-      //used to disable upload button
-      //in case disallowed folder name is typed in
-      if (this.noUploadContainers.find(
-        item => item.container === this.inputFolder) === undefined) {
-        return true;
-      }
-      return false;
-    },
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
   },
   watch: {
-    modalVisible: function() {
+    modalVisible: async function() {
       if (this.modalVisible) {
         //inputFolder not cleared when modal toggled,
         //in case there's a delay in upload start
         //reset when modal visible
         this.recvkeys = [];
-        if(!this.noUploadContainers.length) {
-          this.getNoUploadContainers();
-        } else this.setInputFolder();
+        this.inputFolder = "";
+        this.containers = await getDB().containers
+          .where({ projectID: this.active.id })
+          .toArray();
       }
     },
     inputFolder: function() {
-      this.interacted ?
-        this.errorMsg = validateFolderName(this.inputFolder, this.$t) :
-        this.errorMsg = "";
-      this.refreshNoUpload();
-    },
-    dropFiles: function () {
-      this.refreshNoUpload();
-    },
-    recvkeys: function () {
-      this.refreshNoUpload();
-    },
-    currentUpload: function () {
-      this.refreshNoUpload();
+      if (this.inputFolder && this.interacted) {
+        this.checkFolderName();
+      }
     },
     active: function () {
       this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
@@ -462,8 +470,8 @@ export default {
     },
   },
   methods: {
-    checkPage  (event, isKey){
-      var page = checkIfItemIsLastOnPage(
+    checkPage(event, isKey) {
+      const page = checkIfItemIsLastOnPage(
         {
           currentPage: event.target.pagination.currentPage ,
           itemsPerPage: event.target.pagination.itemsPerPage,
@@ -492,55 +500,21 @@ export default {
         }
       }
     },
-    getNoUploadContainers: async function () {
-      const sharedContainers = await getSharedContainers(this.active.id);
-      if (sharedContainers != []) {
-        for (const item of sharedContainers) {
-          const share = await getAccessDetails(
-            this.active.id,
-            item.container,
-            item.owner,
-          );
-          if (share.access.length < 2) {
-            this.noUploadContainers.push(item);
+    checkFolderName: debounce(function () {
+      const error = validateFolderName(this.inputFolder, this.$t);
+      if (error.length === 0) {
+        if (this.containers) {
+          let found = this.containers.find(
+            cont => cont.name === this.inputFolder);
+          if (found) {
+            this.errorMsg = this.$t("message.error.inUse");
+            return;
           }
         }
+        this.errorMsg = "";
       }
-      this.setInputFolder();
-    },
-    setInputFolder() {
-      if (this.currentFolder) {
-        //only show current container as upload destination
-        //if user has the right to upload to it
-        if (this.noUploadContainers
-          .find(item => item.container === this.currentFolder)
-          === undefined) {
-          this.inputFolder = this.currentFolder;
-          return;
-        }
-      }
-      this.inputFolder = "";
-    },
-    onSelectValue: function (e) {
-      if (e.detail) this.inputFolder = e.detail.name;
-    },
-    onQueryChange: async function (event) {
-      this.interacted = true; //user typed
-      this.inputFolder = event.detail;
-      //filter out containers where user has no upload right
-      const result = await this.containers
-        .filter(cont => cont.projectID === this.active.id)
-        .filter(cont => {
-          return !this.noUploadContainers
-            .some(c => c.container === cont.container);
-        })
-        .filter(cont => cont.name.toLowerCase()
-          .includes(event.detail.toLowerCase()))
-        .filter(cont => !cont.name.endsWith("_segments"))
-        .limit(1000)
-        .toArray();
-      this.filteredItems = result;
-    },
+      else this.errorMsg = error;
+    }, 300),
     setFile: function (item, path) {
       let entry = undefined;
       if (item.isFile) {
@@ -648,15 +622,6 @@ export default {
       }
       this.addRecvkey = "";
     },
-    refreshNoUpload() {
-      this.noUpload = (
-        (!this.pubkey.length && !this.recvkeys.length)
-        || !this.inputFolder
-        || !this.dropFiles.length
-        || (this.currentUpload != undefined)
-        || !this.canUpload
-      );
-    },
     cancelUpload() {
       this.$store.commit("setFilesAdded", false);
       this.$store.commit("eraseDropFiles");
@@ -668,6 +633,7 @@ export default {
     },
     toggleUploadModal() {
       this.resetAccordionVal();
+      document.querySelector("#uploadModal-toasts").removeToast("upload-toast");
       this.$store.commit("toggleUploadModal", false);
       this.addingFiles = false;
       this.tags = [];
@@ -677,8 +643,37 @@ export default {
       this.addRecvkey = "";
       this.recvHashedKeys = [];
       this.errorMsg = "";
+      this.toastMsg = "";
 
       moveFocusOutOfModal(this.prevActiveEl);
+    },
+    checkIfCanUpload() {
+      if (this.dropFiles.length === 0) {
+        return this.$t("message.upload.addFiles");
+      }
+      else if (!this.pubkey.length || !this.recvkeys.length) {
+        return this.$t("message.upload.error");
+      }
+      else return "";
+    },
+    onUploadClick() {
+      this.toastMsg = this.checkIfCanUpload();
+      //In case user does not interact with input field before click
+      this.errorMsg = validateFolderName(this.inputFolder, this.$t);
+      if (this.errorMsg) return;
+      else if (this.toastMsg) {
+        document.querySelector("#uploadModal-toasts").addToast(
+          {
+            id: "upload-toast",
+            type: "error",
+            duration: 4000,
+            progress: false,
+            message: this.toastMsg,
+          },
+        );
+        return;
+      }
+      else this.beginEncryptedUpload();
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {
@@ -688,17 +683,19 @@ export default {
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
 
-      this.$store.commit("setFolderName", this.inputFolder);
+      this.currentFolder ?
+        this.$store.commit("setFolderName", this.currentFolder) :
+        this.$store.commit("setFolderName", this.inputFolder);
 
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
       let upload = new EncryptedUploadSession(
         this.active,
-        this.$route.params.owner ? this.$route.params.owner : this.active.id,
+        this.owner ? this.owner : this.active.id,
         this.$store.state.dropFiles,
         this.recvkeys,
         null,
-        this.inputFolder,
+        this.currentFolder ? this.currentFolder : this.inputFolder,
         "",
         null,
         true,
@@ -730,7 +727,7 @@ export default {
     },
     handleKeyDown: function (e) {
       const focusableList = this.$refs.uploadContainer.querySelectorAll(
-        "c-link, c-button, textarea, c-autocomplete, c-data-table",
+        "c-link, c-button, textarea, c-text-field, c-data-table",
       );
       const { first, last } = getFocusableElements(focusableList);
       keyboardNavigationInsideModal(e, first, last, true);
@@ -770,17 +767,12 @@ export default {
  }
 
 c-card-content {
-  padding: 1.5rem 0 0 0;
+  padding: 1rem 0 0 0;
   color: var(--csc-dark);
 }
 
-c-autocomplete {
-  margin-top: -0.5rem;
-  width: 70%;
-}
-
-.taginput {
-  width: 60%;
+c-card-actions {
+  padding: 0;
 }
 
 .title.is-6 {
@@ -806,9 +798,8 @@ c-data-table.files-table {
   margin-top: -24px;
 }
 
-c-card-actions {
-  padding: 1rem 0 0 0;
-  border-top: 1px solid var(--csc-primary);
+#upload-to-root p {
+  padding: 1rem 0 1rem 0;
 }
 
 c-data-table.publickey-table {

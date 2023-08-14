@@ -192,8 +192,7 @@ export default {
       if (!this.container) {
         setTimeout(() => {
           const uploadFolderInput = document
-            .querySelector("#upload-folder-input")
-            .shadowRoot.querySelector("input"); //TODO
+            .querySelector("#upload-folder-input input");
           uploadFolderInput.focus();
         }, 300);
       }
