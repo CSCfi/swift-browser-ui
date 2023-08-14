@@ -2,7 +2,8 @@
   <div id="main-navigation">
     <div class="toolbar">
       <router-link
-        :to="{name: 'AllFolders'}"
+        v-if="uname && active?.id"
+        :to="{name: 'AllFolders', params: {user: uname, project: active.id }}"
         :aria-label="$t('label.logo')"
       >
         <c-row align="center">
