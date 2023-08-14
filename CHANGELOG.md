@@ -175,9 +175,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1081) Fix for objects' tag editings and deletion being disabled in a normal container
 - (GL #1092) Fix display options' persistence for individual containers and container table
 - (GL #1080 #1086) Fix subfolders changing last_modified dates when sorting and sorting by size
-- (GL #972) Fix for missing required param `"user"` and no match location for path `"/browse"`
 - (GL #1084) Disable download option for empty container and empty object
 - (GL #1058) Fix shown size of copied container when source container has a lot of objects
+- (GL #972) Fix for missing required param `"user"` and no match location for path `"/browse"`
 
 ### Removed
 
