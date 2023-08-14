@@ -5,6 +5,7 @@ alaviiva
 alikansio
 alikansion
 alikansiot
+alkanut
 alla
 aloitettiin
 aloitettu
@@ -275,6 +276,7 @@ minuutin
 minuutteja
 mitätöi
 muiden
+muissa
 muita
 mukaan
 muokata
@@ -288,6 +290,7 @@ muutamia
 muutettiin
 muuttaa
 muuttaaksesi
+myöhemmin
 myös
 määrä
 määrästä
@@ -393,6 +396,7 @@ poudan
 profiili
 projekteihin
 projekteille
+projekteissa
 projekteja
 projekti
 projektia
