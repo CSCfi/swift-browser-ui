@@ -219,7 +219,7 @@ export default {
                       : this.navDownload(item.url);
                   },
                   disabled: this.owner != undefined &&
-                    this.accessRights.length === 0,
+                    this.accessRights.length === 0 || item.bytes === 0,
                 },
               },
             },
