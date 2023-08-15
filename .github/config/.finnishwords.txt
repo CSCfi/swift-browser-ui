@@ -663,7 +663,6 @@ viimeksi
 viiva
 virhe
 virheellinen
-virheviesti
 voi
 voida
 voidaksesi
