@@ -657,7 +657,7 @@ export default {
     },
     onUploadClick() {
       this.toastMsg = this.checkIfCanUpload();
-      if (!this.currentFolder) {
+      if (!this.currentFolder && !this.inputFolder) {
         //In case user does not interact with input field before click
         this.errorMsg = validateFolderName(this.inputFolder, this.$t);
       }
