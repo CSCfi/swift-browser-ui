@@ -28,6 +28,7 @@ avainta
 avainten
 dataa
 edellinen
+edelliselle
 edellyttää
 edistyneitä
 ei
@@ -49,6 +50,7 @@ esimerkiksi
 esitetty
 estetty
 etsi
+etsimääsi
 etsittyä
 että
 etusivulle
@@ -64,10 +66,12 @@ halutako
 halutessasi
 haluttu
 halutun
+hetkellä
 hetkestä
 hetki
 hinnoittelu
 hinnoittelulaskuri
+huoltokatkoistamme
 hyväksy
 hyväksyä
 hyväksyäksesi
@@ -152,6 +156,7 @@ kestää
 kieli
 kielletty
 kiellettyä
+kielletyn
 kiinni
 kirjaudu
 kirjautua
@@ -160,6 +165,7 @@ kirjautumalla
 kirjautuminen
 kirjautumisen
 kirjautumissivulle
+kirjautumistiedoissasi
 kirjautunut
 kirjoitus
 kirjoitusoikeus
@@ -183,6 +189,7 @@ kopioidaan
 kopioinnin
 kopiointi
 kopioitu
+koska
 koskevia
 kuin
 kuinka
@@ -261,6 +268,7 @@ lähetystä
 lähetä
 löydetty
 löydy
+löydät
 löytynyt
 löytävät
 löytää
@@ -309,6 +317,7 @@ numeroisen
 nykyinen
 nykyisen
 nykyisiä
+näet
 nähdä
 näkyvissä
 nämä
@@ -338,6 +347,7 @@ oletusarvoisesti
 oletusarvoiset
 oletusarvojen
 olevia
+oli
 olla
 omaa
 ominaisuutta
@@ -439,6 +449,7 @@ resurssienkäyttö
 resurssit
 rivinvaihtoa
 saa
+saatavilla
 saavutettavuus
 salaa
 salaaminen
@@ -475,6 +486,7 @@ selaus
 selaustila
 selaustilasta
 sen
+sessiosi
 seuraava
 siirry
 siirto
@@ -489,6 +501,7 @@ sisäänkirjauksen
 sivu
 sivua
 sivulla
+sivulle
 sivulta
 sivun
 sivupyynnössä
@@ -497,6 +510,7 @@ sopimus
 sulje
 suljet
 suodata
+suorittaa
 suositellut
 suuren
 suurenna
@@ -559,6 +573,7 @@ tilapäisesti
 toiminnan
 toiminnasta
 toiminnolla
+toiminnon
 toiminta
 toiminto
 toiseen
@@ -604,7 +619,9 @@ tässä
 tästä
 tätä
 täytyy
+täältä
 ulos
+umpeutui
 uniikin
 useiden
 useille
@@ -646,7 +663,6 @@ viimeksi
 viiva
 virhe
 virheellinen
-virheviesti
 voi
 voida
 voidaksesi
@@ -669,4 +685,5 @@ yksityistä
 yli
 ylimääräisiä
 ylläpitoon
+yritit
 yritä
