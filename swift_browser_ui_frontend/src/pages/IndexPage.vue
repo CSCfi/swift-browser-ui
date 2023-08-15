@@ -79,7 +79,21 @@
               {{ $t('message.error.Notfound_text') }}
             </c-card-content>
             <c-card-content v-else-if="uidown">
-              {{ $t('message.error.UIdown_text') }}
+              <p>
+                {{ $t('message.error.UIdown_text1') }}
+              </p>
+              <p>
+                {{ $t('message.error.UIdown_text2') }}
+                <c-link
+                  :href="$t('message.error.UIdown_link')"
+                  underline
+                  target="_blank"
+                >
+                  {{ $t('message.error.UIdown_link_text') }}
+                  <i class="mdi mdi-open-in-new" />
+                </c-link>
+                .
+              </p>
             </c-card-content>
             <c-card-actions v-if="unauth">
               <c-button
@@ -89,12 +103,12 @@
                 {{ $t('message.error.login') }}
               </c-button>
             </c-card-actions>
-            <c-card-actions v-else>
+            <c-card-actions v-else-if="forbid || notfound">
               <c-button
                 href="/browse"
                 target="_self"
               >
-                {{ $t('message.error.frontPage') }}
+                {{ $t('message.error.prevPage') }}
               </c-button>
             </c-card-actions>
           </c-card>
