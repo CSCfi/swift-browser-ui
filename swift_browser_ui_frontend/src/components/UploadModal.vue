@@ -101,11 +101,10 @@
         />
         <!-- eslint-enable-->
         <p
-          v-if="!owner"
           class="info-text is-size-6"
         >
           {{ $t("message.encrypt.uploadedFiles") }}
-          <b>{{ active.name }}</b>.
+          <b>{{ active.name }}</b>{{ !owner ? "." : " (" }}
           <c-link
             :href="projectInfoLink"
             underline
@@ -114,23 +113,8 @@
             {{ $t("message.container_ops.viewProjectMembers") }}
             <i class="mdi mdi-open-in-new" />
           </c-link>
-        </p>
-        <p
-          v-else
-          class="info-text is-size-6"
-        >
-          {{ $t("message.encrypt.uploadedFiles") }}
-          <b>{{ active.name }}</b> (
-          <c-link
-            :href="projectInfoLink"
-            underline
-            target="_blank"
-          >
-            {{ $t("message.container_ops.viewProjectMembers") }}
-            <i class="mdi mdi-open-in-new" />
-          </c-link>
-          )
-          {{ $t("message.encrypt.uploadedToShared") }}
+          {{ !owner ? "" :
+            ") " + $t("message.encrypt.uploadedToShared") }}
         </p>
         <c-accordion
           id="accordion"
