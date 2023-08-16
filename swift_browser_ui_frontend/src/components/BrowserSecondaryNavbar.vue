@@ -83,7 +83,7 @@
         <c-button
           outlined
           data-testid="create-folder"
-          :disabled="inContainer"
+          :disabled="container"
           @click="toggleCreateFolderModal(false)"
           @keyup.enter="toggleCreateFolderModal(true)"
         >
@@ -92,7 +92,7 @@
       </div>
       <div class="nav-item">
         <c-button
-          :disabled="isUploading"
+          :disabled="isUploading || !canUpload"
           data-testid="upload-file"
           @click="toggleUploadModal(false)"
           @keyup.enter="toggleUploadModal(true)"
@@ -105,7 +105,10 @@
 </template>
 
 <script>
-import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import {
+  toggleCreateFolderModal,
+  getAccessDetails,
+} from "@/common/globalFunctions";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import { mdiInformationOutline } from "@mdi/js";
 
@@ -116,6 +119,7 @@ export default {
     return {
       copy: false,
       path: mdiInformationOutline,
+      canUpload: false,
     };
   },
   computed: {
@@ -134,8 +138,22 @@ export default {
     isUploading() {
       return this.$store.state.isUploading;
     },
-    inContainer() {
-      return this.$route.params.container !== undefined;
+    owner() {
+      return this.$route.params.owner;
+    },
+    container() {
+      return this.$route.params.container;
+    },
+    client() {
+      return this.$store.state.client;
+    },
+  },
+  watch: {
+    container() {
+      this.checkIfCanReadWrite();
+    },
+    client() {
+      this.checkIfCanReadWrite();
     },
   },
   methods: {
@@ -171,12 +189,27 @@ export default {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
       if (keypress) setPrevActiveElement();
-      setTimeout(() => {
-        const uploadFolderInput = document
-          .querySelector("#upload-folder-input")
-          .shadowRoot.querySelector("input");
-        uploadFolderInput.focus();
-      }, 300);
+      if (!this.container) {
+        setTimeout(() => {
+          const uploadFolderInput = document
+            .querySelector("#upload-folder-input input");
+          uploadFolderInput.focus();
+        }, 300);
+      }
+    },
+    checkIfCanReadWrite: async function () {
+      //disable upload if user doesn't have rw perms
+      //in shared folder
+      if (!this.owner) this.canUpload = true;
+      else {
+        const share = await getAccessDetails(
+          this.active.id,
+          this.container,
+          this.owner,
+        );
+        if (!share.access) this.canUpload = false;
+        else this.canUpload = share.access.length === 2;
+      }
     },
     copyProjectId: function () {
       const toastMessage = {

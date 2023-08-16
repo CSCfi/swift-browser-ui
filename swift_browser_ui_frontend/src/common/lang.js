@@ -209,6 +209,8 @@ let default_translations = {
         complete: "Uploading completed",
         cancelled: "Uploading cancelled",
         uploadedItems: "Uploaded items will be displayed soon",
+        addFiles: "Please add files to upload.",
+        error: "Upload couldn't start. Please try again later.",
       },
       close: "Close",
       copy: " Copy",
@@ -278,7 +280,8 @@ let default_translations = {
       },
       encrypt: {
         uploadFiles: "Upload files",
-        upload_step1: "Create a new folder or use existing ones.",
+        uploadDestination: "Destination folder: ",
+        upload_step1: "Create a new folder",
         upload_step2: "Files to be uploaded",
         multipleReceivers: "Additional encryption keys (public keys only)",
         pubkey: "Paste public key",
@@ -298,6 +301,9 @@ let default_translations = {
         },
         uploadedFiles:
           "Uploaded files will be shared with all project members in ",
+        uploadedToShared:
+          "and all members in other projects which " +
+          "have access to this shared folder.",
         advancedOptions: "Advanced encryption options",
         enReady:
           "Encryption engine is ready. Refresh the " +
@@ -582,6 +588,8 @@ let default_translations = {
         complete: "Lähetys on valmis",
         cancelled: "Lähetys peruutettu",
         uploadedItems: "Lähetetyt tiedostot näytetään pian",
+        addFiles: "Lisää ladattavat tiedostot.",
+        error: "Lataus ei alkanut. Yritä myöhemmin uudelleen.",
       },
       close: "Sulje",
       copy: " Kopioi",
@@ -653,7 +661,8 @@ let default_translations = {
       },
       encrypt: {
         uploadFiles: "Lataa tiedostoja",
-        upload_step1: "Luo uusi kansio tai käytä olemassa olevia.",
+        uploadDestination: "Kohdekansio: ",
+        upload_step1: "Luo uusi kansio",
         upload_step2: "Ladattavat tiedostot",
         multipleReceivers: "Lisää salausavaimia (vain julkiset avaimet)",
         addkey: "Lisää avain",
@@ -673,6 +682,9 @@ let default_translations = {
         },
         uploadedFiles:
           "Lähetetyt tiedostot jaetaan kaikille jäsenille projektissa ",
+        uploadedToShared:
+          "ja myös kaikille jäsenille muissa projekteissa, " +
+          "joilla on pääsy tähän jaettuun kansioon.",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
         enReady:
           "Salausohjelma on valmiina. Päivitä " +
