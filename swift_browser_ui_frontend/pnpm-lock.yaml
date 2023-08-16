@@ -15,14 +15,14 @@ dependencies:
     specifier: ^4.2.3
     version: 4.2.3(vite@4.4.4)(vue@3.3.4)
   '@vueuse/rxjs':
-    specifier: ^10.2.1
-    version: 10.2.1(rxjs@7.8.1)(vue@3.3.4)
+    specifier: ^10.3.0
+    version: 10.3.0(rxjs@7.8.1)(vue@3.3.4)
   cli-highlight:
     specifier: ^2.1.11
     version: 2.1.11
   csc-ui:
     specifier: github:hannyle/csc-ui
-    version: github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
+    version: git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -1473,12 +1473,12 @@ packages:
       vue-component-type-helpers: 1.8.4
     dev: true
 
-  /@vueuse/rxjs@10.2.1(rxjs@7.8.1)(vue@3.3.4):
-    resolution: {integrity: sha512-kPj3jfcTIn+gDqX60hIIdK/ydA+NT87BS31kCFbay6IV9DMsfEZgK9dFZGdz/zX60M+ErdhCdjcXJNwGp5TCMQ==}
+  /@vueuse/rxjs@10.3.0(rxjs@7.8.1)(vue@3.3.4):
+    resolution: {integrity: sha512-k28cHAwB4ipV8xuL/dlSPgcC/UYvuAIqpTXUpu/+UmTPDrQFauR0XYKaEDLHD3gGN7dBHH5vNJpr3fAi8DFyLg==}
     peerDependencies:
       rxjs: '>=6.0.0'
     dependencies:
-      '@vueuse/shared': 10.2.1(vue@3.3.4)
+      '@vueuse/shared': 10.3.0(vue@3.3.4)
       rxjs: 7.8.1
       vue-demi: 0.14.5(vue@3.3.4)
     transitivePeerDependencies:
@@ -1486,8 +1486,8 @@ packages:
       - vue
     dev: false
 
-  /@vueuse/shared@10.2.1(vue@3.3.4):
-    resolution: {integrity: sha512-QWHq2bSuGptkcxx4f4M/fBYC3Y8d3M2UYyLsyzoPgEoVzJURQ0oJeWXu79OiLlBb8gTKkqe4mO85T/sf39mmiw==}
+  /@vueuse/shared@10.3.0(vue@3.3.4):
+    resolution: {integrity: sha512-kGqCTEuFPMK4+fNWy6dUOiYmxGcUbtznMwBZLC1PubidF4VZY05B+Oht7Jh7/6x4VOWGpvu3R37WHi81cKpiqg==}
     dependencies:
       vue-demi: 0.14.5(vue@3.3.4)
     transitivePeerDependencies:
@@ -5387,8 +5387,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
-    resolution: {tarball: https://codeload.github.com/hannyle/csc-ui/tar.gz/0a4c4fee6c8307d28265819958b1ab01089c6413}
+  git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
+    resolution: {commit: 0a4c4fee6c8307d28265819958b1ab01089c6413, repo: git@github.com:hannyle/csc-ui.git, type: git}
     name: csc-ui
     version: 0.6.79
     prepare: true
