@@ -43,14 +43,14 @@ docs = [
 ]
 test = [
     "black==23.7.0",
-    "coverage==7.2.7",
+    "coverage==7.3.0",
     "flake8-docstrings==1.7.0",
     "flake8==6.1.0",
-    "mypy==1.4.1",
+    "mypy==1.5.0",
     "pytest-cov==4.1.0",
     "pytest-xdist==3.3.1",
     "pytest==7.4.0",
-    "tox==4.6.4",
+    "tox==4.8.0",
 ]
 ui_test = [
     "pytest-timeout==2.1.0",
@@ -60,7 +60,7 @@ dev = [
     "honcho==1.1.0",
     "pre-commit==3.3.3",
     "pyspelling==2.8.2",
-    "ruff==0.0.282",
+    "ruff==0.0.284",
     "types-certifi",
     "types-redis",
     "types-requests",
