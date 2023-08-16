@@ -22,7 +22,7 @@ dependencies:
     version: 2.1.11
   csc-ui:
     specifier: github:hannyle/csc-ui
-    version: github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
+    version: git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -30,8 +30,8 @@ dependencies:
     specifier: ^8.45.0
     version: 8.45.0
   eslint-plugin-vue:
-    specifier: ^9.15.1
-    version: 9.15.1(eslint@8.45.0)
+    specifier: ^9.17.0
+    version: 9.17.0(eslint@8.45.0)
   eslint-utils:
     specifier: ^3.0.0
     version: 3.0.0(eslint@8.45.0)
@@ -2481,8 +2481,8 @@ packages:
     optionalDependencies:
       source-map: 0.6.1
 
-  /eslint-plugin-vue@9.15.1(eslint@8.45.0):
-    resolution: {integrity: sha512-CJE/oZOslvmAR9hf8SClTdQ9JLweghT6JCBQNrT2Iel1uVw0W0OLJxzvPd6CxmABKCvLrtyDnqGV37O7KQv6+A==}
+  /eslint-plugin-vue@9.17.0(eslint@8.45.0):
+    resolution: {integrity: sha512-r7Bp79pxQk9I5XDP0k2dpUC7Ots3OSWgvGZNu3BxmKK6Zg7NgVtcOB6OCna5Kb9oQwJPl5hq183WD0SY5tZtIQ==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.2.0 || ^7.0.0 || ^8.0.0
@@ -5387,8 +5387,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
-    resolution: {tarball: https://codeload.github.com/hannyle/csc-ui/tar.gz/0a4c4fee6c8307d28265819958b1ab01089c6413}
+  git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
+    resolution: {commit: 0a4c4fee6c8307d28265819958b1ab01089c6413, repo: git@github.com:hannyle/csc-ui.git, type: git}
     name: csc-ui
     version: 0.6.79
     prepare: true
