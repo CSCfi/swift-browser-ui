@@ -359,6 +359,7 @@ export default {
         await this.$store.dispatch("updateContainers", {
           projectID: this.active.id,
           signal: this.abortController.signal,
+          routeContainer: this.$route.params.container,
         });
       }, 3000);
     },
