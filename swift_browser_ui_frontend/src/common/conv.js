@@ -126,7 +126,7 @@ export async function syncContainerACLs(store) {
           },
         );
 
-        if (whitelisted.status == 204) {
+        if (whitelisted.status == 404) {
           accesslist.push("v");
         } else {
           accesslist.push("r");
