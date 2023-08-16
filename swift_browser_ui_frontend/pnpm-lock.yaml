@@ -22,7 +22,7 @@ dependencies:
     version: 2.1.11
   csc-ui:
     specifier: github:hannyle/csc-ui
-    version: github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
+    version: git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -89,8 +89,8 @@ devDependencies:
     specifier: ^12.17.1
     version: 12.17.1
   cypress-cloud:
-    specifier: ^1.9.1
-    version: 1.9.1(cypress@12.17.1)
+    specifier: ^1.9.3
+    version: 1.9.3(cypress@12.17.1)
   install:
     specifier: ^0.13.0
     version: 0.13.0
@@ -2132,8 +2132,8 @@ packages:
       - supports-color
     dev: true
 
-  /cypress-cloud@1.9.1(cypress@12.17.1):
-    resolution: {integrity: sha512-JdElp53c4pgNLfRf+7/KdHjg0xgzLtSp4ErzwHsIPQdymJTIqlXI1oypC/HfDKKumj5sNl85uE90GP/sry/9eA==}
+  /cypress-cloud@1.9.3(cypress@12.17.1):
+    resolution: {integrity: sha512-SSS7olSrtX3UQ7OwmLSf2zcapyUD33l1i8gKbRxRLSybUK3Mi4NlEFK8i3lvJXBbo6T5UVQLMM+UTg5KbbflOA==}
     engines: {node: '>=14.7.0'}
     hasBin: true
     peerDependencies:
@@ -5387,8 +5387,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
-    resolution: {tarball: https://codeload.github.com/hannyle/csc-ui/tar.gz/0a4c4fee6c8307d28265819958b1ab01089c6413}
+  git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
+    resolution: {commit: 0a4c4fee6c8307d28265819958b1ab01089c6413, repo: git@github.com:hannyle/csc-ui.git, type: git}
     name: csc-ui
     version: 0.6.79
     prepare: true

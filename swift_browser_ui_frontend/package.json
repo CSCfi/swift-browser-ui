@@ -43,7 +43,7 @@
     "@testing-library/vue": "^7.0.0",
     "@vue/compiler-sfc": "^3.3.4",
     "cypress": "^12.17.1",
-    "cypress-cloud": "^1.9.1",
+    "cypress-cloud": "^1.9.3",
     "install": "^0.13.0",
     "jest": "^29.6.1"
   },
