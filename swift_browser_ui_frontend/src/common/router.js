@@ -4,25 +4,34 @@ import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
 import {getProjects, getContainers} from "@/common/api.js";
 import { getDB } from "@/common/db";
-// import store from "./vuex/store";
 
 
 async function checkProject (to,from,next){
-  const projects = await getProjects();
 
-  const val = projects.find(item =>
-    item.id === to.params.project);
-
-  if(val !== undefined) {
-    next();
+  let projects = await getDB()
+    .projects.where({id: to.params.project} )
+    .toArray();
+  if(projects.length === null){
+    projects = await getProjects();
+    const val = projects.find(item =>
+      item.id === to.params.project);
+    if(val !== undefined) {
+      next();
+    } else {
+      window.location.pathname = "/notfound";
+    }
   } else {
-    window.location.pathname = "/notfound";
+    if(projects.length === 1){
+      next();
+    } else {
+      window.location.pathname = "/notfound";
+    }
   }
 
 }
 async function checkContainer (to){
 
-  var containers = await getDB()
+  let containers = await getDB()
     .containers.where({projectID: to.params.project} )
     .toArray();
   if(containers.length === 0){
