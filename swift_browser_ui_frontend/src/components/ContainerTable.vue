@@ -286,8 +286,8 @@ export default {
                       size: "small",
                       title: this.$t("message.share.share"),
                       path: mdiShareVariantOutline,
-                      onClick: (item) =>
-                        this.onOpenShareModal(item.data.name.value),
+                      onClick: () =>
+                        this.onOpenShareModal(item.name),
                       onKeyUp: (event) => {
                         if(event.keyCode === 13)
                           this.onOpenShareModal(item.name, true);
