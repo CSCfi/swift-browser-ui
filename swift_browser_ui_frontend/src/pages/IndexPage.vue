@@ -129,6 +129,13 @@ export default {
     CFooter,
     LanguageSelector,
   },
+  created: function() {
+    if(this.$route !== undefined && this.$route.query.nf !== true){
+      this.notfound = true;
+      this.notindex = true;
+      this.idb = true;
+    }
+  },
   mounted: function () {
     checkIDB().then(result => this.idb = result);
   },
