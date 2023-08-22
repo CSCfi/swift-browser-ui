@@ -90,6 +90,12 @@ export default {
     active() {
       return this.$store.state.active;
     },
+    openShareModal: {
+      get() {
+        return this.$store.state.openShareModal;
+      },
+      set() {},
+    },
   },
   watch: {
     disablePagination() {
@@ -109,6 +115,13 @@ export default {
       this.getPage();
       this.setPagination();
     },
+    openShareModal: function () {
+      if(!this.openShareModal) {
+        setTimeout(() => {
+          this.getPage();
+        }, 3000);
+      }
+    },
   },
   created() {
     this.setHeaders();
@@ -121,20 +134,6 @@ export default {
     this.abortController.abort();
   },
   methods: {
-    async getSharingContainers() {
-      return this.sharingClient
-        ? this.sharingClient.getShare(
-          this.active.id,
-          this.abortController.signal)
-        : [];
-    },
-    getSharedContainers () {
-      return this.sharingClient
-        ? this.sharingClient.getAccess(
-          this.$route.params.project,
-          this.abortController.signal)
-        : [];
-    },
     async getPage () {
       let offset = 0;
       let limit = this.conts.length;

@@ -32,7 +32,6 @@
 
 <script>
 import { liveQuery } from "dexie";
-import { delay } from "lodash";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
 import { getSharingContainers } from "@/common/globalFunctions";
@@ -66,12 +65,6 @@ export default {
   computed: {
     active() {
       return this.$store.state.active;
-    },
-    openShareModal: {
-      get() {
-        return this.$store.state.openShareModal;
-      },
-      set() {},
     },
     isFolderUploading() {
       return this.$store.state.isUploading;
@@ -116,16 +109,9 @@ export default {
         this.renderingContainers = this.containers;
       }
     },
-    openShareModal: function () {
-      if(!this.openShareModal) {
-        delay(() => {
-          this.fetchContainers();
-        }, 3000);
-      }
-    },
     isFolderUploading: function () {
       if (!this.isFolderUploading) {
-        delay(() => {
+        setTimeout(() => {
           this.fetchContainers();
         }, 3000);
       }

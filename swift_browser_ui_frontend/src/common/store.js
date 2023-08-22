@@ -19,7 +19,6 @@ import {
 
 import { getDB } from "@/common/db";
 import {
-  getSharingContainers,
   getSharedContainers,
   getContainerLastmodified,
   updateContainerLastmodified,
@@ -282,7 +281,7 @@ const store = createStore({
         containers = await getContainers(projectID, marker, signal)
           .catch(() => {});
 
-        if (containers.length > 0) {
+        if (containers?.length > 0) {
           containers.forEach(cont => {
             cont.tokens = cont.name.endsWith("_segments") ?
               [] : tokenize(cont.name);
@@ -356,7 +355,6 @@ const store = createStore({
         addSegmentContainerSize(newContainers[i], newContainers);
       }
 
-      const sharingContainers = await getSharingContainers(projectID, signal);
       let containers_to_update_objects = [];
       for (let i = 0; i < newContainers.length; i++) {
         const container = newContainers[i];
@@ -402,14 +400,13 @@ const store = createStore({
           }
         }
 
-        if (updateObjects ||
-          sharingContainers.some(cont => cont === container.name)
-        ) {
+        if (updateObjects) {
           // Have a separate array contained containers that
           // their objects should be updated
           containers_to_update_objects.push({ container, key });
         }
       }
+
       // Updating objects goes sequentially:
       // Update all objects inside a segment_container first
       // before updating objects inside original container
@@ -507,7 +504,6 @@ const store = createStore({
 
       if (!isSegmentsContainer) {
         const segment_objects = await getSegmentObjects(projectID, container);
-
         for (let i = 0; i < newObjects.length; i++) {
           if (segment_objects[i]) {
             newObjects[i].bytes = segment_objects[i].bytes;
@@ -527,9 +523,7 @@ const store = createStore({
 
       for (let i = 0; i < newObjects.length; i++) {
         const newObj = newObjects[i];
-
         let oldObj = existingObjects.find(obj => obj.name === newObj.name);
-
         if (oldObj) {
           await getDB().objects.update(oldObj.id, newObj);
         } else {
