@@ -86,6 +86,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    breadcrumbClickedProp: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -138,13 +142,27 @@ export default {
   },
   beforeUpdate() {
     this.getPage();
+    if(this.breadcrumbClickedProp) this.paginationOptions.currentPage = 1;
+  },
+  mounted() {
+    window.addEventListener("popstate", this.handlePopState);
+  },
+  beforeUnmount() {
+    window.removeEventListener("popstate", this.handlePopState);
   },
   updated(){
     this.paginationOptions.currentPage =
       checkIfItemIsLastOnPage(this.paginationOptions);
   },
   methods: {
+    handlePopState(event) {
+      // reset page to 1 after reversing a page
+      if (event.type === "popstate") {
+        this.paginationOptions.currentPage = 1;
+      }
+    },
     changeFolder: function (folder) {
+      this.paginationOptions.currentPage = 1;
       this.$router.push(
         `${window.location.pathname}?prefix=${getPrefix(this.$route)}${folder}`,
       );
@@ -219,7 +237,7 @@ export default {
                       : this.navDownload(item.url);
                   },
                   disabled: this.owner != undefined &&
-                    this.accessRights.length === 0 || item.bytes === 0,
+                    this.accessRights.length === 0,
                 },
               },
             },

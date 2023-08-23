@@ -629,6 +629,8 @@ export default {
       this.toastMsg = "";
 
       moveFocusOutOfModal(this.prevActiveEl);
+
+      moveFocusOutOfModal(this.prevActiveEl);
     },
     checkIfCanUpload() {
       if (this.dropFiles.length === 0) {

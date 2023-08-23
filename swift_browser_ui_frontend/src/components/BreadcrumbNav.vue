@@ -6,6 +6,7 @@
     >
       <router-link
         :to="{ name: 'AllFolders'}"
+        @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-home" />
         <span>&nbsp;{{ $t("message.folderTabs.all") }}</span>
@@ -13,6 +14,7 @@
       <router-link
         class="link"
         :to="{name: currentRoute}"
+        @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
         <span :class="subfolders === '' ? 'last' : 'default'">
@@ -24,6 +26,7 @@
         v-for="item, i in subfolders"
         :key="item"
         :to="getPath(i)"
+        @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
         <span :class="i === subfolders.length-1 ? 'last': 'default'">
@@ -51,6 +54,9 @@ export default {
     },
   },
   methods: {
+    onClickBreadcrumb() {
+      this.$emit("breadcrumbClicked", true);
+    },
     getPath(index) {
       if (index === this.subfolders.length-1) {
 

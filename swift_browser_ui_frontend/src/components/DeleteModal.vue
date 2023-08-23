@@ -4,30 +4,36 @@
     class="delete-modal"
     @keydown="handleKeyDown"
   >
-    <c-alert type="error">
-      <div slot="title">
-        {{ $t("message.objects.deleteObjects") }}
-      </div>
+    <c-card
+      ref="deleteObjsModal"
+      class="delete-modal"
+      @keydown="handleKeyDown"
+    >
+      <c-alert type="error">
+        <div slot="title">
+          {{ $t("message.objects.deleteObjects") }}
+        </div>
 
-      {{ $t("message.objects.deleteObjectsMessage") }}
+        {{ $t("message.objects.deleteObjectsMessage") }}
 
-      <c-card-actions justify="end">
-        <c-button
-          outlined
-          @click="toggleDeleteModal(false)"
-          @keyup.enter="toggleDeleteModal(true)"
-        >
-          {{ $t("message.cancel") }}
-        </c-button>
-        <c-button
-          id="delete-objs-btn"
-          @click="deleteObjects()"
-          @keyup.enter="deleteObjects()"
-        >
-          {{ $t("message.objects.deleteConfirm") }}
-        </c-button>
-      </c-card-actions>
-    </c-alert>
+        <c-card-actions justify="end">
+          <c-button
+            outlined
+            @click="toggleDeleteModal(false)"
+            @keyup.enter="toggleDeleteModal(true)"
+          >
+            {{ $t("message.cancel") }}
+          </c-button>
+          <c-button
+            id="delete-objs-btn"
+            @click="deleteObjects()"
+            @keyup.enter="deleteObjects()"
+          >
+            {{ $t("message.objects.deleteConfirm") }}
+          </c-button>
+        </c-card-actions>
+      </c-alert>
+    </c-card>
   </c-card>
 </template>
 

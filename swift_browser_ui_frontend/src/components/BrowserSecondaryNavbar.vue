@@ -105,10 +105,7 @@
 </template>
 
 <script>
-import {
-  toggleCreateFolderModal,
-  getAccessDetails,
-} from "@/common/globalFunctions";
+import { toggleCreateFolderModal } from "@/common/globalFunctions";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import { mdiInformationOutline } from "@mdi/js";
 
@@ -189,27 +186,12 @@ export default {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
       if (keypress) setPrevActiveElement();
-      if (!this.container) {
-        setTimeout(() => {
-          const uploadFolderInput = document
-            .querySelector("#upload-folder-input input");
-          uploadFolderInput.focus();
-        }, 300);
-      }
-    },
-    checkIfCanReadWrite: async function () {
-      //disable upload if user doesn't have rw perms
-      //in shared folder
-      if (!this.owner) this.canUpload = true;
-      else {
-        const share = await getAccessDetails(
-          this.active.id,
-          this.container,
-          this.owner,
-        );
-        if (!share.access) this.canUpload = false;
-        else this.canUpload = share.access.length === 2;
-      }
+      setTimeout(() => {
+        const uploadFolderInput = document
+          .querySelector("#upload-folder-input")
+          .shadowRoot.querySelector("input");
+        uploadFolderInput.focus();
+      }, 300);
     },
     copyProjectId: function () {
       const toastMessage = {
