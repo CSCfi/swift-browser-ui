@@ -1,5 +1,6 @@
 // Vuex store for the variables that need to be globally available.
 import { createStore } from "vuex";
+import { isEqual } from "lodash";
 
 import {
   getContainers,
@@ -325,11 +326,6 @@ const store = createStore({
         newContainers = newContainers.concat(sharedContainers);
       }
 
-      dispatch("updateContainerTags", {
-        projectID: projectID,
-        containers: newContainers,
-        signal,
-      });
 
       const toDelete = [];
       for (let i = 0; i < existingContainers.length; i++) {
@@ -442,17 +438,38 @@ const store = createStore({
 
       if (containers_to_update_objects.length > 0) dispatchUpdateObjects();
       else commit("setLoaderVisible", false);
+
+      dispatch("updateContainerTags", {
+        projectID: projectID,
+        containers: newContainers,
+        signal,
+      });
     },
-    updateContainerTags: async function (_, { projectID, containers, signal }) {
+    updateContainerTags: async function (_, {
+      projectID, containers, signal,
+    }) {
+      const idbContainers = await getDB()
+        .containers.where({ projectID })
+        .toArray();
+
       for (let i = 0; i < containers.length; i++) {
         const container = containers[i];
-        const tags =
+        // Update tags for non-segment containers and for those that
+        // have difference between new tags and existing tags from IDB
+        if (!container.name.endsWith("_segments")) {
+          const tags =
           (await getTagsForContainer(
             projectID, container.name, signal, container.owner)) ||
           null;
-        await getDB().containers
-          .where({ projectID: container.projectID, name: container.name })
-          .modify({ tags });
+
+          idbContainers.forEach(async (cont) => {
+            if (cont.name === container.name && !isEqual(tags, cont.tags)) {
+              await getDB().containers
+                .where({ projectID, name: container.name })
+                .modify({ tags });
+            }
+          });
+        }
       }
     },
 
@@ -565,11 +582,6 @@ const store = createStore({
         // for object name is 1024. Set it to a safe enough amount.
         // We split the requests to prevent reaching said limits.
         objectList.push(objects[i].name);
-        const url = makeGetObjectsMetaURL(
-          projectID,
-          container.name,
-          objectList,
-        );
 
         if (
           i === objects.length - 1 ||
@@ -578,6 +590,12 @@ const store = createStore({
             objects[i + 1].name,
           ]).href.length >= 8190
         ) {
+          const url = makeGetObjectsMetaURL(
+            projectID,
+            container.name,
+            objectList,
+          );
+
           let tags = await getTagsForObjects(
             projectID,
             container.name,
@@ -592,18 +610,22 @@ const store = createStore({
             const tags = item[1];
             if (sharedObjects) {
               objects.forEach(obj => {
-                if (obj.name === objectName) {
+                if (obj.name === objectName && !isEqual(tags, obj.tags)) {
                   obj.tags = tags;
                 }
               });
               commit("updateObjects", objects);
             } else {
-              getDB().objects
-                .where({ containerID: container.id, name: objectName })
-                .modify({ tags });
+              objects.forEach(async (obj) => {
+                if (obj.name === objectName && !isEqual(tags, obj.tags)) {
+                  await getDB().objects
+                    .where({ containerID: container.id, name: objectName })
+                    .modify({ tags });
+                }
+              });
             }
-          }),
-          (objectList = []);
+          });
+          objectList = [];
         }
       }
     },
@@ -664,13 +686,15 @@ const store = createStore({
 
       updateContainerLastmodified(projectID, container, sharedObjects);
 
-      dispatch("updateObjectTags", {
-        projectID: projectID,
-        container,
-        signal,
-        sharedObjects,
-        owner,
-      });
+      if (!isSegmentsContainer) {
+        dispatch("updateObjectTags", {
+          projectID: projectID,
+          container,
+          signal,
+          sharedObjects,
+          owner,
+        });
+      }
     },
   },
 });
