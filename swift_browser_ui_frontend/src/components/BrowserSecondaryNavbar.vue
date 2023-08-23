@@ -105,7 +105,10 @@
 </template>
 
 <script>
-import { toggleCreateFolderModal } from "@/common/globalFunctions";
+import {
+  toggleCreateFolderModal,
+  getAccessDetails,
+} from "@/common/globalFunctions";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import { mdiInformationOutline } from "@mdi/js";
 
@@ -179,6 +182,7 @@ export default {
       setTimeout(() => {
         const newFolderInput = document
           .querySelector("#newFolder-input input");
+        newFolderInput.tabIndex = "0";
         newFolderInput.focus();
       }, 300);
     },
@@ -192,6 +196,20 @@ export default {
           .shadowRoot.querySelector("input");
         uploadFolderInput.focus();
       }, 300);
+    },
+    checkIfCanReadWrite: async function () {
+      //disable upload if user doesn't have rw perms
+      //in shared folder
+      if (!this.owner) this.canUpload = true;
+      else {
+        const share = await getAccessDetails(
+          this.active.id,
+          this.container,
+          this.owner,
+        );
+        if (!share.access) this.canUpload = false;
+        else this.canUpload = share.access.length === 2;
+      }
     },
     copyProjectId: function () {
       const toastMessage = {
