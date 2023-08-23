@@ -370,6 +370,10 @@ const app = createApp({
     document
       .getElementById("mainContainer")
       .addEventListener("keydown", this.onKeydown);
+
+    document
+      .getElementById("mainContainer")
+      .addEventListener("keydown", this.onKeydown);
   },
   methods: {
     containerSyncWrapper: function () {

@@ -445,7 +445,7 @@ let default_translations = {
         sharing_to_one_project: "Tämä kansio on jaettu yhdelle projektille.",
         sharing_to_many_projects: "Tämä kansio on jaettu useille projekteille.",
         shared_with_view: "Tämä kansio on jaettu kanssasi. Voit " +
-        "selata kansion sisältöä. (Katsele).",
+        "selata tätä kansiota. (Katsele).",
         shared_with_read:
           "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
           "tiedostoja tässä kansiossa ja purkaa kansion sisällön " +

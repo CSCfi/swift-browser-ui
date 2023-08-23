@@ -2,7 +2,7 @@
   <div
     id="object-table"
   >
-    <BreadcrumbNav />
+    <BreadcrumbNav @breadcrumbClicked="breadcrumbClickHandler" />
     <div class="folder-info">
       <div class="folder-info-heading">
         <i class="mdi mdi-folder-outline" />
@@ -94,6 +94,7 @@
       </c-menu>
     </c-row>
     <CObjectTable
+      :breadcrumb-clicked-prop="breadcrumbClicked"
       :objs="filteredObjects.length ? filteredObjects : oList"
       :disable-pagination="hidePagination"
       :hide-tags="hideTags"
@@ -177,6 +178,7 @@ export default {
       inCurrentFolder: [],
       tableOptions: [],
       currentContainer: {},
+      breadcrumbClicked: false,
     };
   },
   computed: {
@@ -277,7 +279,13 @@ export default {
   beforeUnmount () {
     this.abortController.abort();
   },
+  updated () {
+    if (this.breadcrumbClicked) this.breadcrumbClicked = false;
+  },
   methods: {
+    breadcrumbClickHandler(value) {
+      this.breadcrumbClicked = value;
+    },
     getSharedContainers: async function () {
       this.sharedContainers =
         await getSharedContainers(this.active.id, this.abortController.signal);
