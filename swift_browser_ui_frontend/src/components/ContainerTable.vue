@@ -136,9 +136,9 @@ export default {
   methods: {
     async getPage () {
       let offset = 0;
-      let limit = this.conts.length;
+      let limit = this.conts?.length;
 
-      if (!this.disablePagination || this.conts.length > 500) {
+      if (!this.disablePagination || this.conts?.length > 500) {
         offset =
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
@@ -236,7 +236,7 @@ export default {
                       },
                     },
                   })),
-                  ...(item.tags && !item.tags.length
+                  ...(item.tags && !item.tags?.length
                     ? [{ key: "no_tags", value: "-" }]
                     : []),
                 ],
@@ -270,7 +270,7 @@ export default {
                       ),
                       target: "_blank",
                       path: mdiTrayArrowDown,
-                      disabled: item.owner && item.accessRights.length === 0,
+                      disabled: item.owner && item.accessRights?.length === 0,
                     },
                   },
                 },
@@ -348,7 +348,7 @@ export default {
                             title: this.$t("message.options"),
                             size: "small",
                             disabled: item.owner &&
-                              item.accessRights.length === 0,
+                              item.accessRights?.length === 0,
                           },
                         },
                       },

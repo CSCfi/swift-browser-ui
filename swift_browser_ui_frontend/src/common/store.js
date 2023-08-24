@@ -376,11 +376,21 @@ const store = createStore({
           ) {
             updateObjects = false;
           }
+
           if (container.count === 0) {
             updateObjects = false;
             await getDB()
               .objects.where({ containerID: oldContainer.id })
               .delete();
+          }
+
+          // Check if shared containers should be updated objects
+          if (
+            container.count === oldContainer.count &&
+            container.bytes === oldContainer.bytes &&
+            container.owner && dbObjects === 0
+          ) {
+            updateObjects = false;
           }
           await getDB().containers.update(oldContainer.id, container);
         } else {
