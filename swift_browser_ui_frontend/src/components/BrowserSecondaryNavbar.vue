@@ -179,6 +179,13 @@ export default {
         Array.from(nav.children).forEach((child) =>
           child.setAttribute("inert", "true"));
       }
+      if (!this.container) {
+        setTimeout(() => {
+          const uploadFolderInput = document
+            .querySelector("#upload-folder-input input");
+          uploadFolderInput.focus();
+        }, 300);
+      }
       setTimeout(() => {
         const newFolderInput = document
           .querySelector("#newFolder-input input");
@@ -190,12 +197,13 @@ export default {
       this.$store.commit("setFilesAdded", true);
       this.$store.commit("toggleUploadModal", true);
       if (keypress) setPrevActiveElement();
-      setTimeout(() => {
-        const uploadFolderInput = document
-          .querySelector("#upload-folder-input")
-          .shadowRoot.querySelector("input");
-        uploadFolderInput.focus();
-      }, 300);
+      if (!this.container) {
+        setTimeout(() => {
+          const uploadFolderInput = document
+            .querySelector("#upload-folder-input input");
+          uploadFolderInput.focus();
+        }, 300);
+      }
     },
     checkIfCanReadWrite: async function () {
       //disable upload if user doesn't have rw perms
