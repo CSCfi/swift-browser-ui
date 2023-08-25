@@ -1,6 +1,6 @@
 // Vuex store for the variables that need to be globally available.
 import { createStore } from "vuex";
-import { isEqual } from "lodash";
+import { isEqual, isEqualWith } from "lodash";
 
 import {
   getContainers,
@@ -572,14 +572,17 @@ const store = createStore({
       }
     },
     updateObjectTags: async function (
-      { commit },
+      _,
       { projectID, container, signal, sharedObjects = undefined, owner },
     ) {
       let objectList = [];
 
       let objects = [];
       if (sharedObjects) {
-        objects = sharedObjects;
+        objects = await getDB().objects
+          .where({ containerID: container.id })
+          .and(obj => obj.containerOwner)
+          .toArray();
       } else {
         objects = await getDB().objects
           .where({ containerID: container.id })
@@ -614,17 +617,18 @@ const store = createStore({
             signal,
             owner,
           );
-
-          tags.forEach(item => {
+          console.log("tags.length :>> ", tags.length);
+          tags.forEach(async (item) => {
             const objectName = item[0];
             const tags = item[1];
             if (sharedObjects) {
-              objects.forEach(obj => {
+              objects.forEach(async (obj) => {
                 if (obj.name === objectName && !isEqual(tags, obj.tags)) {
-                  obj.tags = tags;
+                  await getDB().objects
+                    .where({ containerID: container.id, name: objectName })
+                    .modify({ tags });
                 }
               });
-              commit("updateObjects", objects);
             } else {
               objects.forEach(async (obj) => {
                 if (obj.name === objectName && !isEqual(tags, obj.tags)) {
@@ -653,6 +657,10 @@ const store = createStore({
         signal = controller.signal;
       }
 
+      const existingSharedObjects = await getDB().objects
+        .where({ containerID: container.id })
+        .toArray();
+
       do {
         objects = await getObjects(
           projectID,
@@ -669,12 +677,28 @@ const store = createStore({
           objects.forEach(obj => {
             obj.container = container.name;
             obj.containerID = container.id;
+            obj.containerOwner = container.owner;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
           });
           sharedObjects = sharedObjects.concat(objects);
           marker = objects[objects.length - 1].name;
         }
       } while (objects?.length > 0);
+
+      let toDelete = [];
+
+      for (let i = 0; i < existingSharedObjects.length; i++) {
+        const oldObj = existingSharedObjects[i];
+        if (!sharedObjects.find(obj => obj.name === oldObj.name &&
+          obj.containerID === oldObj.containerID,
+        )) {
+          toDelete.push(oldObj.id);
+        }
+      }
+
+      if (toDelete.length) {
+        await getDB().objects.bulkDelete(toDelete);
+      }
 
       if (!isSegmentsContainer) {
         const segment_objects = await getObjects(
@@ -692,7 +716,33 @@ const store = createStore({
         }
       }
 
-      commit("updateObjects", sharedObjects);
+      for (let i = 0; i < sharedObjects.length; i++) {
+        const newObj = sharedObjects[i];
+        let oldObj = existingSharedObjects.find(
+          obj => obj.name === newObj.name &&
+            obj.containerID === newObj.containerID);
+
+        // Check if oldObj and newObj have the same properties
+        // except the key "id", because key "id" is from IDB for oldObj
+        const isEqualObject = isEqualWith(oldObj, newObj, (oldObj, newObj) => {
+          if (oldObj?.id && !newObj?.id) return true;
+        });
+
+        if (oldObj ) {
+          if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
+        } else {
+          try {
+            await getDB().objects.put(newObj);
+          } catch (e) {
+            if (DEV) console.error("Constraint error: " + e.message);
+          }
+        }
+        if (!isSegmentsContainer && i === sharedObjects.length - 1) {
+          commit("setLoaderVisible", false);
+        }
+      }
+
+      //commit("updateObjects", sharedObjects);
 
       updateContainerLastmodified(projectID, container, sharedObjects);
 

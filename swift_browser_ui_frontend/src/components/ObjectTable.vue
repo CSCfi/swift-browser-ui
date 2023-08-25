@@ -200,9 +200,6 @@ export default {
     active () {
       return this.$store.state.active;
     },
-    sharedObjects() {
-      return this.$store.state.objectCache;
-    },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
     },
@@ -234,12 +231,6 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
-    sharedObjects: function () {
-      if(this.$route.name !== "SharedObjects") {
-        return;
-      }
-      this.oList = this.sharedObjects;
-    },
     queryPage: function () {
       this.currentPage = this.queryPage;
     },
@@ -264,6 +255,7 @@ export default {
       if (!this.shareModal) await this.getFolderSharedStatus();
     },
   },
+
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
@@ -388,22 +380,6 @@ export default {
         return;
       }
 
-      if(this.$route.name === "SharedObjects") {
-        await this.$store.dispatch(
-          "updateSharedObjects",
-          {
-            projectID: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: {
-              id: 0,
-              name: this.$route.params.container,
-            },
-            signal: this.abortController.signal,
-          },
-        );
-        return;
-      }
-
       this.currentContainer = await getDB().containers
         .get({
           projectID: this.$route.params.project,
@@ -418,14 +394,30 @@ export default {
         ),
       );
 
-      this.$store.dispatch(
-        "updateObjects",
-        {
-          projectID: this.$route.params.project,
-          container: this.currentContainer,
-          signal: this.abortController.signal,
-        },
-      );
+      if (this.$route.name === "SharedObjects") {
+        await this.$store.dispatch(
+          "updateSharedObjects",
+          {
+            projectID: this.$route.params.project,
+            owner: this.$route.params.owner,
+            container: {
+              id: this.currentContainer.id,
+              name: this.$route.params.container,
+              owner: this.currentContainer.owner,
+            },
+            signal: this.abortController.signal,
+          },
+        );
+      } else {
+        this.$store.dispatch(
+          "updateObjects",
+          {
+            projectID: this.$route.params.project,
+            container: this.currentContainer,
+            signal: this.abortController.signal,
+          },
+        );
+      }
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {

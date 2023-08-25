@@ -103,8 +103,7 @@ export default {
 
       if (!isSegmentsContainer) {
         segment_container = await getDB().containers.get({
-          projectID: this.$route.name === "SharedObjects" ?
-            this.owner : this.projectID,
+          projectID: this.projectID,
           name: `${this.selectedObjects[0].container}_segments`,
         });
       }
@@ -130,20 +129,17 @@ export default {
         }
       }
 
-      if(this.$route.name !== "SharedObjects") {
-        // Delete objects and segment objects from IDB
-        const objIDs = this.selectedObjects.filter(
-          obj => obj.name && to_remove.includes(obj.name)).reduce(
-          (prev, obj) => [...prev, obj.id], [],
-        );
+      // Delete objects and segment objects from IDB
+      const objIDs = this.selectedObjects.filter(
+        obj => obj.name && to_remove.includes(obj.name)).reduce(
+        (prev, obj) => [...prev, obj.id], [],
+      );
 
-        const segmentObjIDs = segment_container ? await getDB().objects
-          .where({ containerID: segment_container.id })
-          .filter(obj => obj.name && segments_to_remove.includes(obj.name))
-          .primaryKeys() : [];
-
-        await getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
-      }
+      const segmentObjIDs = segment_container ? await getDB().objects
+        .where({ containerID: segment_container.id })
+        .filter(obj => obj.name && segments_to_remove.includes(obj.name))
+        .primaryKeys() : [];
+      await getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
 
       swiftDeleteObjects(
         this.owner || this.projectID,
@@ -155,20 +151,6 @@ export default {
             this.owner || this.projectID,
             segment_container.name,
             segments_to_remove,
-          );
-        }
-
-        if (this.$route.name === "SharedObjects") {
-          await this.$store.dispatch(
-            "updateSharedObjects",
-            {
-              projectID: this.projectID,
-              owner: this.owner,
-              container: {
-                name: this.container,
-                id: 0,
-              },
-            },
           );
         }
 
