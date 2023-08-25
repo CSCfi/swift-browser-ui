@@ -180,6 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1058) Fix shown size of copied container when source container has a lot of objects
 - (GL #972) Fix for missing required param `"user"` and no match location for path `"/browse"`
 - (GL #1111) Fix for Share button not always working
+- (GL #1066) Fix for sharing/permissions not removed correctly
 
 ### Removed
 

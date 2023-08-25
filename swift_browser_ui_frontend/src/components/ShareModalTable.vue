@@ -205,53 +205,64 @@ export default {
       }
       this.$emit("updateSharedFolder");
     },
-    deleteFolderShare: function (folderData) {
-      removeAccessControlMeta(
+    deleteFolderShare: async function (folderData) {
+      await removeAccessControlMeta(
         this.projectId,
         this.folderName,
-      ).then(
-        async () => {
-          await this.$store.state.client.shareDeleteAccess(
-            this.projectId,
-            this.folderName,
-            [folderData.projectId.value],
-          );
+      );
 
-          let projectIDs = await this.$store.state.client.projectCheckIDs(
-            folderData.projectId.value,
-          );
+      await removeAccessControlMeta(
+        this.projectId,
+        `${this.folderName}_segments`,
+      );
 
-          let signatureUrl = new URL("/sign/3600", document.location.origin);
-          signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
-          let signed = await GET(signatureUrl);
-          signed = await signed.json();
-          let whitelistUrl = new URL(
-            `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
-            this.$store.state.uploadEndpoint,
-          );
-          whitelistUrl.searchParams.append(
-            "valid",
-            signed.valid,
-          );
-          whitelistUrl.searchParams.append(
-            "signature",
-            signed.signature,
-          );
-          await fetch(
-            whitelistUrl,
-            {
-              method: "DELETE",
-              body: JSON.stringify([
-                projectIDs.name,
-              ]),
-            },
-          ).then(() => {
-            if (DEV) console.log(
-              `Deleted sharing whitelist entry for ${folderData.projectId.value}`,
-            );
-          });
+      await this.$store.state.client.shareDeleteAccess(
+        this.projectId,
+        this.folderName,
+        [folderData.projectId.value],
+      );
+
+      await this.$store.state.client.shareDeleteAccess(
+        this.projectId,
+        `${this.folderName}_segments`,
+        [folderData.projectId.value],
+      );
+
+      let projectIDs = await this.$store.state.client.projectCheckIDs(
+        folderData.projectId.value,
+      );
+
+      let signatureUrl = new URL("/sign/3600", document.location.origin);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
+      let signed = await GET(signatureUrl);
+      signed = await signed.json();
+      let whitelistUrl = new URL(
+        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        this.$store.state.uploadEndpoint,
+      );
+      whitelistUrl.searchParams.append(
+        "valid",
+        signed.valid,
+      );
+      whitelistUrl.searchParams.append(
+        "signature",
+        signed.signature,
+      );
+
+      fetch(
+        whitelistUrl,
+        {
+          method: "DELETE",
+          body: JSON.stringify([
+            projectIDs.name,
+          ]),
         },
       ).then(() => {
+        if (DEV) console.log(
+          `Deleted sharing whitelist entry for ${folderData.projectId.value}`,
+        );
+      },
+      ).finally(() => {
         if (DEV) console.log(
           `Share deletion for ${folderData.projectId.value} finished.`,
         );
