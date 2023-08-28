@@ -86,6 +86,36 @@
             </c-button>
           </div>
         </c-alert>
+        <c-alert
+          v-show="existingFiles.length"
+          type="warning"
+        >
+          <span>
+            {{ $t("message.objects.file") }}
+            <b>
+              {{ existingFiles.reduce((array, item) => {
+                array.push(item.name);
+                return array;
+              }, []).join(", ") }}
+            </b>
+            {{ $t("message.objects.overwriteConfirm") }}
+          </span>
+          <c-card-actions justify="end">
+            <c-button
+              outlined
+              @click="clearExistingFiles"
+              @keyup.enter="clearExistingFiles"
+            >
+              {{ $t("message.cancel") }}
+            </c-button>
+            <c-button
+              @click="overwriteFiles"
+              @keyup.enter="overwriteFiles"
+            >
+              {{ $t("message.objects.overwrite") }}
+            </c-button>
+          </c-card-actions>
+        </c-alert>
         <!-- Footer options needs to be in CamelCase,
         because csc-ui wont recognise it otherwise. -->
         <!-- eslint-disable-->
@@ -236,6 +266,8 @@ export default {
       errorMsg: "",
       toastMsg : "",
       containers: [],
+      objects: [],
+      existingFiles: [],
     };
   },
   computed: {
@@ -428,6 +460,12 @@ export default {
         this.containers = await getDB().containers
           .where({ projectID: this.active.id })
           .toArray();
+        if (this.currentFolder) {
+          const cont = this.containers.find(c => c.name === this.currentFolder);
+          this.objects = await getDB().objects
+            .where({containerID: cont.id})
+            .toArray();
+        }
       }
     },
     inputFolder: function() {
@@ -472,13 +510,20 @@ export default {
     },
 
     appendDropFiles(file) {
-      //Checking for identical path only, not name:
-      //different folders may have same file names
+      //Check if file path already exists in dropFiles
       if (
         this.$store.state.dropFiles.find(
           ({ relativePath }) => relativePath === String(file.relativePath),
         ) === undefined
       ) {
+        if (this.objects) {
+          //Check if file already exists in container objects
+          const existingFile = this.objects.find(obj => obj.name === `${file.relativePath}.c4gh`);
+          if (existingFile) {
+            this.existingFiles.push(file);
+            return;
+          }
+        }
         this.$store.commit("appendDropFiles", file);
       } else {
         if (!this.duplicateFile) {
@@ -486,6 +531,15 @@ export default {
           setTimeout(() => { this.duplicateFile = false; }, 6000);
         }
       }
+    },
+    overwriteFiles() {
+      for (let i = 0; i < this.existingFiles.length; i++) {
+        this.$store.commit("appendDropFiles", this.existingFiles[i]);
+      }
+      this.clearExistingFiles();
+    },
+    clearExistingFiles() {
+      this.existingFiles = [];
     },
     checkFolderName: debounce(function () {
       const error = validateFolderName(this.inputFolder, this.$t);
@@ -631,6 +685,7 @@ export default {
       this.recvHashedKeys = [];
       this.errorMsg = "";
       this.toastMsg = "";
+      this.clearExistingFiles();
 
       moveFocusOutOfModal(this.prevActiveEl);
 
