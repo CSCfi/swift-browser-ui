@@ -4,9 +4,8 @@ import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
 import {getProjects, getContainers} from "@/common/api.js";
 import { getDB } from "@/common/db";
-import errorNotfound from "@/pages/IndexPage.vue";
 
-async function checkProject (to){
+async function checkProject (to, from, next){
 
   let projects = await getDB()
     .projects.where({id: to.params.project} )
@@ -15,18 +14,16 @@ async function checkProject (to){
     projects = await getProjects();
     const val = projects.find(item =>
       item.id === to.params.project);
-    if(val !== undefined) {
-      return true;
-    } else {
-      return {path: "/notfound", query: {
-        nf: true}};
+    if (val === undefined) {
+      window.location.pathname = "/notfound";
     }
+    next();
+
   } else {
     if(projects.length === 1){
-      return true;
+      next();
     } else {
-      return {path: "/notfound", query: {
-        nf: true}};
+      window.location.pathname = "/notfound";
     }
   }
 
@@ -42,8 +39,7 @@ async function checkContainer (to){
   const val = containers.find(item =>
     item.name === to.params.container);
   if(val === undefined) {
-    return {path: "/notfound", query: {
-      nf: true}};
+    window.location.pathname = "/notfound";
   }
 }
 
@@ -82,13 +78,6 @@ export default createRouter({
       beforeEnter: checkContainer,
       name: "ObjectsView",
       component: ObjectsView,
-    },
-    {
-      name: "notfound",
-      path: "/notfound",
-      component: errorNotfound,
-      props: true,
-
     },
   ],
 });
