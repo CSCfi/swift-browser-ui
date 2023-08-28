@@ -14,7 +14,6 @@ import {
   makeGetObjectsMetaURL,
   tokenize,
   addSegmentContainerSize,
-  getSegmentObjects,
   sortContainer,
 } from "@/common/conv";
 
@@ -294,9 +293,10 @@ const store = createStore({
           newContainers = newContainers.concat(containers);
           marker = containers[containers.length - 1].name;
         }
-      } while (containers.length > 0);
+      } while (containers?.length > 0);
 
       const sharedContainers = await getSharedContainers(projectID, signal);
+
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
@@ -406,7 +406,7 @@ const store = createStore({
           }
         }
 
-        if (updateObjects) {
+        if (updateObjects && !container.name.endsWith("_segments") ) {
           // Have a separate array contained containers that
           // their objects should be updated
           containers_to_update_objects.push({ container, key });
@@ -530,9 +530,15 @@ const store = createStore({
       }
 
       if (!isSegmentsContainer) {
-        const segment_objects = await getSegmentObjects(projectID, container);
+        const segment_objects = await getObjects(
+          projectID,
+          `${container.name}_segments`,
+          "",
+          signal,
+        );
+
         for (let i = 0; i < newObjects.length; i++) {
-          if (segment_objects[i]) {
+          if (segment_objects[i] && newObjects[i].bytes === 0) {
             newObjects[i].bytes = segment_objects[i].bytes;
           }
           else if (!segment_objects[i] && state.isLoaderVisible) {
@@ -551,8 +557,15 @@ const store = createStore({
       for (let i = 0; i < newObjects.length; i++) {
         const newObj = newObjects[i];
         let oldObj = existingObjects.find(obj => obj.name === newObj.name);
+
+        // Check if oldObj and newObj have the same properties
+        // except the key "id", because key "id" is from IDB for oldObj
+        const isEqualObject = isEqualWith(oldObj, newObj, (oldObj, newObj) => {
+          if (oldObj?.id && !newObj?.id) return true;
+        });
+
         if (oldObj) {
-          await getDB().objects.update(oldObj.id, newObj);
+          if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
         } else {
           try {
             await getDB().objects.put(newObj);
@@ -563,7 +576,7 @@ const store = createStore({
       }
 
       if (!isSegmentsContainer) {
-        dispatch("updateObjectTags", {
+        await dispatch("updateObjectTags", {
           projectID,
           container,
           signal,
@@ -573,21 +586,14 @@ const store = createStore({
     },
     updateObjectTags: async function (
       _,
-      { projectID, container, signal, sharedObjects = undefined, owner },
+      { projectID, container, signal, owner },
     ) {
       let objectList = [];
+      const allTags = [];
 
-      let objects = [];
-      if (sharedObjects) {
-        objects = await getDB().objects
-          .where({ containerID: container.id })
-          .and(obj => obj.containerOwner)
-          .toArray();
-      } else {
-        objects = await getDB().objects
-          .where({ containerID: container.id })
-          .toArray();
-      }
+      const objects = await getDB().objects
+        .where({ containerID: container.id })
+        .toArray();
 
       for (let i = 0; i < objects.length; i++) {
         // Object names end up in the URL, which has hard length limits.
@@ -617,30 +623,18 @@ const store = createStore({
             signal,
             owner,
           );
-          console.log("tags.length :>> ", tags.length);
-          tags.forEach(async (item) => {
-            const objectName = item[0];
-            const tags = item[1];
-            if (sharedObjects) {
-              objects.forEach(async (obj) => {
-                if (obj.name === objectName && !isEqual(tags, obj.tags)) {
-                  await getDB().objects
-                    .where({ containerID: container.id, name: objectName })
-                    .modify({ tags });
-                }
-              });
-            } else {
-              objects.forEach(async (obj) => {
-                if (obj.name === objectName && !isEqual(tags, obj.tags)) {
-                  await getDB().objects
-                    .where({ containerID: container.id, name: objectName })
-                    .modify({ tags });
-                }
-              });
-            }
-          });
+
+          allTags.push(tags);
           objectList = [];
         }
+      }
+
+      if (allTags.flat().length > 0) {
+        const newObjects = objects.map((obj, index) => {
+          const tags = allTags.flat()[index][1];
+          return {...obj, tags};
+        });
+        await getDB().objects.bulkPut(newObjects);
       }
     },
     updateSharedObjects: async function (
@@ -710,7 +704,7 @@ const store = createStore({
           owner,
         );
         for (let i = 0; i < sharedObjects.length; i++) {
-          if (segment_objects[i]) {
+          if (segment_objects[i] && sharedObjects[i].bytes === 0) {
             sharedObjects[i].bytes = segment_objects[i].bytes;
           }
         }
@@ -747,11 +741,10 @@ const store = createStore({
       updateContainerLastmodified(projectID, container, sharedObjects);
 
       if (!isSegmentsContainer) {
-        dispatch("updateObjectTags", {
+        await dispatch("updateObjectTags", {
           projectID: projectID,
           container,
           signal,
-          sharedObjects,
           owner,
         });
       }

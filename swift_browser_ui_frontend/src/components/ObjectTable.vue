@@ -409,7 +409,7 @@ export default {
           },
         );
       } else {
-        this.$store.dispatch(
+        await this.$store.dispatch(
           "updateObjects",
           {
             projectID: this.$route.params.project,
