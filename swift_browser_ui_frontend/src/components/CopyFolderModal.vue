@@ -4,62 +4,56 @@
     class="copy-folder"
     @keydown="handleKeyDown"
   >
-    <c-card
-      ref="copyFolderContainer"
-      class="copy-folder"
-      @keydown="handleKeyDown"
-    >
-      <div class="modal-content-wrapper">
-        <h2 class="title is-4">
-          {{
-            $t("message.replicate.copy_folder") + selectedFolderName
-          }}
-        </h2>
-        <c-card-content>
-          <c-text-field
-            id="new-copy-folderName"
-            v-model="folderName"
-            v-csc-control
-            :label="$t('message.replicate.name_newFolder')"
-            name="foldername"
-            :valid="loadingFoldername || errorMsg.length === 0"
-            :validation="errorMsg"
-            aria-required="true"
-            required
-          />
-          <label
-            class="taginput-label"
-            label-for="copy-folder-taginput"
-          >
-            {{ $t('message.tagName') }}
-          </label>
-          <TagInput
-            id="copy-folder-taginput"
-            :tags="tags"
-            @addTag="addingTag"
-            @deleteTag="deletingTag"
-          />
-        </c-card-content>
-      </div>
-      <c-card-actions justify="space-between">
-        <c-button
-          outlined
-          size="large"
-          @click="cancelCopy(false)"
-          @keyup.enter="cancelCopy(true)"
+    <div class="modal-content-wrapper">
+      <h2 class="title is-4">
+        {{
+          $t("message.replicate.copy_folder") + selectedFolderName
+        }}
+      </h2>
+      <c-card-content>
+        <c-text-field
+          id="new-copy-folderName"
+          v-model="folderName"
+          v-csc-control
+          :label="$t('message.replicate.name_newFolder')"
+          name="foldername"
+          :valid="loadingFoldername || errorMsg.length === 0"
+          :validation="errorMsg"
+          aria-required="true"
+          required
+        />
+        <label
+          class="taginput-label"
+          label-for="copy-folder-taginput"
         >
-          {{ $t("message.cancel") }}
-        </c-button>
-        <c-button
-          size="large"
-          :disabled="errorMsg.length"
-          @click="replicateContainer(false)"
-          @keyup.enter="replicateContainer(true)"
-        >
-          {{ $t("message.copy") }}
-        </c-button>
-      </c-card-actions>
-    </c-card>
+          {{ $t('message.tagName') }}
+        </label>
+        <TagInput
+          id="copy-folder-taginput"
+          :tags="tags"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
+        />
+      </c-card-content>
+    </div>
+    <c-card-actions justify="space-between">
+      <c-button
+        outlined
+        size="large"
+        @click="cancelCopy(false)"
+        @keyup.enter="cancelCopy(true)"
+      >
+        {{ $t("message.cancel") }}
+      </c-button>
+      <c-button
+        size="large"
+        :disabled="folderName.length === 0 || errorMsg.length"
+        @click="replicateContainer(false)"
+        @keyup.enter="replicateContainer(true)"
+      >
+        {{ $t("message.copy") }}
+      </c-button>
+    </c-card-actions>
   </c-card>
 </template>
 
@@ -221,6 +215,17 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
+      this.$store.commit("toggleCopyFolderModal", false);
+      document.querySelector("#copyFolder-toasts").addToast(
+        {
+          id: "copy-in-progress",
+          type: "success",
+          indeterminate: true,
+          message: "",
+          custom: true,
+        },
+      );
+
       // Initiate the container replication operation
       swiftCopyContainer(
         this.active.id,
@@ -271,19 +276,20 @@ export default {
             await Promise.all([task, sleep(2000)]);
           }
 
+          this.checkpointsCompleted++;
           this.cancelCopy(keypress);
-        }).catch(() => {
-          document.querySelector("#copyFolder-toasts").addToast(
-            {
-              id: "copy-error",
-              type: "error",
-              duration: 5000,
-              persistent: false,
-              progress: false,
-              message: this.$t("message.copyfail"),
-            },
-          );
         });
+      }).catch(() => {
+        document.querySelector("#copyFolder-toasts").addToast(
+          {
+            id: "copy-error",
+            type: "error",
+            duration: 5000,
+            persistent: false,
+            progress: false,
+            message: this.$t("message.copyfail"),
+          },
+        );
       });
     },
     addingTag: function (e, onBlur) {
