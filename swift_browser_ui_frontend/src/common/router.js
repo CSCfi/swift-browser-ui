@@ -28,7 +28,7 @@ async function checkProject (to, from, next){
   }
 
 }
-async function checkContainer (to){
+async function checkContainer (to, from, next){
 
   let containers = await getDB()
     .containers.where({projectID: to.params.project} )
@@ -41,6 +41,7 @@ async function checkContainer (to){
   if(val === undefined) {
     window.location.pathname = "/notfound";
   }
+  next();
 }
 
 export default createRouter({
