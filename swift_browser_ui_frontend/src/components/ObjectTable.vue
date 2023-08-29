@@ -215,6 +215,9 @@ export default {
     owner() {
       return this.$route.params.owner;
     },
+    shareModal() {
+      return this.$store.state.openShareModal;
+    },
   },
   watch: {
     active: async function() {
@@ -256,6 +259,9 @@ export default {
     },
     isFolderUploading: function () {
       if (!this.isFolderUploading) this.updateContainers();
+    },
+    shareModal: async function(){
+      if (!this.shareModal) await this.getFolderSharedStatus();
     },
   },
   created: function () {
