@@ -17,16 +17,13 @@ async function checkProject (to, from, next){
     if (val === undefined) {
       window.location.pathname = "/notfound";
     }
-    next();
 
   } else {
-    if(projects.length === 1){
-      next();
-    } else {
+    if(projects.length !== 1){
       window.location.pathname = "/notfound";
     }
   }
-
+  next();
 }
 async function checkContainer (to, from, next){
 
