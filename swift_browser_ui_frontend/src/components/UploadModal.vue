@@ -68,7 +68,7 @@
           </CUploadButton>
         </div>
         <c-alert
-          v-show="duplicateFile"
+          v-show="duplicateDropFile"
           type="error"
         >
           <div class="duplicate-notification">
@@ -76,7 +76,7 @@
             <c-button
               text
               size="small"
-              @click="duplicateFile = false"
+              @click="duplicateDropFile = false"
             >
               <i
                 slot="icon"
@@ -235,6 +235,7 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
+import { swiftDeleteObjects } from "@/common/api";
 
 import { delay, debounce } from "lodash";
 import { mdiDelete } from "@mdi/js";
@@ -257,7 +258,7 @@ export default {
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
-      duplicateFile: false,
+      duplicateDropFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
@@ -268,6 +269,7 @@ export default {
       containers: [],
       objects: [],
       existingFiles: [],
+      filesToOverwrite: [],
     };
   },
   computed: {
@@ -455,16 +457,24 @@ export default {
         //inputFolder not cleared when modal toggled,
         //in case there's a delay in upload start
         //reset when modal visible
+        this.clearExistingFiles();
+        this.filesToOverwrite = [];
         this.recvkeys = [];
         this.inputFolder = "";
         this.containers = await getDB().containers
           .where({ projectID: this.active.id })
           .toArray();
         if (this.currentFolder) {
-          const cont = this.containers.find(c => c.name === this.currentFolder);
-          this.objects = await getDB().objects
-            .where({containerID: cont.id})
-            .toArray();
+          if (this.$route.name === "SharedObjects") {
+            this.objects = this.$store.state.objectCache;
+          }
+          else {
+            const cont = this.containers.find(c =>
+              c.name === this.currentFolder);
+            this.objects = await getDB().objects
+              .where({containerID: cont.id})
+              .toArray();
+          }
         }
       }
     },
@@ -526,17 +536,72 @@ export default {
         }
         this.$store.commit("appendDropFiles", file);
       } else {
-        if (!this.duplicateFile) {
-          this.duplicateFile = true;
-          setTimeout(() => { this.duplicateFile = false; }, 6000);
+        if (!this.duplicateDropFile) {
+          this.duplicateDropFile = true;
+          setTimeout(() => { this.duplicateDropFile = false; }, 6000);
         }
       }
     },
     overwriteFiles() {
+      //if new duplicate files appear after confirmation
+      // alert will show again
       for (let i = 0; i < this.existingFiles.length; i++) {
         this.$store.commit("appendDropFiles", this.existingFiles[i]);
+        this.filesToOverwrite.push(this.existingFiles[i]);
       }
       this.clearExistingFiles();
+    },
+    async deleteSegments() {
+      //old file segments need to be deleted because
+      //they are not overwritten
+      if (!this.filesToOverwrite.length) return;
+
+      let oldSegments = [];
+      const segmentCont= await getDB().containers.get({
+        projectID: this.$route.name === "SharedObjects" ?
+          this.owner : this.active.id,
+        name: `${this.currentFolder}_segments`,
+      });
+
+      if (segmentCont) {
+        for (let i = 0; i < this.filesToOverwrite.length; i++) {
+          let segments = await getDB().objects
+            .where({containerID: segmentCont.id})
+            .filter(obj => obj.name.includes(`${this.filesToOverwrite[i].name}.c4gh/`)).first();
+          if (segments) oldSegments.push(segments.name);
+        }
+      }
+
+      if (this.$route.name !== "SharedObjects") {
+        // Delete segment objects from IDB
+        const segmentObjIDs = await getDB().objects
+          .where({ containerID: segmentCont.id })
+          .filter(obj => obj.name && oldSegments.includes(obj.name))
+          .primaryKeys();
+        await getDB().objects.bulkDelete(segmentObjIDs);
+      }
+
+      if (oldSegments.length) {
+        swiftDeleteObjects(
+          this.owner || this.active.id,
+          segmentCont.name,
+          oldSegments,
+        );
+      }
+
+      if (this.$route.name === "SharedObjects") {
+        await this.$store.dispatch(
+          "updateSharedObjects",
+          {
+            projectID: this.active.id,
+            owner: this.owner,
+            container: {
+              name: this.currentFolder,
+              id: 0,
+            },
+          },
+        );
+      }
     },
     clearExistingFiles() {
       this.existingFiles = [];
@@ -679,13 +744,12 @@ export default {
       this.addingFiles = false;
       this.tags = [];
       this.files = [];
-      this.duplicateFile = false;
+      this.duplicateDropFile = false;
       this.interacted = false;
       this.addRecvkey = "";
       this.recvHashedKeys = [];
       this.errorMsg = "";
       this.toastMsg = "";
-      this.clearExistingFiles();
 
       moveFocusOutOfModal(this.prevActiveEl);
 
@@ -721,7 +785,10 @@ export default {
         );
         return;
       }
-      else this.beginEncryptedUpload();
+      else {
+        this.deleteSegments();
+        this.beginEncryptedUpload();
+      }
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

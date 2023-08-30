@@ -190,6 +190,8 @@ kopioinnin
 kopiointi
 kopioitu
 koska
+korvaa
+korvata
 koskevia
 kuin
 kuinka
@@ -553,6 +555,7 @@ tavallisesti
 tekijänoikeustiedot
 tekstinä
 tiedosto
+tiedosto(t)
 tiedostoa
 tiedostoja
 tiedostojen

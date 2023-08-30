@@ -648,9 +648,10 @@ let default_translations = {
         deleteManySuccess: "Alikansiot poistettu.",
       },
       objects: {
-        file: "",
-        overwriteConfirm: "",
-        overwrite: "",
+        file: "Tiedosto(t) ",
+        overwriteConfirm:
+          " ovat jo olemassa. Haluatko korvata tiedoston/tiedostot?",
+        overwrite: "Korvaa",
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
