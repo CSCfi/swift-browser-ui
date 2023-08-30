@@ -19,23 +19,31 @@ let default_translations = {
         ],
       },
       error: {
-        frontPage: "Go to front page",
+        prevPage: "Go to previous page",
+        login: "Go to login",
         BadRequest: "400 – Bad Request",
         BadRequest_text:
           "Something was wrong with the request. This can " +
           "be for example due to missing password and/or " +
           "username.",
-        UIdown: "503 – Service Unavailable",
-        UIdown_text: "Web user interface is currently unavailable",
+        UIdown: "500 – Service Unavailable",
+        UIdown_text1:
+          "You are seeing this page because " +
+          "the service is currently unavailable. Please check back later.",
+        UIdown_text2: "You can find more information about service breaks ",
+        UIdown_link_text: "here",
+        UIdown_link: "#",
         Unauthorized: "401 – Not Logged In",
         Unauthorized_text:
-          "The action requested requires logging " +
-          "in, or the log in credentials were incorrect. " +
-          "Use the button below to log in.",
+          "You are seeing this page because your login " +
+          "information was incorrect, your session expired, " +
+          "or you haven’t logged in yet.",
         Notfound: "404 – Page Not Found",
         Notfound_text: "The page you were looking for was not found.",
         Forbidden: "403 – Forbidden",
-        Forbidden_text: "Your previous request could not be fulfilled.",
+        Forbidden_text:
+          "You are seeing this page because you were " +
+          "trying to perform an action that you are not allowed to.",
         inUse: "Folder name already in use.",
         invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
@@ -396,21 +404,29 @@ let default_translations = {
         ],
       },
       error: {
-        frontPage: "Etusivulle",
+        prevPage: "Siirry edelliselle sivulle",
+        login: "Siirry kirjautumissivulle",
         BadRequest: "400 – Virheellinen pyyntö",
         BadRequest_text:
           "Virhe sivupyynnössä. Tämä voi johtua esimerkiksi " +
           "puuttuvasta salasanasta ja/tai käyttäjänimestä ",
-        UIdown: "503 - Palvelu ei ole käytettävissä",
-        UIdown_text: "Käyttöliittymä on tilapäisesti poissa käytöstä",
-        Unauthorized: "401 – Kirjaudu sisään",
+        UIdown: "500 – Palvelu ei ole saatavilla",
+        UIdown_text1:
+          "Näet tämän sivun, koska palvelu " +
+          "ei ole tällä hetkellä saatavilla.",
+        UIdown_text2: "Löydät tietoa huoltokatkoistamme ",
+        UIdown_link_text: "täältä",
+        UIdown_link: "#",
+        Unauthorized: "401 – Et ole kirjautunut sisään",
         Unauthorized_text:
-          "Sinun täytyy olla kirjautunut sisään voidaksesi nähdä sivun, " +
-          "siirry kirjautumissivulle.",
-        Notfound: "404 – Etsittyä sivua ei löydetty",
-        Notfound_text: "Siirry kirjautumissivulle.",
-        Forbidden: "403 – Kielletty",
-        Forbidden_text: "Edellinen toiminto on kielletty.",
+          "Näet tämän sivun, koska kirjautumistiedoissasi " +
+          "oli virhe, sessiosi umpeutui tai et ole kirjautunut sisään.",
+        Notfound: "404 – Sivua ei löydy",
+        Notfound_text: "Etsimääsi sivua ei löydy.",
+        Forbidden: "403 – Kielletty toiminto",
+        Forbidden_text:
+          "Näet tämän sivun, koska yritit suorittaa " +
+          "kielletyn toiminnon.",
         inUse: "Kansion nimi on jo käytössä.",
         invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",

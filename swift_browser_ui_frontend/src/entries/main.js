@@ -261,6 +261,8 @@ const app = createApp({
         .toCollection()
         .primaryKeys();
       await getDB().projects.bulkPut(projects);
+
+
       const toDelete = [];
       existingProjects.map(async oldProj => {
         if (!projects.find(proj => proj.id === oldProj)) {
