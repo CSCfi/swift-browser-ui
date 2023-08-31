@@ -131,6 +131,7 @@ export default {
                 tag: "c-select",
                 params: {
                   style: {
+                    width: "100%",
                     fontSize: "0.875rem",
                     marginTop: "1rem",
                   },
