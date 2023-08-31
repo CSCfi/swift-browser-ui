@@ -67,7 +67,7 @@ CHUNK *create_crypt4gh_header(
 ) {
     CHUNK *ret = allocate_chunk();
 
-    crypt4gh_header_build(
+    int err = crypt4gh_header_build(
         session_key,
         secret_key,
         receivers,
@@ -75,6 +75,7 @@ CHUNK *create_crypt4gh_header(
         &(ret->chunk),
         &(ret->len)
     );
+    printf("Header build return value: %d\n", err);
 
     return ret;
 }

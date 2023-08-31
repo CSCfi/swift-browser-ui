@@ -95,20 +95,16 @@ uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header) {
         &edit_list_len
     );
 
-    if (keys != NULL && nkeys > 0) {
-        sessionkey = sodium_malloc(sizeof(uint8_t) * crypto_kx_SECRETKEYBYTES);
-        memcpy(sessionkey, keys, crypto_kx_SECRETKEYBYTES);
-        sodium_free(keys);
-    }
-    else {
-        return NULL;
-    }
-
     if (edit_list != NULL && edit_list_len > 0) {
         sodium_free(edit_list);
     }
 
-    return sessionkey;
+    if (keys != NULL && nkeys > 0) {
+        return keys;
+    }
+    else {
+        return NULL;
+    }
 }
 
 

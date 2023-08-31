@@ -43,14 +43,13 @@ int add_recv_key(
 
     if (flag == FTW_F)
     {
+        printf("Adding receiver key in %s\n", path);
         fd = open(path, O_RDONLY);
         amount = read(fd, fout, 1023);
         // Skip if couldn't read from the file or current session is NULL
-        if (amount <= 0 || !current)
+        if (amount <= 0)
         {
-            #ifdef C4GH_WASM_DEV
             printf("Failed to open the receiver key.\n");
-            #endif
             goto finalAddRecv;
         }
         // We need space for the new key inside encrypt session
@@ -102,6 +101,7 @@ void libinit() {
 Read in the receiver keys from a path
 */
 CHUNK *read_in_recv_keys_path(const char *keypath) {
+    printf("Using %s for receiver folder path.\n", keypath);
     int ret = nftw(
         keypath,
         &add_recv_key,

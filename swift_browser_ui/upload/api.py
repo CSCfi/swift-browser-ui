@@ -205,6 +205,8 @@ async def handle_upload_ws(
     ws = aiohttp.web.WebSocketResponse()
     await ws.prepare(request)
 
+    upload_session.set_ws(ws)
+
     LOGGER.info(f"Upload session websocket opened for {request.url.path}")
 
     async for msg in ws:
@@ -223,6 +225,8 @@ async def handle_upload_ws(
                 await upload_session.handle_upload_chunk(msg_unpacked)
             if msg_unpacked["command"] == "cancel":
                 await upload_session.handle_close()
+            if msg_unpacked["command"] == "finish":
+                await upload_session.handle_finish_upload(msg_unpacked)
         except ValueError:
             LOGGER.error("Received an empty message.")
             LOGGER.debug(msg.data)

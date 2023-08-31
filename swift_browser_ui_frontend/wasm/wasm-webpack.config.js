@@ -2,26 +2,21 @@ const path = require('path');
 
 
 module.exports = {
-    context: path.resolve(__dirname, 'build'),
+    context: path.resolve(__dirname, ''),
     mode: "development",
     devtool: "source-map",
-    resolve: {
-        fallback: {
-            "crypto": false,
-        },
-    },
     output: {
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, ''),
     },
     entry: {
         downworker: {
-            import: "./libdownload.js",
-            filename: "./downworker.js",
+            import: "./js/crypt-post-downworker.js",
+            filename: "./build/downworker-post.js",
             chunkLoading: false,
         },
         upworker: {
-            import: "./libupload.js",
-            filename: "./upworker.js",
+            import: "./js/crypt-post-upworker.js",
+            filename: "./build/upworker-post.js",
             chunkLoading: false,
         },
     },

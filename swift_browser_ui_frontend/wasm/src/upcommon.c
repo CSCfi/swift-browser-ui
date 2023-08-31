@@ -35,8 +35,6 @@ KEYPAIR *create_keypair() {
 Free a keypair
 */
 void free_keypair(KEYPAIR *kp) {
-    sodium_free(kp->private);
-    sodium_free(kp->public);
     free(kp);
     return;
 }

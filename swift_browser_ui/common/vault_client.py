@@ -304,7 +304,6 @@ class VaultClient:
             f"c4ghtransit/sharing/{project}/{container}",
             json_data={"id": receiver, "idkeystone": keystoneid},
         )
-        return resp
 
     async def get_project_whitelist(
         self,
@@ -383,6 +382,8 @@ class VaultClient:
         :param header: header as b64 encoded string
         :param owner: name of the project that owns the container
         """
+        LOGGER.info(f"Pushing header to vault: {header}")
+
         if owner:
             await self._request(
                 "POST",

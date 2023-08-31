@@ -46,7 +46,7 @@ mkdir -p vault/plugins
 go build -v -o vault/plugins/c4ghtransit c4ghtransit/cmd/c4ghtransit/main.go
 
 # setup vault for swift-browser-ui in the background, after the server is up
-(sleep 1; initVault) 2>&1 &
+(sleep 5; initVault) 2>&1 &
 
 # start vault server in development mode
 VAULT_LOG_LEVEL=ERROR exec vault server -dev -dev-plugin-dir=vault/plugins -dev-root-token-id="devroot"

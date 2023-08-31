@@ -123,21 +123,14 @@ class FileUpload:
             asyncio.create_task(self.slice_into_queue(i, self.q_cache[i]))
             for i in range(0, self.total_segments)
         ]
-        await asyncio.gather(
-            *[
-                asyncio.create_task(self.get_next_chunk())
-                for _ in range(0, CRYPTUPLOAD_Q_DEPTH)
-            ]
-        )
+        await self.start_upload()
 
-    async def get_next_chunk(self):
-        """Schedule fetching of the next chunk in order."""
-        if len(self.done_chunks) >= self.total_chunks:
-            return
+    async def start_upload(self):
+        """Tell the frontend to start the file upload."""
         await self.socket.send_bytes(
             msgpack.dumps(
                 {
-                    "command": "next_chunk",
+                    "command": "start_upload",
                     "container": self.container,
                     "object": self.path,
                 }
@@ -164,10 +157,6 @@ class FileUpload:
     ):
         """Add a chunk to cache."""
         if order in self.done_chunks or order in self.chunk_cache:
-            try:
-                await self.get_next_chunk()
-            except ConnectionResetError:
-                pass
             return
         self.chunk_cache[order] = data
 
@@ -224,10 +213,6 @@ class FileUpload:
             self.done_chunks.add(i)
             chunk = self.chunk_cache.pop(i)
             await q.put(chunk)
-            try:
-                await self.get_next_chunk()
-            except ConnectionResetError:
-                pass
 
         # Queue EOF
         await q.put(b"")
@@ -264,7 +249,6 @@ class FileUpload:
 
         if self.total_segments - 1 == order:
             LOGGER.info("Informing client that file was finished.")
-            self.finished = True
             await self.socket.send_bytes(
                 msgpack.dumps(
                     {
@@ -274,6 +258,7 @@ class FileUpload:
                     }
                 )
             )
+            self.finished = True
 
         return resp.status
 
@@ -281,7 +266,7 @@ class FileUpload:
         """Finalize the upload."""
         await asyncio.gather(*self.tasks)
 
-        LOGGER.info(f"Add manifest for {self.object_name}.")
+        LOGGER.info(f"Add manifest for {self.path}.")
         async with self.client.put(
             common.generate_download_url(
                 self.host,
@@ -292,6 +277,7 @@ class FileUpload:
             headers={
                 "X-Auth-Token": self.token,
                 "X-Object-Manifest": f"{self.container}{common.SEGMENTS_CONTAINER}/{self.path}/{self.segment_id}/",
+                "Content-Length": "0",
             },
             ssl=ssl_context,
         ) as resp:
@@ -385,6 +371,9 @@ class UploadSession:
                         )
                     )
                     return
+
+        if container not in self.uploads:
+            self.uploads[container] = {}
 
         # We can ignore typing for self.ws, as these functions are only called after messages
         self.uploads[container][path] = FileUpload(

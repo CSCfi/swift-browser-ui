@@ -14,9 +14,15 @@ Schema for storing the upload information:
   }
 }
 */
-let uploads = {};
-let socket = WebScoket;
+import msgpack from "@ygoe/msgpack";
 
+let uploads = {};
+let socket = undefined;
+
+let totalLeft = 0;
+let totalDone = 0;
+let totalFiles = 0;
+let progressInterval = undefined;
 
 // Create an upload session
 function createUploadSession(container, receivers, projectName) {
@@ -26,7 +32,10 @@ function createUploadSession(container, receivers, projectName) {
     + Math.random().toString(36)
     + Math.random().toString(36);
   FS.mkdir(tmpdirpath);
+  let files = [];
   for (const receiver of receivers) {
+    console.log(receiver);
+    files.push(`${tmpdirpath}/pubkey_${receivers.indexOf(receiver).toString()}`);
     FS.writeFile(
       `${tmpdirpath}/pubkey_${receivers.indexOf(receiver).toString()}`,
       receiver,
@@ -34,32 +43,30 @@ function createUploadSession(container, receivers, projectName) {
   }
 
   // Read and parse the receiver keys
-  let receiversStructPtr = Module.ccall([
+  let receiversStructPtr = Module.ccall(
     "read_in_recv_keys_path",
     "number",
     ["string"],
     [tmpdirpath],
-  ]);
-  let receiversPtr = Module.ccall([
+  );
+  let receiversPtr = Module.ccall(
     "wrap_chunk_content",
     "number",
     ["number"],
     [receiversStructPtr],
-  ]);
-  let receiversLen = Module.ccall([
+  );
+  let receiversLen = Module.ccall(
     "wrap_chunk_len",
     "number",
     ["number"],
     [receiversStructPtr],
-  ]);
+  );
 
-  // Clean up after reading the receiver list
-  Module.ccall([
-    "rmrecv",
-    "number",
-    ["string"],
-    [tmpdirpath],
-  ]);
+  console.log(receiversLen);
+
+  for (const file of files) {
+    FS.unlink(file);
+  }
   FS.rmdir(tmpdirpath);
 
   // Store the upload session
@@ -78,34 +85,32 @@ function createUploadSession(container, receivers, projectName) {
 // Add a file to the upload session
 function createUploadSessionFile(container, path) {
   // We'll need an ephemeral keypair for the upload
-  let keypairPtr = Module.ccall([
+  let keypairPtr = Module.ccall(
     "create_keypair",
     "number",
     [],
     [],
-  ]);
+  );
   // We'll also need a session key for encryption
-  let sessionKeyPtr = Module.ccall([
+  let sessionKeyPtr = Module.ccall(
     "create_session_key",
     "number",
     [],
     [],
-  ]);
+  );
 
-  uploads[container].files[path] = {
-    sessionKey: sessionKeyPtr,
-  };
+  uploads[container].files[path].sessionkey = sessionKeyPtr;
 
   // We won't need anything else besides the private key for the header build
-  let privateKeyPtr = Module.ccall([
+  let privateKeyPtr = Module.ccall(
     "get_keypair_private_key",
     "number",
     ["number"],
     [keypairPtr],
-  ]);
+  );
 
   // Build the header using the keypair, session receivers and the file session key
-  let header = Module.ccall([
+  let header = Module.ccall(
     "create_crypt4gh_header",
     "number",
     ["number", "number", "number", "number"],
@@ -115,7 +120,7 @@ function createUploadSessionFile(container, path) {
       uploads[container].receivers,
       uploads[container].receiversLen,
     ],
-  ]);
+  );
   let headerPtr = Module.ccall(
     "wrap_chunk_content",
     "number",
@@ -152,81 +157,166 @@ function createUploadSessionFile(container, path) {
 
 // Encrypt a single chunk of an upload
 function encryptChunk(container, path, deChunk) {
-  let chunk = Module.ccall([
+  let chunk = Module.ccall(
     "encrypt_chunk",
     "number",
     ["number", "array", "number"],
     [
-      uploads[container].files[path],
+      uploads[container].files[path].sessionkey,
       deChunk,
+      deChunk.length,
     ],
-  ]);
-  let chunkPtr = Module.ccall([
+  );
+  let chunkPtr = Module.ccall(
     "wrap_chunk_content",
     "number",
     ["number"],
     [chunk],
-  ]);
-  let chunkLen = Module.ccall([
+  );
+  let chunkLen = Module.ccall(
     "wrap_chunk_len",
     "number",
     ["number"],
     [chunk],
-  ]);
+  );
 
   // As above, need a new array from view as it will get stale
   let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
 
-  Module.ccall([
+  Module.ccall(
     "free_chunk",
     "number",
     ["number"],
     [chunk],
-  ]);
+  );
 
   return ret;
 }
 
-// Slice and encrypt the next chunk
-function getChunk(container, path, iter) {
-  // Get the iterator and offset of the next chunk
-  let ptr = iter * 65536;
+class StreamSlicer{
+  constructor(
+    input,
+    container,
+    path,
+  ) {
+    this.file = input;
+    this.container = container;
+    this.path = path;
+    this.chunk = undefined;
+    this.done = false;
+    this.offset = 0;
+    this.remainder = 0;
+    this.bytes = 0;
+    this.totalBytes = 0;
+    this.iter = 0;
+    this.interval = undefined;
 
-  // Slice out the next chunk, encrypt it and send via websocket
-  uploads[container].files[path].file
-    .slice(ptr, ptr + 65536)
-    .arrayBuffer()
-    .then(c => {
-      socket.send(msgpack.serialize({
-        command: "add_chunk",
-        container: container,
-        object: path,
-        order: iter,
-        data: encryptChunk(container, path, c),
-      }));
-      uploads[container].files[path].currentByte += 65536;
-      uploads[container].files[path].totalUploadedChunks += 1;
-
-      postMessage({
-        eventType: "progress",
-        container: container,
-        object: path,
-        done: uploads[container].files[path].currentByte,
-        total: uploads[container].files[path].totalBytes,
-      });
-    });
-}
-
-// Encrypt the next chunk if it exists
-function nextChunk(container, path) {
-  let iter = uploads[container].files[path].chunks.shift();
-
-  // If shift doesn't return a chunk location, the file has been consumed
-  if (iter === undefined) {
-    return;
+    this.reader = this.file.stream();
   }
 
-  getChunk(container, path, iter);
+  async getStart() {
+    ({ value: this.chunk, done: this.done } = await this.reader.read());
+  }
+
+  async getSliceFromStream() {
+    let enChunk = new Uint8Array(65536);
+    this.bytes = 0;
+
+    while (!this.done) {
+      this.remainder = 65536 - this.bytes;
+      let toSet = this.chunk.subarray(this.offset, this.offset + this.remainder);
+      enChunk.set(toSet, this.bytes);
+      this.bytes += toSet.length;
+
+      if (this.chunk.length - this.offset > this.remainder) {
+        this.offset += this.remainder;
+        this.totalBytes += 65564;
+        return enChunk;
+      } else {
+        this.offset = 0;
+        ({ value: this.chunk, done: this.done } = await this.reader.read());
+      }
+    }
+
+    if (this.chunk !== undefined) {
+      let toSet = this.chunk.subarray(this.offset);
+      enChunk.set(toSet, this.bytes);
+      this.bytes += toSet.length;
+      this.totalBytes += toSet.length - 28;
+    }
+
+    if (this.bytes > 0) {
+      return enChunk.slice(0, this.bytes);
+    }
+
+    return undefined
+  }
+
+  async getChunk(iter) {
+    let enChunk = await this.file.slice(iter * 65536, iter * 65536 + 65536);
+
+    if (enChunk === undefined || enChunk.length === 0 || enChunk.size === 0) {
+      clearInterval(this.interval);
+      return;
+    }
+
+    let enBuffer = await enChunk.arrayBuffer();
+
+    let enData = encryptChunk(
+      this.container,
+      this.path,
+      new Uint8Array(enBuffer),
+    );
+
+
+    let msg = msgpack.serialize({
+      command: "add_chunk",
+      container: this.container,
+      object: this.path,
+      order: iter,
+      data: enData,
+    });
+
+    socket.send(msg);
+  }
+
+  async nextChunk () {
+    let iter = this.iter;
+    this.iter++;
+    totalDone += 65536;
+    return await this.getChunk(iter);
+  }
+
+  retryChunk(iter) {
+    this.getChunk(iter).then(() => {
+      console.log(`Retried chunk ${iter}.`);
+    })
+  }
+
+  sendFile() {
+    console.log("Slicer started.");
+    console.log(this.file);
+    this.interval = setInterval(() => {
+      if (socket.bufferedAmount < 5242880) {
+        this.nextChunk().then(() => {});
+      }
+    }, 1);
+    // Update the frontend with the active file.
+    postMessage({
+      eventType: "activeFile",
+      object: this.file.name,
+    });
+  }
+
+  finishFile() {
+    console.log("File finished.");
+    let msg = msgpack.serialize({
+      command: "finish",
+      container: this.container,
+      object: this.path,
+    });
+    socket.send(msg);
+  }
 }
 
 // Safely free and remove an upload session
@@ -239,7 +329,7 @@ function finishUploadSession(container) {
 async function openWebSocket (
   upinfo,
 ) {
-  let socketURL = new URL(upinfo.webSocketUrl);
+  let socketURL = new URL(upinfo.wsurl);
   socketURL.searchParams.append(
     "session",
     upinfo.id,
@@ -253,7 +343,7 @@ async function openWebSocket (
     upinfo.wssignature.signature,
   );
 
-  socket = new WebSocket(socketURL, "binary");
+  socket = new WebSocket(socketURL);
   socket.binaryType = "arraybuffer";
 
   socket.onmessage = msg => {
@@ -262,6 +352,8 @@ async function openWebSocket (
     switch (msg_data.command) {
       // Abort the upload
       case "abort":
+        console.log("File aborted");
+        console.log(msg_data);
         postMessage({
           eventType: "abort",
           container: msg_data.container,
@@ -271,6 +363,9 @@ async function openWebSocket (
         break;
       // A file was successfully uploaded
       case "success":
+        console.log("File successful");
+        console.log(msg_data);
+        uploads[msg_data.container].files[msg_data.object].slicer.finishFile();
         postMessage({
           eventType: "success",
           container: msg_data.container,
@@ -278,46 +373,64 @@ async function openWebSocket (
         });
         break;
       // Push the next chunk to the websocket
-      case "next_chunk":
-        nextChunk(msg_data.container, msg_data.object);
+      case "start_upload":
+        console.log("Upload started");
+        console.log(msg_data);
+        console.log(uploads);
+        uploads[msg_data.container].files[msg_data.object].slicer.sendFile();
         break;
       // Retry a chunk in the websocket
       case "retry_chunk":
-        getChunk(msg_data.container, msg_data.object, msg_data.order);
+        console.log("Retrying chunk");
+        console.log(msg_data);
+        uploads[msg_data.container].files[msg_data.object].slicer.retryChunk(msg_data.order);
         break;
     }
   }
+
+  setTimeout(() => {
+    Module.ccall("libinit", undefined, undefined, undefined);
+  }, 2000);
 }
 
 /*
 Add a batch of files to the current upload session.
 */
-function addFiles(session, files, container) {
+function addFiles(files, container) {
+  console.log(files);
   for (const file of files) {
-    let path = `${file.name}.c4gh`
-    let totalBytes = Math.floor(file.size / 65536) * 65564;
-    let totalChunks = Math.floor(file.size / 65536);
+    console.log(file);
+
+    let handle = file.file;
+
+    let path = `${file.relativePath}.c4gh`
+    let totalBytes = Math.floor(handle.size / 65536) * 65564;
+    let totalChunks = Math.floor(handle.size / 65536);
 
     // Add the last block to total bytes and total chunks in case it exists
-    if (file.size % 65536 > 0) {
-      totalBytes += file.size % 65536 + 28;
+    if (handle.size % 65536 > 0) {
+      totalBytes += handle.size % 65536 + 28;
       totalChunks++;
     }
 
+    totalLeft += handle.size;
+    totalFiles++;
+
     // Add the chunks that need to be uploaded
     let chunks = []
-    for (let i = 0; i < this.totalChunks; i++) {
+    for (let i = 0; i < totalChunks; i++) {
       chunks.push(i);
     }
 
     // Add the file to the upload session
-    session.files[path] = {
+    uploads[container].files[path] = {
       totalBytes: totalBytes,
       currentByte: 0,
       totalChunks: totalChunks,
       totalUploadedChunks: 0,
       chunks: chunks,
-      file: file,
+      file: handle,
+      slicer: new StreamSlicer(handle, container, path),
     }
 
     // Create the file header
@@ -327,21 +440,40 @@ function addFiles(session, files, container) {
       command: "add_header",
       container: container,
       object: path,
-      name: session.projectName,
+      name: uploads[container].projectName,
       total: totalBytes,
-      data: session.files[path].header,
+      data: uploads[container].files[path].header,
     };
 
-    if (session.owner !== "") {
-      msg.owner = session.owner;
+    if (uploads[container].owner !== "") {
+      msg.owner = uploads[container].owner;
     }
-    if (session.ownerName !== "") {
-      msg.owner_name = session.ownerName;
+    if (uploads[container].ownerName !== "") {
+      msg.owner_name = uploads[container].ownerName;
     }
 
     // Upload the file header
     socket.send(msgpack.serialize(msg));
   }
+
+  // Create an interval for updating progress
+  progressInterval = setInterval(() => {
+    if (totalDone == totalLeft) {
+      postMessage({
+        eventType: "finish",
+        container: container,
+      });
+      totalDone = 0;
+      totalLeft = 0;
+      totalFiles = 0;
+    } else {
+      postMessage({
+        eventType: "progress",
+        totalFiles: totalFiles,
+        progress: totalDone / totalLeft,
+      });
+    }
+  }, 250);
 }
 
 self.addEventListener("message", (e) => {
@@ -355,6 +487,7 @@ self.addEventListener("message", (e) => {
         createUploadSession(
           e.data.container,
           e.data.receivers,
+          e.data.projectName,
         );
       }
 
@@ -366,9 +499,9 @@ self.addEventListener("message", (e) => {
       }
 
       // Add the files in the upload request
-      addFiles(uploads[e.data.container], e.data.files);
+      addFiles(e.data.files, e.data.container);
 
-      e.source.postMessage({
+      postMessage({
         eventType: "uploadCreated",
         container: e.data.container,
       });

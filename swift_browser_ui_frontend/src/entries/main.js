@@ -58,29 +58,29 @@ checkIDB().then(result => {
   }
 });
 
-if ("serviceWorker" in navigator) {
-  let workerUrl = new URL(
-    "/libupload.js",
-    document.location.origin,
-  );
-  let ping = (navigator.serviceWorker.controller == null);
-  navigator.serviceWorker.register(workerUrl).then(reg => {
-    reg.update();
-    if (ping) {
-      if (DEV) console.log("Pinging first serviceWorker.");
-      navigator.serviceWorker.ready.then(reg => {
-        reg.active.postMessage({
-          cmd: "pingWasm",
-        });
-      });
-    }
-  }).catch((err) => {
-    if(DEV) console.log("Failed to register service worker.");
-    if(DEV) console.log(err);
-  });
-} else {
-  if (DEV) console.log("Did not register Service Worker.");
-}
+// if ("serviceWorker" in navigator) {
+//   let workerUrl = new URL(
+//     "/libupload.js",
+//     document.location.origin,
+//   );
+//   let ping = (navigator.serviceWorker.controller == null);
+//   navigator.serviceWorker.register(workerUrl).then(reg => {
+//     reg.update();
+//     if (ping) {
+//       if (DEV) console.log("Pinging first serviceWorker.");
+//       navigator.serviceWorker.ready.then(reg => {
+//         reg.active.postMessage({
+//           cmd: "pingWasm",
+//         });
+//       });
+//     }
+//   }).catch((err) => {
+//     if(DEV) console.log("Failed to register service worker.");
+//     if(DEV) console.log(err);
+//   });
+// } else {
+//   if (DEV) console.log("Did not register Service Worker.");
+// }
 
 window.onerror = function (error) {
   if (DEV) console.log("Global error", error);

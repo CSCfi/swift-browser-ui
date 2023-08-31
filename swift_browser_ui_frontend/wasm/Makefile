@@ -1,11 +1,10 @@
 all: upload download
 
-upload: build/libupload.js src/libupload.wasm
+upload: build/upworker.js src/libupload.wasm
 
-download: build/libdownload.js src/libdownload.wasm
+download: build/downworker.js src/libdownload.wasm
 
-build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
-	mkdir --mode=777 -p build ; \
+build/upworker.js: src/upinit.c src/streamingupload.c src/upcommon.c
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 		-fsanitize=undefined \
 		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
@@ -16,9 +15,8 @@ build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
 		-s TOTAL_MEMORY=268435456 \
 		-s LLD_REPORT_UNDEFINED \
 		-s FORCE_FILESYSTEM=1 \
-		-s ENVIRONMENT=worker \
 		-s EXPORTED_RUNTIME_METHODS=ccall \
-		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_create_session_key,_get_keypair_private_key,_create_crypt4gh_header,_free_chunk,_free_keypair,_encrypt_chunk \
+		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_create_session_key,_get_keypair_private_key,_create_crypt4gh_header,_free_chunk,_free_keypair,_encrypt_chunk,_libinit \
 		-O3 \
 		-o \
 		$@ \
@@ -28,11 +26,10 @@ build/libupload.js: src/upinit.c src/streamingupload.c src/upcommon.c
 		-lssl \
 		-lcrypto \
 		-lsodium \
-		--post-js js/crypt-post-upworker.js \
+		--post-js build/upworker-post.js \
 		--pre-js js/crypt-pre.js
 
-build/libdownload.js: src/upinit.c src/streamingdownload.c src/upcommon.c
-	mkdir --mode=777 -p build ; \
+build/downworker.js: src/upinit.c src/streamingdownload.c src/upcommon.c
 	$(CC) $(CFLAGS) $(LDFLAGS) \
 		-fsanitize=undefined \
 		-s ERROR_ON_UNDEFINED_SYMBOLS=0 \
@@ -43,9 +40,8 @@ build/libdownload.js: src/upinit.c src/streamingdownload.c src/upcommon.c
 		-s TOTAL_MEMORY=268435456 \
 		-s LLD_REPORT_UNDEFINED \
 		-s FORCE_FILESYSTEM=1 \
-		-s ENVIRONMENT=worker \
 		-s EXPORTED_RUNTIME_METHODS=ccall \
-		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_get_session_key_from_header,_get_keypair_public_key,_free_chunk,_free_keypair,_decrypt_chunk,_clean_session \
+		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_get_session_key_from_header,_get_keypair_public_key,_free_chunk,_free_keypair,_decrypt_chunk,_clean_session,_libinit \
 		-O3 \
 		-o \
 		$@ \
@@ -55,7 +51,7 @@ build/libdownload.js: src/upinit.c src/streamingdownload.c src/upcommon.c
 		-lssl \
 		-lcrypto \
 		-lsodium \
-		--post-js js/crypt-post-downworker.js \
+		--post-js build/downworker-post.js \
 		--pre-js js/crypt-pre.js
 
 clean:

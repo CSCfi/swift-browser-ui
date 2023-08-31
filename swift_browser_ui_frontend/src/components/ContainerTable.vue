@@ -270,11 +270,9 @@ export default {
                       text: true,
                       size: "small",
                       title: this.$t("message.download"),
-                      href: "/download/".concat(
-                        this.$route.params.project,
-                        "/",
-                        item.name,
-                      ),
+                      onClick: () => {
+                        this.beginDownload(item.name);
+                      },
                       target: "_blank",
                       path: mdiTrayArrowDown,
                       disabled: item.owner && item.accessRights?.length === 0,
@@ -483,6 +481,15 @@ export default {
           itemCount:
             this.paginationOptions.itemCount - 1,
         });
+    },
+    beginDownload(container) {
+      console.log(container);
+      this.$store.state.socket.addDownload(
+        container,
+        [],
+      ).then(() => {
+        console.log(`Started downloading all objects from container ${container}`);
+      });
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {

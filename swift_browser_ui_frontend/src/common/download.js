@@ -162,12 +162,6 @@ export class DecryptedDownloadSession {
       ids = await this.$store.state.client.projectCheckIDs(this.owner);
     }
 
-    // Check the shared container owner canonical project name
-    let ids = undefined;
-    if (this.owner !== "") {
-      ids = await this.$store.state.client.projectCheckIDs(this.owner);
-    }
-
     let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
     signatureUrl.searchParams.append("path", this.whitelistPath);
     let signed = await GET(signatureUrl);

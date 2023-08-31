@@ -835,18 +835,13 @@ export default {
 
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
-      let upload = new EncryptedUploadSession(
-        this.active,
-        this.owner ? this.owner : this.active.id,
-        this.$store.state.dropFiles,
-        this.recvkeys,
-        null,
-        this.currentFolder ? this.currentFolder : this.inputFolder,
-        "",
-        null,
-        true,
-        this.$store,
-        this.$el,
+
+      this.socket.addUpload(
+        this.inputFolder,
+        this.$store.state.dropFiles.map(item => item),
+        this.recvkeys.map(item => item),
+        this.$route.params.owner ? this.$route.params.owner : "",
+        this.$route.params.owner ? this.$route.params.owner : "",
       );
 
       delay(() => {
@@ -864,7 +859,7 @@ export default {
             //avoid overlapping toasts
             setTimeout(() => { this.toastVisible = false; }, 4000);
           }
-          this.beginEncryptedUpload();
+          // this.beginEncryptedUpload();
         }
       }, 1000);
       this.toggleUploadModal();

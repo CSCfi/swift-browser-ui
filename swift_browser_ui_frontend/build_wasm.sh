@@ -10,16 +10,18 @@ SCRIPT_ROOT=$(dirname "$SCRIPT")
 WASM_ROOT="${SCRIPT_ROOT}"/wasm/
 
 docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh clean
-docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh all
 
-cp "${WASM_ROOT}/js/tar.js" "${WASM_ROOT}/build/tar.js"
-
+mkdir "${WASM_ROOT}/build"
 (
     cd $SCRIPT_ROOT
     npx webpack --config "${WASM_ROOT}/wasm-webpack.config.js"
 )
 
+docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh all
+
 cp "${WASM_ROOT}/build/upworker.js" "${SCRIPT_ROOT}/public/"
 cp "${WASM_ROOT}/build/downworker.js" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/libupload.wasm" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/libdownload.wasm" "${SCRIPT_ROOT}/public/"
+cp "${WASM_ROOT}/build/upworker-post.js.map" "${SCRIPT_ROOT}/public/"
+cp "${WASM_ROOT}/build/downworker-post.js.map" "${SCRIPT_ROOT}/public/"
+cp "${WASM_ROOT}/build/upworker.wasm" "${SCRIPT_ROOT}/public/"
+cp "${WASM_ROOT}/build/downworker.wasm" "${SCRIPT_ROOT}/public/"
