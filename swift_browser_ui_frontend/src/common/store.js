@@ -262,7 +262,7 @@ const store = createStore({
   },
   actions: {
     updateContainers: async function (
-      { dispatch },
+      { dispatch, commit },
       { projectID, signal, routeContainer = undefined },
     ) {
       const existingContainers = await getDB()
@@ -437,10 +437,14 @@ const store = createStore({
               signal: signal,
             });
           }
+          if (i === containers_to_update_objects.length - 1) {
+            commit("setLoaderVisible", false);
+          }
         }
       };
 
       if (containers_to_update_objects.length > 0) dispatchUpdateObjects();
+      else commit("setLoaderVisible", false);
     },
     updateContainerTags: async function (_, { projectID, containers, signal }) {
       for (let i = 0; i < containers.length; i++) {
@@ -456,7 +460,7 @@ const store = createStore({
     },
 
     updateObjects: async function (
-      { dispatch, commit, state },
+      { dispatch, state },
       { projectID, container, signal },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
@@ -534,9 +538,6 @@ const store = createStore({
           } catch (e) {
             if (DEV) console.error("Constraint error: " + e.message);
           }
-        }
-        if (!isSegmentsContainer && i === newObjects.length - 1) {
-          commit("setLoaderVisible", false);
         }
       }
 
@@ -661,9 +662,6 @@ const store = createStore({
         for (let i = 0; i < sharedObjects.length; i++) {
           if (segment_objects[i]) {
             sharedObjects[i].bytes = segment_objects[i].bytes;
-          }
-          if (!isSegmentsContainer && i === sharedObjects.length - 1) {
-            commit("setLoaderVisible", false);
           }
         }
       }
