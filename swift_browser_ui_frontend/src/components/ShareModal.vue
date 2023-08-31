@@ -66,21 +66,18 @@
             <p>
               {{ $t("message.share.share_guide_intro") }}
             </p>
-            <p>
-              {{ $t("message.share.share_guide_step1") }}
-            </p>
-            <p>
-              {{ $t("message.share.share_guide_step2") }}
-            </p>
+            <!-- eslint-disable vue/no-v-html -->
+            <p v-html="$t('message.share.share_guide_step1')" />
+            <p v-html="$t('message.share.share_guide_step2')" />
             <ul>
               <li
                 v-for="(item, i) in
                   $tm('message.share.share_guide_step2_list')"
                 :key="i"
-              >
-                {{ item }}
-              </li>
+                v-html="item"
+              />
             </ul>
+            <!-- eslint-enable vue/no-v-html -->
           </div>
           <TagInput
             id="share-ids"
