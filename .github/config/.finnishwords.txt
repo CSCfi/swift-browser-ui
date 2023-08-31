@@ -189,9 +189,9 @@ kopioidaan
 kopioinnin
 kopiointi
 kopioitu
-koska
 korvaa
 korvata
+koska
 koskevia
 kuin
 kuinka
