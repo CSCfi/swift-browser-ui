@@ -306,6 +306,7 @@ napilla
 nappi
 nappia
 navigointia
+ne
 niiden
 niin
 nimellä
@@ -391,6 +392,7 @@ pois
 poissa
 poista
 poistaa
+poistakaa
 poistaminen
 poistamisen
 poistamista
