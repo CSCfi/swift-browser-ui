@@ -90,15 +90,26 @@
           v-show="existingFiles.length"
           type="warning"
         >
-          <span>
+          <span
+            v-if="existingFiles.length === 1"
+          >
             {{ $t("message.objects.file") }}
+            <b>
+              {{ existingFiles[0].name }}
+            </b>
+            {{ $t("message.objects.overwriteConfirm") }}
+          </span>
+          <span
+            v-else
+          >
+            {{ $t("message.objects.files") }}
             <b>
               {{ existingFiles.reduce((array, item) => {
                 array.push(item.name);
                 return array;
               }, []).join(", ") }}
             </b>
-            {{ $t("message.objects.overwriteConfirm") }}
+            {{ $t("message.objects.overwriteConfirmMany") }}
           </span>
           <c-card-actions justify="end">
             <c-button
@@ -518,15 +529,14 @@ export default {
         this.currentPage = page;
       }
     },
-
-    appendDropFiles(file) {
+    appendDropFiles(file, overwrite = false) {
       //Check if file path already exists in dropFiles
       if (
         this.$store.state.dropFiles.find(
           ({ relativePath }) => relativePath === String(file.relativePath),
         ) === undefined
       ) {
-        if (this.objects) {
+        if (this.objects && !overwrite) {
           //Check if file already exists in container objects
           const existingFile = this.objects.find(obj => obj.name === `${file.relativePath}.c4gh`);
           if (existingFile) {
@@ -546,7 +556,7 @@ export default {
       //if new duplicate files appear after confirmation
       // alert will show again
       for (let i = 0; i < this.existingFiles.length; i++) {
-        this.$store.commit("appendDropFiles", this.existingFiles[i]);
+        this.appendDropFiles(this.existingFiles[i], true);
         this.filesToOverwrite.push(this.existingFiles[i]);
       }
       this.clearExistingFiles();

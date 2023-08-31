@@ -555,7 +555,6 @@ tavallisesti
 tekijänoikeustiedot
 tekstinä
 tiedosto
-tiedosto(t)
 tiedostoa
 tiedostoja
 tiedostojen

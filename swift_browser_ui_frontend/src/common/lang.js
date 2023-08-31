@@ -254,9 +254,11 @@ let default_translations = {
         deleteManySuccess: "Subfolders were deleted.",
       },
       objects: {
-        file: "File(s) ",
-        overwriteConfirm:
-          " already exist(s). Do you want to overwrite the file(s)?",
+        file: "File ",
+        files: "Files ",
+        overwriteConfirm: " already exists. Do you want to overwrite the file?",
+        overwriteConfirmMany:
+          " already exist. Do you want to overwrite the files?",
         overwrite: "Overwrite",
         filterBy: "Filter by name or tag",
         deleteConfirm: "Delete items",
@@ -648,9 +650,12 @@ let default_translations = {
         deleteManySuccess: "Alikansiot poistettu.",
       },
       objects: {
-        file: "Tiedosto(t) ",
+        file: "Tiedosto ",
+        files: "Tiedostot ",
         overwriteConfirm:
-          " ovat jo olemassa. Haluatko korvata tiedoston/tiedostot?",
+          " on jo olemassa. Haluatko korvata tiedoston?",
+        overwriteConfirmMany:
+          " ovat jo olemassa. Haluatko korvata tiedostot?",
         overwrite: "Korvaa",
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
