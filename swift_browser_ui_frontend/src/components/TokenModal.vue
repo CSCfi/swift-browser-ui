@@ -4,79 +4,74 @@
     class="token-card"
     @keydown="handleKeyDown"
   >
-    <c-card
-      ref="tokenContainer"
-      class="token-card"
-      @keydown="handleKeyDown"
+    <c-card-actions
+      justify="space-between"
+      align="center"
     >
-      <c-card-actions
-        justify="space-between"
-        align="center"
+      <h2 class="title is-4">
+        {{ $t("message.tokens.title") }}
+      </h2>
+      <c-button
+        id="close-token-modal-btn"
+        text
+        @click="closeTokenModal"
+        @keyup.enter="closeTokenModal"
       >
-        <h2 class="title is-4">
-          {{ $t("message.tokens.title") }}
-        </h2>
-        <c-button
-          id="close-token-modal-btn"
-          text
-          @click="closeTokenModal"
-          @keyup.enter="closeTokenModal"
-        >
-          <c-icon
-            :path="mdiClose"
-            alt=""
-            aria-hidden="true"
-          />
-          {{ $t("message.close") }}
-        </c-button>
-      </c-card-actions>
-      <c-card-content>
-        <c-text-field
-          id="token-input"
-          v-model="newIdentifier"
-          v-csc-control
-          name="newIdentifier"
-          :label="$t('message.tokens.identLabel')"
+        <c-icon
+          :path="mdiClose"
+          alt=""
+          aria-hidden="true"
         />
+        {{ $t("message.close") }}
+      </c-button>
+    </c-card-actions>
+    <c-card-content>
+      <c-text-field
+        id="token-input"
+        v-model="newIdentifier"
+        v-csc-control
+        name="newIdentifier"
+        :label="$t('message.tokens.identLabel')"
+      />
+      <c-button
+        id="create-token-button"
+        @click="addToken(newIdentifier)"
+        @keyup.enter="addToken(newIdentifier)"
+      >
+        {{ $t('message.tokens.createToken') }}
+      </c-button>
+      <c-row
+        v-show="latest.token"
+        align="start"
+        justify="space-between"
+      >
+        <p>
+          <strong>{{ $t('message.tokens.latestToken') }}</strong>
+        </p>
+        <div id="token">
+          <p>{{ latest.token }}</p>
+        </div>
         <c-button
-          id="create-token-button"
-          @click="addToken(newIdentifier)"
-          @keyup.enter="addToken(newIdentifier)"
+          size="small"
+          @click="copyLatestToken"
+          @keyup.enter="copyLatestToken"
         >
-          {{ $t('message.tokens.createToken') }}
+          <i
+            slot="icon"
+            class="mdi mdi-content-copy"
+          />
+          {{ $t('message.tokens.copy') }}
         </c-button>
-        <c-row
-          v-show="latest.token"
-          align="start"
-          justify="space-between"
-        >
-          <p>
-            <strong>{{ $t('message.tokens.latestToken') }}</strong>
-          </p>
-          <div id="token">
-            <p>{{ latest.token }}</p>
-          </div>
-          <c-button
-            size="small"
-            @click="copyLatestToken"
-            @keyup.enter="copyLatestToken"
-          >
-            <i
-              slot="icon"
-              class="mdi mdi-content-copy"
-            />
-            {{ $t('message.tokens.copy') }}
-          </c-button>
-        </c-row>
-        <c-alert
-          v-show="latest.token"
-          type="warning"
-        >
-          <p>{{ $t('message.tokens.copyWarning') }}</p>
-        </c-alert>
-        <!-- Footer options needs to be in CamelCase,
+      </c-row>
+      <c-alert
+        v-show="latest.token"
+        type="warning"
+      >
+        <p>{{ $t('message.tokens.copyWarning') }}</p>
+      </c-alert>
+      <!-- Footer options needs to be in CamelCase,
       because csc-ui wont recognise it otherwise. -->
-        <!-- eslint-disable-->
+      <!-- eslint-disable-->
       <c-data-table
         sort-by="identifier"
         sort-direction="asc"
@@ -89,12 +84,11 @@
         @click="checkPage"
       />
       <!-- eslint-enable-->
-        <c-toasts
-          id="token-toasts"
-          data-testid="token-toasts"
-        />
-      </c-card-content>
-    </c-card>
+      <c-toasts
+        id="token-toasts"
+        data-testid="token-toasts"
+      />
+    </c-card-content>
   </c-card>
 </template>
 
