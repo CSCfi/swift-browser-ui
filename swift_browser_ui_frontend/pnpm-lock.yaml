@@ -22,7 +22,7 @@ dependencies:
     version: 2.1.11
   csc-ui:
     specifier: github:hannyle/csc-ui
-    version: github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
+    version: git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -74,8 +74,8 @@ devDependencies:
     specifier: ^9.3.1
     version: 9.3.1
   '@testing-library/jest-dom':
-    specifier: ^6.0.0
-    version: 6.0.0(jest@29.6.1)
+    specifier: ^6.1.2
+    version: 6.1.2(jest@29.6.1)
   '@testing-library/user-event':
     specifier: ^14.4.3
     version: 14.4.3(@testing-library/dom@9.3.1)
@@ -105,8 +105,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /@adobe/css-tools@4.2.0:
-    resolution: {integrity: sha512-E09FiIft46CmH5Qnjb0wsW54/YQd69LsxeKUOWawmws1XWvyFGURnAChH0mlr7YPFR1ofwvUQfcL0J3lMxXqPA==}
+  /@adobe/css-tools@4.3.1:
+    resolution: {integrity: sha512-/62yikz7NLScCGAAST5SHdnjaDJQBDq0M2muyRTpf2VQhw6StBg2ALiu73zSJQ4fMVLA+0uBhBHAle7Wg+2kSg==}
     dev: true
 
   /@ampproject/remapping@2.2.1:
@@ -1212,8 +1212,8 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@testing-library/jest-dom@6.0.0(jest@29.6.1):
-    resolution: {integrity: sha512-Ye2R3+/oM27jir8CzYPmuWdavTaKwNZcu0d22L9pO/vnOYE0wmrtpw79TQJa8H6gV8/i7yd+pLaqeLlA0rTMfg==}
+  /@testing-library/jest-dom@6.1.2(jest@29.6.1):
+    resolution: {integrity: sha512-NP9jl1Q2qDDtx+cqogowtQtmgD2OVs37iMSIsTv5eN5ETRkf26Kj6ugVwA93/gZzzFWQAsgkKkcftDe91BJCkQ==}
     engines: {node: '>=14', npm: '>=6', yarn: '>=1'}
     peerDependencies:
       '@jest/globals': '>= 28'
@@ -1230,7 +1230,7 @@ packages:
       vitest:
         optional: true
     dependencies:
-      '@adobe/css-tools': 4.2.0
+      '@adobe/css-tools': 4.3.1
       '@babel/runtime': 7.22.6
       aria-query: 5.3.0
       chalk: 3.0.0
@@ -5387,8 +5387,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  github.com/hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
-    resolution: {tarball: https://codeload.github.com/hannyle/csc-ui/tar.gz/0a4c4fee6c8307d28265819958b1ab01089c6413}
+  git/github.com+hannyle/csc-ui/0a4c4fee6c8307d28265819958b1ab01089c6413:
+    resolution: {commit: 0a4c4fee6c8307d28265819958b1ab01089c6413, repo: git@github.com:hannyle/csc-ui.git, type: git}
     name: csc-ui
     version: 0.6.79
     prepare: true
