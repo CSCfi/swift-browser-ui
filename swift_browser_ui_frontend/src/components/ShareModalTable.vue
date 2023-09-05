@@ -25,6 +25,7 @@ import {
   GET,
 } from "@/common/api";
 import { DEV } from "@/common/conv";
+import { mdiDelete } from "@mdi/js";
 
 export default {
   name: "ShareModalTable",
@@ -63,18 +64,19 @@ export default {
           sortable: false,
         },
         {
-          key: "remove",
+          key: "delete",
           value: null,
           sortable: false,
           children: [
             {
-              value: this.$t("message.remove"),
+              value: this.$t("message.delete"),
               component: {
                 tag: "c-button",
                 params: {
                   text: true,
                   size: "small",
-                  title: this.$t("message.remove"),
+                  title: this.$t("message.delete"),
+                  path: mdiDelete,
                   onClick: ({ data }) => {
                     this.$emit("removeSharedFolder", data);
                     this.deleteFolderShare(data);
@@ -129,6 +131,7 @@ export default {
                 tag: "c-select",
                 params: {
                   style: {
+                    width: "100%",
                     fontSize: "0.875rem",
                     marginTop: "1rem",
                   },

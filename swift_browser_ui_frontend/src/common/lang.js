@@ -153,20 +153,20 @@ let default_translations = {
         share_guide_intro:
           "To share a folder with another project you need to:",
         share_guide_step1:
-          "1. Enter the Share ID. You need to know in advance " +
+          "1. <b>Enter the Share ID.</b> You need to know in advance " +
           "the Share ID (a 32-digit code) associated " +
           "with the project you want to share a folder with. The " +
           "recipient can copy the Share ID from the user " +
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
-        share_guide_step2: "2. Select the permission rights: ",
+        share_guide_step2: "2. <b>Select the permission rights:</b> ",
         share_guide_step2_list: [
-          "View: project members can access the folder's content " +
+          "<b>View:</b> project members can access the folder's content " +
             "but can not directly download or copy " +
             "its content.",
-          "Copy and download: project members can copy, download " +
+          "<b>Copy and download:</b> project members can copy, download " +
             "and decrypt the folder content.",
-          "Copy, download and upload: project members can copy, " +
+          "<b>Copy, download and upload:</b> project members can copy, " +
             "download and decrypt the folder content. They can also upload " +
             "new files to the shared folder accessible to both projects.",
         ],
@@ -184,8 +184,8 @@ let default_translations = {
         fail_noperm: "Please select permissions to grant.",
         fail_noid: "Please enter at least one Share ID.",
         fail_duplicate: "The project already has access to the folder.",
-        invalid_share_id: " is not a valid Share ID.",
-        invalid_share_ids: " are not valid Share IDs.",
+        invalid_share_id: " is not a valid Share ID. Please remove it.",
+        invalid_share_ids: " are not valid Share IDs. Please remove them.",
       },
       download: " Download",
       largeDownMessage:
@@ -540,21 +540,21 @@ let default_translations = {
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro: "Kun haluat jakaa kansion toisen projektin kanssa: ",
         share_guide_step1:
-          "1. Syötä jakamistunnus. Sinun tulee tietää " +
+          "1. <b>Syötä jakamistunnus.</b> Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
           "koodi). Vastaanottaja voi kopioida " +
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
-        share_guide_step2: "2. Valitse käyttöoikeudet: ",
+        share_guide_step2: "2. <b>Valitse käyttöoikeudet:</b> ",
         share_guide_step2_list: [
-          "Tarkastele: projektin jäsenet voivat tarkastella kansion sisältöä" +
-            ", mutta eivät voi ladata ja kopioida kansion sisältöä.",
-          "Kopioi ja lataa: projektin jäsenet voivat kopioida ja ladata " +
-            "kansion sisällön sekä purkaa kansion sisällön salauksen.",
-          "Kopioi, lataa ja lähetä: projektin jäsenet voivat kopioida ja " +
-            "ladata kansion sisällön sekä purkaa kansion sisällön salauksen. " +
-            "He voivat myös lähettää tiedostoja jaettuun kansioon.",
+          "<b>Tarkastele:</b> projektin jäsenet voivat tarkastella kansion " +
+            "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
+          "<b>Kopioi ja lataa:</b> projektin jäsenet voivat kopioida ja " +
+            "ladata kansion sisällön sekä purkaa kansion sisällön salauksen.",
+          "<b>Kopioi, lataa ja lähetä:</b> projektin jäsenet voivat kopioida " +
+            "ja ladata kansion sisällön sekä purkaa kansion sisällön " +
+            "salauksen. He voivat myös lähettää tiedostoja jaettuun kansioon.",
         ],
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
@@ -570,8 +570,9 @@ let default_translations = {
         fail_noperm: "Valitse käyttöoikeudet.",
         fail_noid: "Anna vähintään yhden projektin jakamistunnus.",
         fail_duplicate: "Kansio on jo jaettu kyseiselle projektille.",
-        invalid_share_id: " ei ole kelvollinen jakamistunnus.",
-        invalid_share_ids: " eivät ole kelvollisia jakamistunnuksia.",
+        invalid_share_id: " ei ole kelvollinen jakamistunnus. Poistakaa se.",
+        invalid_share_ids:
+          " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
       },
       download: " Lataa",
       largeDownMessage:

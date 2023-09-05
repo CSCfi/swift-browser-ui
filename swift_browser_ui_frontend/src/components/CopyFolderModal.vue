@@ -47,7 +47,6 @@
       </c-button>
       <c-button
         size="large"
-        :disabled="folderName.length === 0 || errorMsg.length"
         @click="replicateContainer(false)"
         @keyup.enter="replicateContainer(true)"
       >
@@ -215,6 +214,7 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
+      if (this.errorMsg.length) return;
       this.$store.commit("toggleCopyFolderModal", false);
       document.querySelector("#copyFolder-toasts").addToast(
         {

@@ -74,7 +74,6 @@
       <c-button
         size="large"
         data-testid="save-folder"
-        :disabled="errorMsg.length"
         @click="createContainer(false)"
         @keyup.enter="createContainer(true)"
       >
@@ -141,6 +140,9 @@ export default {
   },
   methods: {
     createContainer: function (keypress) {
+      this.errorMsg = validateFolderName(this.folderName, this.$t);
+      if (this.errorMsg.length) return;
+
       let projectID = this.$route.params.project;
       const folderName = toRaw(this.folderName);
       const tags = toRaw(this.tags);
