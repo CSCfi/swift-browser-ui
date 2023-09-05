@@ -60,7 +60,7 @@ dev = [
     "honcho==1.1.0",
     "pre-commit==3.3.3",
     "pyspelling==2.8.2",
-    "ruff==0.0.286",
+    "ruff==0.0.287",
     "types-certifi",
     "types-redis",
     "types-requests",
