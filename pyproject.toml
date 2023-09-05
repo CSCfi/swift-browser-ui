@@ -50,7 +50,7 @@ test = [
     "pytest-cov==4.1.0",
     "pytest-xdist==3.3.1",
     "pytest==7.4.0",
-    "tox==4.11.0",
+    "tox==4.11.1",
 ]
 ui_test = [
     "pytest-timeout==2.1.0",
