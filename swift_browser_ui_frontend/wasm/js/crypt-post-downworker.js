@@ -34,80 +34,8 @@ OPFS based version might not be worth it in real world use, since it needs
 intermediary storage and the ServiceWorker doesn't.
 */
 
-// Detect if inside a ServiceWorker
-function detectServiceWorker() {
-  if (typeof ServiceWorkerGlobalScope !== "undefined") {
-    return self instanceof ServiceWorkerGlobalScope;
-  }
-  return false;
-}
 
 console.log("Download worker started.");
-console.log(`Checking if running in a ServiceWorker: ${detectServiceWorker()}`);
-
-if (detectServiceWorker()) {
-  // Example: https://devenv:8443/file/test-container/examplefile.txt.c4gh
-  const fileUrl = new RegExp("/file/[^/]*/.*$");
-  // Example: https://devenv:8443/archive/test-container.tar
-  const archiveUrl = new RegExp("/archive/[^/]*\.tar$");
-  const fileUrlStart = new RegExp("/file/[^/]*/");
-
-  self.addEventListener("fetch", (e) => {
-    if (!e.clientId) return;
-    const url = new URL(e.request.url);
-    let fileName;
-    let containerName;
-
-    if (fileUrl.test(url.path)) {
-      fileName = url.path.replace(fileUrlStart, "");
-      containerName = url.path.replace("/file/", "").replace(fileName, "");
-    } else if (archiveUrl.test(url.path)) {
-      fileName = request.path.replace("/archive/", "");
-      containerName = fileName.replace(/\.tar$/, "");
-    } else {
-      return;
-    }
-
-    if (fileUrl.test(url.path) || archiveUrl.test(url.path)) {
-      let streamController;
-      const stream = new ReadableStream({
-        start(controller) {
-          streamController = controller;
-        },
-      });
-      const response = new Response(stream);
-      response.headers.append(
-        "Content-Disposition",
-        'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
-      );
-
-      createDownloadSession(containerName, streamController, archiveUrl.test(url.path));
-
-      let files;
-      if (fileUrl.test(url.path)) {
-        files = [fileName];
-      } else if (url.searchParams.get("files") !== null) {
-        files = url.searchParams.get("files").split(",");
-      } else {
-        files = [];  // empty list signifies all files in a specific container
-      }
-
-      e.waitUntil(
-        (async () => {
-          const client = await clients.get(e.clientId);
-          if (!client) return;
-          client.postMessage({
-            eventType: "getHeaders",
-            container: containerName,
-            files: files,
-            publickey: downloads[containerName].pubkey,
-          });
-          e.respondWith(response);
-        }),
-      );
-    }
-  });
-}
 
 
 // Create a download session
@@ -396,7 +324,7 @@ async function beginDownloadInSession(
     fileStream.close();
   }
 
-  if (downloads[container].direct && detectServiceWorker()) {
+  if (downloads[container].direct) {
     // Direct downloads need no further action, the resulting archive is
     // already in the filesystem.
     postMessage({
@@ -422,13 +350,15 @@ function finishDownloadSession(container) {
 }
 
 self.addEventListener("message", (e) => {
-  e.stopImmediatePropagation();
+  if (!inServiceWorker) {
+    e.stopImmediatePropagation();
+  } else {
+    return;
+  }
 
   switch(e.data.command) {
     // Create the download session for single or multiple files
     case "downloadFile":
-      // Don't need to detect ServiceWorker environment here, as downloads
-      // are started by the fetch event in ServiceWorker.
       createDownloadSession(e.data.container, e.data.handle, false);
       postMessage({
         eventType: "getHeaders",
@@ -440,8 +370,6 @@ self.addEventListener("message", (e) => {
       });
       break;
     case "downloadFiles":
-      // Don't need to detect ServiceWorker environment here, as downloads
-      // are started by the fetch event in ServiceWorker.
       createDownloadSession(e.data.container, e.data.handle, true);
       postMessage({
         eventType: "getHeaders",
@@ -455,17 +383,10 @@ self.addEventListener("message", (e) => {
         e.data.container,
         e.data.headers,
       );
-      if (detectServiceWorker()) {
-        e.source.postMessage({
-          eventType: "downloadStarted",
-          container: e.data.container,
-        });
-      } else {
-        postMessage({
-          eventType: "downloadStarted",
-          container: e.data.container,
-        });
-      }
+      postMessage({
+        eventType: "downloadStarted",
+        container: e.data.container,
+      });
       break;
   }
 });

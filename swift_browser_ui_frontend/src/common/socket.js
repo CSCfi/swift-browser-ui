@@ -19,26 +19,28 @@ export default class UploadSocket {
     this.outputFiles = {};
 
     // Initialize the workers
-    // The workers will handle threading by themselves, to avert
-    // blocking the main browser thread
+    // The workers will eventually handle threading by themselves, to
+    // avoid blocking the main browser thread
     this.upWorker = new Worker("/upworker.js");
     if (
       "serviceWorker" in navigator
-      && window.showSaveFilePicker === undefined
+      // && window.showSaveFilePicker === undefined
     ) {
       console.log("Registering download script into service worker.");
-      let workerUrl = new URL("/downworker.js", document.location.origin);
+      let workerUrl = new URL("/serviceworker.js", document.location.origin);
       navigator.serviceWorker.register(workerUrl).then(reg => {
         reg.update();
       }).catch((err) => {
         if (DEV) console.log("Failed to register the service worker.");
         if (DEV) console.log(err);
       });
+      this.downWorker = undefined;
     } else if (window.showSaveFilePicker !== undefined) {
       console.log("Registering the download script as a normal worker.");
       this.downWorker = new Worker("/downworker.js");
     } else {
       if (DEV) console.log("Could not register a worker for download.");
+      if (DEV) console.log("Decrypted downloads are not available.");
     }
 
     // Add message handlers for upload and download workers
@@ -112,7 +114,7 @@ export default class UploadSocket {
     this.upWorker.onmessage = handleUpWorker;
     if (
       "serviceWorker" in navigator
-      && window.showSaveFilePicker === undefined
+      // && window.showSaveFilePicker === undefined
     ) {
       navigator.serviceWorker.addEventListener(
         "message",
@@ -197,11 +199,21 @@ export default class UploadSocket {
 
     console.log(headers);
 
-    this.downWorker.postMessage({
-      command: "addHeaders",
-      container: container,
-      headers: headers,
-    });
+    if (this.downWorker !== undefined) {
+      this.downWorker.postMessage({
+        command: "addHeaders",
+        container: container,
+        headers: headers,
+      });
+    } else {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.active.postMessage({
+          command: "addHeaders",
+          container: container,
+          headers: headers,
+        });
+      });
+    }
   }
 
   // Get the latest upload endpoint
