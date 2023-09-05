@@ -68,7 +68,7 @@
           </CUploadButton>
         </div>
         <c-alert
-          v-show="duplicateFile"
+          v-show="duplicateDropFile"
           type="error"
         >
           <div class="duplicate-notification">
@@ -76,7 +76,7 @@
             <c-button
               text
               size="small"
-              @click="duplicateFile = false"
+              @click="duplicateDropFile = false"
             >
               <i
                 slot="icon"
@@ -85,6 +85,44 @@
               {{ $t("message.close") }}
             </c-button>
           </div>
+        </c-alert>
+        <c-alert
+          v-show="existingFiles.length"
+          type="warning"
+        >
+          <span
+            v-if="existingFiles.length === 1"
+          >
+            {{ $t("message.objects.file") }}
+            <b>
+              {{ existingFiles[0].name }}
+            </b>
+            {{ $t("message.objects.overwriteConfirm") }}
+          </span>
+          <span
+            v-else
+          >
+            {{ $t("message.objects.files") }}
+            <b>
+              {{ existingFileNames }}
+            </b>
+            {{ $t("message.objects.overwriteConfirmMany") }}
+          </span>
+          <c-card-actions justify="end">
+            <c-button
+              outlined
+              @click="clearExistingFiles"
+              @keyup.enter="clearExistingFiles"
+            >
+              {{ $t("message.cancel") }}
+            </c-button>
+            <c-button
+              @click="overwriteFiles"
+              @keyup.enter="overwriteFiles"
+            >
+              {{ $t("message.objects.overwrite") }}
+            </c-button>
+          </c-card-actions>
         </c-alert>
         <!-- Footer options needs to be in CamelCase,
         because csc-ui wont recognise it otherwise. -->
@@ -205,6 +243,7 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
+import { swiftDeleteObjects } from "@/common/api";
 
 import { delay, debounce } from "lodash";
 import { mdiDelete } from "@mdi/js";
@@ -227,7 +266,7 @@ export default {
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
-      duplicateFile: false,
+      duplicateDropFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
@@ -236,6 +275,9 @@ export default {
       errorMsg: "",
       toastMsg : "",
       containers: [],
+      objects: [],
+      existingFiles: [],
+      filesToOverwrite: [],
     };
   },
   computed: {
@@ -416,6 +458,12 @@ export default {
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
+    existingFileNames() {
+      return this.existingFiles.reduce((array, item) => {
+        array.push(item.name);
+        return array;
+      }, []).join(", ");
+    },
   },
   watch: {
     modalVisible: async function() {
@@ -423,11 +471,25 @@ export default {
         //inputFolder not cleared when modal toggled,
         //in case there's a delay in upload start
         //reset when modal visible
+        this.clearExistingFiles();
+        this.filesToOverwrite = [];
         this.recvkeys = [];
         this.inputFolder = "";
         this.containers = await getDB().containers
           .where({ projectID: this.active.id })
           .toArray();
+        if (this.currentFolder) {
+          if (this.$route.name === "SharedObjects") {
+            this.objects = this.$store.state.objectCache;
+          }
+          else {
+            const cont = this.containers.find(c =>
+              c.name === this.currentFolder);
+            this.objects = await getDB().objects
+              .where({containerID: cont.id})
+              .toArray();
+          }
+        }
       }
     },
     inputFolder: function() {
@@ -470,22 +532,92 @@ export default {
         this.currentPage = page;
       }
     },
-
-    appendDropFiles(file) {
-      //Checking for identical path only, not name:
-      //different folders may have same file names
+    appendDropFiles(file, overwrite = false) {
+      //Check if file path already exists in dropFiles
       if (
         this.$store.state.dropFiles.find(
           ({ relativePath }) => relativePath === String(file.relativePath),
         ) === undefined
       ) {
+        if (this.objects && !overwrite) {
+          //Check if file already exists in container objects
+          const existingFile = this.objects.find(obj => obj.name === `${file.relativePath}.c4gh`);
+          if (existingFile) {
+            this.existingFiles.push(file);
+            return;
+          }
+        }
         this.$store.commit("appendDropFiles", file);
       } else {
-        if (!this.duplicateFile) {
-          this.duplicateFile = true;
-          setTimeout(() => { this.duplicateFile = false; }, 6000);
+        if (!this.duplicateDropFile) {
+          this.duplicateDropFile = true;
+          setTimeout(() => { this.duplicateDropFile = false; }, 6000);
         }
       }
+    },
+    overwriteFiles() {
+      //if new duplicate files appear after confirmation
+      // alert will show again
+      for (let i = 0; i < this.existingFiles.length; i++) {
+        this.appendDropFiles(this.existingFiles[i], true);
+        this.filesToOverwrite.push(this.existingFiles[i]);
+      }
+      this.clearExistingFiles();
+    },
+    async deleteSegments() {
+      //old file segments need to be deleted because
+      //they are not overwritten
+      if (!this.filesToOverwrite.length) return;
+
+      let oldSegments = [];
+      const segmentCont= await getDB().containers.get({
+        projectID: this.$route.name === "SharedObjects" ?
+          this.owner : this.active.id,
+        name: `${this.currentFolder}_segments`,
+      });
+
+      if (segmentCont) {
+        for (let i = 0; i < this.filesToOverwrite.length; i++) {
+          let segments = await getDB().objects
+            .where({containerID: segmentCont.id})
+            .filter(obj => obj.name.includes(`${this.filesToOverwrite[i].name}.c4gh/`)).first();
+          if (segments) oldSegments.push(segments.name);
+        }
+      }
+
+      if (this.$route.name !== "SharedObjects") {
+        // Delete segment objects from IDB
+        const segmentObjIDs = await getDB().objects
+          .where({ containerID: segmentCont.id })
+          .filter(obj => obj.name && oldSegments.includes(obj.name))
+          .primaryKeys();
+        await getDB().objects.bulkDelete(segmentObjIDs);
+      }
+
+      if (oldSegments.length) {
+        swiftDeleteObjects(
+          this.owner || this.active.id,
+          segmentCont.name,
+          oldSegments,
+        );
+      }
+
+      if (this.$route.name === "SharedObjects") {
+        await this.$store.dispatch(
+          "updateSharedObjects",
+          {
+            projectID: this.active.id,
+            owner: this.owner,
+            container: {
+              name: this.currentFolder,
+              id: 0,
+            },
+          },
+        );
+      }
+    },
+    clearExistingFiles() {
+      this.existingFiles = [];
     },
     checkFolderName: debounce(function () {
       const error = validateFolderName(this.inputFolder, this.$t);
@@ -625,7 +757,7 @@ export default {
       this.addingFiles = false;
       this.tags = [];
       this.files = [];
-      this.duplicateFile = false;
+      this.duplicateDropFile = false;
       this.interacted = false;
       this.addRecvkey = "";
       this.recvHashedKeys = [];
@@ -666,7 +798,10 @@ export default {
         );
         return;
       }
-      else this.beginEncryptedUpload();
+      else {
+        this.deleteSegments();
+        this.beginEncryptedUpload();
+      }
     },
     beginEncryptedUpload() {
       if (this.pubkey.length > 0) {

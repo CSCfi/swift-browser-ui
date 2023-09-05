@@ -189,6 +189,8 @@ kopioidaan
 kopioinnin
 kopiointi
 kopioitu
+korvaa
+korvata
 koska
 koskevia
 kuin
