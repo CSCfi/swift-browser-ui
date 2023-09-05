@@ -104,10 +104,7 @@
           >
             {{ $t("message.objects.files") }}
             <b>
-              {{ existingFiles.reduce((array, item) => {
-                array.push(item.name);
-                return array;
-              }, []).join(", ") }}
+              {{ existingFileNames }}
             </b>
             {{ $t("message.objects.overwriteConfirmMany") }}
           </span>
@@ -460,6 +457,12 @@ export default {
     },
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
+    },
+    existingFileNames() {
+      return this.existingFiles.reduce((array, item) => {
+        array.push(item.name);
+        return array;
+      }, []).join(", ");
     },
   },
   watch: {
