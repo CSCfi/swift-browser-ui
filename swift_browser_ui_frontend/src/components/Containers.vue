@@ -34,7 +34,10 @@
 import { liveQuery } from "dexie";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
-import { getSharingContainers } from "@/common/globalFunctions";
+import {
+  getSharingContainers,
+  updateObjectsAndObjectTags,
+} from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
 import SearchBox from "@/components/SearchBox.vue";
 
@@ -60,6 +63,7 @@ export default {
       abortController: null,
       containers: [],
       renderingContainers: [],
+      containersToUpdateObjs: [],
     };
   },
   computed: {
@@ -89,7 +93,7 @@ export default {
         this.updateTableOptions();
       }
     },
-    containers: function() {
+    containers: async function() {
       if (this.$route.name === "SharedFrom") {
         getSharingContainers(
           this.$route.params.project,
@@ -124,6 +128,13 @@ export default {
     },
     locale: function () {
       this.updateTableOptions();
+    },
+    containersToUpdateObjs: async function () {
+      await updateObjectsAndObjectTags(
+        this.containersToUpdateObjs,
+        this.active.id,
+        this.abortController.signal,
+      );
     },
   },
   created() {
@@ -215,6 +226,12 @@ export default {
         id: this.active.id,
       });
 
+      this.containersToUpdateObjs = await this.$store
+        .dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: this.abortController.signal,
+        });
+
       this.containers = useObservable(
         liveQuery(() =>
           getDB().containers
@@ -222,11 +239,6 @@ export default {
             .toArray(),
         ),
       );
-
-      await this.$store.dispatch("updateContainers", {
-        projectID: this.active.id,
-        signal: this.abortController.signal,
-      });
     },
     removeContainer: async function(container) {
       await getDB().containers.where({

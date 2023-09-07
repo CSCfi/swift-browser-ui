@@ -208,3 +208,38 @@ export function checkIfItemIsLastOnPage(paginationOptions){
   }
   return paginationOptions.currentPage;
 }
+
+export async function updateObjectsAndObjectTags(
+  containers,
+  projectID,
+  signal,
+  updateTags = true, // Obj tags don't need to be updated when uploading objs
+) {
+  if (containers.length > 0) {
+    for (let i = 0; i < containers.length; i++) {
+      const currentContainer = containers[i];
+      if (!currentContainer.container.owner) {
+        await store.dispatch("updateObjects", {
+          projectID,
+          container: {
+            id: currentContainer.key,
+            ...currentContainer.container,
+          },
+          signal,
+          updateTags,
+        });
+      } else {
+        await store.dispatch("updateObjects", {
+          projectID,
+          owner: currentContainer.container.owner,
+          container: {
+            id: currentContainer.key,
+            ...currentContainer.container,
+          },
+          signal,
+          updateTags,
+        });
+      }
+    }
+  }
+}

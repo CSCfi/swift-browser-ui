@@ -134,6 +134,7 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
+  updateObjectsAndObjectTags,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -144,7 +145,7 @@ import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
-import { debounce, delay, escapeRegExp } from "lodash";
+import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 
@@ -249,7 +250,21 @@ export default {
       this.getFolderSharedStatus();
     },
     isFolderUploading: function () {
-      if (!this.isFolderUploading) this.updateContainers();
+      if (!this.isFolderUploading) {
+        setTimeout(async () => {
+          const containersToUpdateObjs = {
+            key: this.currentContainer.id,
+            container: {...this.currentContainer},
+          };
+
+          await updateObjectsAndObjectTags(
+            [containersToUpdateObjs],
+            this.active.id,
+            this.abortController.signal,
+            false, // No need to update object tags in this case
+          );
+        }, 3000);
+      }
     },
     shareModal: async function(){
       if (!this.shareModal) await this.getFolderSharedStatus();
@@ -360,15 +375,6 @@ export default {
           });
       }
     },
-    updateContainers: function() {
-      delay(async () => {
-        await this.$store.dispatch("updateContainers", {
-          projectID: this.active.id,
-          signal: this.abortController.signal,
-          routeContainer: this.$route.params.container,
-        });
-      }, 3000);
-    },
     updateObjects: async function () {
       if (
         this.containerName === undefined
@@ -386,17 +392,9 @@ export default {
           name: this.containerName,
         });
 
-      this.oList = useObservable(
-        liveQuery(() =>
-          getDB().objects
-            .where({"containerID": this.currentContainer.id})
-            .toArray(),
-        ),
-      );
-
       if (this.$route.name === "SharedObjects") {
         await this.$store.dispatch(
-          "updateSharedObjects",
+          "updateObjects",
           {
             projectID: this.$route.params.project,
             owner: this.$route.params.owner,
@@ -418,6 +416,14 @@ export default {
           },
         );
       }
+
+      this.oList = useObservable(
+        liveQuery(() =>
+          getDB().objects
+            .where({"containerID": this.currentContainer.id})
+            .toArray(),
+        ),
+      );
     },
     checkLargeDownloads: function () {
       if (document.cookie.match("ENA_DL")) {
