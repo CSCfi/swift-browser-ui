@@ -93,7 +93,7 @@ export default {
         this.updateTableOptions();
       }
     },
-    containers: async function() {
+    containers: function() {
       if (this.$route.name === "SharedFrom") {
         getSharingContainers(
           this.$route.params.project,

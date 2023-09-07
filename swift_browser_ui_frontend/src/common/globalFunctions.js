@@ -240,6 +240,9 @@ export async function updateObjectsAndObjectTags(
           updateTags,
         });
       }
+      if (i === containers.length - 1) {
+        store.commit("setLoaderVisible", false);
+      }
     }
   }
 }

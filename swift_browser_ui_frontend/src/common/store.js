@@ -7,7 +7,6 @@ import {
   getObjects,
 } from "@/common/api";
 import {
-  DEV,
   getTagsForContainer,
   getMetadataForSharedContainer,
   getTagsForObjects,
@@ -261,7 +260,7 @@ const store = createStore({
   },
   actions: {
     updateContainers: async function (
-      { dispatch, commit },
+      { dispatch },
       { projectID, signal, routeContainer = undefined },
     ) {
       const existingContainers = await getDB()
@@ -413,47 +412,12 @@ const store = createStore({
         }
       }
 
-      // Updating objects goes sequentially:
-      // Update all objects inside a segment_container first
-      // before updating objects inside original container
-      const dispatchUpdateObjects = async () => {
-        for (let i = 0; i < containers_to_update_objects.length; i++) {
-          const currentContainer = containers_to_update_objects[i];
-
-          if (!currentContainer.container.owner) {
-            await dispatch("updateObjects", {
-              projectID: projectID,
-              container: {
-                id: currentContainer.key,
-                ...currentContainer.container,
-              },
-              signal: signal,
-            });
-          } else {
-            await dispatch("updateSharedObjects", {
-              projectID: projectID,
-              owner: currentContainer.container.owner,
-              container: {
-                id: currentContainer.key,
-                ...currentContainer.container,
-              },
-              signal: signal,
-            });
-          }
-          if (i === containers_to_update_objects.length - 1) {
-            commit("setLoaderVisible", false);
-          }
-        }
-      };
-
-      if (containers_to_update_objects.length > 0) dispatchUpdateObjects();
-      else commit("setLoaderVisible", false);
-
-      dispatch("updateContainerTags", {
+      await dispatch("updateContainerTags", {
         projectID: projectID,
         containers: newContainers,
         signal,
       });
+      return containers_to_update_objects;
     },
     updateContainerTags: async function (_, {
       projectID, containers, signal,
@@ -482,16 +446,14 @@ const store = createStore({
         }
       }
     },
-
     updateObjects: async function (
       { dispatch, state },
-      { projectID, container, signal },
+      { projectID, owner, container, signal, updateTags },
     ) {
       const isSegmentsContainer = container.name.endsWith("_segments");
       const existingObjects = await getDB().objects
         .where({ containerID: container.id })
         .toArray();
-
       let newObjects = [];
       let objects;
       let marker = "";
@@ -502,14 +464,29 @@ const store = createStore({
       }
 
       do {
-        objects = await getObjects(
-          projectID, container.name, marker, signal);
+        if (owner) {
+          objects = await getObjects(
+            projectID,
+            container.name,
+            marker,
+            signal,
+            true,
+            owner,
+          );
+        } else {
+          objects = await getObjects(
+            projectID, container.name, marker, signal);
+        }
+
 
         if (objects.length > 0) {
           objects.forEach(obj => {
             obj.container = container.name;
             obj.containerID = container.id;
             obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
+            if (owner) {
+              obj.containerOwner = container.owner;
+            }
           });
           newObjects = newObjects.concat(objects);
           marker = objects[objects.length - 1].name;
@@ -520,7 +497,9 @@ const store = createStore({
 
       for (let i = 0; i < existingObjects.length; i++) {
         const oldObj = existingObjects[i];
-        if (!newObjects.find(obj => obj.name === oldObj.name)) {
+        if (!newObjects.find(obj => obj.name === oldObj.name &&
+          obj.containerID === oldObj.containerID)
+        ) {
           toDelete.push(oldObj.id);
         }
       }
@@ -535,8 +514,12 @@ const store = createStore({
           `${container.name}_segments`,
           "",
           signal,
+          !!owner,
+          owner ? owner : "",
         );
 
+        // Find the segments of an object and
+        // update the original objects size accordingly
         for (let i = 0; i < newObjects.length; i++) {
           if (segment_objects[i] && newObjects[i].bytes === 0) {
             newObjects[i].bytes = segment_objects[i].bytes;
@@ -556,10 +539,12 @@ const store = createStore({
 
       for (let i = 0; i < newObjects.length; i++) {
         const newObj = newObjects[i];
-        let oldObj = existingObjects.find(obj => obj.name === newObj.name);
+        let oldObj = existingObjects.find(obj => obj.name === newObj.name &&
+          obj.containerID === newObj.containerID,
+        );
 
         // Check if oldObj and newObj have the same properties
-        // except the key "id", because key "id" is from IDB for oldObj
+        // except the key "id", because key "id" comes from oldObj in IDB
         const isEqualObject = isEqualWith(oldObj, newObj, (oldObj, newObj) => {
           if (oldObj?.id && !newObj?.id) return true;
         });
@@ -567,21 +552,25 @@ const store = createStore({
         if (oldObj) {
           if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
         } else {
-          try {
-            await getDB().objects.put(newObj);
-          } catch (e) {
-            if (DEV) console.error("Constraint error: " + e.message);
-          }
+          getDB().objects.put(newObj);
         }
       }
 
-      if (!isSegmentsContainer) {
-        await dispatch("updateObjectTags", {
-          projectID,
-          container,
-          signal,
-        });
-
+      if (!isSegmentsContainer && updateTags) {
+        if (owner) {
+          await dispatch("updateObjectTags", {
+            projectID: projectID,
+            container,
+            signal,
+            owner,
+          });
+        } else {
+          await dispatch("updateObjectTags", {
+            projectID,
+            container,
+            signal,
+          });
+        }
       }
     },
     updateObjectTags: async function (
@@ -635,118 +624,6 @@ const store = createStore({
           return {...obj, tags};
         });
         await getDB().objects.bulkPut(newObjects);
-      }
-    },
-    updateSharedObjects: async function (
-      { commit, dispatch },
-      { projectID, owner, container, signal },
-    ) {
-      const isSegmentsContainer = container.name.endsWith("_segments");
-      let sharedObjects = [];
-      let marker = "";
-      let objects = [];
-
-      if (!signal) {
-        const controller = new AbortController();
-        signal = controller.signal;
-      }
-
-      const existingSharedObjects = await getDB().objects
-        .where({ containerID: container.id })
-        .toArray();
-
-      do {
-        objects = await getObjects(
-          projectID,
-          container.name,
-          marker,
-          signal,
-          true,
-          owner,
-        ).catch(() => {
-          commit("updateObjects", []);
-        });
-
-        if (objects?.length > 0) {
-          objects.forEach(obj => {
-            obj.container = container.name;
-            obj.containerID = container.id;
-            obj.containerOwner = container.owner;
-            obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
-          });
-          sharedObjects = sharedObjects.concat(objects);
-          marker = objects[objects.length - 1].name;
-        }
-      } while (objects?.length > 0);
-
-      let toDelete = [];
-
-      for (let i = 0; i < existingSharedObjects.length; i++) {
-        const oldObj = existingSharedObjects[i];
-        if (!sharedObjects.find(obj => obj.name === oldObj.name &&
-          obj.containerID === oldObj.containerID,
-        )) {
-          toDelete.push(oldObj.id);
-        }
-      }
-
-      if (toDelete.length) {
-        await getDB().objects.bulkDelete(toDelete);
-      }
-
-      if (!isSegmentsContainer) {
-        const segment_objects = await getObjects(
-          projectID,
-          `${container.name}_segments`,
-          "",
-          signal,
-          true,
-          owner,
-        );
-        for (let i = 0; i < sharedObjects.length; i++) {
-          if (segment_objects[i] && sharedObjects[i].bytes === 0) {
-            sharedObjects[i].bytes = segment_objects[i].bytes;
-          }
-        }
-      }
-
-      for (let i = 0; i < sharedObjects.length; i++) {
-        const newObj = sharedObjects[i];
-        let oldObj = existingSharedObjects.find(
-          obj => obj.name === newObj.name &&
-            obj.containerID === newObj.containerID);
-
-        // Check if oldObj and newObj have the same properties
-        // except the key "id", because key "id" is from IDB for oldObj
-        const isEqualObject = isEqualWith(oldObj, newObj, (oldObj, newObj) => {
-          if (oldObj?.id && !newObj?.id) return true;
-        });
-
-        if (oldObj ) {
-          if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
-        } else {
-          try {
-            await getDB().objects.put(newObj);
-          } catch (e) {
-            if (DEV) console.error("Constraint error: " + e.message);
-          }
-        }
-        if (!isSegmentsContainer && i === sharedObjects.length - 1) {
-          commit("setLoaderVisible", false);
-        }
-      }
-
-      //commit("updateObjects", sharedObjects);
-
-      updateContainerLastmodified(projectID, container, sharedObjects);
-
-      if (!isSegmentsContainer) {
-        await dispatch("updateObjectTags", {
-          projectID: projectID,
-          container,
-          signal,
-          owner,
-        });
       }
     },
   },
