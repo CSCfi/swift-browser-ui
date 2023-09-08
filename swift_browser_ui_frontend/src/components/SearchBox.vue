@@ -66,7 +66,6 @@ export default {
       selectedItem: null,
       refs: [],
       isSearching: false,
-      sharedConts: [],
     };
   },
   computed: {
