@@ -223,7 +223,8 @@ export default {
       this.optionsKey++;
     },
     fetchContainers: async function (withLoader = false) {
-      if (this.active.id === undefined) {
+      if (this.active.id === undefined
+        || this.abortController.signal?.aborted) {
         return;
       }
       if (withLoader) this.contsLoading = true;
