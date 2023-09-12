@@ -29,7 +29,6 @@ const store = createStore({
     active: {},
     uname: "",
     multipleProjects: false,
-    objectCache: [], // Only for shared objects
     langs: [
       { ph: "In English", value: "en" },
       { ph: "Suomeksi", value: "fi" },
@@ -72,13 +71,6 @@ const store = createStore({
     prevActiveEl: null,
   },
   mutations: {
-    updateObjects(state, objects) {
-      // Update object cache with the new object listing.
-      state.objectCache = [...objects];
-    },
-    eraseObjects(state) {
-      state.objectCache = [];
-    },
     setProjects(state, newProjects) {
       // Update the project listing in store
       state.projects = newProjects;
@@ -552,25 +544,17 @@ const store = createStore({
         if (oldObj) {
           if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
         } else {
-          getDB().objects.put(newObj);
+          await getDB().objects.put(newObj);
         }
       }
 
       if (!isSegmentsContainer && updateTags) {
-        if (owner) {
-          await dispatch("updateObjectTags", {
-            projectID: projectID,
-            container,
-            signal,
-            owner,
-          });
-        } else {
-          await dispatch("updateObjectTags", {
-            projectID,
-            container,
-            signal,
-          });
-        }
+        await dispatch("updateObjectTags", {
+          projectID,
+          container,
+          signal,
+          owner,
+        });
       }
     },
     updateObjectTags: async function (

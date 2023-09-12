@@ -245,7 +245,7 @@ import {
 import CUploadButton from "@/components/CUploadButton.vue";
 import { swiftDeleteObjects, getObjects } from "@/common/api";
 
-import { delay, debounce } from "lodash";
+import { debounce } from "lodash";
 import { mdiDelete } from "@mdi/js";
 
 
@@ -772,7 +772,7 @@ export default {
         return;
       }
       else {
-        if (this.filesToOverwrite.length > 0) this.deleteSegments();
+        this.deleteSegments();
         this.beginEncryptedUpload();
       }
     },
@@ -806,7 +806,7 @@ export default {
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
-      delay(() => {
+      setTimeout(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
           if (!this.toastVisible) {
             this.toastVisible = true;

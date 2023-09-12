@@ -46,8 +46,6 @@ import UploadNotification from "@/components/UploadNotification.vue";
 //Custom footer element
 import CFooter from "@/components/CFooter.vue";
 
-// Import delay
-import delay from "lodash/delay";
 import { getDB } from "@/common/db";
 
 // Import global functions
@@ -271,7 +269,7 @@ const app = createApp({
       });
       if (toDelete.length) {
         await getDB().projects.bulkDelete(toDelete);
-        const containersCollection = getDB().containers
+        const containersCollection = await getDB().containers
           .where("projectID")
           .anyOf(toDelete);
         const containers = await containersCollection.primaryKeys();
@@ -356,7 +354,7 @@ const app = createApp({
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
     });
-    delay(this.containerSyncWrapper, 10000);
+    setTimeout(this.containerSyncWrapper, 10000);
   },
   mounted() {
     document

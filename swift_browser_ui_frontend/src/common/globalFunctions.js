@@ -218,28 +218,18 @@ export async function updateObjectsAndObjectTags(
   if (containers.length > 0) {
     for (let i = 0; i < containers.length; i++) {
       const currentContainer = containers[i];
-      if (!currentContainer.container.owner) {
-        await store.dispatch("updateObjects", {
-          projectID,
-          container: {
-            id: currentContainer.key,
-            ...currentContainer.container,
-          },
-          signal,
-          updateTags,
-        });
-      } else {
-        await store.dispatch("updateObjects", {
-          projectID,
-          owner: currentContainer.container.owner,
-          container: {
-            id: currentContainer.key,
-            ...currentContainer.container,
-          },
-          signal,
-          updateTags,
-        });
-      }
+
+      await store.dispatch("updateObjects", {
+        projectID,
+        owner: currentContainer.container.owner,
+        container: {
+          id: currentContainer.key,
+          ...currentContainer.container,
+        },
+        signal,
+        updateTags,
+      });
+
       if (i === containers.length - 1) {
         store.commit("setLoaderVisible", false);
       }

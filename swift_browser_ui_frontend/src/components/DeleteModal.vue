@@ -132,7 +132,7 @@ export default {
         }
       }
 
-      // Delete objects and segment objects from IDB
+      // Delete objects from IDB
       const objIDs = this.selectedObjects.filter(
         obj => obj.name && to_remove.includes(obj.name)).reduce(
         (prev, obj) => [...prev, obj.id], [],
