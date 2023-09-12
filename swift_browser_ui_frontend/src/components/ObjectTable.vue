@@ -93,17 +93,20 @@
         </span>
       </c-menu>
     </c-row>
-    <CObjectTable
-      :breadcrumb-clicked-prop="breadcrumbClicked"
-      :objs="filteredObjects.length ? filteredObjects : oList"
-      :disable-pagination="hidePagination"
-      :hide-tags="hideTags"
-      :render-folders="renderFolders"
-      :show-timestamp="showTimestamp"
-      :access-rights="accessRights"
-      @selected-rows="handleSelection"
-      @delete-object="confirmDelete"
-    />
+    <div id="obj-table-wrapper">
+      <CObjectTable
+        :breadcrumb-clicked-prop="breadcrumbClicked"
+        :objs="filteredObjects.length ? filteredObjects : oList"
+        :disable-pagination="hidePagination"
+        :hide-tags="hideTags"
+        :render-folders="renderFolders"
+        :show-timestamp="showTimestamp"
+        :access-rights="accessRights"
+        @selected-rows="handleSelection"
+        @delete-object="confirmDelete"
+      />
+      <c-loader v-show="objsLoading" />
+    </div>
     <c-toasts
       id="objects-toasts"
       data-testid="objects-toasts"
@@ -180,6 +183,7 @@ export default {
       tableOptions: [],
       currentContainer: {},
       breadcrumbClicked: false,
+      objsLoading: false,
     };
   },
   computed: {
@@ -269,6 +273,9 @@ export default {
     shareModal: async function(){
       if (!this.shareModal) await this.getFolderSharedStatus();
     },
+    oList() {
+      if (this.objsLoading) setTimeout(() => this.objsLoading = false, 100);
+    },
   },
 
   created: function () {
@@ -285,6 +292,7 @@ export default {
     this.checkLargeDownloads();
   },
   async mounted () {
+    this.objsLoading = true;
     await this.getSharedContainers();
     await this.getFolderSharedStatus();
     this.updateObjects();
@@ -752,4 +760,9 @@ export default {
 #objects-toasts {
   bottom: 40vh;
 }
+
+#obj-table-wrapper {
+  position: relative;
+}
+
 </style>

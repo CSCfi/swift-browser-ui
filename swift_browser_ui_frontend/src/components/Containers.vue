@@ -16,13 +16,16 @@
         </span>
       </c-menu>
     </c-row>
-    <ContainerTable
-      :conts="renderingContainers"
-      :show-timestamp="showTimestamp"
-      :disable-pagination="hidePagination"
-      :hide-tags="hideTags"
-      @delete-container="(cont) => removeContainer(cont)"
-    />
+    <div id="cont-table-wrapper">
+      <ContainerTable
+        :conts="renderingContainers"
+        :show-timestamp="showTimestamp"
+        :disable-pagination="hidePagination"
+        :hide-tags="hideTags"
+        @delete-container="(cont) => removeContainer(cont)"
+      />
+      <c-loader v-show="contsLoading" />
+    </div>
     <c-toasts
       id="container-toasts"
       data-testid="container-toasts"
@@ -64,6 +67,7 @@ export default {
       containers: [],
       renderingContainers: [],
       containersToUpdateObjs: [],
+      contsLoading: false,
     };
   },
   computed: {
@@ -82,7 +86,7 @@ export default {
   },
   watch: {
     active: function () {
-      this.fetchContainers();
+      this.fetchContainers(true);
     },
     currentProject: function() {
       const savedDisplayOptions = this.currentProject.displayOptions;
@@ -130,6 +134,7 @@ export default {
       this.updateTableOptions();
     },
     containersToUpdateObjs: async function () {
+      if (this.contsLoading) setTimeout(() => this.contsLoading = false, 100);
       await updateObjectsAndObjectTags(
         this.containersToUpdateObjs,
         this.active.id,
@@ -145,7 +150,7 @@ export default {
     this.getDirectCurrentPage();
   },
   mounted() {
-    this.fetchContainers();
+    this.fetchContainers(true);
   },
   beforeUnmount() {
     this.abortController.abort();
@@ -217,10 +222,11 @@ export default {
       ];
       this.optionsKey++;
     },
-    fetchContainers: async function () {
+    fetchContainers: async function (withLoader = false) {
       if (this.active.id === undefined) {
         return;
       }
+      if (withLoader) this.contsLoading = true;
 
       this.currentProject = await getDB().projects.get({
         id: this.active.id,
@@ -287,6 +293,10 @@ export default {
 #optionsbar {
   margin: 0.5em 0;
   background: #fff;
+}
+
+#cont-table-wrapper {
+  position: relative;
 }
 
 </style>
