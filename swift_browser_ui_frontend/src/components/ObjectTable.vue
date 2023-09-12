@@ -239,7 +239,8 @@ export default {
     queryPage: function () {
       this.currentPage = this.queryPage;
     },
-    currentContainer: function() {
+    currentContainer: async function() {
+      if (this.currentContainer === undefined) return;
       const savedDisplayOptions = toRaw(this.currentContainer.displayOptions);
       if (savedDisplayOptions) {
         this.renderFolders = savedDisplayOptions.renderFolders;
@@ -256,17 +257,7 @@ export default {
     isFolderUploading: function () {
       if (!this.isFolderUploading) {
         setTimeout(async () => {
-          const containersToUpdateObjs = {
-            key: this.currentContainer.id,
-            container: {...this.currentContainer},
-          };
-
-          await updateObjectsAndObjectTags(
-            [containersToUpdateObjs],
-            this.active.id,
-            this.abortController.signal,
-            false, // No need to update object tags in this case
-          );
+          this.updateAfterUpload();
         }, 3000);
       }
     },
@@ -383,6 +374,26 @@ export default {
           });
       }
     },
+    getCurrentContainer: function () {
+      return getDB().containers
+        .get({
+          projectID: this.$route.params.project,
+          name: this.containerName,
+        });
+    },
+    updateAfterUpload: async function () {
+      const containersToUpdateObjs = {
+        key: this.currentContainer.id,
+        container: {...this.currentContainer},
+      };
+
+      await updateObjectsAndObjectTags(
+        [containersToUpdateObjs],
+        this.active.id,
+        this.abortController.signal,
+        false, // No need to update object tags in this case
+      );
+    },
     updateObjects: async function () {
       if (
         this.containerName === undefined
@@ -394,27 +405,20 @@ export default {
         return;
       }
 
-      this.currentContainer = await getDB().containers
-        .get({
-          projectID: this.$route.params.project,
-          name: this.containerName,
-        });
+      this.currentContainer = await this.getCurrentContainer();
 
-      if (this.$route.name === "SharedObjects") {
-        await this.$store.dispatch(
-          "updateObjects",
-          {
-            projectID: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: {
-              id: this.currentContainer.id,
-              name: this.$route.params.container,
-              owner: this.currentContainer.owner,
-            },
-            signal: this.abortController.signal,
-          },
-        );
-      } else {
+      if (this.currentContainer === undefined) {
+        //container not in DB when clicking "view destination"
+        // while / right after uploading
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: this.abortController.signal,
+        });
+        this.currentContainer = await this.getCurrentContainer();
+        if (this.currentContainer === undefined) return;
+        await this.updateAfterUpload();
+      }
+      else {
         await this.$store.dispatch(
           "updateObjects",
           {
