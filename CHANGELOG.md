@@ -182,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1111) Fix for Share button not always working
 - (GL #1066) Fix for sharing/permissions not removed correctly
 - (GL #1078) Fix overwriting existing files with upload
-
+- (GL #1108) Fix deleting large amount of objects (~100 items) with long names
 ### Removed
 
 - (GL #944) Unused views and components

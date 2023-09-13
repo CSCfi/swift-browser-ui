@@ -202,30 +202,31 @@ async def swift_delete_objects(request: aiohttp.web.Request) -> aiohttp.web.Resp
     project = request.match_info["project"]
     container = request.match_info["container"]
 
-    # Bulk deletion middleware wants a list of URL-safe object names separated
-    # with newlines
-    objects = (
-        "".join(
-            [urllib.parse.quote(f"/{container}/{i}") + "\n" for i in await request.json()]
-        )
-    ).encode("utf-8")
-    if len(objects) > 10000:
-        raise aiohttp.web.HTTPBadRequest(reason="Too many objects (>10000)")
+    req_json = await request.json()
 
-    async with client.post(
-        f"{session['projects'][project]['endpoint']}",
-        headers={
-            "X-Auth-Token": session["projects"][project]["token"],
-            "Accept": "application/json",
-            "Content-Type": "text/plain",
-        },
-        params={
-            "bulk-delete": "true",
-        },
-        data=objects,
-    ) as ret:
-        resp = aiohttp.web.Response(status=ret.status, body=(await ret.read()))
-    return resp
+    if len(req_json) > 10000:
+        raise aiohttp.web.HTTPBadRequest(reason="Too many objects (>10000)")
+    else:
+        # Bulk deletion middleware wants a list of URL-safe object names separated
+        # with newlines
+        objects = (
+            "".join([urllib.parse.quote(f"/{container}/{i}") + "\n" for i in req_json])
+        ).encode("utf-8")
+
+        async with client.post(
+            f"{session['projects'][project]['endpoint']}",
+            headers={
+                "X-Auth-Token": session["projects"][project]["token"],
+                "Accept": "application/json",
+                "Content-Type": "text/plain",
+            },
+            params={
+                "bulk-delete": "true",
+            },
+            data=objects,
+        ) as ret:
+            resp = aiohttp.web.Response(status=ret.status, body=(await ret.read()))
+        return resp
 
 
 async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
