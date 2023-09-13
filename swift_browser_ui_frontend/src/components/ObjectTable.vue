@@ -151,6 +151,7 @@ import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
+import { DEV } from "@/common/conv";
 
 export default {
   name: "ObjectTable",
@@ -325,7 +326,7 @@ export default {
                   = await getAccessDetails(
                     this.project,
                     this.containerName,
-                    this.$route.params.owner,
+                    this.owner,
                     this.abortController.signal,
                   );
 
@@ -377,7 +378,7 @@ export default {
     getCurrentContainer: function () {
       return getDB().containers
         .get({
-          projectID: this.$route.params.project,
+          projectID: this.project,
           name: this.containerName,
         });
     },
@@ -399,7 +400,7 @@ export default {
         this.containerName === undefined
         || (
           this.active.id === undefined
-          && this.$route.params.project
+          && this.project
         )
       ) {
         return;
@@ -415,18 +416,28 @@ export default {
           signal: this.abortController.signal,
         });
         this.currentContainer = await this.getCurrentContainer();
-        if (this.currentContainer === undefined) return;
+        if (this.currentContainer === undefined) {
+          if (DEV) console.log("Error with uploaded container");
+          return;
+        }
         await this.updateAfterUpload();
       }
       else {
-        await this.$store.dispatch(
-          "updateObjects",
-          {
-            projectID: this.$route.params.project,
+        let params = {
+          projectID: this.project,
+          container: this.currentContainer,
+          signal: this.abortController.signal,
+        };
+
+        if (this.owner) {
+          params = {
+            projectID: this.project,
+            owner: this.owner,
             container: this.currentContainer,
             signal: this.abortController.signal,
-          },
-        );
+          };
+        }
+        await this.$store.dispatch("updateObjects", params);
       }
 
       this.oList = useObservable(
@@ -448,8 +459,8 @@ export default {
           name: "SharedObjects",
           params: {
             project: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: this.$route.params.container,
+            owner: this.owner,
+            container: this.containerName,
           },
           query: {
             page: pageNumber,
@@ -462,7 +473,7 @@ export default {
           params: {
             user: this.$route.params.user,
             project: this.$route.params.project,
-            container: this.$route.params.container,
+            container: this.containerName,
           },
           query: {
             page: pageNumber,
