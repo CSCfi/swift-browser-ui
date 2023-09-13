@@ -429,14 +429,8 @@ export default {
           signal: this.abortController.signal,
         };
 
-        if (this.owner) {
-          params = {
-            projectID: this.project,
-            owner: this.owner,
-            container: this.currentContainer,
-            signal: this.abortController.signal,
-          };
-        }
+        if (this.owner) params.owner = this.owner;
+
         await this.$store.dispatch("updateObjects", params);
       }
 
@@ -472,7 +466,7 @@ export default {
           name: "ObjectsView",
           params: {
             user: this.$route.params.user,
-            project: this.$route.params.project,
+            project: this.project,
             container: this.containerName,
           },
           query: {
