@@ -256,10 +256,12 @@ let default_translations = {
       objects: {
         file: "File ",
         files: "Files ",
-        overwriteConfirm: " already exists. Do you want to overwrite the file?",
+        overwriteConfirm: " already exists. Do you want to replace " +
+        "this file? (Previous file will be lost.)",
         overwriteConfirmMany:
-          " already exist. Do you want to overwrite the files?",
-        overwrite: "Overwrite",
+          " already exist. Do you want to replace these files? " +
+          "(Previous files will be lost.)",
+        overwrite: "Replace",
         filterBy: "Filter by name or tag",
         deleteConfirm: "Delete items",
         deleteObjects: "Delete items",
@@ -653,9 +655,11 @@ let default_translations = {
         file: "Tiedosto ",
         files: "Tiedostot ",
         overwriteConfirm:
-          " on jo olemassa. Haluatko korvata tiedoston?",
+          " on jo olemassa. Haluatko korvata tiedoston? " +
+          "(Edellinen tiedosto poistetaan.)",
         overwriteConfirmMany:
-          " ovat jo olemassa. Haluatko korvata tiedostot?",
+          " ovat jo olemassa. Haluatko korvata tiedostot? " +
+          "(Edelliset tiedostot poistetaan.)",
         overwrite: "Korvaa",
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
