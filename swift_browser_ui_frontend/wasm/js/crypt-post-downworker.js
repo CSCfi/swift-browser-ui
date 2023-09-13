@@ -35,8 +35,20 @@ intermediary storage and the ServiceWorker doesn't.
 */
 
 
-console.log("Download worker started.");
+// Example: https://devenv:8443/file/test-container/examplefile.txt.c4gh
+const fileUrl = new RegExp("/file/[^/]*/.*$");
+// Example: https://devenv:8443/archive/test-container.tar
+const archiveUrl = new RegExp("/archive/[^/]*\.tar$");
+const fileUrlStart = new RegExp("/file/[^/]*/");
 
+if (inServiceWorker) {
+  self.addEventListener("install", (event) => {
+    event.waitUntil(waitAsm());
+  });
+  self.addEventListener("activate", (event) => {
+    event.waitUntil(self.clients.claim());
+  });
+}
 
 // Create a download session
 function createDownloadSession(container, handle, archive) {
@@ -57,7 +69,7 @@ function createDownloadSession(container, handle, archive) {
     keypair: keypairPtr,
     pubkey: new Uint8Array(HEAPU8.subarray(pubkeyPtr, pubkeyPtr + 32)),
     handle: handle,
-    direct: !(handle instanceof ReadableStreamDefaultController),
+    direct: !inServiceWorker,
     archive: archive,
     files: {},
   };
@@ -205,16 +217,19 @@ class FileSlicer {
       } else {
         // Otherwise queue to the streamController since we're using a
         // ServiceWorker for downloading
-        this.output.enqueue(enChunk);
+        this.output.enqueue(decryptChunk(
+          this.container,
+          this.path,
+          enChunk,
+        ));
       }
       enChunk = await this.getSlice();
     }
 
     // Round up to a multiple of 512, because tar
     if (this.totalBytes % 512 > 0 && downloads[container].archive) {
-      new Uint8Array()
       let padding = "\x00".repeat(512 - this.totalBytes % 512);
-      if (this.output instanceof WritableSteram) {
+      if (this.output instanceof WritableStream) {
         await this.output.write(padding);
       } else {
         this.output.enqueue(padding);
@@ -222,14 +237,6 @@ class FileSlicer {
     }
 
     return;
-  }
-
-  begin() {
-    this.sliceFile().then(() => {
-      return true;
-    }).catch(() => {
-      return false;
-    });
   }
 }
 
@@ -241,7 +248,7 @@ async function beginDownloadInSession(
   if (downloads[container].direct) {
     fileStream = await downloads[container].handle.createWritable();
   } else {
-    fileStream = handle;
+    fileStream = downloads[container].handle;
   }
 
   // Add the archive folder structure
@@ -273,16 +280,13 @@ async function beginDownloadInSession(
   for (const file in headers) {
     const response = await fetch(headers[file].url);
     const ensize = response.headers.get("Content-Length");
-    console.log(ensize);
     const size = (Math.floor(ensize / 65564) * 65536) + (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0);
-
-    console.log(size);
 
     let path = file.split("/");
     let name = path.slice(-1)[0];
     let prefix
     if (path.length > 1) {
-      prefix = path.slice(0, 1).join("/");
+      prefix = path.slice(0, -1).join("/");
     } else {
       prefix = "";
     }
@@ -349,52 +353,109 @@ function finishDownloadSession(container) {
   delete downloads[container];
 }
 
-self.addEventListener("message", (e) => {
-  if (!inServiceWorker) {
-    e.stopImmediatePropagation();
-  } else {
-    return;
-  }
+if (inServiceWorker) {
+  // Add listener for fetch events
+  self.addEventListener("fetch", (e) => {
+    const url = new URL(e.request.url);
 
-  switch(e.data.command) {
-    // Create the download session for single or multiple files
-    case "downloadFile":
-      createDownloadSession(e.data.container, e.data.handle, false);
-      postMessage({
-        eventType: "getHeaders",
-        container: e.data.container,
-        files: [
-          e.data.file,
-        ],
-        pubkey: downloads[e.data.container].pubkey,
+    let fileName;
+    let containerName;
+
+    if (fileUrl.test(url.pathname)) {
+      fileName = url.pathname.replace(fileUrlStart, "");
+      containerName = url.pathname.replace("/file/", "").replace(fileName, "").replace("/", "");
+    } else if (archiveUrl.test(url.pathname)) {
+      fileName = url.pathname.replace("/archive/", "");
+      containerName = fileName.replace(/\.tar$/, "");
+    } else {
+      return;
+    }
+
+    if (fileUrl.test(url.pathname) || archiveUrl.test(url.pathname)) {
+      let streamController;
+      const stream = new ReadableStream({
+        start(controller) {
+          streamController = controller;
+        },
       });
+      const response = new Response(stream);
+      response.headers.append(
+        "Content-Disposition",
+        'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
+      );
+
+      createDownloadSession(containerName, streamController, archiveUrl.test(url.pathname));
+
+      e.respondWith(response);
+    }
+  });
+}
+
+self.addEventListener("message", (e) => {
+  switch(e.data.command) {
+    case "downloadFile":
+      if (inServiceWorker) {
+        e.source.postMessage({
+          eventType: "getHeaders",
+          container: e.data.container,
+          files: [
+            e.data.file,
+          ],
+          pubkey: downloads[e.data.container].pubkey,
+        });
+      } else {
+        createDownloadSession(e.data.container, e.data.handle, false);
+        postMessage({
+          eventType: "getHeaders",
+          container: e.data.container,
+          files: [
+            e.data.file,
+          ],
+          pubkey: downloads[e.data.container].pubkey,
+        });
+      }
       break;
     case "downloadFiles":
-      createDownloadSession(e.data.container, e.data.handle, true);
-      postMessage({
-        eventType: "getHeaders",
-        container: e.data.container,
-        files: e.data.files,
-        pubkey: downloads[e.data.container].pubkey,
-      });
-    break;
+      if (inServiceWorker) {
+        e.source.postMessage({
+          eventType: "getHeaders",
+          container: e.data.container,
+          files: e.data.files,
+          pubkey: downloads[e.data.container].pubkey,
+        });
+      } else {
+        createDownloadSession(e.data.container, e.data.handle, true);
+        postMessage({
+          eventType: "getHeaders",
+          container: e.data.container,
+          files: e.data.files,
+          pubkey: downloads[e.data.container].pubkey,
+        });
+      }
+      break;
     case "addHeaders":
       beginDownloadInSession(
         e.data.container,
         e.data.headers,
       );
-      postMessage({
-        eventType: "downloadStarted",
-        container: e.data.container,
-      });
+      if (inServiceWorker) {
+        e.source.postMessage({
+          eventType: "downloadStarted",
+          container: e.data.container,
+        });
+      } else {
+        postMessage({
+          eventType: "downloadStarted",
+          container: e.data.container,
+        });
+      }
       break;
   }
 });
 
 setTimeout(() => {
   Module.ccall("libinit", undefined, undefined, undefined);
-  console.log("Initialized the download worker RNG.");
-}, 2000);
+}, 1000);
 
 export var downloadRuntime = Module;
 export var downloadFileSystem = FS;

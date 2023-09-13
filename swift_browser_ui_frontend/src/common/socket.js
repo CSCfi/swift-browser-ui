@@ -18,16 +18,17 @@ export default class UploadSocket {
     this.inputFiles = {};
     this.outputFiles = {};
 
+    this.useServiceWorker = true;
+    // this.useServiceWorker = "serviceWorker" in navigator
+    //   && window.showSaveFilePicker === undefined
+
     // Initialize the workers
     // The workers will eventually handle threading by themselves, to
     // avoid blocking the main browser thread
     this.upWorker = new Worker("/upworker.js");
-    if (
-      "serviceWorker" in navigator
-      // && window.showSaveFilePicker === undefined
-    ) {
-      console.log("Registering download script into service worker.");
-      let workerUrl = new URL("/serviceworker.js", document.location.origin);
+    if (this.useServiceWorker) {
+      if (DEV) console.log("Registering download script into service worker.");
+      let workerUrl = new URL("/downworker.js", document.location.origin);
       navigator.serviceWorker.register(workerUrl).then(reg => {
         reg.update();
       }).catch((err) => {
@@ -36,7 +37,9 @@ export default class UploadSocket {
       });
       this.downWorker = undefined;
     } else if (window.showSaveFilePicker !== undefined) {
-      console.log("Registering the download script as a normal worker.");
+      if (DEV) {
+        console.log("Registering the download script as a normal worker.");
+      }
       this.downWorker = new Worker("/downworker.js");
     } else {
       if (DEV) console.log("Could not register a worker for download.");
@@ -45,17 +48,13 @@ export default class UploadSocket {
 
     // Add message handlers for upload and download workers
     let handleUpWorker = (e) => {
-      console.log(e);
       switch(e.data.eventType) {
         case "uploadCreated":
-          if (DEV) console.log(e.data);
           break;
         case "webSocketOpened":
-          if (DEV) console.log(e.data);
           break;
         case "retryChunk":
-          if (DEV) console.log("Retrying chunk.");
-          if (DEV) console.log(e.data);
+          if (DEV) console.log("Retrying a chunk.");
           break;
         case "activeFile":
           this.$store.commit(
@@ -74,15 +73,15 @@ export default class UploadSocket {
           );
           break;
         case "abort":
-          if (DEV) console.log(e.data);
           break;
         case "success":
-          if (DEV) console.log(e.data);
+          break;
+        case "finished":
+          this.$store.commit("eraseNotClosable");
           break;
       }
     };
     let handleDownWorker = (e) => {
-      console.log(e);
       switch(e.data.eventType) {
         case "getHeaders":
           this.getHeaders(
@@ -90,20 +89,19 @@ export default class UploadSocket {
             e.data.files,
             e.data.pubkey,
           ).then(() => {
-            console.log("Got headers.");
+            if (DEV) {
+              console.log(
+                `Got headers for download in container ${e.data.container}`,
+              );
+            }
           });
           break;
         case "finished":
-          console.log("download finished");
-          console.log(e.data);
-          break;
-        case "success":
-          console.log("file successfully downloaded");
-          console.log(e.data);
-          break;
-        case "downloadSessionRemoved":
-          console.log("Download session removed.");
-          console.log(e.data);
+          if (DEV) {
+            console.log(
+              `Finished a download in container ${e.data.container}`,
+            );
+          }
           break;
       }
     };
@@ -112,10 +110,7 @@ export default class UploadSocket {
     this.handleDownWorker = handleDownWorker;
 
     this.upWorker.onmessage = handleUpWorker;
-    if (
-      "serviceWorker" in navigator
-      // && window.showSaveFilePicker === undefined
-    ) {
+    if (this.useServiceWorker) {
       navigator.serviceWorker.addEventListener(
         "message",
         handleDownWorker,
@@ -150,7 +145,7 @@ export default class UploadSocket {
     let upInfo = await getUploadEndpoint(
       this.active.id,
       this.project,
-      this.container,
+      container,
     );
 
     let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
@@ -196,8 +191,6 @@ export default class UploadSocket {
     }
 
     await DELETE(whitelistUrl);
-
-    console.log(headers);
 
     if (this.downWorker !== undefined) {
       this.downWorker.postMessage({
@@ -245,9 +238,6 @@ export default class UploadSocket {
     owner = "",
     ownerName = "",
   ) {
-    console.log(files);
-    console.log(receivers);
-
     let uploadFiles = [];
     for (const file of files) {
       uploadFiles.push({
@@ -255,8 +245,6 @@ export default class UploadSocket {
         file: file,
       });
     }
-
-    console.log(uploadFiles);
 
     this.upWorker.postMessage({
       command: "addFiles",
@@ -270,6 +258,7 @@ export default class UploadSocket {
 
     if (DEV) console.log("Pushed new files to the service worker.");
     this.$store.commit("setUploading");
+    this.$store.commit("setNotClosable");
   }
 
   // Schedule file/files for download
@@ -303,12 +292,24 @@ export default class UploadSocket {
           handle: fileHandle,
         });
       } else {
+        if (DEV) {
+          console.log("Instructing ServiceWorker to add a file to downloads.");
+        }
         let downloadUrl = new URL(
           `/file/${container}/${objects[0]}`,
           document.location.origin,
         );
         if (DEV) console.log(downloadUrl);
         window.open(downloadUrl, "_blank");
+        setTimeout(() => {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.active.postMessage({
+              command: "downloadFile",
+              container: container,
+              file: objects[0],
+            });
+          });
+        }, 500);
       }
     } else {
       // Download directly into the archive if available.
@@ -333,14 +334,19 @@ export default class UploadSocket {
         });
       } else {
         let downloadUrl = new URL(
-          `/archive/${container}`,
+          `/archive/${container}.tar`,
           document.location.origin,
         );
-        if (objects.length >= 1) {
-          let objlist = objects.join(",");
-          downloadUrl.searchParams.append("files", objlist);
-        }
         window.open(downloadUrl, "_blank");
+        setTimeout(() => {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.active.postMessage({
+              command: "downloadFiles",
+              container: container,
+              files: objects.length < 1 ? [] : objects,
+            });
+          });
+        }, 500);
       }
     }
   }

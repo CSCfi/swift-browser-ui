@@ -204,6 +204,12 @@ const store = createStore({
       state.currentUpload = undefined;
       state.uploadNotificationClosable = true;
     },
+    setNotClosable(state) {
+      state.uploadNotificationClosable = false;
+    },
+    eraseNotClosable(state) {
+      state.uploadNotificationClosable = true;
+    },
     createCurrentUploadAbort(state) {
       state.uploadAbort = new AbortController();
     },

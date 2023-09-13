@@ -22,7 +22,9 @@ let socket = undefined;
 let totalLeft = 0;
 let totalDone = 0;
 let totalFiles = 0;
+let doneFiles = 0;
 let progressInterval = undefined;
+let uploadCount = 0;
 
 // Create an upload session
 function createUploadSession(container, receivers, projectName) {
@@ -34,7 +36,6 @@ function createUploadSession(container, receivers, projectName) {
   FS.mkdir(tmpdirpath);
   let files = [];
   for (const receiver of receivers) {
-    console.log(receiver);
     files.push(`${tmpdirpath}/pubkey_${receivers.indexOf(receiver).toString()}`);
     FS.writeFile(
       `${tmpdirpath}/pubkey_${receivers.indexOf(receiver).toString()}`,
@@ -61,8 +62,6 @@ function createUploadSession(container, receivers, projectName) {
     ["number"],
     [receiversStructPtr],
   );
-
-  console.log(receiversLen);
 
   for (const file of files) {
     FS.unlink(file);
@@ -218,40 +217,6 @@ class StreamSlicer{
     ({ value: this.chunk, done: this.done } = await this.reader.read());
   }
 
-  async getSliceFromStream() {
-    let enChunk = new Uint8Array(65536);
-    this.bytes = 0;
-
-    while (!this.done) {
-      this.remainder = 65536 - this.bytes;
-      let toSet = this.chunk.subarray(this.offset, this.offset + this.remainder);
-      enChunk.set(toSet, this.bytes);
-      this.bytes += toSet.length;
-
-      if (this.chunk.length - this.offset > this.remainder) {
-        this.offset += this.remainder;
-        this.totalBytes += 65564;
-        return enChunk;
-      } else {
-        this.offset = 0;
-        ({ value: this.chunk, done: this.done } = await this.reader.read());
-      }
-    }
-
-    if (this.chunk !== undefined) {
-      let toSet = this.chunk.subarray(this.offset);
-      enChunk.set(toSet, this.bytes);
-      this.bytes += toSet.length;
-      this.totalBytes += toSet.length - 28;
-    }
-
-    if (this.bytes > 0) {
-      return enChunk.slice(0, this.bytes);
-    }
-
-    return undefined
-  }
-
   async getChunk(iter) {
     let enChunk = await this.file.slice(iter * 65536, iter * 65536 + 65536);
 
@@ -288,14 +253,17 @@ class StreamSlicer{
   }
 
   retryChunk(iter) {
-    this.getChunk(iter).then(() => {
-      console.log(`Retried chunk ${iter}.`);
-    })
+    this.getChunk(iter).then(() => {});
   }
 
-  sendFile() {
-    console.log("Slicer started.");
-    console.log(this.file);
+  async sendFile() {
+    // Uploads need to be throttled a bit, without throttling
+    // upload doesn't progress fast enough to keep the upload
+    // connection open.
+    while (uploadCount > 4) {
+      await timeout(250);
+    }
+    uploadCount++;
     this.interval = setInterval(() => {
       if (socket.bufferedAmount < 5242880) {
         this.nextChunk().then(() => {});
@@ -309,13 +277,14 @@ class StreamSlicer{
   }
 
   finishFile() {
-    console.log("File finished.");
     let msg = msgpack.serialize({
       command: "finish",
       container: this.container,
       object: this.path,
     });
     socket.send(msg);
+    uploadCount--;
+    doneFiles++;
   }
 }
 
@@ -352,8 +321,6 @@ async function openWebSocket (
     switch (msg_data.command) {
       // Abort the upload
       case "abort":
-        console.log("File aborted");
-        console.log(msg_data);
         postMessage({
           eventType: "abort",
           container: msg_data.container,
@@ -363,8 +330,6 @@ async function openWebSocket (
         break;
       // A file was successfully uploaded
       case "success":
-        console.log("File successful");
-        console.log(msg_data);
         uploads[msg_data.container].files[msg_data.object].slicer.finishFile();
         postMessage({
           eventType: "success",
@@ -374,15 +339,12 @@ async function openWebSocket (
         break;
       // Push the next chunk to the websocket
       case "start_upload":
-        console.log("Upload started");
-        console.log(msg_data);
-        console.log(uploads);
-        uploads[msg_data.container].files[msg_data.object].slicer.sendFile();
+        uploads[msg_data.container].files[msg_data.object].slicer.sendFile().then(
+          () => {}
+        );
         break;
       // Retry a chunk in the websocket
       case "retry_chunk":
-        console.log("Retrying chunk");
-        console.log(msg_data);
         uploads[msg_data.container].files[msg_data.object].slicer.retryChunk(msg_data.order);
         break;
     }
@@ -397,10 +359,7 @@ async function openWebSocket (
 Add a batch of files to the current upload session.
 */
 function addFiles(files, container) {
-  console.log(files);
   for (const file of files) {
-    console.log(file);
-
     let handle = file.file;
 
     let path = `${file.relativePath}.c4gh`
@@ -458,19 +417,21 @@ function addFiles(files, container) {
 
   // Create an interval for updating progress
   progressInterval = setInterval(() => {
-    if (totalDone == totalLeft) {
+    if (doneFiles >= totalFiles) {
       postMessage({
-        eventType: "finish",
+        eventType: "finished",
         container: container,
       });
       totalDone = 0;
       totalLeft = 0;
       totalFiles = 0;
+      doneFiles = 0;
+      clearInterval(progressInterval);
     } else {
       postMessage({
         eventType: "progress",
         totalFiles: totalFiles,
-        progress: totalDone / totalLeft,
+        progress: totalDone / totalLeft < 1 ? totalDone / totalLeft : 1,
       });
     }
   }, 250);
