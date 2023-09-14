@@ -18,9 +18,8 @@ export default class UploadSocket {
     this.inputFiles = {};
     this.outputFiles = {};
 
-    this.useServiceWorker = true;
-    // this.useServiceWorker = "serviceWorker" in navigator
-    //   && window.showSaveFilePicker === undefined
+    this.useServiceWorker = "serviceWorker" in navigator
+      && window.showSaveFilePicker === undefined;
 
     // Initialize the workers
     // The workers will eventually handle threading by themselves, to
