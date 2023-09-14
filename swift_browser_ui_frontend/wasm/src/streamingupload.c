@@ -22,36 +22,10 @@ Upload service worker handlers
 
 
 /*
-Open an ephemeral key upload session
-*/
-ENCRYPT_SESSION *open_session_eph() {
-    ENCRYPT_SESSION *ret = open_session_enc();
-    read_in_recv_keys(ret);
-    ret->sessionkey = crypt4gh_session_key_new();
-    return ret;
-}
-
-
-/*
 Create a session key for single upload.
 */
 uint8_t *create_session_key() {
     uint8_t *ret = crypt4gh_session_key_new();
-    return ret;
-}
-
-
-/*
-Open an upload session
-*/
-ENCRYPT_SESSION *open_session(
-    const char *passphrase // optional
-) {
-    ENCRYPT_SESSION *ret = open_session_enc();
-    read_in_keys(
-        passphrase,
-        ret);
-    ret->sessionkey = crypt4gh_session_key_new();
     return ret;
 }
 
@@ -80,21 +54,6 @@ CHUNK *create_crypt4gh_header(
     return ret;
 }
 
-
-/*
-Wrap crypt4gh header creation for access in JS side.
-*/
-CHUNK *wrap_crypt4gh_header(ENCRYPT_SESSION *sess) {
-    CHUNK* ret = allocate_chunk();
-    crypt4gh_header_build(
-        sess->sessionkey,
-        sess->seckey,
-        sess->recv_keys,
-        sess->recv_key_amount,
-        &(ret->chunk),
-        &(ret->len));
-    return ret;
-}
 
 
 /*

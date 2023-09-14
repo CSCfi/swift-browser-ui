@@ -41,7 +41,7 @@ build/downworker.js: src/upinit.c src/streamingdownload.c src/upcommon.c
 		-s LLD_REPORT_UNDEFINED \
 		-s FORCE_FILESYSTEM=1 \
 		-s EXPORTED_RUNTIME_METHODS=ccall \
-		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_get_session_key_from_header,_get_keypair_public_key,_free_chunk,_free_keypair,_decrypt_chunk,_clean_session,_libinit \
+		-s EXPORTED_FUNCTIONS=_read_in_recv_keys_path,_wrap_chunk_content,_wrap_chunk_len,_rmrecv,_create_keypair,_get_session_key_from_header,_get_keypair_public_key,_free_chunk,_free_keypair,_decrypt_chunk,_libinit \
 		-O3 \
 		-o \
 		$@ \

@@ -23,55 +23,6 @@ Download service worker handlers.
 
 
 /*
-Open a download session
-*/
-ENCRYPT_SESSION *open_decrypt_session() {
-    ENCRYPT_SESSION *ret = open_session_enc();
-
-    // Create temporary keys for the session
-    crypto_kx_keypair(
-        ret->pubkey,
-        ret->seckey
-    );
-
-    return ret;
-}
-
-
-/*
-Dump crypt4gh public key
-*/
-char *get_session_public_key(ENCRYPT_SESSION *sess) {
-    char *ret = malloc(33 * sizeof(char));
-    memset(ret, '\0', 33);
-    memcpy(ret, sess->pubkey, 32);
-    return ret;
-}
-
-
-/*
-Dump crypt4gh private key
-*/
-char *get_session_private_key(ENCRYPT_SESSION *sess) {
-    char *ret = malloc(33 * sizeof(char));
-    memset(ret, '\0', 33);
-    memcpy(ret, sess->seckey, 32);
-    return ret;
-}
-
-
-/*
-Dump crypt4gh session key
-*/
-char *get_session_key(ENCRYPT_SESSION *sess) {
-    char *ret = malloc(33 * sizeof(char));
-    memset(ret, '\0', 33);
-    memcpy(ret, sess->sessionkey, 32);
-    return ret;
-}
-
-
-/*
 Open crypt4gh header for file decryption.
 */
 uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header) {

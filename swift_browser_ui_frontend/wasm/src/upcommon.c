@@ -77,6 +77,7 @@ uint8_t *crypt4gh_session_key_new(void){
     return key;
 }
 
+
 /*
 wrap filesystem item remove
 */
@@ -91,6 +92,7 @@ int nftwremove(
     }
     return 0;
 }
+
 
 /*
 Wipe the temporary receiver keys used for building the receiver list.
@@ -107,25 +109,6 @@ int rmrecv(const char *keypath) {
     return ret;
 }
 
-/*
-Wipe the keys stored in FS
-*/
-int rmrf() {
-    int ret;
-    ret = nftw(
-        "/keys",
-        &nftwremove,
-        5, // use at most 5 file descriptors
-        0
-    );
-    ret = nftw(
-        "/data",
-        &nftwremove,
-        5, // use at most 5 file descriptors
-        0
-    );
-    return ret;
-}
 
 /*
 Allocate chunk.
@@ -165,14 +148,5 @@ void free_chunk(CHUNK *chunk) {
         free(chunk->chunk);
     }
     free(chunk);
-    return;
-}
-
-/*
-Release session resources.
-*/
-void clean_session(ENCRYPT_SESSION *sess) {
-    rmrf();
-    close_session(sess);
     return;
 }
