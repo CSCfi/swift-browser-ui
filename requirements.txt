@@ -10,3 +10,4 @@ keystoneauth1==5.3.0
 oidcrp==2.1.4
 python-swiftclient==4.4.0
 uvloop==0.18.0
+msgpack==1.0.5
