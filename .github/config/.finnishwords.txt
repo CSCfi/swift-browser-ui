@@ -29,6 +29,7 @@ avainten
 dataa
 edellinen
 edelliselle
+edelliset
 edellyttää
 edistyneitä
 ei
@@ -398,6 +399,7 @@ poistakaa
 poistaminen
 poistamisen
 poistamista
+poistetaan
 poistettava
 poistettiin
 poistettu

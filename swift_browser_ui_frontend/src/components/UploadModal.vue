@@ -111,16 +111,16 @@
           <c-card-actions justify="end">
             <c-button
               outlined
-              @click="clearExistingFiles"
-              @keyup.enter="clearExistingFiles"
-            >
-              {{ $t("message.cancel") }}
-            </c-button>
-            <c-button
               @click="overwriteFiles"
               @keyup.enter="overwriteFiles"
             >
               {{ $t("message.objects.overwrite") }}
+            </c-button>
+            <c-button
+              @click="clearExistingFiles"
+              @keyup.enter="clearExistingFiles"
+            >
+              {{ $t("message.cancel") }}
             </c-button>
           </c-card-actions>
         </c-alert>
