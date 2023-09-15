@@ -8,5 +8,5 @@ cryptography==41.0.3
 gunicorn==21.2.0
 keystoneauth1==5.3.0
 oidcrp==2.1.4
-python-swiftclient==4.3.0
+python-swiftclient==4.4.0
 uvloop==0.17.0
