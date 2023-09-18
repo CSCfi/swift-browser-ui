@@ -11,17 +11,20 @@
         }}
       </h2>
       <c-card-content>
-        <c-text-field
-          id="new-copy-folderName"
-          v-model="folderName"
-          v-csc-control
-          :label="$t('message.replicate.name_newFolder')"
-          name="foldername"
-          :valid="loadingFoldername || errorMsg.length === 0"
-          :validation="errorMsg"
-          aria-required="true"
-          required
-        />
+        <div id="folder-name-wrapper">
+          <c-text-field
+            id="new-copy-folderName"
+            v-model="folderName"
+            v-csc-control
+            :label="$t('message.replicate.name_newFolder')"
+            name="foldername"
+            :valid="loadingFoldername || errorMsg.length === 0"
+            :validation="errorMsg"
+            aria-required="true"
+            required
+          />
+          <c-loader v-show="loadingFoldername" />
+        </div>
         <label
           class="taginput-label"
           label-for="copy-folder-taginput"
@@ -373,6 +376,11 @@ c-card-actions {
 
 c-card-actions > c-button {
   margin: 0;
+}
+
+#folder-name-wrapper {
+  position: relative;
+  padding-top: 0.5rem;
 }
 
 </style>
