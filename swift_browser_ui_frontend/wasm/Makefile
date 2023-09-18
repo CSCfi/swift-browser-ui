@@ -1,8 +1,8 @@
 all: upload download
 
-upload: build/upworker.js src/libupload.wasm
+upload: build/upworker.js build/upworker.wasm
 
-download: build/downworker.js src/libdownload.wasm
+download: build/downworker.js build/downworker.wasm
 
 build/upworker.js: src/upinit.c src/streamingupload.c src/upcommon.c
 	$(CC) $(CFLAGS) $(LDFLAGS) \
