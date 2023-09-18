@@ -27,6 +27,7 @@ import {
   sortObjects,
   parseDateTime,
   parseDateFromNow,
+  deleteStaleSharedContainers,
 } from "@/common/conv";
 import {
   mdiTrayArrowDown,
@@ -333,7 +334,7 @@ export default {
                         {
                           name: this.$t("message.delete"),
                           action: () => this.delete(
-                            item.name, item.count,
+                            item.name, item.count, item.owner,
                           ),
                           disabled: item.owner,
                         },
@@ -444,7 +445,7 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-    delete: function (container, objects) {
+    delete: function (container, objects, owner) {
       if (objects > 0) { //if container not empty
         document.querySelector("#container-error-toasts").addToast(
           {
@@ -467,6 +468,7 @@ export default {
               message: this.$t("message.container_ops.deleteSuccess")},
           );
           this.$emit("delete-container", container);
+          if (owner) await deleteStaleSharedContainers(this.$store);
         });
       }
       this.paginationOptions.currentPage =
