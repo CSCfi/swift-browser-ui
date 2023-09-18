@@ -58,30 +58,6 @@ checkIDB().then(result => {
   }
 });
 
-// if ("serviceWorker" in navigator) {
-//   let workerUrl = new URL(
-//     "/libupload.js",
-//     document.location.origin,
-//   );
-//   let ping = (navigator.serviceWorker.controller == null);
-//   navigator.serviceWorker.register(workerUrl).then(reg => {
-//     reg.update();
-//     if (ping) {
-//       if (DEV) console.log("Pinging first serviceWorker.");
-//       navigator.serviceWorker.ready.then(reg => {
-//         reg.active.postMessage({
-//           cmd: "pingWasm",
-//         });
-//       });
-//     }
-//   }).catch((err) => {
-//     if(DEV) console.log("Failed to register service worker.");
-//     if(DEV) console.log(err);
-//   });
-// } else {
-//   if (DEV) console.log("Did not register Service Worker.");
-// }
-
 window.onerror = function (error) {
   if (DEV) console.log("Global error", error);
 };
@@ -353,7 +329,7 @@ const app = createApp({
       }
 
       this.initSocket().then(
-        () => {console.log("Initialized the websocket.");},
+        () => {if (DEV) console.log("Initialized the websocket.");},
       );
     };
     initialize().then(() => {
@@ -389,21 +365,21 @@ const app = createApp({
       if (available.quota < 53687091200) {
         await navigator.storage.persist();
         if (await navigator.storage.persisted()) {
-          console.log("Storage persisted.");
+          if (DEV) console.log("Storage persisted.");
           // Update the quotas
           available = await navigator.storage.estimate();
         } else {
-          console.log(
+          if (DEV) console.log(
             "Couldn't persist storage, "
             + "possible limited save space for downloads.",
           );
         }
       }
 
-      console.log(
+      if (DEV) console.log(
         `${available.usage}/${available.quota} of available storage used.`,
       );
-      console.log(
+      if (DEV) console.log(
         "Any downloads need to fit under this size when downloading.",
       );
 

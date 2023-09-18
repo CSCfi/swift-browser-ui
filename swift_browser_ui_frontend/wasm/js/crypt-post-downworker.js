@@ -240,6 +240,14 @@ class FileSlicer {
   }
 }
 
+
+// Safely free and remove a download session
+function finishDownloadSession(container) {
+  _free(downloads[container].keypairPtr);
+  delete downloads[container];
+}
+
+
 async function beginDownloadInSession(
   container,
   headers,
@@ -338,19 +346,9 @@ async function beginDownloadInSession(
     });
   }
 
+  finishDownloadSession(container);
+
   return;
-}
-
-
-// Safely free and remove a download session
-function finishDownloadSession(container) {
-  // Module.ccall([
-  //   "clean_session",
-  //   undefined,
-  //   ["number"],
-  //   [downloads[container].session],
-  // ]);
-  delete downloads[container];
 }
 
 if (inServiceWorker) {

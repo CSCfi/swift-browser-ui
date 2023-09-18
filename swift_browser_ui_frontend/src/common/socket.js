@@ -77,6 +77,8 @@ export default class UploadSocket {
           break;
         case "finished":
           this.$store.commit("eraseNotClosable");
+          this.$store.commit("eraseDropFiles");
+          this.$store.commit("stopUploading");
           break;
       }
     };

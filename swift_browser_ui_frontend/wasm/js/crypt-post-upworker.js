@@ -17,6 +17,7 @@ Schema for storing the upload information:
 import msgpack from "@ygoe/msgpack";
 
 let uploads = {};
+let upinfo = undefined;
 let socket = undefined;
 
 let totalLeft = 0;
@@ -285,11 +286,14 @@ class StreamSlicer{
     socket.send(msg);
     uploadCount--;
     doneFiles++;
+    _free(uploads[this.container].files[this.path].sessionkey);
   }
 }
 
 // Safely free and remove an upload session
 function finishUploadSession(container) {
+  _free(uploads[container].receivers);
+  delete uploads[container];
   return;
 }
 
@@ -298,6 +302,13 @@ function finishUploadSession(container) {
 async function openWebSocket (
   upinfo,
 ) {
+  // Skip socket initialization if the socket is connecting or open
+  if (socket !== undefined) {
+    if (socket.readyState === 0 || socket.readyState === 1) {
+      return;
+    }
+  }
+
   let socketURL = new URL(upinfo.wsurl);
   socketURL.searchParams.append(
     "session",
@@ -459,6 +470,9 @@ self.addEventListener("message", (e) => {
         uploads[container].ownerName = e.data.ownerName;
       }
 
+      // Ensure the websocket has stayed open
+      openWebSocket(upinfo);
+
       // Add the files in the upload request
       addFiles(e.data.files, e.data.container);
 
@@ -469,10 +483,12 @@ self.addEventListener("message", (e) => {
       break;
     // Abort the upload in question
     case "openWebSocket":
-      openWebSocket(e.data.upinfo);
+      upinfo = e.data.upinfo;
+      openWebSocket(upinfo);
       postMessage({
         eventType: "webSocketOpened",
-      })
+      });
+      break;
     case "abortUpload":
       finishUploadSession(e.data.container);
       break;

@@ -49,7 +49,6 @@ CHUNK *create_crypt4gh_header(
         &(ret->chunk),
         &(ret->len)
     );
-    printf("Header build return value: %d\n", err);
 
     return ret;
 }
