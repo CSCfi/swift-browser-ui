@@ -837,7 +837,7 @@ export default {
       this.$store.commit("createCurrentUploadAbort");
 
       this.socket.addUpload(
-        this.inputFolder,
+        this.currentFolder ? this.currentFolder : this.inputFolder,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
         this.$route.params.owner ? this.$route.params.owner : "",
