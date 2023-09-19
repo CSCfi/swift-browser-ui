@@ -885,19 +885,19 @@ export default {
 .upload-card {
   padding: 3rem;
   position: absolute;
-  top: -5rem;
+  top: -1rem;
   left: 0;
   right: 0;
   max-height: 75vh;
 }
 
-@media screen and (max-width: 766px), (max-height: 580px) {
+@media screen and (max-width: 767px), (max-height: 580px) {
    .upload-card {
     top: -5rem;
   }
 }
 
-@media screen and (max-height: 580px) and (max-width: 766px),
+@media screen and (max-height: 580px) and (max-width: 767px),
 (max-width: 525px) {
   .upload-card {
     top: -9rem;
@@ -907,8 +907,8 @@ export default {
 @media screen and (max-height: 580px) and (max-width: 525px) {
   .upload-card {
     top: -13rem;
-   }
- }
+  }
+}
 
 c-card-content {
   padding: 1rem 0 0 0;

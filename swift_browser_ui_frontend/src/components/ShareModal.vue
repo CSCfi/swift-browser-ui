@@ -4,36 +4,34 @@
     class="share-card"
     @keydown="handleKeyDown"
   >
-    <c-card-actions
-      justify="space-between"
-    >
-      <h2 class="title is-4">
-        {{ $t('message.share.share_title') }}
-        {{ folderName }}
-      </h2>
-      <c-button
-        id="close-share-modal-btn"
-        text
-        @click="toggleShareModal"
-        @keyup.enter="toggleShareModal"
+    <div class="modal-content-wrapper">
+      <c-card-actions
+        justify="space-between"
       >
-        <c-icon
-          :path="mdiClose"
-          alt=""
-          aria-hidden="true"
-        />
-        {{ $t("message.share.close") }}
-      </c-button>
-    </c-card-actions>
-    <c-card-content id="share-card-modal-content">
-      <div
-        id="overflow-div"
-        :class="{ 'scroll': sharedDetails.length > 0 }"
-      >
+        <h2 class="title is-4">
+          {{ $t('message.share.share_title') }}
+          {{ folderName }}
+        </h2>
+        <c-button
+          id="close-share-modal-btn"
+          text
+          @click="toggleShareModal"
+          @keyup.enter="toggleShareModal"
+        >
+          <c-icon
+            :path="mdiClose"
+            alt=""
+            aria-hidden="true"
+          />
+          {{ $t("message.share.close") }}
+        </c-button>
+      </c-card-actions>
+      <c-card-content id="share-card-modal-content">
         <c-container>
           <c-row
             justify="space-between"
             align="center"
+            gap="10"
           >
             <h3 class="title is-5 has-text-dark">
               {{ $t("message.share.share_other_projects") }}
@@ -142,12 +140,12 @@
             @updateSharedFolder="updateSharedFolder"
           />
         </c-container>
-      </div>
-    </c-card-content>
-    <c-toasts
-      id="shareModal-toasts"
-      data-testid="shareModal-toasts"
-    />
+      </c-card-content>
+      <c-toasts
+        id="shareModal-toasts"
+        data-testid="shareModal-toasts"
+      />
+    </div>
   </c-card>
 </template>
 
@@ -596,47 +594,39 @@ export default {
 <style lang="scss" scoped>
 
 .share-card {
-  padding: 3rem 2rem 0 2rem;
+  padding: 3rem 2rem 2rem 2rem;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-}
-
-#overflow-div {
   max-height: 60vh;
-  padding-bottom: 3rem;
-}
-.scroll {
-  overflow-y: scroll;
-  padding-right: 1rem;
 }
 
-@media screen and (max-height: 720px) {
+@media screen and (max-width: 767px), (max-height: 580px) {
   .share-card {
-    top: -30vh;
-  }
-  .scroll {
-    max-height: 55vh;
+    top: -5rem;
   }
 }
 
-c-card-content  {
-  scrollbar-width: 0.5rem;
-  &::-webkit-scrollbar {
-    width: 0.5rem;
+@media screen and (max-height: 580px) and (max-width: 767px),
+(max-width: 525px) {
+  .share-card {
+    top: -9rem;
   }
-  &::-webkit-scrollbar-thumb {
-    background: var(--csc-mid-grey);
-    border-radius: 10px;
-    &:hover {
-      background: var(--csc-dark-grey);
-    }
-  }
+}
 
-  & > * {
-    margin: 0 !important;
-  };
+@media screen and (max-height: 580px) and (max-width: 525px) {
+  .share-card {
+    top: -13rem;
+  }
+}
+
+c-container {
+  width: 100%;
+}
+
+c-card-actions {
+  padding-bottom: 10px;
 }
 
 c-card-actions > h2 {
