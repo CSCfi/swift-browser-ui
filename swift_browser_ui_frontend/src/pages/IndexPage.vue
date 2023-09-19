@@ -97,7 +97,7 @@
             </c-card-content>
             <c-card-actions v-if="unauth">
               <c-button
-                href="/login/kill"
+                href="/"
                 target="_self"
               >
                 {{ $t('message.error.login') }}

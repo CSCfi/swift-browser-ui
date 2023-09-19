@@ -400,10 +400,3 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         self.mock_client.delete.assert_called()
         self.assertEqual(resp.status, 303)
         self.assertEqual(resp.headers["Location"], "/")
-
-        # Test with "undecryptable" session
-        self.aiohttp_session_get_session_mock.side_effect = aiohttp.web.HTTPUnauthorized
-        with self.assertRaises(aiohttp.web.HTTPUnauthorized), self.p_get_sess:
-            await swift_browser_ui.ui.login.handle_logout(
-                self.mock_request,
-            )

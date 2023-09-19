@@ -10,6 +10,7 @@ import typing
 # aiohttp
 import aiohttp.web
 import aiohttp_session
+from aiohttp.client_exceptions import ClientError
 from multidict import MultiDictProxy
 from oidcrp.exception import OidcServiceError
 
@@ -472,22 +473,24 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
     log = request.app["Log"]
     client = request.app["api_client"]
     if not setd["set_session_devmode"]:
-        try:
-            session = await aiohttp_session.get_session(request)
-            log.info(f"Killing session {session.identity}")
-            for project in session["projects"]:
-                async with client.delete(
+        session = await aiohttp_session.get_session(request)
+        log.info(f"Killing session {session.identity}")
+        for project in session["projects"]:
+            try:
+                await client.delete(
                     f"{setd['auth_endpoint_url']}/auth/tokens",
                     headers={
                         "X-Auth-Token": session["token"],
                         "X-Subject-Token": session["projects"][project]["token"],
                     },
-                ):
-                    pass
-            session.invalidate()
-        except aiohttp.web.HTTPUnauthorized:
-            log.info("Trying to log out an invalidated session")
-            pass
+                )
+            except (aiohttp.web.HTTPError, ClientError):
+                log.exception(
+                    f"Failed deleting project token while logging out {session.identity}"
+                )
+
+        session.invalidate()
+
     response = aiohttp.web.Response(status=303)
     response.headers["Location"] = "/"
     return response
