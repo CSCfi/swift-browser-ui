@@ -236,6 +236,14 @@ class FileSlicer {
       }
     }
 
+    // Free the session key
+    Module.ccall(
+      "free_crypt4gh_session_key",
+      undefined,
+      ["number"],
+      [downloads[this.container].files[this.path]],
+    );
+
     return;
   }
 }
@@ -243,7 +251,12 @@ class FileSlicer {
 
 // Safely free and remove a download session
 function finishDownloadSession(container) {
-  _free(downloads[container].keypairPtr);
+  Module.ccall(
+    "free_keypair",
+    undefined,
+    ["number"],
+    [downloads[contaienr].keypair]
+  )
   delete downloads[container];
 }
 

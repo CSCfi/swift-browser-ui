@@ -38,6 +38,12 @@ Key init function, from libcrypt4gh
 uint8_t *crypt4gh_session_key_new(void);
 
 
+/*
+Free the crypt4gh session key with sodium.
+*/
+void free_crypt4gh_session_key(uint8_t *sk);
+
+
 /***************************************************
 Encryption / decryption chunk convenience functions.
 ***************************************************/

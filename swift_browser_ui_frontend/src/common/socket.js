@@ -338,6 +338,7 @@ export default class UploadSocket {
           `/archive/${container}.tar`,
           document.location.origin,
         );
+        if (DEV) console.log(downloadUrl, "_blank");
         window.open(downloadUrl, "_blank");
         setTimeout(() => {
           navigator.serviceWorker.ready.then(reg => {

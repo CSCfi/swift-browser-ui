@@ -286,7 +286,12 @@ class StreamSlicer{
     socket.send(msg);
     uploadCount--;
     doneFiles++;
-    _free(uploads[this.container].files[this.path].sessionkey);
+    Module.ccall(
+      "free_crypt4gh_session_key",
+      undefined,
+      ["number"],
+      [uploads[this.container].files[this.path].sessionkey],
+    );
   }
 }
 
