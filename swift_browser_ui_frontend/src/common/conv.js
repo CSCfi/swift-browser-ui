@@ -61,8 +61,8 @@ function check_stale(detail, access) {
 export async function deleteStaleSharedContainers (store) {
   const project = store.state.active.id;
   const acl = await getAccessControlMeta(project);
-  const client = store.state.client;
   const aclmeta = acl.access;
+  const client = store.state.client;
 
   const currentsharing = await client.getShare(project);
 
@@ -75,7 +75,7 @@ export async function deleteStaleSharedContainers (store) {
     }
   }
 
-  return { project, acl, client, aclmeta };
+  return { project, client, acl, aclmeta };
 }
 
 export async function syncContainerACLs(store) {
