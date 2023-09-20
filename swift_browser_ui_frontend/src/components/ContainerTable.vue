@@ -28,6 +28,7 @@ import {
   parseDateTime,
   parseDateFromNow,
   deleteStaleSharedContainers,
+  DEV,
 } from "@/common/conv";
 import {
   mdiTrayArrowDown,
@@ -49,7 +50,9 @@ import {
   disableFocusOutsideModal,
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
-import { swiftDeleteContainer } from "@/common/api";
+import {
+  swiftDeleteContainer,
+} from "@/common/api";
 
 export default {
   name: "ContainerTable",
@@ -483,12 +486,11 @@ export default {
         });
     },
     beginDownload(container) {
-      console.log(container);
       this.$store.state.socket.addDownload(
         container,
         [],
       ).then(() => {
-        console.log(`Started downloading all objects from container ${container}`);
+        if (DEV) console.log(`Started downloading all objects from container ${container}`);
       });
     },
     getEmptyText() {

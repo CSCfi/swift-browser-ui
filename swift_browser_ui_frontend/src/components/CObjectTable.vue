@@ -34,6 +34,7 @@ import {
   parseDateTime,
   parseDateFromNow,
   getHumanReadableSize,
+  DEV,
 } from "@/common/conv";
 
 import {
@@ -405,12 +406,11 @@ export default {
       }
     },
     beginDownload(object) {
-      console.log(object);
       this.$store.state.socket.addDownload(
         this.$route.params.container,
         [object.name],
       ).then(() => {
-        console.log(`Started downloading object ${object.name}`);
+        if (DEV) console.log(`Started downloading object ${object.name}`);
       });
     },
     navDownload(url) {

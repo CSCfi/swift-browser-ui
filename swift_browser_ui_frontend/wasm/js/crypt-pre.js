@@ -1,7 +1,5 @@
 var moduleStartComplete = false;
 
-console.log("Download/upload worker started.");
-
 // Detect if inside a ServiceWorker
 let inServiceWorker = false;
 if (typeof ServiceWorkerGlobalScope !== "undefined") {
@@ -24,7 +22,5 @@ var Module = {
   onRuntimeInitialized: () => {
     moduleStartComplete = true;
   },
-  printErr: (text) => {
-    console.log("WASM execution debug: ", text);
-  },
+  printErr: (text) => {},
 };

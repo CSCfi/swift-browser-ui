@@ -301,7 +301,7 @@ async function beginDownloadInSession(
 
     if (downloads[container].archive) {
       let fileHeader = addTarFile(
-        name,
+        name.replace(".c4gh", ""),
         prefix,
         size,
       );

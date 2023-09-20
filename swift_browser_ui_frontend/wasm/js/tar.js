@@ -38,9 +38,6 @@ export function addTarFolder(name, prefix) {
 
 // Add a file to the tar archive structure
 export function addTarFile(name, prefix, size) {
-  console.log(prefix);
-  console.log(name);
-  console.log(size);
   let mtime = Math.floor(Date.now() / 1000).toString(8);
 
   let header =
