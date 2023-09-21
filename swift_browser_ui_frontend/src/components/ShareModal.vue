@@ -4,7 +4,10 @@
     class="share-card"
     @keydown="handleKeyDown"
   >
-    <div class="modal-content-wrapper">
+    <div
+      id="share-scroll-wrapper"
+      class="modal-content-wrapper"
+    >
       <c-card-actions
         justify="space-between"
       >
@@ -88,16 +91,24 @@
           <c-row
             justify="space-between"
             align="start"
+            gap="10"
+            nowrap
           >
-            <c-select
-              v-model="sharedAccessRight"
-              v-csc-control
-              shadow="false"
-              :label="$t('message.share.permissions')"
-              :items.prop="accessRights"
-              :placeholder="$t('message.share.permissions')"
-              @changeValue="onSelectPermission($event)"
-            />
+            <div>
+              <c-select
+                id="select-share-access"
+                v-model="sharedAccessRight"
+                v-csc-control
+                shadow="false"
+                :label="$t('message.share.permissions')"
+                :items.prop="accessRights"
+                :placeholder="$t('message.share.permissions')"
+                hide-details
+                @changeValue="onSelectPermission($event)"
+                @mouseover="calculateSelectPosition()"
+                @click="calculateSelectPosition()"
+              />
+            </div>
             <c-button
               id="share-btn"
               :loading="loading"
@@ -131,15 +142,14 @@
             </c-button>
           </div>
         </c-alert>
-        <c-container v-show="sharedDetails.length > 0">
-          <ShareModalTable
-            :shared-details="sharedDetails"
-            :folder-name="folderName"
-            :access-rights="accessRights"
-            @removeSharedFolder="removeSharedFolder"
-            @updateSharedFolder="updateSharedFolder"
-          />
-        </c-container>
+        <ShareModalTable
+          v-show="sharedDetails.length > 0"
+          :shared-details="sharedDetails"
+          :folder-name="folderName"
+          :access-rights="accessRights"
+          @removeSharedFolder="removeSharedFolder"
+          @updateSharedFolder="updateSharedFolder"
+        />
       </c-card-content>
       <c-toasts
         id="shareModal-toasts"
@@ -243,6 +253,20 @@ export default {
           this.giveReadWriteAccess();
           break;
       }
+    },
+    calculateSelectPosition: function() {
+      const btn = document.getElementById("share-btn");
+      const wrapper = document.getElementById("share-scroll-wrapper");
+      const content = document.getElementById("mainContent");
+      const card = document.getElementsByClassName("share-card")[0];
+      let btnPosition = btn.getBoundingClientRect();
+      let wrapperPosition = wrapper.getBoundingClientRect();
+      let contentPosition = content.getBoundingClientRect();
+      let cardPosition = card.getBoundingClientRect();
+
+      const cselect = document.getElementById("select-share-access");
+      cselect.style.top = btnPosition.top - wrapperPosition.top -
+        (contentPosition.top - cardPosition.top) + "px";
     },
     setAccessRights: function () {
       this.accessRights = [
@@ -593,8 +617,10 @@ export default {
 
 <style lang="scss" scoped>
 
+$share-card-padding: 2rem;
+
 .share-card {
-  padding: 3rem 2rem 2rem 2rem;
+  padding: $share-card-padding;
   position: absolute;
   top: 0;
   left: 0;
@@ -619,6 +645,12 @@ export default {
   .share-card {
     top: -13rem;
   }
+}
+
+c-select:hover {
+  position: fixed;
+  padding-top: $share-card-padding;
+  z-index: 2;
 }
 
 c-container {
@@ -660,6 +692,10 @@ h3 {
 
 c-select {
   color: var(--csc-dark);
+}
+
+c-link {
+  min-width: 60px;
 }
 
 c-link > span {
