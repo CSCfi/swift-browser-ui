@@ -101,9 +101,9 @@ const store = createStore({
       state.isUploading = true;
       if (!state.uploadNotification) state.uploadNotification = true;
     },
-    stopUploading(state) {
+    stopUploading(state, cancelled = false) {
       state.isUploading = false;
-      state.isLoaderVisible = true;
+      if (!cancelled) state.isLoaderVisible = true;
     },
     setChunking(state) {
       state.isChunking = true;

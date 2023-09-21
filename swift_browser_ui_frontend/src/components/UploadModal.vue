@@ -272,7 +272,6 @@ export default {
       recvHashedKeys: [],
       CUploadButton,
       projectInfoLink: "",
-      toastVisible: false,
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
@@ -846,19 +845,17 @@ export default {
 
       delay(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
-          if (!this.toastVisible) {
-            this.toastVisible = true;
-            document.querySelector("#container-error-toasts").addToast(
-              {
-                type: "success",
-                duration: 4000,
-                progress: false,
-                message: this.$t("message.upload.isStarting"),
-              },
-            );
-            //avoid overlapping toasts
-            setTimeout(() => { this.toastVisible = false; }, 4000);
-          }
+          document.querySelector("#container-error-toasts").addToast(
+            {
+              type: "error",
+              duration: 4000,
+              progress: false,
+              message: this.$t("message.upload.error"),
+            },
+          );
+          //TODO reset for user to upload again
+          this.$store.commit("stopUploading", true);
+          this.$store.commit("toggleUploadNotification", false);
         }
       }, 1000);
       this.toggleUploadModal();
