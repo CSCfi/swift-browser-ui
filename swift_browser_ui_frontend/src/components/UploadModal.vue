@@ -744,7 +744,6 @@ export default {
       this.addingFiles = false;
       this.tags = [];
       this.files = [];
-      this.duplicateDropFile = false;
       this.interacted = false;
       this.addRecvkey = "";
       this.recvHashedKeys = [];
