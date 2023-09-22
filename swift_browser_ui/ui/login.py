@@ -476,6 +476,7 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
             session = await aiohttp_session.get_session(request)
             log.info(f"Killing session {session.identity}")
             for project in session["projects"]:
+                # the test client only supports `async with`
                 async with client.delete(
                     f"{setd['auth_endpoint_url']}/auth/tokens",
                     headers={
@@ -485,9 +486,8 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
                 ):
                     pass
             session.invalidate()
-        except aiohttp.web.HTTPUnauthorized:
-            log.info("Trying to log our an invalidated session")
-            raise aiohttp.web.HTTPUnauthorized
+        except aiohttp.web.HTTPError:
+            log.info("Trying to log out an invalidated session")
     response = aiohttp.web.Response(status=303)
     response.headers["Location"] = "/"
     return response
