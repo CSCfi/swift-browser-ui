@@ -67,25 +67,28 @@
             </span>
           </CUploadButton>
         </div>
-        <c-alert
-          v-show="duplicateDropFile"
-          type="error"
-        >
-          <div class="duplicate-notification">
-            {{ $t("message.upload.duplicate") }}
-            <c-button
-              text
-              size="small"
-              @click="duplicateDropFile = false"
-            >
-              <i
-                slot="icon"
-                class="mdi mdi-close"
-              />
-              {{ $t("message.close") }}
-            </c-button>
-          </div>
-        </c-alert>
+        <template v-for="error in dropFileErrors">
+          <c-alert
+            v-if="error.show"
+            :key="error.id"
+            type="error"
+          >
+            <div class="drop-file-notification">
+              {{ $t(`message.upload.${error.id}`) }}
+              <c-button
+                text
+                size="small"
+                @click="error.show = false"
+              >
+                <i
+                  slot="icon"
+                  class="mdi mdi-close"
+                />
+                {{ $t("message.close") }}
+              </c-button>
+            </div>
+          </c-alert>
+        </template>
         <c-alert
           v-show="existingFiles.length"
           type="warning"
@@ -266,7 +269,6 @@ export default {
       CUploadButton,
       projectInfoLink: "",
       toastVisible: false,
-      duplicateDropFile: false,
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
@@ -278,6 +280,10 @@ export default {
       objects: [],
       existingFiles: [],
       filesToOverwrite: [],
+      dropFileErrors: [
+        {id: "duplicate", show: false},
+        {id: "sizeZero", show: false},
+      ],
     };
   },
   computed: {
@@ -528,6 +534,11 @@ export default {
       }
     },
     appendDropFiles(file, overwrite = false) {
+      if (file?.size === 0) {
+        this.dropFileErrors[1].show = true;
+        setTimeout(() => this.dropFileErrors[1].show = false, 6000);
+        return;
+      }
       //Check if file path already exists in dropFiles
       if (
         this.$store.state.dropFiles.find(
@@ -544,10 +555,8 @@ export default {
         }
         this.$store.commit("appendDropFiles", file);
       } else {
-        if (!this.duplicateDropFile) {
-          this.duplicateDropFile = true;
-          setTimeout(() => { this.duplicateDropFile = false; }, 6000);
-        }
+        this.dropFileErrors[0].show = true;
+        setTimeout(() => this.dropFileErrors[0].show = false, 6000);
       }
     },
     overwriteFiles() {
@@ -907,7 +916,7 @@ c-data-table.publickey-table {
   margin-top: 1rem;
 }
 
-.duplicate-notification {
+.drop-file-notification {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

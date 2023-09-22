@@ -202,6 +202,7 @@ let default_translations = {
       containers: "Folders - ",
       upload: {
         duplicate: "Files with the same paths are not allowed.",
+        sizeZero: "Empty files cannot be uploaded.",
         upfinish: "Finished uploading ",
         upfail: "Failed uploading ",
         upnotsupported: "Uploading is not supported by your browser",
@@ -598,6 +599,7 @@ let default_translations = {
       containers: "Kansiot - ",
       upload: {
         duplicate: "Tiedostot, joilla on samat polut, eivät ole sallittuja.",
+        sizeZero: "Tyhjiä tiedostoja ei voi lähettää.",
         upfinish: "Lähetettiin tiedosto ",
         upfail: "Epäonnistuttiin lähettäessä tiedosto ",
         upnotsupported: "Selain ei tue tiedostojen lähettämistä",
