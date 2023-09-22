@@ -737,6 +737,9 @@ export default {
     toggleUploadModal() {
       this.resetAccordionVal();
       document.querySelector("#uploadModal-toasts").removeToast("upload-toast");
+      for (let i = 0; i < this.dropFileErrors.length; i++) {
+        this.dropFileErrors[i].show = false;
+      }
       this.$store.commit("toggleUploadModal", false);
       this.addingFiles = false;
       this.tags = [];
