@@ -63,10 +63,6 @@ export default class UploadSocket {
           break;
         case "progress":
           this.$store.commit(
-            "updateEncryptedProgress",
-            e.data.progress,
-          );
-          this.$store.commit(
             "updateProgress",
             e.data.progress,
           );
@@ -79,6 +75,7 @@ export default class UploadSocket {
           this.$store.commit("eraseNotClosable");
           this.$store.commit("eraseDropFiles");
           this.$store.commit("stopUploading");
+          this.$store.commit("eraseProgress");
           break;
       }
     };

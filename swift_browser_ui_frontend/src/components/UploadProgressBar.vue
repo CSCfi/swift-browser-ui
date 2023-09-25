@@ -32,9 +32,6 @@ export default {
     progress() {
       return this.$store.state.uploadProgress;
     },
-    encryptedProgress () {
-      return this.$store.state.encryptedProgress;
-    },
     encryptedFile () {
       return this.$store.state.encryptedFile;
     },

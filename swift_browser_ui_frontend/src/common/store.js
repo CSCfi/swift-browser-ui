@@ -41,7 +41,6 @@ const store = createStore({
     isChunking: false,
     encryptedFile: "",
     encryptedFileProgress: undefined,
-    encryptedProgress: undefined,
     uploadProgress: undefined,
     uploadNotification: false,
     uploadNotificationClosable: false,
@@ -112,12 +111,6 @@ const store = createStore({
     },
     stopChunking(state) {
       state.isChunking = false;
-    },
-    updateEncryptedProgress(state, progress) {
-      state.encryptedProgress = progress;
-    },
-    eraseEncryptedProgress(state) {
-      state.encryptedProgress = undefined;
     },
     setEncryptedFile(state, file) {
       state.encryptedFile = file;
