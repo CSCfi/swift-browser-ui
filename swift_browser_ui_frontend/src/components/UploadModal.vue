@@ -859,7 +859,6 @@ export default {
             //avoid overlapping toasts
             setTimeout(() => { this.toastVisible = false; }, 4000);
           }
-          // this.beginEncryptedUpload();
         }
       }, 1000);
       this.toggleUploadModal();
