@@ -255,7 +255,7 @@ function finishDownloadSession(container) {
     "free_keypair",
     undefined,
     ["number"],
-    [downloads[contaienr].keypair]
+    [downloads[container].keypair]
   )
   delete downloads[container];
 }
