@@ -66,7 +66,6 @@ export default {
       selectedItem: null,
       refs: [],
       isSearching: false,
-      sharedConts: [],
     };
   },
   computed: {
@@ -164,20 +163,6 @@ export default {
       //get IDs of containers whose objects should be included in results
       const containerIDs = conts.map(({ id }) => id);
 
-      //Objects in shared containers retain IDs from original container
-      this.sharedConts = conts.filter(cont => cont.owner);
-
-      //get IDs of original containers
-      for(let i=0; i < this.sharedConts.length; i++) {
-        const cont = await getDB().containers
-          .get({
-            projectID: this.sharedConts[i].owner,
-            name: this.sharedConts[i].container,
-          });
-        this.sharedConts[i] = {...this.sharedConts[i], originalID: cont.id};
-        containerIDs.push(cont.id);
-      }
-
       const objects = await getDB().objects
         .filter(obj => obj.tokens?.find(t => t.match(re))
           || obj.tags?.find(t => t.match(re)))
@@ -212,18 +197,9 @@ export default {
             let subfolder = {
               container: obj.container, name: subName,
               subfolder: true, bytes: size, count: count,
+              owner: obj.containerOwner,
             };
 
-            //if shared, get owner for routing
-            const sharedIndex = this.sharedConts
-              .findIndex(cont => cont.originalID === obj.containerID);
-
-            if (sharedIndex >= 0) {
-              subfolder = {
-                ...subfolder,
-                owner: this.sharedConts[sharedIndex].owner,
-              };
-            }
             subfolders.push(subfolder);
           }
         }
@@ -245,21 +221,18 @@ export default {
       }
       let route = {};
 
-      const index = this.sharedConts
-        .findIndex(cont => cont.originalID === item.containerID);
-
       let prefix = null;
       if (item.subfolder) prefix = item.name;
       else if (item.name.includes("/")) { //for objects
         prefix = item.name.slice(0, item.name.lastIndexOf("/"));
       }
 
-      if (item.owner || index >= 0) {
+      if (item.owner || item.containerOwner) {
         route = {
           name: "SharedObjects",
           params: {
-            container: item.container || this.sharedConts[index].container,
-            owner: item.owner || this.sharedConts[index].owner,
+            container: item.container,
+            owner: item.owner || item.containerOwner,
           },
         };
       }

@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { swiftDeleteObjects } from "@/common/api";
+import { swiftDeleteObjects, getObjects } from "@/common/api";
 import { getDB } from "@/common/db";
 
 import { isFile } from "@/common/globalFunctions";
@@ -103,8 +103,7 @@ export default {
 
       if (!isSegmentsContainer) {
         segment_container = await getDB().containers.get({
-          projectID: this.$route.name === "SharedObjects" ?
-            this.owner : this.projectID,
+          projectID: this.projectID,
           name: `${this.selectedObjects[0].container}_segments`,
         });
       }
@@ -118,9 +117,12 @@ export default {
 
           if (segment_container) {
             // Equivalent object from segment container needs to be deleted
-            const segment_obj = await getDB().objects
-              .where({containerID: segment_container.id})
-              .filter(obj => obj.name.includes(`${object.name}/`)).first();
+            const segment_objects =  await getObjects(
+              this.owner ? this.owner : this.projectID,
+              segment_container.name,
+            );
+            const segment_obj = segment_objects.filter(obj =>
+              obj.name.includes(`${object.name}/`))[0];
             if (segment_obj) segments_to_remove.push(segment_obj.name);
           }
         } else {
@@ -130,20 +132,12 @@ export default {
         }
       }
 
-      if(this.$route.name !== "SharedObjects") {
-        // Delete objects and segment objects from IDB
-        const objIDs = this.selectedObjects.filter(
-          obj => obj.name && to_remove.includes(obj.name)).reduce(
-          (prev, obj) => [...prev, obj.id], [],
-        );
-
-        const segmentObjIDs = segment_container ? await getDB().objects
-          .where({ containerID: segment_container.id })
-          .filter(obj => obj.name && segments_to_remove.includes(obj.name))
-          .primaryKeys() : [];
-
-        await getDB().objects.bulkDelete(objIDs.concat(segmentObjIDs));
-      }
+      // Delete objects from IDB
+      const objIDs = this.selectedObjects.filter(
+        obj => obj.name && to_remove.includes(obj.name)).reduce(
+        (prev, obj) => [...prev, obj.id], [],
+      );
+      await getDB().objects.bulkDelete(objIDs);
 
       swiftDeleteObjects(
         this.owner || this.projectID,
@@ -155,20 +149,6 @@ export default {
             this.owner || this.projectID,
             segment_container.name,
             segments_to_remove,
-          );
-        }
-
-        if (this.$route.name === "SharedObjects") {
-          await this.$store.dispatch(
-            "updateSharedObjects",
-            {
-              projectID: this.projectID,
-              owner: this.owner,
-              container: {
-                name: this.container,
-                id: 0,
-              },
-            },
           );
         }
 

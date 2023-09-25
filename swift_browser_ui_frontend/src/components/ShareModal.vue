@@ -456,8 +456,6 @@ export default {
         .removeToast("error-duplicate");
 
       moveFocusOutOfModal(this.prevActiveEl);
-
-      moveFocusOutOfModal(this.prevActiveEl);
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);

@@ -4,6 +4,7 @@ import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
 import {getProjects, getContainers} from "@/common/api.js";
 import { getDB } from "@/common/db";
+import store from "@/common/store";
 
 async function checkProject (to, from, next){
 
@@ -27,18 +28,24 @@ async function checkProject (to, from, next){
 }
 async function checkContainer (to, from, next){
 
-  let containers = await getDB()
-    .containers.where({projectID: to.params.project} )
-    .toArray();
-  if(containers.length === 0){
-    containers = await getContainers();
+  if(to.params.container === store.state.selectedFolderName) {
+    //When new folder is created with upload but containers not updated yet
+    next();
   }
-  const val = containers.find(item =>
-    item.name === to.params.container);
-  if(val === undefined) {
-    window.location.pathname = "/notfound";
+  else {
+    let containers = await getDB()
+      .containers.where({projectID: to.params.project} )
+      .toArray();
+    if(containers.length === 0){
+      containers = await getContainers();
+    }
+    const val = containers.find(item =>
+      item.name === to.params.container);
+    if(val === undefined) {
+      window.location.pathname = "/notfound";
+    }
+    next();
   }
-  next();
 }
 
 export default createRouter({

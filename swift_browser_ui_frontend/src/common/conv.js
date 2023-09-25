@@ -4,7 +4,6 @@ import {
   getObjectsMeta,
   GET,
 } from "@/common/api";
-import { getDB } from "@/common/db";
 import { DateTime } from "luxon";
 
 export default function getLangCookie() {
@@ -460,19 +459,6 @@ export function addSegmentContainerSize(container, containers) {
   if (segments !== undefined) {
     container.bytes = segments.bytes;
   }
-}
-
-// Find the segments of an object and
-// update the original objects size accordingly
-export async function getSegmentObjects(projectID, container) {
-  const segment_container = await getDB().containers.get({
-    projectID,
-    name: `${container.name}_segments`,
-  });
-
-  return segment_container ? await getDB()
-    .objects.where({ containerID: segment_container.id })
-    .toArray() : [];
 }
 
 export function sortContainer(containers) {

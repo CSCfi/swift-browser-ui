@@ -243,9 +243,9 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
-import { swiftDeleteObjects } from "@/common/api";
+import { swiftDeleteObjects, getObjects } from "@/common/api";
 
-import { delay, debounce } from "lodash";
+import { debounce } from "lodash";
 import { mdiDelete } from "@mdi/js";
 
 
@@ -479,16 +479,11 @@ export default {
           .where({ projectID: this.active.id })
           .toArray();
         if (this.currentFolder) {
-          if (this.$route.name === "SharedObjects") {
-            this.objects = this.$store.state.objectCache;
-          }
-          else {
-            const cont = this.containers.find(c =>
-              c.name === this.currentFolder);
-            this.objects = await getDB().objects
-              .where({containerID: cont.id})
-              .toArray();
-          }
+          const cont = this.containers.find(c =>
+            c.name === this.currentFolder);
+          this.objects = await getDB().objects
+            .where({containerID: cont.id})
+            .toArray();
         }
       }
     },
@@ -571,53 +566,33 @@ export default {
 
       let oldSegments = [];
       const segmentCont= await getDB().containers.get({
-        projectID: this.$route.name === "SharedObjects" ?
-          this.owner : this.active.id,
+        projectID: this.active.id,
         name: `${this.currentFolder}_segments`,
       });
+      const segmentObjs =  await getObjects(
+        this.owner ? this.owner : this.active.id,
+        segmentCont.name,
+      );
 
       if (segmentCont) {
         for (let i = 0; i < this.filesToOverwrite.length; i++) {
-          let segments = await getDB().objects
-            .where({containerID: segmentCont.id})
-            .filter(obj => obj.name.includes(`${this.filesToOverwrite[i].name}.c4gh/`)).first();
-          if (segments) oldSegments.push(segments.name);
+          const segment = segmentObjs.filter(obj =>
+            obj.name.includes(`${this.filesToOverwrite[i].name}.c4gh/`))[0];
+          if (segment) oldSegments.push(segment.name);
         }
       }
 
-      if (this.$route.name !== "SharedObjects") {
-        // Delete segment objects from IDB
-        const segmentObjIDs = await getDB().objects
-          .where({ containerID: segmentCont.id })
-          .filter(obj => obj.name && oldSegments.includes(obj.name))
-          .primaryKeys();
-        await getDB().objects.bulkDelete(segmentObjIDs);
-      }
-
       if (oldSegments.length) {
-        swiftDeleteObjects(
+        await swiftDeleteObjects(
           this.owner || this.active.id,
           segmentCont.name,
           oldSegments,
         );
       }
-
-      if (this.$route.name === "SharedObjects") {
-        await this.$store.dispatch(
-          "updateSharedObjects",
-          {
-            projectID: this.active.id,
-            owner: this.owner,
-            container: {
-              name: this.currentFolder,
-              id: 0,
-            },
-          },
-        );
-      }
     },
     clearExistingFiles() {
       this.existingFiles = [];
+      this.objects = [];
     },
     checkFolderName: debounce(function () {
       const error = validateFolderName(this.inputFolder, this.$t);
@@ -765,8 +740,6 @@ export default {
       this.toastMsg = "";
 
       moveFocusOutOfModal(this.prevActiveEl);
-
-      moveFocusOutOfModal(this.prevActiveEl);
     },
     checkIfCanUpload() {
       if (this.dropFiles.length === 0) {
@@ -833,7 +806,7 @@ export default {
       upload.initServiceWorker();
       this.$store.commit("setCurrentUpload", upload);
       upload.cleanUp();
-      delay(() => {
+      setTimeout(() => {
         if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
           if (!this.toastVisible) {
             this.toastVisible = true;

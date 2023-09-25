@@ -93,17 +93,20 @@
         </span>
       </c-menu>
     </c-row>
-    <CObjectTable
-      :breadcrumb-clicked-prop="breadcrumbClicked"
-      :objs="filteredObjects.length ? filteredObjects : oList"
-      :disable-pagination="hidePagination"
-      :hide-tags="hideTags"
-      :render-folders="renderFolders"
-      :show-timestamp="showTimestamp"
-      :access-rights="accessRights"
-      @selected-rows="handleSelection"
-      @delete-object="confirmDelete"
-    />
+    <div id="obj-table-wrapper">
+      <CObjectTable
+        :breadcrumb-clicked-prop="breadcrumbClicked"
+        :objs="filteredObjects.length ? filteredObjects : oList"
+        :disable-pagination="hidePagination"
+        :hide-tags="hideTags"
+        :render-folders="renderFolders"
+        :show-timestamp="showTimestamp"
+        :access-rights="accessRights"
+        @selected-rows="handleSelection"
+        @delete-object="confirmDelete"
+      />
+      <c-loader v-show="objsLoading" />
+    </div>
     <c-toasts
       id="objects-toasts"
       data-testid="objects-toasts"
@@ -134,6 +137,7 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
+  updateObjectsAndObjectTags,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -144,9 +148,10 @@ import { getDB } from "@/common/db";
 import { liveQuery } from "dexie";
 import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
-import { debounce, delay, escapeRegExp } from "lodash";
+import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
+import { DEV } from "@/common/conv";
 
 export default {
   name: "ObjectTable",
@@ -179,6 +184,7 @@ export default {
       tableOptions: [],
       currentContainer: {},
       breadcrumbClicked: false,
+      objsLoading: false,
     };
   },
   computed: {
@@ -199,9 +205,6 @@ export default {
     },
     active () {
       return this.$store.state.active;
-    },
-    sharedObjects() {
-      return this.$store.state.objectCache;
     },
     openCreateFolderModal() {
       return this.$store.state.openCreateFolderModal;
@@ -234,16 +237,11 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
-    sharedObjects: function () {
-      if(this.$route.name !== "SharedObjects") {
-        return;
-      }
-      this.oList = this.sharedObjects;
-    },
     queryPage: function () {
       this.currentPage = this.queryPage;
     },
-    currentContainer: function() {
+    currentContainer: async function() {
+      if (this.currentContainer === undefined) return;
       const savedDisplayOptions = toRaw(this.currentContainer.displayOptions);
       if (savedDisplayOptions) {
         this.renderFolders = savedDisplayOptions.renderFolders;
@@ -258,12 +256,20 @@ export default {
       this.getFolderSharedStatus();
     },
     isFolderUploading: function () {
-      if (!this.isFolderUploading) this.updateContainers();
+      if (!this.isFolderUploading) {
+        setTimeout(async () => {
+          this.updateAfterUpload();
+        }, 3000);
+      }
     },
     shareModal: async function(){
       if (!this.shareModal) await this.getFolderSharedStatus();
     },
+    oList() {
+      if (this.objsLoading) setTimeout(() => this.objsLoading = false, 100);
+    },
   },
+
   created: function () {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
@@ -278,6 +284,7 @@ export default {
     this.checkLargeDownloads();
   },
   async mounted () {
+    this.objsLoading = true;
     await this.getSharedContainers();
     await this.getFolderSharedStatus();
     this.updateObjects();
@@ -319,7 +326,7 @@ export default {
                   = await getAccessDetails(
                     this.project,
                     this.containerName,
-                    this.$route.params.owner,
+                    this.owner,
                     this.abortController.signal,
                   );
 
@@ -368,47 +375,64 @@ export default {
           });
       }
     },
-    updateContainers: function() {
-      delay(async () => {
-        await this.$store.dispatch("updateContainers", {
-          projectID: this.active.id,
-          signal: this.abortController.signal,
-          routeContainer: this.$route.params.container,
+    getCurrentContainer: function () {
+      return getDB().containers
+        .get({
+          projectID: this.project,
+          name: this.containerName,
         });
-      }, 3000);
+    },
+    updateAfterUpload: async function () {
+      const containersToUpdateObjs = {
+        key: this.currentContainer.id,
+        container: {...this.currentContainer},
+      };
+
+      await updateObjectsAndObjectTags(
+        [containersToUpdateObjs],
+        this.active.id,
+        this.abortController.signal,
+        false, // No need to update object tags in this case
+      );
     },
     updateObjects: async function () {
       if (
         this.containerName === undefined
         || (
           this.active.id === undefined
-          && this.$route.params.project
+          && this.project
         )
       ) {
         return;
       }
 
-      if(this.$route.name === "SharedObjects") {
-        await this.$store.dispatch(
-          "updateSharedObjects",
-          {
-            projectID: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: {
-              id: 0,
-              name: this.$route.params.container,
-            },
-            signal: this.abortController.signal,
-          },
-        );
-        return;
-      }
+      this.currentContainer = await this.getCurrentContainer();
 
-      this.currentContainer = await getDB().containers
-        .get({
-          projectID: this.$route.params.project,
-          name: this.containerName,
+      if (this.currentContainer === undefined) {
+        //container not in DB when clicking "view destination"
+        // while / right after uploading
+        await this.$store.dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: this.abortController.signal,
         });
+        this.currentContainer = await this.getCurrentContainer();
+        if (this.currentContainer === undefined) {
+          if (DEV) console.log("Error with uploaded container");
+          return;
+        }
+        await this.updateAfterUpload();
+      }
+      else {
+        let params = {
+          projectID: this.project,
+          container: this.currentContainer,
+          signal: this.abortController.signal,
+        };
+
+        if (this.owner) params.owner = this.owner;
+
+        await this.$store.dispatch("updateObjects", params);
+      }
 
       this.oList = useObservable(
         liveQuery(() =>
@@ -416,15 +440,6 @@ export default {
             .where({"containerID": this.currentContainer.id})
             .toArray(),
         ),
-      );
-
-      this.$store.dispatch(
-        "updateObjects",
-        {
-          projectID: this.$route.params.project,
-          container: this.currentContainer,
-          signal: this.abortController.signal,
-        },
       );
     },
     checkLargeDownloads: function () {
@@ -438,8 +453,8 @@ export default {
           name: "SharedObjects",
           params: {
             project: this.$route.params.project,
-            owner: this.$route.params.owner,
-            container: this.$route.params.container,
+            owner: this.owner,
+            container: this.containerName,
           },
           query: {
             page: pageNumber,
@@ -451,8 +466,8 @@ export default {
           name: "ObjectsView",
           params: {
             user: this.$route.params.user,
-            project: this.$route.params.project,
-            container: this.$route.params.container,
+            project: this.project,
+            container: this.containerName,
           },
           query: {
             page: pageNumber,
@@ -754,4 +769,9 @@ export default {
 #objects-toasts {
   bottom: 40vh;
 }
+
+#obj-table-wrapper {
+  position: relative;
+}
+
 </style>

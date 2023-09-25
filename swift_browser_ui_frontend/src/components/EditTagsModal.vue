@@ -127,28 +127,21 @@ export default {
         projectID: this.projectID,
         name: this.containerName,
       });
-      if (this.$route.name === "SharedObjects") {
-        this.$store.state.objectCache.map(obj => {
-          if (obj.name === this.selectedObjectName) {
-            this.tags = obj.tags;
-            this.object = obj;
-          }
-        });
+
+      this.object = await getDB().objects.get({
+        containerID: this.container.id,
+        name: this.selectedObjectName,
+      });
+
+      if (!this.object.tags?.length) {
+        const tags = await getTagsForObjects(
+          this.projectID,
+          this.container.name,
+          [this.selectedObjectName],
+        );
+        this.tags = tags[0][1] || [];
       } else {
-        this.object = await getDB().objects.get({
-          containerID: this.container.id,
-          name: this.selectedObjectName,
-        });
-        if (!this.object.tags?.length) {
-          const tags = await getTagsForObjects(
-            this.projectID,
-            this.container.name,
-            [this.selectedObjectName],
-          );
-          this.tags = tags[0][1] || [];
-        } else {
-          this.tags = this.object.tags;
-        }
+        this.tags = this.object.tags;
       }
     },
     getContainer: async function () {
@@ -199,26 +192,19 @@ export default {
         this.containerName,
         objectMeta,
       ).then(async () => {
-        if (this.$route.name !== "SharedObjects") {
-          const currentTime = getCurrentISOtime();
-          await getDB().objects
-            .where(":id").equals(this.object.id)
-            .modify({ tags, last_modified: currentTime });
+        const currentTime = getCurrentISOtime();
+        await getDB().objects
+          .where(":id").equals(this.object.id)
+          .modify({ tags, last_modified: currentTime });
 
-          // Also update container's last_modified in IDB
-          await getDB().containers
-            .where({
-              projectID: this.projectID,
-              name: this.containerName,
-            })
-            .modify({ last_modified: currentTime });
-        } else {
-          await this.$store.dispatch("updateSharedObjects", {
+        // Also update container's last_modified in IDB
+        await getDB().containers
+          .where({
             projectID: this.projectID,
-            container: {name: this.containerName},
-            owner: this.$route.params.owner,
-          });
-        }
+            name: this.containerName,
+          })
+          .modify({ last_modified: currentTime });
+
         this.toggleEditTagsModal(keypress);
       });
     },
@@ -230,14 +216,12 @@ export default {
       };
       updateContainerMeta(this.projectID, containerName, meta)
         .then(async () => {
-          if (this.$route.name !== "SharedObjects") {
-            await getDB().containers
-              .where({
-                projectID: this.projectID,
-                name: containerName,
-              })
-              .modify({ tags, last_modified: getCurrentISOtime() });
-          }
+          await getDB().containers
+            .where({
+              projectID: this.projectID,
+              name: containerName,
+            })
+            .modify({ tags, last_modified: getCurrentISOtime() });
         });
       this.toggleEditTagsModal(keypress);
     },

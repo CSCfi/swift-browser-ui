@@ -395,25 +395,6 @@ export default {
       this.sortDirection = event.detail.direction;
       //sorted in getPage()
     },
-    getEditRoute: function(containerName, objectName) {
-      if (this.$route.name == "SharedObjects") {
-        return {
-          name: "EditSharedObjectView",
-          params: {
-            container: containerName,
-            object: objectName,
-            owner: this.owner,
-          },
-        };
-      }
-      return {
-        name: "EditObjectView",
-        params: {
-          container: containerName,
-          object: objectName,
-        },
-      };
-    },
     handleSelection(event) {
       if (event.detail.length > 0 && this.renderFolders) {
         const prefix = getPrefix(this.$route);

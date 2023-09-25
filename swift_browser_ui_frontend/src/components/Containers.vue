@@ -16,13 +16,16 @@
         </span>
       </c-menu>
     </c-row>
-    <ContainerTable
-      :conts="renderingContainers"
-      :show-timestamp="showTimestamp"
-      :disable-pagination="hidePagination"
-      :hide-tags="hideTags"
-      @delete-container="(cont) => removeContainer(cont)"
-    />
+    <div id="cont-table-wrapper">
+      <ContainerTable
+        :conts="renderingContainers"
+        :show-timestamp="showTimestamp"
+        :disable-pagination="hidePagination"
+        :hide-tags="hideTags"
+        @delete-container="(cont) => removeContainer(cont)"
+      />
+      <c-loader v-show="contsLoading" />
+    </div>
     <c-toasts
       id="container-toasts"
       data-testid="container-toasts"
@@ -32,10 +35,12 @@
 
 <script>
 import { liveQuery } from "dexie";
-import { delay } from "lodash";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
-import { getSharingContainers } from "@/common/globalFunctions";
+import {
+  getSharingContainers,
+  updateObjectsAndObjectTags,
+} from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
 import SearchBox from "@/components/SearchBox.vue";
 
@@ -61,17 +66,13 @@ export default {
       abortController: null,
       containers: [],
       renderingContainers: [],
+      containersToUpdateObjs: [],
+      contsLoading: false,
     };
   },
   computed: {
     active() {
       return this.$store.state.active;
-    },
-    openShareModal: {
-      get() {
-        return this.$store.state.openShareModal;
-      },
-      set() {},
     },
     isFolderUploading() {
       return this.$store.state.isUploading;
@@ -85,7 +86,7 @@ export default {
   },
   watch: {
     active: function () {
-      this.fetchContainers();
+      this.fetchContainers(true);
     },
     currentProject: function() {
       const savedDisplayOptions = this.currentProject.displayOptions;
@@ -116,16 +117,9 @@ export default {
         this.renderingContainers = this.containers;
       }
     },
-    openShareModal: function () {
-      if(!this.openShareModal) {
-        delay(() => {
-          this.fetchContainers();
-        }, 3000);
-      }
-    },
     isFolderUploading: function () {
       if (!this.isFolderUploading) {
-        delay(() => {
+        setTimeout(() => {
           this.fetchContainers();
         }, 3000);
       }
@@ -139,6 +133,14 @@ export default {
     locale: function () {
       this.updateTableOptions();
     },
+    containersToUpdateObjs: async function () {
+      if (this.contsLoading) setTimeout(() => this.contsLoading = false, 100);
+      await updateObjectsAndObjectTags(
+        this.containersToUpdateObjs,
+        this.active.id,
+        this.abortController.signal,
+      );
+    },
   },
   created() {
     this.updateTableOptions();
@@ -148,7 +150,7 @@ export default {
     this.getDirectCurrentPage();
   },
   mounted() {
-    this.fetchContainers();
+    this.fetchContainers(true);
   },
   beforeUnmount() {
     this.abortController.abort();
@@ -220,14 +222,22 @@ export default {
       ];
       this.optionsKey++;
     },
-    fetchContainers: async function () {
-      if (this.active.id === undefined) {
+    fetchContainers: async function (withLoader = false) {
+      if (this.active.id === undefined
+        || this.abortController.signal?.aborted) {
         return;
       }
+      if (withLoader) this.contsLoading = true;
 
       this.currentProject = await getDB().projects.get({
         id: this.active.id,
       });
+
+      this.containersToUpdateObjs = await this.$store
+        .dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: this.abortController.signal,
+        });
 
       this.containers = useObservable(
         liveQuery(() =>
@@ -236,11 +246,6 @@ export default {
             .toArray(),
         ),
       );
-
-      await this.$store.dispatch("updateContainers", {
-        projectID: this.active.id,
-        signal: this.abortController.signal,
-      });
     },
     removeContainer: async function(container) {
       await getDB().containers.where({
@@ -289,6 +294,10 @@ export default {
 #optionsbar {
   margin: 0.5em 0;
   background: #fff;
+}
+
+#cont-table-wrapper {
+  position: relative;
 }
 
 </style>
