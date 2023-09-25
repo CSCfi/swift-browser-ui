@@ -185,14 +185,8 @@ class FileSlicer {
       }
     }
 
-    if (this.chunk !== undefined) {
-      let toSet = this.chunk.subarray(this.offset);
-      enChunk.set(toSet, this.bytes);
-      this.bytes += toSet.length;
-      this.totalBytes += toSet.length - 28;
-    }
-
     if(this.bytes > 0) {
+      this.totalBytes += this.bytes - 28;
       return enChunk.slice(0, this.bytes);
     }
 
@@ -227,7 +221,7 @@ class FileSlicer {
     }
 
     // Round up to a multiple of 512, because tar
-    if (this.totalBytes % 512 > 0 && downloads[container].archive) {
+    if (this.totalBytes % 512 > 0 && downloads[this.container].archive) {
       let padding = "\x00".repeat(512 - this.totalBytes % 512);
       if (this.output instanceof WritableStream) {
         await this.output.write(padding);
