@@ -253,7 +253,7 @@ import {
 import CUploadButton from "@/components/CUploadButton.vue";
 import { swiftDeleteObjects, getObjects } from "@/common/api";
 
-import { debounce } from "lodash";
+import { debounce, delay } from "lodash";
 import { mdiDelete } from "@mdi/js";
 
 export default {
