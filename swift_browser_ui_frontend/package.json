@@ -16,7 +16,7 @@
   "dependencies": {
     "@intlify/unplugin-vue-i18n": "^0.13.0",
     "@mdi/js": "^7.2.96",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^4.3.4",
     "@vueuse/rxjs": "^10.2.1",
     "cli-highlight": "^2.1.11",
     "csc-ui": "0.9.3",
