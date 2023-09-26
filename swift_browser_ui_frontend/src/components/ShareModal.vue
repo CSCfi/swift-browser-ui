@@ -4,158 +4,156 @@
     class="share-card"
     @keydown="handleKeyDown"
   >
-    <div
-      id="share-scroll-wrapper"
+    <c-card-actions
+      justify="space-between"
+    >
+      <h2 class="title is-4">
+        {{ $t('message.share.share_title') }}
+        {{ folderName }}
+      </h2>
+      <c-button
+        id="close-share-modal-btn"
+        text
+        @click="toggleShareModal"
+        @keyup.enter="toggleShareModal"
+      >
+        <c-icon
+          :path="mdiClose"
+          alt=""
+          aria-hidden="true"
+        />
+        {{ $t("message.share.close") }}
+      </c-button>
+    </c-card-actions>
+    <c-card-content
+      id="share-card-modal-content"
       class="modal-content-wrapper"
     >
-      <c-card-actions
-        justify="space-between"
-      >
-        <h2 class="title is-4">
-          {{ $t('message.share.share_title') }}
-          {{ folderName }}
-        </h2>
-        <c-button
-          id="close-share-modal-btn"
-          text
-          @click="toggleShareModal"
-          @keyup.enter="toggleShareModal"
+      <c-container>
+        <c-row
+          justify="space-between"
+          align="center"
+          gap="10"
         >
-          <c-icon
-            :path="mdiClose"
-            alt=""
-            aria-hidden="true"
-          />
-          {{ $t("message.share.close") }}
-        </c-button>
-      </c-card-actions>
-      <c-card-content id="share-card-modal-content">
-        <c-container>
-          <c-row
-            justify="space-between"
-            align="center"
-            gap="10"
+          <h3 class="title is-5 has-text-dark">
+            {{ $t("message.share.share_other_projects") }}
+          </h3>
+          <c-flex
+            class="toggle-instructions"
+            :aria-label="$t('label.shareid_instructions')"
+            @click="toggleShareGuide"
+            @keyup.enter="toggleShareGuide"
           >
-            <h3 class="title is-5 has-text-dark">
-              {{ $t("message.share.share_other_projects") }}
-            </h3>
-            <c-flex
-              class="toggle-instructions"
-              :aria-label="$t('label.shareid_instructions')"
-              @click="toggleShareGuide"
-              @keyup.enter="toggleShareGuide"
+            <c-icon
+              :path="mdiInformationOutline"
+              alt=""
+              aria-hidden="true"
+            />
+            <c-link
+              underline
+              tabindex="0"
             >
-              <c-icon
-                :path="mdiInformationOutline"
-                alt=""
-                aria-hidden="true"
-              />
-              <c-link
-                underline
-                tabindex="0"
-              >
-                {{ openShareGuide ? $t("message.share.close_instructions")
-                  : $t("message.share.instructions")
-                }}
-              </c-link>
-            </c-flex>
-          </c-row>
-          <div
-            v-show="openShareGuide"
-            class="content guide-content"
-          >
-            <p>
-              {{ $t("message.share.share_guide_intro") }}
-            </p>
-            <!-- eslint-disable vue/no-v-html -->
-            <p v-html="$t('message.share.share_guide_step1')" />
-            <p v-html="$t('message.share.share_guide_step2')" />
-            <ul>
-              <li
-                v-for="(item, i) in
-                  $tm('message.share.share_guide_step2_list')"
-                :key="i"
-                v-html="item"
-              />
-            </ul>
-            <!-- eslint-enable vue/no-v-html -->
-          </div>
-          <TagInput
-            id="share-ids"
-            :tags="tags"
-            aria-label="label.list_of_shareids"
-            placeholder="message.share.field_placeholder"
-            @addTag="addingTag"
-            @deleteTag="deletingTag"
-          />
-          <c-row
-            justify="space-between"
-            align="start"
-            gap="10"
-            nowrap
-          >
-            <div>
-              <c-select
-                id="select-share-access"
-                v-model="sharedAccessRight"
-                v-csc-control
-                shadow="false"
-                :label="$t('message.share.permissions')"
-                :items.prop="accessRights"
-                :placeholder="$t('message.share.permissions')"
-                hide-details
-                @changeValue="onSelectPermission($event)"
-                @mouseover="calculateSelectPosition()"
-                @click="calculateSelectPosition()"
-              />
-            </div>
-            <c-button
-              id="share-btn"
-              :loading="loading"
-              @click="shareSubmit"
-              @keyup.enter="shareSubmit"
-            >
-              {{ $t('message.share.confirm') }}
-            </c-button>
-          </c-row>
-        </c-container>
-        <c-alert
-          v-show="isShared || isPermissionRemoved || isPermissionUpdated"
-          type="success"
+              {{ openShareGuide ? $t("message.share.close_instructions")
+                : $t("message.share.instructions")
+              }}
+            </c-link>
+          </c-flex>
+        </c-row>
+        <div
+          v-show="openShareGuide"
+          class="content guide-content"
         >
-          <div class="shared-notification">
-            {{ isShared ? $t('message.share.shared_successfully')
-              : isPermissionUpdated ? $t('message.share.update_permission')
-                : $t('message.share.remove_permission')
-            }}
-            <c-button
-              text
-              size="small"
-              @click="closeSharedNotification"
-            >
-              <c-icon
-                :path="mdiClose"
-                alt=""
-                aria-hidden="true"
-              />
-              {{ $t("message.share.close") }}
-            </c-button>
-          </div>
-        </c-alert>
-        <ShareModalTable
-          v-show="sharedDetails.length > 0"
-          :shared-details="sharedDetails"
-          :folder-name="folderName"
-          :access-rights="accessRights"
-          @removeSharedFolder="removeSharedFolder"
-          @updateSharedFolder="updateSharedFolder"
+          <p>
+            {{ $t("message.share.share_guide_intro") }}
+          </p>
+          <!-- eslint-disable vue/no-v-html -->
+          <p v-html="$t('message.share.share_guide_step1')" />
+          <p v-html="$t('message.share.share_guide_step2')" />
+          <ul>
+            <li
+              v-for="(item, i) in
+                $tm('message.share.share_guide_step2_list')"
+              :key="i"
+              v-html="item"
+            />
+          </ul>
+          <!-- eslint-enable vue/no-v-html -->
+        </div>
+        <TagInput
+          id="share-ids"
+          :tags="tags"
+          aria-label="label.list_of_shareids"
+          placeholder="message.share.field_placeholder"
+          @addTag="addingTag"
+          @deleteTag="deletingTag"
         />
-      </c-card-content>
-      <c-toasts
-        id="shareModal-toasts"
-        data-testid="shareModal-toasts"
+        <c-row
+          id="share-select-row"
+          justify="space-between"
+          align="start"
+          gap="10"
+        >
+          <c-select
+            id="select-share-access"
+            v-model="sharedAccessRight"
+            v-csc-control
+            shadow="false"
+            :label="$t('message.share.permissions')"
+            :items.prop="accessRights"
+            :placeholder="$t('message.share.permissions')"
+            hide-details
+            @changeValue="onSelectPermission($event)"
+            @mouseleave="resetHover()"
+            @mouseover="calculateSelectPosition()"
+            @click="calculateSelectPosition()"
+          />
+          <c-select hide-details />
+          <c-button
+            id="share-btn"
+            :loading="loading"
+            @click="shareSubmit"
+            @keyup.enter="shareSubmit"
+          >
+            {{ $t('message.share.confirm') }}
+          </c-button>
+        </c-row>
+      </c-container>
+      <c-alert
+        v-show="isShared || isPermissionRemoved || isPermissionUpdated"
+        type="success"
+      >
+        <div class="shared-notification">
+          {{ isShared ? $t('message.share.shared_successfully')
+            : isPermissionUpdated ? $t('message.share.update_permission')
+              : $t('message.share.remove_permission')
+          }}
+          <c-button
+            text
+            size="small"
+            @click="closeSharedNotification"
+          >
+            <c-icon
+              :path="mdiClose"
+              alt=""
+              aria-hidden="true"
+            />
+            {{ $t("message.share.close") }}
+          </c-button>
+        </div>
+      </c-alert>
+      <ShareModalTable
+        v-show="sharedDetails.length > 0"
+        :shared-details="sharedDetails"
+        :folder-name="folderName"
+        :access-rights="accessRights"
+        @removeSharedFolder="removeSharedFolder"
+        @updateSharedFolder="updateSharedFolder"
       />
-    </div>
+    </c-card-content>
+    <c-toasts
+      id="shareModal-toasts"
+      data-testid="shareModal-toasts"
+    />
   </c-card>
 </template>
 
@@ -255,18 +253,20 @@ export default {
       }
     },
     calculateSelectPosition: function() {
-      const btn = document.getElementById("share-btn");
-      const wrapper = document.getElementById("share-scroll-wrapper");
+      const row = document.getElementById("share-select-row");
       const content = document.getElementById("mainContent");
-      const card = document.getElementsByClassName("share-card")[0];
-      let btnPosition = btn.getBoundingClientRect();
-      let wrapperPosition = wrapper.getBoundingClientRect();
+      let rowPosition = row.getBoundingClientRect();
       let contentPosition = content.getBoundingClientRect();
-      let cardPosition = card.getBoundingClientRect();
 
+      let width = row.children[1].getBoundingClientRect().width;
+
+      row.children[0].style.top = rowPosition.top - contentPosition.top -
+        document.body.scrollTop + "px";
+      row.children[0].style.maxWidth = width + "px";
+    },
+    resetHover: function() {
       const cselect = document.getElementById("select-share-access");
-      cselect.style.top = btnPosition.top - wrapperPosition.top -
-        (contentPosition.top - cardPosition.top) + "px";
+      cselect.style.maxWidth = "none";
     },
     setAccessRights: function () {
       this.accessRights = [
@@ -617,10 +617,8 @@ export default {
 
 <style lang="scss" scoped>
 
-$share-card-padding: 2rem;
-
 .share-card {
-  padding: $share-card-padding;
+  padding: 2rem;
   position: absolute;
   top: 0;
   left: 0;
@@ -647,10 +645,18 @@ $share-card-padding: 2rem;
   }
 }
 
-c-select:hover {
+#select-share-access:hover {
   position: fixed;
-  padding-top: $share-card-padding;
   z-index: 2;
+}
+
+#select-share-access ~ c-select {
+  display: none;
+}
+
+#select-share-access:hover ~ c-select {
+  display: unset;
+  visibility: hidden;
 }
 
 c-container {
