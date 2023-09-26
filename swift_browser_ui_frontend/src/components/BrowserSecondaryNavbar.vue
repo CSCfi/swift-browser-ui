@@ -158,11 +158,11 @@ export default {
   },
   methods: {
     changeActive(event) {
-      const item = event.target.value;
-      if (item.id !== this.active.id) {
+      const itemId = event.target.value;
+      if (itemId !== this.active.id) {
         const navigationParams = {
           name: "AllFolders",
-          params: {user: this.uname, project: item.id},
+          params: {user: this.uname, project: itemId},
         };
         // Updates URL, and then refreshes the page
         this.$router.push(navigationParams).then(() => {
@@ -300,8 +300,9 @@ c-select {
   display: inline-block;
 }
 
-c-icon {
+.tooltip c-icon {
   margin-left: 0.5rem;
+  color: $csc-primary;
 }
 
 .tooltip-content {
