@@ -217,7 +217,7 @@ async def handle_upload_ws(
 
         # Open msgpack and handle message
         try:
-            msg_unpacked: typing.Dict[str, typing.Any] = msgpack.loads(msg.data)
+            msg_unpacked: typing.Dict[str, typing.Any] = msgpack.unpackb(msg.data)
 
             if msg_unpacked["command"] == "add_header":
                 await upload_session.handle_begin_upload(msg_unpacked)

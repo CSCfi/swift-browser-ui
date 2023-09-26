@@ -9,7 +9,8 @@ import secrets
 import ssl
 import typing
 
-import aiohttp
+import aiohttp.client
+import aiohttp.web
 import certifi
 import msgpack
 
@@ -97,7 +98,7 @@ class FileUpload:
         """Add header for the file."""
         if not await self.a_create_container():
             await self.socket.send_bytes(
-                msgpack.dumps(
+                msgpack.packb(
                     {
                         "command": "abort",
                         "container": self.container,
@@ -128,7 +129,7 @@ class FileUpload:
     async def start_upload(self):
         """Tell the frontend to start the file upload."""
         await self.socket.send_bytes(
-            msgpack.dumps(
+            msgpack.packb(
                 {
                     "command": "start_upload",
                     "container": self.container,
@@ -140,7 +141,7 @@ class FileUpload:
     async def retry_chunk(self, order):
         """Retry a failed chunk."""
         await self.socket.send_bytes(
-            msgpack.dumps(
+            msgpack.packb(
                 {
                     "command": "retry_chunk",
                     "container": self.container,
@@ -250,7 +251,7 @@ class FileUpload:
         if self.total_segments - 1 == order:
             LOGGER.info("Informing client that file was finished.")
             await self.socket.send_bytes(
-                msgpack.dumps(
+                msgpack.packb(
                     {
                         "command": "success",
                         "container": self.container,
@@ -286,7 +287,7 @@ class FileUpload:
     async def abort_upload(self):
         """Abort the upload."""
         await self.socket.send_bytes(
-            msgpack.dumps(
+            msgpack.packb(
                 {
                     "command": "abort",
                     "container": self.container,
@@ -361,7 +362,7 @@ class UploadSession:
             if path in self.uploads[container]:
                 if self.ws:
                     await self.ws.send_bytes(
-                        msgpack.dumps(
+                        msgpack.packb(
                             {
                                 "command": "abort",
                                 "container": container,
