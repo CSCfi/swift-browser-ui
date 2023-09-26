@@ -103,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1069) Forbid special characters in container names
 - (GL #1074) Updated `/api/{project}` endpoint to check for `last_modified` values before returning the container list
 - (GL #1105) Upload modal restricted to uploading to current container, or creating a new one in main container view
+- (GL #1028) Disallow uploading files with size 0
 
 ### Fixed
 

@@ -609,6 +609,7 @@ tuo
 tuottaa
 turvalliseen
 tyhjennä
+tyhjiä
 tyhjä
 tyyppi
 työkaluvinkki
