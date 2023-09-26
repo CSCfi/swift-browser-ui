@@ -15,8 +15,8 @@ dependencies:
     specifier: ^4.2.3
     version: 4.2.3(vite@4.4.4)(vue@3.3.4)
   '@vueuse/rxjs':
-    specifier: ^10.2.1
-    version: 10.2.1(rxjs@7.8.1)(vue@3.3.4)
+    specifier: ^10.4.1
+    version: 10.4.1(rxjs@7.8.1)(vue@3.3.4)
   cli-highlight:
     specifier: ^2.1.11
     version: 2.1.11
@@ -1473,12 +1473,12 @@ packages:
       vue-component-type-helpers: 1.8.4
     dev: true
 
-  /@vueuse/rxjs@10.2.1(rxjs@7.8.1)(vue@3.3.4):
-    resolution: {integrity: sha512-kPj3jfcTIn+gDqX60hIIdK/ydA+NT87BS31kCFbay6IV9DMsfEZgK9dFZGdz/zX60M+ErdhCdjcXJNwGp5TCMQ==}
+  /@vueuse/rxjs@10.4.1(rxjs@7.8.1)(vue@3.3.4):
+    resolution: {integrity: sha512-UU2v4qNKlVjpI9MUYVJ2lAd59IZ29ALwumh5POjaUaqZ+Sapg1+2pscxU7gVDX5pTcTvQ7LPpxDujfS8BSJ/rw==}
     peerDependencies:
       rxjs: '>=6.0.0'
     dependencies:
-      '@vueuse/shared': 10.2.1(vue@3.3.4)
+      '@vueuse/shared': 10.4.1(vue@3.3.4)
       rxjs: 7.8.1
       vue-demi: 0.14.5(vue@3.3.4)
     transitivePeerDependencies:
@@ -1486,8 +1486,8 @@ packages:
       - vue
     dev: false
 
-  /@vueuse/shared@10.2.1(vue@3.3.4):
-    resolution: {integrity: sha512-QWHq2bSuGptkcxx4f4M/fBYC3Y8d3M2UYyLsyzoPgEoVzJURQ0oJeWXu79OiLlBb8gTKkqe4mO85T/sf39mmiw==}
+  /@vueuse/shared@10.4.1(vue@3.3.4):
+    resolution: {integrity: sha512-vz5hbAM4qA0lDKmcr2y3pPdU+2EVw/yzfRsBdu+6+USGa4PxqSQRYIUC9/NcT06y+ZgaTsyURw2I9qOFaaXHAg==}
     dependencies:
       vue-demi: 0.14.5(vue@3.3.4)
     transitivePeerDependencies:
