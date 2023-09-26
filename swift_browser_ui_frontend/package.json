@@ -19,7 +19,7 @@
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/rxjs": "^10.2.1",
     "cli-highlight": "^2.1.11",
-    "csc-ui": "github:hannyle/csc-ui",
+    "csc-ui": "0.9.3",
     "dexie": "^3.2.4",
     "eslint": "^8.45.0",
     "eslint-plugin-vue": "^9.15.1",

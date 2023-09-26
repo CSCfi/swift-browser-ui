@@ -5,42 +5,34 @@
     @keydown="handleKeyDown"
   >
     <h2 class="title is-4 has-text-dark">
-      <c-card
-        ref="editTagsContainer"
-        class="edit-tags"
-        @keydown="handleKeyDown"
-      >
-        <h2 class="title is-4 has-text-dark">
-          {{ $t('message.editTags') }}
-        </h2>
-        <c-card-content>
-          <TagInput
-            id="edit-tags-input"
-            :tags="tags"
-            @addTag="addingTag"
-            @deleteTag="deletingTag"
-          />
-        </c-card-content>
-        <c-card-actions justify="space-between">
-          <c-button
-            outlined
-            size="large"
-            @click="toggleEditTagsModal(false)"
-            @keyup.enter="toggleEditTagsModal(true)"
-          >
-            {{ $t("message.cancel") }}
-          </c-button>
-          <c-button
-            size="large"
-            @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
-            @keyup.enter="isObject ?
-              saveObjectTags(true) : saveContainerTags(true)"
-          >
-            {{ $t("message.save") }}
-          </c-button>
-        </c-card-actions>
-      </c-card>
+      {{ $t('message.editTags') }}
     </h2>
+    <c-card-content>
+      <TagInput
+        id="edit-tags-input"
+        :tags="tags"
+        @addTag="addingTag"
+        @deleteTag="deletingTag"
+      />
+    </c-card-content>
+    <c-card-actions justify="space-between">
+      <c-button
+        outlined
+        size="large"
+        @click="toggleEditTagsModal(false)"
+        @keyup.enter="toggleEditTagsModal(true)"
+      >
+        {{ $t("message.cancel") }}
+      </c-button>
+      <c-button
+        size="large"
+        @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
+        @keyup.enter="isObject ?
+          saveObjectTags(true) : saveContainerTags(true)"
+      >
+        {{ $t("message.save") }}
+      </c-button>
+    </c-card-actions>
   </c-card>
 </template>
 

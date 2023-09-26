@@ -648,6 +648,7 @@ c-card-actions > h2 {
 .toggle-instructions {
   justify-content: flex-end;
   align-items: center;
+  color: $csc-primary;
 }
 
 h3 {
