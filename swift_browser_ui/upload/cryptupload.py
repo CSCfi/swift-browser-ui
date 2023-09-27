@@ -358,20 +358,18 @@ class UploadSession:
             owner_name = str(msg["owner_name"])
         total = int(msg["total"])
 
-        if container in self.uploads:
-            if path in self.uploads[container]:
-                if self.ws:
-                    await self.ws.send_bytes(
-                        msgpack.packb(
-                            {
-                                "command": "abort",
-                                "container": container,
-                                "object": path,
-                                "reason": "Object is already being uploaded.",
-                            }
-                        )
-                    )
-                    return
+        if container in self.uploads and path in self.uploads[container] and self.ws:
+            await self.ws.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "abort",
+                        "container": container,
+                        "object": path,
+                        "reason": "Object is already being uploaded.",
+                    }
+                )
+            )
+            return
 
         if container not in self.uploads:
             self.uploads[container] = {}
