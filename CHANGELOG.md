@@ -184,7 +184,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1066) Fix for sharing/permissions not removed correctly
 - (GL #1078) Fix overwriting existing files with upload
 - (GL #1108) Fix deleting large amount of objects (~100 items) with long names
-- (GL #1125) Remove shared containers if the owner container is deleted
+- (GL #1140) Fix Sharing permissions swapping between options after sharing
 
 ### Removed
 

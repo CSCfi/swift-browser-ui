@@ -178,6 +178,7 @@ export default {
     return {
       tags: [],
       openShareGuide: false,
+      view: false,
       read: false,
       write: false,
       loading: false,
