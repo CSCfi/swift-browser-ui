@@ -36,7 +36,8 @@ export function disableFocusOutsideModal (modal) {
     child.setAttribute("inert", "true"));
 }
 
-export function moveFocusOutOfModal(prevActiveEl, isParentEl = false) {
+export function moveFocusOutOfModal(prevActiveEl, isParentEl = false,
+  addFocus = true) {
   removeFocusClass(document.activeElement);
   if (isParentEl) {
     store.commit("setPreviousActiveEl", prevActiveEl);
@@ -58,7 +59,7 @@ export function moveFocusOutOfModal(prevActiveEl, isParentEl = false) {
   if (prevActiveEl) {
     prevActiveEl.tabIndex = "0";
     prevActiveEl?.focus();
-    if (prevActiveEl === document.activeElement) {
+    if (prevActiveEl === document.activeElement && addFocus) {
       addFocusClass(prevActiveEl);
     }
   }
