@@ -58,25 +58,34 @@ function check_stale(detail, access) {
   return check_acl_mismatch(detail, access[detail.sharedTo]);
 }
 
-export async function syncContainerACLs(store) {
-  let project = store.state.active.id;
+export async function deleteStaleSharedContainers (store) {
+  const project = store.state.active.id;
+  const acl = await getAccessControlMeta(project);
+  const aclmeta = acl.access;
+  const client = store.state.client;
 
-  let acl = await getAccessControlMeta(project);
+  const currentsharing = await client.getShare(project);
 
-  let client = store.state.client;
-  let amount = 0;
-  let aclmeta = acl.access;
-  let currentsharing = await client.getShare(project);
-
-  // Delete stale shared container access entries from the database
-  for (let container of currentsharing) {
-    if (!Object.keys(aclmeta).includes(container)) {
-      await client.shareContainerDeleteAccess(project, container);
+  if (currentsharing.length > 0) {
+    // Delete stale shared container access entries from the database
+    for (let container of currentsharing) {
+      if (!Object.keys(aclmeta).includes(container)) {
+        await client.shareContainerDeleteAccess(project, container);
+      }
     }
   }
 
+  return { project, client, acl, aclmeta };
+}
+
+export async function syncContainerACLs(store) {
+  let amount = 0;
+
+  const { project, acl, client, aclmeta } =
+    await deleteStaleSharedContainers(store);
+
   // Refresh current sharing information
-  currentsharing = await client.getShare(project);
+  let currentsharing = await client.getShare(project);
   // Prune stale shared user access entries from the database
   for (let container of currentsharing) {
     let containerDetails = await client.getShareDetails(project, container);
