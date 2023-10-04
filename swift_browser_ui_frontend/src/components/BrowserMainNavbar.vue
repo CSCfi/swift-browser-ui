@@ -117,7 +117,7 @@ export default {
   },
   watch: {
     active () {
-      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+      this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
         + getProjectNumber(this.active);
       this.setNavigationMenu();
     },
@@ -159,11 +159,15 @@ export default {
           ariaLabel: this.$t("label.support_menu"),
           subs: [
             {
-              title: this.$t("message.supportMenu.item1"),
-              href: this.$t("message.supportMenu.itemLink1"),
+              title: this.$t("message.supportMenu.userGuide"),
+              href: this.$t("message.supportMenu.userGuideLink"),
             },
             {
-              title: this.$t("message.supportMenu.item2"),
+              title: this.$t("message.supportMenu.projectInfo"),
+              href: this.projectInfoLink,
+            },
+            {
+              title: this.$t("message.supportMenu.createTokens"),
               action: () => this.openTokenModal(),
             },
           ],
@@ -174,10 +178,6 @@ export default {
           testid: "user-menu",
           ariaLabel: this.$t("label.project_info"),
           subs: [
-            {
-              title: this.$t("message.dashboard.projectInfo"),
-              href: this.projectInfoLink,
-            },
             {
               title: this.$t("message.logOut"),
               route: "/login/kill",

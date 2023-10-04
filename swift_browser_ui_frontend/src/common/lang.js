@@ -130,10 +130,6 @@ let default_translations = {
         hidePagination: "Hide pagination",
         showPagination: "Display pagination",
       },
-      dashboard: {
-        projectInfo: "Project information",
-        projectInfoBaseLink: "#",
-      },
       share: {
         share: "Share",
         share_id: "Share ID",
@@ -362,9 +358,11 @@ let default_translations = {
         pwd: "Password",
       },
       supportMenu: {
-        item1: "User manual",
-        itemLink1: "#",
-        item2: "Create API tokens",
+        userGuide: "User guide",
+        userGuideLink: "#",
+        projectInfo: "Project information",
+        projectInfoBaseLink: "#",
+        createTokens: "Create API tokens",
       },
       footerMenu: {
         title: "Swift browser",
@@ -525,10 +523,6 @@ let default_translations = {
         showTags: "Näytä asiasanat",
         hidePagination: "Piilota sivutus",
         showPagination: "Näytä sivutus",
-      },
-      dashboard: {
-        projectInfo: "Projektin tiedot",
-        projectInfoBaseLink: "#",
       },
       share: {
         share: "Jaa",
@@ -759,9 +753,11 @@ let default_translations = {
         pwd: "Salasana",
       },
       supportMenu: {
-        item1: "Käyttöohje",
-        itemLink1: "#",
-        item2: "Luo API-avaimia",
+        userGuide: "Käyttöohje",
+        userGuideLink: "#",
+        projectInfo: "Projektin tiedot",
+        projectInfoBaseLink: "#",
+        createTokens: "Luo API-avaimia",
       },
       footerMenu: {
         title: "Swift browser",

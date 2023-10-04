@@ -129,7 +129,7 @@ export default {
   },
   watch: {
     active: function () {
-      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+      this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
         + getProjectNumber(this.active);
     },
     folderName: function () {
