@@ -164,15 +164,7 @@ export default {
             },
             {
               title: this.$t("message.supportMenu.item2"),
-              href: this.$t("message.supportMenu.itemLink2"),
-            },
-            {
-              title: this.$t("message.supportMenu.item3"),
               action: () => this.openTokenModal(),
-            },
-            {
-              title: this.$t("message.supportMenu.item4"),
-              href: this.$t("message.supportMenu.itemLink4"),
             },
           ],
         },

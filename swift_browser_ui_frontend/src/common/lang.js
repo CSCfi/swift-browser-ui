@@ -364,11 +364,7 @@ let default_translations = {
       supportMenu: {
         item1: "User manual",
         itemLink1: "#",
-        item2: "Billing",
-        itemLink2: "#",
-        item3: "Create API tokens",
-        item4: "About",
-        itemLink4: "#",
+        item2: "Create API tokens",
       },
       footerMenu: {
         title: "Swift browser",
@@ -378,6 +374,8 @@ let default_translations = {
         menuItemLink1: "#",
         menuItem2: "Item 2",
         menuItemLink2: "#",
+        menuItem3: "Item 3",
+        menuItemLink3: "#",
       },
     },
     label: {
@@ -763,11 +761,7 @@ let default_translations = {
       supportMenu: {
         item1: "Käyttöohje",
         itemLink1: "#",
-        item2: "Hinnoittelu",
-        itemLink2: "#",
-        item3: "Luo API-avaimia",
-        item4: "Tietoa",
-        itemLink4: "#",
+        item2: "Luo API-avaimia",
       },
       footerMenu: {
         title: "Swift browser",
@@ -777,6 +771,8 @@ let default_translations = {
         menuItemLink1: "#",
         menuItem2: "Menu 2",
         menuItemLink2: "#",
+        menuItem3: "Menu 3",
+        menuItemLink3: "#",
       },
     },
     label: {

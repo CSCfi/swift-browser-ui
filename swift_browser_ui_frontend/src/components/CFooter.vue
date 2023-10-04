@@ -54,6 +54,16 @@
             {{ $t("message.footerMenu.menuItem2") }}
           </a>
         </div>
+        <div class="smalltext">
+          <a
+            class="linktext"
+            target="_blank"
+            :href="$t('message.footerMenu.menuItemLink3')"
+            :alt="$t('message.footerMenu.menuItem3')"
+          >
+            {{ $t("message.footerMenu.menuItem3") }}
+          </a>
+        </div>
       </div>
     </div>
   </footer>
