@@ -164,6 +164,13 @@ export default {
         rights,
       );
 
+      await this.$store.state.client.shareEditAccess(
+        this.projectId,
+        `${this.folderName}_segments`,
+        [sharedProjectId],
+        rights,
+      );
+
       let projectIDs = await this.$store.state.client.projectCheckIDs(
         sharedProjectId,
       );
