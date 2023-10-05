@@ -521,7 +521,6 @@ export default {
           }
         }
         this.$store.commit("appendDropFiles", file);
-        this.getDropTablePage();
       } else {
         this.dropFileErrors[0].show = true;
         setTimeout(() => this.dropFileErrors[0].show = false, 6000);
