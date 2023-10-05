@@ -68,6 +68,9 @@ export default class UploadSocket {
           );
           break;
         case "abort":
+          this.$store.commit("setUploadAbortReason", e.data.reason);
+          this.$store.commit("stopUploading", true);
+          this.$store.commit("toggleUploadNotification", false);
           break;
         case "success":
           break;

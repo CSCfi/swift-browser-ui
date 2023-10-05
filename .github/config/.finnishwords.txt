@@ -441,6 +441,7 @@ pyyntö
 päivitä
 päänäkymään
 pääsy
+pääsyä
 päättyä
 rajan
 rajattu

@@ -65,6 +65,7 @@ const store = createStore({
     isFolderCopied: false,
     sourceProjectId: "",
     uploadAbort: undefined,
+    uploadAbortReason: undefined,
     renderedFolders: true,
     addUploadFiles: false,
     isLoaderVisible: false,
@@ -212,6 +213,9 @@ const store = createStore({
       }
       delete state.uploadAbort;
       state.uploadAbort = undefined;
+    },
+    setUploadAbortReason(state, payload) {
+      state.uploadAbortReason = payload;
     },
     setSocket(state, payload) {
       state.socket = payload;
