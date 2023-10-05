@@ -319,7 +319,7 @@ class VaultClient:
         """
         resp = await self._request(
             "GET",
-            f"c4ghransit/sharing/{project}/{container}",
+            f"c4ghtransit/sharing/{project}/{container}",
             params={"id": receiver},
         )
         return resp

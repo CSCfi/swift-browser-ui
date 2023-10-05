@@ -164,6 +164,13 @@ export default {
         rights,
       );
 
+      await this.$store.state.client.shareEditAccess(
+        this.projectId,
+        `${this.folderName}_segments`,
+        [sharedProjectId],
+        rights,
+      );
+
       let projectIDs = await this.$store.state.client.projectCheckIDs(
         sharedProjectId,
       );
@@ -172,10 +179,10 @@ export default {
       signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
-      let whitelistUrl = new URL(
+
+      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
         `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
-        this.$store.state.uploadEndpoint,
-      );
+      ));
       whitelistUrl.searchParams.append(
         "valid",
         signed.valid,
@@ -239,10 +246,10 @@ export default {
       signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
-      let whitelistUrl = new URL(
+
+      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
         `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
-        this.$store.state.uploadEndpoint,
-      );
+      ));
       whitelistUrl.searchParams.append(
         "valid",
         signed.valid,

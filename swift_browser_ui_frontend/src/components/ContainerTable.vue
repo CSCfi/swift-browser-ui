@@ -74,6 +74,8 @@ export default {
   data() {
     return {
       containers: [],
+      sharingContainers: [],
+      sharedContainers: [],
       direction: "asc",
       footerOptions: {
         itemsPerPageOptions: [5, 10, 25, 50, 100],
@@ -106,7 +108,8 @@ export default {
       this.getPage();
     },
     conts() {
-      this.getPage();
+      Promise.all([this.getSharingContainers(), this.getSharedContainers()])
+        .then(() => this.getPage());
     },
     showTimestamp() {
       this.getPage();
@@ -119,7 +122,7 @@ export default {
     openShareModal: function () {
       if(!this.openShareModal) {
         setTimeout(() => {
-          this.getPage();
+          this.getSharingContainers().then(() => this.getPage());
         }, 3000);
       }
     },
@@ -135,6 +138,14 @@ export default {
     this.abortController.abort();
   },
   methods: {
+    async getSharingContainers () {
+      this.sharingContainers =
+        await getSharingContainers(this.active.id, this.abortController.signal);
+    },
+    async getSharedContainers () {
+      this.sharedContainers =
+        await getSharedContainers(this.active.id, this.abortController.signal);
+    },
     async getPage () {
       let offset = 0;
       let limit = this.conts?.length;
@@ -148,15 +159,10 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      const sharingContainers =
-        await getSharingContainers(this.active.id, this.abortController.signal);
-      const sharedContainers =
-        await getSharedContainers(this.active.id, this.abortController.signal);
-
       const getSharedStatus = (folderName) => {
-        if (sharingContainers.indexOf(folderName) > -1) {
+        if (this.sharingContainers.indexOf(folderName) > -1) {
           return this.$t("message.table.sharing");
-        } else if (sharedContainers.findIndex(
+        } else if (this.sharedContainers.findIndex(
           cont => cont.container === folderName) > -1) {
           return this.$t("message.table.shared");
         }
@@ -373,21 +379,11 @@ export default {
       this.sortDirection = event.detail.direction;
 
       if (this.sortBy === "sharing") {
-        const sharingContainers =
-          await getSharingContainers(
-            this.active.id,
-            this.abortController.signal,
-          );
-        const sharedContainers =
-          await getSharedContainers(
-            this.active.id,
-            this.abortController.signal,
-          );
-
-        let allSharing = this.conts.map(x => sharingContainers.includes(x.name)
-          ? this.$t("message.table.sharing") : "");
+        let allSharing = this.conts.map(x =>
+          this.sharingContainers.includes(x.name)
+            ? this.$t("message.table.sharing") : "");
         let allShared = this.conts.map(x =>
-          sharedContainers.some(cont => cont.container === x.name)
+          this.sharedContainers.some(cont => cont.container === x.name)
             ? this.$t("message.table.shared") : "");
 
         let combined = allSharing.map((value, idx) =>

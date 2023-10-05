@@ -178,6 +178,7 @@ export default {
     return {
       tags: [],
       openShareGuide: false,
+      view: false,
       read: false,
       write: false,
       loading: false,
@@ -406,10 +407,11 @@ export default {
       signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${folder}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
-      let whitelistUrl = new URL(
+
+      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
         `/cryptic/${this.$store.state.active.name}/${folder}`,
-        this.$store.state.uploadEndpoint,
-      );
+      ));
+
       whitelistUrl.searchParams.append(
         "valid",
         signed.valid,
