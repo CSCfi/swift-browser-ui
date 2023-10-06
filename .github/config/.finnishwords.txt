@@ -586,6 +586,7 @@ toiminto
 toiseen
 toiselle
 toisen
+toisessa
 toisesta
 toista
 toteuttaa

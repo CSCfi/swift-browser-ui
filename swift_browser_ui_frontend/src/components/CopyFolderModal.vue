@@ -78,7 +78,6 @@ import {
   moveFocusOutOfModal,
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
-import escapeRegExp from "lodash/escapeRegExp";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 import TagInput from "@/components/TagInput.vue";
@@ -302,27 +301,8 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     checkValidity: debounce(function () {
-      const error = validateFolderName(this.folderName, this.$t);
-      if (error.length === 0) {
-        //check if name exists
-        //request parameter should be sanitized first
-        const safeKey = escapeRegExp(this.folderName).trim();
-        let re = new RegExp("^".concat(safeKey, "$"));
-
-        if (this.folders) {
-          for (let folder of this.folders) {
-            if (folder.name.match(re)) {
-              this.errorMsg = this.$t("message.replicate.destinationExists");
-              return;
-            }
-          }
-        }
-        this.errorMsg = "";
-      }
-      else {
-        //name too short or ends with "_segments"
-        this.errorMsg = error;
-      }
+      this.errorMsg = validateFolderName(
+        this.folderName, this.$t, this.folders);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
       const focusableList = this.$refs.copyFolderContainer.querySelectorAll(

@@ -638,19 +638,8 @@ export default {
       this.objects = [];
     },
     checkFolderName: debounce(function () {
-      const error = validateFolderName(this.inputFolder, this.$t);
-      if (error.length === 0) {
-        if (this.containers) {
-          let found = this.containers.find(
-            cont => cont.name === this.inputFolder);
-          if (found) {
-            this.errorMsg = this.$t("message.error.inUse");
-            return;
-          }
-        }
-        this.errorMsg = "";
-      }
-      else this.errorMsg = error;
+      this.errorMsg = validateFolderName(
+        this.inputFolder, this.$t, this.containers);
     }, 300),
     setFile: function (item, path) {
       let entry = undefined;
@@ -854,7 +843,7 @@ export default {
             this.uploadError = this.currentFolder ?
               this.$t("message.upload.accessFail")
               : this.$t("message.error.createFail")
-                .concat(" ", this.$t("message.error.inUse"));
+                .concat(" ", this.$t("message.error.inUseOtherPrj"));
           }
           else if (this.abortReason.match("cancel")) {
             this.uploadError = this.$t("message.upload.cancelled");

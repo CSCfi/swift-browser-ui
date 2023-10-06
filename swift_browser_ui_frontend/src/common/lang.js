@@ -44,7 +44,8 @@ let default_translations = {
         Forbidden_text:
           "You are seeing this page because you were " +
           "trying to perform an action that you are not allowed to.",
-        inUse: "Folder name already in use.",
+        inUse: "Folder name is already in use.",
+        inUseOtherPrj: "Folder name is already in use by another project.",
         invalidName: "Folder name or tag is invalid.",
         createFail: "Folder creation failed.",
         tooShort: "Please enter at least 3 characters",
@@ -270,7 +271,6 @@ let default_translations = {
           "Are you sure you want to proceed?",
       },
       replicate: {
-        destinationExists: "Folder already exists",
         copy_folder: "Copy folder: ",
         name_newFolder: "Name new folder",
       },
@@ -434,6 +434,7 @@ let default_translations = {
           "Näet tämän sivun, koska yritit suorittaa " +
           "kielletyn toiminnon.",
         inUse: "Kansion nimi on jo käytössä.",
+        inUseOtherPrj: "Kansion nimi on jo käytössä toisessa projektissa.",
         invalidName: "Kansion nimi tai asiasana ei kelpaa.",
         createFail: "Kansion luonti epäonnistui.",
         tooShort: "Anna vähintään 3 merkkiä",
@@ -667,7 +668,6 @@ let default_translations = {
           "Haluatko varmasti poistaa nämä tiedostot?",
       },
       replicate: {
-        destinationExists: "Kansio on jo olemassa",
         copy_folder: "Kopioi kansio: ",
         name_newFolder: "Nimeä uusi kansio",
       },
