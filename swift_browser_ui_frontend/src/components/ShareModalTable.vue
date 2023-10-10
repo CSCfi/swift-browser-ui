@@ -22,6 +22,7 @@
 
 <script>
 import {
+  modifyAccessControlMeta,
   removeAccessControlMeta,
   GET,
 } from "@/common/api";
@@ -172,6 +173,20 @@ export default {
       if (val === "view") rights.push("v");
       else if (val === "read") rights.push("r");
       else rights.push("r", "w");
+
+      await modifyAccessControlMeta(
+        this.projectId,
+        this.folderName,
+        [sharedProjectId],
+        rights,
+      );
+
+      await modifyAccessControlMeta(
+        this.projectId,
+        `${this.folderName}_segments`,
+        [sharedProjectId],
+        rights,
+      );
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,

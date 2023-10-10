@@ -284,6 +284,25 @@ export async function removeAccessControlMeta(
   await DELETE(aclURL);
 }
 
+export async function modifyAccessControlMeta(
+  project,
+  container,
+  receivers,
+  rights,
+) {
+  // Modify access control metadata from the specified container
+  let url = "/api/access/".concat(
+    encodeURI(project), "/",
+    encodeURI(container),
+  );
+  const projects_csv = receivers.toString();
+  const aclURL = new URL(url, document.location.origin);
+  aclURL.searchParams.append("rights", rights);
+  aclURL.searchParams.append("projects", projects_csv);
+
+  await PUT(aclURL);
+}
+
 export async function addAccessControlMeta(
   project,
   container,

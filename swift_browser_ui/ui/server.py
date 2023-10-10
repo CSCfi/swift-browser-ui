@@ -27,6 +27,7 @@ from swift_browser_ui.ui.api import (
     get_os_user,
     get_shared_container_address,
     get_upload_session,
+    modify_container_acl,
     os_list_projects,
     remove_container_acl,
     remove_project_container_acl,
@@ -244,6 +245,7 @@ async def servinit(
                 "/api/access/{project}/{container}/{receiver}",
                 remove_project_container_acl,
             ),
+            aiohttp.web.put("/api/access/{project}/{container}", modify_container_acl),
             aiohttp.web.get("/api/meta/{project}", swift_get_project_metadata),
             aiohttp.web.get(
                 "/api/meta/{project}/{container}", swift_get_metadata_container
