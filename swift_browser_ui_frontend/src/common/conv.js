@@ -133,7 +133,7 @@ export async function syncContainerACLs(store) {
           },
         );
 
-        if (whitelisted.status == 404) {
+        if (whitelisted.status == 204) {
           accesslist.push("v");
         } else {
           accesslist.push("r");
