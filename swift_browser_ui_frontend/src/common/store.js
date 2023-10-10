@@ -161,8 +161,8 @@ const store = createStore({
       state.dropFiles.splice(
         state.dropFiles.findIndex(
           ({ name, relativePath }) =>
-            relativePath === file.relativePath.value &&
-            name === file.name.value,
+            relativePath === file.relativePath &&
+            name === file.name,
         ),
         1,
       );

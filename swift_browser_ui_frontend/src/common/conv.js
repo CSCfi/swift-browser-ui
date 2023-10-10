@@ -364,7 +364,8 @@ export function getTimestamp(str) {
 }
 
 export function sortItems(a, b, sortBy, sortDirection) {
-  sortBy = sortBy === "size" ? "bytes"
+  sortBy = sortBy === "size" ?
+    a?.size ? "size" : "bytes" //size for dropFiles
     : sortBy === "items" ? "count"
       : sortBy === "last_activity" ? "last_modified" : sortBy;
 

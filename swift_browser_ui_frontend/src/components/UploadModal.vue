@@ -133,12 +133,17 @@
         <c-data-table
           v-if="dropFiles.length > 0"
           class="files-table"
-          :data.prop="dropFiles"
+          :data.prop="paginatedDropFiles"
           :headers.prop="fileHeaders"
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
           :footerOptions.prop="footer"
+          :sort-by="sortBy"
+          :sort-direction="sortDirection"
+          external-data
           @click="checkPage($event,false)"
+          @sort="onSort"
+          @paginate="getDropTablePage"
         />
         <!-- eslint-enable-->
         <p
@@ -232,6 +237,7 @@ import {
   getHumanReadableSize,
   truncate,
   computeSHA256,
+  sortItems,
 } from "@/common/conv";
 import { getDB } from "@/common/db";
 
@@ -250,7 +256,6 @@ import { swiftDeleteObjects, getObjects } from "@/common/api";
 
 import { debounce } from "lodash";
 import { mdiDelete } from "@mdi/js";
-
 
 export default {
   name: "UploadModal",
@@ -272,8 +277,7 @@ export default {
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
-      currentPage: 1,
-      currentKeyPage:1,
+      currentKeyPage: 1,
       errorMsg: "",
       toastMsg : "",
       containers: [],
@@ -284,6 +288,14 @@ export default {
         {id: "duplicate", show: false},
         {id: "sizeZero", show: false},
       ],
+      paginatedDropFiles: [],
+      sortBy: "name",
+      sortDirection: "asc",
+      filesPagination: {
+        itemCount: 0,
+        itemsPerPage: 20,
+        currentPage: 1,
+      },
     };
   },
   computed: {
@@ -335,35 +347,6 @@ export default {
           key: "delete",
           value: null,
           sortable: false,
-          children: [
-            {
-              value: this.$t("message.delete"),
-              component: {
-                tag: "c-button",
-                params: {
-                  text: true,
-                  size: "small",
-                  title: this.$t("message.delete"),
-                  path: mdiDelete,
-                  onClick: ({ data }) =>
-                    this.$store.commit("eraseDropFile", data),
-                  onKeyUp: (e) => {
-                    if(e.keyCode === 13) {
-                      // Get the row element of item that is to be removed
-                      const row = e.target.closest("tr");
-                      if (row !== undefined) {
-                        const data = {
-                          name: row.children[0]?.innerText,
-                          relativePath: row.children[3]?.innerText,
-                        };
-                        this.$store.commit("eraseDropFile", data);
-                      }
-                    }
-                  },
-                },
-              },
-            },
-          ],
         },
       ];
     },
@@ -413,16 +396,7 @@ export default {
       ];
     },
     dropFiles() {
-      return this.$store.state.dropFiles.map(file => {
-        return {
-          name: { value: file.name || truncate(100) },
-          type: { value: file.type },
-          size: { value: this.localHumanReadableSize(file.size) },
-          relativePath: {
-            value: file.relativePath || truncate(100),
-          },
-        };
-      });
+      return this.$store.state.dropFiles;
     },
     files: {
       get() {
@@ -438,13 +412,6 @@ export default {
         });
         this.buttonAddingFiles = false;
       },
-    },
-    filesPagination() {
-      return {
-        itemCount: this.dropFiles.length,
-        itemsPerPage: 20,
-        currentPage: this.currentPage,
-      };
     },
     footer() {
       return {
@@ -530,7 +497,7 @@ export default {
       if (isKey) {
         this.currentKeyPage = page;
       } else {
-        this.currentPage = page;
+        this.filesPagination.currentPage = page;
       }
     },
     appendDropFiles(file, overwrite = false) {
@@ -541,8 +508,8 @@ export default {
       }
       //Check if file path already exists in dropFiles
       if (
-        this.$store.state.dropFiles.find(
-          ({ relativePath }) => relativePath === String(file.relativePath),
+        this.dropFiles.find(
+          ({ relativePath }) => relativePath === file.relativePath,
         ) === undefined
       ) {
         if (this.objects && !overwrite) {
@@ -558,6 +525,64 @@ export default {
         this.dropFileErrors[0].show = true;
         setTimeout(() => this.dropFileErrors[0].show = false, 6000);
       }
+    },
+    getDropTablePage() {
+      const offset =
+        this.filesPagination.currentPage
+        * this.filesPagination.itemsPerPage
+        - this.filesPagination.itemsPerPage;
+
+      const limit = this.filesPagination.itemsPerPage;
+      this.paginatedDropFiles = this.dropFiles
+        .sort((a, b) => sortItems(
+          a, b, this.sortBy, this.sortDirection))
+        .slice(offset, offset + limit)
+        .map(file => {
+          return {
+            name: { value: file.name || truncate(100) },
+            type: { value: file.type },
+            size: { value: this.localHumanReadableSize(file.size) },
+            relativePath: {
+              value: file.relativePath || truncate(100),
+            },
+            delete: {
+              children: [
+                {
+                  value: this.$t("message.delete"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.delete"),
+                      path: mdiDelete,
+                      onClick: () => {
+                        this.$store.commit("eraseDropFile", file);
+                        this.getDropTablePage();
+                      },
+                      onKeyUp: (e) => {
+                        if(e.keyCode === 13) {
+                          this.$store.commit("eraseDropFile", file);
+                          this.getDropTablePage();
+                        }
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          };
+        });
+
+      this.filesPagination = {
+        ...this.filesPagination,
+        itemCount: this.dropFiles.length,
+      };
+    },
+    onSort(event) {
+      this.sortBy = event.detail.sortBy;
+      this.sortDirection = event.detail.direction;
+      this.getDropTablePage();
     },
     overwriteFiles() {
       //if new duplicate files appear after confirmation
@@ -749,6 +774,9 @@ export default {
       this.recvHashedKeys = [];
       this.errorMsg = "";
       this.toastMsg = "";
+      this.sortBy = "name";
+      this.sortDirection = "asc";
+      this.filesPagination.currentPage = 1;
 
       moveFocusOutOfModal(this.prevActiveEl);
     },
