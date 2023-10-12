@@ -131,12 +131,13 @@
         because csc-ui wont recognise it otherwise. -->
         <!-- eslint-disable-->
         <c-data-table
-          v-show="dropFiles.length > 0"
+          v-if="dropFiles.length > 0"
           class="files-table"
           :data.prop="paginatedDropFiles"
           :headers.prop="fileHeaders"
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
+          :footerOptions.prop="footer"
           :sort-by="sortBy"
           :sort-direction="sortDirection"
           external-data
@@ -199,7 +200,7 @@
                   :headers.prop="publickeyHeaders"
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
-                  :footerOptions.prop="{hideDetails: true}"
+                  :footerOptions.prop="footer"
                   @click="checkPage($event,true)"
                 />
                 <!-- eslint-enable-->
@@ -412,6 +413,11 @@ export default {
         this.buttonAddingFiles = false;
       },
     },
+    footer() {
+      return {
+        hideDetails: true,
+      };
+    },
     keyPagination() {
       return {
         itemCount: this.recvHashedKeys.length,
@@ -478,13 +484,6 @@ export default {
           }
         }, 200);
       }
-    },
-    dropFiles() {
-      //hide itemsPerPageOptions
-      const table = document.querySelector("c-data-table.files-table");
-      const pagination = table.shadowRoot.querySelector("c-pagination");
-      const menu = pagination.shadowRoot.querySelector("c-menu");
-      menu.setAttribute("hidden", "true");
     },
   },
   methods: {
