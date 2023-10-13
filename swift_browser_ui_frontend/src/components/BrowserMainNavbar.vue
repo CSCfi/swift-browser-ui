@@ -176,7 +176,7 @@ export default {
           title: this.uname,
           icon: "mdi-account",
           testid: "user-menu",
-          ariaLabel: this.$t("label.project_info"),
+          ariaLabel: this.$t("label.user_menu"),
           subs: [
             {
               title: this.$t("message.logOut"),
