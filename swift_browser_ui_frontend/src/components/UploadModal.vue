@@ -460,6 +460,12 @@ export default {
         }
       }
     },
+    dropFiles: {
+      deep: true,
+      handler() {
+        if (this.modalVisible) this.getDropTablePage();
+      },
+    },
     inputFolder: function() {
       if (this.inputFolder && this.interacted) {
         this.checkFolderName();
@@ -558,12 +564,10 @@ export default {
                       path: mdiDelete,
                       onClick: () => {
                         this.$store.commit("eraseDropFile", file);
-                        this.getDropTablePage();
                       },
                       onKeyUp: (e) => {
                         if(e.keyCode === 13) {
                           this.$store.commit("eraseDropFile", file);
-                          this.getDropTablePage();
                         }
                       },
                     },
