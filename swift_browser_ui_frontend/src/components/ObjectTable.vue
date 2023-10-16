@@ -96,12 +96,14 @@
     <div id="obj-table-wrapper">
       <CObjectTable
         :breadcrumb-clicked-prop="breadcrumbClicked"
-        :objs="filteredObjects.length ? filteredObjects : oList"
+        :objs="filtering ? filteredObjects : oList"
         :disable-pagination="hidePagination"
         :hide-tags="hideTags"
         :render-folders="renderFolders"
         :show-timestamp="showTimestamp"
         :access-rights="accessRights"
+        :no-data-text="filtering ?
+          $t('message.search.empty') : $t('message.emptyContainer')"
         @selected-rows="handleSelection"
         @delete-object="confirmDelete"
       />
@@ -185,6 +187,7 @@ export default {
       currentContainer: {},
       breadcrumbClicked: false,
       objsLoading: false,
+      filtering: false,
     };
   },
   computed: {
@@ -519,9 +522,11 @@ export default {
     },
     filter: function () {
       if(this.searchQuery.length === 0) {
+        this.filtering = false;
         this.filteredObjects = [];
         return;
       }
+      this.filtering = true;
       // request parameter should be sanitized first
       var safeKey = escapeRegExp(this.searchQuery);
       var name_re = new RegExp(safeKey, "i");

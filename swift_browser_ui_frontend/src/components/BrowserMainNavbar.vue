@@ -117,7 +117,7 @@ export default {
   },
   watch: {
     active () {
-      this.projectInfoLink = this.$t("message.dashboard.projectInfoBaseLink")
+      this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
         + getProjectNumber(this.active);
       this.setNavigationMenu();
     },
@@ -159,20 +159,16 @@ export default {
           ariaLabel: this.$t("label.support_menu"),
           subs: [
             {
-              title: this.$t("message.supportMenu.item1"),
-              href: this.$t("message.supportMenu.itemLink1"),
+              title: this.$t("message.supportMenu.userGuide"),
+              href: this.$t("message.supportMenu.userGuideLink"),
             },
             {
-              title: this.$t("message.supportMenu.item2"),
-              href: this.$t("message.supportMenu.itemLink2"),
+              title: this.$t("message.supportMenu.projectInfo"),
+              href: this.projectInfoLink,
             },
             {
-              title: this.$t("message.supportMenu.item3"),
+              title: this.$t("message.supportMenu.createTokens"),
               action: () => this.openTokenModal(),
-            },
-            {
-              title: this.$t("message.supportMenu.item4"),
-              href: this.$t("message.supportMenu.itemLink4"),
             },
           ],
         },
@@ -180,12 +176,8 @@ export default {
           title: this.uname,
           icon: "mdi-account",
           testid: "user-menu",
-          ariaLabel: this.$t("label.project_info"),
+          ariaLabel: this.$t("label.user_menu"),
           subs: [
-            {
-              title: this.$t("message.dashboard.projectInfo"),
-              href: this.projectInfoLink,
-            },
             {
               title: this.$t("message.logOut"),
               route: "/login/kill",

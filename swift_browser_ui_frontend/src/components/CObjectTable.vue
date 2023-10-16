@@ -11,7 +11,7 @@
       :pagination.prop="disablePagination ? null : paginationOptions"
       :hide-footer="disablePagination"
       :footerOptions.prop="footerOptions"
-      :no-data-text="$t('message.emptyContainer')"
+      :no-data-text="noDataText"
       :sort-by="sortBy"
       :sort-direction="sortDirection"
       selection-property="name"
@@ -89,6 +89,10 @@ export default {
     breadcrumbClickedProp: {
       type: Boolean,
       default: false,
+    },
+    noDataText: {
+      type: String,
+      default: "",
     },
   },
   data() {

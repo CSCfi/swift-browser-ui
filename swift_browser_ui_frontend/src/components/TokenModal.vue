@@ -14,8 +14,8 @@
       <c-button
         id="close-token-modal-btn"
         text
-        @click="closeTokenModal"
-        @keyup.enter="closeTokenModal"
+        @click="closeTokenModal(false)"
+        @keyup.enter="closeTokenModal(true)"
       >
         <c-icon
           :path="mdiClose"
@@ -204,7 +204,7 @@ export default {
     checkPage: function(event){
       this.currentPage = event.target.pagination.currentPage;
     },
-    closeTokenModal: function () {
+    closeTokenModal: function (addFocus) {
       this.currentPage = 1;
       this.$store.commit("toggleTokenModal", false);
       this.newIdentifier = "";
@@ -223,7 +223,7 @@ export default {
       */
       const prevActiveElParent = document
         .querySelector("[data-testid='support-menu']");
-      moveFocusOutOfModal(prevActiveElParent, true);
+      moveFocusOutOfModal(prevActiveElParent, true, addFocus);
     },
     getTokens: function () {
       listTokens(this.activeId).then((ret) => {this.tokens = ret;});
