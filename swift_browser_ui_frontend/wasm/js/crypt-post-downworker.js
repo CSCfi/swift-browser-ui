@@ -458,9 +458,9 @@ self.addEventListener("message", (e) => {
   }
 });
 
-setTimeout(() => {
+waitAsm().then(() => {
   Module.ccall("libinit", undefined, undefined, undefined);
-}, 1000);
+});
 
 export var downloadRuntime = Module;
 export var downloadFileSystem = FS;
