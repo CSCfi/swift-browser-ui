@@ -9,10 +9,10 @@ from cryptography.fernet import InvalidToken
 from swift_browser_ui.ui.settings import setd
 
 
-async def swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+async def up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
     return aiohttp.web.FileResponse(
-        str(setd["static_directory"]) + "/libupload.js",
+        str(setd["static_directory"]) + "/upworker.js",
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
@@ -22,10 +22,75 @@ async def swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     )
 
 
-async def swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+async def up_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker wasm in worker scope."""
     return aiohttp.web.FileResponse(
-        str(setd["static_directory"]) + "/libupload.wasm",
+        str(setd["static_directory"]) + "/upworker.wasm",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker js in worker scope."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/downworker.js",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def down_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker wasm in worker scope."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/downworker.wasm",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def map_down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker js in worker scope."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/downworker-post.js.map",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def map_up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker js in worker scope."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/upworker-post.js.map",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def agg_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker js in worker scope."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/aggregatorsw.js",
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",

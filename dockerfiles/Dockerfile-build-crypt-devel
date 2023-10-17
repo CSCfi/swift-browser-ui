@@ -1,7 +1,27 @@
-# Build wasm encryption
+# Build encryption post-script
+FROM node:18-alpine3.17 AS WEBPACK_WASM_PREPROCESS
+
+RUN --mount=type=cache,target=/var/cache/apk/ \
+    apk add git python3
+
+COPY swift_browser_ui_frontend/package.json /root/swift-browser-ui/swift_browser_ui_frontend/package.json
+COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift-browser-ui/swift_browser_ui_frontend/pnpm-lock.yaml
+
+RUN --mount=type=cache,target=/root/.pnpm-store \
+    cd /root/swift-browser-ui/swift_browser_ui_frontend/ \
+    && npm install -g pnpm@8 \
+    && pnpm install
+
+COPY . /root/swift-browser-ui
+
+RUN cd /root/swift-browser-ui/swift_browser_ui_frontend/wasm \
+    && mkdir build \
+    && npx webpack --config "./wasm-webpack.config.js"
+
+# Build upworker and downworker WebAssembly contents
 FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.2.0 AS WASMCRYPT
 
-COPY swift_browser_ui_frontend/wasm/ /src/
+COPY --from=WEBPACK_WASM_PREPROCESS /root/swift-browser-ui/swift_browser_ui_frontend/wasm/ /src/
 
 RUN bash /bin/build_wasm.sh all
 
@@ -16,9 +36,17 @@ COPY swift_browser_ui_frontend/pnpm-lock.yaml /root/swift_ui/swift_browser_ui_fr
 RUN --mount=type=cache,target=/root/.pnpm-store \
     cd /root/swift_ui/swift_browser_ui_frontend \
     && npm install -g pnpm@8 \
-    && pnpm install --prod
+    && pnpm install
 
 COPY . /root/swift_ui/
+
+# Copy wasm files for build
+COPY --from=WASMCRYPT "/src/build/upworker.js" "/root/swift_ui/swift_browser_ui_frontend/public/upworker.js"
+COPY --from=WASMCRYPT "/src/build/downworker.js" "/root/swift_ui/swift_browser_ui_frontend/public/downworker.js"
+COPY --from=WASMCRYPT "/src/build/upworker-post.js.map" "/root/swift_ui/swift_browser_ui_frontend/public/upworker-post.js.map"
+COPY --from=WASMCRYPT "/src/build/downworker-post.js.map" "/root/swift_ui/swift_browser_ui_frontend/public/downworker-post.js.map"
+COPY --from=WASMCRYPT "/src/build/upworker.wasm" "/root/swift_ui/swift_browser_ui_frontend/public/upworker.wasm"
+COPY --from=WASMCRYPT "/src/build/downworker.wasm" "/root/swift_ui/swift_browser_ui_frontend/public/downworker.wasm"
 
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && OIDC_ENABLED=$OIDC_ENABLED pnpm run build-devel
@@ -28,9 +56,13 @@ FROM python:3.11-alpine3.17 as BACKEND
 COPY pyproject.toml /root/swift_ui/pyproject.toml
 COPY README.md /root/swift_ui/README.md
 COPY swift_browser_ui /root/swift_ui/swift_browser_ui
-COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist /root/swift_ui/swift_browser_ui_frontend/dist
-COPY --from=WASMCRYPT /src/src/libupload.js /root/swift_ui/swift_browser_ui_frontend/dist/libupload.js
-COPY --from=WASMCRYPT /src/src/libupload.wasm /root/swift_ui/swift_browser_ui_frontend/dist/libupload.wasm
+COPY --from=FRONTEND /root/swift_ui/swift_browser_ui_frontend/dist/ /root/swift_ui/swift_browser_ui_frontend/dist/
+COPY --from=WASMCRYPT "/src/build/downworker.wasm" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/downworker.wasm"
+COPY --from=WASMCRYPT "/src/build/downworker.js" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/downworker.js"
+COPY --from=WASMCRYPT "/src/build/upworker-post.js.map" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/upworker-post.js.map"
+COPY --from=WASMCRYPT "/src/build/downworker-post.js.map" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/downworker-post.js.map"
+COPY --from=WASMCRYPT "/src/build/upworker.wasm" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/upworker.wasm"
+COPY --from=WASMCRYPT "/src/build/upworker.js" "/usr/local/lib/python3.11/site-packages/swift_browser_ui/ui/static/upworker.js"
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip \

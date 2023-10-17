@@ -19,9 +19,9 @@ mkdir "${WASM_ROOT}/build"
 
 docker run --rm -it --mount type=bind,source="${WASM_ROOT}",target=/src/ ghcr.io/cscfi/docker-emscripten-crypt4gh all
 
-cp "${WASM_ROOT}/build/upworker.js" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker.js" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/upworker-post.js.map" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker-post.js.map" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/upworker.wasm" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker.wasm" "${SCRIPT_ROOT}/public/"
+cp "${WASM_ROOT}/build/upworker.js" "${SCRIPT_ROOT}/src/public/"
+cp "${WASM_ROOT}/build/downworker.js" "${SCRIPT_ROOT}/src/public/"
+cp "${WASM_ROOT}/build/upworker-post.js.map" "${SCRIPT_ROOT}/src/public/"
+cp "${WASM_ROOT}/build/downworker-post.js.map" "${SCRIPT_ROOT}/src/public/"
+cp "${WASM_ROOT}/build/upworker.wasm" "${SCRIPT_ROOT}/src/public/"
+cp "${WASM_ROOT}/build/downworker.wasm" "${SCRIPT_ROOT}/src/public/"
