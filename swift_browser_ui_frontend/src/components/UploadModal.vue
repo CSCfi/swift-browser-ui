@@ -137,7 +137,6 @@
           :headers.prop="fileHeaders"
           :no-data-text="$t('message.encrypt.empty')"
           :pagination.prop="filesPagination"
-          :footerOptions.prop="footer"
           :sort-by="sortBy"
           :sort-direction="sortDirection"
           external-data
@@ -200,7 +199,7 @@
                   :headers.prop="publickeyHeaders"
                   :no-data-text="$t('message.encrypt.noRecipients')"
                   :pagination.prop="keyPagination"
-                  :footerOptions.prop="footer"
+                  :footerOptions.prop="{hideDetails: true}"
                   @click="checkPage($event,true)"
                 />
                 <!-- eslint-enable-->
@@ -418,11 +417,6 @@ export default {
         this.buttonAddingFiles = false;
       },
     },
-    footer() {
-      return {
-        hideDetails: true,
-      };
-    },
     keyPagination() {
       return {
         itemCount: this.recvHashedKeys.length,
@@ -496,6 +490,15 @@ export default {
         }, 200);
       }
     },
+  },
+  updated() {
+    if (this.dropFiles.length) {
+      //hide itemsPerPageOptions
+      const table = document.querySelector("c-data-table.files-table");
+      const pagination = table?.shadowRoot.querySelector("c-pagination");
+      const menu = pagination?.shadowRoot.querySelector("c-menu");
+      menu?.setAttribute("hidden", "true");
+    }
   },
   methods: {
     checkPage(event, isKey) {
