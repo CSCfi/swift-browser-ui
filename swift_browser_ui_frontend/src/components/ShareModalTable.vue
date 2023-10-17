@@ -146,13 +146,18 @@ export default {
                   onChangeValue: (e) => this.editAccessRight(e, item.sharedTo),
                   onClick: ({ event }) => {
                     const wrapper =
-                      document.getElementById("share-scroll-wrapper");
+                      document.getElementById("share-card-modal-content");
                     let wrapperPosition = wrapper.getBoundingClientRect();
                     let targetPosition = event.target.getBoundingClientRect();
                     let diff = wrapperPosition.bottom - targetPosition.bottom;
-                    if (diff < 125) {
-                      wrapper.scrollBy(0, 125 - diff);
-                    }
+                    const ul = event.target.shadowRoot.
+                      activeElement.parentNode.nextSibling.querySelector("ul");
+                    setTimeout(() => {
+                      const ulPosition = ul.getBoundingClientRect();
+                      if (diff < ulPosition.height) {
+                        wrapper.scrollBy(0, ulPosition.height - diff);
+                      }
+                    }, 150);
                   },
                 },
               },
