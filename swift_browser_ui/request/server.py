@@ -26,7 +26,10 @@ from swift_browser_ui.request.api import (
 from swift_browser_ui.request.db import DBConn
 
 logging.basicConfig(level=logging.DEBUG)
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+# temporarily ignore typecheck from mypy until
+# this issue is fixed https://github.com/MagicStack/uvloop/issues/575
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 
 
 async def resume_on_start(app: aiohttp.web.Application) -> None:

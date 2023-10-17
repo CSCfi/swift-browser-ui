@@ -39,7 +39,9 @@ from swift_browser_ui.upload.auth import (
 )
 from swift_browser_ui.upload.common import VAULT_CLIENT
 
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+# temporarily ignore typecheck from mypy until
+# this issue is fixed https://github.com/MagicStack/uvloop/issues/575
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 
 
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))

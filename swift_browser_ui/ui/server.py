@@ -76,7 +76,9 @@ from swift_browser_ui.ui.signature import (
     handle_signature_request,
 )
 
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+# temporarily ignore typecheck from mypy until
+# this issue is fixed https://github.com/MagicStack/uvloop/issues/575
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 
 
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
