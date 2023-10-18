@@ -18,6 +18,7 @@
     </c-row>
     <div id="cont-table-wrapper">
       <ContainerTable
+        ref="containerTable"
         :conts="renderingContainers"
         :show-timestamp="showTimestamp"
         :disable-pagination="hidePagination"
@@ -80,6 +81,9 @@ export default {
     isFolderCopied() {
       return this.$store.state.isFolderCopied;
     },
+    newFolder() {
+      return this.$store.state.newFolder;
+    },
     locale() {
       return this.$i18n.locale;
     },
@@ -115,6 +119,19 @@ export default {
           this.containers.filter(cont => cont.owner) : [];
       } else {
         this.renderingContainers = this.containers;
+
+        if (this.containers && this.newFolder) {
+          const idx = this.containers.findIndex(c => c.name === this.newFolder);
+          if (idx > 0) {
+            this.containers.unshift(this.containers.splice(idx, 1)[0]);
+            this.$refs.containerTable.toFirstPage();
+          }
+        }
+      }
+    },
+    $route: function(to) {
+      if (to.name !== "AllFolders") {
+        this.$store.commit("setNewFolder", "");
       }
     },
     isFolderUploading: function () {

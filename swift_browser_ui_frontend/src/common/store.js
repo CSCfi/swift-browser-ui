@@ -70,6 +70,7 @@ const store = createStore({
     addUploadFiles: false,
     isLoaderVisible: false,
     prevActiveEl: null,
+    newFolder: "",
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -255,6 +256,9 @@ const store = createStore({
     },
     setPreviousActiveEl(state, payload) {
       state.prevActiveEl = payload;
+    },
+    setNewFolder(state, payload) {
+      state.newFolder = payload;
     },
   },
   actions: {
