@@ -97,6 +97,30 @@ export default class UploadSocket {
             }
           });
           break;
+        case "downloadStarted":
+          if (DEV) {
+            console.log(
+              `Started downloading in container ${e.data.container}`,
+            );
+          }
+          if (this.useServiceWorker) {
+            if (e.data.archive) {
+              let downloadUrl = new URL(
+                `/archive/${e.data.container}.tar`,
+                document.location.origin,
+              );
+              if (DEV) console.log(downloadUrl);
+              window.open(downloadUrl, "_blank");
+            } else {
+              let downloadUrl = new URL(
+                `/file/${e.data.container}/${e.data.path}`,
+                document.location.origin,
+              );
+              if (DEV) console.log(downloadUrl);
+              window.open(downloadUrl, "_blank");
+            }
+          }
+          break;
         case "finished":
           if (DEV) {
             console.log(
@@ -193,7 +217,7 @@ export default class UploadSocket {
 
     await DELETE(whitelistUrl);
 
-    if (this.downWorker !== undefined) {
+    if (!this.useServiceWorker) {
       this.downWorker.postMessage({
         command: "addHeaders",
         container: container,
@@ -271,7 +295,7 @@ export default class UploadSocket {
     if (objects.length == 1) {
       // Download directly into the file if available.
       // Otherwise, use streaming + ServiceWorker.
-      if (window.showSaveFilePicker !== undefined) {
+      if (!this.useServiceWorker) {
         // Match the file identifier
         const fident = objects[0].replace(".c4gh", "").match(/\.[^.]*$/g);
 
@@ -296,26 +320,18 @@ export default class UploadSocket {
         if (DEV) {
           console.log("Instructing ServiceWorker to add a file to downloads.");
         }
-        let downloadUrl = new URL(
-          `/file/${container}/${objects[0]}`,
-          document.location.origin,
-        );
-        if (DEV) console.log(downloadUrl);
-        window.open(downloadUrl, "_blank");
-        setTimeout(() => {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.active.postMessage({
-              command: "downloadFile",
-              container: container,
-              file: objects[0],
-            });
+        navigator.serviceWorker.ready.then(reg => {
+          reg.active.postMessage({
+            command: "downloadFile",
+            container: container,
+            file: objects[0],
           });
-        }, 500);
+        });
       }
     } else {
       // Download directly into the archive if available.
       // Otherwise, use streaming + ServiceWorker.
-      if (window.showSaveFilePicker !== undefined) {
+      if (!this.useServiceWorker) {
         fileHandle = await window.showSaveFilePicker({
           suggestedName: `${container}_download.tar`,
           types: [
@@ -334,21 +350,13 @@ export default class UploadSocket {
           handle: fileHandle,
         });
       } else {
-        let downloadUrl = new URL(
-          `/archive/${container}.tar`,
-          document.location.origin,
-        );
-        if (DEV) console.log(downloadUrl, "_blank");
-        window.open(downloadUrl, "_blank");
-        setTimeout(() => {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.active.postMessage({
-              command: "downloadFiles",
-              container: container,
-              files: objects.length < 1 ? [] : objects,
-            });
+        navigator.serviceWorker.ready.then(reg => {
+          reg.active.postMessage({
+            command: "downloadFiles",
+            container: container,
+            files: objects.length < 1 ? [] : objects,
           });
-        }, 500);
+        });
       }
     }
   }
