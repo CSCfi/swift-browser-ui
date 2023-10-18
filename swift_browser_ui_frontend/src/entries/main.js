@@ -20,7 +20,7 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
-import { GET, getUser } from "@/common/api";
+import { getUser, signedFetch } from "@/common/api";
 import { getProjects } from "@/common/api";
 
 // Import SharingView and Request API
@@ -312,17 +312,12 @@ const app = createApp({
           "setUploadEndpoint",
           discovery.upload_endpoint,
         );
-        let keyPath = `/cryptic/${this.active.name}/keys`;
-        let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
-        signatureUrl.searchParams.append("path", keyPath);
-        let signed = await GET(signatureUrl);
-        signed = await signed.json();
-        let keyURL = new URL(
-          discovery.upload_endpoint.concat(keyPath),
+
+        let key = await signedFetch(
+          "GET",
+          discovery.upload_endpoint,
+          `/cryptic/${this.active.name}/keys`,
         );
-        keyURL.searchParams.append("valid", signed.valid);
-        keyURL.searchParams.append("signature", signed.signature);
-        let key = await GET(keyURL);
         key = await key.text();
         key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
         this.$store.commit("appendPubKey", key);
