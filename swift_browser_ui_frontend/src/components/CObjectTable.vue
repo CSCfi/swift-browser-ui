@@ -233,7 +233,7 @@ export default {
                   title: "Download",
                   path: mdiTrayArrowDown,
                   onClick: () => {
-                    item.name.match(".c4gh")
+                    item.name.match(".c4gh") || item?.subfolder
                       ? this.beginDownload(item)
                       : this.navDownload(item.url);
                   },
@@ -406,12 +406,28 @@ export default {
       }
     },
     beginDownload(object) {
-      this.$store.state.socket.addDownload(
-        this.$route.params.container,
-        [object.name],
-      ).then(() => {
-        if (DEV) console.log(`Started downloading object ${object.name}`);
-      });
+      if (object?.subfolder) {
+        const subfolderFiles = this
+          .objs
+          .filter((obj) => {
+            return obj.name.startsWith(object.name);
+          })
+          .map(item => item.name);
+        if (DEV) console.log(subfolderFiles);
+        this.$store.state.socket.addDownload(
+          this.$route.params.container,
+          subfolderFiles,
+        ).then(() => {
+          if (DEV) console.log(`Started downloading subfolder ${object.name}`);
+        });
+      } else {
+        this.$store.state.socket.addDownload(
+          this.$route.params.container,
+          [object.name],
+        ).then(() => {
+          if (DEV) console.log(`Started downloading object ${object.name}`);
+        });
+      }
     },
     navDownload(url) {
       window.open(url, "_blank");
