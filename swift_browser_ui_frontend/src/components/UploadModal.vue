@@ -250,7 +250,7 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
-import { swiftDeleteObjects, getObjects } from "@/common/api";
+import { swiftDeleteObjects, getObjects, signedFetch } from "@/common/api";
 
 import { debounce, delay } from "lodash";
 import { mdiDelete } from "@mdi/js";
@@ -817,10 +817,32 @@ export default {
         this.beginEncryptedUpload();
       }
     },
-    beginEncryptedUpload() {
-      if (this.pubkey.length > 0) {
+    async aBeginEncryptedUpload() {
+      // We need the proper IDs for the other project for Vault access
+      let owner = "";
+      let ownerName = "";
+      if (this.pubkey.length > 0 && !(this.$route.params.owner)) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
+      } else if (this.$route.params.owner) {
+        let ids = await this.$store.state.client.projectCheckIDs(
+          this.$route.params.owner,
+        );
+        owner = ids.id;
+        ownerName = ids.name;
       }
+
+      // Also need to get the other project's key from Vault
+      if (this.$route.params.owner) {
+        let sharedKey = await signedFetch(
+          "GET",
+          this.$store.state.uploadEndpoint,
+          `/cryptic/${ownerName}/keys`,
+        );
+        sharedKey = await sharedKey.text();
+        sharedKey = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${sharedKey}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
+        this.recvkeys = this.recvkeys.concat([sharedKey]);
+      }
+
       // Clean up old stale upload if exists
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
@@ -835,44 +857,47 @@ export default {
         this.currentFolder ? this.currentFolder : this.inputFolder,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
-        this.$route.params.owner ? this.$route.params.owner : "",
-        this.$route.params.owner ? this.$route.params.owner : "",
+        owner,
+        ownerName,
       );
-
-      delay(() => {
-        if (this.abortReason !== undefined) {
-          if (this.abortReason
-            .match("Could not create or access the container.")) {
-            this.uploadError = this.currentFolder ?
-              this.$t("message.upload.accessFail")
-              : this.$t("message.error.createFail")
-                .concat(" ", this.$t("message.error.inUseOtherPrj"));
+    },
+    beginEncryptedUpload() {
+      this.aBeginEncryptedUpload().then(() => {
+        delay(() => {
+          if (this.abortReason !== undefined) {
+            if (this.abortReason
+              .match("Could not create or access the container.")) {
+              this.uploadError = this.currentFolder ?
+                this.$t("message.upload.accessFail")
+                : this.$t("message.error.createFail")
+                  .concat(" ", this.$t("message.error.inUseOtherPrj"));
+            }
+            else if (this.abortReason.match("cancel")) {
+              this.uploadError = this.$t("message.upload.cancelled");
+            }
+            this.$store.commit("setUploadAbortReason", undefined);
           }
-          else if (this.abortReason.match("cancel")) {
-            this.uploadError = this.$t("message.upload.cancelled");
+          else if (this.$store.state.encryptedFile == ""
+            && this.dropFiles.length) {
+            //upload didn't start
+            this.uploadError = this.$t("message.upload.error");
+            this.$store.commit("stopUploading", true);
+            this.$store.commit("toggleUploadNotification", false);
           }
-          this.$store.commit("setUploadAbortReason", undefined);
-        }
-        else if (this.$store.state.encryptedFile == ""
-          && this.dropFiles.length) {
-          //upload didn't start
-          this.uploadError = this.$t("message.upload.error");
-          this.$store.commit("stopUploading", true);
-          this.$store.commit("toggleUploadNotification", false);
-        }
 
-        if (this.uploadError) {
-          document.querySelector("#container-error-toasts").addToast(
-            {
-              type: "error",
-              duration: 6000,
-              progress: false,
-              message: this.uploadError,
-            },
-          );
-        }
-      }, 1000);
-      this.toggleUploadModal();
+          if (this.uploadError) {
+            document.querySelector("#container-error-toasts").addToast(
+              {
+                type: "error",
+                duration: 6000,
+                progress: false,
+                message: this.uploadError,
+              },
+            );
+          }
+        }, 1000);
+        this.toggleUploadModal();
+      });
     },
     handleKeyDown: function (e) {
       const focusableList = this.$refs.uploadContainer.querySelectorAll(

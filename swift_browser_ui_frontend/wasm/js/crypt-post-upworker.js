@@ -468,10 +468,10 @@ self.addEventListener("message", (e) => {
       }
 
       if (e.data.owner !== "") {
-        uploads[container].owner = e.data.owner;
+        uploads[e.data.container].owner = e.data.owner;
       }
       if (e.data.ownerName !== "") {
-        uploads[container].ownerName = e.data.ownerName;
+        uploads[e.data.container].ownerName = e.data.ownerName;
       }
 
       // Ensure the websocket has stayed open
