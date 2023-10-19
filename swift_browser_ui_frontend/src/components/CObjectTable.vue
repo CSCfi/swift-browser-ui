@@ -417,6 +417,7 @@ export default {
         this.$store.state.socket.addDownload(
           this.$route.params.container,
           subfolderFiles,
+          this.$route.params.owner ? this.$route.params.owner : "",
         ).then(() => {
           if (DEV) console.log(`Started downloading subfolder ${object.name}`);
         });
@@ -424,6 +425,7 @@ export default {
         this.$store.state.socket.addDownload(
           this.$route.params.container,
           [object.name],
+          this.$route.params.owner ? this.$route.params.owner : "",
         ).then(() => {
           if (DEV) console.log(`Started downloading object ${object.name}`);
         });
