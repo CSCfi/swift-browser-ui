@@ -702,16 +702,23 @@ async def modify_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Resp
     read_acl = ""
     write_acl = ""
 
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if "X-Container-Read" in ret.headers:
+            read_acl = ret.headers["X-Container-Read"]
+        if "X-Container-Write" in ret.headers:
+            write_acl = ret.headers["X-Container-Write"]
     if "w" in rights:
         for receiver in receivers:
-            read_acl += f",{receiver}:*"
             write_acl += f",{receiver}:*"
     else:
         for receiver in receivers:
-            read_acl += f"{receiver}:*"
-            write_acl += ","
-    read_acl = read_acl.replace(",,", ",").lstrip(",")
-    write_acl = write_acl.replace(",,", ",").lstrip(",")
+            write_acl = write_acl.replace(f"{receiver}:*", "")
+
+    read_acl = read_acl.replace(",,", ",").strip(",")
+    write_acl = write_acl.replace(",,", ",").strip(",")
 
     headers["X-Container-Read"] = read_acl
     headers["X-Container-Write"] = write_acl
