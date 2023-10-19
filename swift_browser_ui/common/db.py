@@ -80,6 +80,32 @@ class BaseDBConn:
         return []
 
 
+class UploadDBConn(BaseDBConn):
+    """Class for the upload token database."""
+
+    def __init__(self) -> None:
+        """Initialize connection variable."""
+        super().__init__()
+
+    async def open(self) -> None:
+        """Initialize the database connection."""
+        await super()._open(
+            password=os.environ.get("UPLOAD_DB_PASSWORD", None),
+            user=os.environ.get("UPLOAD_DB_USER", "sharing"),
+            host=os.environ.get("UPLOAD_DB_HOST", "localhost"),
+            port=int(os.environ.get("UPLOAD_DB_PORT", 5432)),
+            ssl=os.environ.get("UPLOAD_DB_SSL", "prefer"),
+            database=os.environ.get("UPLOAD_DB_NAME", "swiftbrowserdb"),
+            min_size=int(os.environ.get("UPLOAD_DB_MIN_CONNECTIONS", 0)),
+            max_size=int(os.environ.get("UPLOAD_DB_MAX_CONNECTIONS", 2)),
+            timeout=int(os.environ.get("UPLOAD_DB_TIMEOUT", 120)),
+            command_timeout=int(os.environ.get("UPLOAD_DB_COMMAND_TIMEOUT", 180)),
+            max_inactive_connection_lifetime=int(
+                os.environ.get("UPLOAD_DB_MAX_INACTIVE_CONN_LIFETIME", 10)
+            ),
+        )
+
+
 class SharingDBConn(BaseDBConn):
     """Class for the account sharing database functionality."""
 
