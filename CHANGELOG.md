@@ -84,6 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1152) Added ConfirmRouteModal to confirm navigating away from project with ongoing upload
 - Add unit tests for WebAssembly C code
 - (GL #1170) Added alerts to require user confirmation to change or delete sharing permissions
+- Support tokens for authentication on the upload runner API
 
 ### Changed
 

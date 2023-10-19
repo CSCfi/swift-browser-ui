@@ -88,28 +88,3 @@ async def handle_logout(request: aiohttp.web.Request) -> aiohttp.web.Response:
         pass
 
     return aiohttp.web.Response(status=204)
-
-
-@aiohttp.web.middleware
-async def handle_validate_authentication(
-    request: aiohttp.web.Request,
-    handler: swift_browser_ui.common.types.AiohttpHandler,
-) -> aiohttp.web.Response:
-    """Handle the authentication of a response as a middleware function."""
-    if request.path == "/health":
-        return await handler(request)
-
-    try:
-        signature = request.query["signature"]
-        validity = request.query["valid"]
-        path = request.url.path
-    except KeyError:
-        raise aiohttp.web.HTTPUnauthorized(
-            reason="Query string missing validity or signature"
-        )
-
-    await swift_browser_ui.common.signature.test_signature(
-        request.app["tokens"], signature, validity + path, validity
-    )
-
-    return await handler(request)

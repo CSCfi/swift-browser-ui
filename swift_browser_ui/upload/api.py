@@ -2,6 +2,7 @@
 
 
 import asyncio
+import base64
 import logging
 import os
 import time
@@ -315,17 +316,35 @@ async def handle_project_key(request: aiohttp.web.Request) -> aiohttp.web.Respon
     )
 
 
-async def handle_object_header(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def handle_put_object_header(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """PUT the header of an object."""
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    obj = request.match_info["object_name"]
+
+    header = await request.read()
+    b64_header = base64.standard_b64encode(header).decode("ascii")
+
+    owner = ""
+    if "owner" in request.query:
+        owner = request.query["owner"]
+
+    await vault_client.put_header(project, container, obj, b64_header, owner)
+
+    return aiohttp.web.HTTPNoContent()
+
+
+async def handle_get_object_header(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """GET the header for an object."""
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     container = request.match_info["container"]
     obj = request.match_info["object_name"]
+    owner = ""
     if "owner" in request.query:
         owner = request.query["owner"]
-        header = await vault_client.get_header(project, container, obj, owner)
-    else:
-        header = await vault_client.get_header(project, container, obj)
+    header = await vault_client.get_header(project, container, obj, owner)
 
     return aiohttp.web.Response(
         text=header,
