@@ -195,6 +195,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1125) Remove shared containers if the owner container is deleted
 - (GL #966) Fix upload cancel/finish breaking upload and download functions due to `ServiceWorker` issues
 - (GL #1137) Fix upload repeatability and worker lifecycle issues leading to upload unavailability
+- (GL #1127) Fix `ServiceWorker` issues affecting Firefox downloads
 
 ### Removed
 

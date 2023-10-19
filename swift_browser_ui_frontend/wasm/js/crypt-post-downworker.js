@@ -17,6 +17,8 @@ Schema for storing the download information:
 */
 
 let downloads = {};
+// Text encoder for quickly encoding tar headers
+let enc = new TextEncoder();
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -77,7 +79,7 @@ function createDownloadSession(container, handle, archive) {
 
 
 // Add a file to the download session
-function createDownloadSessionFile(container, path, header) {
+function createDownloadSessionFile(container, path, header, url) {
   let headerPath = `header_${container}_`
     + Math.random().toString(36)
     + Math.random().toString(36);
@@ -92,7 +94,10 @@ function createDownloadSessionFile(container, path, header) {
     ["number", "string"],
     [downloads[container].keypair, headerPath],
   );
-  downloads[container].files[path] = sessionKeyPtr;
+  downloads[container].files[path] = {
+    key: sessionKeyPtr,
+    url: url,
+  };
 
   // Remove the header after parsing
   FS.unlink(headerPath);
@@ -108,7 +113,7 @@ function decryptChunk(container, path, enChunk) {
     "number",
     ["number", "array", "number"],
     [
-      downloads[container].files[path],
+      downloads[container].files[path].key,
       enChunk,
       enChunk.length,
     ],
@@ -224,9 +229,9 @@ class FileSlicer {
     if (this.totalBytes % 512 > 0 && downloads[this.container].archive) {
       let padding = "\x00".repeat(512 - this.totalBytes % 512);
       if (this.output instanceof WritableStream) {
-        await this.output.write(padding);
+        await this.output.write(enc.encode(padding));
       } else {
-        this.output.enqueue(padding);
+        this.output.enqueue(enc.encode(padding));
       }
     }
 
@@ -235,7 +240,7 @@ class FileSlicer {
       "free_crypt4gh_session_key",
       undefined,
       ["number"],
-      [downloads[this.container].files[this.path]],
+      [downloads[this.container].files[this.path].key],
     );
 
     return;
@@ -255,9 +260,18 @@ function finishDownloadSession(container) {
 }
 
 
-async function beginDownloadInSession(
+async function addSessionFiles(
   container,
   headers,
+) {
+  for (const file in headers) {
+    createDownloadSessionFile(container, file, headers[file].header, headers[file].url);
+  }
+}
+
+
+async function beginDownloadInSession(
+  container,
 ) {
   let fileStream = undefined;
   if (downloads[container].direct) {
@@ -268,7 +282,7 @@ async function beginDownloadInSession(
 
   // Add the archive folder structure
   if (downloads[container].archive) {
-    let folderPaths = Object.keys(headers)
+    let folderPaths = Object.keys(downloads[container].files)
       .map(path => path.split("/"))  // split paths to items
       .map(path => path.slice(0, -1))  // remove the file names from paths
       .filter(path => path.length > 0)  // remove empty paths (root level files)
@@ -284,16 +298,16 @@ async function beginDownloadInSession(
     for (const path of folderPaths) {
       if (downloads[container].direct) {
         await fileStream.write(
-          addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/")),
+          enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))),
         );
       } else {
-        fileStream.enqueue(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/")));
+        fileStream.enqueue(enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))));
       }
     }
   }
 
-  for (const file in headers) {
-    const response = await fetch(headers[file].url);
+  for (const file in downloads[container].files) {
+    const response = await fetch(downloads[container].files[file].url);
     const ensize = response.headers.get("Content-Length");
     const size = (Math.floor(ensize / 65564) * 65536) + (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0);
 
@@ -307,11 +321,11 @@ async function beginDownloadInSession(
     }
 
     if (downloads[container].archive) {
-      let fileHeader = addTarFile(
+      let fileHeader = enc.encode(addTarFile(
         name.replace(".c4gh", ""),
         prefix,
         size,
-      );
+      ));
       if (downloads[container].direct) {
         await fileStream.write(fileHeader);
       } else {
@@ -320,16 +334,15 @@ async function beginDownloadInSession(
     }
 
     const slicer = new FileSlicer(response.body.getReader(), fileStream, container, file);
-    createDownloadSessionFile(container, file, headers[file].header);
     await slicer.sliceFile();
   }
 
   if (downloads[container].archive) {
     // Write the end of the archive
     if (downloads[container].direct) {
-      await fileStream.write("\x00".repeat(1024));
+      await fileStream.write(enc.encode("\x00".repeat(1024)));
     } else {
-      fileStream.enqueue("\x00".repeat(1024));
+      fileStream.enqueue(enc.encode("\x00".repeat(1024)));
     }
   }
 
@@ -376,6 +389,10 @@ if (inServiceWorker) {
       return;
     }
 
+    // Fix URL safe contents
+    fileName = decodeURIComponent(fileName);
+    containerName = decodeURIComponent(containerName);
+
     if (fileUrl.test(url.pathname) || archiveUrl.test(url.pathname)) {
       let streamController;
       const stream = new ReadableStream({
@@ -389,9 +406,15 @@ if (inServiceWorker) {
         'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
       );
 
-      createDownloadSession(containerName, streamController, archiveUrl.test(url.pathname));
+      // Map the streamController as the stream for the download
+      downloads[containerName].handle = streamController;
 
-      e.respondWith(response);
+      // Start the decrypt slicer and respond, tell worker to stay open until
+      // stream is consumed
+      e.respondWith((() => {
+        e.waitUntil(beginDownloadInSession(containerName));
+        return response;
+      })());
     }
   });
 }
@@ -400,6 +423,7 @@ self.addEventListener("message", (e) => {
   switch(e.data.command) {
     case "downloadFile":
       if (inServiceWorker) {
+        createDownloadSession(e.data.container, undefined, false);
         e.source.postMessage({
           eventType: "getHeaders",
           container: e.data.container,
@@ -422,6 +446,7 @@ self.addEventListener("message", (e) => {
       break;
     case "downloadFiles":
       if (inServiceWorker) {
+        createDownloadSession(e.data.container, undefined, true);
         e.source.postMessage({
           eventType: "getHeaders",
           container: e.data.container,
@@ -439,16 +464,17 @@ self.addEventListener("message", (e) => {
       }
       break;
     case "addHeaders":
-      beginDownloadInSession(
-        e.data.container,
-        e.data.headers,
-      );
+      addSessionFiles(e.data.container, e.data.headers);
       if (inServiceWorker) {
         e.source.postMessage({
           eventType: "downloadStarted",
           container: e.data.container,
+          archive: downloads[e.data.container].archive,
+          path: downloads[e.data.container].archive ? undefined
+            : Object.keys(e.data.headers)[0],
         });
       } else {
+        beginDownloadInSession(e.data.container);
         postMessage({
           eventType: "downloadStarted",
           container: e.data.container,
