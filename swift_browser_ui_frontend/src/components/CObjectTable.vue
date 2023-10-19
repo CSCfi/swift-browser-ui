@@ -34,11 +34,8 @@ import {
   parseDateTime,
   parseDateFromNow,
   getHumanReadableSize,
+  DEV,
 } from "@/common/conv";
-import {
-  DecryptedDownloadSession,
-  beginDownload,
-} from "@/common/download";
 
 import {
   toggleEditTagsModal,
@@ -409,16 +406,12 @@ export default {
       }
     },
     beginDownload(object) {
-      this.currentDownload = new DecryptedDownloadSession(
-        this.active,
-        this.active.id,
-        [object.name],
+      this.$store.state.socket.addDownload(
         this.$route.params.container,
-        (this.owner != undefined) ? this.owner : "",
-        this.$store,
-      );
-      this.currentDownload.initServiceWorker();
-      beginDownload();
+        [object.name],
+      ).then(() => {
+        if (DEV) console.log(`Started downloading object ${object.name}`);
+      });
     },
     navDownload(url) {
       window.open(url, "_blank");

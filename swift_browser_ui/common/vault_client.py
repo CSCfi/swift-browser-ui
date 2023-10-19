@@ -382,6 +382,8 @@ class VaultClient:
         :param header: header as b64 encoded string
         :param owner: name of the project that owns the container
         """
+        LOGGER.info(f"Pushing header to vault: {header}")
+
         if owner:
             await self._request(
                 "POST",

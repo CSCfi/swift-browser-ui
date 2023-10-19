@@ -441,6 +441,7 @@ pyyntö
 päivitä
 päänäkymään
 pääsy
+pääsyä
 päättyä
 rajan
 rajattu
@@ -585,6 +586,7 @@ toiminto
 toiseen
 toiselle
 toisen
+toisessa
 toisesta
 toista
 toteuttaa

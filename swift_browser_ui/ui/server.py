@@ -23,6 +23,7 @@ from swift_browser_ui.ui.api import (
     close_upload_session,
     get_access_control_metadata,
     get_crypted_upload_session,
+    get_crypted_upload_socket_info,
     get_os_user,
     get_shared_container_address,
     get_upload_session,
@@ -43,17 +44,22 @@ from swift_browser_ui.ui.api import (
 )
 from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.front import (
+    agg_swjs,
     badrequest,
     browse,
+    down_swasm,
+    down_swjs,
     forbid,
     index,
     loginpassword,
+    map_down_swjs,
+    map_up_swjs,
     notfound,
     select,
-    swasm,
-    swjs,
     uidown,
     unauth,
+    up_swasm,
+    up_swjs,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.login import (
@@ -165,8 +171,13 @@ async def servinit(
         [
             aiohttp.web.get("/", index),
             # Worker routes
-            aiohttp.web.get("/libupload.js", swjs),
-            aiohttp.web.get("/libupload.wasm", swasm),
+            aiohttp.web.get("/upworker.js", up_swjs),
+            aiohttp.web.get("/upworker.wasm", up_swasm),
+            aiohttp.web.get("/downworker.js", down_swjs),
+            aiohttp.web.get("/downworker.wasm", down_swasm),
+            aiohttp.web.get("/upworker-post.js.map", map_up_swjs),
+            aiohttp.web.get("/downworker-post.js.map", map_down_swjs),
+            aiohttp.web.get("/aggregatorsw.js", agg_swjs),
             aiohttp.web.get("/loginpassword", loginpassword),
             aiohttp.web.get("/browse", browse),
             # Route all URLs prefixed by /browse to the browser page, as this is
@@ -271,6 +282,10 @@ async def servinit(
             aiohttp.web.get(
                 "/enupload/{project}/{container}/{object_name:.*}",
                 get_crypted_upload_session,
+            ),
+            aiohttp.web.get(
+                "/enupload/{project}",
+                get_crypted_upload_socket_info,
             ),
         ]
     )

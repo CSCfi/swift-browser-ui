@@ -186,7 +186,6 @@ export default {
         [sharedProjectId],
         rights,
       );
-
       let projectIDs = await this.$store.state.client.projectCheckIDs(
         sharedProjectId,
       );
@@ -207,6 +206,8 @@ export default {
         "signature",
         signed.signature,
       );
+
+      console.log(projectIDs);
 
       if (val === "view") {
         await fetch(

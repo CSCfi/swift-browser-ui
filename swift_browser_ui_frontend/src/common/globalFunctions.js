@@ -131,7 +131,7 @@ export function getPaginationOptions(t) {
   return paginationOptions;
 }
 
-export function validateFolderName(str, t) {
+export function validateFolderName(str, t, containers) {
   //minimum length 3 chars
   let error = "";
   //forbid !"#$%&'()*+,/:;<=>?@[\]^`{|}~  allow .-_
@@ -144,6 +144,12 @@ export function validateFolderName(str, t) {
   }
   else if (str.endsWith("_segments")) {
     error= t("message.error.segments");
+  }
+  else {
+    if (containers) {
+      const found = containers.find(cont => cont.name === str);
+      if (found) error = t("message.error.inUse");
+    }
   }
   return error;
 }

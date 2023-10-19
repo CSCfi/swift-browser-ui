@@ -26,6 +26,7 @@ SWIFT_BROWSER_UI_DIR=${SWIFT_BROWSER_UI_DIR:-$ROOT}
 function initVault {
     cd "$SWIFT_BROWSER_UI_DIR"
     export VAULT_ADDR='http://127.0.0.1:8200'
+    wget --retry-connrefused --waitretry=1 --timeout=60 --spider http://127.0.0.1:8200/v1/sys/health?standbyok=true
     vault login token=devroot
     vault auth enable approle
     vault secrets enable c4ghtransit
@@ -46,7 +47,7 @@ mkdir -p vault/plugins
 go build -v -o vault/plugins/c4ghtransit c4ghtransit/cmd/c4ghtransit/main.go
 
 # setup vault for swift-browser-ui in the background, after the server is up
-(sleep 1; initVault) 2>&1 &
+initVault 2>&1 &
 
 # start vault server in development mode
 VAULT_LOG_LEVEL=ERROR exec vault server -dev -dev-plugin-dir=vault/plugins -dev-root-token-id="devroot"

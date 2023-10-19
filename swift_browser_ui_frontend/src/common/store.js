@@ -36,11 +36,11 @@ const store = createStore({
     client: undefined,
     requestClient: undefined,
     resumableClient: undefined,
+    socket: undefined,
     isUploading: false,
     isChunking: false,
     encryptedFile: "",
     encryptedFileProgress: undefined,
-    encryptedProgress: undefined,
     uploadProgress: undefined,
     uploadNotification: false,
     uploadNotificationClosable: false,
@@ -65,6 +65,7 @@ const store = createStore({
     isFolderCopied: false,
     sourceProjectId: "",
     uploadAbort: undefined,
+    uploadAbortReason: undefined,
     renderedFolders: true,
     addUploadFiles: false,
     isLoaderVisible: false,
@@ -101,9 +102,9 @@ const store = createStore({
       state.isUploading = true;
       if (!state.uploadNotification) state.uploadNotification = true;
     },
-    stopUploading(state) {
+    stopUploading(state, cancelled = false) {
       state.isUploading = false;
-      state.isLoaderVisible = true;
+      if (!cancelled) state.isLoaderVisible = true;
     },
     setChunking(state) {
       state.isChunking = true;
@@ -111,12 +112,6 @@ const store = createStore({
     },
     stopChunking(state) {
       state.isChunking = false;
-    },
-    updateEncryptedProgress(state, progress) {
-      state.encryptedProgress = progress;
-    },
-    eraseEncryptedProgress(state) {
-      state.encryptedProgress = undefined;
     },
     setEncryptedFile(state, file) {
       state.encryptedFile = file;
@@ -203,6 +198,12 @@ const store = createStore({
       state.currentUpload = undefined;
       state.uploadNotificationClosable = true;
     },
+    setNotClosable(state) {
+      state.uploadNotificationClosable = false;
+    },
+    eraseNotClosable(state) {
+      state.uploadNotificationClosable = true;
+    },
     createCurrentUploadAbort(state) {
       state.uploadAbort = new AbortController();
     },
@@ -212,6 +213,12 @@ const store = createStore({
       }
       delete state.uploadAbort;
       state.uploadAbort = undefined;
+    },
+    setUploadAbortReason(state, payload) {
+      state.uploadAbortReason = payload;
+    },
+    setSocket(state, payload) {
+      state.socket = payload;
     },
     toggleEditTagsModal(state, payload) {
       state.openEditTagsModal = payload;

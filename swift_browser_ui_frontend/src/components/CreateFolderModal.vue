@@ -114,6 +114,7 @@ export default {
       projectInfoLink: "",
       interacted: false, //don't show error when opening modal
       errorMsg: "",
+      containers: [],
     };
   },
   computed: {
@@ -126,6 +127,9 @@ export default {
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
+    modalVisible() {
+      return this.$store.state.openCreateFolderModal;
+    },
   },
   watch: {
     active: function () {
@@ -134,13 +138,22 @@ export default {
     },
     folderName: function () {
       this.interacted ?
-        this.errorMsg = validateFolderName(this.folderName, this.$t) :
+        this.errorMsg = validateFolderName(
+          this.folderName, this.$t, this.containers) :
         this.errorMsg = "";
+    },
+    modalVisible: async function() {
+      if (this.modalVisible) {
+        this.containers = await getDB().containers
+          .where({ projectID: this.active.id })
+          .toArray();
+      }
     },
   },
   methods: {
     createContainer: function (keypress) {
-      this.errorMsg = validateFolderName(this.folderName, this.$t);
+      this.errorMsg = validateFolderName(
+        this.folderName, this.$t, this.containers);
       if (this.errorMsg.length) return;
 
       let projectID = this.$route.params.project;
@@ -177,7 +190,7 @@ export default {
         .catch(err => {
           let errorMessage = this.$t("message.error.createFail");
           if (err.message.match("Container name already in use")) {
-            errorMessage = this.$t("message.error.inUse");
+            errorMessage = this.$t("message.error.inUseOtherPrj");
           } else if (err.message.match("Invalid container or tag name")) {
             errorMessage = this.$t("message.error.invalidName");
           }

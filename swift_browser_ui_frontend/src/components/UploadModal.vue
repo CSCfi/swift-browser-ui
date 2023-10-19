@@ -232,7 +232,6 @@
 </template>
 
 <script>
-import EncryptedUploadSession from "@/common/upload";
 import {
   getHumanReadableSize,
   truncate,
@@ -254,7 +253,7 @@ import {
 import CUploadButton from "@/components/CUploadButton.vue";
 import { swiftDeleteObjects, getObjects } from "@/common/api";
 
-import { debounce } from "lodash";
+import { debounce, delay } from "lodash";
 import { mdiDelete } from "@mdi/js";
 
 export default {
@@ -273,7 +272,6 @@ export default {
       recvHashedKeys: [],
       CUploadButton,
       projectInfoLink: "",
-      toastVisible: false,
       addingFiles: false,
       buttonAddingFiles: false,
       interacted: false,
@@ -296,6 +294,7 @@ export default {
         itemsPerPage: 20,
         currentPage: 1,
       },
+      uploadError: "",
     };
   },
   computed: {
@@ -316,6 +315,12 @@ export default {
     },
     owner() {
       return this.$route.params.owner;
+    },
+    socket() {
+      return this.$store.state.socket;
+    },
+    abortReason() {
+      return this.$store.state.uploadAbortReason;
     },
     fileHeaders() {
       return [
@@ -633,19 +638,8 @@ export default {
       this.objects = [];
     },
     checkFolderName: debounce(function () {
-      const error = validateFolderName(this.inputFolder, this.$t);
-      if (error.length === 0) {
-        if (this.containers) {
-          let found = this.containers.find(
-            cont => cont.name === this.inputFolder);
-          if (found) {
-            this.errorMsg = this.$t("message.error.inUse");
-            return;
-          }
-        }
-        this.errorMsg = "";
-      }
-      else this.errorMsg = error;
+      this.errorMsg = validateFolderName(
+        this.inputFolder, this.$t, this.containers);
     }, 300),
     setFile: function (item, path) {
       let entry = undefined;
@@ -781,6 +775,7 @@ export default {
       this.sortBy = "name";
       this.sortDirection = "asc";
       this.filesPagination.currentPage = 1;
+      this.uploadError = "";
 
       moveFocusOutOfModal(this.prevActiveEl);
     },
@@ -830,41 +825,48 @@ export default {
       this.currentFolder ?
         this.$store.commit("setFolderName", this.currentFolder) :
         this.$store.commit("setFolderName", this.inputFolder);
-
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
-      let upload = new EncryptedUploadSession(
-        this.active,
-        this.owner ? this.owner : this.active.id,
-        this.$store.state.dropFiles,
-        this.recvkeys,
-        null,
+
+      this.socket.addUpload(
         this.currentFolder ? this.currentFolder : this.inputFolder,
-        "",
-        null,
-        true,
-        this.$store,
-        this.$el,
+        this.$store.state.dropFiles.map(item => item),
+        this.recvkeys.map(item => item),
+        this.$route.params.owner ? this.$route.params.owner : "",
+        this.$route.params.owner ? this.$route.params.owner : "",
       );
-      upload.initServiceWorker();
-      this.$store.commit("setCurrentUpload", upload);
-      upload.cleanUp();
-      setTimeout(() => {
-        if (this.$store.state.encryptedFile == "" && this.dropFiles.length) {
-          if (!this.toastVisible) {
-            this.toastVisible = true;
-            document.querySelector("#container-error-toasts").addToast(
-              {
-                type: "success",
-                duration: 4000,
-                progress: false,
-                message: this.$t("message.upload.isStarting"),
-              },
-            );
-            //avoid overlapping toasts
-            setTimeout(() => { this.toastVisible = false; }, 4000);
+
+      delay(() => {
+        if (this.abortReason !== undefined) {
+          if (this.abortReason
+            .match("Could not create or access the container.")) {
+            this.uploadError = this.currentFolder ?
+              this.$t("message.upload.accessFail")
+              : this.$t("message.error.createFail")
+                .concat(" ", this.$t("message.error.inUseOtherPrj"));
           }
-          this.beginEncryptedUpload();
+          else if (this.abortReason.match("cancel")) {
+            this.uploadError = this.$t("message.upload.cancelled");
+          }
+          this.$store.commit("setUploadAbortReason", undefined);
+        }
+        else if (this.$store.state.encryptedFile == ""
+          && this.dropFiles.length) {
+          //upload didn't start
+          this.uploadError = this.$t("message.upload.error");
+          this.$store.commit("stopUploading", true);
+          this.$store.commit("toggleUploadNotification", false);
+        }
+
+        if (this.uploadError) {
+          document.querySelector("#container-error-toasts").addToast(
+            {
+              type: "error",
+              duration: 6000,
+              progress: false,
+              message: this.uploadError,
+            },
+          );
         }
       }, 1000);
       this.toggleUploadModal();

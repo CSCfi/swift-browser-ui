@@ -12,28 +12,27 @@ Encrypted file streaming functions.
 
 
 /*
-Open an upload session.
+Create an encryption key for session.
 */
-ENCRYPT_SESSION *open_session(const char *passphrase);
+uint8_t *create_session_key();
 
 
 /*
-Open an upload session with ephemeral keys.
+Create the crypt4gh header using a set session key.
 */
-ENCRYPT_SESSION *open_session_eph();
-
-
-/*
-Wrap crypt4gh header creation for access in JS side.
-*/
-struct CHUNK *wrap_crypt4gh_header(ENCRYPT_SESSION *sess);
+CHUNK *create_crypt4gh_header(
+    const uint8_t *session_key,
+    const uint8_t *secret_key,
+    const uint8_t *receivers,
+    const unsigned int len_receivers
+);
 
 
 /*
 Encrypt a 64KiB chunk of data.
 */
 struct CHUNK *encrypt_chunk (
-    ENCRYPT_SESSION *sess,
+    const uint8_t *session_Key,
     uint8_t *segment,
     size_t len_segment
 );

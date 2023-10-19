@@ -28,6 +28,7 @@ import {
   parseDateTime,
   parseDateFromNow,
   deleteStaleSharedContainers,
+  DEV,
 } from "@/common/conv";
 import {
   mdiTrayArrowDown,
@@ -49,7 +50,9 @@ import {
   disableFocusOutsideModal,
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
-import { swiftDeleteContainer } from "@/common/api";
+import {
+  swiftDeleteContainer,
+} from "@/common/api";
 
 export default {
   name: "ContainerTable",
@@ -270,11 +273,9 @@ export default {
                       text: true,
                       size: "small",
                       title: this.$t("message.download"),
-                      href: "/download/".concat(
-                        this.$route.params.project,
-                        "/",
-                        item.name,
-                      ),
+                      onClick: () => {
+                        this.beginDownload(item.name);
+                      },
                       target: "_blank",
                       path: mdiTrayArrowDown,
                       disabled: item.owner && item.accessRights?.length === 0,
@@ -483,6 +484,14 @@ export default {
           itemCount:
             this.paginationOptions.itemCount - 1,
         });
+    },
+    beginDownload(container) {
+      this.$store.state.socket.addDownload(
+        container,
+        [],
+      ).then(() => {
+        if (DEV) console.log(`Started downloading all objects from container ${container}`);
+      });
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {

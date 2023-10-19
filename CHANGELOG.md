@@ -71,6 +71,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1047) Added redis and vault monitoring to `/health` endpoint
 - (GL #947) Added cypress tests for sharing folders
 - (GL #987) Added keyboard navigation for all modals in the UI
+- (GL #931) Added proper parallel upload and download support
+  - Move tar archiving to frontend
+  - Add frontend support for downloading arbitrary files as an archive
+  - Use msgpack for parsing websocket data
+  - Separate upload and download workers
+  - Use direct file system writes if available on system
+  - Move upload, download fetch calls to workers to reduce messaging overhead
 
 ### Changed
 
@@ -185,6 +192,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1078) Fix overwriting existing files with upload
 - (GL #1108) Fix deleting large amount of objects (~100 items) with long names
 - (GL #1140) Fix Sharing permissions swapping between options after sharing
+- (GL #1125) Remove shared containers if the owner container is deleted
+- (GL #966) Fix upload cancel/finish breaking upload and download functions due to `ServiceWorker` issues
+- (GL #1137) Fix upload repeatability and worker lifecycle issues leading to upload unavailability
 
 ### Removed
 

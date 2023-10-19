@@ -9,18 +9,17 @@ Encrypted file download functions
 #define SWIFT_UI_DOWNLOAD_STREAMING_INCLUDED
 
 
-ENCRYPT_SESSION *open_decrypt_session();
+/*
+Open crypt4gh header for file decryption and return session key.
+*/
+uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header);
 
-char *get_session_public_key(ENCRYPT_SESSION *sess);
 
-char *get_session_private_key(ENCRYPT_SESSION *sess);
-
-char *get_session_key(ENCRYPT_SESSION *sess);
-
-void open_crypt4gh_header(ENCRYPT_SESSION *sess);
-
-struct CHUNK *decrypt_chunk(
-    ENCRYPT_SESSION *sess,
+/*
+Decrypt a crypt4gh encrypted chunk using the session key.
+*/
+CHUNK *decrypt_chunk(
+    const uint8_t *session_key,
     uint8_t *segment,
     size_t len_segment
 );
