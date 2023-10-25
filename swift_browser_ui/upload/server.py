@@ -54,7 +54,7 @@ async def servinit() -> aiohttp.web.Application:
         swift_browser_ui.common.common_middleware.error_handler,
     ]
 
-    if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", None):
+    if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", False):
         middlewares.append(
             swift_browser_ui.common.common_middleware.handle_validate_authentication,
         )
