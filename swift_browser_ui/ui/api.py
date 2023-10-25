@@ -685,8 +685,10 @@ async def remove_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Resp
             raise aiohttp.web.HTTPNotFound()
 
 
-async def modify_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Modify sharing permission from container acl."""
+async def modify_container_write_acl(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Modify write access for a project from container acl."""
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to modify projects fom container ACL from "
