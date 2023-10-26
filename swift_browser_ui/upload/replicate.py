@@ -262,7 +262,7 @@ class ObjectReplicationProxy:
                         )
                 LOGGER.debug(f"Uploaded manifest for {object_name}")
 
-            if ".c4gh" in object_name and self.source_project_name and self.project_name:
+            if ".c4gh" in object_name and self.project_name:
                 LOGGER.debug(f"Copying the header for encrypted object {object_name}")
                 header = await self.vault.get_header(
                     self.project_name,
@@ -276,7 +276,7 @@ class ObjectReplicationProxy:
 
     async def check_public_key(self) -> None:
         """Check that the source project public key is whitelisted."""
-        if self.project_name and self.source_project_name:
+        if self.project_name:
             pubkey = await self.vault.get_public_key(self.project_name)
             LOGGER.debug(
                 f"Add public key of {self.project_name} temporarily for re-encryption."
@@ -287,7 +287,7 @@ class ObjectReplicationProxy:
 
     async def remove_public_key(self) -> None:
         """Remove the project public key from whitelist if it's been added."""
-        if self.project_name and self.source_project_name:
+        if self.project_name:
             await self.vault.remove_whitelist_key(self.project_name)
 
     async def a_copy_single_object(self, object_name: str) -> None:

@@ -246,7 +246,7 @@ export default {
         this.folderName,
         this.sourceProjectId ? this.sourceProjectId : this.active.id,
         this.selectedFolderName,
-        this.sourceProjectId ? this.active.name : "",
+        this.active.name,
         sourceProjectName,
       ).then(async () => {
         await this.$store.dispatch("updateContainers", {
