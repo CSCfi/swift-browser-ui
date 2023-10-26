@@ -285,7 +285,8 @@ export default {
                       },
                       target: "_blank",
                       path: mdiTrayArrowDown,
-                      disabled: item.owner && item.accessRights?.length === 0,
+                      disabled: (item.owner && item.accessRights?.length === 0)
+                        || !item.bytes,
                     },
                   },
                 },
@@ -362,8 +363,8 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
-                            disabled: item.owner &&
-                              item.accessRights?.length === 0,
+                            disabled: (item.owner &&
+                              item.accessRights?.length === 0) || !item.bytes,
                           },
                         },
                       },
