@@ -685,6 +685,55 @@ async def remove_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Resp
             raise aiohttp.web.HTTPNotFound()
 
 
+async def modify_container_write_acl(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Modify write access for a project from container acl."""
+    session = await aiohttp_session.get_session(request)
+    request.app["Log"].info(
+        "API call to modify projects fom container ACL from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    receivers = request.query["projects"].split(",")
+    rights = request.query["rights"].split(",")
+
+    headers = {"X-Auth-Token": session["projects"][project]["token"]}
+    read_acl = ""
+    write_acl = ""
+
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if "X-Container-Read" in ret.headers:
+            read_acl = ret.headers["X-Container-Read"]
+        if "X-Container-Write" in ret.headers:
+            write_acl = ret.headers["X-Container-Write"]
+    if "w" in rights:
+        for receiver in receivers:
+            write_acl += f",{receiver}:*"
+    else:
+        for receiver in receivers:
+            write_acl = write_acl.replace(f"{receiver}:*", "")
+
+    read_acl = read_acl.replace(",,", ",").strip(",")
+    write_acl = write_acl.replace(",,", ",").strip(",")
+
+    headers["X-Container-Read"] = read_acl
+    headers["X-Container-Write"] = write_acl
+
+    async with client.post(
+        f"{session['projects'][project]['endpoint']}/{container}", headers=headers
+    ) as ret:
+        if ret.status == 204:
+            return aiohttp.web.Response(status=200)
+        else:
+            raise aiohttp.web.HTTPNotFound()
+
+
 async def add_project_container_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
