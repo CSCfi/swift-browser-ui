@@ -111,6 +111,9 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.mock_request.match_info["project"] = "test-project"
         self.mock_request.match_info["container"] = "test-container"
 
+        mock_vault_client = unittest.mock.Mock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
         with self.p_get_sess, patch_replicator:
             resp = await swift_browser_ui.upload.api.handle_replicate_container(
                 self.mock_request,
@@ -121,10 +124,13 @@ class APITestClass(tests.common.mockups.APITestBase):
         mock_init_replicator.assert_called_once_with(
             "placeholder",
             self.mock_client,
+            mock_vault_client,
             "test-project",
             "test-container",
             "other-project",
             "source-container",
+            "",
+            "",
         )
         mock_copy_from_container.assert_called_once()
         mock_ensure_container.assert_called()
@@ -135,7 +141,7 @@ class APITestClass(tests.common.mockups.APITestBase):
         mock_ensure_container = unittest.mock.AsyncMock()
         mock_replicator = types.SimpleNamespace(
             **{
-                "a_copy_object": mock_copy_object,
+                "a_copy_single_object": mock_copy_object,
                 "a_ensure_container": mock_ensure_container,
             }
         )
@@ -150,6 +156,9 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.mock_request.query["from_container"] = "source-container"
         self.mock_request.query["from_object"] = "source-object"
 
+        mock_vault_client = unittest.mock.Mock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
         with self.p_get_sess, patch_replicator:
             resp = await swift_browser_ui.upload.api.handle_replicate_object(
                 self.mock_request,
@@ -160,10 +169,13 @@ class APITestClass(tests.common.mockups.APITestBase):
         mock_init_replicator.assert_called_once_with(
             "placeholder",
             self.mock_client,
+            mock_vault_client,
             "test-project",
             "test-container",
             "other-project",
             "source-container",
+            "",
+            "",
         )
         mock_copy_object.assert_called_once_with("source-object")
         mock_ensure_container.assert_called()

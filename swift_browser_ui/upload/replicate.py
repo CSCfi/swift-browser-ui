@@ -1,6 +1,7 @@
 """Container and object replication handlers using aiohttp."""
 
 
+import base64
 import logging
 import os
 import ssl
@@ -10,6 +11,7 @@ import aiohttp.client
 import aiohttp.web
 import certifi
 
+import swift_browser_ui.common.vault_client
 from swift_browser_ui.upload import common
 
 LOGGER = logging.getLogger(__name__)
@@ -33,17 +35,24 @@ class ObjectReplicationProxy:
         self,
         session: typing.Dict[str, typing.Any],
         client: aiohttp.client.ClientSession,
+        vault: swift_browser_ui.common.vault_client.VaultClient,
         project: str,
         container: str,
         source_project: str,
         source_container: str,
+        project_name: str = "",
+        source_project_name: str = "",
     ) -> None:
         """."""
         self.project = project
         self.container = container
+        self.vault = vault
 
         self.source_project = source_project
         self.source_container = source_container
+
+        self.project_name = project_name
+        self.source_project_name = source_project_name
 
         self.client = client
 
@@ -53,19 +62,6 @@ class ObjectReplicationProxy:
         self.source_host: str = common.get_download_host(
             self.endpoint, self.source_project
         )
-
-    async def a_generate_object_from_reader(
-        self, resp: aiohttp.client.ClientResponse
-    ) -> typing.AsyncGenerator:
-        """Generate uploaded object chunks from a response."""
-        number = 0
-        while True:
-            chunk = await resp.content.read(1048576)
-            if not chunk:
-                break
-            yield chunk
-            number += 1
-        LOGGER.debug("Response stream complete.")
 
     async def a_ensure_container(self, segmented: bool = False) -> None:
         """Ensure that the container required for copying exists."""
@@ -166,7 +162,7 @@ class ObjectReplicationProxy:
                 LOGGER.debug(f"Posting segment to url: {to_url}")
                 async with self.client.put(
                     to_url,
-                    data=self.a_generate_object_from_reader(resp_g),
+                    data=resp_g.content.iter_chunked(65564),
                     headers=headers,
                     timeout=REPL_TIMEOUT,
                     ssl=ssl_context,
@@ -226,7 +222,7 @@ class ObjectReplicationProxy:
                     )
                 async with self.client.put(
                     common.generate_download_url(self.host, self.container, object_name),
-                    data=self.a_generate_object_from_reader(resp_g),
+                    data=resp_g.content.iter_chunked(65564),
                     headers=headers,
                     timeout=REPL_TIMEOUT,
                     ssl=ssl_context,
@@ -266,6 +262,67 @@ class ObjectReplicationProxy:
                         )
                 LOGGER.debug(f"Uploaded manifest for {object_name}")
 
+            if ".c4gh" in object_name and self.source_project_name and self.project_name:
+                LOGGER.debug(f"Copying the header for encrypted object {object_name}")
+                header = await self.vault.get_header(
+                    self.project_name,
+                    self.source_container,
+                    object_name,
+                    owner=self.source_project_name,
+                )
+                await self.vault.put_header(
+                    self.project_name, self.container, object_name, header
+                )
+
+    async def check_public_key(self) -> None:
+        """Check that the source project public key is whitelisted."""
+        if self.project_name and self.source_project_name:
+            pubkey = await self.vault.get_public_key(self.project_name)
+            LOGGER.debug(
+                f"Add public key of {self.project_name} temporarily for re-encryption."
+            )
+            await self.vault.put_whitelist_key(
+                self.project_name, "crypt4gh", base64.urlsafe_b64decode(pubkey)
+            )
+
+    async def remove_public_key(self) -> None:
+        """Remove the project public key from whitelist if it's been added."""
+        if self.project_name and self.source_project_name:
+            await self.vault.remove_whitelist_key(self.project_name)
+
+    async def a_copy_single_object(self, object_name: str) -> None:
+        """Only copy a single object."""
+        await self.check_public_key()
+
+        try:
+            await self.a_copy_object(object_name)
+        finally:
+            await self.remove_public_key()
+
+    async def a_get_container_page(self, marker: str = "") -> list[str]:
+        """Get a single page of objects from a container."""
+        async with self.client.get(
+            common.generate_download_url(
+                self.source_host,
+                container=self.source_container,
+            ),
+            headers={"X-Auth-Token": self.token},
+            params={"marker": marker} if marker else None,
+            timeout=REPL_TIMEOUT,
+            ssl=ssl_context,
+        ) as resp:
+            if resp.status >= 400:
+                LOGGER.debug(f"Container fetch failed with status {resp.status}")
+                raise aiohttp.web.HTTPBadRequest(
+                    reason="Could not fetch source container."
+                )
+
+            if resp.status == 200:
+                ret = await resp.text()
+                return ret.rstrip().lstrip().split("\n")
+
+            return []
+
     async def a_copy_from_container(self) -> None:
         """Copy objects from a source container."""
         LOGGER.debug(f"Fetching objects from container {self.source_container}")
@@ -273,20 +330,18 @@ class ObjectReplicationProxy:
             self.source_host, container=self.source_container
         )
         LOGGER.debug(f"Container url: {container_url}")
-        async with self.client.get(
-            common.generate_download_url(
-                self.source_host,
-                container=self.source_container,
-            ),
-            headers={"X-Auth-Token": self.token},
-            timeout=REPL_TIMEOUT,
-            ssl=ssl_context,
-        ) as resp:
-            if resp.status != 200:
-                LOGGER.debug(f"Container fetch failed with status {resp.status}")
-                raise aiohttp.web.HTTPBadRequest(reason="Source container fetch failed")
-            LOGGER.debug("Got container object listing")
-            objects_text = await resp.text()
-            objects_list = objects_text.rstrip().lstrip().split("\n")
-            for i in objects_list:
-                await self.a_copy_object(i)
+
+        # Page through all the objects in a container
+        to_copy: list[str] = []
+        page = await self.a_get_container_page()
+        while page:
+            to_copy = to_copy + page
+            page = await self.a_get_container_page(to_copy[-1])
+
+        await self.check_public_key()
+
+        try:
+            for obj in to_copy:
+                await self.a_copy_object(obj)
+        finally:
+            await self.remove_public_key()
