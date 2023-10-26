@@ -431,6 +431,8 @@ self.addEventListener("message", (e) => {
             e.data.file,
           ],
           pubkey: downloads[e.data.container].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
         });
       } else {
         createDownloadSession(e.data.container, e.data.handle, false);
@@ -441,6 +443,8 @@ self.addEventListener("message", (e) => {
             e.data.file,
           ],
           pubkey: downloads[e.data.container].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
         });
       }
       break;
@@ -452,6 +456,8 @@ self.addEventListener("message", (e) => {
           container: e.data.container,
           files: e.data.files,
           pubkey: downloads[e.data.container].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
         });
       } else {
         createDownloadSession(e.data.container, e.data.handle, true);
@@ -460,6 +466,8 @@ self.addEventListener("message", (e) => {
           container: e.data.container,
           files: e.data.files,
           pubkey: downloads[e.data.container].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
         });
       }
       break;

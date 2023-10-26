@@ -1,6 +1,6 @@
 // Functions for handling interfacing between workers and upload API socket
 
-import { DELETE, GET, PUT, getUploadEndpoint, getUploadSocket } from "./api";
+import { getUploadEndpoint, getUploadSocket, signedFetch } from "./api";
 import { DEV } from "./conv";
 import { getDB } from "./db";
 
@@ -89,6 +89,8 @@ export default class UploadSocket {
             e.data.container,
             e.data.files,
             e.data.pubkey,
+            e.data.owner,
+            e.data.ownerName,
           ).then(() => {
             if (DEV) {
               console.log(
@@ -146,7 +148,7 @@ export default class UploadSocket {
   }
 
   // Get headers for download
-  async getHeaders(container, fileList, pubkey) {
+  async getHeaders(container, fileList, pubkey, owner, ownerName) {
     let headers = {};
 
     // If no files are specified, get all files in the container
@@ -173,38 +175,34 @@ export default class UploadSocket {
       container,
     );
 
-    let signatureUrl = new URL(`/sign/${60}`, document.location.origin);
-    signatureUrl.searchParams.append("path", whitelistPath);
-    let signed = await GET(signatureUrl);
-    signed = await signed.json();
-    let whitelistUrl = new URL(
-      this.$store.state.uploadEndpoint.concat(whitelistPath),
+    await signedFetch(
+      "PUT",
+      this.$store.state.uploadEndpoint,
+      whitelistPath,
+      pubkey,
+      {
+        flavor: "crypt4gh",
+        session: upInfo.id,
+      },
     );
-    whitelistUrl.searchParams.append("valid", signed.valid);
-    whitelistUrl.searchParams.append("signature", signed.signature);
-    whitelistUrl.searchParams.append("flavor", "crypt4gh");
-    whitelistUrl.searchParams.append("session", upInfo.id);
-    await PUT(whitelistUrl, pubkey);
 
     for (const file of files) {
       // Get the file header
-      let headerPath = `/header/${this.active.name}/${container}/${file}`;
-      signatureUrl = new URL(`/sign/${60}`, document.location.origin);
-      signatureUrl.searchParams.append("path", headerPath);
-      signed = await GET(signatureUrl);
-      signed = await signed.json();
-      let headerUrl = new URL(
-        this.$store.state.uploadEndpoint.concat(headerPath),
+      let header = await signedFetch(
+        "GET",
+        this.$store.state.uploadEndpoint,
+        `/header/${this.active.name}/${container}/${file}`,
+        undefined,
+        {
+          session: upInfo.id,
+          owner: ownerName,
+        },
       );
-      headerUrl.searchParams.append("valid", signed.valid);
-      headerUrl.searchParams.append("signature", signed.signature);
-      headerUrl.searchParams.append("session", upInfo.id);
-      let resp = await GET(headerUrl);
-      let header = await resp.text();
+      header = await header.text();
 
-      // Prepare and sign the file URL
+      // Prepare the file URL
       let fileUrl = new URL(
-        `/download/${this.active.id}/${container}/${file}`,
+        `/download/${owner ? owner : this.active.id}/${container}/${file}`,
         document.location.origin,
       );
       fileUrl.searchParams.append("project", this.active.id);
@@ -215,7 +213,15 @@ export default class UploadSocket {
       };
     }
 
-    await DELETE(whitelistUrl);
+    await signedFetch(
+      "DELETE",
+      this.$store.state.uploadEndpoint,
+      whitelistPath,
+      undefined,
+      {
+        session: upInfo.id,
+      },
+    );
 
     if (!this.useServiceWorker) {
       this.downWorker.postMessage({
@@ -290,7 +296,14 @@ export default class UploadSocket {
   async addDownload(
     container,
     objects,
+    owner = "",
   ) {
+    let ownerName = "";
+    if (owner) {
+      let ids = await this.$store.state.client.projectCheckIDs(owner);
+      ownerName = ids.name;
+    }
+
     let fileHandle = undefined;
     if (objects.length == 1) {
       // Download directly into the file if available.
@@ -315,6 +328,8 @@ export default class UploadSocket {
           container: container,
           file: objects[0],
           handle: fileHandle,
+          owner: owner,
+          ownerName: ownerName,
         });
       } else {
         if (DEV) {
@@ -325,6 +340,8 @@ export default class UploadSocket {
             command: "downloadFile",
             container: container,
             file: objects[0],
+            owner: owner,
+            ownerName: ownerName,
           });
         });
       }
@@ -348,6 +365,8 @@ export default class UploadSocket {
           container: container,
           files: objects.length < 1 ? [] : objects,
           handle: fileHandle,
+          owner: owner,
+          ownerName: ownerName,
         });
       } else {
         navigator.serviceWorker.ready.then(reg => {
@@ -355,6 +374,8 @@ export default class UploadSocket {
             command: "downloadFiles",
             container: container,
             files: objects.length < 1 ? [] : objects,
+            owner: owner,
+            ownerName: ownerName,
           });
         });
       }

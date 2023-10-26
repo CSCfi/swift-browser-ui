@@ -274,7 +274,10 @@ export default {
                       size: "small",
                       title: this.$t("message.download"),
                       onClick: () => {
-                        this.beginDownload(item.name);
+                        this.beginDownload(
+                          item.name,
+                          item.owner ? item.owner : "",
+                        );
                       },
                       target: "_blank",
                       path: mdiTrayArrowDown,
@@ -485,10 +488,11 @@ export default {
             this.paginationOptions.itemCount - 1,
         });
     },
-    beginDownload(container) {
+    beginDownload(container, owner) {
       this.$store.state.socket.addDownload(
         container,
         [],
+        owner,
       ).then(() => {
         if (DEV) console.log(`Started downloading all objects from container ${container}`);
       });
