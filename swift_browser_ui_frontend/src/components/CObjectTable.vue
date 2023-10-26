@@ -44,6 +44,7 @@ import {
   getPrefix,
   getPaginationOptions,
   checkIfItemIsLastOnPage,
+  checkIfCanDownloadTar,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -413,14 +414,25 @@ export default {
             return obj.name.startsWith(object.name);
           })
           .map(item => item.name);
-        if (DEV) console.log(subfolderFiles);
-        this.$store.state.socket.addDownload(
-          this.$route.params.container,
-          subfolderFiles,
-          this.$route.params.owner ? this.$route.params.owner : "",
-        ).then(() => {
-          if (DEV) console.log(`Started downloading subfolder ${object.name}`);
-        });
+        const canDownload = checkIfCanDownloadTar(subfolderFiles, true);
+        if (canDownload) {
+          if (DEV) console.log(subfolderFiles);
+          this.$store.state.socket.addDownload(
+            this.$route.params.container,
+            subfolderFiles,
+            this.$route.params.owner ? this.$route.params.owner : "",
+          ).then(() => {
+            if (DEV) console.log(`Started downloading subfolder ${object.name}`);
+          });
+        } else {
+          document.querySelector("#container-error-toasts")
+            .addToast(
+              { progress: false,
+                type: "error",
+                duration: 6000,
+                message: this.$t("message.downloadFiles")},
+            );
+        }
       } else {
         this.$store.state.socket.addDownload(
           this.$route.params.container,

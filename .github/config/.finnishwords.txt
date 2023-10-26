@@ -3,6 +3,7 @@ ajaksi
 alapuolisesta
 alaviiva
 alikansio
+alikansioiden
 alikansion
 alikansiot
 alkanut
@@ -390,6 +391,7 @@ pienemmissä
 pienennä
 piilota
 piste
+pitkiä
 poiketa
 pois
 poissa
@@ -644,6 +646,7 @@ uusia
 vaatii
 vaihda
 vaihto
+vain
 valikkoon
 valikossa
 valinnan
@@ -674,6 +677,7 @@ virhe
 virheellinen
 voi
 voida
+voidaan
 voidaksesi
 voit
 voivat

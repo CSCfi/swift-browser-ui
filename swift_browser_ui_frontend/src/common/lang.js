@@ -185,6 +185,9 @@ let default_translations = {
         invalid_share_ids: " are not valid Share IDs. Please remove them.",
       },
       download: " Download",
+      downloadFiles: "Files can only be downloaded " +
+      "individually because there are file or subfolder names longer than " +
+      "99 characters.",
       largeDownMessage:
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
@@ -578,6 +581,9 @@ let default_translations = {
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
       },
       download: " Lataa",
+      downloadFiles: "Tiedostot voidaan ladata vain " +
+      "erikseen, koska tiedostojen tai alikansioiden nimet ovat " +
+      "yli 99 merkkiä pitkiä.",
       largeDownMessage:
         "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
