@@ -314,6 +314,7 @@ ne
 niiden
 niin
 nimellä
+nimet
 nimetä
 nimeä
 nimi
