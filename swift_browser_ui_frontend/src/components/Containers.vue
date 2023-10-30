@@ -136,8 +136,10 @@ export default {
     },
     isFolderUploading: function () {
       if (!this.isFolderUploading) {
+        this.contsLoading = true;
         setTimeout(() => {
           this.fetchContainers();
+          this.contsLoading = false;
         }, 3000);
       }
     },
