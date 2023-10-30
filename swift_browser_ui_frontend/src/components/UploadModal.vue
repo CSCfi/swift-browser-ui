@@ -493,6 +493,33 @@ export default {
         }, 200);
       }
     },
+    abortReason() {
+      if (this.abortReason !== undefined) {
+        if (this.abortReason
+          ?.match("Could not create or access the container.")) {
+          this.uploadError = this.currentFolder ?
+            this.$t("message.upload.accessFail")
+            : this.$t("message.error.createFail")
+              .concat(" ", this.$t("message.error.inUseOtherPrj"));
+        }
+        else if (this.abortReason?.match("cancel")) {
+          this.uploadError = this.$t("message.upload.cancelled");
+        }
+        this.$store.commit("setUploadAbortReason", undefined);
+      }
+    },
+    uploadError() {
+      if (this.uploadError) {
+        document.querySelector("#container-error-toasts").addToast(
+          {
+            type: "error",
+            duration: 6000,
+            progress: false,
+            message: this.uploadError,
+          },
+        );
+      }
+    },
   },
   updated() {
     if (this.dropFiles.length) {
@@ -868,36 +895,12 @@ export default {
     beginEncryptedUpload() {
       this.aBeginEncryptedUpload().then(() => {
         delay(() => {
-          if (this.abortReason !== undefined) {
-            if (this.abortReason
-              .match("Could not create or access the container.")) {
-              this.uploadError = this.currentFolder ?
-                this.$t("message.upload.accessFail")
-                : this.$t("message.error.createFail")
-                  .concat(" ", this.$t("message.error.inUseOtherPrj"));
-            }
-            else if (this.abortReason.match("cancel")) {
-              this.uploadError = this.$t("message.upload.cancelled");
-            }
-            this.$store.commit("setUploadAbortReason", undefined);
-          }
-          else if (this.$store.state.encryptedFile == ""
+          if (this.$store.state.encryptedFile == ""
             && this.dropFiles.length) {
             //upload didn't start
             this.uploadError = this.$t("message.upload.error");
             this.$store.commit("stopUploading", true);
             this.$store.commit("toggleUploadNotification", false);
-          }
-
-          if (this.uploadError) {
-            document.querySelector("#container-error-toasts").addToast(
-              {
-                type: "error",
-                duration: 6000,
-                progress: false,
-                message: this.uploadError,
-              },
-            );
           }
         }, 1000);
         this.toggleUploadModal();
