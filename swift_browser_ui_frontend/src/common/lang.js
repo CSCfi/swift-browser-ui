@@ -327,6 +327,13 @@ let default_translations = {
           "window to enable encryption.",
         refresh: "Refresh",
       },
+      route: {
+        title: "Switch project",
+        text: "Switching to another project will interrupt ongoing " +
+        "uploads and downloads. Are you sure you want to proceed?",
+        confirm: "Switch project",
+        cancel: "Cancel",
+      },
       search: {
         container: "Folder",
         object: "Item",
@@ -726,6 +733,13 @@ let default_translations = {
           "Salausohjelma on valmiina. Päivitä " +
           "selainikkuna mahdollistaaksesi salauksen.",
         refresh: "Päivitä",
+      },
+      route: {
+        title: "Vaihda projekti",
+        text: "Tämä toiminto keskeyttää käynnissä olevat " +
+        "lataukset ja lähetykset. Haluatko varmasti vaihtaa projektin?",
+        confirm: "Vaihda projekti",
+        cancel: "Peruuta",
       },
       search: {
         container: "Kansio",

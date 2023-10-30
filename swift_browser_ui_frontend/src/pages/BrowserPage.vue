@@ -12,6 +12,12 @@
       role="main"
     >
       <c-modal
+        v-model="openConfirmRouteModal"
+        v-csc-control
+      >
+        <ConfirmRouteModal />
+      </c-modal>
+      <c-modal
         v-model="openCreateFolderModal"
         v-csc-control
         width="64vw"

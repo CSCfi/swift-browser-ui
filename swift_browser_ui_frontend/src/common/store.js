@@ -51,6 +51,8 @@ const store = createStore({
     pubkey: [],
     currentPrefix: "",
     dropFiles: [],
+    openConfirmRouteModal: false,
+    routeTo: {},
     openCreateFolderModal: false,
     selectedFolderName: "",
     openUploadModal: false,
@@ -177,6 +179,12 @@ const store = createStore({
     },
     erasePrefix(state) {
       state.currentPrefix = "";
+    },
+    toggleConfirmRouteModal(state, payload) {
+      state.openConfirmRouteModal = payload;
+    },
+    setRouteTo(state, payload) {
+      state.routeTo = payload;
     },
     toggleCreateFolderModal(state, payload) {
       state.openCreateFolderModal = payload;

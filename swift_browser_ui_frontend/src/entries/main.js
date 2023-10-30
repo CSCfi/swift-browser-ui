@@ -6,6 +6,7 @@ import router from "@/common/router";
 // Project Vue components
 import BrowserMainNavbar from "@/components/BrowserMainNavbar.vue";
 import BrowserSecondaryNavbar from "@/components/BrowserSecondaryNavbar.vue";
+import ConfirmRouteModal from "@/components/ConfirmRouteModal.vue";
 import CreateFolderModal from "@/components/CreateFolderModal.vue";
 import UploadModal from "@/components/UploadModal.vue";
 import EditTagsModal from "@/components/EditTagsModal.vue";
@@ -82,6 +83,7 @@ const app = createApp({
     CFooter,
     BrowserMainNavbar,
     BrowserSecondaryNavbar,
+    ConfirmRouteModal,
     CreateFolderModal,
     UploadModal,
     UploadNotification,
@@ -135,6 +137,14 @@ const app = createApp({
     },
     prefix() {
       return this.$store.state.currentPrefix;
+    },
+    openConfirmRouteModal: {
+      get() {
+        return this.$store.state.openConfirmRouteModal;
+      },
+      set(newState) {
+        return newState;
+      },
     },
     openCreateFolderModal: {
       get() {
