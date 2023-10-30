@@ -15,6 +15,7 @@ Schema for storing the upload information:
 }
 */
 import msgpack from "@ygoe/msgpack";
+import { checkPollutingName } from "./nameCheck";
 
 let uploads = {};
 let upinfo = undefined;
@@ -377,6 +378,8 @@ function addFiles(files, container) {
   for (const file of files) {
     let handle = file.file;
 
+    if (checkPollutingName(file.relativePath)) return;
+
     let path = `${file.relativePath}.c4gh`
     let totalBytes = Math.floor(handle.size / 65536) * 65564;
     let totalChunks = Math.floor(handle.size / 65536);
@@ -454,6 +457,9 @@ function addFiles(files, container) {
 
 self.addEventListener("message", (e) => {
   e.stopImmediatePropagation();
+
+  // Sanity check container name
+  if (checkPollutingName(e.data.container)) return;
 
   switch(e.data.command) {
     // Create a new upload session with provided files

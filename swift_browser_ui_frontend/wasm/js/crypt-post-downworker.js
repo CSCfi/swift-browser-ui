@@ -1,6 +1,7 @@
 // Worker script for download chunks
 
 import { addTarFile, addTarFolder } from "./tar";
+import { checkPollutingName } from "./nameCheck";
 
 /*
 Schema for storing the download information:
@@ -80,6 +81,8 @@ function createDownloadSession(container, handle, archive) {
 
 // Add a file to the download session
 function createDownloadSessionFile(container, path, header, url) {
+  if (checkPollutingName(path)) return;
+
   let headerPath = `header_${container}_`
     + Math.random().toString(36)
     + Math.random().toString(36);
@@ -393,6 +396,8 @@ if (inServiceWorker) {
     fileName = decodeURIComponent(fileName);
     containerName = decodeURIComponent(containerName);
 
+    if (checkPollutingName(containerName)) return;
+
     if (fileUrl.test(url.pathname) || archiveUrl.test(url.pathname)) {
       let streamController;
       const stream = new ReadableStream({
@@ -420,6 +425,9 @@ if (inServiceWorker) {
 }
 
 self.addEventListener("message", (e) => {
+  // Sanity check container name
+  if (checkPollutingName(e.data.container)) return;
+
   switch(e.data.command) {
     case "downloadFile":
       if (inServiceWorker) {

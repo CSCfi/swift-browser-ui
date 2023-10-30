@@ -200,6 +200,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1127) Fix `ServiceWorker` issues affecting Firefox downloads
 - (GL #1091) Fix subfolder download button downloading only one file
 - (GL #1129) Fix shared folder uploads and downloads in the new upload implementation (follow-up)
+- Fix possible prototype pollution vector in upload/download workers
 
 ### Removed
 
