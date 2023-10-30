@@ -40,7 +40,7 @@ intermediary storage and the ServiceWorker doesn't.
 // Example: https://devenv:8443/file/test-container/examplefile.txt.c4gh
 const fileUrl = new RegExp("/file/[^/]*/.*$");
 // Example: https://devenv:8443/archive/test-container.tar
-const archiveUrl = new RegExp("/archive/[^/]*\.tar$");
+const archiveUrl = new RegExp("/archive/[^/]*\\.tar$");
 const fileUrlStart = new RegExp("/file/[^/]*/");
 
 if (inServiceWorker) {
