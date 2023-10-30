@@ -79,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Use direct file system writes if available on system
   - Move upload, download fetch calls to workers to reduce messaging overhead
 - (GL #1145) Added new api for modifying write access from container's access control list
+- (GL #1151) New folder moved to the top of the table for a while when created via Upload modal or Create Folder modal
 
 ### Changed
 
