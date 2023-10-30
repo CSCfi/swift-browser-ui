@@ -847,14 +847,18 @@ export default {
       this.$store.commit("abortCurrentUpload");
       this.$store.commit("eraseCurrentUpload");
 
-      this.currentFolder ?
-        this.$store.commit("setFolderName", this.currentFolder) :
-        this.$store.commit("setFolderName", this.inputFolder);
+      const folderName = this.currentFolder ?
+        this.currentFolder :
+        this.inputFolder;
+
+      this.$store.commit("setFolderName", folderName);
+      this.$store.commit("setNewFolder", folderName);
+
       // Create a fresh session from scratch
       this.$store.commit("createCurrentUploadAbort");
 
       this.socket.addUpload(
-        this.currentFolder ? this.currentFolder : this.inputFolder,
+        folderName,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
         owner,

@@ -140,7 +140,11 @@ export default {
   beforeUnmount () {
     this.abortController.abort();
   },
+  expose: ["toFirstPage"],
   methods: {
+    toFirstPage() {
+      this.paginationOptions.currentPage = 1;
+    },
     async getSharingContainers () {
       this.sharingContainers =
         await getSharingContainers(this.active.id, this.abortController.signal);
@@ -379,6 +383,8 @@ export default {
       };
     },
     async onSort(event) {
+      this.$store.commit("setNewFolder", "");
+
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
 

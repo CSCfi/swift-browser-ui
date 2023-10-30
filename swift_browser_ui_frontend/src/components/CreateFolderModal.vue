@@ -121,6 +121,9 @@ export default {
     active() {
       return this.$store.state.active;
     },
+    uname() {
+      return this.$store.state.uname;
+    },
     controller() {
       return new AbortController();
     },
@@ -186,6 +189,15 @@ export default {
               });
             });
           this.toggleCreateFolderModal(keypress);
+
+          this.$router.push({
+            name: "AllFolders",
+            params: {
+              project: this.active.id,
+              user: this.uname,
+            },
+          });
+          this.$store.commit("setNewFolder", folderName);
         })
         .catch(err => {
           let errorMessage = this.$t("message.error.createFail");
@@ -212,7 +224,7 @@ export default {
       this.errorMsg = "";
       document.querySelector("#createModal-toasts").removeToast("create-toast");
 
-      if (keypress )moveFocusOutOfModal(this.prevActiveEl);
+      if (keypress) moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
