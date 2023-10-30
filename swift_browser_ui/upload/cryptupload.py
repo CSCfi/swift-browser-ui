@@ -210,8 +210,11 @@ class FileUpload:
                 # If handler has waited for too long for the next chunk, retry
                 # Currently 10 seconds is considered too long
                 if wait_count > 2000:
-                    await self.retry_chunk(i)
-                    wait_count = 0
+                    try:
+                        await self.retry_chunk(i)
+                        wait_count = 0
+                    except ConnectionResetError:
+                        pass
             self.done_chunks.add(i)
             chunk = self.chunk_cache.pop(i)
             await q.put(chunk)

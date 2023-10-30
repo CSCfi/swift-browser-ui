@@ -71,6 +71,8 @@ export default class UploadSocket {
           this.$store.commit("setUploadAbortReason", e.data.reason);
           this.$store.commit("stopUploading", true);
           this.$store.commit("toggleUploadNotification", false);
+          this.$store.commit("eraseProgress");
+          this.$store.commit("eraseDropFiles");
           break;
         case "success":
           break;
@@ -259,6 +261,11 @@ export default class UploadSocket {
       });
       if (DEV) console.log("Instructed upWorker to open the websocket.");
     });
+  }
+
+  cancelUpload(container) {
+    this.upWorker.postMessage({ command: "closeWebSocket", container });
+    if (DEV) console.log("Close the websocket and cancel current upload");
   }
 
   // Schecule file/files for upload

@@ -27,6 +27,7 @@ let totalFiles = 0;
 let doneFiles = 0;
 let progressInterval = undefined;
 let uploadCount = 0;
+let uploadCancelled = false;
 
 // Create an upload session
 function createUploadSession(container, receivers, projectName) {
@@ -126,7 +127,7 @@ function createUploadSessionFile(container, path) {
     "wrap_chunk_content",
     "number",
     ["number"],
-    [header]
+    [header],
   );
   let headerLen = Module.ccall(
     "wrap_chunk_len",
@@ -222,29 +223,36 @@ class StreamSlicer{
   async getChunk(iter) {
     let enChunk = await this.file.slice(iter * 65536, iter * 65536 + 65536);
 
-    if (enChunk === undefined || enChunk.length === 0 || enChunk.size === 0) {
+    if (enChunk === undefined || enChunk.length === 0 || enChunk.size === 0
+      || uploadCancelled
+    ) {
       clearInterval(this.interval);
+      if (uploadCancelled) uploadCount = 0;
       return;
     }
 
     let enBuffer = await enChunk.arrayBuffer();
 
-    let enData = encryptChunk(
-      this.container,
-      this.path,
-      new Uint8Array(enBuffer),
-    );
+    if (uploads[this.container]) {
+      let enData = encryptChunk(
+        this.container,
+        this.path,
+        new Uint8Array(enBuffer),
+      );
 
 
-    let msg = msgpack.serialize({
-      command: "add_chunk",
-      container: this.container,
-      object: this.path,
-      order: iter,
-      data: enData,
-    });
+      let msg = msgpack.serialize({
+        command: "add_chunk",
+        container: this.container,
+        object: this.path,
+        order: iter,
+        data: enData,
+      });
 
-    socket.send(msg);
+      if (socket.readyState === 1) {
+        socket.send(msg);
+      }
+    }
   }
 
   async nextChunk () {
@@ -338,6 +346,10 @@ async function openWebSocket (
     switch (msg_data.command) {
       // Abort the upload
       case "abort":
+        socket.close();
+        doneFiles = 0;
+        totalFiles = 0;
+        uploadCount = 0;
         postMessage({
           eventType: "abort",
           container: msg_data.container,
@@ -347,25 +359,31 @@ async function openWebSocket (
         break;
       // A file was successfully uploaded
       case "success":
-        uploads[msg_data.container].files[msg_data.object].slicer.finishFile();
-        postMessage({
-          eventType: "success",
-          container: msg_data.container,
-          object: msg_data.object,
-        });
+        if(!uploadCancelled) {
+          uploads[msg_data.container].files[msg_data.object].slicer.finishFile();
+          postMessage({
+            eventType: "success",
+            container: msg_data.container,
+            object: msg_data.object,
+          });
+        }
         break;
       // Push the next chunk to the websocket
       case "start_upload":
-        uploads[msg_data.container].files[msg_data.object].slicer.sendFile().then(
-          () => {}
-        );
+        if(!uploadCancelled) {
+          uploads[msg_data.container].files[msg_data.object].slicer.sendFile().then(
+            () => {},
+          );
+        }
         break;
       // Retry a chunk in the websocket
       case "retry_chunk":
-        uploads[msg_data.container].files[msg_data.object].slicer.retryChunk(msg_data.order);
+        if(!uploadCancelled) {
+          uploads[msg_data.container].files[msg_data.object].slicer.retryChunk(msg_data.order);
+        }
         break;
     }
-  }
+  };
 
   await waitAsm();
   Module.ccall("libinit", undefined, undefined, undefined);
@@ -374,13 +392,13 @@ async function openWebSocket (
 /*
 Add a batch of files to the current upload session.
 */
-function addFiles(files, container) {
+async function addFiles(files, container) {
   for (const file of files) {
     let handle = file.file;
 
     if (checkPollutingName(file.relativePath)) return;
 
-    let path = `${file.relativePath}.c4gh`
+    let path = `${file.relativePath}.c4gh`;
     let totalBytes = Math.floor(handle.size / 65536) * 65564;
     let totalChunks = Math.floor(handle.size / 65536);
 
@@ -394,7 +412,7 @@ function addFiles(files, container) {
     totalFiles++;
 
     // Add the chunks that need to be uploaded
-    let chunks = []
+    let chunks = [];
     for (let i = 0; i < totalChunks; i++) {
       chunks.push(i);
     }
@@ -408,7 +426,7 @@ function addFiles(files, container) {
       chunks: chunks,
       file: handle,
       slicer: new StreamSlicer(handle, container, path),
-    }
+    };
 
     // Create the file header
     createUploadSessionFile(container, path);
@@ -429,8 +447,15 @@ function addFiles(files, container) {
       msg.owner_name = uploads[container].ownerName;
     }
 
-    // Upload the file header
-    socket.send(msgpack.serialize(msg));
+    while (socket.readyState !== 1 && !uploadCancelled) {
+      await timeout(250);
+      // Ensure the websocket has stayed open
+      openWebSocket(upinfo);
+    }
+    if (socket.readyState === 1) {
+      // Upload the file header
+      socket.send(msgpack.serialize(msg));
+    }
   }
 
   // Create an interval for updating progress
@@ -455,6 +480,15 @@ function addFiles(files, container) {
   }, 250);
 }
 
+
+function closeWebSocket(container) {
+  let msg = msgpack.serialize({
+    command: "cancel",
+  });
+  socket.send(msg);
+  finishUploadSession(container);
+}
+
 self.addEventListener("message", (e) => {
   e.stopImmediatePropagation();
 
@@ -464,6 +498,7 @@ self.addEventListener("message", (e) => {
   switch(e.data.command) {
     // Create a new upload session with provided files
     case "addFiles":
+      uploadCancelled = false;
       // Create new upload session if it doesn't already exist
       if (uploads[e.data.container] === undefined) {
         createUploadSession(
@@ -479,9 +514,6 @@ self.addEventListener("message", (e) => {
       if (e.data.ownerName !== "") {
         uploads[e.data.container].ownerName = e.data.ownerName;
       }
-
-      // Ensure the websocket has stayed open
-      openWebSocket(upinfo);
 
       // Add the files in the upload request
       addFiles(e.data.files, e.data.container);
@@ -499,11 +531,15 @@ self.addEventListener("message", (e) => {
         eventType: "webSocketOpened",
       });
       break;
+    case "closeWebSocket":
+      uploadCancelled = true;
+      closeWebSocket(e.data.container);
+      break;
     case "abortUpload":
       finishUploadSession(e.data.container);
       break;
   }
-})
+});
 
 export var uploadRuntime = Module;
 export var uploadFileSystem = FS;
