@@ -416,7 +416,6 @@ export default {
           .map(item => item.name);
         const canDownload = checkIfCanDownloadTar(subfolderFiles, true);
         if (canDownload) {
-          if (DEV) console.log(subfolderFiles);
           this.$store.state.socket.addDownload(
             this.$route.params.container,
             subfolderFiles,
