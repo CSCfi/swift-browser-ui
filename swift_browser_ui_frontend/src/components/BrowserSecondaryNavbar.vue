@@ -6,6 +6,7 @@
         class="nav-item select-project"
       >
         <c-select
+          :key="routeToParams ? routeToParams?.project : active.id"
           v-csc-control
           v-bind="active"
           :items.prop="mappedProjects"
@@ -127,6 +128,9 @@ export default {
       const activeObject = this.$store.state.active;
       return { ...activeObject, value: activeObject.id };
     },
+    routeToParams() {
+      return this.$store.state.routeTo.params;
+    },
     uname() {
       return this.$store.state.uname;
     },
@@ -159,15 +163,23 @@ export default {
   methods: {
     changeActive(event) {
       const itemId = event.target.value;
+      const navigationParams = {
+        name: "AllFolders",
+        params: {user: this.uname, project: itemId},
+      };
+
       if (itemId !== this.active.id) {
-        const navigationParams = {
-          name: "AllFolders",
-          params: {user: this.uname, project: itemId},
-        };
-        // Updates URL, and then refreshes the page
-        this.$router.push(navigationParams).then(() => {
-          this.$router.go(0);
-        });
+        if (!this.isUploading) {
+          // Updates URL, and then refreshes the page
+          this.$router.push(navigationParams).then(() => {
+            this.$router.go(0);
+          });
+        }
+        else {
+          //ask user confirmation to interrupt upload / download
+          this.$store.commit("setRouteTo", navigationParams);
+          this.$store.commit("toggleConfirmRouteModal", true);
+        }
       }
     },
     toggleCreateFolderModal: function (keypress) {

@@ -153,6 +153,7 @@ kelvollisia
 kenttää
 kentällä
 kerran
+keskeyttää
 keskus
 kestää
 kieli
@@ -352,6 +353,7 @@ olet
 oletusarvoisesti
 oletusarvoiset
 oletusarvojen
+olevat
 olevia
 oli
 olla
@@ -646,6 +648,7 @@ uusi
 uusia
 vaatii
 vaihda
+vaihtaa
 vaihto
 vain
 valikkoon
