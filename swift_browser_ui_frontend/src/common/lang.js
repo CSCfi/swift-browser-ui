@@ -735,10 +735,10 @@ let default_translations = {
         refresh: "Päivitä",
       },
       route: {
-        title: "Vaihda projekti",
+        title: "Vaihda projektia",
         text: "Tämä toiminto keskeyttää käynnissä olevat " +
-        "lataukset ja lähetykset. Haluatko varmasti vaihtaa projektin?",
-        confirm: "Vaihda projekti",
+        "lataukset. Haluatko varmasti vaihtaa projektia?",
+        confirm: "Vaihda projektia",
         cancel: "Peruuta",
       },
       search: {

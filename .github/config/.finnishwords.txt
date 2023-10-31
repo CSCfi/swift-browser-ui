@@ -268,7 +268,6 @@ lähettäessä
 lähettäjän
 lähettämistä
 lähettää
-lähetykset
 lähetys
 lähetystä
 lähetä
