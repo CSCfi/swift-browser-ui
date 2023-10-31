@@ -242,3 +242,25 @@ export async function updateObjectsAndObjectTags(
     }
   }
 }
+
+export function checkIfCanDownloadTar(objs, isSubfolder) {
+  if (!objs) {
+    return true;
+  }
+  else if (isSubfolder && objs.length === 1) {
+    //no tar when single file in a subfolder
+    return true;
+  }
+  else {
+    //file or subfolder name max 99 chars, prefix max 154
+    const pathOk = objs.every(
+      (path) => {
+        const elements = path.split("/");
+        if (elements.find(el => el.length > 99)) return false;
+        if (elements.length > 2 &&
+          path.length - elements.slice(-1)[0].length > 154) return false;
+        return true;
+      });
+    return pathOk;
+  }
+}

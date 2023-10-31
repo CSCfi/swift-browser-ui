@@ -44,6 +44,7 @@ import {
   getPaginationOptions,
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
+  checkIfCanDownloadTar,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -52,6 +53,7 @@ import {
 import { toRaw } from "vue";
 import {
   swiftDeleteContainer,
+  getObjects,
 } from "@/common/api";
 
 export default {
@@ -277,15 +279,16 @@ export default {
                       text: true,
                       size: "small",
                       title: this.$t("message.download"),
-                      onClick: () => {
-                        this.beginDownload(
+                      onClick: async () => {
+                        await this.containerDownload(
                           item.name,
                           item.owner ? item.owner : "",
                         );
                       },
                       target: "_blank",
                       path: mdiTrayArrowDown,
-                      disabled: item.owner && item.accessRights?.length === 0,
+                      disabled: (item.owner && item.accessRights?.length === 0)
+                        || !item.bytes,
                     },
                   },
                 },
@@ -362,8 +365,8 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
-                            disabled: item.owner &&
-                              item.accessRights?.length === 0,
+                            disabled: (item.owner &&
+                              item.accessRights?.length === 0) || !item.bytes,
                           },
                         },
                       },
@@ -502,6 +505,24 @@ export default {
       ).then(() => {
         if (DEV) console.log(`Started downloading all objects from container ${container}`);
       });
+    },
+    async containerDownload(containerName, owner) {
+      let containerObjs = await getObjects(this.active.id, containerName);
+      containerObjs = containerObjs.map(obj => obj.name);
+
+      const canDownload = checkIfCanDownloadTar(
+        containerObjs, false);
+      if (canDownload) {
+        this.beginDownload(containerName, owner);
+      } else {
+        document.querySelector("#container-error-toasts")
+          .addToast(
+            { progress: false,
+              type: "error",
+              duration: 6000,
+              message: this.$t("message.downloadFiles")},
+          );
+      }
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {

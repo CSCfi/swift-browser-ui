@@ -3,6 +3,7 @@ ajaksi
 alapuolisesta
 alaviiva
 alikansio
+alikansioiden
 alikansion
 alikansiot
 alkanut
@@ -313,6 +314,7 @@ ne
 niiden
 niin
 nimellä
+nimet
 nimetä
 nimeä
 nimi
@@ -390,6 +392,7 @@ pienemmissä
 pienennä
 piilota
 piste
+pitkiä
 poiketa
 pois
 poissa
@@ -644,6 +647,7 @@ uusia
 vaatii
 vaihda
 vaihto
+vain
 valikkoon
 valikossa
 valinnan
@@ -674,6 +678,7 @@ virhe
 virheellinen
 voi
 voida
+voidaan
 voidaksesi
 voit
 voivat
