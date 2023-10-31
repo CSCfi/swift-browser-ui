@@ -20,7 +20,7 @@
     "@vueuse/rxjs": "^10.5.0",
     "@ygoe/msgpack": "^1.0.3",
     "cli-highlight": "^2.1.11",
-    "csc-ui": "0.9.3",
+    "csc-ui": "0.9.4",
     "dexie": "^3.2.4",
     "eslint": "^8.51.0",
     "eslint-plugin-vue": "^9.17.0",
