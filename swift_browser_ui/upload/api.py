@@ -74,10 +74,15 @@ async def handle_replicate_container(
     replicator = ObjectReplicationProxy(
         request.app[session],
         request.app["client"],
+        request.app[VAULT_CLIENT],
         project,
         container,
         source_project,
         source_container,
+        request.query["project_name"] if "project_name" in request.query else "",
+        request.query["from_project_name"]
+        if "from_project_name" in request.query
+        else "",
     )
 
     # Ensure that both containers exist
@@ -103,17 +108,22 @@ async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.R
     replicator = ObjectReplicationProxy(
         request.app[session],
         request.app["client"],
+        request.app[VAULT_CLIENT],
         project,
         container,
         source_project,
         source_container,
+        request.query["project_name"] if "project_name" in request.query else "",
+        request.query["from_project_name"]
+        if "from_project_name" in request.query
+        else "",
     )
 
     # Ensure that both containers exist
     await replicator.a_ensure_container()
     await replicator.a_ensure_container(segmented=True)
 
-    asyncio.ensure_future(replicator.a_copy_object(source_object))
+    asyncio.ensure_future(replicator.a_copy_single_object(source_object))
 
     return aiohttp.web.Response(status=202)
 

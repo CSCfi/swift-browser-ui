@@ -408,6 +408,8 @@ export async function swiftCopyContainer(
   container,
   source_project,
   source_container,
+  project_name = "",
+  source_project_name = "",
 ) {
   // Replicate the container from a specified source to the location
   let fetchURL = new URL("/replicate/".concat(
@@ -417,6 +419,13 @@ export async function swiftCopyContainer(
 
   fetchURL.searchParams.append("from_project", source_project);
   fetchURL.searchParams.append("from_container", source_container);
+
+  if (project_name !== "") {
+    fetchURL.searchParams.append("project_name", project_name);
+  }
+  if (source_project_name !== "") {
+    fetchURL.searchParams.append("from_project_name", source_project_name);
+  }
 
   let ret = await POST(fetchURL);
 

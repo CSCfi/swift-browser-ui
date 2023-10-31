@@ -216,6 +216,9 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
+      this.a_replicate_container(keypress).then(() => {});
+    },
+    a_replicate_container: async function (keypress) {
       if (this.errorMsg.length) return;
       this.$store.commit("toggleCopyFolderModal", false);
       document.querySelector("#copyFolder-toasts").addToast(
@@ -228,12 +231,23 @@ export default {
         },
       );
 
+      // Fetch the source project id if it exists
+      let sourceProjectName = "";
+      if (this.sourceProjectId) {
+        let ids = await this.$store.state.client.projectCheckIDs(
+          this.sourceProjectId,
+        );
+        sourceProjectName = ids.name;
+      }
+
       // Initiate the container replication operation
-      swiftCopyContainer(
+      await swiftCopyContainer(
         this.active.id,
         this.folderName,
         this.sourceProjectId ? this.sourceProjectId : this.active.id,
         this.selectedFolderName,
+        this.active.name,
+        sourceProjectName,
       ).then(async () => {
         await this.$store.dispatch("updateContainers", {
           projectID: this.$route.params.project,
