@@ -204,6 +204,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1129) Fix shared folder uploads and downloads in the new upload implementation (follow-up)
 - Fix possible prototype pollution vector in upload/download workers
 - (GL #1149) Fix headers no getting copied when replicating a container
+- (GL #1154) Fix session cookie not getting properly clear on invalidation
 
 ### Removed
 
