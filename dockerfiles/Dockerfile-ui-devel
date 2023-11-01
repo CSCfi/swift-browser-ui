@@ -1,4 +1,4 @@
-FROM node:18-alpine3.17 as FRONTEND
+FROM node:21-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
