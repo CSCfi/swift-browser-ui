@@ -28,13 +28,13 @@ dependencies = [
     "asyncpg==0.28.0",
     "certifi==2023.7.22",
     "click==8.1.7",
-    "cryptography==41.0.4",
+    "cryptography==41.0.5",
     "gunicorn==21.2.0",
     "keystoneauth1==5.3.0",
     "oidcrp==2.1.4",
     "python-swiftclient==4.4.0",
-    "uvloop==0.18.0",
-    "msgpack==1.0.5",
+    "uvloop==0.19.0",
+    "msgpack==1.0.7",
 ]
 
 [project.optional-dependencies]
@@ -43,25 +43,25 @@ docs = [
     "sphinx_rtd_theme==1.3.0",
 ]
 test = [
-    "black==23.9.1",
+    "black==23.10.1",
     "coverage==7.3.2",
     "flake8-docstrings==1.7.0",
     "flake8==6.1.0",
-    "mypy==1.6.0",
+    "mypy==1.6.1",
     "pytest-cov==4.1.0",
     "pytest-xdist==3.3.1",
-    "pytest==7.4.2",
+    "pytest==7.4.3",
     "tox==4.11.3",
 ]
 ui_test = [
     "pytest-timeout==2.2.0",
-    "pytest==7.4.2",
+    "pytest==7.4.3",
 ]
 dev = [
     "honcho==1.1.0",
     "pre-commit==3.5.0",
     "pyspelling==2.9",
-    "ruff==0.0.292",
+    "ruff==0.1.3",
     "types-certifi",
     "types-redis",
     "types-requests",
