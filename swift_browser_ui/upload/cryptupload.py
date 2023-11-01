@@ -304,7 +304,14 @@ class FileUpload:
         for q in self.q_cache:
             await q.put(b"")
 
-        await asyncio.gather(*self.tasks)
+        try:
+            await asyncio.gather(*self.tasks)
+        except ConnectionResetError:
+            pass
+        finally:
+            for task in self.tasks:
+                if not task.done():
+                    task.cancel()
 
         # Delete segments that might've been uploaded
         headers = {
