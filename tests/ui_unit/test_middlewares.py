@@ -17,8 +17,9 @@ async def return_401_handler(with_exception):
     """Return an HTTP401 error."""
     if with_exception:
         raise HTTPUnauthorized()
-    return FileResponse(
-        status=401, path=f"{os.getcwd()}/swift_browser_ui_frontend/dist/401.html"
+    return Response(
+        status=401,
+        body=b"",
     )
 
 
@@ -26,8 +27,9 @@ async def return_403_handler(with_exception):
     """Return an HTTP403 error."""
     if with_exception:
         raise HTTPForbidden()
-    return FileResponse(
-        status=403, path=f"{os.getcwd()}/swift_browser_ui_frontend/dist/403.html"
+    return Response(
+        status=403,
+        body=b"",
     )
 
 
@@ -35,8 +37,9 @@ async def return_404_handler(with_exception):
     """Return or raise an HTTP404 error."""
     if with_exception:
         raise HTTPNotFound()
-    return FileResponse(
-        status=404, path=f"{os.getcwd()}/swift_browser_ui_frontend/dist/404.html"
+    return Response(
+        status=404,
+        body=b"",
     )
 
 
@@ -44,8 +47,9 @@ async def return_400_handler(with_exception):
     """Return or raise an HTTP400 error."""
     if with_exception:
         raise HTTPClientError()
-    return FileResponse(
-        status=400, path=f"{os.getcwd()}/swift_browser_ui_frontend/dist/400.html"
+    return Response(
+        status=400,
+        body=b"",
     )
 
 
@@ -63,6 +67,10 @@ class MiddlewareTestClass(tests.common.mockups.APITestBase):
         self.p_get_sess = unittest.mock.patch(
             "swift_browser_ui.ui.middlewares.aiohttp_session.get_session",
             self.aiohttp_session_get_session_mock,
+        )
+        self.p_setd = unittest.mock.patch(
+            "swift_browser_ui.ui.middlewares.setd",
+            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
         )
 
     async def test_check_session(self):
@@ -97,59 +105,61 @@ class MiddlewareTestClass(tests.common.mockups.APITestBase):
 
     async def test_401_return(self):
         """Test 401 middleware when the 401 status is returned."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            None, return_401_handler
-        )
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_401_handler
+            )
         self.assertEqual(resp.status, 401)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_401_exception(self):
         """Test 401 middleware when the 401 status is risen."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            True, return_401_handler
-        )
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_401_handler
+            )
         self.assertEqual(resp.status, 401)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_403_return(self):
         """Test 403 middleware when the 403 status is returned."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            None, return_403_handler
-        )
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_403_handler
+            )
         self.assertEqual(resp.status, 403)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_403_exception(self):
         """Test 403 middleware when the 403 status is risen."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            True, return_403_handler
-        )
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_403_handler
+            )
         self.assertEqual(resp.status, 403)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_404_return(self):
         """Test 404 middleware when the 404 status is returned."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            None, return_404_handler
-        )
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                None, return_404_handler
+            )
         self.assertEqual(resp.status, 404)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_404_exception(self):
-        """Test 404 middlewrae when the 404 status is risen."""
-        resp = await swift_browser_ui.ui.middlewares.error_middleware(
-            True, return_404_handler
-        )
+        """Test 404 middleware when the 404 status is risen."""
+        with self.p_setd:
+            resp = await swift_browser_ui.ui.middlewares.error_middleware(
+                True, return_404_handler
+            )
         self.assertEqual(resp.status, 404)
-        self.assertIsInstance(resp, FileResponse)
+        self.assertIsInstance(resp, Response)
 
     async def test_error_middleware_no_error(self):
         """Test the general error middleware with correct status."""
-        patch_setd = unittest.mock.patch(
-            "swift_browser_ui.ui.middlewares.setd",
-            new={"static_directory": os.getcwd() + "/swift_browser_ui_frontend/dist"},
-        )
-        with patch_setd:
+        with self.p_setd:
             resp = await swift_browser_ui.ui.middlewares.error_middleware(None, index)
             self.assertEqual(resp.status, 200)
             self.assertIsInstance(resp, FileResponse)
