@@ -138,6 +138,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
             def __init__(self, mockresp):
                 """."""
                 self.mock_client_response = mockresp
+                self._asyncioRunner = None
 
             async def __aenter__(self):
                 return self.mock_client_response
