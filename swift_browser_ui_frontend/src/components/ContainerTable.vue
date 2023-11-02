@@ -332,7 +332,7 @@ export default {
                               }
                             });
                           },
-                          disabled: !item.bytes ? true : false,
+                          disabled: !item.bytes,
                         },
                         {
                           name: this.$t("message.editTags"),
@@ -366,7 +366,8 @@ export default {
                             title: this.$t("message.options"),
                             size: "small",
                             disabled: (item.owner &&
-                              item.accessRights?.length === 0) || !item.bytes,
+                              (item.accessRights?.length === 0 ||
+                                !item.bytes)),
                           },
                         },
                       },
