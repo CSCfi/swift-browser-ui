@@ -60,7 +60,7 @@ jobs:
           pip install -r requirements.txt
           pip install honcho
           honcho start -f ${{ github.workspace }}/.github/config/Procfile --env ${{ github.workspace }}/.github/config/.env.test &
-      - uses: cypress-io/github-action@v5
+      - uses: cypress-io/github-action@v6
         with:
           project: ./swift_browser_ui_frontend
           install: false

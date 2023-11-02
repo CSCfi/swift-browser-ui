@@ -17,7 +17,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Wait other jobs are passed or failed
         if: ${{ steps.metadata.outputs.package-ecosystem == 'pip' || steps.metadata.outputs.package-ecosystem == 'github_actions' }}
-        uses: kachick/wait-other-jobs@v1
+        uses: kachick/wait-other-jobs@v2
         timeout-minutes: 30
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
