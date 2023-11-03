@@ -236,7 +236,7 @@ export default {
               value: item.count,
             },
             size: {
-              value: getHumanReadableSize(item.bytes),
+              value: getHumanReadableSize(item.bytes, this.locale),
             },
             ...(this.hideTags ? {} : {
               tags: {

@@ -130,7 +130,6 @@
 
 <script>
 import {
-  getHumanReadableSize,
   truncate,
   parseDateTime,
 } from "@/common/conv";
@@ -510,11 +509,6 @@ export default {
       this.currentPage = this.$route.query.page ?
         parseInt(this.$route.query.page) :
         1;
-    },
-    // Make human readable translation functions available in instance
-    // namespace
-    localHumanReadableSize: function ( size ) {
-      return getHumanReadableSize( size );
     },
     getPrefix: function () {
       // Get current pseudofolder prefix

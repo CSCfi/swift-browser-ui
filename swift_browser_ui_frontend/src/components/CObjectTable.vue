@@ -194,7 +194,7 @@ export default {
           } : {}),
         },
         size: {
-          value: getHumanReadableSize(item.bytes),
+          value: getHumanReadableSize(item.bytes, this.locale),
         },
         last_modified: {
           value: this.showTimestamp? parseDateTime(

@@ -303,6 +303,9 @@ export default {
     active() {
       return this.$store.state.active;
     },
+    locale() {
+      return this.$i18n.locale;
+    },
     pubkey() {
       return this.$store.state.pubkey;
     },
@@ -501,6 +504,7 @@ export default {
     }
   },
   methods: {
+    getHumanReadableSize,
     checkPage(event, isKey) {
       const page = checkIfItemIsLastOnPage(
         {
@@ -555,7 +559,7 @@ export default {
           return {
             name: { value: file.name || truncate(100) },
             type: { value: file.type },
-            size: { value: this.localHumanReadableSize(file.size) },
+            size: { value: getHumanReadableSize(file.size, this.locale) },
             relativePath: {
               value: file.relativePath || truncate(100),
             },
@@ -698,11 +702,6 @@ export default {
           this.setFile(entry, "");
         }
       }
-    },
-    // Make human readable translation functions available in instance
-    // namespace
-    localHumanReadableSize: function (size) {
-      return getHumanReadableSize(size);
     },
     dragHandler: function (e) {
       e.preventDefault();
