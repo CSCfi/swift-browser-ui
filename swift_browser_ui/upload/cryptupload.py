@@ -82,7 +82,6 @@ class FileUpload:
         self.total_segments: int = -(self.total // -SEGMENT_SIZE)
         self.remainder_segment: int = self.total % SEGMENT_SIZE
         self.total_chunks: int = -(self.total // -CHUNK_SIZE)
-        self.remainder_chunk: int = self.total % CHUNK_SIZE
         self.remainder_chunks: int = -(self.remainder_segment // -CHUNK_SIZE)
 
         self.q_cache: typing.List[asyncio.Queue] = [
@@ -183,12 +182,14 @@ class FileUpload:
         """Slice a ~5GiB segment from queue."""
         seg_start = segment * SEGMENT_CHUNKS
         seg_end = seg_start + SEGMENT_CHUNKS
-        if segment == self.total_segments - 1 and self.remainder_chunks:
-            LOGGER.debug(
-                f"Using {self.remainder_chunks} as chunk amount for last segment."
-            )
-            seg_end = seg_start + self.remainder_chunks
-
+        if segment == self.total_segments - 1 and self.total_chunks:
+            # In case of the object size > SEGMENT_SIZE,
+            # there are some variances between calculated variables
+            # which can cause some missing chunks.
+            # Using total_chunks for last segment's chunk amount
+            # is more accurate than remainder_chunks
+            LOGGER.debug(f"Using {self.total_chunks} as chunk amount for last segment.")
+            seg_end = self.total_chunks
         LOGGER.debug(f"Consuming chunks {seg_start} through {seg_end}")
         LOGGER.debug(f"Waiting until first chunk in segment {segment} is available.")
 
