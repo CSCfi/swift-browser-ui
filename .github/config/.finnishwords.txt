@@ -644,6 +644,7 @@ uudella
 uudelle
 uudelleen
 uuden
+uudet
 uusi
 uusia
 vaatii
@@ -655,6 +656,7 @@ valikkoon
 valikossa
 valinnan
 valinnat
+valinnut
 valitse
 valitsemaasi
 valittu

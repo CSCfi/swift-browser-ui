@@ -6,7 +6,32 @@
     <!-- Footer options needs to be in CamelCase,
     because csc-ui wont recognise it otherwise. -->
     <!-- eslint-disable-->
+    <c-alert
+      v-show="clickedPermChange"
+      id="perm-change-alert"
+      type="warning"
+    >
+      {{ $t("message.share.perm_change_text") +
+      "(" + getPermName(newPerms) + ")" +
+      $t("message.share.perm_change_text2") }}
+      <c-card-actions justify="end">
+        <c-button
+          outlined
+          @click="clearPermChange"
+          @keyup.enter="clearPermChange"
+        >
+          {{ $t("message.share.cancel") }}
+        </c-button>
+        <c-button
+          @click="confirmPermChange"
+          @keyup.enter="confirmPermChange"
+        >
+          {{ $t("message.share.perm_change_confirm") }}
+        </c-button>
+      </c-card-actions>
+    </c-alert>
     <c-data-table
+      :key="newPerms"
       id="shared-projects-table"
       v-if="tableData.length > 0"
       :data.prop="tableData"
@@ -21,6 +46,7 @@
 </template>
 
 <script>
+import { toRaw } from "vue";
 import {
   modifyAccessControlMeta,
   removeAccessControlMeta,
@@ -36,11 +62,17 @@ export default {
   data: function () {
     return {
       tableData: [],
+      clickedPermChange: false,
+      newPerms: [],
+      sharedTo: "",
     };
   },
   computed: {
     projectId () {
       return this.$store.state.active.id;
+    },
+    shareModalOpen () {
+      return this.$store.state.openShareModal;
     },
     headers () {
       return [
@@ -120,6 +152,11 @@ export default {
     sharedDetails: function () {
       this.getTableData();
     },
+    shareModalOpen: function () {
+      if (!this.shareModalOpen) {
+        this.clearPermChange();
+      }
+    },
   },
   methods: {
     getTableData: function () {
@@ -144,7 +181,19 @@ export default {
                         ? this.accessRights[2]
                         : this.accessRights[1])
                     : this.accessRights[0],
-                  onChangeValue: (e) => this.editAccessRight(e, item.sharedTo),
+                  onChangeValue: (e) =>  {
+                    this.newPerms = this.getPermArray(e.detail.value);
+                    if (this.getPermName(this.newPerms)
+                      !== this.getPermName(toRaw(item.access))) {
+                      //if different than current perms chosen
+                      this.sharedTo = item.sharedTo;
+                      this.clickedPermChange = true;
+                      document.getElementById("perm-change-alert")
+                        .scrollTo(0, 0);
+                    } else {
+                      this.clearPermChange();
+                    }
+                  },
                   onClick: ({ event }) => {
                     const wrapper =
                       document.getElementById("share-card-modal-content");
@@ -167,39 +216,55 @@ export default {
         },
       }));
     },
-    editAccessRight: async function (e, sharedProjectId) {
-      const rights = [];
-      const val = e.detail.value;
-      if (val === "view") rights.push("v");
-      else if (val === "read") rights.push("r");
-      else rights.push("r", "w");
+    getPermName(array) {
+      return array.length > 1 ? this.accessRights[2].name
+        : (this.accessRights[1].value[0] === array[0] ?
+          this.accessRights[1].name : this.accessRights[0].name);
+    },
+    clearPermChange() {
+      this.clickedPermChange = false;
+      this.newPerms = [];
+      this.sharedTo = "";
+    },
+    async confirmPermChange() {
+      await this.editAccessRight(this.sharedTo);
+      this.clearPermChange();
+      this.getTableData();
+    },
+    getPermArray(val) {
+      if (!val) return [];
+      if (val === "view") return ["v"];
+      else if (val === "read") return ["r"];
+      else return ["r", "w"];
+    },
+    editAccessRight: async function (sharedProjectId) {
 
       await modifyAccessControlMeta(
         this.projectId,
         this.folderName,
         [sharedProjectId],
-        rights,
+        this.newPerms,
       );
 
       await modifyAccessControlMeta(
         this.projectId,
         `${this.folderName}_segments`,
         [sharedProjectId],
-        rights,
+        this.newPerms,
       );
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,
         this.folderName,
         [sharedProjectId],
-        rights,
+        this.newPerms,
       );
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,
         `${this.folderName}_segments`,
         [sharedProjectId],
-        rights,
+        this.newPerms,
       );
       let projectIDs = await this.$store.state.client.projectCheckIDs(
         sharedProjectId,
@@ -222,9 +287,7 @@ export default {
         signed.signature,
       );
 
-      console.log(projectIDs);
-
-      if (val === "view") {
+      if (this.newPerms.length === 1 && this.newPerms[0] === "v") {
         await fetch(
           whitelistUrl,
           {
