@@ -32,6 +32,35 @@
         </li>
       </ul>
     </div>
+
+    <c-row
+      id="optionsbar"
+      justify="space-between"
+    >
+      <c-text-field
+        id="search"
+        v-model="searchQuery"
+        v-csc-control
+        name="search"
+        :placeholder="$t('message.objects.filterBy')"
+        type="search"
+      >
+        <i
+          slot="pre"
+          class="mdi mdi-filter-variant mdi-24px"
+        />
+      </c-text-field>
+      <c-menu
+        :key="optionsKey"
+        :items.prop="tableOptions"
+        options-testid="table-options-selector"
+      >
+        <span class="menu-active display-options-menu">
+          <i class="mdi mdi-tune" />
+          {{ $t("message.tableOptions.displayOptions") }}
+        </span>
+      </c-menu>
+    </c-row>
     <div
       v-if="checkedRows.length"
       class="selection-bar"
@@ -64,35 +93,6 @@
         </c-button>
       </div>
     </div>
-
-    <c-row
-      id="optionsbar"
-      justify="space-between"
-    >
-      <c-text-field
-        id="search"
-        v-model="searchQuery"
-        v-csc-control
-        name="search"
-        :placeholder="$t('message.objects.filterBy')"
-        type="search"
-      >
-        <i
-          slot="pre"
-          class="mdi mdi-filter-variant mdi-24px"
-        />
-      </c-text-field>
-      <c-menu
-        :key="optionsKey"
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
-      >
-        <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
-    </c-row>
     <div id="obj-table-wrapper">
       <CObjectTable
         :breadcrumb-clicked-prop="breadcrumbClicked"
