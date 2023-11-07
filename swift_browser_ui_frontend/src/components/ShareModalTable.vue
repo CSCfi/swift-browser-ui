@@ -30,6 +30,28 @@
         </c-button>
       </c-card-actions>
     </c-alert>
+    <c-alert
+      v-show="clickedDelete"
+      id="delete-alert"
+      type="warning"
+    >
+      {{ $t("message.share.share_delete_text") }}
+      <c-card-actions justify="end">
+        <c-button
+          outlined
+          @click="clearDelete"
+          @keyup.enter="clearDelete"
+        >
+          {{ $t("message.share.cancel") }}
+        </c-button>
+        <c-button
+          @click="confirmDelete"
+          @keyup.enter="confirmDelete"
+        >
+          {{ $t("message.share.share_delete_confirm") }}
+        </c-button>
+      </c-card-actions>
+    </c-alert>
     <c-data-table
       :key="newPerms"
       id="shared-projects-table"
@@ -65,6 +87,8 @@ export default {
       clickedPermChange: false,
       newPerms: [],
       sharedTo: "",
+      clickedDelete: false,
+      toDelete: {},
     };
   },
   computed: {
@@ -112,8 +136,10 @@ export default {
                   title: this.$t("message.delete"),
                   path: mdiDelete,
                   onClick: ({ data }) => {
-                    this.$emit("removeSharedFolder", data);
-                    this.deleteFolderShare(data);
+                    this.toDelete = data;
+                    this.clickedDelete = true;
+                    document.getElementById("delete-alert")
+                      .scrollTo(0, 0);
                   },
                   onKeyUp: (e) => {
                     if(e.keyCode === 13) {
@@ -123,8 +149,10 @@ export default {
                         const data = {
                           projectId: {value: row.children[0]?.innerText},
                         };
-                        this.$emit("removeSharedFolder", data);
-                        this.deleteFolderShare(data);
+                        this.toDelete = data;
+                        this.clickedDelete = true;
+                        document.getElementById("delete-alert")
+                          .scrollTo(0, 0);
                       }
                     }
                   },
@@ -154,7 +182,9 @@ export default {
     },
     shareModalOpen: function () {
       if (!this.shareModalOpen) {
+        //clear alerts on closed modal
         this.clearPermChange();
+        this.clearDelete();
       }
     },
   },
@@ -309,6 +339,15 @@ export default {
         });
       }
       this.$emit("updateSharedFolder");
+    },
+    confirmDelete: async function () {
+      this.$emit("removeSharedFolder", this.toDelete);
+      await this.deleteFolderShare(this.toDelete);
+      this.clearDelete();
+    },
+    clearDelete: function () {
+      this.clickedDelete = false;
+      this.toDelete = {};
     },
     deleteFolderShare: async function (folderData) {
       await removeAccessControlMeta(

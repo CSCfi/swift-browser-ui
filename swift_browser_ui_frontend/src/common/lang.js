@@ -186,6 +186,10 @@ let default_translations = {
         perm_change_text: "You have selected new sharing permissions ",
         perm_change_text2: ". Are you sure you want to proceed?",
         perm_change_confirm: "Change permissions",
+        share_delete_text:
+          "Are you sure you want to " +
+          "delete the sharing permissions?",
+        share_delete_confirm: "Delete permissions",
       },
       download: " Download",
       downloadFiles: "Files can only be downloaded " +
@@ -590,8 +594,10 @@ let default_translations = {
         invalid_share_ids:
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
         perm_change_text: "Olet valinnut uudet käyttöoikeudet ",
-        perm_change_text2: ". Haluatko varmasti vaihtaa käyttöoikeudet?",
-        perm_change_confirm: "Vaihda käyttöoikeudet",
+        perm_change_text2: ". Haluatko varmasti muuttaa käyttöoikeudet?",
+        perm_change_confirm: "Muuta käyttöoikeudet",
+        share_delete_text: "Haluatko varmasti poistaa käyttöoikeudet?",
+        share_delete_confirm: "Poista käyttöoikeudet",
       },
       download: " Lataa",
       downloadFiles: "Tiedostot voidaan ladata vain " +
