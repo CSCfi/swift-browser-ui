@@ -741,9 +741,10 @@ export default {
       const crypt4gh = new RegExp (
         "^-----BEGIN CRYPT4GH PUBLIC KEY-----\\s[A-Za-z0-9+/]{42,44}[=]{0,2}" +
           "\\s-----END CRYPT4GH PUBLIC KEY-----$");
-      return (key.match(sshed25519) || key.match(crypt4gh));
+      return (key.trim().match(sshed25519) || key.trim().match(crypt4gh));
     },
     appendPublicKey: async function () {
+      this.addRecvkey = this.addRecvkey.trim();
       if (!this.recvkeys.includes(this.addRecvkey)){
         this.recvkeys.push(this.addRecvkey);
         this.recvHashedKeys
