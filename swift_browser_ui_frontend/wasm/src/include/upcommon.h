@@ -2,14 +2,18 @@
 Upload process common functions
 */
 
-
 #include <stdint.h>
+#ifdef TEST
+#include "stub_ftw.h"
+#include "stub_fcntl.h"
+#else
+#include <fcntl.h>
+#include <ftw.h>
+#endif
 #include "uptypes.h"
-
 
 #ifndef SWIFT_UI_UPLOAD_COMMON
 #define SWIFT_UI_UPLOAD_COMMON
-
 
 /*****************************************************
 Encryption / decryption keypair convenience functions.
@@ -31,18 +35,25 @@ Return private key from the keypair.
 */
 uint8_t *get_keypair_private_key(KEYPAIR *kp);
 
-
 /*
 Key init function, from libcrypt4gh
 */
 uint8_t *crypt4gh_session_key_new(void);
-
 
 /*
 Free the crypt4gh session key with sodium.
 */
 void free_crypt4gh_session_key(uint8_t *sk);
 
+/*
+Remove file in callback from FTW.
+*/
+int nftwremove(const char *path, const stat *st, int flag, FTW *ftws);
+
+/*
+Remove tmp files recursively.
+*/
+int rmrecv(const char *keypath);
 
 /***************************************************
 Encryption / decryption chunk convenience functions.
@@ -62,7 +73,6 @@ uint8_t *wrap_chunk_content(CHUNK *chunk);
 /*
 Free a chunk from memory.
 */
-void free_chunk (CHUNK *chunk);
-
+void free_chunk(CHUNK *chunk);
 
 #endif

@@ -4,11 +4,19 @@ Init functions for folder upload
 
 #define _XOPEN_SOURCE 500
 #include <unistd.h>
+#ifdef TEST
+#include "stub_sodium.h"
+#include "stub_crypt4gh_key.h"
+#include "stub_ftw.h"
+#include "stub_fcntl.h"
+#else
 #include <fcntl.h>
 #include <sodium.h>
-#include <ftw.h>
-#include <string.h>
 #include <crypt4gh/key.h>
+#include <ftw.h>
+#endif // TEST
+#include <stdlib.h>
+#include <string.h>
 #include <uuid/uuid.h>
 #include <stdio.h>
 
@@ -20,7 +28,7 @@ Init functions for folder upload
 Read a public key from ftw entry
 */
 uint8_t *recv_keys = NULL;
-unsigned int recv_key_amount;
+unsigned int recv_key_amount = 0;
 
 
 /*
