@@ -48,7 +48,7 @@ void free_crypt4gh_session_key(uint8_t *sk);
 /*
 Remove file in callback from FTW.
 */
-int nftwremove(const char *path, const stat *st, int flag, FTW *ftws);
+int nftwremove(const char *path, const struct stat *st, int flag, struct FTW *ftws);
 
 /*
 Remove tmp files recursively.

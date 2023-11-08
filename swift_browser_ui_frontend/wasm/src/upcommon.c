@@ -97,9 +97,9 @@ wrap filesystem item remove
 */
 int nftwremove(
     const char *path,
-    const stat *st,
+    const struct stat *st,
     int flag,
-    FTW *ftws)
+    struct FTW *ftws)
 {
     if (flag == FTW_F)
     {
