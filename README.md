@@ -311,6 +311,11 @@ It's possible to set the host to run against by using the environment variable `
 
     CYPRESS_BASE_URL=http://localhost:8081 pnpm cypress open
 
+#### WebAssembly C Code Unit Tests
+C code is tested using a unit tests collection built using `ceedling`. They can be ran by
+navigating to the `swift_browser_ui_frontend/wasm` directory and running the `ceedling` command.
+You'll have to install `ceedling` first, which can be found [here](https://www.throwtheswitch.org/ceedling)
+
 ### License
 
 ``swift-browser-ui`` and all it sources are released under *MIT License*.
