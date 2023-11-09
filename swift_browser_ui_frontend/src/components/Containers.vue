@@ -298,12 +298,6 @@ export default {
       // Add pagination current page number to the URL in query string
       this.$router.push("?page=" + pageNumber);
     },
-    toggleCreateFolderModal: function (folderName) {
-      this.$store.commit("toggleCreateFolderModal", true);
-      if (folderName) {
-        this.$store.commit("setFolderName", folderName);
-      }
-    },
   },
 };
 </script>

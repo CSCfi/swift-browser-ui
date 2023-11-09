@@ -55,6 +55,7 @@ const store = createStore({
     routeTo: {},
     openCreateFolderModal: false,
     selectedFolderName: "",
+    uploadFolderName: "",
     openUploadModal: false,
     openShareModal: false,
     currentUpload: undefined,
@@ -191,6 +192,11 @@ const store = createStore({
     },
     setFolderName(state, payload) {
       state.selectedFolderName = payload;
+    },
+    setUploadFolderName(state, payload) {
+      //separate for upload because it's needed
+      //for the duration of upload for "view destination"
+      state.uploadFolderName = payload;
     },
     toggleUploadModal(state, payload) {
       state.openUploadModal = payload;

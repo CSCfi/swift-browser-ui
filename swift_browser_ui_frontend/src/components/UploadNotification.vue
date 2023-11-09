@@ -38,7 +38,7 @@ export default {
       return this.$store.state.uname;
     },
     container() {
-      return this.$store.state.selectedFolderName;
+      return this.$store.state.uploadFolderName;
     },
   },
   methods: {
