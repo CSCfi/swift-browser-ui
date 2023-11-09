@@ -226,15 +226,15 @@ export default {
     },
   },
   watch: {
-    active: async function() {
-      await this.getSharedContainers();
-      await this.getFolderSharedStatus();
-      await this.updateObjects();
+    active: function() {
+      this.getData();
     },
-    client: async function() {
-      await this.getSharedContainers();
-      await this.getFolderSharedStatus();
-      await this.updateObjects();
+    client: function() {
+      this.getData();
+    },
+    containerName: function() {
+      this.objsLoading = true;
+      this.getData();
     },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -286,11 +286,9 @@ export default {
     this.getDirectCurrentPage();
     this.checkLargeDownloads();
   },
-  async mounted () {
+  mounted () {
     this.objsLoading = true;
-    await this.getSharedContainers();
-    await this.getFolderSharedStatus();
-    this.updateObjects();
+    this.getData();
   },
   beforeUnmount () {
     this.abortController.abort();
@@ -299,6 +297,11 @@ export default {
     if (this.breadcrumbClicked) this.breadcrumbClicked = false;
   },
   methods: {
+    getData: async function () {
+      await this.getSharedContainers();
+      await this.getFolderSharedStatus();
+      await this.updateObjects();
+    },
     breadcrumbClickHandler(value) {
       this.breadcrumbClicked = value;
     },
