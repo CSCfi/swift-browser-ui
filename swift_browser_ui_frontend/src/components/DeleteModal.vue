@@ -121,9 +121,11 @@ export default {
               this.owner ? this.owner : this.projectID,
               segment_container.name,
             );
-            const segment_obj = segment_objects.filter(obj =>
-              obj.name.includes(`${object.name}/`))[0];
-            if (segment_obj) segments_to_remove.push(segment_obj.name);
+            const filtered_segment_objects = segment_objects.filter(obj =>
+              obj.name.includes(`${object.name}/`));
+            for (const segment_obj of filtered_segment_objects) {
+              segments_to_remove.push(segment_obj.name);
+            }
           }
         } else {
           //flag if user is trying to delete a subfolder
