@@ -222,6 +222,7 @@ käyttää
 käyttöliittymä
 käyttöliittymän
 käyttöohje
+käyttöoikeuden
 käyttöoikeudet
 käyttöoikeus
 käyttöoikeutta
