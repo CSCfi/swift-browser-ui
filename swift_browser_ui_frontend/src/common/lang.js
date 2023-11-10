@@ -593,11 +593,11 @@ let default_translations = {
         invalid_share_id: " ei ole kelvollinen jakamistunnus. Poistakaa se.",
         invalid_share_ids:
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
-        perm_change_text: "Olet valinnut uudet käyttöoikeudet ",
-        perm_change_text2: ". Haluatko varmasti muuttaa käyttöoikeudet?",
-        perm_change_confirm: "Muuta käyttöoikeudet",
-        share_delete_text: "Haluatko varmasti poistaa käyttöoikeudet?",
-        share_delete_confirm: "Poista käyttöoikeudet",
+        perm_change_text: "Olet valinnut toisen käyttöoikeuden ",
+        perm_change_text2: ". Haluatko varmasti muuttaa käyttöoikeutta?",
+        perm_change_confirm: "Muuta käyttöoikeus",
+        share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
+        share_delete_confirm: "Poista käyttöoikeus",
       },
       download: " Lataa",
       downloadFiles: "Tiedostot voidaan ladata vain " +

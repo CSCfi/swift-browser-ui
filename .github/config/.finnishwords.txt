@@ -224,6 +224,7 @@ käyttöliittymän
 käyttöohje
 käyttöoikeudet
 käyttöoikeus
+käyttöoikeutta
 käyttörajoista
 käyttöä
 käyttöön
@@ -645,7 +646,6 @@ uudella
 uudelle
 uudelleen
 uuden
-uudet
 uusi
 uusia
 vaatii
