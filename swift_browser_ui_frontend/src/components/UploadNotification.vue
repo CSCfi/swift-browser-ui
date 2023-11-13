@@ -54,15 +54,17 @@ export default {
       this.$store.commit("toggleUploadNotification", false);
     },
     viewContainer() {
-      if (this.$route.params.container !== this.container) {
+      if (this.$route.params.container !== this.container
+        || this.$route.query.prefix) {
         this.$router.push({
           name: "ObjectsView",
           params: {
             user: this.user,
             project: this.project,
             container: this.container,
-          }},
-        );
+          },
+          query: null,
+        });
       }
     },
   },
