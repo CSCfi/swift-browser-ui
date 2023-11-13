@@ -354,8 +354,9 @@ async def swift_get_batch_object_metadata(
     batch = []
     for obj in request.query["objects"].split(","):
         batch.append(_swift_get_object_metadata_wrapper(request, obj))
-    batch = await asyncio.gather(*batch, return_exceptions=False)
-    return aiohttp.web.json_response(batch)
+    return aiohttp.web.json_response(
+        await asyncio.gather(*batch, return_exceptions=False)
+    )
 
 
 async def swift_get_metadata_container(
