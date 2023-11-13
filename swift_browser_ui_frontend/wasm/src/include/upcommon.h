@@ -65,7 +65,7 @@ CHUNK *allocate_chunk();
 /*
 Get chunk length from struct.
 */
-int warp_chunk_len(CHUNK *chunk);
+int wrap_chunk_len(CHUNK *chunk);
 /*
 Get chunk ptr from struct.
 */
