@@ -138,6 +138,15 @@ class SignatureTokenTestClass(
     async def test_handle_ext_token_remove_correct(self):
         """Test external API token removal handler."""
         with self.sign_patch, self.setd_patch, self.p_get_sess:
+            self.mock_request.app["api_client"] = types.SimpleNamespace(
+                **{
+                    "delete": unittest.mock.AsyncMock(
+                        return_value=self.MockHandler(
+                            self.mock_client_response,
+                        )
+                    ),
+                }
+            )
             resp = await handle_ext_token_remove(self.mock_request)
             self.assertIsInstance(resp, aiohttp.web.Response)
             self.assertEqual(resp.status, 204)
