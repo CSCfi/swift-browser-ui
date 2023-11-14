@@ -385,8 +385,8 @@ export function sortItems(a, b, sortBy, sortDirection) {
 
   // Handle tags as single string
   if (Array.isArray(valueA)) {
-    valueA = valueA.join(" ");
-    valueB = valueB.join(" ");
+    valueA = valueA ? valueA.join(" ") : "";
+    valueB = valueB ? valueB.join(" ") : "";
   }
 
   if (typeof valueA === "string") {
