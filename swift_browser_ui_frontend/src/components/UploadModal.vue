@@ -852,7 +852,7 @@ export default {
         this.currentFolder :
         this.inputFolder;
 
-      this.$store.commit("setFolderName", folderName);
+      this.$store.commit("setUploadFolderName", folderName);
       this.$store.commit("setNewFolder", folderName);
 
       // Create a fresh session from scratch

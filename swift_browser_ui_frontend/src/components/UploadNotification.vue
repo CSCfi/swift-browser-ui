@@ -27,28 +27,19 @@ export default {
   data() {
     return {
       maximized: true,
-      project: "",
-      user: "",
-      container: "",
       notificationToggled: false,
     };
   },
   computed: {
-    closable() {
-      return this.$store.state.uploadNotificationClosable;
+    project() {
+      return this.$store.state.active.id;
     },
-  },
-  watch: {
-    closable: function() {
-      if (!this.closable) {
-        this.container = this.$store.state.selectedFolderName;
-      }
+    user() {
+      return this.$store.state.uname;
     },
-  },
-  mounted() {
-    this.project = this.$store.state.active.id;
-    this.user = this.$store.state.uname;
-    this.container = this.$store.state.selectedFolderName;
+    container() {
+      return this.$store.state.uploadFolderName;
+    },
   },
   methods: {
     toggleNotification() {
@@ -63,15 +54,17 @@ export default {
       this.$store.commit("toggleUploadNotification", false);
     },
     viewContainer() {
-      if (this.$route.params.container !== this.container) {
+      if (this.$route.params.container !== this.container
+        || this.$route.query.prefix) {
         this.$router.push({
           name: "ObjectsView",
           params: {
             user: this.user,
             project: this.project,
             container: this.container,
-          }},
-        );
+          },
+          query: null,
+        });
       }
     },
   },
