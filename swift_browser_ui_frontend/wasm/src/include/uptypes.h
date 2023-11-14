@@ -1,10 +1,13 @@
 #include <stdint.h>
+#ifdef TEST
+#include "stub_sodium.h"
+#else
 #include <sodium.h>
+#endif // TEST
 #include <uuid/uuid.h>
 
 #ifndef SWIFT_UI_UPLOAD_TYPES
 #define SWIFT_UI_UPLOAD_TYPES
-
 
 /*
 Struct for length aware chunk for easier interfacing with JS.
@@ -15,7 +18,6 @@ typedef struct CHUNK
     size_t len;
 } CHUNK;
 
-
 /*
 Struct for the encryption keypair.
 */
@@ -24,6 +26,5 @@ typedef struct KEYPAIR
     uint8_t private[crypto_kx_SECRETKEYBYTES];
     uint8_t public[crypto_kx_PUBLICKEYBYTES];
 } KEYPAIR;
-
 
 #endif

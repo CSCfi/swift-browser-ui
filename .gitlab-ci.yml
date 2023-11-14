@@ -66,6 +66,21 @@ backend-test:
     - coverage report --precision=1
   coverage: '/TOTAL.*\s+(\d+\%)/'
 
+wasm-test:
+  stage: test
+  tags:
+    - docker-exec
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  image: $BUILD_IMAGE
+  before_script:
+    - ruby --version
+    - gem --version
+    - gem install ceedling
+  script:
+    - cd swift_browser_ui_frontend/wasm
+    - ceedling
+
 build-ci-image:
   stage: build
   tags:
