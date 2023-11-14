@@ -155,18 +155,46 @@ export async function syncContainerACLs(store) {
   return amount;
 }
 
-export function getHumanReadableSize(val) {
+export function getHumanReadableSize(val, locale) {
   // Get a human readable version of the size, which is returned from the
-  // API as bytes, flooring to the most significant size without decimals.
+  // API as bytes
 
-  // As JS doesn't allow us to natively handle 64 bit integers, ditch all
-  // unnecessary stuff from the value, we only need the significant part.
-  let byteval = val > 4294967296 ? parseInt(val / 1073741824) : val;
-  let count = val > 4294967296 ? 3 : 0;
+  const isLargeVal = val > 4294967296;
+  let largeNum;
+  let byteval = val;
+  let count = 0;
 
-  let human = shiftSizeDivision([byteval, count]);
-  let ret = human[0].toString();
-  switch (human[1]) {
+  if (isLargeVal) {
+    largeNum = val / 1073741824;
+    byteval = parseInt(largeNum);
+    count = 3;
+  }
+
+  const result = shiftSizeDivision([byteval, count]);
+  let ret = result[0].toString();
+
+  if (ret.length === 1 && ret !== "0") {
+    //display single digit results with one decimal rounded up
+    let decimal;
+    let retNum = result[0];
+
+    for (let i=count; i < result[1]; i++) {
+      retNum = retNum << 10;
+    }
+    if (isLargeVal) {
+      decimal = largeNum - retNum;
+    }
+    else {
+      let remainder = val ^ retNum;
+      decimal = remainder / Math.pow(1024, result[1]);
+    }
+    ret = (result[0] + decimal).toFixed(1).toString();
+
+    if (locale === "fi") {
+      ret = ret.replace(".", ",");
+    }
+  }
+  switch (result[1]) {
     case 0:
       ret += " B";
       break;

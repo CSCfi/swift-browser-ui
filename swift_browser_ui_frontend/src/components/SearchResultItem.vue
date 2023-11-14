@@ -37,7 +37,7 @@
           </span>
           <span>
             <b>{{ $t('message.search.size') }}: </b>
-            <span> {{ getHumanReadableSize(item.bytes) }}</span>
+            <span> {{ getHumanReadableSize(item.bytes, locale) }}</span>
           </span>
           <span v-if="item.count">
             <br>
@@ -62,6 +62,11 @@ export default {
     "searchArray",
     "route",
   ],
+  computed :{
+    locale () {
+      return this.$i18n.locale;
+    },
+  },
   methods: {
     getHumanReadableSize,
     isSubfolder: function() {
