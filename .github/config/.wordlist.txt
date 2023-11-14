@@ -19,6 +19,7 @@ configs
 containerport
 cp
 cryptfiles
+cryptupload
 csc
 cscfi
 decrypt
@@ -54,6 +55,7 @@ lt
 macos
 matchlabels
 maxdepth
+middleware
 middlewares
 namespace
 navbar
@@ -106,6 +108,7 @@ ui
 untrusted
 url
 usr
+util
 venv
 veryfast
 vm
