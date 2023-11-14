@@ -495,7 +495,6 @@ const store = createStore({
             projectID, container.name, marker, signal);
         }
 
-
         if (objects.length > 0) {
           objects.forEach(obj => {
             obj.container = container.name;
@@ -535,20 +534,44 @@ const store = createStore({
           owner ? owner : "",
         );
 
-        // Find the segments of an object and
-        // update the original objects size accordingly
-        for (let i = 0; i < newObjects.length; i++) {
-          if (segment_objects[i] && newObjects[i].bytes === 0) {
-            newObjects[i].bytes = segment_objects[i].bytes;
-          }
-          else if (!segment_objects[i] && state.isLoaderVisible) {
+        if (newObjects.length === segment_objects.length) {
+          // Find the segments of an object and
+          // update the original objects size accordingly
+          for (let i = 0; i < newObjects.length; i++) {
+            if (segment_objects[i] && newObjects[i].bytes === 0) {
+              newObjects[i].bytes = segment_objects[i].bytes;
+            }
+            else if (!segment_objects[i] && state.isLoaderVisible) {
             /* When cancelling the upload of large amount of files
               or big files sizes, the original folder could have
               more objects than segment folder which results in the
               last updated file has size 0 (segment folder doesn't have it)
               Therefore it's better to remove that file.
             */
-            newObjects.splice(i, 1);
+              newObjects.splice(i, 1);
+            }
+          }
+        } else if (segment_objects.length > newObjects.length) {
+          /*
+            For uploaded objects having size > 5GiB,
+            their equivalent segment_objects are split off into
+            multiple segments (~5GiB/each) of which combined size
+            in total is roughly equal to the original uploaded file.
+            The regular objects are not separated into segments, hence
+            the number of segment_objects > regular objects.
+          */
+          for (let i = 0; i < newObjects.length; i++) {
+            // Filter equivalent segment objects
+            const filteredSegmentObjects = segment_objects.filter(obj =>
+              obj.name.includes(newObjects[i].name),
+            );
+            // Calculate total size of equivalent segment objects
+            const totalSegmentSize = filteredSegmentObjects.reduce(
+              (totalSize, obj) =>
+                obj.name.includes(newObjects[i].name) ?
+                  totalSize + obj.bytes : null, 0,
+            );
+            newObjects[i].bytes = totalSegmentSize;
           }
         }
         updateContainerLastmodified(projectID, container, newObjects);
