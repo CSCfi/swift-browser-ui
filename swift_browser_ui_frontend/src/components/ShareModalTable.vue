@@ -68,7 +68,6 @@
 </template>
 
 <script>
-import { toRaw } from "vue";
 import {
   modifyAccessControlMeta,
   removeAccessControlMeta,
@@ -214,7 +213,7 @@ export default {
                   onChangeValue: (e) =>  {
                     this.newPerms = this.getPermArray(e.detail.value);
                     if (this.getPermName(this.newPerms)
-                      !== this.getPermName(toRaw(item.access))) {
+                      !== this.getPermName(item.access)) {
                       //if different than current perms chosen
                       this.sharedTo = item.sharedTo;
                       this.clickedPermChange = true;
@@ -246,10 +245,12 @@ export default {
         },
       }));
     },
-    getPermName(array) {
-      return array.length > 1 ? this.accessRights[2].name
-        : (this.accessRights[1].value[0] === array[0] ?
-          this.accessRights[1].name : this.accessRights[0].name);
+    getPermName(permArray) {
+      return permArray.length > 1
+        ? this.accessRights[2].name
+        : (this.accessRights[1].value[0] === permArray[0]
+          ? this.accessRights[1].name
+          : this.accessRights[0].name);
     },
     clearPermChange() {
       this.clickedPermChange = false;
@@ -259,7 +260,6 @@ export default {
     async confirmPermChange() {
       await this.editAccessRight(this.sharedTo);
       this.clearPermChange();
-      this.getTableData();
     },
     getPermArray(val) {
       if (!val) return [];
