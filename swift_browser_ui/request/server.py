@@ -12,6 +12,7 @@ import uvloop
 import swift_browser_ui.common.common_handlers
 import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
+import swift_browser_ui.common.db
 from swift_browser_ui.request.api import (
     handle_container_request_listing,
     handle_health_check,
@@ -23,26 +24,12 @@ from swift_browser_ui.request.api import (
     handle_user_owned_request_listing,
     handle_user_share_request_delete,
 )
-from swift_browser_ui.request.db import DBConn
 
 logging.basicConfig(level=logging.DEBUG)
 
 # temporarily ignore typecheck from mypy until
 # this issue is fixed https://github.com/MagicStack/uvloop/issues/575
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
-
-
-async def resume_on_start(app: aiohttp.web.Application) -> None:
-    """Resume old instance on start."""
-    app["db_conn"] = DBConn()
-    app["tokens"] = []
-    await app["db_conn"].open()
-
-
-async def graceful_shutdown(app: aiohttp.web.Application) -> None:
-    """Correctly close the service."""
-    if app["db_conn"] is not None:
-        await app["db_conn"].close()
 
 
 async def init_server() -> aiohttp.web.Application:
@@ -56,6 +43,9 @@ async def init_server() -> aiohttp.web.Application:
             swift_browser_ui.common.common_middleware.error_handler,  # type: ignore
         ]
     )
+
+    # Cache db class
+    app["db_class"] = swift_browser_ui.common.db.RequestDBConn
 
     async def on_prepare(
         _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
@@ -104,9 +94,9 @@ async def init_server() -> aiohttp.web.Application:
         ]
     )
 
-    app.on_startup.append(resume_on_start)
+    app.on_startup.append(swift_browser_ui.common.db.db_graceful_start)
     app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
-    app.on_shutdown.append(graceful_shutdown)
+    app.on_shutdown.append(swift_browser_ui.common.db.db_graceful_close)
 
     return app
 

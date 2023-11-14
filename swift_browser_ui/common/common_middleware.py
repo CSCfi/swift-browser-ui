@@ -92,7 +92,7 @@ async def handle_validate_authentication(
             except KeyError:
                 project = None
     finally:
-        if project:
+        if project and "db_conn" in request.app:
             try:
                 project_tokens = [
                     rec["token"].encode("utf-8")
@@ -102,8 +102,10 @@ async def handle_validate_authentication(
                 pass
         else:
             if request.path != "/health":
-                LOGGER.debug(f"No project ID found in request {request}")
-                raise aiohttp.web.HTTPUnauthorized(reason="No project ID in request")
+                LOGGER.debug(
+                    f"No project ID found in request {request}, "
+                    "assuming scopeless authentication and skipping tokens."
+                )
 
     await swift_browser_ui.common.signature.test_signature(
         request.app["tokens"] + project_tokens, signature, validity + path, validity

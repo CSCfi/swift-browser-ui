@@ -31,7 +31,6 @@ Python Modules
 
     swift_browser_ui.sharing.bindings.bind
     swift_browser_ui.sharing.api
-    swift_browser_ui.sharing.db
     swift_browser_ui.sharing.server
     swift_browser_ui.sharing.shared
 
@@ -44,7 +43,6 @@ Python Modules
 
     swift_browser_ui.request.bindings.bind
     swift_browser_ui.request.api
-    swift_browser_ui.request.db
     swift_browser_ui.request.server
 
 .. automodule:: swift_browser_ui.upload
@@ -61,6 +59,21 @@ Python Modules
     swift_browser_ui.upload.replicate
     swift_browser_ui.upload.server
     swift_browser_ui.upload.upload
+    swift_browser_ui.upload.cryptupload
 
+.. automodule:: swift_browser_ui.common
+    :synopsis: The ``swift_browser_ui.common`` package contains code shared
+               between the different services.
+
+.. autosummary::
+    :toctree: swift_browser_ui.common
+
+    swift_browser_ui.common.common_handlers
+    swift_browser_ui.common.common_middleware
+    swift_browser_ui.common.common_util
+    swift_browser_ui.common.db
+    swift_browser_ui.common.signature
+    swift_browser_ui.common.types
+    swift_browser_ui.common.vault_client
 
 :ref:`genindex` | :ref:`modindex`

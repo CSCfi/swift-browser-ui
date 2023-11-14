@@ -70,6 +70,7 @@ docs/source/swift_browser_ui.ui
 docs/source/swift_browser_ui.sharing
 docs/source/swift_browser_ui.request
 docs/source/swift_browser_ui.upload
+docs/source/swift_browser_ui.common
 
 # PyBuilder
 target/
