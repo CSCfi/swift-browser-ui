@@ -222,8 +222,10 @@ käyttää
 käyttöliittymä
 käyttöliittymän
 käyttöohje
+käyttöoikeuden
 käyttöoikeudet
 käyttöoikeus
+käyttöoikeutta
 käyttörajoista
 käyttöä
 käyttöön
@@ -298,6 +300,7 @@ muokattu
 muokkaa
 mutta
 muussa
+muuta
 muutaman
 muutamia
 muutettiin
@@ -655,6 +658,7 @@ valikkoon
 valikossa
 valinnan
 valinnat
+valinnut
 valitse
 valitsemaasi
 valittu

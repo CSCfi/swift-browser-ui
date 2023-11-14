@@ -507,6 +507,7 @@ export default {
       this.closeSharedNotification();
       this.isPermissionUpdated = true;
       this.closeSharedNotificationWithTimeout();
+      this.getSharedDetails();
     },
     removeSharedFolder: function (folderData) {
       this.closeSharedNotification();

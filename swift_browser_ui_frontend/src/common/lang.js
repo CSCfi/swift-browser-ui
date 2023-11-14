@@ -183,6 +183,13 @@ let default_translations = {
         fail_duplicate: "The project already has access to the folder.",
         invalid_share_id: " is not a valid Share ID. Please remove it.",
         invalid_share_ids: " are not valid Share IDs. Please remove them.",
+        perm_change_text: "You have selected new sharing permissions ",
+        perm_change_text2: ". Are you sure you want to proceed?",
+        perm_change_confirm: "Change permissions",
+        share_delete_text:
+          "Are you sure you want to " +
+          "delete the sharing permissions?",
+        share_delete_confirm: "Delete permissions",
       },
       download: " Download",
       downloadFiles: "Files can only be downloaded " +
@@ -586,6 +593,11 @@ let default_translations = {
         invalid_share_id: " ei ole kelvollinen jakamistunnus. Poistakaa se.",
         invalid_share_ids:
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
+        perm_change_text: "Olet valinnut toisen käyttöoikeuden ",
+        perm_change_text2: ". Haluatko varmasti muuttaa käyttöoikeutta?",
+        perm_change_confirm: "Muuta käyttöoikeus",
+        share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
+        share_delete_confirm: "Poista käyttöoikeus",
       },
       download: " Lataa",
       downloadFiles: "Tiedostot voidaan ladata vain " +
