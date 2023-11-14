@@ -104,17 +104,16 @@ async def handle_validate_authentication(
                 rec["token"].encode("utf-8")
                 for rec in await request.app["db_conn"].get_tokens(project)
             ]
+            if not project_tokens:
+                LOGGER.debug(
+                    f"No tokens found for project {project}, "
+                    "assuming scopeless authentication and skipping tokens."
+                )
         except asyncpg.exceptions.InterfaceError:
             pass
     else:
         LOGGER.debug(
             f"No project ID found in request {request}, "
-            "assuming scopeless authentication and skipping tokens."
-        )
-
-    if not project_tokens:
-        LOGGER.debug(
-            f"No tokens found for project {project}, "
             "assuming scopeless authentication and skipping tokens."
         )
 

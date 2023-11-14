@@ -101,20 +101,18 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
     path = f"/token/{project}/{ident}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path)
 
-    async with client.delete(
+    await client.delete(
         f"{sharing_api_address}{path}",
         params=signature,
-    ) as _:
-        pass
+    )
 
     path_name = f"/token/{project}/{ident}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path_name)
 
-    async with client.delete(
+    await client.delete(
         f"{sharing_api_address}{path_name}",
         params=signature,
-    ) as _:
-        pass
+    )
 
     resp = aiohttp.web.Response(status=204)
 
