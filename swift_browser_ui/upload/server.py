@@ -13,6 +13,7 @@ import uvloop
 
 import swift_browser_ui.common.common_middleware
 import swift_browser_ui.common.common_util
+import swift_browser_ui.common.db
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.api import (
     handle_batch_add_sharing_whitelist,
@@ -21,12 +22,13 @@ from swift_browser_ui.upload.api import (
     handle_delete_project_whitelist,
     handle_get_container,
     handle_get_object,
+    handle_get_object_header,
     handle_health_check,
-    handle_object_header,
     handle_post_object_chunk,
     handle_post_object_options,
     handle_project_key,
     handle_project_whitelist,
+    handle_put_object_header,
     handle_upload_encrypted_object_options,
     handle_upload_ws,
     handle_whitelist_options,
@@ -34,7 +36,6 @@ from swift_browser_ui.upload.api import (
 from swift_browser_ui.upload.auth import (
     handle_login,
     handle_logout,
-    handle_validate_authentication,
 )
 from swift_browser_ui.upload.common import VAULT_CLIENT
 
@@ -53,10 +54,15 @@ async def servinit() -> aiohttp.web.Application:
         swift_browser_ui.common.common_middleware.error_handler,
     ]
 
-    if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", None):
-        middlewares.append(handle_validate_authentication)
+    if not os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_AUTH", False):
+        middlewares.append(
+            swift_browser_ui.common.common_middleware.handle_validate_authentication,
+        )
 
     app = aiohttp.web.Application(middlewares=middlewares)
+
+    # Cache db class
+    app["db_class"] = swift_browser_ui.common.db.UploadDBConn
 
     async def on_prepare(
         _: aiohttp.web.Request, response: aiohttp.web.StreamResponse
@@ -67,8 +73,10 @@ async def servinit() -> aiohttp.web.Application:
     # add custom response headers
     app.on_response_prepare.append(on_prepare)
 
+    app.on_startup.append(swift_browser_ui.common.db.db_graceful_start)
     app.on_startup.append(swift_browser_ui.common.common_util.read_in_keys)
     app.on_shutdown.append(kill_client)
+    app.on_shutdown.append(swift_browser_ui.common.db.db_graceful_close)
 
     # Add client session for aiohttp requests
     http_client = aiohttp.client.ClientSession()
@@ -96,7 +104,11 @@ async def servinit() -> aiohttp.web.Application:
             ),
             aiohttp.web.get(
                 "/header/{project}/{container}/{object_name:.*}",
-                handle_object_header,
+                handle_get_object_header,
+            ),
+            aiohttp.web.put(
+                "/header/{project}/{container}/{object_name:.*}",
+                handle_put_object_header,
             ),
             aiohttp.web.get(
                 "/cryptic/{project}/keys",

@@ -81,31 +81,41 @@ async def handle_validate_authentication(
 
     project: None | str = None
     project_tokens = []
-    try:
-        project = request.match_info["project"]
-    except KeyError:
-        try:
+
+    if "db_conn" in request.app:
+        project = ""
+        if "project" in request.match_info:
+            LOGGER.debug(f"Using main project for {request}.")
+            project = request.match_info["project"]
+        elif "owner" in request.match_info:
             project = request.match_info["owner"]
-        except KeyError:
-            try:
-                project = request.match_info["user"]
-            except KeyError:
-                project = None
-    finally:
-        if project and "db_conn" in request.app:
-            try:
-                project_tokens = [
-                    rec["token"].encode("utf-8")
-                    for rec in await request.app["db_conn"].get_tokens(project)
-                ]
-            except asyncpg.exceptions.InterfaceError:
-                pass
-        else:
-            if request.path != "/health":
+            LOGGER.debug(f"Using owner project for {request}.")
+        elif "user" in request.match_info:
+            project = request.match_info["user"]
+            LOGGER.debug(f"Using user project for {request}.")
+    else:
+        LOGGER.debug(
+            f"No database connection found for {request}, assuming scopeless "
+            "authentication and skipping tokens."
+        )
+    if project:
+        try:
+            project_tokens = [
+                rec["token"].encode("utf-8")
+                for rec in await request.app["db_conn"].get_tokens(project)
+            ]
+            if not project_tokens:
                 LOGGER.debug(
-                    f"No project ID found in request {request}, "
+                    f"No tokens found for project {project}, "
                     "assuming scopeless authentication and skipping tokens."
                 )
+        except asyncpg.exceptions.InterfaceError:
+            pass
+    else:
+        LOGGER.debug(
+            f"No project ID found in request {request}, "
+            "assuming scopeless authentication and skipping tokens."
+        )
 
     await swift_browser_ui.common.signature.test_signature(
         request.app["tokens"] + project_tokens, signature, validity + path, validity

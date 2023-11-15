@@ -314,22 +314,59 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.assertEqual(resp.status, 200)
         self.assertEqual(resp.text, "test-key")
 
-    async def test_handle_object_header(self):
-        """Test swift_browser_ui.upload.api.handle_object_header."""
+    async def test_handle_get_object_header(self):
+        """Test swift_browser_ui.upload.api.handle_get_object_header."""
         mock_vault_client = unittest.mock.Mock()
         mock_vault_client.get_header = unittest.mock.AsyncMock(return_value="test-header")
         self.mock_request.app[VAULT_CLIENT] = mock_vault_client
 
-        resp = await swift_browser_ui.upload.api.handle_object_header(self.mock_request)
+        resp = await swift_browser_ui.upload.api.handle_get_object_header(
+            self.mock_request
+        )
         self.assertIsInstance(resp, aiohttp.web.Response)
         self.assertEqual(resp.status, 200)
         self.assertEqual(resp.text, "test-header")
 
         self.mock_request.query["owner"] = "test-owner"
-        resp = await swift_browser_ui.upload.api.handle_object_header(self.mock_request)
+        resp = await swift_browser_ui.upload.api.handle_get_object_header(
+            self.mock_request
+        )
         self.assertIsInstance(resp, aiohttp.web.Response)
         mock_vault_client.get_header.assert_called_with(
             "test-id-0", "test-container", "test-object1", "test-owner"
+        )
+
+    async def test_handle_put_object_header(self):
+        """Test swift_browser_ui.upload.api.handle_put_object_header."""
+        mock_vault_client = unittest.mock.Mock()
+        mock_vault_client.put_header = unittest.mock.AsyncMock()
+        self.mock_request.app[VAULT_CLIENT] = mock_vault_client
+
+        self.mock_request.read = unittest.mock.AsyncMock(return_value=b"test-header")
+
+        resp = await swift_browser_ui.upload.api.handle_put_object_header(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.HTTPNoContent)
+        mock_vault_client.put_header.assert_called_with(
+            "test-id-0",
+            "test-container",
+            "test-object1",
+            "dGVzdC1oZWFkZXI=",
+            "",
+        )
+
+        self.mock_request.query["owner"] = "test-owner"
+        resp = await swift_browser_ui.upload.api.handle_put_object_header(
+            self.mock_request
+        )
+        self.assertIsInstance(resp, aiohttp.web.HTTPNoContent)
+        mock_vault_client.put_header.assert_called_with(
+            "test-id-0",
+            "test-container",
+            "test-object1",
+            "dGVzdC1oZWFkZXI=",
+            "test-owner",
         )
 
     async def test_handle_project_whitelist(self):

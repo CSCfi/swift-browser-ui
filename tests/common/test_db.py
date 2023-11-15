@@ -107,7 +107,7 @@ class TestBaseDB(BaseDBConnTestClass):
         super().setUp()
         # Using UploadDBConn, as it's the barebones version without any
         # additional methods
-        self.db = swift_browser_ui.common.db.SharingDBConn()
+        self.db = swift_browser_ui.common.db.UploadDBConn()
 
     def test_db_erase(self):
         """Test connection erase method."""
