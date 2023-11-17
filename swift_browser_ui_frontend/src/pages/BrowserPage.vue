@@ -14,12 +14,14 @@
       <c-modal
         v-model="openConfirmRouteModal"
         v-csc-control
+        disable-backdrop-blur
       >
         <ConfirmRouteModal />
       </c-modal>
       <c-modal
         v-model="openCreateFolderModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <CreateFolderModal />
@@ -27,6 +29,7 @@
       <c-modal
         v-model="openUploadModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <UploadModal />
@@ -39,6 +42,7 @@
         id="edit-tags-modal"
         v-model="openEditTagsModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <EditTagsModal />
@@ -47,6 +51,7 @@
         id="share-modal"
         v-model="openShareModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <ShareModal />
@@ -55,6 +60,7 @@
         id="copy-folder-modal"
         v-model="openCopyFolderModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <CopyFolderModal />
@@ -63,6 +69,7 @@
         id="delete-objs-modal"
         v-model="openDeleteModal"
         v-csc-control
+        disable-backdrop-blur
       >
         <DeleteModal />
       </c-modal>
@@ -70,6 +77,7 @@
         id="token-modal"
         v-model="openTokenModal"
         v-csc-control
+        disable-backdrop-blur
         width="64vw"
       >
         <TokenModal />
