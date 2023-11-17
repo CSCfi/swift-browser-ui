@@ -201,6 +201,9 @@ const app = createApp({
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
+    socket() {
+      return this.$store.state.socket;
+    },
   },
   watch: {
     openCreateFolderModal: function () {
@@ -500,6 +503,9 @@ const app = createApp({
       });
 
       this.onComplete();
+    },
+    cancelUpload: function(container) {
+      this.socket.cancelUpload(container);
     },
     updateProgress() {
       this.$store.commit("updateProgress", this.resumableClient.progress());

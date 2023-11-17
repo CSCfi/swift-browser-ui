@@ -210,8 +210,11 @@ class FileUpload:
                 # If handler has waited for too long for the next chunk, retry
                 # Currently 10 seconds is considered too long
                 if wait_count > 2000:
-                    await self.retry_chunk(i)
-                    wait_count = 0
+                    try:
+                        await self.retry_chunk(i)
+                        wait_count = 0
+                    except ConnectionResetError:
+                        pass
             self.done_chunks.add(i)
             chunk = self.chunk_cache.pop(i)
             await q.put(chunk)
@@ -301,7 +304,14 @@ class FileUpload:
         for q in self.q_cache:
             await q.put(b"")
 
-        await asyncio.gather(*self.tasks)
+        try:
+            await asyncio.gather(*self.tasks)
+        except ConnectionResetError:
+            pass
+        finally:
+            for task in self.tasks:
+                if not task.done():
+                    task.cancel()
 
         # Delete segments that might've been uploaded
         headers = {

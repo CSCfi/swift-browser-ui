@@ -47,7 +47,7 @@ export default {
       this.notificationToggled = true;
     },
     onCancel() {
-      this.$emit("cancel-upload");
+      this.$emit("cancel-current-upload", this.container);
       this.$store.commit("toggleUploadNotification", false);
     },
     onClosed() {

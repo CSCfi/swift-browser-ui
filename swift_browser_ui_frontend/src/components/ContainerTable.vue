@@ -52,8 +52,9 @@ import {
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import {
-  swiftDeleteContainer,
   getObjects,
+  swiftDeleteContainer,
+  swiftDeleteObjects,
 } from "@/common/api";
 
 export default {
@@ -471,7 +472,25 @@ export default {
           projectID,
           container,
         ).then(async() => {
-          await swiftDeleteContainer(projectID, `${container}_segments`);
+          /*
+            In case the upload was initially cancelled and
+            regular container has no uploaded objects yet (0 item), but
+            segment container does have, we need to check and delete
+            segment objects first before deleting the segment container
+          */
+          const segment_objects =  await getObjects(
+            projectID,
+            `${container}_segments`,
+          );
+          if(segment_objects) {
+            await swiftDeleteObjects(
+              projectID,
+              `${container}_segments`,
+              segment_objects.map(obj => obj.name),
+            );
+            await swiftDeleteContainer(projectID, `${container}_segments`);
+          }
+
           document.querySelector("#container-toasts").addToast(
             { progress: false,
               type: "success",

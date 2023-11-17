@@ -33,7 +33,7 @@
       </c-modal>
       <UploadNotification
         v-if="displayUploadNotification"
-        @cancel-upload="currentUpload.cancelUpload()"
+        @cancel-current-upload="cancelUpload"
       />
       <c-modal
         id="edit-tags-modal"
