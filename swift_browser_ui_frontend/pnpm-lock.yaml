@@ -24,8 +24,8 @@ dependencies:
     specifier: ^2.1.11
     version: 2.1.11
   csc-ui:
-    specifier: 0.9.4
-    version: 0.9.4
+    specifier: 0.9.5
+    version: 0.9.5
   dexie:
     specifier: ^3.2.4
     version: 3.2.4
@@ -2283,8 +2283,8 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  /csc-ui@0.9.4:
-    resolution: {integrity: sha512-Mxp5fuehFgucIKJ3gNiT7nq+xtA4RrlM+iVyX0wTdrCDXZIHG8KFz9sOmmHLkBu9Z/z8eQ3+1FSGhYqV5e13gg==}
+  /csc-ui@0.9.5:
+    resolution: {integrity: sha512-GJsl24TWr3sA4RHqXPB6klk6L3dhx+I1cZo1NcAo6WXcdRU8Z1TaMZocsRS9mlxH5evkndf0W7PrUISRgAjmfg==}
     dependencies:
       '@mdi/js': 7.3.67
       '@stencil/core': 4.7.0
