@@ -2,21 +2,36 @@
 
 function calcChecksum(header) {
   let checksum = 0;
-    for(let i = 0, length = 512; i < length; i++) {
-      checksum += header.charCodeAt(i);
-    }
+  for(let i = 0, length = 512; i < length; i++) {
+    checksum += header.charCodeAt(i);
+  }
   let checksumStr = checksum.toString(8).padStart(6, "0") + "\x00 ";
   return checksumStr;
 }
 
+const headerEnd =
+  //header end (355B) same for all cases
+  "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
+  + "ustar "  // ustar indicator
+  + " \x00"  // ustar version
+  + "\x00".repeat(32)  // Owner user name
+  + "\x00".repeat(32)  // Owner group name
+  + "0000000\x000000000\x00" // device major and minor numbers
+  + "\x00".repeat(12) // last accessed, atime
+  + "\x00".repeat(12)// last changed, ctime
+  // skip as NUL the following:
+  // offset[12], longnames[4], unused[1],
+  // sparse[4*24], isextended[1], realsize[12]
+  + "\x00".repeat(126)
+  + "\x00".repeat(17) // pad to 512 bytes
+;
+
 // Add a folder to the tar archive structure
-export function addTarFolder(name, prefix) {
-  let path = prefix ?
-    prefix + "/" + name + "/": name + "/";
+export function addTarFolder(path) {
   let mtime = Math.floor(Date.now() / 1000).toString(8);
   let header = "";
 
-  if (path.length > 100 && path.length <= 512) {
+  if (path.length > 100) {
 
     //extra header block for long path name
     let lBlock =
@@ -32,14 +47,9 @@ export function addTarFolder(name, prefix) {
       + "00000000000\x00"
       + "        "  // checksum placeholder
       + "L" // 1 byte type flag, L for long pathname
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "root".padEnd(32, "\x00") //"\x00".repeat(32)  // Owner user name
-      + "root".padEnd(32, "\x00") //"\x00".repeat(32)  // Owner group name
-      + "\x00".repeat(183) // skip the rest, pad to 512 bytes
+      + headerEnd
     ;
-
+    //next block is the whole path
     let pathBlock = path;
     //pad the path to be divisable by 512 to get full blocks
     const pathRemainder = path.length % 512;
@@ -52,7 +62,7 @@ export function addTarFolder(name, prefix) {
     lBlock = lBlock.replace("        ", calcChecksum(lBlock));
 
     let regularBlock =
-      path.substring(0, 100)  // when path too long, truncate to 99
+      path.substring(0, 100)  // when path too long, truncate
       + "0000755\x00"  // File mode, 7 bytes octal + padding NUL
       // Owner UID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
@@ -64,18 +74,7 @@ export function addTarFolder(name, prefix) {
       + mtime.padStart(11, "0") + "\x00"
       + "        "  // checksum placeholder
       + "5"  // 1 byte type flag, 5 for folder
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "\x00".repeat(32)  // Owner user name
-      + "\x00".repeat(32)  // Owner group name
-      + "0000000\x000000000\x00" // device major and minor numbers
-      + mtime.padStart(11, "0") + "\x00" // last accessed, atime
-      + mtime.padStart(11, "0") + "\x00" // last changed, ctime
-      + "\x00".repeat(12) // offset
-      + "\x00".repeat(102) // longnames, unused, sparse structs, isextended
-      + "00000000000\x00" // real size
-      + "\x00".repeat(17) // pad to 512 bytes
+      + headerEnd
     ;
     regularBlock = regularBlock.replace("        ", calcChecksum(regularBlock));
     // Calculate checksum in between to ease header calculation
@@ -95,19 +94,7 @@ export function addTarFolder(name, prefix) {
       + mtime.padStart(11, "0") + "\x00"
       + "        "  // checksum placeholder
       + "5"  // 1 byte type flag, 5 for folder
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "\x00".repeat(32)  // Owner user name
-      + "\x00".repeat(32)  // Owner group name
-      + "0000000\x000000000\x00" // device major and minor numbers
-      + mtime.padStart(11, "0") + "\x00" // last accessed, atime
-      + mtime.padStart(11, "0") + "\x00" // last changed, ctime
-      // skip as NUL the following:
-      // offset[12], longnames[4], unused[1],
-      // sparse[4*24], isextended[1], realsize[12]
-      + "\x00".repeat(126)
-      + "\x00".repeat(17) // pad to 512 bytes
+      + headerEnd
     ;
     header = header.replace("        ", calcChecksum(header));
   }
@@ -115,13 +102,20 @@ export function addTarFolder(name, prefix) {
 }
 
 // Add a file to the tar archive structure
-export function addTarFile(name, prefix, size) {
+export function addTarFile(path, size) {
   let mtime = Math.floor(Date.now() / 1000).toString(8);
-  let path = prefix ?
-    prefix + "/" + name : name;
   let header = "";
+  let sizeStr = "";
+  let maxOctal = 8589934591;
 
-  if (path.length > 100 && path.length <= 512) {
+  if (size < maxOctal) {
+    //display smaller sizes than 8GiB in octal
+    sizeStr = size.toString(8).padStart(11, "0") + "\x00";
+  } else {
+    //use base256 (signed) for larger numbers
+  }
+
+  if (path.length > 100) {
 
     //extra header block for long path name
     let lBlock =
@@ -137,12 +131,7 @@ export function addTarFile(name, prefix, size) {
       + "00000000000\x00"
       + "        "  // checksum placeholder
       + "L" // 1 byte type flag, L for long pathname
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "root".padEnd(32, "\x00") //"\x00".repeat(32)  // Owner user name
-      + "root".padEnd(32, "\x00") //"\x00".repeat(32)  // Owner group name
-      + "\x00".repeat(183) // skip the rest, pad to 512 bytes
+      + headerEnd
     ;
 
     let pathBlock = path;
@@ -157,31 +146,19 @@ export function addTarFile(name, prefix, size) {
     lBlock = lBlock.replace("        ", calcChecksum(lBlock));
 
     let regularBlock =
-      path.substring(0, 100)  // when path too long, truncate to 99
+      path.substring(0, 100)  // when path too long, truncate to 100
       + "0000644\x00"  // File mode, 7 bytes octal + padding NUL
       // Owner UID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
       // Size in octal ASCII, 11 bytes + padding NUL
-      + size.toString(8).padStart(11, "0") + "\x00"
+      + sizeStr
       // Last modification, not used, 11 bytes + padding NUL
       + mtime.padStart(11, "0") + "\x00"
       + "        "  // checksum placeholder
       + "0"  // 1 byte type flag, 0 for normal file
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "\x00".repeat(32)  // Owner user name
-      + "\x00".repeat(32)  // Owner group name
-      + "0000000\x000000000\x00" // device major and minor numbers
-      + mtime.padStart(11, "0") + "\x00" // last accessed, atime
-      + mtime.padStart(11, "0") + "\x00" // last changed, ctime
-      + "\x00".repeat(12) // offset
-      + "\x00".repeat(101) // longnames, unused, sparse structs
-      + "0" // is extended
-      + size.toString(8).padStart(11, "0") + "\x00" // real size
-      + "\x00".repeat(17) // pad to 512 bytes
+      + headerEnd
     ;
     regularBlock = regularBlock.replace("        ", calcChecksum(regularBlock));
     // Calculate checksum in between to ease header calculation
@@ -196,24 +173,12 @@ export function addTarFile(name, prefix, size) {
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
       // Size in octal ASCII, 11 bytes + padding NUL
-      + size.toString(8).padStart(11, "0") + "\x00"
+      + sizeStr
       // Last modification, not used, 11 bytes + padding NUL
       + mtime.padStart(11, "0") + "\x00"
       + "        "  // checksum placeholder
       + "0"  // 1 byte type flag, 0 for normal file
-      + "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
-      + "ustar "  // ustar indicator
-      + " \x00"  // ustar version
-      + "\x00".repeat(32)  // Owner user name
-      + "\x00".repeat(32)  // Owner group name
-      + "0000000\x000000000\x00" // device major and minor numbers
-      + mtime.padStart(11, "0") + "\x00" // last accessed, atime
-      + mtime.padStart(11, "0") + "\x00" // last changed, ctime
-      // skip as NUL the following:
-      // offset[12], longnames[4], unused[1],
-      // sparse[4*24], isextended[1], realsize[12]
-      + "\x00".repeat(126)
-      + "\x00".repeat(17) // pad to 512 bytes
+      + headerEnd
     ;
 
     // Calculate checksum in between to ease header calculation

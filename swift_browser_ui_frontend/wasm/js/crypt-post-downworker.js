@@ -400,10 +400,10 @@ async function beginDownloadInSession(
     for (const path of folderPaths) {
       if (downloads[container].direct) {
         await fileStream.write(
-          enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))),
+          enc.encode(addTarFolder(path)),
         );
       } else {
-        fileStream.enqueue(enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))));
+        fileStream.enqueue(enc.encode(addTarFolder(path)));
       }
     }
   }
@@ -431,21 +431,13 @@ async function beginDownloadInSession(
     }
 
     const response = await fetch(downloads[container].files[file].url);
+    let path = file.replace(".c4gh", "");
 
     if (downloads[container].archive) {
       const size = getFileSize(response, downloads[container].files[file].key);
-      let path = file.split("/");
-      let name = path.slice(-1)[0];
-      let prefix;
-      if (path.length > 1) {
-        prefix = path.slice(0, -1).join("/");
-      } else {
-        prefix = "";
-      }
 
       let fileHeader = enc.encode(addTarFile(
-        downloads[container].files[file].key != 0 ? name.replace(".c4gh", ""): name,
-        prefix,
+        downloads[container].files[file].key != 0 ? path : file,
         size,
       ));
 
