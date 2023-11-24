@@ -121,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1028) Disallow uploading files with size 0
 - Use common base class for database connections
 - (GL #1153) Display decimals with single digit file sizes
+- (GL #1184) Move `create folder` button out of secondary nav bar into containers' view
 
 ### Fixed
 
