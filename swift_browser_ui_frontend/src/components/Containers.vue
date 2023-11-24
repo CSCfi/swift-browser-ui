@@ -5,16 +5,28 @@
       justify="space-between"
     >
       <SearchBox :containers="renderingContainers" />
-      <c-menu
-        :key="optionsKey"
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
-      >
-        <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
+      <div class="row-end">
+        <c-button
+          size="small"
+          outlined
+          data-testid="create-folder"
+          @click="toggleCreateFolderModal(false)"
+          @keyup.enter="toggleCreateFolderModal(true)"
+        >
+          <c-icon :path="mdiPlus" />
+          {{ $t("message.createFolder") }}
+        </c-button>
+        <c-menu
+          :key="optionsKey"
+          :items.prop="tableOptions"
+          options-testid="table-options-selector"
+        >
+          <span class="menu-active display-options-menu">
+            <i class="mdi mdi-tune" />
+            {{ $t("message.tableOptions.displayOptions") }}
+          </span>
+        </c-menu>
+      </div>
     </c-row>
     <div id="cont-table-wrapper">
       <ContainerTable
@@ -38,12 +50,15 @@
 import { liveQuery } from "dexie";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
+import { mdiPlus } from "@mdi/js";
 import {
   getSharingContainers,
   updateObjectsAndObjectTags,
+  toggleCreateFolderModal,
 } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
 import SearchBox from "@/components/SearchBox.vue";
+import { setPrevActiveElement } from "@/common/keyboardNavigation";
 
 export default {
   name: "ContainersView",
@@ -53,6 +68,7 @@ export default {
   },
   data: function () {
     return {
+      mdiPlus,
       currentProject: {},
       showTimestamp: false,
       hidePagination: false,
@@ -298,6 +314,18 @@ export default {
       // Add pagination current page number to the URL in query string
       this.$router.push("?page=" + pageNumber);
     },
+    toggleCreateFolderModal: function (keypress) {
+      toggleCreateFolderModal();
+      if (keypress) {
+        setPrevActiveElement();
+      }
+      setTimeout(() => {
+        const newFolderInput = document
+          .querySelector("#newFolder-input input");
+        newFolderInput.tabIndex = "0";
+        newFolderInput.focus();
+      }, 300);
+    },
   },
 };
 </script>
@@ -311,6 +339,15 @@ export default {
 
 #cont-table-wrapper {
   position: relative;
+}
+
+.row-end {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+}
+.row-end > * {
+  align-self: center;
 }
 
 </style>
