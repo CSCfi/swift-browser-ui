@@ -49,7 +49,7 @@
           :aria-label="$t('label.shareid_tooltip')"
         >
           <c-icon
-            :path="path"
+            :path="mdiInformationOutline"
             tabindex="0"
           />
           <!-- eslint-disable vue/no-v-html -->
@@ -82,22 +82,12 @@
       <c-spacer />
       <div class="nav-item">
         <c-button
-          outlined
-          data-testid="create-folder"
-          :disabled="container"
-          @click="toggleCreateFolderModal(false)"
-          @keyup.enter="toggleCreateFolderModal(true)"
-        >
-          {{ $t("message.createFolder") }}
-        </c-button>
-      </div>
-      <div class="nav-item">
-        <c-button
           :disabled="isUploading || !canUpload"
           data-testid="upload-file"
           @click="toggleUploadModal(false)"
           @keyup.enter="toggleUploadModal(true)"
         >
+          <c-icon :path="mdiTrayArrowUp" />
           {{ $t("message.uploadSecondaryNav") }}
         </c-button>
       </div>
@@ -107,19 +97,22 @@
 
 <script>
 import {
-  toggleCreateFolderModal,
   getAccessDetails,
 } from "@/common/globalFunctions";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
-import { mdiInformationOutline } from "@mdi/js";
+import {
+  mdiInformationOutline,
+  mdiTrayArrowUp,
+} from "@mdi/js";
 
 export default {
   name: "BrowserSecondaryNavbar",
   props: ["multipleProjects", "projects"],
   data: function () {
     return {
+      mdiInformationOutline,
+      mdiTrayArrowUp,
       copy: false,
-      path: mdiInformationOutline,
       canUpload: false,
     };
   },
@@ -181,29 +174,6 @@ export default {
           this.$store.commit("toggleConfirmRouteModal", true);
         }
       }
-    },
-    toggleCreateFolderModal: function (keypress) {
-      toggleCreateFolderModal();
-      if (keypress) {
-        setPrevActiveElement();
-        const nav = document.querySelector("nav");
-
-        Array.from(nav.children).forEach((child) =>
-          child.setAttribute("inert", "true"));
-      }
-      if (!this.container) {
-        setTimeout(() => {
-          const uploadFolderInput = document
-            .querySelector("#upload-folder-input input");
-          uploadFolderInput.focus();
-        }, 300);
-      }
-      setTimeout(() => {
-        const newFolderInput = document
-          .querySelector("#newFolder-input input");
-        newFolderInput.tabIndex = "0";
-        newFolderInput.focus();
-      }, 300);
     },
     toggleUploadModal: function (keypress) {
       this.$store.commit("setFilesAdded", true);
