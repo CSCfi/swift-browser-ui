@@ -67,7 +67,10 @@ async def swift_list_containers(
         f"{request.remote}, session: {session} :: {time.ctime()}"
     )
 
-    query = request.query.copy()
+    # as of v 3.9.1 the return type of query is "MultiMapping[str]"
+    # however the actual function returns MultiDictProxy which has copy
+    # https://github.com/aio-libs/multidict/blob/master/multidict/_multidict_py.py#L146-L163
+    query = request.query.copy()  # type: ignore[attr-defined]
     query["format"] = "json"
     try:
         async with client.get(
@@ -241,7 +244,10 @@ async def swift_list_objects(request: aiohttp.web.Request) -> aiohttp.web.Stream
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
-    query = request.query.copy()
+    # as of v 3.9.1 the return type of query is "MultiMapping[str]"
+    # however the actual function returns MultiDictProxy which has copy
+    # https://github.com/aio-libs/multidict/blob/master/multidict/_multidict_py.py#L146-L163
+    query = request.query.copy()  # type: ignore[attr-defined]
     query["format"] = "json"
 
     endpoint = session["projects"][project]["endpoint"]
