@@ -20,6 +20,7 @@ Schema for storing the download information:
 let downloads = {};
 // Text encoder for quickly encoding tar headers
 let enc = new TextEncoder();
+let libinitDone = false;
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -61,6 +62,7 @@ function createDownloadSession(container, handle, archive) {
     [],
     [],
   );
+
   let pubkeyPtr = Module.ccall(
     "get_keypair_public_key",
     "number",
@@ -257,8 +259,8 @@ function finishDownloadSession(container) {
     "free_keypair",
     undefined,
     ["number"],
-    [downloads[container].keypair]
-  )
+    [downloads[container].keypair],
+  );
   delete downloads[container];
 }
 
@@ -316,7 +318,7 @@ async function beginDownloadInSession(
 
     let path = file.split("/");
     let name = path.slice(-1)[0];
-    let prefix
+    let prefix;
     if (path.length > 1) {
       prefix = path.slice(0, -1).join("/");
     } else {
@@ -352,7 +354,7 @@ async function beginDownloadInSession(
   // Sync the file if downloading directly into file, otherwise finish
   // the fetch request.
   if (downloads[container].direct) {
-    await fileStream.close()
+    await fileStream.close();
     // downloads[container].handle.flush();
     // downloads[container].handle.close();
   } else {
@@ -408,7 +410,7 @@ if (inServiceWorker) {
       const response = new Response(stream);
       response.headers.append(
         "Content-Disposition",
-        'attachment; filename="' + fileName.replace(".c4gh", "") + '"',
+        "attachment; filename=\"" + fileName.replace(".c4gh", "") + "\"",
       );
 
       // Map the streamController as the stream for the download
@@ -424,24 +426,31 @@ if (inServiceWorker) {
   });
 }
 
-self.addEventListener("message", (e) => {
+self.addEventListener("message", async (e) => {
   // Sanity check container name
   if (checkPollutingName(e.data.container)) return;
 
   switch(e.data.command) {
     case "downloadFile":
       if (inServiceWorker) {
-        createDownloadSession(e.data.container, undefined, false);
-        e.source.postMessage({
-          eventType: "getHeaders",
-          container: e.data.container,
-          files: [
-            e.data.file,
-          ],
-          pubkey: downloads[e.data.container].pubkey,
-          owner: e.data.owner,
-          ownerName: e.data.ownerName,
-        });
+        while (!libinitDone) {
+          await timeout(250);
+        }
+        if (libinitDone) {
+          createDownloadSession(e.data.container, undefined, false);
+          e.source.postMessage({
+            eventType: "getHeaders",
+            container: e.data.container,
+            files: [
+              e.data.file,
+            ],
+            pubkey: downloads[e.data.container].pubkey,
+            owner: e.data.owner,
+            ownerName: e.data.ownerName,
+          });
+
+        }
+
       } else {
         createDownloadSession(e.data.container, e.data.handle, false);
         postMessage({
@@ -458,15 +467,20 @@ self.addEventListener("message", (e) => {
       break;
     case "downloadFiles":
       if (inServiceWorker) {
-        createDownloadSession(e.data.container, undefined, true);
-        e.source.postMessage({
-          eventType: "getHeaders",
-          container: e.data.container,
-          files: e.data.files,
-          pubkey: downloads[e.data.container].pubkey,
-          owner: e.data.owner,
-          ownerName: e.data.ownerName,
-        });
+        while (!libinitDone) {
+          await timeout(250);
+        }
+        if (libinitDone) {
+          createDownloadSession(e.data.container, undefined, true);
+          e.source.postMessage({
+            eventType: "getHeaders",
+            container: e.data.container,
+            files: e.data.files,
+            pubkey: downloads[e.data.container].pubkey,
+            owner: e.data.owner,
+            ownerName: e.data.ownerName,
+          });
+        }
       } else {
         createDownloadSession(e.data.container, e.data.handle, true);
         postMessage({
@@ -502,6 +516,7 @@ self.addEventListener("message", (e) => {
 
 waitAsm().then(() => {
   Module.ccall("libinit", undefined, undefined, undefined);
+  libinitDone = true;
 });
 
 export var downloadRuntime = Module;
