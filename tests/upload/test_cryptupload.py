@@ -21,6 +21,7 @@ class CryptTestClass(tests.common.mockups.APITestBase):
         }
         self.test_header = b"this is a test header"
         self.mock_socket = unittest.mock.AsyncMock(aiohttp.web.WebSocketResponse)
+        self.mock_socket.closed = False
         self.mock_vault = unittest.mock.AsyncMock(VaultClient)
         self.file_uploader = FileUpload(
             self.mock_client,
@@ -94,7 +95,7 @@ class CryptTestClass(tests.common.mockups.APITestBase):
         await self.file_uploader.add_to_chunks(1, b"data")
         self.assertEqual(len(self.file_uploader.chunk_cache), 1)
 
-    async def test_slice_semgent(self):
+    async def test_slice_segment(self):
         """Test slicing segment from queue."""
         self.file_uploader.total_segments = 3
         for i in range(0, 81885):
@@ -102,7 +103,7 @@ class CryptTestClass(tests.common.mockups.APITestBase):
         ret = []
         async for chunk in self.file_uploader.slice_segment(0):
             ret.append(chunk)
-        self.assertEqual(len(ret), 81886)
+        self.assertEqual(len(ret), 81885)
 
     async def test_upload_segment(self):
         """Test uploading segment with given ordering number."""
@@ -148,6 +149,7 @@ class CryptTestClass(tests.common.mockups.APITestBase):
     async def test_handle_begin_upload(self):
         """Test upload start handling."""
         mock_ws = unittest.mock.AsyncMock()
+        mock_ws.closed = False
         self.upload_session.ws = mock_ws
         await self.upload_session.handle_begin_upload(self.msg)
         mock_ws.send_bytes.assert_awaited_once()

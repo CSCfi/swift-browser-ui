@@ -78,6 +78,7 @@ class FileUpload:
         self.chunk_cache: typing.Dict[int, bytes] = {}
         self.failed: bool = False
         self.finished: bool = False
+        self.aborted: bool = False
 
         # Calculate upload parameters
         self.total_segments: int = -(self.total // -SEGMENT_SIZE)
@@ -101,7 +102,11 @@ class FileUpload:
 
     async def add_header(self, header: bytes) -> None:
         """Add header for the file."""
-        if not await self.a_create_container():
+        if (
+            not await self.a_create_container()
+            and self.socket is not None
+            and not self.socket.closed
+        ):
             await self.socket.send_bytes(
                 msgpack.packb(
                     {
@@ -134,28 +139,30 @@ class FileUpload:
 
     async def start_upload(self):
         """Tell the frontend to start the file upload."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "start_upload",
-                    "container": self.container,
-                    "object": self.path,
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "start_upload",
+                        "container": self.container,
+                        "object": self.path,
+                    }
+                )
             )
-        )
 
     async def retry_chunk(self, order):
         """Retry a failed chunk."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "retry_chunk",
-                    "container": self.container,
-                    "object": self.path,
-                    "order": order,
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "retry_chunk",
+                        "container": self.container,
+                        "object": self.path,
+                        "order": order,
+                    }
+                )
             )
-        )
 
     async def add_to_chunks(
         self,
@@ -205,6 +212,11 @@ class FileUpload:
         for i in range(seg_start, seg_end):
             wait_count = 0
             while i not in self.chunk_cache:
+                if self.aborted:
+                    LOGGER.debug(
+                        f"Terminating slicer for segment {segment} for {self.container}/{self.path} due to upload abortion."
+                    )
+                    return
                 wait_count += 1
                 await asyncio.sleep(0.1)
                 # If handler has waited for too long for the next chunk, retry
@@ -220,7 +232,6 @@ class FileUpload:
             yield chunk
 
         # Finally yield eof
-        yield b""
         return
 
     async def upload_segment(self, order: int) -> int:
@@ -229,6 +240,11 @@ class FileUpload:
         # Wait until first chunk is available in cache, before starting the request
         LOGGER.debug(f"Waiting until first chunk in segment {order} is available.")
         while (seg_start) not in self.chunk_cache:
+            if self.aborted:
+                LOGGER.debug(
+                    f"Terminating segment {order} for {self.container}/{self.path} early due to upload abortion."
+                )
+                return 410
             await asyncio.sleep(0.1)
         LOGGER.debug(f"Got first chunk for segment {order}. Starting upload...")
 
@@ -250,7 +266,11 @@ class FileUpload:
         ) as resp:
             LOGGER.info(f"Segment {order} finished with status {resp.status}.")
 
-        if self.total_segments - 1 == order:
+        if (
+            self.total_segments - 1 == order
+            and self.socket is not None
+            and not self.socket.closed
+        ):
             LOGGER.info("Informing client that file was finished.")
             await self.socket.send_bytes(
                 msgpack.packb(
@@ -288,21 +308,24 @@ class FileUpload:
 
     async def abort_upload(self):
         """Abort the upload."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "abort",
-                    "container": self.container,
-                    "object": self.path,
-                    "reason": "cancel",
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "abort",
+                        "container": self.container,
+                        "object": self.path,
+                        "reason": "cancel",
+                    }
+                )
             )
-        )
 
+        self.aborted = True
+
+        await asyncio.gather(*self.tasks)
         for task in self.tasks:
             if not task.done():
                 task.cancel()
-        asyncio.gather(*self.tasks)
 
         # Delete segments that might've been uploaded
         headers = {
@@ -360,7 +383,12 @@ class UploadSession:
             owner_name = str(msg["owner_name"])
         total = int(msg["total"])
 
-        if container in self.uploads and path in self.uploads[container] and self.ws:
+        if (
+            container in self.uploads
+            and path in self.uploads[container]
+            and self.ws is not None
+            and not self.ws.closed
+        ):
             await self.ws.send_bytes(
                 msgpack.packb(
                     {
@@ -447,6 +475,9 @@ class UploadSession:
                     asyncio.create_task(self.uploads[container][file].abort_upload())
                 )
         await asyncio.gather(*abort_tasks)
+
+        LOGGER.debug("Clearing upload session directory.")
+        self.uploads = {}
 
 
 def get_encrypted_upload_session(
