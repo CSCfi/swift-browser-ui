@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM docker.io/nginx:latest
 COPY nginx.conf /etc/nginx/nginx.conf.template
 
 COPY swiftui-proxy.key /etc/ssl/swiftui-proxy.key
