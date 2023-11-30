@@ -113,6 +113,18 @@ export function addTarFile(path, size) {
     sizeStr = size.toString(8).padStart(11, "0") + "\x00";
   } else {
     //use base256 (signed) for larger numbers
+    //TODO test this with downloads over maxOctal size
+    let bytes = BigInt(size);
+
+    let base256 = [];
+    do {
+      base256.unshift(Number(bytes%256n));
+      bytes = bytes/256n;
+    } while (bytes);
+
+    while (base256.length < 12) base256.unshift(0x00);
+    base256[0] |= 0x80;
+    sizeStr = base256.join("");
   }
 
   if (path.length > 100) {
