@@ -28,7 +28,7 @@ dependencies = [
     "asyncpg==0.29.0",
     "certifi==2023.11.17",
     "click==8.1.7",
-    "cryptography==41.0.5",
+    "cryptography==41.0.7",
     "gunicorn==21.2.0",
     "keystoneauth1==5.4.0",
     "oidcrp==2.1.4",
@@ -51,7 +51,7 @@ test = [
     "pytest-cov==4.1.0",
     "pytest-xdist==3.5.0",
     "pytest==7.4.3",
-    "tox==4.11.3",
+    "tox==4.11.4",
 ]
 ui_test = [
     "pytest-timeout==2.2.0",
