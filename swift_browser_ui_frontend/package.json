@@ -16,7 +16,7 @@
   "dependencies": {
     "@intlify/unplugin-vue-i18n": "^1.5.0",
     "@mdi/js": "^7.3.67",
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@vitejs/plugin-vue": "^4.5.1",
     "@vueuse/rxjs": "^10.6.1",
     "@ygoe/msgpack": "^1.0.3",
     "cli-highlight": "^2.1.11",
