@@ -213,6 +213,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1149) Fix headers no getting copied when replicating a container
 - (GL #1154) Fix session cookie not getting properly clear on invalidation
 - (GL #1160) Fix large uploaded file (> 5 GiB) showing wrong size in the UI
+- (GL #1165) Fix download function not working reliably in Firefox
 
 ### Removed
 
