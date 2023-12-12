@@ -1,4 +1,4 @@
-FROM python:3.11-alpine3.17 as BACKEND
+FROM docker.io/python:3.11-alpine3.17 as BACKEND
 
 COPY pyproject.toml /root/swift_sharing/pyproject.toml
 COPY README.md /root/swift_sharing/README.md
@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip \
     && pip install /root/swift_sharing
 
-FROM python:3.11-alpine3.17
+FROM docker.io/python:3.11-alpine3.17
 
 LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
