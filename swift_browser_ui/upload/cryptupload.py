@@ -5,6 +5,7 @@ import asyncio
 import base64
 import logging
 import os
+import random
 import secrets
 import ssl
 import typing
@@ -97,7 +98,8 @@ class FileUpload:
         while len(self.chunk_cache) > CRYPTUPLOAD_Q_DEPTH:
             if self.finished:
                 return False
-            await asyncio.sleep(0.1)
+            # We can safely ignore the warning about using the random library
+            await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec  # noqa: S311
         return True
 
     async def add_header(self, header: bytes) -> None:
@@ -218,7 +220,8 @@ class FileUpload:
                     )
                     return
                 wait_count += 1
-                await asyncio.sleep(0.1)
+                # We can safely ignore the warning about using the random library
+                await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec # noqa: S311
                 # If handler has waited for too long for the next chunk, retry
                 # Currently 60 seconds is considered too long
                 if wait_count > 600:
@@ -245,7 +248,8 @@ class FileUpload:
                     f"Terminating segment {order} for {self.container}/{self.path} early due to upload abortion."
                 )
                 return 410
-            await asyncio.sleep(0.1)
+            # We can safely ignore the warning about using the random library
+            await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec  # noqa: S311
         LOGGER.debug(f"Got first chunk for segment {order}. Starting upload...")
 
         headers = {
