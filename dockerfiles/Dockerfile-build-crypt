@@ -1,5 +1,5 @@
 # Build encryption post-script
-FROM docker.io/node:18-alpine3.17 AS WEBPACK_WASM_PREPROCESS
+FROM docker.io/node:20-alpine3.17 AS WEBPACK_WASM_PREPROCESS
 
 RUN --mount=type=cache,target=/var/cache/apk/ \
     apk add git python3
@@ -26,7 +26,7 @@ COPY --from=WEBPACK_WASM_PREPROCESS /root/swift-browser-ui/swift_browser_ui_fron
 RUN bash /bin/build_wasm.sh all
 
 # Build UI with encryption
-FROM docker.io/node:18-alpine3.17 as FRONTEND
+FROM docker.io/node:20-alpine3.17 as FRONTEND
 
 ARG OIDC_ENABLED
 
