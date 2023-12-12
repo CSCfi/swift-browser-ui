@@ -22,7 +22,7 @@
     "cli-highlight": "^2.1.11",
     "csc-ui": "0.9.5",
     "dexie": "^3.2.4",
-    "eslint": "^8.54.0",
+    "eslint": "^8.55.0",
     "eslint-plugin-vue": "^9.19.2",
     "eslint-utils": "^3.0.0",
     "lodash": "^4.17.21",
