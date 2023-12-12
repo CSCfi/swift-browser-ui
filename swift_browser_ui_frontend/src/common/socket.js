@@ -3,6 +3,7 @@
 import { getUploadEndpoint, getUploadSocket, signedFetch } from "./api";
 import { DEV } from "./conv";
 import { getDB } from "./db";
+import { timeout } from "./globalFunctions";
 
 
 export default class UploadSocket {
@@ -161,9 +162,15 @@ export default class UploadSocket {
           projectID: this.active.id,
           name: container,
         });
-      let objects = await getDB().objects
-        .where({"containerID": dbContainer.id})
-        .toArray();
+
+      let objects = [];
+      while (objects.length < dbContainer.count) {
+        await timeout(250);
+        objects = await getDB().objects
+          .where({"containerID": dbContainer.id})
+          .toArray();
+      }
+
       files = objects.map(item => item.name);
     } else {
       files = fileList;

@@ -264,3 +264,7 @@ export function checkIfCanDownloadTar(objs, isSubfolder) {
     return pathOk;
   }
 }
+
+export function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
