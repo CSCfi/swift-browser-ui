@@ -5,6 +5,7 @@ import asyncio
 import base64
 import logging
 import os
+import random
 import secrets
 import ssl
 import typing
@@ -30,7 +31,8 @@ SEGMENT_SIZE = 5368708140
 SEGMENT_CHUNKS = 81885
 CHUNK_SIZE = 65564
 
-CRYPTUPLOAD_Q_DEPTH = int(os.environ.get("SWIFTUI_UPLOAD_RUNNER_Q_DEPTH", 96))
+# Use an approx 10 MiB queue for each upload by default
+CRYPTUPLOAD_Q_DEPTH = int(os.environ.get("SWIFTUI_UPLOAD_RUNNER_Q_DEPTH", 160))
 
 
 class FileUpload:
@@ -77,6 +79,7 @@ class FileUpload:
         self.chunk_cache: typing.Dict[int, bytes] = {}
         self.failed: bool = False
         self.finished: bool = False
+        self.aborted: bool = False
 
         # Calculate upload parameters
         self.total_segments: int = -(self.total // -SEGMENT_SIZE)
@@ -84,18 +87,28 @@ class FileUpload:
         self.total_chunks: int = -(self.total // -CHUNK_SIZE)
         self.remainder_chunks: int = -(self.remainder_segment // -CHUNK_SIZE)
 
-        self.q_cache: typing.List[asyncio.Queue] = [
-            asyncio.Queue(maxsize=256) for _ in range(0, self.total_segments)
-        ]
         self.tasks: typing.List[asyncio.Task] = []
 
         LOGGER.debug(f"total: {self.total}")
         LOGGER.debug(f"segments: {self.total_segments}")
         LOGGER.debug(f"chunks: {self.total_chunks}")
 
+    async def wait_for_cache(self) -> bool:
+        """Block until the cache has enough space available."""
+        while len(self.chunk_cache) > CRYPTUPLOAD_Q_DEPTH:
+            if self.finished:
+                return False
+            # We can safely ignore the warning about using the random library
+            await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec  # noqa: S311
+        return True
+
     async def add_header(self, header: bytes) -> None:
         """Add header for the file."""
-        if not await self.a_create_container():
+        if (
+            not await self.a_create_container()
+            and self.socket is not None
+            and not self.socket.closed
+        ):
             await self.socket.send_bytes(
                 msgpack.packb(
                     {
@@ -120,35 +133,38 @@ class FileUpload:
         )
 
         self.tasks = [
-            asyncio.create_task(self.slice_into_queue(i, self.q_cache[i]))
+            asyncio.create_task(self.upload_segment(i))
             for i in range(0, self.total_segments)
         ]
+
         await self.start_upload()
 
     async def start_upload(self):
         """Tell the frontend to start the file upload."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "start_upload",
-                    "container": self.container,
-                    "object": self.path,
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "start_upload",
+                        "container": self.container,
+                        "object": self.path,
+                    }
+                )
             )
-        )
 
     async def retry_chunk(self, order):
         """Retry a failed chunk."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "retry_chunk",
-                    "container": self.container,
-                    "object": self.path,
-                    "order": order,
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "retry_chunk",
+                        "container": self.container,
+                        "object": self.path,
+                        "order": order,
+                    }
+                )
             )
-        )
 
     async def add_to_chunks(
         self,
@@ -158,6 +174,7 @@ class FileUpload:
         """Add a chunk to cache."""
         if order in self.done_chunks or order in self.chunk_cache:
             return
+
         self.chunk_cache[order] = data
 
     async def a_create_container(self) -> bool:
@@ -178,7 +195,7 @@ class FileUpload:
                             return False
         return True
 
-    async def slice_into_queue(self, segment: int, q: asyncio.Queue):
+    async def slice_segment(self, segment: int):
         """Slice a ~5GiB segment from queue."""
         seg_start = segment * SEGMENT_CHUNKS
         seg_end = seg_start + SEGMENT_CHUNKS
@@ -191,25 +208,23 @@ class FileUpload:
             LOGGER.debug(f"Using {self.total_chunks} as chunk amount for last segment.")
             seg_end = self.total_chunks
         LOGGER.debug(f"Consuming chunks {seg_start} through {seg_end}")
-        LOGGER.debug(f"Waiting until first chunk in segment {segment} is available.")
-
-        while (seg_start) not in self.chunk_cache:
-            await asyncio.sleep(0.1)
-        LOGGER.debug(f"Got first chunk for segment {segment}. Starting upload...")
-
-        # Create a task for segment upload
-        self.tasks.append(asyncio.create_task(self.upload_segment(segment)))
 
         # Start the upload
-        LOGGER.debug(f"Pushing chunks from {seg_start} until {seg_end} to queue.")
+        LOGGER.debug(f"Generator yielding chunks from {seg_start} until {seg_end}.")
         for i in range(seg_start, seg_end):
             wait_count = 0
             while i not in self.chunk_cache:
+                if self.aborted:
+                    LOGGER.debug(
+                        f"Terminating slicer for segment {segment} for {self.container}/{self.path} due to upload abortion."
+                    )
+                    return
                 wait_count += 1
-                await asyncio.sleep(0.05)
+                # We can safely ignore the warning about using the random library
+                await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec # noqa: S311
                 # If handler has waited for too long for the next chunk, retry
-                # Currently 10 seconds is considered too long
-                if wait_count > 2000:
+                # Currently 60 seconds is considered too long
+                if wait_count > 600:
                     try:
                         await self.retry_chunk(i)
                         wait_count = 0
@@ -217,23 +232,26 @@ class FileUpload:
                         pass
             self.done_chunks.add(i)
             chunk = self.chunk_cache.pop(i)
-            await q.put(chunk)
-
-        # Queue EOF
-        await q.put(b"")
-
-    async def queue_generator(self, q: asyncio.Queue):
-        """Consume the upload queue."""
-        LOGGER.debug("Starting consumption of the queue.")
-        chunk = await q.get()
-        while chunk:
             yield chunk
-            chunk = await q.get()
+
+        # Finally yield eof
+        return
 
     async def upload_segment(self, order: int) -> int:
         """Upload the segment with given ordering number."""
-        # Fetch the queue from storage
-        q = self.q_cache[order]
+        seg_start = order * SEGMENT_CHUNKS
+        # Wait until first chunk is available in cache, before starting the request
+        LOGGER.debug(f"Waiting until first chunk in segment {order} is available.")
+        while (seg_start) not in self.chunk_cache:
+            if self.aborted:
+                LOGGER.debug(
+                    f"Terminating segment {order} for {self.container}/{self.path} early due to upload abortion."
+                )
+                return 410
+            # We can safely ignore the warning about using the random library
+            await asyncio.sleep(random.uniform(0.1, 0.2))  # nosec  # noqa: S311
+        LOGGER.debug(f"Got first chunk for segment {order}. Starting upload...")
+
         headers = {
             "X-Auth-Token": self.token,
             "Content-Type": "application/swiftclient-segment",
@@ -245,14 +263,18 @@ class FileUpload:
                 container=f"{self.container}{common.SEGMENTS_CONTAINER}",
                 object_name=f"{self.path}/{self.segment_id}/{(order + 1):08d}",
             ),
-            data=self.queue_generator(q),
+            data=self.slice_segment(order),
             headers=headers,
             timeout=UPL_TIMEOUT,
             ssl=ssl_context,
         ) as resp:
             LOGGER.info(f"Segment {order} finished with status {resp.status}.")
 
-        if self.total_segments - 1 == order:
+        if (
+            self.total_segments - 1 == order
+            and self.socket is not None
+            and not self.socket.closed
+        ):
             LOGGER.info("Informing client that file was finished.")
             await self.socket.send_bytes(
                 msgpack.packb(
@@ -290,28 +312,24 @@ class FileUpload:
 
     async def abort_upload(self):
         """Abort the upload."""
-        await self.socket.send_bytes(
-            msgpack.packb(
-                {
-                    "command": "abort",
-                    "container": self.container,
-                    "object": self.path,
-                    "reason": "cancel",
-                }
+        if self.socket is not None and not self.socket.closed:
+            await self.socket.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "abort",
+                        "container": self.container,
+                        "object": self.path,
+                        "reason": "cancel",
+                    }
+                )
             )
-        )
 
-        for q in self.q_cache:
-            await q.put(b"")
+        self.aborted = True
 
-        try:
-            await asyncio.gather(*self.tasks)
-        except ConnectionResetError:
-            pass
-        finally:
-            for task in self.tasks:
-                if not task.done():
-                    task.cancel()
+        await asyncio.gather(*self.tasks)
+        for task in self.tasks:
+            if not task.done():
+                task.cancel()
 
         # Delete segments that might've been uploaded
         headers = {
@@ -369,7 +387,12 @@ class UploadSession:
             owner_name = str(msg["owner_name"])
         total = int(msg["total"])
 
-        if container in self.uploads and path in self.uploads[container] and self.ws:
+        if (
+            container in self.uploads
+            and path in self.uploads[container]
+            and self.ws is not None
+            and not self.ws.closed
+        ):
             await self.ws.send_bytes(
                 msgpack.packb(
                     {
@@ -412,6 +435,33 @@ class UploadSession:
             bytes(msg["data"]),
         )
 
+    async def handle_upload_chunks(self, msg: typing.Dict[str, typing.Any]):
+        """Handle the addition of multiple new chunks."""
+        container: str = str(msg["container"])
+        path: str = str(msg["object"])
+
+        for chunk in msg["chunks"]:
+            await self.uploads[container][path].add_to_chunks(
+                int(chunk["order"]),
+                bytes(chunk["data"]),
+            )
+
+        if (
+            container in self.uploads
+            and path in self.uploads[container]
+            and await self.uploads[container][path].wait_for_cache()
+            and self.ws is not None
+        ):
+            await self.ws.send_bytes(
+                msgpack.packb(
+                    {
+                        "command": "next",
+                        "container": container,
+                        "object": path,
+                    }
+                )
+            )
+
     async def handle_finish_upload(self, msg: typing.Dict[str, typing.Any]):
         """Handle the upload end."""
         container: str = str(msg["container"])
@@ -429,6 +479,9 @@ class UploadSession:
                     asyncio.create_task(self.uploads[container][file].abort_upload())
                 )
         await asyncio.gather(*abort_tasks)
+
+        LOGGER.debug("Clearing upload session directory.")
+        self.uploads = {}
 
 
 def get_encrypted_upload_session(

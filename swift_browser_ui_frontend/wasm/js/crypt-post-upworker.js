@@ -211,7 +211,6 @@ class StreamSlicer{
     this.bytes = 0;
     this.totalBytes = 0;
     this.iter = 0;
-    this.interval = undefined;
 
     this.reader = this.file.stream();
   }
@@ -226,47 +225,73 @@ class StreamSlicer{
     if (enChunk === undefined || enChunk.length === 0 || enChunk.size === 0
       || uploadCancelled
     ) {
-      clearInterval(this.interval);
       if (uploadCancelled) uploadCount = 0;
-      return;
+      return undefined;
     }
 
     let enBuffer = await enChunk.arrayBuffer();
 
-    if (uploads[this.container]) {
-      let enData = encryptChunk(
-        this.container,
-        this.path,
-        new Uint8Array(enBuffer),
-      );
+    let enData = encryptChunk(
+      this.container,
+      this.path,
+      new Uint8Array(enBuffer),
+    );
 
+    return enData;
+  }
+
+  retryChunk(iter) {
+    this.getChunk(iter).then(async (chunk) => {
+      if (uploads[this.container]) {
+        let chunk = await this.getChunk(iter);
+
+        if (chunk === undefined) {
+          return;
+        }
+
+        let msg = msgpack.serialize({
+          command: "add_chunk",
+          container: this.container,
+          object: this.path,
+          order: iter,
+          data: chunk,
+        });
+        if (socket.readyState === 1) {
+          socket.send(msg);
+        }
+      }
+    });
+  }
+
+  async sendChunks() {
+    if (uploads[this.container]) {
+      let chunks = [];
+      while (chunks.length < 20) {
+        let chunk = await this.getChunk(this.iter);
+        if (chunk === undefined) {
+          break;
+        }
+        chunks.push({
+          order: this.iter,
+          data: chunk,
+        });
+        this.iter++;
+        totalDone += chunk.length - 28;
+      }
 
       let msg = msgpack.serialize({
-        command: "add_chunk",
+        command: "add_chunks",
         container: this.container,
         object: this.path,
-        order: iter,
-        data: enData,
+        chunks: chunks,
       });
-
       if (socket.readyState === 1) {
         socket.send(msg);
       }
     }
   }
 
-  async nextChunk () {
-    let iter = this.iter;
-    this.iter++;
-    totalDone += 65536;
-    return await this.getChunk(iter);
-  }
-
-  retryChunk(iter) {
-    this.getChunk(iter).then(() => {});
-  }
-
-  async sendFile() {
+  async startFile() {
     // Uploads need to be throttled a bit, without throttling
     // upload doesn't progress fast enough to keep the upload
     // connection open.
@@ -274,16 +299,11 @@ class StreamSlicer{
       await timeout(250);
     }
     uploadCount++;
-    this.interval = setInterval(() => {
-      if (socket.bufferedAmount < 5242880) {
-        this.nextChunk().then(() => {});
-      }
-    }, 1);
-    // Update the frontend with the active file.
     postMessage({
       eventType: "activeFile",
       object: this.file.name,
     });
+    await this.sendChunks();
   }
 
   finishFile() {
@@ -371,7 +391,15 @@ async function openWebSocket (
       // Push the next chunk to the websocket
       case "start_upload":
         if(!uploadCancelled) {
-          uploads[msg_data.container].files[msg_data.object].slicer.sendFile().then(
+          uploads[msg_data.container].files[msg_data.object].slicer.startFile().then(
+            () => {},
+          );
+        }
+        break;
+      // Respond to server ACK with next content
+      case "next":
+        if(!uploadCancelled) {
+          uploads[msg_data.container].files[msg_data.object].slicer.sendChunks().then(
             () => {},
           );
         }

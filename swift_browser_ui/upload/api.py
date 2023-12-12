@@ -234,6 +234,8 @@ async def handle_upload_ws(
                 await upload_session.handle_begin_upload(msg_unpacked)
             if msg_unpacked["command"] == "add_chunk":
                 await upload_session.handle_upload_chunk(msg_unpacked)
+            if msg_unpacked["command"] == "add_chunks":
+                await upload_session.handle_upload_chunks(msg_unpacked)
             if msg_unpacked["command"] == "cancel":
                 await upload_session.handle_close()
             if msg_unpacked["command"] == "finish":
