@@ -43,8 +43,8 @@ docs = [
     "sphinx_rtd_theme==2.0.0",
 ]
 test = [
-    "black==23.11.0",
-    "coverage==7.3.2",
+    "black==23.12.0",
+    "coverage==7.3.3",
     "flake8-docstrings==1.7.0",
     "flake8==6.1.0",
     "mypy==1.7.1",
@@ -59,9 +59,9 @@ ui_test = [
 ]
 dev = [
     "honcho==1.1.0",
-    "pre-commit==3.5.0",
+    "pre-commit==3.6.0",
     "pyspelling==2.9",
-    "ruff==0.1.6",
+    "ruff==0.1.8",
     "types-certifi",
     "types-redis",
     "types-requests",
