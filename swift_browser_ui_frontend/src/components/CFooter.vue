@@ -30,38 +30,19 @@
           </a>
         </div>
       </div>
-
       <div
+        v-for="(menuItem, index) in $tm('message.footerMenu.menuItems')"
+        :key="index"
         class="footer-end"
       >
         <div class="smalltext">
           <a
             class="linktext"
             target="_blank"
-            :href="$t('message.footerMenu.menuItemLink1')"
-            :alt="$t('message.footerMenu.menuItem1')"
+            :href="$rt(menuItem.link)"
+            :alt="$rt(menuItem.item)"
           >
-            {{ $t("message.footerMenu.menuItem1") }}
-          </a>
-        </div>
-        <div class="smalltext">
-          <a
-            class="linktext"
-            target="_blank"
-            :href="$t('message.footerMenu.menuItemLink2')"
-            :alt="$t('message.footerMenu.menuItem2')"
-          >
-            {{ $t("message.footerMenu.menuItem2") }}
-          </a>
-        </div>
-        <div class="smalltext">
-          <a
-            class="linktext"
-            target="_blank"
-            :href="$t('message.footerMenu.menuItemLink3')"
-            :alt="$t('message.footerMenu.menuItem3')"
-          >
-            {{ $t("message.footerMenu.menuItem3") }}
+            {{ $rt(menuItem.item) }}
           </a>
         </div>
       </div>
