@@ -298,12 +298,14 @@ class StreamSlicer{
     while (uploadCount > 4) {
       await timeout(250);
     }
-    uploadCount++;
-    postMessage({
-      eventType: "activeFile",
-      object: this.file.name,
-    });
-    await this.sendChunks();
+    if (!uploadCancelled) {
+      uploadCount++;
+      postMessage({
+        eventType: "activeFile",
+        object: this.file.name,
+      });
+      await this.sendChunks();
+    }
   }
 
   finishFile() {
