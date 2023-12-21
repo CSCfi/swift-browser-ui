@@ -159,6 +159,7 @@ function createUploadSessionFile(container, path) {
 
 // Encrypt a single chunk of an upload
 function encryptChunk(container, path, deChunk) {
+  if (!uploads[container]) return undefined;
   let chunk = Module.ccall(
     "encrypt_chunk",
     "number",
@@ -241,7 +242,7 @@ class StreamSlicer{
   }
 
   retryChunk(iter) {
-    this.getChunk(iter).then(async (chunk) => {
+    this.getChunk(iter).then(async () => {
       if (uploads[this.container]) {
         let chunk = await this.getChunk(iter);
 
