@@ -15,7 +15,9 @@ AiohttpHandler = typing.Callable[
 ]
 
 
-def return_error_response(error_code: int) -> web.Response:
+def return_error_response(
+    error_code: int, reason: str = "Unknown reason."
+) -> web.Response:
     """Return the correct error page with correct status code."""
     # Read the error response page fully before dumping body since
     # aiohttp.web.FileResponse is not an option, for info see
@@ -28,11 +30,13 @@ def return_error_response(error_code: int) -> web.Response:
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Content-Type": "text/html",
+            "X-Error-Reason": reason,
             "Pragma": "no-cache",
             "Expires": "0",
         },
         body=error_body,
     )
+
     if error_code == 401:
         resp.headers["WWW-Authenticate"] = 'Bearer realm="/", charset="UTF-8"'
 
@@ -144,7 +148,7 @@ async def error_middleware(request: web.Request, handler: AiohttpHandler) -> web
         return response
     except web.HTTPException as ex:
         if ex.status in to_process:
-            return return_error_response(ex.status)
+            return return_error_response(ex.status, ex.reason)
         if ex.status in container_errors:
             raise ex
         if ex.status > 405 and ex.status < 500:
