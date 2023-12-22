@@ -527,11 +527,21 @@ export default {
       });
     },
     async containerDownload(containerName, owner) {
-      let containerObjs = await getObjects(this.active.id, containerName);
-      containerObjs = containerObjs.map(obj => obj.name);
+      let containerObjs = [];
+      if (owner) containerObjs = await getObjects(
+        this.active.id,
+        containerName,
+        "",
+        this.abortController.signal,
+        true,
+        owner,
+      );
+      else containerObjs = await getObjects(this.active.id, containerName);
+
+      const containerObjNames = containerObjs.map(obj => obj.name);
 
       const canDownload = checkIfCanDownloadTar(
-        containerObjs, false);
+        containerObjNames, false);
       if (canDownload) {
         this.beginDownload(containerName, owner);
       } else {

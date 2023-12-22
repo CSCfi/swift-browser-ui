@@ -216,6 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1160) Fix large uploaded file (> 5 GiB) showing wrong size in the UI
 - (GL #1165) Fix download function not working reliably in Firefox
 - (GL #1173) Fix new upload regressions in congested conditions
+- (GL #1183) Downloaded containers have wrong sizes
 
 ### Removed
 
