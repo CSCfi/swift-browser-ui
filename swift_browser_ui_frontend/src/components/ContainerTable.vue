@@ -45,6 +45,7 @@ import {
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
   checkIfCanDownloadTar,
+  addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -459,15 +460,9 @@ export default {
     },
     delete: async function (container, objects) {
       if (objects > 0) { //if container not empty
-        document.querySelector("#container-error-toasts").addToast(
-          {
-            progress: false,
-            type: "error",
-            duration: 6000,
-            message: this.$t("message.container_ops.deleteNote"),
-          },
-        );
-      } else { //delete empty folder without confirmation
+        addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
+      }
+      else { //delete empty folder without confirmation
         const projectID = this.$route.params.project;
         swiftDeleteContainer(
           projectID,
@@ -525,6 +520,8 @@ export default {
         owner,
       ).then(() => {
         if (DEV) console.log(`Started downloading all objects from container ${container}`);
+      }).catch(() => {
+        addErrorToastOnMain(this.$t("message.download.error"));
       });
     },
     async containerDownload(containerName, owner) {
@@ -546,13 +543,7 @@ export default {
       if (canDownload) {
         this.beginDownload(containerName, owner);
       } else {
-        document.querySelector("#container-error-toasts")
-          .addToast(
-            { progress: false,
-              type: "error",
-              duration: 6000,
-              message: this.$t("message.download.files")},
-          );
+        addErrorToastOnMain(this.$t("message.download.files"));
       }
     },
     getEmptyText() {

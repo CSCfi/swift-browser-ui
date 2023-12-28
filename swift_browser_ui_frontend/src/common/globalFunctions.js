@@ -268,3 +268,13 @@ export function checkIfCanDownloadTar(objs, isSubfolder) {
 export function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export function addErrorToastOnMain(msg) {
+  document.querySelector("#container-error-toasts")
+    .addToast(
+      { progress: false,
+        type: "error",
+        duration: 6000,
+        message: msg },
+    );
+}
