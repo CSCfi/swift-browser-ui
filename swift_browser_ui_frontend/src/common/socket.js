@@ -135,6 +135,10 @@ export default class UploadSocket {
               if (DEV) console.log(downloadUrl);
               window.open(downloadUrl, "_blank");
             }
+          } else {
+            //show download progress
+            this.$store.commit("eraseDownloadProgress");
+            this.$store.commit("toggleDownloadNotification", true);
           }
           break;
         case "downloadProgressing":
@@ -170,6 +174,8 @@ export default class UploadSocket {
               message: this.$t("message.notDecryptable"),
             },
           );
+        case "progress":
+          this.$store.commit("updateDownloadProgress", e.data.progress);
           break;
         case "finished":
           if (DEV) {
@@ -177,6 +183,7 @@ export default class UploadSocket {
               `Finished a download in container ${e.data.container}`,
             );
           }
+          this.$store.commit("updateDownloadProgress", 1);
           break;
       }
     };

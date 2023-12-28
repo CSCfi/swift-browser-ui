@@ -38,6 +38,9 @@
         v-if="displayUploadNotification"
         @cancel-current-upload="cancelUpload"
       />
+      <DownloadNotification
+        v-if="displayDownloadNotification"
+      />
       <c-modal
         id="edit-tags-modal"
         v-model="openEditTagsModal"

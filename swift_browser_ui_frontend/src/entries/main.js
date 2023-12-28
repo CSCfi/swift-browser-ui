@@ -44,6 +44,8 @@ import Resumable from "resumablejs";
 // Upload notification handler
 import UploadNotification from "@/components/UploadNotification.vue";
 
+import DownloadNotification from "@/components/DownloadNotification.vue";
+
 //Custom footer element
 import CFooter from "@/components/CFooter.vue";
 
@@ -87,6 +89,7 @@ const app = createApp({
     CreateFolderModal,
     UploadModal,
     UploadNotification,
+    DownloadNotification,
     EditTagsModal,
     ShareModal,
     CopyFolderModal,
@@ -125,6 +128,9 @@ const app = createApp({
     },
     displayUploadNotification() {
       return this.$store.state.uploadNotification;
+    },
+    displayDownloadNotification() {
+      return this.$store.state.downloadNotification;
     },
     resumableClient() {
       return this.$store.state.resumableClient;

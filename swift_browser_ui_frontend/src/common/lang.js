@@ -191,10 +191,6 @@ let default_translations = {
           "delete the sharing permissions?",
         share_delete_confirm: "Delete permissions",
       },
-      download: " Download",
-      downloadFiles: "Files can only be downloaded " +
-      "individually because there are file or subfolder names longer than " +
-      "99 characters.",
       largeDownMessage:
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
@@ -207,13 +203,21 @@ let default_translations = {
       },
       sharing: "Sharing - ",
       containers: "Folders - ",
+      download: {
+        download: " Download",
+        files: "Files can only be downloaded " +
+          "individually because there are file or subfolder names longer " +
+          "than 99 characters.",
+        inProgress: "Download in progress",
+        complete: "Download completed",
+        error: "Download couldn't start. Please try again.",
+      },
       upload: {
         duplicate: "Files with the same paths are not allowed.",
         sizeZero: "Empty files cannot be uploaded.",
         upfinish: "Finished uploading ",
         upfail: "Failed uploading ",
         upnotsupported: "Uploading is not supported by your browser",
-        isStarting: "Data upload will start shortly",
         hasStarted: "Uploading has started",
         inProgress: "Upload in progress",
         longProgress: "Upload in progress",
@@ -729,10 +733,6 @@ let default_translations = {
         share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
         share_delete_confirm: "Poista käyttöoikeus",
       },
-      download: " Lataa",
-      downloadFiles: "Tiedostot voidaan ladata vain " +
-      "erikseen, koska tiedostojen tai alikansioiden nimet ovat " +
-      "yli 99 merkkiä pitkiä.",
       largeDownMessage:
         "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
         "erikseen. Paina hyväksyäksesi suuret lataukset " +
@@ -746,6 +746,15 @@ let default_translations = {
       },
       sharing: "Jako - ",
       containers: "Kansiot - ",
+      download: {
+        download: " Lataa",
+        files: "Tiedostot voidaan ladata vain " +
+          "erikseen, koska tiedostojen tai alikansioiden nimet ovat " +
+          "yli 99 merkkiä pitkiä.",
+        inProgress: "Lataus käynnissä",
+        complete: "Lataus on valmis",
+        error: "Lataus ei alkanut. Yritä uudelleen.",
+      },
       upload: {
         duplicate: "Tiedostot, joilla on samat polut, eivät ole sallittuja.",
         sizeZero: "Tyhjiä tiedostoja ei voi lähettää.",
@@ -753,7 +762,6 @@ let default_translations = {
         upfail: "Epäonnistuttiin lähettäessä tiedosto ",
         upnotsupported: "Selain ei tue tiedostojen lähettämistä",
         hasStarted: "Lähetys aloitettu",
-        isStarting: "Tiedostojen lähetys käynnistyy pian",
         inProgress: "Lähetys käynnissä",
         longProgress: "Lähetys käynnissä, lähetetään tiedostoa ",
         viewDestinationFolder: "Näytä kohdekansio",

@@ -39,11 +39,14 @@ const store = createStore({
     socket: undefined,
     isUploading: false,
     isChunking: false,
+    isDownloading: false,
     encryptedFile: "",
     encryptedFileProgress: undefined,
     uploadProgress: undefined,
     uploadNotification: false,
     uploadNotificationClosable: false,
+    downloadProgress: undefined,
+    downloadNotification: false,
     altContainer: undefined,
     uploadInfo: undefined,
     uploadEndpoint: "",
@@ -132,11 +135,20 @@ const store = createStore({
     toggleUploadNotification(state, payload) {
       state.uploadNotification = payload;
     },
+    toggleDownloadNotification(state, payload) {
+      state.downloadNotification = payload;
+    },
     updateProgress(state, progress) {
       state.uploadProgress = progress;
     },
     eraseProgress(state) {
       state.uploadProgress = undefined;
+    },
+    updateDownloadProgress(state, progress) {
+      state.downloadProgress = progress;
+    },
+    eraseDownloadProgress(state) {
+      state.downloadProgress = undefined;
     },
     setAltContainer(state, altContainer) {
       state.altContainer = altContainer;

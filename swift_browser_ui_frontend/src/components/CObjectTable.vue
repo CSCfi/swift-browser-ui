@@ -226,7 +226,7 @@ export default {
           align: "end",
           children: [
             {
-              value: this.$t("message.download"),
+              value: this.$t("message.download.download"),
               component: {
                 tag: "c-button",
                 params: {
@@ -434,7 +434,7 @@ export default {
               { progress: false,
                 type: "error",
                 duration: 6000,
-                message: this.$t("message.downloadFiles")},
+                message: this.$t("message.download.files")},
             );
         }
       } else {

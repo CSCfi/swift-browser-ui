@@ -22,6 +22,12 @@ let downloads = {};
 let enc = new TextEncoder();
 let libinitDone = false;
 
+// Download progress displayed in Chrome
+let downProgressInterval = undefined;
+let downloading = false;
+let totalDone = 0;
+let totalToDo = 0;
+
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
 worker. The former is to provide support for Firefox and Safari, which only
@@ -144,6 +150,7 @@ function decryptChunk(container, path, enChunk) {
   // We need to clone the view to a new typed array, otherwise it'll get
   // stale on return
   let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
+  totalDone += chunkLen;
   Module.ccall(
     "free_chunk",
     "number",
@@ -154,6 +161,14 @@ function decryptChunk(container, path, enChunk) {
   return ret;
 }
 
+function getFileSize(response, key) {
+  // Use encrypted size as the total file size if the file can't be decrypted
+  const ensize = parseInt(response.headers.get("Content-Length"));
+  return key !=0 ? 
+  (Math.floor(ensize / 65564) * 65536) +
+    (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
+  ensize;  
+}
 class FileSlicer {
   constructor(
     input,
@@ -322,6 +337,8 @@ async function beginDownloadInSession(
   container,
 ) {
   let fileStream = undefined;
+  downloading = true;
+
   if (downloads[container].direct) {
     fileStream = await downloads[container].handle.createWritable();
   } else {
@@ -355,6 +372,20 @@ async function beginDownloadInSession(
   }
 
   for (const file in downloads[container].files) {
+    const res = await fetch(downloads[container].files[file].url);
+    totalToDo += getFileSize(res, downloads[container].files[file].key);
+  }
+
+  downProgressInterval = setInterval(() => {
+    if (downloading) {
+      postMessage({
+        eventType: "progress",
+        progress: totalDone / totalToDo < 1 ? totalDone / totalToDo : 1,
+      });
+    }
+  }, 250);
+
+  for (const file in downloads[container].files) {
     if (inServiceWorker) {
       self.clients.matchAll().then(clients => {
         clients.forEach(client =>
@@ -364,27 +395,27 @@ async function beginDownloadInSession(
           }));
       });
     }
-    const response = await fetch(downloads[container].files[file].url);
-    const ensize = parseInt(response.headers.get("Content-Length"));
 
-    let path = file.split("/");
-    let name = path.slice(-1)[0];
-    let prefix;
-    if (path.length > 1) {
-      prefix = path.slice(0, -1).join("/");
-    } else {
-      prefix = "";
-    }
+    const response = await fetch(downloads[container].files[file].url);
 
     if (downloads[container].archive) {
+
+      const size = getFileSize(response, downloads[container].files[file].key);
+      let path = file.split("/");
+      let name = path.slice(-1)[0];
+      let prefix;
+      if (path.length > 1) {
+        prefix = path.slice(0, -1).join("/");
+      } else {
+        prefix = "";
+      }
+
       let fileHeader = enc.encode(addTarFile(
         downloads[container].files[file].key != 0 ? name.replace(".c4gh", ""): name,
         prefix,
-        // Use encrypted size as the total file size if the file can't be decrypted
-        downloads[container].files[file].key != 0 ?
-        (Math.floor(ensize / 65564) * 65536) + (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-        ensize,
+        size,
       ));
+
       if (downloads[container].direct) {
         await fileStream.write(fileHeader);
       } else {
@@ -443,6 +474,8 @@ async function beginDownloadInSession(
     });
   }
 
+  downloading = false;
+  clearInterval(downProgressInterval);
   finishDownloadSession(container);
 
   return;
