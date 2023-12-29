@@ -1,6 +1,8 @@
+//login
+
 // successfull login with correct login and password
 
-describe("Login a user", function () {
+describe("Login a user", () => {
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
   });
@@ -13,7 +15,7 @@ describe("Login a user", function () {
   it("Login with correct credentials redirects to project browsing page", () => {
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.url().should("include", "browse");
-    cy.get(".select-project").contains("Select");
+    cy.contains("Create folder");
     cy.getCookie("SWIFT_UI_SESSION").should("exist");
     cy.getCookie("OBJ_UI_LANG").should("have.property", "value", "en");
   });
@@ -21,7 +23,7 @@ describe("Login a user", function () {
 
 // successful login with changing languages before pressing 'Login with SSO'
 
-describe("Switch language EN (default) to FI upon selection before login", function () {
+describe("Switch language EN (default) to FI upon selection before login", () => {
   it("Upon login languages can be switched, visible in cookies", () => {
     cy.visit(Cypress.config().baseUrl);
     cy.getCookie("OBJ_UI_LANG").should("have.property", "value", "en");
@@ -49,7 +51,7 @@ describe("Displays errors if login goes wrong", function () {
     cy.get("c-card-title.hydrated").should("contain", "401");
     cy.get("c-card-content.hydrated").should(
       "contain",
-      "The action requested requires logging in, or the log in credentials were incorrect"
+      "your login information was incorrect"
     );
   });
 
@@ -59,7 +61,7 @@ describe("Displays errors if login goes wrong", function () {
     cy.get("c-card-title.hydrated").should("contain", "401");
     cy.get("c-card-content.hydrated").should(
       "contain",
-      "The action requested requires logging in, or the log in credentials were incorrect"
+      "your login information was incorrect"
     );
   });
 
@@ -85,7 +87,7 @@ describe("Displays errors if login goes wrong", function () {
     cy.get("c-card-title.hydrated").should("contain", "401");
     cy.get("c-card-content.hydrated").should(
       "contain",
-      "The action requested requires logging in, or the log in credentials were incorrect"
+      "your login information was incorrect"
     );
   });
 

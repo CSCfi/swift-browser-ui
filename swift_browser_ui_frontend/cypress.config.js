@@ -54,10 +54,11 @@ module.exports = defineConfig({
       return cloudPlugin(on, config);
     },
     // baseUrl: "https://172.17.0.1:8081/",
-    baseUrl: "https://sd-connect.dev:8000/",
+    baseUrl: "https://sd-connect.dev:8081/",
 
     specPattern: "../tests/cypress/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "../tests/cypress/support/index.js",
+    experimentalStudio: true,
   },
   env: {
     username: "swift",
