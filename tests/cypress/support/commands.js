@@ -1,3 +1,5 @@
+//commands
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -35,7 +37,7 @@ Cypress.Commands.add("login", (username, password) => {
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.contains('[data-testid="user-menu"]').click();
+  cy.get('[data-testid="user-menu"]').click();
   cy.get("ul.c-menu-items").find("li").contains("Log out").click();
 });
 
@@ -120,7 +122,22 @@ Cypress.Commands.add("deleteFolder", (folderName) => {
   cy.get("ul.c-menu-items").find("li").contains("Delete").click();
 });
 
-Cypress.Commands.add("uploadFile", (fileName) => {});
+Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
+  //press upload button from folder
+  cy.get('[data-testid="upload-file"]').click({ force: true });
+  cy.wait(5000);
+
+  //upload the fixture file
+  cy.get(".upload-btn-wrapper")
+    .find("input")
+    .invoke("show")
+    .selectFile(`cypress/fixtures/text-files/${fileName}.txt`);
+  cy.wait(8000);
+  cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
+    force: true,
+  });
+  cy.wait(8000);
+});
 
 Cypress.Commands.add("deleteFile", (fileName) => {
   cy.contains(fileName)
@@ -136,6 +153,7 @@ Cypress.Commands.add("deleteFile", (fileName) => {
 });
 
 Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
+  //delete the file by checkbox
   cy.contains(fileName)
     .parent()
     .parent()
@@ -144,14 +162,14 @@ Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
     .find("button")
     .eq(2)
     .click({ force: true });
-  cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
+  cy.get("#delete-objs-btn").eq(0).click({
     force: true,
   });
 });
 
 Cypress.Commands.add("searchFolder", (folderName) => {
   cy.get(".c-input--text")
-    .eq(1)
+    .eq(0)
     .children()
     .eq(0)
     .children()
@@ -165,6 +183,7 @@ Cypress.Commands.add("searchFolder", (folderName) => {
     .find("input")
     .eq(0)
     .type(folderName, { force: true });
+
   cy.wait(5000);
 });
 
