@@ -66,13 +66,13 @@ jobs:
           install: false
           browser: ${{ matrix.browser }}
           env: port=8000
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: swift_browser_ui_frontend/cypress/screenshots
           retention-days: 5
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-videos
