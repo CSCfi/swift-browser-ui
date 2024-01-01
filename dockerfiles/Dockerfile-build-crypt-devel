@@ -19,7 +19,7 @@ RUN cd /root/swift-browser-ui/swift_browser_ui_frontend/wasm \
     && npx webpack --config "./wasm-webpack.config.js"
 
 # Build upworker and downworker WebAssembly contents
-FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.2.0 AS WASMCRYPT
+FROM ghcr.io/cscfi/docker-emscripten-crypt4gh:1.3.0 AS WASMCRYPT
 
 COPY --from=WEBPACK_WASM_PREPROCESS /root/swift-browser-ui/swift_browser_ui_frontend/wasm/ /src/
 
