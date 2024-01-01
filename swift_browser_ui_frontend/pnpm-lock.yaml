@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.6.0
     version: 1.6.0(vue-i18n@9.8.0)
   '@mdi/js':
-    specifier: ^7.3.67
-    version: 7.3.67
+    specifier: ^7.4.47
+    version: 7.4.47
   '@vitejs/plugin-vue':
     specifier: ^4.5.2
     version: 4.5.2(vite@4.5.1)(vue@3.3.11)
@@ -1130,8 +1130,8 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  /@mdi/js@7.3.67:
-    resolution: {integrity: sha512-MnRjknFqpTC6FifhGHjZ0+QYq2bAkZFQqIj8JA2AdPZbBxUvr8QSgB2yPAJ8/ob/XkR41xlg5majDR3c1JP1hw==}
+  /@mdi/js@7.4.47:
+    resolution: {integrity: sha512-KPnNOtm5i2pMabqZxpUz7iQf+mfrYZyKCZ8QNz85czgEt7cuHcGorWfdzUMWYA0SD+a6Hn4FmJ+YhzzzjkTZrQ==}
     dev: false
 
   /@nodelib/fs.scandir@2.1.5:
@@ -2316,7 +2316,7 @@ packages:
   /csc-ui@0.9.5:
     resolution: {integrity: sha512-GJsl24TWr3sA4RHqXPB6klk6L3dhx+I1cZo1NcAo6WXcdRU8Z1TaMZocsRS9mlxH5evkndf0W7PrUISRgAjmfg==}
     dependencies:
-      '@mdi/js': 7.3.67
+      '@mdi/js': 7.4.47
       '@stencil/core': 4.8.2
       '@types/node': 20.10.4
       normalize.css: 8.0.1
