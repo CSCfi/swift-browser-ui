@@ -137,7 +137,10 @@ export default class UploadSocket {
             }
           } else {
             //show download progress
-            this.$store.commit("eraseDownloadProgress");
+            if (this.$store.state.downloadCount <= 0) {
+              this.$store.commit("eraseDownloadProgress");
+            }
+            this.$store.commit("addDownload");
             this.$store.commit("toggleDownloadNotification", true);
           }
           break;
@@ -183,7 +186,16 @@ export default class UploadSocket {
               `Finished a download in container ${e.data.container}`,
             );
           }
-          this.$store.commit("updateDownloadProgress", 1);
+          if (this.$store.state.downloadCount === 1) {
+            this.$store.commit("updateDownloadProgress", 1);
+            this.downWorker.postMessage({
+              command: "clearProgressInterval",
+            });
+            if (DEV) {
+              console.log("Clearing download progress interval");
+            }
+          }
+          this.$store.commit("removeDownload");
           break;
       }
     };

@@ -21,10 +21,7 @@ let downloads = {};
 // Text encoder for quickly encoding tar headers
 let enc = new TextEncoder();
 let libinitDone = false;
-
-// Download progress displayed in Chrome
 let downProgressInterval = undefined;
-let downloading = false;
 let totalDone = 0;
 let totalToDo = 0;
 
@@ -168,6 +165,16 @@ function getFileSize(response, key) {
   (Math.floor(ensize / 65564) * 65536) +
     (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
   ensize;  
+}
+
+function startProgressInterval() {
+  const interval = setInterval(() => {
+    postMessage({
+      eventType: "progress",
+      progress: totalDone / totalToDo < 1 ? totalDone / totalToDo : 1,
+    });
+  }, 250);
+  return interval;
 }
 class FileSlicer {
   constructor(
@@ -337,7 +344,6 @@ async function beginDownloadInSession(
   container,
 ) {
   let fileStream = undefined;
-  downloading = true;
 
   if (downloads[container].direct) {
     fileStream = await downloads[container].handle.createWritable();
@@ -371,19 +377,16 @@ async function beginDownloadInSession(
     }
   }
 
-  for (const file in downloads[container].files) {
-    const res = await fetch(downloads[container].files[file].url);
-    totalToDo += getFileSize(res, downloads[container].files[file].key);
-  }
-
-  downProgressInterval = setInterval(() => {
-    if (downloading) {
-      postMessage({
-        eventType: "progress",
-        progress: totalDone / totalToDo < 1 ? totalDone / totalToDo : 1,
-      });
+  if (downloads[container].direct) {
+  //get total download size and periodically report download progress
+    for (const file in downloads[container].files) {
+      const res = await fetch(downloads[container].files[file].url);
+      totalToDo += getFileSize(res, downloads[container].files[file].key);
     }
-  }, 250);
+    if (!downProgressInterval) {
+      downProgressInterval = startProgressInterval();
+    }
+  }
 
   for (const file in downloads[container].files) {
     if (inServiceWorker) {
@@ -473,11 +476,7 @@ async function beginDownloadInSession(
         }));
     });
   }
-
-  downloading = false;
-  clearInterval(downProgressInterval);
   finishDownloadSession(container);
-
   return;
 }
 
@@ -627,6 +626,11 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "keepDownloadProgressing":
+      break;
+    case "clearProgressInterval":
+      if (downProgressInterval) {
+        clearInterval(downProgressInterval);
+      }
       break;
   }
 });
