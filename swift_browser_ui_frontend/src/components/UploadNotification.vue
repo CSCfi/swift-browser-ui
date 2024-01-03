@@ -26,7 +26,6 @@ export default {
   },
   data() {
     return {
-      maximized: true,
       notificationToggled: false,
     };
   },
@@ -39,6 +38,10 @@ export default {
     },
     container() {
       return this.$store.state.uploadFolderName;
+    },
+    maximized() {
+      //minimize if download notification shown
+      return !this.$store.state.downloadNotification;
     },
   },
   methods: {

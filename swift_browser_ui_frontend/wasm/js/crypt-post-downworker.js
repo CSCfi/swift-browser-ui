@@ -630,6 +630,7 @@ self.addEventListener("message", async (e) => {
     case "clearProgressInterval":
       if (downProgressInterval) {
         clearInterval(downProgressInterval);
+        downProgressInterval = undefined;
       }
       break;
   }
