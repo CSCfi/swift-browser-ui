@@ -210,6 +210,9 @@ let default_translations = {
           "than 99 characters.",
         inProgress: "Download in progress",
         complete: "Download completed",
+        warnWait: "Please wait for the download to finish.",
+        warnTempFiles: "Opening temporary files or folders " +
+          "(.crdownload, .crswap) may interrupt the process.",
         error: "Download couldn't start. Please try again.",
       },
       upload: {
@@ -753,6 +756,9 @@ let default_translations = {
           "yli 99 merkkiä pitkiä.",
         inProgress: "Lataus käynnissä",
         complete: "Lataus on valmis",
+        warnWait: "Odota, kunnes lataus on valmis. ",
+        warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +
+        "(.crdownload, .crswap) avaaminen voi keskeyttää latauksen.",
         error: "Lataus ei alkanut. Yritä uudelleen.",
       },
       upload: {

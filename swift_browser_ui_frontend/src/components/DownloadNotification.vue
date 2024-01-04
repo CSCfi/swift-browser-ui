@@ -11,16 +11,20 @@
         </h3>
       </c-row>
       <div class="toast-main">
-        <c-progress-bar
-          v-if="progress != undefined"
-          :value="(progress * 100).toFixed()"
-          single-line
-          :label="$t('message.upload.progressLabel')"
-        />
-        <c-progress-bar
-          v-else
-          hide-details
-        />
+        <template v-if="progress != 1">
+          <c-progress-bar
+            v-if="progress != undefined"
+            :value="(progress * 100).toFixed()"
+            single-line
+            :label="$t('message.upload.progressLabel')"
+          />
+          <c-progress-bar
+            v-else
+            hide-details
+          />
+          <p>{{ $t("message.download.warnWait") }}</p>
+          <p>{{ $t("message.download.warnTempFiles") }}</p>
+        </template>
         <c-button
           outlined
           @click="closeNotification"
