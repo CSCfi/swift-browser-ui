@@ -19,6 +19,8 @@ export default class UploadSocket {
     this.inputFiles = {};
     this.outputFiles = {};
 
+    this.downloadFinished = true; // track download progress with service worker
+
     this.useServiceWorker = "serviceWorker" in navigator
       && window.showSaveFilePicker === undefined;
 
@@ -109,6 +111,7 @@ export default class UploadSocket {
             );
           }
           if (this.useServiceWorker) {
+            this.downloadFinished = false;
             if (e.data.archive) {
               let downloadUrl = new URL(
                 `/archive/${e.data.container}.tar`,
@@ -124,6 +127,28 @@ export default class UploadSocket {
               if (DEV) console.log(downloadUrl);
               window.open(downloadUrl, "_blank");
             }
+          }
+          break;
+        case "downloadProgressing":
+          if (this.useServiceWorker) {
+            navigator.serviceWorker.ready.then(async(reg) => {
+              while (!this.downloadFinished) {
+                // keep the service worker awake while downloading
+                reg.active.postMessage({
+                  command: "keepDownloadProgressing",
+                });
+                await timeout(10000);
+              }
+            });
+          }
+          break;
+        case "downloadProgressFinished":
+          this.downloadFinished = true;
+          if (DEV) {
+            console.log(
+              `Finished a download in container ${e.data.container}
+                with service worker`,
+            );
           }
           break;
         case "finished":

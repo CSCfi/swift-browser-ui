@@ -312,6 +312,15 @@ async function beginDownloadInSession(
   }
 
   for (const file in downloads[container].files) {
+    if (inServiceWorker) {
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client =>
+          client.postMessage({
+            eventType: "downloadProgressing",
+            container: container,
+          }));
+      });
+    }
     const response = await fetch(downloads[container].files[file].url);
     const ensize = response.headers.get("Content-Length");
     const size = (Math.floor(ensize / 65564) * 65536) + (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0);
@@ -338,7 +347,11 @@ async function beginDownloadInSession(
       }
     }
 
-    const slicer = new FileSlicer(response.body.getReader(), fileStream, container, file);
+    const slicer = new FileSlicer(
+      response.body.getReader(),
+      fileStream,
+      container,
+      file);
     await slicer.sliceFile();
   }
 
@@ -368,6 +381,15 @@ async function beginDownloadInSession(
       eventType: "finished",
       direct: true,
       container: container,
+    });
+  } else {
+    // Inform download with service worker finished
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client =>
+        client.postMessage({
+          eventType: "downloadProgressFinished",
+          container: container,
+        }));
     });
   }
 
@@ -448,9 +470,7 @@ self.addEventListener("message", async (e) => {
             owner: e.data.owner,
             ownerName: e.data.ownerName,
           });
-
         }
-
       } else {
         createDownloadSession(e.data.container, e.data.handle, false);
         postMessage({
@@ -510,6 +530,8 @@ self.addEventListener("message", async (e) => {
           container: e.data.container,
         });
       }
+      break;
+    case "keepDownloadProgressing":
       break;
   }
 });
