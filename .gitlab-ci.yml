@@ -1,10 +1,16 @@
 stages:
   - verify
   - test
+  - release
   - deploy
 
 variables:
   BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/sdd-common-ci
+
+include:
+  - project: 'sds-dev/releases'
+    ref: main
+    file: 'releases.yml'
 
 backend-lint:
   stage: verify
@@ -79,6 +85,25 @@ wasm-test:
   script:
     - cd swift_browser_ui_frontend/wasm
     - ceedling
+
+release-job:
+  extends: .automated-release
+  release:
+    description: 'Automated release for SD Connect'
+    assets:
+      links:
+        - name: sd-connect-ui-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/sd-connect:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-runner-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swiftui-upload-runner:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-sharing-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swift-x-account-sharing:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-request-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
+          link_type: image
 
 deploy:
   rules:
