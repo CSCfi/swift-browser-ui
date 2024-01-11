@@ -23,7 +23,7 @@
     "csc-ui": "0.9.5",
     "dexie": "^3.2.4",
     "eslint": "^8.56.0",
-    "eslint-plugin-vue": "^9.19.2",
+    "eslint-plugin-vue": "^9.20.0",
     "eslint-utils": "^3.0.0",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
