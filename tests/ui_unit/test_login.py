@@ -27,6 +27,10 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             "swift_browser_ui.ui.login.aiohttp_session.get_session",
             self.aiohttp_session_get_session_mock,
         )
+        self.p_get_sess_oidc = unittest.mock.patch(
+            "swift_browser_ui.ui.login.aiohttp_session.get_session",
+            self.aiohttp_session_get_session_oidc_mock,
+        )
 
     async def test_oidc_start(self):
         """Test oidc initial request."""
@@ -364,7 +368,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
 
         self.setd_mock["oidc_enabled"] = True
         self.setd_mock["sdconnect_enabled"] = False
-        with patch1, patch2, self.p_get_sess:
+        with patch1, patch2, self.p_get_sess_oidc:
             resp = await swift_browser_ui.ui.login.login_with_token(
                 self.mock_request,
                 token,

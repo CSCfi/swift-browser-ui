@@ -327,7 +327,7 @@ async def login_with_token(
         else await aiohttp_session.new_session(request)
     )
 
-    if setd["oidc_enabled"] and session.new or "oidc" not in session:
+    if setd["oidc_enabled"] and (session.new or "oidc" not in session):
         session.invalidate()
         return aiohttp.web.Response(status=302, headers={"Location": "/"})
 
