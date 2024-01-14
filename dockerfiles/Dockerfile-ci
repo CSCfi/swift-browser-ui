@@ -1,7 +1,7 @@
 # We use this image in ci so the packages don't have to be installed on each run
 # and we can run both frontend and backend with it
 
-FROM docker.io/python:3.11-slim-bullseye
+FROM docker.io/python:3.12-slim-bullseye
 
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
