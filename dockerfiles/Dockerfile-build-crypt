@@ -51,7 +51,7 @@ COPY --from=WASMCRYPT "/src/build/downworker.wasm" "/root/swift_ui/swift_browser
 RUN cd /root/swift_ui/swift_browser_ui_frontend \
     && OIDC_ENABLED=$OIDC_ENABLED pnpm run build
 
-FROM docker.io/python:3.12-alpine3.17 as BACKEND
+FROM docker.io/python:3.11-alpine3.17 as BACKEND
 
 COPY pyproject.toml /root/swift_ui/pyproject.toml
 COPY README.md /root/swift_ui/README.md
@@ -68,7 +68,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip \
     && pip install /root/swift_ui
 
-FROM docker.io/python:3.12-alpine3.17
+FROM docker.io/python:3.11-alpine3.17
 
 LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
