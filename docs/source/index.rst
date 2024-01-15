@@ -33,7 +33,6 @@ Out of the box the ``swift-browser-ui`` offers:
     Sharing Backend            <sharing>
     Access Request Backend     <request>
     Upload, Download and Copy  <runner>
-    Python Modules             <code>
     Testing                    <testing>
     Tools / Miscellaneous      <tools>
 
