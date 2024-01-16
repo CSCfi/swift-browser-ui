@@ -1,11 +1,16 @@
 stages:
-  - build
   - verify
   - test
+  - release
   - deploy
 
 variables:
-  BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/${CI_PROJECT_NAME}-ci
+  BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/sdd-common-ci
+
+include:
+  - project: 'sds-dev/releases'
+    ref: main
+    file: 'releases.yml'
 
 backend-lint:
   stage: verify
@@ -81,47 +86,24 @@ wasm-test:
     - cd swift_browser_ui_frontend/wasm
     - ceedling
 
-build-ci-image:
-  stage: build
-  tags:
-    - sds
-  rules:
-    # when the ci image might have changed, we want to build and push it
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
-      changes:
-        - .gitlab-ci.yml
-        - dockerfiles/Dockerfile-ci
-    # when the ci image might have changed, we want to build it
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      changes:
-        - .gitlab-ci.yml
-        - dockerfiles/Dockerfile-ci
-
-    # we don't want to build for git tags or from another pipeline
-    - if: '$CI_COMMIT_TAG !~ "/^$/"'
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "pipeline"
-      when: never
-
-    # otherwise, we can update it manually or on a schedule
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-    - when: manual
-  script:
-    - >
-      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
-        echo Building image;
-        docker build -f dockerfiles/Dockerfile-ci dockerfiles;
-      else
-        echo Building latest;
-        docker build -f dockerfiles/Dockerfile-ci -t $BUILD_IMAGE:latest dockerfiles;
-      fi
-    - >
-      if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]; then
-        echo Pushing latest image;
-        echo "$ARTIFACTORY_USER_PASSWORD" | docker login --username "$ARTIFACTORY_USER" --password-stdin "$ARTIFACTORY_SERVER";
-        docker push $BUILD_IMAGE:latest;
-      fi
-  allow_failure: true
+release-job:
+  extends: .automated-release
+  release:
+    description: 'Automated release for SD Connect'
+    assets:
+      links:
+        - name: sd-connect-ui-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/sd-connect:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-runner-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swiftui-upload-runner:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-sharing-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swift-x-account-sharing:${RELEASE_VERSION}
+          link_type: image
+        - name: sd-connect-request-${RELEASE_VERSION} (artifactory)
+          url: https://${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
+          link_type: image
 
 deploy:
   rules:
