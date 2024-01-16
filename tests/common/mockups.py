@@ -54,14 +54,17 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
             self.aiohttp_session_new_session_mock,
         )
         self.aiohttp_session_get_session_oidc_mock = unittest.mock.AsyncMock()
-        self.aiohttp_session_get_session_oidc_mock.return_value = {
-            **self.session_return,
-            "oidc": {
-                "userinfo": {},
-                "state": "",
-                "access_token": "",
-            },
+        self.oidc_session_return = aiohttp_session.Session(
+            "test-identity-2",
+            new=False,
+            data=dict(self.session_return),
+        )
+        self.oidc_session_return["oidc"] = {
+            "userinfo": {},
+            "state": "",
+            "access_token": "",
         }
+        self.aiohttp_session_get_session_oidc_mock.return_value = self.oidc_session_return
         self.p_get_sess_oidc = unittest.mock.patch(
             "swift_browser_ui.ui.api.aiohttp_session.get_session",
             self.aiohttp_session_get_session_oidc_mock,

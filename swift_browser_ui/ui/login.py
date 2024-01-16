@@ -110,6 +110,8 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
             origin=str(setd["set_origin_address"]),
         )
 
+    session.changed()
+
     return response
 
 
@@ -126,12 +128,13 @@ async def handle_login(
 
     if setd["oidc_enabled"]:
         session = await aiohttp_session.get_session(request)
-        if "oidc" in session:
+        if session.new or "oidc" not in session:
+            session.invalidate()
+            response.headers["Location"] = "/"
+        else:
             response = aiohttp.web.FileResponse(
                 str(setd["static_directory"]) + "/login2step.html"
             )
-        else:
-            response.headers["Location"] = "/"
 
     else:
         response.headers["Location"] = "/login/front"
@@ -148,7 +151,8 @@ async def sso_query_begin(
 
     if request and setd["oidc_enabled"]:
         session = await aiohttp_session.get_session(request)
-        if "oidc" not in session:
+        if session.new or "oidc" not in session:
+            session.invalidate()
             return aiohttp.web.Response(status=302, headers={"Location": "/"})
     if not setd["has_trust"]:
         response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
@@ -173,7 +177,8 @@ async def sso_query_begin_oidc(
 
     if request and setd["oidc_enabled"]:
         session = await aiohttp_session.get_session(request)
-        if "oidc" not in session:
+        if session.new or "oidc" not in session:
+            session.invalidate()
             return aiohttp.web.Response(status=302, headers={"Location": "/"})
     if not setd["has_trust"]:
         response = aiohttp.web.FileResponse(str(setd["static_directory"]) + "/login.html")
@@ -322,6 +327,10 @@ async def login_with_token(
         else await aiohttp_session.new_session(request)
     )
 
+    if setd["oidc_enabled"] and (session.new or "oidc" not in session):
+        session.invalidate()
+        return aiohttp.web.Response(status=302, headers={"Location": "/"})
+
     session["at"] = time.time()
 
     session["referer"] = request.url.host
@@ -360,8 +369,10 @@ async def login_with_token(
             },
         ) as resp:
             if resp.status == 401:
+                session.invalidate()
                 raise aiohttp.web.HTTPUnauthorized(reason="Token is not valid")
             if resp.status == 403:
+                session.invalidate()
                 raise aiohttp.web.HTTPForbidden(reason="No access to service with token.")
             ret = await resp.json()
 
@@ -404,6 +415,7 @@ async def login_with_token(
     # in practice this might happen if there are sd connect projects that
     # don't have Allas enabled
     if not session["projects"]:
+        session.invalidate()
         request.app["Log"].debug("possible sdConnectProjects and Allas projects mismatch")
         raise aiohttp.web.HTTPForbidden(
             reason="There are no projects available for this user."
