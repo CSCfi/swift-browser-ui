@@ -7,11 +7,10 @@
       justify="space-between"
       align="center"
     >
-      <h3 v-if="closable">
-        {{ $t("message.upload.complete") }}
-      </h3>
-      <h3 v-else>
-        {{ $t("message.upload.inProgress") }}
+      <h3>
+        {{ closable ?
+          $t("message.upload.complete") :
+          $t("message.upload.inProgress") }}
       </h3>
 
       <ProgressBar />
@@ -23,29 +22,30 @@
       >
         {{ $t("message.upload.viewDestinationFolder") }}
       </a>
-
-      <a
-        ref="maximize"
-        href="javascript:void(0)"
-        class="toggle-notification"
-        @click="$emit('toggle-notification')"
-      >
-        <i
-          slot="icon"
-          class="mdi mdi-arrow-expand"
-        />
-      </a>
-      <a
-        v-if="closable"
-        ref="close"
-        href="javascript:void(0)"
-        @click="$emit('close-upload')"
-      >
-        <i
-          slot="icon"
-          class="mdi mdi-close"
-        />
-      </a>
+      <div class="actions">
+        <a
+          ref="maximize"
+          href="javascript:void(0)"
+          class="toggle-notification"
+          @click="$emit('toggle-notification')"
+        >
+          <i
+            slot="icon"
+            class="mdi mdi-arrow-expand"
+          />
+        </a>
+        <a
+          v-if="closable"
+          ref="close"
+          href="javascript:void(0)"
+          @click="$emit('close-upload')"
+        >
+          <i
+            slot="icon"
+            class="mdi mdi-close"
+          />
+        </a>
+      </div>
     </c-row>
   </c-alert>
 </template>
@@ -79,7 +79,10 @@ c-alert {
 
 h3 {
   font-size: 18px;
-  margin-top: -2px;
+}
+
+.actions a {
+  margin-left: 2rem;
 }
 
 @media screen and (max-width: 840px) {

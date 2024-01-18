@@ -27,6 +27,7 @@ export default {
   data() {
     return {
       notificationToggled: false,
+      maximized: !this.$store.state.downloadNotification,
     };
   },
   computed: {
@@ -39,9 +40,15 @@ export default {
     container() {
       return this.$store.state.uploadFolderName;
     },
-    maximized() {
-      //minimize if download notification shown
-      return !this.$store.state.downloadNotification;
+    downloadNotification() {
+      return this.$store.state.downloadNotification;
+    },
+  },
+  watch: {
+    downloadNotification() {
+      if (this.downloadNotification && this.maximized) {
+        this.toggleNotification();
+      }
     },
   },
   methods: {
