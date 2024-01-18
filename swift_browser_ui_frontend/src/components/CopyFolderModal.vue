@@ -216,6 +216,8 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
+      this.folderName = this.folderName.trim();
+      this.checkValidity();
       this.a_replicate_container(keypress).then(() => {});
     },
     a_replicate_container: async function (keypress) {
