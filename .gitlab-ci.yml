@@ -113,9 +113,18 @@ deploy:
       when: manual
     - if: '$CI_COMMIT_TAG !~ "/^$/"'
     - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
-  variables:
-    ENVIRONMENT: $CI_COMMIT_BRANCH
   stage: deploy
-  trigger:
-    project: sds-dev/sd-connect/swift-ui-csc-deployment
+  tags:
+    - sds
+  variables:
+    GITLAB_PROJECT_ID: 1013
+    GITLAB_REF: main
+    BUILD_BRANCH: $CI_COMMIT_REF_NAME
+  script:
+    - >
+      curl --request POST
+      --form "token=$CI_JOB_TOKEN"
+      --form "ref=$GITLAB_REF"
+      --form "variables[ENVIRONMENT]=$BUILD_BRANCH"
+      "https://gitlab.ci.csc.fi/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
   allow_failure: true
