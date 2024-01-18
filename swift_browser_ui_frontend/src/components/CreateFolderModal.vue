@@ -155,6 +155,7 @@ export default {
   },
   methods: {
     createContainer: function (keypress) {
+      this.folderName = this.folderName.trim();
       this.errorMsg = validateFolderName(
         this.folderName, this.$t, this.containers);
       if (this.errorMsg.length) return;

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- (GL #1187) Trim whitespace from container names before creation
+
 ## [2024.01.0]
 
 ### Added
