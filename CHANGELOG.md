@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2024.01.0]
+
+### Added
+- (GL #1192) Add link to privacy policy in footer
+
+### Changed
+- Package dependency updates
+
+### Fixed
+- (GL #1183) Downloaded containers having wrong sizes
+- (GL #1194) Fix upload functionality after cancelling large uploads
+- (GL #1196) Fix service worker stopping downloads for large containers and files
+- (GL #1176) Prevent incorrect 2-step login order causing session fixation
+
+## [2023.12.0]
+
 ### Added
 - (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
@@ -86,7 +102,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1170) Added alerts to require user confirmation to change or delete sharing permissions
 - Support tokens for authentication on the upload runner API
 - (GL #1138) Make it possible to cancel an upload without error and a new upload can start successfully
-- (GL #1192) Add link to privacy policy in footer
 
 ### Changed
 
@@ -216,8 +231,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1160) Fix large uploaded file (> 5 GiB) showing wrong size in the UI
 - (GL #1165) Fix download function not working reliably in Firefox
 - (GL #1173) Fix new upload regressions in congested conditions
-- (GL #1183) Downloaded containers have wrong sizes
-- (GL #1196) Fix service worker stopping downloads for large containers and files
 
 ### Removed
 
@@ -316,5 +329,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://github.com/CSCfi/swift-browser-ui/compare/2.0.0...devel
-[v2.0.0]: https://github.com/CSCfi/swift-browser-ui/compare/1.1.0b8...2.0.0
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...main
+[2024.01.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/3.0.0...2024.01.0
+[2023.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/v2.0.0...3.0.0
