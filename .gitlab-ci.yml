@@ -117,7 +117,7 @@ deploy:
   tags:
     - sds
   variables:
-    GITLAB_PROJECT_ID: 1013
+    GITLAB_PROJECT_ID: $GITLAB_SWIFT_BROWSER_CONFIG_BUILD
     GITLAB_REF: main
     BUILD_BRANCH: $CI_COMMIT_REF_NAME
   script:
@@ -126,5 +126,5 @@ deploy:
       --form "token=$CI_JOB_TOKEN"
       --form "ref=$GITLAB_REF"
       --form "variables[ENVIRONMENT]=$BUILD_BRANCH"
-      "https://gitlab.ci.csc.fi/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
+      "$GITLAB_CI_URL/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
   allow_failure: true
