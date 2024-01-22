@@ -14,7 +14,7 @@
               : $t('message.search.object')
           }}: </b>
           <!-- eslint-disable-next-line -->
-          <span v-html="getFilename()"></span>
+          <span v-html="getFilename()" />
         </span>
         <br>
         <small>
@@ -26,13 +26,13 @@
           <span v-if="!isSubfolder() && hasPath()">
             <b>{{ $t('message.search.folder') }}: </b>
             <!-- eslint-disable-next-line -->
-            <span v-html="getFilePath()"></span>
+            <span v-html="getFilePath()" />
             <br>
           </span>
           <span v-if="item.tags && item.tags.length">
             <b>{{ $t('message.search.tags') }}: </b>
             <!-- eslint-disable-next-line -->
-            <span v-html="highlight(item.tags.join(', '))"></span>
+            <span v-html="highlight(item.tags.join(', '))" />
             <br>
           </span>
           <span>
