@@ -26,6 +26,7 @@ csc
 csc's
 cscfi
 decrypt
+decrypted
 dev
 devel
 devenv

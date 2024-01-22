@@ -395,6 +395,7 @@ const app = createApp({
         this.$store.state.active,
         this.$store.state.active.id,
         this.$store,
+        this.$t,
       );
       workers.openSocket();
       this.$store.commit("setSocket", workers);

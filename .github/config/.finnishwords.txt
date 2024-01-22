@@ -373,6 +373,7 @@ onnistunut
 onnistuu
 operaatio
 operaation
+osassa
 osoite
 ota
 ottaneesi
@@ -444,6 +445,7 @@ projektitunnuksen
 projektitunnukset
 pudota
 purkaa
+purkaminen
 puuttuvasta
 pysyvästi
 pyydetty

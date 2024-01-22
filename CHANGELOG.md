@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (GL #1185) Add Accessibility page (English version)
+- (GL #1174) Download files that cannot be decrypted directly as is
 
 ## [2024.01.0]
 
