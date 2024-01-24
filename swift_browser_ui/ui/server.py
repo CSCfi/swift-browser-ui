@@ -45,6 +45,7 @@ from swift_browser_ui.ui.api import (
 )
 from swift_browser_ui.ui.discover import handle_discover
 from swift_browser_ui.ui.front import (
+    accessibility,
     agg_swjs,
     badrequest,
     browse,
@@ -190,6 +191,7 @@ async def servinit(
             aiohttp.web.get("/uidown", uidown),
             aiohttp.web.get("/badrequest", badrequest),
             aiohttp.web.get("/notfound", notfound),
+            aiohttp.web.get("/accessibility", accessibility),
         ]
     )
 
