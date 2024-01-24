@@ -47,6 +47,7 @@ const store = createStore({
     downloadCount: 0,
     downloadProgress: undefined,
     downloadNotification: false,
+    downloadError: false,
     altContainer: undefined,
     uploadInfo: undefined,
     uploadEndpoint: "",
@@ -147,8 +148,9 @@ const store = createStore({
     addDownload(state) {
       state.downloadCount += 1;
     },
-    removeDownload(state) {
-      state.downloadCount -= 1;
+    removeDownload(state, all = false) {
+      if (all) state.downloadCount = 0;
+      else state.downloadCount -= 1;
     },
     updateDownloadProgress(state, progress) {
       state.downloadProgress = progress;

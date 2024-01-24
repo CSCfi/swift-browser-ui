@@ -126,7 +126,7 @@ export default {
     },
   },
   mounted() {
-    this.addToast();
+    if (this.maximized) this.addToast();
   },
   methods: {
     addToast() {

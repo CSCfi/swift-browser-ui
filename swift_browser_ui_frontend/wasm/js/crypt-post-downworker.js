@@ -24,6 +24,7 @@ let libinitDone = false;
 let downProgressInterval = undefined;
 let totalDone = 0;
 let totalToDo = 0;
+let aborted = false;
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -307,7 +308,30 @@ class FileSlicer {
       [downloads[this.container].files[this.path].key],
     );
 
-    return;
+    return true;
+  }
+}
+
+function abortDownloads(direct) {
+  if (direct) {
+    postMessage({
+      eventType: "error",
+    });
+  } else {
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client =>
+        client.postMessage({
+          eventType: "error",
+        }));
+    });
+  }
+  clearInterval(downProgressInterval);
+  downProgressInterval = undefined;
+  totalDone = 0;
+  totalToDo = 0;
+  aborted = true;
+  for (let container in downloads) {
+    finishDownloadSession(container);
   }
 }
 
@@ -343,6 +367,7 @@ async function addSessionFiles(
 async function beginDownloadInSession(
   container,
 ) {
+  aborted = false; //reset with download start
   let fileStream = undefined;
 
   if (downloads[container].direct) {
@@ -432,10 +457,18 @@ async function beginDownloadInSession(
       container,
       file);
 
+    let res;
     if (downloads[container].files[file].key <= 0) {
-      await slicer.concatFile();
+      res = await slicer.concatFile().catch(() => {
+        return false;
+      });
     } else {
-      await slicer.sliceFile();
+      res = await slicer.sliceFile().catch(() => {
+        return false;
+      });
+    if (!res) {
+      if (!aborted) abortDownloads(!inServiceWorker);
+      return;
     }
   }
 

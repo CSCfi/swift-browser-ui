@@ -102,6 +102,7 @@
 
 <script>
 import {
+  addErrorToastOnMain,
   getAccessDetails,
 } from "@/common/globalFunctions";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
@@ -149,6 +150,9 @@ export default {
     client() {
       return this.$store.state.client;
     },
+    downloadError() {
+      return this.$store.state.downloadError;
+    },
   },
   watch: {
     container() {
@@ -156,6 +160,12 @@ export default {
     },
     client() {
       this.checkIfCanReadWrite();
+    },
+    downloadError() {
+      if (this.downloadError) {
+        addErrorToastOnMain(this.$t("message.download.error"));
+        this.$store.state.downloadError = false;
+      }
     },
   },
   methods: {

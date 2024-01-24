@@ -177,6 +177,15 @@ export default class UploadSocket {
               message: this.$t("message.notDecryptable"),
             },
           );
+          break;
+        case "error":
+          this.$store.state.downloadError = true;
+          if (!this.useServiceWorker) {
+            this.$store.commit("toggleDownloadNotification", false);
+            this.$store.commit("removeDownload", true);
+            this.$store.commit("eraseDownloadProgress");
+          }
+          break;
         case "progress":
           this.$store.commit("updateDownloadProgress", e.data.progress);
           break;
