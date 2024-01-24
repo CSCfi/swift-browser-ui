@@ -127,10 +127,10 @@ const app = createApp({
       return this.$store.state.isUploading;
     },
     displayUploadNotification() {
-      return this.$store.state.uploadNotification;
+      return this.$store.state.uploadNotification.visible;
     },
     displayDownloadNotification() {
-      return this.$store.state.downloadNotification;
+      return this.$store.state.downloadNotification.visible;
     },
     resumableClient() {
       return this.$store.state.resumableClient;

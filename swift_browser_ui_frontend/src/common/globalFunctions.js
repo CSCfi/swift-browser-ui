@@ -278,3 +278,7 @@ export function addErrorToastOnMain(msg) {
         message: msg },
     );
 }
+
+export function getElementHeightPx(element) {
+  if (element) return element.getBoundingClientRect().height;
+}

@@ -1,15 +1,12 @@
 <template>
   <UploadToast
-    v-if="maximized"
-    :notification-toggled="notificationToggled"
-    @toggle-notification="toggleNotification"
+    v-if="upNotification.visible && upNotification.maximized"
     @view-container="viewContainer"
     @cancel-upload="onCancel"
     @close-upload="onClosed"
   />
   <UploadAlert
-    v-else
-    @toggle-notification="toggleNotification"
+    v-if="upNotification.visible && !upNotification.maximized"
     @view-container="viewContainer"
     @close-upload="onClosed"
   />
@@ -24,12 +21,7 @@ export default {
     UploadToast,
     UploadAlert,
   },
-  data() {
-    return {
-      notificationToggled: false,
-      maximized: !this.$store.state.downloadNotification,
-    };
-  },
+  emits: ["cancel-current-upload"],
   computed: {
     project() {
       return this.$store.state.active.id;
@@ -40,28 +32,22 @@ export default {
     container() {
       return this.$store.state.uploadFolderName;
     },
-    downloadNotification() {
-      return this.$store.state.downloadNotification;
-    },
-  },
-  watch: {
-    downloadNotification() {
-      if (this.downloadNotification && this.maximized) {
-        this.toggleNotification();
-      }
+    upNotification() {
+      return this.$store.state.uploadNotification;
     },
   },
   methods: {
     toggleNotification() {
-      this.maximized = !this.maximized;
-      this.notificationToggled = true;
+      this.$store.commit("toggleUploadNotificationSize");
     },
     onCancel() {
       this.$emit("cancel-current-upload", this.container);
-      this.$store.commit("toggleUploadNotification", false);
+      this.onClosed();
     },
     onClosed() {
+      //close and reset to maximized
       this.$store.commit("toggleUploadNotification", false);
+      if (!this.upNotification.maximized) this.toggleNotification();
     },
     viewContainer() {
       if (this.$route.params.container !== this.container

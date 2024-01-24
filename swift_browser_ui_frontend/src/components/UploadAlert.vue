@@ -27,7 +27,7 @@
           ref="maximize"
           href="javascript:void(0)"
           class="toggle-notification"
-          @click="$emit('toggle-notification')"
+          @click="toggleNotification"
         >
           <i
             slot="icon"
@@ -58,15 +58,21 @@ export default {
   components: {
     ProgressBar,
   },
+  emits: ["view-container", "close-upload"],
   computed: {
     closable() {
-      return this.$store.state.uploadNotificationClosable;
+      return this.$store.state.uploadNotification.closable;
     },
   },
   mounted() {
     setTimeout(() => {
       this.$refs.maximize.focus();
     }, 100);
+  },
+  methods: {
+    toggleNotification() {
+      this.$store.commit("toggleUploadNotificationSize");
+    },
   },
 };
 </script>

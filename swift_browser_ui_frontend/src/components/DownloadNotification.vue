@@ -1,6 +1,6 @@
 <template>
   <c-toasts
-    v-if="maximized"
+    v-if="downNotification.visible && downNotification.maximized"
     id="download-toasts"
   >
     <div class="toast-wrapper">
@@ -47,7 +47,7 @@
   </c-toasts>
 
   <c-alert
-    v-else
+    v-if="downNotification.visible && !downNotification.maximized"
     type="success"
   >
     <c-row
@@ -95,38 +95,39 @@
 </template>
 
 <script>
+import { getElementHeightPx } from "@/common/globalFunctions";
+
 export default {
   name: "DownloadNotification",
   data() {
     return {
-      maximized: !this.$store.state.uploadNotification,
+      moved: false,
     };
   },
   computed: {
     progress() {
       return this.$store.state.downloadProgress;
     },
-    showNotification() {
+    downNotification() {
       return this.$store.state.downloadNotification;
     },
-    uploadNotification() {
+    upNotification() {
       return this.$store.state.uploadNotification;
     },
   },
   watch: {
-    uploadNotification() {
-      if (this.uploadNotification && this.maximized) {
-        // if upload started while downloading
-        // minimize both notifications
-        this.toggleSize();
-      }
-    },
-    maximized() {
-      if (this.maximized) this.addToast();
+    upNotification: {
+      handler() {
+        if (this.moved && (!this.upNotification.visible ||
+          !this.upNotification.maximized)) {
+          this.moveToast(true);
+        }
+      },
+      deep: true,
     },
   },
   mounted() {
-    if (this.maximized) this.addToast();
+    this.addToast();
   },
   methods: {
     addToast() {
@@ -137,14 +138,40 @@ export default {
           persistent: true,
           custom: true,
         });
+        if (this.upNotification.visible && this.upNotification.maximized) {
+          this.moveToast();
+        }
+        else this.moved = false;
       },0);
     },
     closeNotification() {
-      document.querySelector("#download-toasts")?.removeToast("download-toast");
       this.$store.commit("toggleDownloadNotification", false);
+      this.removeToast();
+      if (!this.downNotification.maximized) {
+        this.$store.commit("toggleDownloadNotificationSize");
+      }
     },
     toggleSize() {
-      this.maximized = !this.maximized;
+      this.$store.commit("toggleDownloadNotificationSize");
+      if (this.downNotification.maximized) this.addToast();
+      else this.removeToast();
+    },
+    removeToast() {
+      document.querySelector("#download-toasts")?.removeToast("download-toast");
+      this.moved = false;
+    },
+    moveToast(restore = false) {
+      let toast = document.querySelector("c-toasts#download-toasts");
+      if (restore) {
+        toast.style.marginBottom = "0";
+        this.moved = false;
+      }
+      else {
+        const h = getElementHeightPx(document
+          .getElementById("upload-toast"));
+        toast.style.marginBottom = h + "px";
+        this.moved = true;
+      }
     },
   },
 };
