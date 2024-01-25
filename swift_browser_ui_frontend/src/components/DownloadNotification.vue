@@ -48,6 +48,7 @@
 
   <c-alert
     v-if="downNotification.visible && !downNotification.maximized"
+    id="download-alert"
     type="success"
   >
     <c-row
@@ -56,11 +57,14 @@
       justify="space-between"
     >
       <h3>
+        <i
+          slot="icon"
+          class="mdi mdi-tray-arrow-down"
+        />
         {{ progress === 1 ?
           $t("message.download.complete") :
           $t("message.download.inProgress") }}
       </h3>
-
       <div
         v-if="progress != 1"
         class="progress-bar"
@@ -210,6 +214,10 @@ c-alert {
 
 c-alert h3 {
   font-size: 18px;
+}
+
+c-alert h3 i {
+  margin-right: 0.5rem;
 }
 
 .actions a {

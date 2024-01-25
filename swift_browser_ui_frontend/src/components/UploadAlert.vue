@@ -1,5 +1,6 @@
 <template>
   <c-alert
+    id="upload-alert"
     type="success"
   >
     <c-row
@@ -8,6 +9,10 @@
       align="center"
     >
       <h3>
+        <i
+          slot="icon"
+          class="mdi mdi-tray-arrow-up"
+        />
         {{ closable ?
           $t("message.upload.complete") :
           $t("message.upload.inProgress") }}
@@ -89,6 +94,10 @@ h3 {
 
 .actions a {
   margin-left: 2rem;
+}
+
+c-alert h3 i {
+  margin-right: 0.5rem;
 }
 
 @media screen and (max-width: 840px) {
