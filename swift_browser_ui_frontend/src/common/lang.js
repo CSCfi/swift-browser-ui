@@ -432,10 +432,10 @@ let default_translations = {
       },
       part2: {
         heading: "Non-accessible content",
-        text: "Despite our best efforts to ensure accessibility of the" +
+        text: "Despite our best efforts to ensure accessibility of" +
             " @:accessibilityPage.service , the website is not yet fully" +
-            " compliant with requirements (WCAG 2.1) and there may be some" +
-            " limitations.",
+            " compliant with the requirements (WCAG 2.1) and there may be" +
+            " some limitations.",
         subheading1: "Non-accessible content and its shortcomings",
         subheading2: "Accessibility requirements that are not met",
         subparts: [
@@ -447,7 +447,7 @@ let default_translations = {
           },
           {
             heading: "Perceivable: Contrast issues",
-            text1: "Few elements have few contrast issues.",
+            text1: "A few elements have a few contrast issues.",
             text2: "1.4.3 Contrast (Minimum)",
           },
           {
@@ -469,16 +469,21 @@ let default_translations = {
           },
           {
             heading: "Operable: Problems with focus order",
-            text1: "When navigating with keyboard or mobile with assistive" +
-                    " mode, the cursor does not always move logically.",
+            text1: "When navigating with a keyboard or on a mobile device in"+
+                  " assistive mode, the cursor does not always move logically.",
             text2: "2.4.3 Focus Order",
+          },
+          {
+            heading: "Operable: Problems with focus visibility",
+            text1: "When navigating the website with a keyboard, the cursor" +
+                  " sometimes disappears completely.",
+            text2: "2.4.7 Focus Visible",
           },
           {
             heading: "Understandable: Problems with focus functions",
             text1: "In some drop-down menus, hovering over a selection" +
                     " automatically triggers an action that opens new content" +
-                    " without the user consciously making a selection." +
-                    " Accessibility requirements that are not met.",
+                    " without the user consciously making a selection.",
             text2: "3.2.1 On Focus",
           },
         ],
@@ -495,7 +500,7 @@ let default_translations = {
         ],
       },
       part4: {
-        heading: "Supervision authority",
+        heading: "Supervisory authority",
         authorityLink: "#",
         authorityName: "Authority name",
         text: "If you notice accessibility problems on the website," +
@@ -519,7 +524,7 @@ let default_translations = {
       },
       part6: {
         heading: "We are constantly working to improve accessibility",
-        subheading: "We are committed to improve the accessibility of our" +
+        subheading: "We are committed to improving the accessibility of our" +
                   " digital services",
         text1: "We will update this statement as we correct the" +
                 " deficiencies. We are committed to improving the" +
@@ -530,7 +535,7 @@ let default_translations = {
                 " develop services." },
           { list: "We already take accessibility requirements into account" +
                 " when we make purchases." },
-          { list : "We support our staff in producing accessible content" },
+          { list : "We support our staff in producing accessible content." },
         ],
       },
     },
@@ -967,10 +972,10 @@ let default_translations = {
       },
       part2: {
         heading: "Non-accessible content",
-        text: "Despite our best efforts to ensure accessibility of the" +
+        text: "Despite our best efforts to ensure accessibility of" +
             " @:accessibilityPage.service , the website is not yet fully" +
-            " compliant with requirements (WCAG 2.1) and there may be some" +
-            " limitations.",
+            " compliant with the requirements (WCAG 2.1) and there may be" +
+            " some limitations.",
         subheading1: "Non-accessible content and its shortcomings",
         subheading2: "Accessibility requirements that are not met",
         subparts: [
@@ -982,7 +987,7 @@ let default_translations = {
           },
           {
             heading: "Perceivable: Contrast issues",
-            text1: "Few elements have few contrast issues.",
+            text1: "A few elements have a few contrast issues.",
             text2: "1.4.3 Contrast (Minimum)",
           },
           {
@@ -1004,16 +1009,21 @@ let default_translations = {
           },
           {
             heading: "Operable: Problems with focus order",
-            text1: "When navigating with keyboard or mobile with assistive" +
-                    " mode, the cursor does not always move logically.",
+            text1: "When navigating with a keyboard or on a mobile device in"+
+                  " assistive mode, the cursor does not always move logically.",
             text2: "2.4.3 Focus Order",
+          },
+          {
+            heading: "Operable: Problems with focus visibility",
+            text1: "When navigating the website with a keyboard, the cursor" +
+                  " sometimes disappears completely.",
+            text2: "2.4.7 Focus Visible",
           },
           {
             heading: "Understandable: Problems with focus functions",
             text1: "In some drop-down menus, hovering over a selection" +
                     " automatically triggers an action that opens new content" +
-                    " without the user consciously making a selection." +
-                    " Accessibility requirements that are not met.",
+                    " without the user consciously making a selection.",
             text2: "3.2.1 On Focus",
           },
         ],
@@ -1030,7 +1040,7 @@ let default_translations = {
         ],
       },
       part4: {
-        heading: "Supervision authority",
+        heading: "Supervisory authority",
         authorityLink: "#",
         authorityName: "Authority name",
         text: "If you notice accessibility problems on the website," +
@@ -1054,7 +1064,7 @@ let default_translations = {
       },
       part6: {
         heading: "We are constantly working to improve accessibility",
-        subheading: "We are committed to improve the accessibility of our" +
+        subheading: "We are committed to improving the accessibility of our" +
                   " digital services",
         text1: "We will update this statement as we correct the" +
                 " deficiencies. We are committed to improving the" +
@@ -1065,7 +1075,7 @@ let default_translations = {
                 " develop services." },
           { list: "We already take accessibility requirements into account" +
                 " when we make purchases." },
-          { list : "We support our staff in producing accessible content" },
+          { list : "We support our staff in producing accessible content." },
         ],
       },
     },
