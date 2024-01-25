@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - (GL #1205) Add a route back to front page from top toolbar
+- (GL #1126) Added download progress bar for direct downloads (Chrome)
+- (GL #1166) Added clarifying text about folder extension during download
+- (GL #1168) Added notifications for failed downloads
 
 ### Changed
 - Refactor entries' files, IndexPage and IndexOIDCPage
