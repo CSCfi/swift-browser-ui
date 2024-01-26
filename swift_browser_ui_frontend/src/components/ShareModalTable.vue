@@ -56,11 +56,10 @@
         </c-button>
       </c-card-actions>
     </c-alert>
-    <!-- eslint-disable-->
     <c-data-table
-      :key="newPerms"
-      id="shared-projects-table"
       v-if="tableData.length > 0"
+      id="shared-projects-table"
+      :key="newPerms"
       :data.prop="tableData"
       :headers.prop="headers"
       :no-data-text="$t('message.encrypt.empty')"
@@ -68,7 +67,6 @@
       :footerOptions.prop="footer"
       horizontal-scrolling
     />
-    <!-- eslint-enable-->
   </c-container>
 </template>
 
