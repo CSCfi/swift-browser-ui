@@ -1,7 +1,6 @@
 <template>
   <!-- Footer options needs to be in CamelCase,
   because csc-ui wont recognise it otherwise. -->
-  <!-- eslint-disable-->
   <c-data-table
     id="container-table"
     :data.prop="containers"
@@ -17,7 +16,6 @@
     @paginate="getPage"
     @sort="onSort"
   />
-  <!-- eslint-enable-->
 </template>
 
 <script>

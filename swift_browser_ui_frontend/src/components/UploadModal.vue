@@ -129,7 +129,6 @@
         </c-alert>
         <!-- Footer options needs to be in CamelCase,
         because csc-ui wont recognise it otherwise. -->
-        <!-- eslint-disable-->
         <c-data-table
           v-if="dropFiles.length > 0"
           class="files-table"
@@ -144,7 +143,6 @@
           @sort="onSort"
           @paginate="getDropTablePage"
         />
-        <!-- eslint-enable-->
         <p
           class="info-text is-size-6"
         >
@@ -192,7 +190,6 @@
                 </c-button>
                 <!-- Footer options needs to be in CamelCase,
                 because csc-ui wont recognise it otherwise. -->
-                <!-- eslint-disable-->
                 <c-data-table
                   class="publickey-table"
                   :data.prop="recvHashedKeys"
@@ -202,7 +199,6 @@
                   :footerOptions.prop="{hideDetails: true}"
                   @click="checkPage($event,true)"
                 />
-                <!-- eslint-enable-->
               </c-flex>
             </c-container>
           </c-accordion-item>
