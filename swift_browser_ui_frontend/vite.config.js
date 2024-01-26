@@ -90,8 +90,7 @@ const multipagePlugin = () => ({
 
       // redirect to defined page's HTML file
       let pageName = url.split("/")[1];
-      // eslint-disable-next-line no-prototype-builtins
-      if (pages.hasOwnProperty(pageName)) {
+      if (Object.prototype.hasOwnProperty.call(pages, pageName)) {
         let pathArray = pages[pageName].split("/");
         req.url = "/" + pathArray[pathArray.length - 1];
       }
