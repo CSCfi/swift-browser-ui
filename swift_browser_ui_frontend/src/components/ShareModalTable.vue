@@ -56,6 +56,7 @@
         </c-button>
       </c-card-actions>
     </c-alert>
+    <!-- eslint-disable-->
     <c-data-table
       v-if="tableData.length > 0"
       id="shared-projects-table"
