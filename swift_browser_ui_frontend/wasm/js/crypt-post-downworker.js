@@ -564,19 +564,19 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "addHeaders":
-      if(addSessionFiles(e.data.container, e.data.headers)) {
-        if (inServiceWorker) {
+      addSessionFiles(e.data.container, e.data.headers).then(ret => {
+        if (ret && inServiceWorker) {
           e.source.postMessage({
             eventType: "notDecryptable",
             container: e.data.container,
           });
-        } else {
+        } else if (ret) {
           postMessage({
             eventType: "notDecryptable",
             container: e.data.container,
           });
         }
-      }
+      })
       if (inServiceWorker) {
         e.source.postMessage({
           eventType: "downloadStarted",
