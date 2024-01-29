@@ -74,5 +74,9 @@ uint8_t *wrap_chunk_content(CHUNK *chunk);
 Free a chunk from memory.
 */
 void free_chunk(CHUNK *chunk);
+/*
+Free a static buffer chunk from memory.
+*/
+void free_chunk_nobuf(CHUNK *chunk);
 
 #endif

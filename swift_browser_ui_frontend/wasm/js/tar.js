@@ -106,7 +106,7 @@ export function addTarFile(path, size) {
   let mtime = Math.floor(Date.now() / 1000).toString(8);
   let header = "";
   let sizeStr = "";
-  let maxOctal = 8589934591;
+  let maxOctal = 8589934592;
 
   if (size < maxOctal) {
     //display smaller sizes than 8GiB in octal
@@ -118,11 +118,11 @@ export function addTarFile(path, size) {
 
     let base256 = [];
     do {
-      base256.unshift(Number(bytes%256n));
+      base256.unshift(String.fromCharCode(Number(bytes%256n)));
       bytes = bytes/256n;
     } while (bytes);
 
-    while (base256.length < 12) base256.unshift(0x00);
+    while (base256.length < 12) base256.unshift("0x00");
     base256[0] |= 0x80;
     sizeStr = base256.join("");
   }
