@@ -92,14 +92,22 @@
             v-csc-control
             shadow="false"
             :label="$t('message.share.permissions')"
-            :items.prop="accessRights"
             :placeholder="$t('message.share.permissions')"
             hide-details
             @changeValue="onSelectPermission($event)"
             @mouseleave="resetHover()"
             @mouseover="calculateSelectPosition()"
             @click="calculateSelectPosition()"
-          />
+          >
+            <c-option
+              v-for="(perm, i) in accessRights"
+              :key="i"
+              :name="perm.name"
+              :value="perm.value"
+            >
+              <b>{{ perm.name }}</b>{{ perm.desc }}
+            </c-option>
+          </c-select>
           <c-select hide-details />
         </c-row>
         <c-button
@@ -266,14 +274,17 @@ export default {
         {
           name: this.$t("message.share.read_perm"),
           value: "read",
+          desc: this.$t("message.share.read_perm_desc"),
         },
         {
           name: this.$t("message.share.write_perm"),
           value: "read and write",
+          desc: this.$t("message.share.write_perm_desc"),
         },
         {
           name: this.$t("message.share.view_perm"),
           value: "view",
+          desc: this.$t("message.share.view_perm_desc"),
         },
       ];
     },
@@ -303,6 +314,7 @@ export default {
             this.closeSharedNotificationWithTimeout();
           }
           this.loading = false;
+          this.sharedAccessRight = null;
         },
       );
     },
@@ -690,6 +702,9 @@ c-select {
   color: var(--csc-dark);
   width: 100%;
   padding-bottom: 1.5rem;
+  & > * {
+    font-size: $body-size;
+  }
 }
 
 c-link {
