@@ -601,4 +601,9 @@ app.config.warnHandler = function (msg, vm, info) {
   if (DEV) console.log("Vue warning: ", msg, vm, info);
 };
 
+router.afterEach((to) => {
+  if (!to.name) {
+    window.location.pathname = "/notfound";
+  }
+});
 router.isReady().then(() => app.mount("#app"));
