@@ -211,6 +211,7 @@ export default {
                   iconFill: "primary",
                   iconStyle: {
                     marginRight: "1rem",
+                    flexShrink: "0",
                   },
                   onClick: () => {
                     if(item.owner) {

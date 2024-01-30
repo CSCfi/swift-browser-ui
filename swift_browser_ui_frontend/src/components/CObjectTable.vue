@@ -187,6 +187,7 @@ export default {
                 iconFill: "primary",
                 iconStyle: {
                   marginRight: "1rem",
+                  flexShrink: "0",
                 },
                 onClick: () => this.changeFolder(name),
               },
