@@ -93,6 +93,7 @@ jaettua
 jaettuja
 jaettuun
 jaetun
+jaetusta
 jaetut
 jakaa
 jakamaan
@@ -442,6 +443,7 @@ projektitunnukset
 pudota
 purkaa
 puuttuvasta
+pysyvästi
 pyydetty
 pyydetyn
 pyydä

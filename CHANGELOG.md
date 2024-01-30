@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- (GL #1203) Add a warning when deleting files from a shared folder
+
+### Changed
+- (GL #1202) Change the status text of unshared folder
+
 ### Fixed
 - (GL #1187) Trim whitespace from container names before creation
 - (GL #1182) Prevent folder icons in table from shrinking
