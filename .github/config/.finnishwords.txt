@@ -142,6 +142,7 @@ kansioita
 kansion
 kansioon
 kansiossa
+kansiosta
 kansiot
 kansiota
 kanssa
@@ -408,6 +409,7 @@ poistakaa
 poistaminen
 poistamisen
 poistamista
+poistat
 poistetaan
 poistettava
 poistettiin
