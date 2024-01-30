@@ -207,9 +207,9 @@ export default {
                   value: item.access.length > 0
                     ? (
                       item.access.length > 1
-                        ? this.accessRights[2]
-                        : this.accessRights[1])
-                    : this.accessRights[0],
+                        ? this.accessRights[1]
+                        : this.accessRights[0])
+                    : this.accessRights[2],
                   onChangeValue: (e) =>  {
                     this.newPerms = this.getPermArray(e.detail.value);
                     if (this.getPermName(this.newPerms)
@@ -247,10 +247,10 @@ export default {
     },
     getPermName(permArray) {
       return permArray.length > 1
-        ? this.accessRights[2].name
-        : (this.accessRights[1].value[0] === permArray[0]
-          ? this.accessRights[1].name
-          : this.accessRights[0].name);
+        ? this.accessRights[1].name
+        : (this.accessRights[0].value[0] === permArray[0]
+          ? this.accessRights[0].name
+          : this.accessRights[2].name);
     },
     clearPermChange() {
       this.clickedPermChange = false;

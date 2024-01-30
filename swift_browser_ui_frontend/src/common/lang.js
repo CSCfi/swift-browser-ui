@@ -157,20 +157,36 @@ let default_translations = {
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
         share_guide_step2: "2. <b>Select the permission rights:</b> ",
-        share_guide_step2_list: [
-          "<b>View:</b> project members can access the folder's content " +
-            "but can not directly download or copy " +
-            "its content.",
-          "<b>Copy and download:</b> project members can copy, download " +
+        share_guide_step2_read:
+          ": project members can copy, download " +
             "and decrypt the folder content.",
-          "<b>Copy, download and upload:</b> project members can copy, " +
+        share_guide_step2_write:
+          ": project members can copy, " +
             "download and decrypt the folder content. They can also upload " +
             "new files to the shared folder accessible to both projects.",
-        ],
-        permissions: "Select permissions",
+        share_guide_step2_view:
+          ": project members can access the folder's content " +
+            "but can not directly download or copy " +
+            "its content.",
+        permissions: "Permissions",
         view_perm: "View",
+        view_perm_desc:
+          ": The recipient project's members can only " +
+          "view the folder content. Use this when you " +
+          "need maximum certainty that your files are not distributed " +
+          "further. Note that you have to be also the project manager of " +
+          "the recipient project.",
         read_perm: "Copy and download",
+        read_perm_desc:
+          ": The recipient project's members can copy your folder " +
+          "and download decrypted files. Use this when you want to transfer " +
+          "your data to another project.",
         write_perm: "Copy, download and upload",
+        write_perm_desc:
+          ": In addition to Read-only permission, " +
+          "the recipient project's members can upload new files or delete " +
+          "existing files from your folder. Use this when " +
+          "you want the folder to be your shared workspace.",
         shared_successfully: "Folder was shared successfully!",
         remove_permission: "Permissions were removed successfully!",
         update_permission: "Permissions were changed successfully.",
@@ -703,19 +719,23 @@ let default_translations = {
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
         share_guide_step2: "2. <b>Valitse käyttöoikeudet:</b> ",
-        share_guide_step2_list: [
-          "<b>Tarkastele:</b> projektin jäsenet voivat tarkastella kansion " +
-            "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
-          "<b>Kopioi ja lataa:</b> projektin jäsenet voivat kopioida ja " +
+        share_guide_step2_read:
+          ": projektin jäsenet voivat kopioida ja " +
             "ladata kansion sisällön sekä purkaa kansion sisällön salauksen.",
-          "<b>Kopioi, lataa ja lähetä:</b> projektin jäsenet voivat kopioida " +
+        share_guide_step2_write:
+          ": projektin jäsenet voivat kopioida " +
             "ja ladata kansion sisällön sekä purkaa kansion sisällön " +
             "salauksen. He voivat myös lähettää tiedostoja jaettuun kansioon.",
-        ],
+        share_guide_step2_view:
+            ": projektin jäsenet voivat tarkastella kansion " +
+            "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
+        view_perm_desc: "", //TODO
         read_perm: "Kopioi ja lataa",
+        read_perm_desc: "", //TODO
         write_perm: "Kopioi, lataa ja lähetä",
+        write_perm_desc: "", //TODO
         shared_successfully: "Kansion jakaminen onnistui.",
         remove_permission: "Käyttöoikeus poistettiin onnistuneesti.",
         update_permission: "Käyttöoikeus muutettiin onnistuneesti.",
