@@ -14,7 +14,10 @@
           {{ $t("message.objects.deleteObjects") }}
         </div>
 
-        {{ $t("message.objects.deleteObjectsMessage") }}
+        {{ owner ?
+          $t("message.objects.deleteSharedObjects") :
+          $t("message.objects.deleteObjectsMessage")
+        }}
 
         <c-card-actions justify="end">
           <c-button

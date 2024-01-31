@@ -74,7 +74,7 @@ let default_translations = {
         sharedTo: "Folders shared with you",
       },
       folderDetails: {
-        notShared: "This folder isn't shared to any projects.",
+        notShared: "This folder isn't shared with other projects.",
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
         shared_with_view: "This folder is shared with you. You can browse " +
@@ -276,6 +276,10 @@ let default_translations = {
         deleteObjects: "Delete items",
         deleteManySuccess: " items deleted",
         deleteOneSuccess: " item deleted",
+        deleteSharedObjects:
+          "This action will permanently delete " +
+          "items from a shared folder. " +
+          "Are you sure you want to proceed?",
         deleteObjectsMessage:
           "Items can't be restored after being deleted. " +
           "Are you sure you want to proceed?",
@@ -688,6 +692,10 @@ let default_translations = {
         deleteObjects: "Poista tiedostot",
         deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",
+        deleteSharedObjects:
+         "Tällä toiminnolla poistat " +
+         "tiedostot jaetusta kansiosta pysyvästi. " +
+         "Haluatko varmasti poistaa nämä tiedostot?",
         deleteObjectsMessage:
           "Tiedostoja ei voi palauttaa poistamisen jälkeen. " +
           "Haluatko varmasti poistaa nämä tiedostot?",

@@ -93,6 +93,7 @@ jaettua
 jaettuja
 jaettuun
 jaetun
+jaetusta
 jaetut
 jakaa
 jakamaan
@@ -141,6 +142,7 @@ kansioita
 kansion
 kansioon
 kansiossa
+kansiosta
 kansiot
 kansiota
 kanssa
@@ -407,6 +409,7 @@ poistakaa
 poistaminen
 poistamisen
 poistamista
+poistat
 poistetaan
 poistettava
 poistettiin
@@ -442,6 +445,7 @@ projektitunnukset
 pudota
 purkaa
 puuttuvasta
+pysyvästi
 pyydetty
 pyydetyn
 pyydä
