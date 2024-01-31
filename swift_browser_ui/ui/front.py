@@ -247,3 +247,15 @@ async def notfound(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
             "Expires": "0",
         },
     )
+
+
+async def accessibility(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """Serve worker js in worker scope."""
+    return aiohttp.web.FileResponse(
+        path=str(f"{setd['static_directory']}/accessibility.html"),
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )

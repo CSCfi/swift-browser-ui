@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1187) Trim whitespace from container names before creation
 - (GL #1182) Prevent folder icons in table from shrinking
 
+### Added
+- (GL #1185) Add Accessibility page (English version)
+
 ## [2024.01.0]
 
 ### Added

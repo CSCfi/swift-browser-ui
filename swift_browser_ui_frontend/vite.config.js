@@ -43,6 +43,7 @@ let pages = {
   "loginpassword": path.resolve(root, "loginpassword.html"),
   "login":         path.resolve(root, "login.html"),
   "login2step":    path.resolve(root, "login2step.html"),
+  "accessibility": path.resolve(root, "accessibility.html"),
 };
 
 let proxy = {
@@ -109,11 +110,10 @@ const htmlPlugin = (oidc) => {
           if (path.endsWith("index.html")) {
             return html.replace("index.js", "index_oidc.js");
           }
-        }
+        },
       },
-    }
+    };
   }
-
 };
 
 // https://vitejs.dev/config/
@@ -159,7 +159,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       multipagePlugin(),
       VueI18nPlugin(),
-      htmlPlugin(oidcEnabled)
+      htmlPlugin(oidcEnabled),
     ],
     build: {
       outDir: path.resolve(__dirname, "dist"),

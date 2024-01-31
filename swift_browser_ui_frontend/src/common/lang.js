@@ -392,7 +392,7 @@ let default_translations = {
         serviceProviderLink: "#",
         menuItems: [
           { item: "Item 1", link: "#" },
-          { item: "Item 2", link: "#" },
+          { item: "Item 2", link: "/accessibility" },
           { item: "Item 3", link: "#" },
           { item: "Item 4", link: "#" },
         ],
@@ -413,6 +413,131 @@ let default_translations = {
       edit_tag: "edit tags",
       delete_tag: "delete tag",
       footer: "copyright information",
+    },
+    accessibilityPage: {
+      service: "Service",
+      date: "dd.mm.yy",
+      title: "@:accessibilityPage.service – Accessibility statement",
+      intro1: "This accessibility statement applies to the" +
+            " @:accessibilityPage.service service and was made on" +
+            " @:accessibilityPage.date . The service is subject to the Act" +
+            " on the Provision of Digital Services (306/2019), which requires"+
+            " that public online services must be accessible.",
+      intro2: "The accessibility of the service has been evaluated by" +
+                  " an external organization.",
+      part1: {
+        heading: "Compliance status" ,
+        text: "The website is partially compliant with the requirements of" +
+            " the Web Content Accessibility Guidelines (WCAG) 2.1 level AA.",
+      },
+      part2: {
+        heading: "Non-accessible content",
+        text: "Despite our best efforts to ensure accessibility of" +
+            " @:accessibilityPage.service , the website is not yet fully" +
+            " compliant with the requirements (WCAG 2.1) and there may be" +
+            " some limitations.",
+        subheading1: "Non-accessible content and its shortcomings",
+        subheading2: "Accessibility requirements that are not met",
+        subparts: [
+          {
+            heading: "Perceivable: Some structural deficiencies",
+            text1: "The page has content that is not accessible with" +
+                " assistive technology devices. ",
+            text2: "1.3.1 Info and Relationships",
+          },
+          {
+            heading: "Perceivable: Contrast issues",
+            text1: "A few elements have a few contrast issues.",
+            text2: "1.4.3 Contrast (Minimum)",
+          },
+          {
+            heading: "Perceivable: Problems with small screens and" +
+                    " in mobile use",
+            text1: "The site is not responsive, and it is partially" +
+                    " impossible to use with mobile devices and assistive" +
+                    " technology. Some of the content and functions are not" +
+                    " available for mobile users. ",
+            text2: "1.4.10 Reflow",
+          },
+          {
+            heading: "Perceivable: Deficiencies in focus and hover functions",
+            text1: "There are parts of the service where the cursor does" +
+                    " not work correctly and pointing functions automatically" +
+                    " trigger a transition to another page automatically. " +
+                    "This is a disadvantage for users of assistive technology.",
+            text2: "1.4.13 Content on Hover or Focus",
+          },
+          {
+            heading: "Operable: Problems with focus order",
+            text1: "When navigating with a keyboard or on a mobile device in"+
+                  " assistive mode, the cursor does not always move logically.",
+            text2: "2.4.3 Focus Order",
+          },
+          {
+            heading: "Operable: Problems with focus visibility",
+            text1: "When navigating the website with a keyboard, the cursor" +
+                  " sometimes disappears completely.",
+            text2: "2.4.7 Focus Visible",
+          },
+          {
+            heading: "Understandable: Problems with focus functions",
+            text1: "In some drop-down menus, hovering over a selection" +
+                    " automatically triggers an action that opens new content" +
+                    " without the user consciously making a selection.",
+            text2: "3.2.1 On Focus",
+          },
+        ],
+      },
+      part3: {
+        heading: "Did you notice an accessibility issue in our" +
+                " digital service? Let us know and we will do our best to" +
+                " correct the shortcoming",
+        subheading: "Reporting issues",
+        text1: "To report any issues, reach out to CSC's service desk:",
+        text2: [
+          { list: "Email" },
+          { list: "Phone" },
+        ],
+      },
+      part4: {
+        heading: "Supervisory authority",
+        authorityLink: "#",
+        authorityName: "Authority name",
+        text: "If you notice accessibility problems on the website," +
+              " start by giving feedback to us, that is, the website" +
+              " administrator. Receiving a response may take 14 days. If you" +
+              " are not satisfied with the response from us or if you do not" +
+              " receive any response within two weeks, you may file a report" +
+              " with the { authorityName }. The agency website has detailed" +
+              " instructions (in Finnish and Swedish only) on how to file a" +
+              " complaint and how the issue will be processed.",
+      },
+      part5: {
+        heading: "Supervisory authority's contact information",
+        text: [
+          { list: "Name" },
+          { list: "Unit" },
+          { list: "Website" },
+          { list: "Email" },
+          { list: "Phone number"},
+        ],
+      },
+      part6: {
+        heading: "We are constantly working to improve accessibility",
+        subheading: "We are committed to improving the accessibility of our" +
+                  " digital services",
+        text1: "We will update this statement as we correct the" +
+                " deficiencies. We are committed to improving the" +
+                " accessibility of online services. We ensure accessibility" +
+                " with, among other things, the following measures: ",
+        text2: [
+          { list: "We take accessibility requirements into account when we" +
+                " develop services." },
+          { list: "We already take accessibility requirements into account" +
+                " when we make purchases." },
+          { list : "We support our staff in producing accessible content." },
+        ],
+      },
     },
   },
   fi: {
@@ -807,7 +932,7 @@ let default_translations = {
         serviceProviderLink: "#",
         menuItems: [
           { item: "Menu 1", link: "#" },
-          { item: "Menu 2", link: "#" },
+          { item: "Menu 2", link: "/accessibility" },
           { item: "Menu 3", link: "#" },
           { item: "Menu 4", link: "#" },
         ],
@@ -828,6 +953,131 @@ let default_translations = {
       edit_tag: "muokata nykyisiä tunnisteita",
       delete_tag: "poista tunniste",
       footer: "tekijänoikeustiedot",
+    },
+    accessibilityPage: {
+      service: "Service",
+      date: "dd.mm.yy",
+      title: "@:accessibilityPage.service – Accessibility statement",
+      intro1: "This accessibility statement applies to the" +
+            " @:accessibilityPage.service service and was made on" +
+            " @:accessibilityPage.date . The service is subject to the Act" +
+            " on the Provision of Digital Services (306/2019), which requires"+
+            " that public online services must be accessible.",
+      intro2: "The accessibility of the service has been evaluated by" +
+                  " an external organization.",
+      part1: {
+        heading: "Compliance status" ,
+        text: "The website is partially compliant with the requirements of" +
+            " the Web Content Accessibility Guidelines (WCAG) 2.1 level AA.",
+      },
+      part2: {
+        heading: "Non-accessible content",
+        text: "Despite our best efforts to ensure accessibility of" +
+            " @:accessibilityPage.service , the website is not yet fully" +
+            " compliant with the requirements (WCAG 2.1) and there may be" +
+            " some limitations.",
+        subheading1: "Non-accessible content and its shortcomings",
+        subheading2: "Accessibility requirements that are not met",
+        subparts: [
+          {
+            heading: "Perceivable: Some structural deficiencies",
+            text1: "The page has content that is not accessible with" +
+                " assistive technology devices. ",
+            text2: "1.3.1 Info and Relationships",
+          },
+          {
+            heading: "Perceivable: Contrast issues",
+            text1: "A few elements have a few contrast issues.",
+            text2: "1.4.3 Contrast (Minimum)",
+          },
+          {
+            heading: "Perceivable: Problems with small screens and" +
+                    " in mobile use",
+            text1: "The site is not responsive, and it is partially" +
+                    " impossible to use with mobile devices and assistive" +
+                    " technology. Some of the content and functions are not" +
+                    " available for mobile users. ",
+            text2: "1.4.10 Reflow",
+          },
+          {
+            heading: "Perceivable: Deficiencies in focus and hover functions",
+            text1: "There are parts of the service where the cursor does" +
+                    " not work correctly and pointing functions automatically" +
+                    " trigger a transition to another page automatically. " +
+                    "This is a disadvantage for users of assistive technology.",
+            text2: "1.4.13 Content on Hover or Focus",
+          },
+          {
+            heading: "Operable: Problems with focus order",
+            text1: "When navigating with a keyboard or on a mobile device in"+
+                  " assistive mode, the cursor does not always move logically.",
+            text2: "2.4.3 Focus Order",
+          },
+          {
+            heading: "Operable: Problems with focus visibility",
+            text1: "When navigating the website with a keyboard, the cursor" +
+                  " sometimes disappears completely.",
+            text2: "2.4.7 Focus Visible",
+          },
+          {
+            heading: "Understandable: Problems with focus functions",
+            text1: "In some drop-down menus, hovering over a selection" +
+                    " automatically triggers an action that opens new content" +
+                    " without the user consciously making a selection.",
+            text2: "3.2.1 On Focus",
+          },
+        ],
+      },
+      part3: {
+        heading: "Did you notice an accessibility issue in our" +
+                " digital service? Let us know and we will do our best to" +
+                " correct the shortcoming",
+        subheading: "Reporting issues",
+        text1: "To report any issues, reach out to CSC's service desk:",
+        text2: [
+          { list: "Email" },
+          { list: "Phone" },
+        ],
+      },
+      part4: {
+        heading: "Supervisory authority",
+        authorityLink: "#",
+        authorityName: "Authority name",
+        text: "If you notice accessibility problems on the website," +
+              " start by giving feedback to us, that is, the website" +
+              " administrator. Receiving a response may take 14 days. If you" +
+              " are not satisfied with the response from us or if you do not" +
+              " receive any response within two weeks, you may file a report" +
+              " with the { authorityName }. The agency website has detailed" +
+              " instructions (in Finnish and Swedish only) on how to file a" +
+              " complaint and how the issue will be processed.",
+      },
+      part5: {
+        heading: "Supervisory authority's contact information",
+        text: [
+          { list: "Name" },
+          { list: "Unit" },
+          { list: "Website" },
+          { list: "Email" },
+          { list: "Phone number"},
+        ],
+      },
+      part6: {
+        heading: "We are constantly working to improve accessibility",
+        subheading: "We are committed to improving the accessibility of our" +
+                  " digital services",
+        text1: "We will update this statement as we correct the" +
+                " deficiencies. We are committed to improving the" +
+                " accessibility of online services. We ensure accessibility" +
+                " with, among other things, the following measures: ",
+        text2: [
+          { list: "We take accessibility requirements into account when we" +
+                " develop services." },
+          { list: "We already take accessibility requirements into account" +
+                " when we make purchases." },
+          { list : "We support our staff in producing accessible content." },
+        ],
+      },
     },
   },
 };
