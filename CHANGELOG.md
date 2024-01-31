@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (GL #1187) Trim whitespace from container names before creation
 - (GL #1182) Prevent folder icons in table from shrinking
+- (GL #1198) Faulty subfolders in route should lead to status 404
 
 ### Added
 - (GL #1185) Add Accessibility page (English version)
