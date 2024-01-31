@@ -312,6 +312,15 @@ class FileSlicer {
   }
 }
 
+function clear() {
+  if (downProgressInterval) {
+    clearInterval(downProgressInterval);
+    downProgressInterval = undefined;
+  }
+  totalDone = 0;
+  totalToDo = 0;
+}
+
 function abortDownloads(direct) {
   if (direct) {
     postMessage({
@@ -325,10 +334,7 @@ function abortDownloads(direct) {
         }));
     });
   }
-  clearInterval(downProgressInterval);
-  downProgressInterval = undefined;
-  totalDone = 0;
-  totalToDo = 0;
+  clear();
   aborted = true;
   for (let container in downloads) {
     finishDownloadSession(container);
@@ -660,11 +666,8 @@ self.addEventListener("message", async (e) => {
       break;
     case "keepDownloadProgressing":
       break;
-    case "clearProgressInterval":
-      if (downProgressInterval) {
-        clearInterval(downProgressInterval);
-        downProgressInterval = undefined;
-      }
+    case "clear":
+      clear();
       break;
   }
 });

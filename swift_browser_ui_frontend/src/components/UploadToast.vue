@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { getElementHeightPx } from "@/common/globalFunctions";
+import { moveToast } from "@/common/globalFunctions";
 import ProgressBar from "@/components/UploadProgressBar.vue";
 
 export default {
@@ -73,7 +73,7 @@ export default {
   emits: ["view-container", "close-upload", "cancel-upload"],
   data() {
     return {
-      moved: false,
+      toastMoved: false,
     };
   },
   computed: {
@@ -90,7 +90,7 @@ export default {
   watch: {
     downNotification: {
       handler() {
-        if (this.moved && !this.downNotification.visible ||
+        if (this.toastMoved && !this.downNotification.visible ||
           !this.downNotification.maximized
         ) {
           //restore toast position if no overlap
@@ -116,7 +116,7 @@ export default {
         if (this.downNotification.visible && this.downNotification.maximized) {
           this.moveToast();
         }
-        else this.moved = false;
+        else this.toastMoved = false;
       },0);
 
       setTimeout(() => {
@@ -139,17 +139,10 @@ export default {
       document.querySelector("#upload-toast").removeToast("upload-toast");
     },
     moveToast(restore = false) {
-      let toast = document.querySelector("c-toasts#upload-toast");
-      if (restore) {
-        toast.style.marginBottom = "0";
-        this.moved = false;
-      }
-      else {
-        const h = getElementHeightPx(document
-          .getElementById("download-toasts"));
-        toast.style.marginBottom = h + "px";
-        this.moved = true;
-      }
+      const downloadToast = document?.querySelector("c-toasts#download-toasts");
+      const toastToMove = document?.querySelector("c-toasts#upload-toast");
+      moveToast(toastToMove, downloadToast, restore);
+      this.toastMoved = !restore;
     },
   },
 };

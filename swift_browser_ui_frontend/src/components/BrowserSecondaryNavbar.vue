@@ -164,7 +164,7 @@ export default {
     downloadError() {
       if (this.downloadError) {
         addErrorToastOnMain(this.$t("message.download.error"));
-        this.$store.state.downloadError = false;
+        this.$store.commit("setDownloadError", false);
       }
     },
   },

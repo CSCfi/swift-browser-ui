@@ -99,13 +99,13 @@
 </template>
 
 <script>
-import { getElementHeightPx } from "@/common/globalFunctions";
+import { moveToast } from "@/common/globalFunctions";
 
 export default {
   name: "DownloadNotification",
   data() {
     return {
-      moved: false,
+      toastMoved: false,
     };
   },
   computed: {
@@ -122,7 +122,7 @@ export default {
   watch: {
     upNotification: {
       handler() {
-        if (this.moved && (!this.upNotification.visible ||
+        if (this.toastMoved && (!this.upNotification.visible ||
           !this.upNotification.maximized)) {
           this.moveToast(true);
         }
@@ -145,7 +145,7 @@ export default {
         if (this.upNotification.visible && this.upNotification.maximized) {
           this.moveToast();
         }
-        else this.moved = false;
+        else this.toastMoved = false;
       },0);
     },
     closeNotification() {
@@ -162,20 +162,13 @@ export default {
     },
     removeToast() {
       document.querySelector("#download-toasts")?.removeToast("download-toast");
-      this.moved = false;
+      this.toastMoved = false;
     },
     moveToast(restore = false) {
-      let toast = document.querySelector("c-toasts#download-toasts");
-      if (restore) {
-        toast.style.marginBottom = "0";
-        this.moved = false;
-      }
-      else {
-        const h = getElementHeightPx(document
-          .getElementById("upload-toast"));
-        toast.style.marginBottom = h + "px";
-        this.moved = true;
-      }
+      const toastToMove = document?.querySelector("c-toasts#download-toasts");
+      const uploadToast = document?.querySelector("c-toasts#upload-toast");
+      moveToast(toastToMove, uploadToast, restore);
+      this.toastMoved = !restore;
     },
   },
 };

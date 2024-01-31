@@ -179,7 +179,7 @@ export default class UploadSocket {
           );
           break;
         case "error":
-          this.$store.state.downloadError = true;
+          this.$store.commit("setDownloadError", true);
           if (!this.useServiceWorker) {
             this.$store.commit("toggleDownloadNotification", false);
             this.$store.commit("removeDownload", true);
@@ -198,7 +198,7 @@ export default class UploadSocket {
           if (this.$store.state.downloadCount === 1) {
             this.$store.commit("updateDownloadProgress", 1);
             this.downWorker.postMessage({
-              command: "clearProgressInterval",
+              command: "clear",
             });
             if (DEV) {
               console.log("Clearing download progress interval");

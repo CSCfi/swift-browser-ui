@@ -163,6 +163,9 @@ const store = createStore({
     eraseProgress(state) {
       state.uploadProgress = undefined;
     },
+    setDownloadError(state, payload) {
+      state.downloadError = payload;
+    },
     addDownload(state) {
       state.downloadCount += 1;
     },

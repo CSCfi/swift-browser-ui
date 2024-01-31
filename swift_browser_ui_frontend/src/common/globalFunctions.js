@@ -279,6 +279,14 @@ export function addErrorToastOnMain(msg) {
     );
 }
 
-export function getElementHeightPx(element) {
-  if (element) return element.getBoundingClientRect().height;
+export function moveToast(toastToMove, otherElement, restore) {
+  //restore toast to original position or
+  //move toast above another element
+  if (toastToMove && restore) {
+    toastToMove.style.marginBottom = "0";
+  }
+  else if (toastToMove && otherElement){
+    const h = otherElement.getBoundingClientRect().height;
+    toastToMove.style.marginBottom = h + "px";
+  }
 }
