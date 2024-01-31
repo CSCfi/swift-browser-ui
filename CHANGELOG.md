@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - (GL #1187) Trim whitespace from container names before creation
+- (GL #1182) Prevent folder icons in table from shrinking
 
 ## [2024.01.0]
 
