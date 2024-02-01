@@ -68,6 +68,11 @@
         data-testid="copy-toasts"
       />
       <c-toasts
+        id="decryption-toasts"
+        vertical="center"
+        data-testid="decryption-toasts"
+      />
+      <c-toasts
         id="refresh-toasts"
         data-testid="refresh-toasts"
       >

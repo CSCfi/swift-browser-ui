@@ -11,10 +11,12 @@ export default class UploadSocket {
     active,
     project = "",
     store,
+    t,
   ) {
     this.active = active;
     this.project = project;
     this.$store = store;
+    this.$t = t;
 
     this.inputFiles = {};
     this.outputFiles = {};
@@ -47,6 +49,12 @@ export default class UploadSocket {
       if (DEV) console.log("Could not register a worker for download.");
       if (DEV) console.log("Decrypted downloads are not available.");
     }
+
+    this.toastMessage = {
+      duration: 6000,
+      persistent: false,
+      progress: false,
+    };
 
     // Add message handlers for upload and download workers
     let handleUpWorker = (e) => {
@@ -150,6 +158,18 @@ export default class UploadSocket {
                 with service worker`,
             );
           }
+          break;
+        case "notDecryptable":
+          if (DEV) {
+            console.log(`Could not decrypt all files in container ${e.data.container}`);
+          }
+          document.querySelector("#decryption-toasts").addToast(
+            {
+              ...this.toastMessage,
+              type: "warning",
+              message: this.$t("message.notDecryptable"),
+            },
+          );
           break;
         case "finished":
           if (DEV) {

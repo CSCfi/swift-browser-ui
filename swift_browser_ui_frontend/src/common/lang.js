@@ -242,6 +242,7 @@ let default_translations = {
       copysuccess: "Copying in progress",
       copytime: "It may take few seconds",
       copyfail: "Failed to copy the folder",
+      notDecryptable: "Some requested files could not be decrypted.",
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
@@ -780,6 +781,7 @@ let default_translations = {
       copysuccess: "Kansiota kopioidaan",
       copytime: "Se voi kestää muutaman sekunnin",
       copyfail: "Kansion kopiointi epäonnistui",
+      notDecryptable: "Salauksen purkaminen epäonnistui osassa tiedostoja.",
       tagName: "Asiasanat",
       tagPlaceholder: "# Lisää asiasana ja paina rivinvaihtoa",
       container_ops: {
