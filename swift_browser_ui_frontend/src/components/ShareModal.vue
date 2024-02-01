@@ -53,9 +53,19 @@
           <p>
             {{ $t("message.share.share_guide_intro") }}
           </p>
-          <!-- eslint-disable vue/no-v-html -->
-          <p v-html="$t('message.share.share_guide_step1')" />
-          <p v-html="$t('message.share.share_guide_step2')" />
+          <p>
+            <i18n-t
+              keypath="message.share.share_guide_step1b"
+              tag="b"
+            />
+            <i18n-t
+              keypath="message.share.share_guide_step1"
+            />
+          </p>
+          <i18n-t
+            keypath="message.share.share_guide_step2"
+            tag="b"
+          />
           <!-- eslint-enable vue/no-v-html -->
           <ul>
             <li>
@@ -69,7 +79,13 @@
             <li>
               <b>{{ $t("message.share.view_perm") }}</b>{{
                 $t("message.share.view_perm_desc") }}
-            </li>
+            </li>            
+            <li
+              v-for="(item, i) in
+                $tm('message.share.share_guide_step2_list')"
+              :key="i"
+              v-html="item"
+            />
           </ul>
         </div>
         <TagInput
@@ -169,6 +185,7 @@ import {
   addNewTag,
   deleteTag,
 } from "@/common/globalFunctions";
+
 import {
   addFocusClass,
   removeFocusClass,

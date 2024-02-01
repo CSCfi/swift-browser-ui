@@ -142,19 +142,29 @@ let default_translations = {
         close: "Close",
         instructions: "How to share a folder",
         close_instructions: "Hide",
-        share_cont: "Share the folder",
         share_title: "Share folder",
         share_other_projects: "Share with other projects",
         share_guide_intro:
           "To share a folder with another project you need to:",
+        share_guide_step1b: "1. Enter the Share ID. ",
         share_guide_step1:
-          "1. <b>Enter the Share ID.</b> You need to know in advance " +
+          "You need to know in advance " +
           "the Share ID (a 32-digit code) associated " +
           "with the project you want to share a folder with. The " +
           "recipient can copy the Share ID from the user " +
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
-        share_guide_step2: "2. <b>Select the permission rights:</b> ",
+        share_guide_step2: "2. Select the permission rights:",
+        share_guide_step2_list: [
+          "<b>View:</b> project members can access the folder's content " +
+            "but can not directly download or copy " +
+            "its content.",
+          "<b>Copy and download:</b> project members can copy, download " +
+            "and decrypt the folder content.",
+          "<b>Copy, download and upload:</b> project members can copy, " +
+            "download and decrypt the folder content. They can also upload " +
+            "new files to the shared folder accessible to both projects.",
+        ],
         permissions: "Permissions",
         view_perm: "View",
         view_perm_desc:
@@ -696,12 +706,12 @@ let default_translations = {
         close: "Sulje",
         instructions: "Kuinka jaan kansion",
         close_instructions: "Sulje ohjeet",
-        share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro: "Kun haluat jakaa kansion toisen projektin kanssa: ",
+        share_guide_step1b: "Syötä jakamistunnus. ",
         share_guide_step1:
-          "1. <b>Syötä jakamistunnus.</b> Sinun tulee tietää " +
+          "1. Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
           "koodi). Vastaanottaja voi kopioida " +
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
