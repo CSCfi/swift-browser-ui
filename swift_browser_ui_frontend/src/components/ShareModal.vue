@@ -84,8 +84,12 @@
               v-for="(item, i) in
                 $tm('message.share.share_guide_step2_list')"
               :key="i"
-              v-html="item"
-            />
+            >
+              <b>
+                {{ item.slice(0,item.indexOf(":")+1) }}
+              </b>
+              {{ item.slice(item.indexOf(":")+1, item.length) }}
+            </li>
           </ul>
         </div>
         <TagInput
@@ -185,7 +189,6 @@ import {
   addNewTag,
   deleteTag,
 } from "@/common/globalFunctions";
-
 import {
   addFocusClass,
   removeFocusClass,

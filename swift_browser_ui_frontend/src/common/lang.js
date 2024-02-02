@@ -156,12 +156,13 @@ let default_translations = {
           "a folder with multiple projects.",
         share_guide_step2: "2. Select the permission rights:",
         share_guide_step2_list: [
-          "<b>View:</b> project members can access the folder's content " +
+          "View: project members can access" +
+            "the folder's content " +
             "but can not directly download or copy " +
             "its content.",
-          "<b>Copy and download:</b> project members can copy, download " +
+          "Copy and download: project members can copy, download " +
             "and decrypt the folder content.",
-          "<b>Copy, download and upload:</b> project members can copy, " +
+          "Copy, download and upload: project members can copy, " +
             "download and decrypt the folder content. They can also upload " +
             "new files to the shared folder accessible to both projects.",
         ],
@@ -709,15 +710,24 @@ let default_translations = {
         share_title: "Jaa kansio ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro: "Kun haluat jakaa kansion toisen projektin kanssa: ",
-        share_guide_step1b: "Syötä jakamistunnus. ",
+        share_guide_step1b: "1. Syötä jakamistunnus. ",
         share_guide_step1:
-          "1. Sinun tulee tietää " +
+          "Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
           "koodi). Vastaanottaja voi kopioida " +
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
-        share_guide_step2: "2. <b>Valitse käyttöoikeudet:</b> ",
+        share_guide_step2: "2. Valitse käyttöoikeudet: ",
+        share_guide_step2_list: [
+          "Tarkastele: projektin jäsenet voivat tarkastella kansion " +
+            "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
+          "Kopioi ja lataa: projektin jäsenet voivat kopioida ja " +
+            "ladata kansion sisällön sekä purkaa kansion sisällön salauksen.",
+          "Kopioi, lataa ja lähetä: projektin jäsenet voivat kopioida " +
+            "ja ladata kansion sisällön sekä purkaa kansion sisällön " +
+            "salauksen. He voivat myös lähettää tiedostoja jaettuun kansioon.",
+        ],
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
         view_perm_desc:
