@@ -162,10 +162,10 @@ function decryptChunk(container, path, enChunk) {
 function getFileSize(response, key) {
   // Use encrypted size as the total file size if the file can't be decrypted
   const ensize = parseInt(response.headers.get("Content-Length"));
-  return key !=0 ? 
+  return key !=0 ?
   (Math.floor(ensize / 65564) * 65536) +
     (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-  ensize;  
+  ensize;
 }
 
 function startProgressInterval() {
