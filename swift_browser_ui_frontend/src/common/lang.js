@@ -133,10 +133,11 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         share_id_copy: "Copy Share ID",
+        share_id_tooltipb: "currently selected",
         share_id_tooltip:
           "With this action, you can copy the Share ID: " +
-          "a unique 32-digit code associated with your <b>currently " +
-          "selected</b> project. Provide the Share ID to members " +
+          "a unique 32-digit code associated with your {tooltipb} " +
+          "project. Provide the Share ID to members " +
           "of other projects (e.g., via email) so that they can " +
           "share folders with you.",
         close: "Close",
@@ -699,9 +700,10 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jakamistunnus",
         share_id_copy: "Kopioi jakamistunnus",
+        share_id_tooltipb: "valitsemaasi",
         share_id_tooltip:
           "Tällä toiminnolla voit kopioida jakamistunnuksen: uniikin " +
-          "32-numeroisen koodin, joka on yhdistetty <b>valitsemaasi</b> " +
+          "32-numeroisen koodin, joka on yhdistetty {tooltipb} " +
           "projektiin. Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa kansioita sinulle.",
         close: "Sulje",

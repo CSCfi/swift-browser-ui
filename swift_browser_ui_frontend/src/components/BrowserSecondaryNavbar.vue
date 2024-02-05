@@ -52,14 +52,21 @@
             :path="mdiInformationOutline"
             tabindex="0"
           />
-          <!-- eslint-disable vue/no-v-html -->
           <span
             id="shareid-tooltip-content"
             class="tooltip-content"
-            role="tootip"
-            v-html="$t('message.share.share_id_tooltip')"
-          />
-          <!-- eslint-enable vue/no-v-html -->
+            role="tooltip"
+          >
+            <i18n-t
+              keypath="message.share.share_id_tooltip"
+            >
+              <template #tooltipb>
+                <b>
+                  {{ $t("message.share.share_id_tooltipb") }}
+                </b>
+              </template>
+            </i18n-t>
+          </span>
         </div>
       </div>
       <c-toasts

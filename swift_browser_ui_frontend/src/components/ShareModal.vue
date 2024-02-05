@@ -79,7 +79,7 @@
             <li>
               <b>{{ $t("message.share.view_perm") }}</b>{{
                 $t("message.share.view_perm_desc") }}
-            </li>            
+            </li>
             <li
               v-for="(item, i) in
                 $tm('message.share.share_guide_step2_list')"
