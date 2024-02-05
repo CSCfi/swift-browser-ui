@@ -52,9 +52,11 @@ esim
 esimerkiksi
 esitetty
 estetty
+eteenpäin
 etsi
 etsimääsi
 etsittyä
+ettei
 että
 etusivulle
 etusivun
@@ -75,6 +77,7 @@ hetki
 hinnoittelu
 hinnoittelulaskuri
 huoltokatkoistamme
+huomaa
 hyväksy
 hyväksyä
 hyväksyäksesi
@@ -84,6 +87,7 @@ ja
 jaa
 jaan
 jaat
+jaeta
 jaetaan
 jaettava
 jaettavaksi
@@ -92,6 +96,7 @@ jaettiin
 jaettu
 jaettua
 jaettuja
+jaettuna
 jaettuun
 jaetun
 jaetusta
@@ -143,6 +148,7 @@ kansioina
 kansioita
 kansion
 kansioon
+kansiosi
 kansiossa
 kansiosta
 kansiot
@@ -251,6 +257,7 @@ leikepöydälle
 liitä
 linkki
 lista
+lisäksi
 lisätietoja
 lisättiin
 lisätty
@@ -355,6 +362,7 @@ ohjeita
 oikeuden
 oikeudet
 oikeuksia
+oikeuksien
 ole
 olemassa
 olet
@@ -367,6 +375,7 @@ oli
 olla
 omaa
 ominaisuutta
+omistaja
 omistavan
 on
 ongelmiin
@@ -513,7 +522,9 @@ sen
 sessiosi
 seuraava
 siirry
+siirrä
 siirto
+siirtää
 sinulle
 sinun
 sisällön
@@ -577,9 +588,11 @@ tekstinä
 tiedosto
 tiedostoa
 tiedostoja
+tiedostojasi
 tiedostojen
 tiedostolle
 tiedoston
+tiedostosi
 tiedostot
 tiedot
 tieteen
@@ -632,6 +645,7 @@ tyhjiä
 tyhjä
 tyyppi
 työkaluvinkki
+työtilana
 tägejä
 tägillä
 tägit
@@ -678,6 +692,7 @@ valmiina
 valmis
 varmasti
 varmistathan
+varmuuden
 varten
 vastaanottaja
 vastaanottajan
@@ -706,6 +721,7 @@ yhdelle
 yhden
 yhdistetty
 yhteenlaskettu
+yhteiskäyttö
 yhteys
 yhtään
 yksityinen

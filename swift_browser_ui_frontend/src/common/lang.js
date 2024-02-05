@@ -77,17 +77,15 @@ let default_translations = {
         notShared: "This folder isn't shared with other projects.",
         sharing_to_one_project: "This folder is shared to one project.",
         sharing_to_many_projects: "This folder is shared to multiple projects.",
-        shared_with_view: "This folder is shared with you. You can browse " +
-        "this folder. (View).",
+        shared_with_view:
+          "You can browse this folder. (@:message.share.view_perm)",
         shared_with_read:
-          "This folder is shared with you. You can copy and download " +
-          "the files in this folder as well as decrypt them. " +
-          "(Copy and download).",
+          "You can copy this folder and download files in decrypted format. " +
+          "(@:message.share.read_perm)",
         shared_with_read_write:
-          "This folder is shared with you. You can copy and download " +
-          "the files in this folder as well as decrypt them. " +
-          "You can also upload files to this folder. " +
-          "(Copy, download and upload).",
+          "You can copy this folder and download files in decrypted format. " +
+          "You can upload new files or delete existing files from this " +
+          "folder. (@:message.share.write_perm)",
       },
       table: {
         name: "Name",
@@ -176,14 +174,14 @@ let default_translations = {
           "need maximum certainty that your files are not distributed " +
           "further. Note that you have to be also the project manager of " +
           "the recipient project.",
-        read_perm: "Copy and download",
+        read_perm: "Transfer data",
         read_perm_desc:
           ": The recipient project's members can copy your folder " +
-          "and download decrypted files. Use this when you want to transfer " +
-          "your data to another project.",
-        write_perm: "Copy, download and upload",
+          "and download files in decrypted format. Use this when you want to " +
+          "transfer your data to another project.",
+        write_perm: "Collaborate",
         write_perm_desc:
-          ": In addition to Read-only permission, " +
+          ": In addition to @:message.share.read_perm permission, " +
           "the recipient project's members can upload new files or delete " +
           "existing files from your folder. Use this when " +
           "you want the folder to be your shared workspace.",
@@ -636,17 +634,17 @@ let default_translations = {
         notShared: "Tätä kansiota ei ole jaettu toiselle projektille.",
         sharing_to_one_project: "Tämä kansio on jaettu yhdelle projektille.",
         sharing_to_many_projects: "Tämä kansio on jaettu useille projekteille.",
-        shared_with_view: "Tämä kansio on jaettu kanssasi. Voit " +
-        "selata tätä kansiota. (Katsele).",
+        shared_with_view:
+          "Voit selata tätä kansiota. (@:message.share.view_perm)",
         shared_with_read:
-          "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
+          "Voit kopioida kansion, ladata " +
           "tiedostoja tässä kansiossa ja purkaa kansion sisällön " +
-          "salauksen. (Kopioi ja lataa).",
+          "salauksen. (@:message.share.read_perm)",
         shared_with_read_write:
-          "Tämä kansio on jaettu kanssasi. Voit kopioida ja ladata " +
+          "Voit kopioida ja ladata " +
           "tiedostoja, sekä purkaa kansion sisällön salauksen. " +
-          "Voit myös lähettää tiedostoja tähän kansioon. " +
-          "(Kopioi, lataa ja lähetä).",
+          "Voit lähettää uusia tai poistaa jo kansiossa olevia tiedostoja. " +
+          "(@:message.share.write_perm)",
       },
       table: {
         name: "Nimi",
@@ -731,11 +729,22 @@ let default_translations = {
             "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
-        view_perm_desc: "", //TODO
-        read_perm: "Kopioi ja lataa",
-        read_perm_desc: "", //TODO
-        write_perm: "Kopioi, lataa ja lähetä",
-        write_perm_desc: "", //TODO
+        view_perm_desc:
+          ": Vastaanottavan projektin jäsenet voivat tarkastella kansion " +
+          "sisältöä. Käytä tätä, kun tarvitset varmuuden, ettei " +
+          "tiedostojasi jaeta eteenpäin. Huomaa, että " +
+          "sinun tulee olla myös vastaanottavan projektin omistaja.",
+        read_perm: "Siirrä tiedostot",
+        read_perm_desc:
+          ": Vastaanottavan projektin jäsenet voivat kopioida kansiosi " +
+          ", ladata tiedostot sekä purkaa kansion sisällön salauksen. " +
+          "Käytä tätä, kun haluat siirtää tiedostosi toiselle projektille.",
+        write_perm: "Yhteiskäyttö",
+        write_perm_desc:
+          ": @:message.share.read_perm -oikeuksien lisäksi vastaanottavan " +
+          "projektin jäsenet voivat lähettää uusia tai poistaa jo kansiossa " +
+          "olevia tiedostoja. Käytä tätä, kun haluat käyttää " +
+          "kansiota jaettuna työtilana.",
         shared_successfully: "Kansion jakaminen onnistui.",
         remove_permission: "Käyttöoikeus poistettiin onnistuneesti.",
         update_permission: "Käyttöoikeus muutettiin onnistuneesti.",
