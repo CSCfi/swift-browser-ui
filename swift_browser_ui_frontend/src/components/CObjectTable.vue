@@ -311,6 +311,10 @@ export default {
           return obj.name.startsWith(getPrefix(this.$route));
         });
 
+      if (this.objs.length > 0 && filteredObjs.length == 0) {
+        window.location.pathname = "/notfound";
+      }
+
       let pagedLength = 0;
 
       this.objects = filteredObjs.reduce((items, item) => {
