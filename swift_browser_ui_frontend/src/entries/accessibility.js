@@ -1,10 +1,8 @@
 import { newApp } from "@/entries/index_app_factory";
 import AccessibilityPage from "@/pages/AccessibilityPage.vue";
 
-import "@/css/prod.scss";
-
 const app = newApp(
-  "Accessibility",
+  "AccessibilityPage",
   () => {
     return {
       notindex: true,

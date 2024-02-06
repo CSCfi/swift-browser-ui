@@ -1,11 +1,6 @@
 <template>
   <c-main>
-    <c-toolbar class="relative">
-      <c-csc-logo />
-      {{ $t('message.program_name') }}
-      <c-spacer />
-      <LanguageSelector />
-    </c-toolbar>
+    <MainToolbar />
     <c-row>
       <c-flex>
         <c-container class="padding">
@@ -44,6 +39,17 @@
     <CFooter />
   </c-main>
 </template>
+
+<script>
+export default {
+  methods: {
+    loginButtonClick: function() {
+      this.loading = true;
+      window.location.pathname = this.$t("message.indexOIDC.href");
+    },
+  },
+};
+</script>
 
 <style>
 

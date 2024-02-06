@@ -8,19 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- (GL #1205) Add a route back to front page from top toolbar
+
+### Changed
+- Refactor entries' files, IndexPage and IndexOIDCPage
+
+## [2024.02.0]
+
+### Added
 - (GL #1203) Add a warning when deleting files from a shared folder
+- (GL #1185) Add Accessibility page (English version)
+- (GL #1174) Download files that cannot be decrypted directly as is
 
 ### Changed
 - (GL #1202) Change the status text of unshared folder
+- Package dependency updates
 
 ### Fixed
 - (GL #1187) Trim whitespace from container names before creation
 - (GL #1182) Prevent folder icons in table from shrinking
 - (GL #1198) Faulty subfolders in route should lead to status 404
-
-### Added
-- (GL #1185) Add Accessibility page (English version)
-- (GL #1174) Download files that cannot be decrypted directly as is
 
 ## [2024.01.0]
 
@@ -345,5 +352,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - removed vue-material-design-icons
 
 [unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...main
+[2024.02.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...2024.02.0
 [2024.01.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/3.0.0...2024.01.0
 [2023.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/v2.0.0...3.0.0

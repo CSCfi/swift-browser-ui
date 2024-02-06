@@ -1,11 +1,6 @@
 <template>
   <c-main>
-    <c-toolbar class="relative">
-      <c-csc-logo />
-      {{ $t('message.program_name') }}
-      <c-spacer />
-      <LanguageSelector />
-    </c-toolbar>
+    <MainToolbar />
     <c-row v-if="!notindex && idb">
       <c-flex>
         <c-container class="padding">
@@ -120,19 +115,7 @@
 </template>
 
 <script>
-import checkIDB from "@/common/idb_support";
-import CFooter from "@/components/CFooter.vue";
-import LanguageSelector from "@/components/CLanguageSelector.vue";
-
-export default {
-  components:{
-    CFooter,
-    LanguageSelector,
-  },
-  mounted: function () {
-    checkIDB().then(result => this.idb = result);
-  },
-};
+export default {};
 </script>
 
 <style>

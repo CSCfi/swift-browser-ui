@@ -1,11 +1,6 @@
 <template>
   <c-main>
-    <c-toolbar class="relative">
-      <c-csc-logo />
-      {{ $t('message.program_name') }}
-      <c-spacer />
-      <LanguageSelector />
-    </c-toolbar>
+    <MainToolbar />
     <c-row
       class="title-row"
       align="center"
@@ -118,15 +113,7 @@
 </template>
 
 <script>
-import CFooter from "@/components/CFooter.vue";
-import LanguageSelector from "@/components/CLanguageSelector.vue";
-
-export default {
-  components:{
-    CFooter,
-    LanguageSelector,
-  },
-};
+export default {};
 </script>
 
 <style lang="scss" scoped>

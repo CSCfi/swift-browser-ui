@@ -1,8 +1,6 @@
 import { newApp } from "@/entries/index_app_factory";
 import IndexPage from "@/pages/IndexPage.vue";
 
-import "@/css/prod.scss";
-
 const app = newApp(
   "UnauthorizedPage",
   () => {
