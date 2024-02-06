@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1203) Add a warning when deleting files from a shared folder
 - (GL #1185) Add Accessibility page (English version)
 - (GL #1174) Download files that cannot be decrypted directly as is
+- (GL #1207) Make vault service id configurable via environment variable
 
 ### Changed
 - (GL #1202) Change the status text of unshared folder
