@@ -11,6 +11,8 @@ from aiohttp import ClientSession, ClientTimeout
 from aiohttp.web import HTTPError, HTTPGatewayTimeout, HTTPInternalServerError
 from yarl import URL
 
+from swift_browser_ui.ui.settings import setd
+
 LOGGER = logging.getLogger("swift_browser_ui.common.vault_client")
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
@@ -81,7 +83,7 @@ class VaultClient:
     """AioHttp client that interacts with a Vault server."""
 
     _vault_token = str()
-    service = "SD-Connect"
+    service = setd["vault_service_id"]
 
     def __init__(self, http_client: ClientSession):
         """Reuse an existing http client, and load environment variables.
