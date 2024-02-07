@@ -186,7 +186,6 @@ class FileSlicer {
   ) {
     this.reader = input;
     this.output = output;
-    this.stream;
     this.container = container;
     this.path = path;
     this.chunk = undefined;
@@ -275,41 +274,24 @@ class FileSlicer {
     // Get the first chunk from stream
     await this.getStart();
 
-    // Write at most 256 MiB before reopening the stream.
-    // Chrome caches the writes in memory until the file is closed, so
-    // for larger files the download needs to be periodically paused
-    // to allow filesystem synchronization.
-    let refreshStream = 268435456;
-    if (this.output instanceof FileSystemFileHandle) {
-      this.stream = await this.output.createWritable({keepExistingData: true});
-    } else {
-      this.stream = this.output;
-    }
-
     // Slice the file and write decrypted content to output
     let enChunk = await this.getSlice();
     while (enChunk !== undefined) {
-      if (this.stream instanceof WritableStream) {
+      if (this.output instanceof WritableStream) {
         // Write the decrypted contents directly in the file stream if
         // downloading to File System
-        await this.stream.write(decryptChunk(
+        await this.output.write(decryptChunk(
           this.container,
           this.path,
           enChunk,
         ));
-        refreshStream -= 65536;
-        if (refreshStream <= 0) {
-          refreshStream = 268435456;
-          await this.stream.close();
-          this.stream = await this.output.createWritable({keepExistingData: true});
-        }
       } else {
         // Otherwise queue to the streamController since we're using a
         // ServiceWorker for downloading
-        while(this.stream.desiredSize <= 0) {
+        while(this.output.desiredSize <= 0) {
           await timeout(10);
         }
-        this.stream.enqueue(decryptChunk(
+        this.output.enqueue(decryptChunk(
           this.container,
           this.path,
           enChunk,
@@ -328,7 +310,6 @@ class FileSlicer {
       ["number"],
       [downloads[this.container].files[this.path].key],
     );
-    await this.stream.close();
     return true;
   }
 }
@@ -422,10 +403,10 @@ async function beginDownloadInSession(
     for (const path of folderPaths) {
       if (downloads[container].direct) {
         await fileStream.write(
-          enc.encode(addTarFolder(path)),
+          addTarFolder(path),
         );
       } else {
-        fileStream.enqueue(enc.encode(addTarFolder(path)));
+        fileStream.enqueue(addTarFolder(path));
       }
     }
   }
@@ -439,7 +420,6 @@ async function beginDownloadInSession(
     if (!downProgressInterval) {
       downProgressInterval = startProgressInterval();
     }
-    await fileStream.close();
   }
 
   for (const file in downloads[container].files) {
@@ -456,17 +436,13 @@ async function beginDownloadInSession(
     const response = await fetch(downloads[container].files[file].url);
     let path = file.replace(".c4gh", "");
 
-    if (downloads[container].direct) {
-      fileStream = await fileHandle.createWritable({keepExistingData: true});
-    }
-
     if (downloads[container].archive) {
       const size = getFileSize(response, downloads[container].files[file].key);
 
-      let fileHeader = enc.encode(addTarFile(
+      let fileHeader = addTarFile(
         downloads[container].files[file].key != 0 ? path : file,
         size,
-      ));
+      );
 
       if (downloads[container].direct) {
         await fileStream.write(fileHeader);
@@ -475,13 +451,9 @@ async function beginDownloadInSession(
       }
     }
 
-    if (downloads[container].direct) {
-      await fileStream.close();
-    }
-
     const slicer = new FileSlicer(
       response.body.getReader(),
-      fileHandle,
+      fileStream,
       container,
       file);
 
@@ -503,7 +475,6 @@ async function beginDownloadInSession(
     if (downloads[container].archive) {
       // Write the end of the archive
       if (downloads[container].direct) {
-        fileStream = await fileHandle.createWritable({keepExistingData: true});
         await fileStream.write(enc.encode("\x00".repeat(1024)));
       } else {
         fileStream.enqueue(enc.encode("\x00".repeat(1024)));

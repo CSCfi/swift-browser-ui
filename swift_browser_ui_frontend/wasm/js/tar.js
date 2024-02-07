@@ -9,6 +9,17 @@ function calcChecksum(header) {
   return checksumStr;
 }
 
+// Convert a header to an array, since TextEncoder can't deal with non 7-bit ASCII
+function convertToArray(header) {
+  let ret = [];
+
+  for (let i = 0; i < header.length; i++) {
+    ret.push(header.charCodeAt(i));
+  }
+
+  return new Uint8Array(ret);
+}
+
 const headerEnd =
   //header end (355B) same for all cases
   "\x00".repeat(100)  // Linked file name, 100 bytes, skip as NUL
@@ -98,7 +109,7 @@ export function addTarFolder(path) {
     ;
     header = header.replace("        ", calcChecksum(header));
   }
-  return header;
+  return convertToArray(header);
 }
 
 // Add a file to the tar archive structure
@@ -118,12 +129,13 @@ export function addTarFile(path, size) {
 
     let base256 = [];
     do {
-      base256.unshift(String.fromCharCode(Number(bytes%256n)));
+      base256.unshift(Number(bytes%256n));
       bytes = bytes/256n;
     } while (bytes);
 
-    while (base256.length < 12) base256.unshift("0x00");
+    while (base256.length < 12) base256.unshift(0);
     base256[0] |= 0x80;
+    base256 = base256.map(i => String.fromCharCode(i));
     sizeStr = base256.join("");
   }
 
@@ -138,7 +150,7 @@ export function addTarFile(path, size) {
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
       // Size in octal ASCII, 11 bytes + padding NUL
-      + (path.length + 1).toString(8).padStart(11, "0") + "\x00"
+      + sizeStr
       // Last modification, not used, 11 bytes + padding NUL
       + "00000000000\x00"
       + "        "  // checksum placeholder
@@ -164,7 +176,7 @@ export function addTarFile(path, size) {
       + "0000000\x00"
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
-      // Size in octal ASCII, 11 bytes + padding NUL
+      // Size in octal ASCII or base256, 11 bytes + padding NUL
       + sizeStr
       // Last modification, not used, 11 bytes + padding NUL
       + mtime.padStart(11, "0") + "\x00"
@@ -184,7 +196,7 @@ export function addTarFile(path, size) {
       + "0000000\x00"
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
-      // Size in octal ASCII, 11 bytes + padding NUL
+      // Size in octal ASCII or base256, 11 bytes + padding NUL
       + sizeStr
       // Last modification, not used, 11 bytes + padding NUL
       + mtime.padStart(11, "0") + "\x00"
@@ -197,5 +209,5 @@ export function addTarFile(path, size) {
     header = header.replace("        ", calcChecksum(header));
   }
 
-  return header;
+  return convertToArray(header);
 }
