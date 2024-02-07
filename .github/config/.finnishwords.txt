@@ -20,6 +20,7 @@ asiasana
 asiasanalla
 asiasanat
 asiasanoja
+avaaminen
 avaimelle
 avaimen
 avaimet
@@ -136,6 +137,7 @@ kaikille
 kaikki
 kaikkien
 kansio
+kansioiden
 kansioille
 kansioina
 kansioita
@@ -241,6 +243,7 @@ laskutuksesta
 laskutusyksiköiden
 laskutusysiköiden
 lataa
+latauksen
 lataukset
 lataus
 latauslinkki
@@ -698,6 +701,7 @@ voivat
 vuoksi
 vähintään
 väliaikaiseen
+väliaikaisten
 yhdelle
 yhden
 yhdistetty

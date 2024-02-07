@@ -42,8 +42,18 @@ const store = createStore({
     encryptedFile: "",
     encryptedFileProgress: undefined,
     uploadProgress: undefined,
-    uploadNotification: false,
-    uploadNotificationClosable: false,
+    uploadNotification: {
+      visible: false,
+      maximized: true,
+      closable: false,
+    },
+    downloadCount: 0,
+    downloadProgress: undefined,
+    downloadNotification: {
+      visible: false,
+      maximized: true,
+    },
+    downloadError: false,
     altContainer: undefined,
     uploadInfo: undefined,
     uploadEndpoint: "",
@@ -104,7 +114,9 @@ const store = createStore({
     },
     setUploading(state) {
       state.isUploading = true;
-      if (!state.uploadNotification) state.uploadNotification = true;
+      if (!state.uploadNotification.visible) {
+        state.uploadNotification.visible = true;
+      }
     },
     stopUploading(state, cancelled = false) {
       state.isUploading = false;
@@ -112,7 +124,9 @@ const store = createStore({
     },
     setChunking(state) {
       state.isChunking = true;
-      if (!state.uploadNotification) state.uploadNotification = true;
+      if (!state.uploadNotification.visible) {
+        state.uploadNotification.visible = true;
+      }
     },
     stopChunking(state) {
       state.isChunking = false;
@@ -130,13 +144,40 @@ const store = createStore({
       state.encryptedFileProgress = undefined;
     },
     toggleUploadNotification(state, payload) {
-      state.uploadNotification = payload;
+      state.uploadNotification.visible = payload;
+    },
+    toggleUploadNotificationSize(state) {
+      state.uploadNotification.maximized =
+        !state.uploadNotification.maximized;
+    },
+    toggleDownloadNotification(state, payload) {
+      state.downloadNotification.visible = payload;
+    },
+    toggleDownloadNotificationSize(state) {
+      state.downloadNotification.maximized =
+        !state.downloadNotification.maximized;
     },
     updateProgress(state, progress) {
       state.uploadProgress = progress;
     },
     eraseProgress(state) {
       state.uploadProgress = undefined;
+    },
+    setDownloadError(state, payload) {
+      state.downloadError = payload;
+    },
+    addDownload(state) {
+      state.downloadCount += 1;
+    },
+    removeDownload(state, all = false) {
+      if (all) state.downloadCount = 0;
+      else state.downloadCount -= 1;
+    },
+    updateDownloadProgress(state, progress) {
+      state.downloadProgress = progress;
+    },
+    eraseDownloadProgress(state) {
+      state.downloadProgress = undefined;
     },
     setAltContainer(state, altContainer) {
       state.altContainer = altContainer;
@@ -206,18 +247,18 @@ const store = createStore({
     },
     setCurrentUpload(state, cur) {
       state.currentUpload = cur;
-      state.uploadNotificationClosable = false;
+      state.uploadNotification.closable = false;
     },
     eraseCurrentUpload(state) {
       delete state.currentUpload;
       state.currentUpload = undefined;
-      state.uploadNotificationClosable = true;
+      state.uploadNotification.closable = true;
     },
     setNotClosable(state) {
-      state.uploadNotificationClosable = false;
+      state.uploadNotification.closable = false;
     },
     eraseNotClosable(state) {
-      state.uploadNotificationClosable = true;
+      state.uploadNotification.closable = true;
     },
     createCurrentUploadAbort(state) {
       state.uploadAbort = new AbortController();

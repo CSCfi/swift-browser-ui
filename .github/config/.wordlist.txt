@@ -20,6 +20,8 @@ cli
 configs
 containerport
 cp
+crdownload
+crswap
 cryptfiles
 cryptupload
 csc

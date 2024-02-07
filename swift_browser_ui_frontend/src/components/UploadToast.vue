@@ -3,14 +3,10 @@
     <div class="toast-wrapper">
       <c-row justify="space-between">
         <div class="col">
-          <h3 v-if="closable">
-            {{ $t("message.upload.complete") }}
-          </h3>
-          <h3 v-else-if="!notificationToggled">
-            {{ $t("message.upload.hasStarted") }}
-          </h3>
-          <h3 v-else>
-            {{ $t("message.upload.longProgress") }}
+          <h3>
+            {{ closable ?
+              $t("message.upload.complete") :
+              $t("message.upload.inProgress") }}
           </h3>
         </div>
         <div class="col">
@@ -66,6 +62,7 @@
 </template>
 
 <script>
+import { moveToast } from "@/common/globalFunctions";
 import ProgressBar from "@/components/UploadProgressBar.vue";
 
 export default {
@@ -73,13 +70,34 @@ export default {
   components: {
     ProgressBar,
   },
-  props: ["notificationToggled"],
+  emits: ["view-container", "close-upload", "cancel-upload"],
+  data() {
+    return {
+      toastMoved: false,
+    };
+  },
   computed: {
     currentFile() {
       return this.$store.state.encryptedFile;
     },
     closable() {
-      return this.$store.state.uploadNotificationClosable;
+      return this.$store.state.uploadNotification.closable;
+    },
+    downNotification() {
+      return this.$store.state.downloadNotification;
+    },
+  },
+  watch: {
+    downNotification: {
+      handler() {
+        if (this.toastMoved && !this.downNotification.visible ||
+          !this.downNotification.maximized
+        ) {
+          //restore toast position if no overlap
+          this.moveToast(true);
+        }
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -95,6 +113,10 @@ export default {
           custom: true,
           horizontal: "center",
         });
+        if (this.downNotification.visible && this.downNotification.maximized) {
+          this.moveToast();
+        }
+        else this.toastMoved = false;
       },0);
 
       setTimeout(() => {
@@ -110,11 +132,17 @@ export default {
       this.$emit("cancel-upload");
     },
     minimizeToast() {
+      this.$store.commit("toggleUploadNotificationSize");
       this.removeToast();
-      this.$emit("toggle-notification");
     },
     removeToast() {
       document.querySelector("#upload-toast").removeToast("upload-toast");
+    },
+    moveToast(restore = false) {
+      const downloadToast = document?.querySelector("c-toasts#download-toasts");
+      const toastToMove = document?.querySelector("c-toasts#upload-toast");
+      moveToast(toastToMove, downloadToast, restore);
+      this.toastMoved = !restore;
     },
   },
 };

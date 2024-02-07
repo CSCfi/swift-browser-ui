@@ -139,6 +139,7 @@ import {
   toggleDeleteModal,
   isFile,
   updateObjectsAndObjectTags,
+  addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -371,13 +372,7 @@ export default {
         toggleDeleteModal([item]);
         if (keypress) this.moveFocusToDeleteModal();
       } else {
-        document.querySelector("#container-error-toasts").addToast(
-          {
-            progress: false,
-            type: "error",
-            duration: 6000,
-            message: this.$t("message.subfolders.deleteNote"),
-          });
+        addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
       }
     },
     getCurrentContainer: function () {

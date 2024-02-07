@@ -243,6 +243,7 @@ import {
   getProjectNumber,
   validateFolderName,
   checkIfItemIsLastOnPage,
+  addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
   getFocusableElements,
@@ -509,16 +510,7 @@ export default {
       }
     },
     uploadError() {
-      if (this.uploadError) {
-        document.querySelector("#container-error-toasts").addToast(
-          {
-            type: "error",
-            duration: 6000,
-            progress: false,
-            message: this.uploadError,
-          },
-        );
-      }
+      if (this.uploadError) addErrorToastOnMain(this.uploadError);
     },
   },
   updated() {

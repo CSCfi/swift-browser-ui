@@ -1,5 +1,6 @@
 <template>
   <c-alert
+    id="upload-alert"
     type="success"
   >
     <c-row
@@ -7,11 +8,14 @@
       justify="space-between"
       align="center"
     >
-      <h3 v-if="closable">
-        {{ $t("message.upload.complete") }}
-      </h3>
-      <h3 v-else>
-        {{ $t("message.upload.inProgress") }}
+      <h3>
+        <i
+          slot="icon"
+          class="mdi mdi-tray-arrow-up"
+        />
+        {{ closable ?
+          $t("message.upload.complete") :
+          $t("message.upload.inProgress") }}
       </h3>
 
       <ProgressBar />
@@ -23,29 +27,30 @@
       >
         {{ $t("message.upload.viewDestinationFolder") }}
       </a>
-
-      <a
-        ref="maximize"
-        href="javascript:void(0)"
-        class="toggle-notification"
-        @click="$emit('toggle-notification')"
-      >
-        <i
-          slot="icon"
-          class="mdi mdi-arrow-expand"
-        />
-      </a>
-      <a
-        v-if="closable"
-        ref="close"
-        href="javascript:void(0)"
-        @click="$emit('close-upload')"
-      >
-        <i
-          slot="icon"
-          class="mdi mdi-close"
-        />
-      </a>
+      <div class="actions">
+        <a
+          ref="maximize"
+          href="javascript:void(0)"
+          class="toggle-notification"
+          @click="toggleNotification"
+        >
+          <i
+            slot="icon"
+            class="mdi mdi-arrow-expand"
+          />
+        </a>
+        <a
+          v-if="closable"
+          ref="close"
+          href="javascript:void(0)"
+          @click="$emit('close-upload')"
+        >
+          <i
+            slot="icon"
+            class="mdi mdi-close"
+          />
+        </a>
+      </div>
     </c-row>
   </c-alert>
 </template>
@@ -58,15 +63,21 @@ export default {
   components: {
     ProgressBar,
   },
+  emits: ["view-container", "close-upload"],
   computed: {
     closable() {
-      return this.$store.state.uploadNotificationClosable;
+      return this.$store.state.uploadNotification.closable;
     },
   },
   mounted() {
     setTimeout(() => {
       this.$refs.maximize.focus();
     }, 100);
+  },
+  methods: {
+    toggleNotification() {
+      this.$store.commit("toggleUploadNotificationSize");
+    },
   },
 };
 </script>
@@ -79,7 +90,14 @@ c-alert {
 
 h3 {
   font-size: 18px;
-  margin-top: -2px;
+}
+
+.actions a {
+  margin-left: 2rem;
+}
+
+c-alert h3 i {
+  margin-right: 0.5rem;
 }
 
 @media screen and (max-width: 840px) {

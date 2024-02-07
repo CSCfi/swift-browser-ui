@@ -45,6 +45,7 @@ import {
   getPaginationOptions,
   checkIfItemIsLastOnPage,
   checkIfCanDownloadTar,
+  addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
   setPrevActiveElement,
@@ -226,7 +227,7 @@ export default {
           align: "end",
           children: [
             {
-              value: this.$t("message.download"),
+              value: this.$t("message.download.download"),
               component: {
                 tag: "c-button",
                 params: {
@@ -427,15 +428,11 @@ export default {
             this.$route.params.owner ? this.$route.params.owner : "",
           ).then(() => {
             if (DEV) console.log(`Started downloading subfolder ${object.name}`);
+          }).catch(() => {
+            addErrorToastOnMain(this.$t("message.download.error"));
           });
         } else {
-          document.querySelector("#container-error-toasts")
-            .addToast(
-              { progress: false,
-                type: "error",
-                duration: 6000,
-                message: this.$t("message.downloadFiles")},
-            );
+          addErrorToastOnMain(this.$t("message.download.files"));
         }
       } else {
         this.$store.state.socket.addDownload(
@@ -444,6 +441,8 @@ export default {
           this.$route.params.owner ? this.$route.params.owner : "",
         ).then(() => {
           if (DEV) console.log(`Started downloading object ${object.name}`);
+        }).catch(() => {
+          addErrorToastOnMain(this.$t("message.download.error"));
         });
       }
     },

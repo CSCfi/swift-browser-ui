@@ -21,6 +21,10 @@ let downloads = {};
 // Text encoder for quickly encoding tar headers
 let enc = new TextEncoder();
 let libinitDone = false;
+let downProgressInterval = undefined;
+let totalDone = 0;
+let totalToDo = 0;
+let aborted = false;
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -144,6 +148,7 @@ function decryptChunk(container, path, enChunk) {
   // We need to clone the view to a new typed array, otherwise it'll get
   // stale on return
   let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
+  totalDone += chunkLen;
   Module.ccall(
     "free_chunk",
     "number",
@@ -154,6 +159,24 @@ function decryptChunk(container, path, enChunk) {
   return ret;
 }
 
+function getFileSize(response, key) {
+  // Use encrypted size as the total file size if the file can't be decrypted
+  const ensize = parseInt(response.headers.get("Content-Length"));
+  return key !=0 ?
+  (Math.floor(ensize / 65564) * 65536) +
+    (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
+  ensize;
+}
+
+function startProgressInterval() {
+  const interval = setInterval(() => {
+    postMessage({
+      eventType: "progress",
+      progress: totalDone / totalToDo < 1 ? totalDone / totalToDo : 1,
+    });
+  }, 250);
+  return interval;
+}
 class FileSlicer {
   constructor(
     input,
@@ -285,7 +308,36 @@ class FileSlicer {
       [downloads[this.container].files[this.path].key],
     );
 
-    return;
+    return true;
+  }
+}
+
+function clear() {
+  if (downProgressInterval) {
+    clearInterval(downProgressInterval);
+    downProgressInterval = undefined;
+  }
+  totalDone = 0;
+  totalToDo = 0;
+}
+
+function abortDownloads(direct) {
+  if (direct) {
+    postMessage({
+      eventType: "error",
+    });
+  } else {
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client =>
+        client.postMessage({
+          eventType: "error",
+        }));
+    });
+  }
+  clear();
+  aborted = true;
+  for (let container in downloads) {
+    finishDownloadSession(container);
   }
 }
 
@@ -321,7 +373,9 @@ async function addSessionFiles(
 async function beginDownloadInSession(
   container,
 ) {
+  aborted = false; //reset with download start
   let fileStream = undefined;
+
   if (downloads[container].direct) {
     fileStream = await downloads[container].handle.createWritable();
   } else {
@@ -354,6 +408,17 @@ async function beginDownloadInSession(
     }
   }
 
+  if (downloads[container].direct) {
+  //get total download size and periodically report download progress
+    for (const file in downloads[container].files) {
+      const res = await fetch(downloads[container].files[file].url);
+      totalToDo += getFileSize(res, downloads[container].files[file].key);
+    }
+    if (!downProgressInterval) {
+      downProgressInterval = startProgressInterval();
+    }
+  }
+
   for (const file in downloads[container].files) {
     if (inServiceWorker) {
       self.clients.matchAll().then(clients => {
@@ -364,27 +429,27 @@ async function beginDownloadInSession(
           }));
       });
     }
-    const response = await fetch(downloads[container].files[file].url);
-    const ensize = parseInt(response.headers.get("Content-Length"));
 
-    let path = file.split("/");
-    let name = path.slice(-1)[0];
-    let prefix;
-    if (path.length > 1) {
-      prefix = path.slice(0, -1).join("/");
-    } else {
-      prefix = "";
-    }
+    const response = await fetch(downloads[container].files[file].url);
 
     if (downloads[container].archive) {
+
+      const size = getFileSize(response, downloads[container].files[file].key);
+      let path = file.split("/");
+      let name = path.slice(-1)[0];
+      let prefix;
+      if (path.length > 1) {
+        prefix = path.slice(0, -1).join("/");
+      } else {
+        prefix = "";
+      }
+
       let fileHeader = enc.encode(addTarFile(
         downloads[container].files[file].key != 0 ? name.replace(".c4gh", ""): name,
         prefix,
-        // Use encrypted size as the total file size if the file can't be decrypted
-        downloads[container].files[file].key != 0 ?
-        (Math.floor(ensize / 65564) * 65536) + (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-        ensize,
+        size,
       ));
+
       if (downloads[container].direct) {
         await fileStream.write(fileHeader);
       } else {
@@ -398,10 +463,18 @@ async function beginDownloadInSession(
       container,
       file);
 
+    let res;
     if (downloads[container].files[file].key <= 0) {
-      await slicer.concatFile();
+      res = await slicer.concatFile().catch(() => {
+        return false;
+      });
     } else {
-      await slicer.sliceFile();
+      res = await slicer.sliceFile().catch(() => {
+        return false;
+      });
+    if (!res) {
+      if (!aborted) abortDownloads(!inServiceWorker);
+      return;
     }
   }
 
@@ -442,9 +515,7 @@ async function beginDownloadInSession(
         }));
     });
   }
-
   finishDownloadSession(container);
-
   return;
 }
 
@@ -594,6 +665,9 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "keepDownloadProgressing":
+      break;
+    case "clear":
+      clear();
       break;
   }
 });
