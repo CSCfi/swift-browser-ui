@@ -163,9 +163,9 @@ function getFileSize(response, key) {
   // Use encrypted size as the total file size if the file can't be decrypted
   const ensize = parseInt(response.headers.get("Content-Length"));
   return key !=0 ?
-  (Math.floor(ensize / 65564) * 65536) +
+    (Math.floor(ensize / 65564) * 65536) +
     (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-  ensize;
+    ensize;
 }
 
 function startProgressInterval() {
@@ -433,7 +433,6 @@ async function beginDownloadInSession(
     const response = await fetch(downloads[container].files[file].url);
 
     if (downloads[container].archive) {
-
       const size = getFileSize(response, downloads[container].files[file].key);
       let path = file.split("/");
       let name = path.slice(-1)[0];
@@ -472,51 +471,52 @@ async function beginDownloadInSession(
       res = await slicer.sliceFile().catch(() => {
         return false;
       });
-    if (!res) {
-      if (!aborted) abortDownloads(!inServiceWorker);
-      return;
+      if (!res) {
+        if (!aborted) abortDownloads(!inServiceWorker);
+        return;
+      }
     }
-  }
 
-  if (downloads[container].archive) {
-    // Write the end of the archive
+    if (downloads[container].archive) {
+      // Write the end of the archive
+      if (downloads[container].direct) {
+        await fileStream.write(enc.encode("\x00".repeat(1024)));
+      } else {
+        fileStream.enqueue(enc.encode("\x00".repeat(1024)));
+      }
+    }
+
+    // Sync the file if downloading directly into file, otherwise finish
+    // the fetch request.
     if (downloads[container].direct) {
-      await fileStream.write(enc.encode("\x00".repeat(1024)));
-    } else {
-      fileStream.enqueue(enc.encode("\x00".repeat(1024)));
-    }
-  }
-
-  // Sync the file if downloading directly into file, otherwise finish
-  // the fetch request.
-  if (downloads[container].direct) {
-    await fileStream.close();
+      await fileStream.close();
     // downloads[container].handle.flush();
     // downloads[container].handle.close();
-  } else {
-    fileStream.close();
-  }
+    } else {
+      fileStream.close();
+    }
 
-  if (downloads[container].direct) {
+    if (downloads[container].direct) {
     // Direct downloads need no further action, the resulting archive is
     // already in the filesystem.
-    postMessage({
-      eventType: "finished",
-      direct: true,
-      container: container,
-    });
-  } else {
+      postMessage({
+        eventType: "finished",
+        direct: true,
+        container: container,
+      });
+    } else {
     // Inform download with service worker finished
-    self.clients.matchAll().then(clients => {
-      clients.forEach(client =>
-        client.postMessage({
-          eventType: "downloadProgressFinished",
-          container: container,
-        }));
-    });
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client =>
+          client.postMessage({
+            eventType: "downloadProgressFinished",
+            container: container,
+          }));
+      });
+    }
+    finishDownloadSession(container);
+    return;
   }
-  finishDownloadSession(container);
-  return;
 }
 
 if (inServiceWorker) {
@@ -647,7 +647,7 @@ self.addEventListener("message", async (e) => {
             container: e.data.container,
           });
         }
-      })
+      });
       if (inServiceWorker) {
         e.source.postMessage({
           eventType: "downloadStarted",
