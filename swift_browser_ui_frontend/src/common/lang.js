@@ -155,17 +155,6 @@ let default_translations = {
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
         share_guide_step2: "2. <b>Select the permission rights:</b> ",
-        share_guide_step2_read:
-          ": project members can copy, download " +
-            "and decrypt the folder content.",
-        share_guide_step2_write:
-          ": project members can copy, " +
-            "download and decrypt the folder content. They can also upload " +
-            "new files to the shared folder accessible to both projects.",
-        share_guide_step2_view:
-          ": project members can access the folder's content " +
-            "but can not directly download or copy " +
-            "its content.",
         permissions: "Permissions",
         view_perm: "View",
         view_perm_desc:
@@ -197,8 +186,6 @@ let default_translations = {
         fail_duplicate: "The project already has access to the folder.",
         invalid_share_id: " is not a valid Share ID. Please remove it.",
         invalid_share_ids: " are not valid Share IDs. Please remove them.",
-        perm_change_text: "You have selected new sharing permissions ",
-        perm_change_text2: ". Are you sure you want to proceed?",
         perm_change_confirm: "Change permissions",
         share_delete_text:
           "Are you sure you want to " +
@@ -717,16 +704,6 @@ let default_translations = {
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
         share_guide_step2: "2. <b>Valitse käyttöoikeudet:</b> ",
-        share_guide_step2_read:
-          ": projektin jäsenet voivat kopioida ja " +
-            "ladata kansion sisällön sekä purkaa kansion sisällön salauksen.",
-        share_guide_step2_write:
-          ": projektin jäsenet voivat kopioida " +
-            "ja ladata kansion sisällön sekä purkaa kansion sisällön " +
-            "salauksen. He voivat myös lähettää tiedostoja jaettuun kansioon.",
-        share_guide_step2_view:
-            ": projektin jäsenet voivat tarkastella kansion " +
-            "sisältöä, mutta eivät voi ladata ja kopioida kansion sisältöä.",
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
         view_perm_desc:
@@ -758,8 +735,6 @@ let default_translations = {
         invalid_share_id: " ei ole kelvollinen jakamistunnus. Poistakaa se.",
         invalid_share_ids:
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",
-        perm_change_text: "Olet valinnut toisen käyttöoikeuden ",
-        perm_change_text2: ". Haluatko varmasti muuttaa käyttöoikeutta?",
         perm_change_confirm: "Muuta käyttöoikeus",
         share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
         share_delete_confirm: "Poista käyttöoikeus",

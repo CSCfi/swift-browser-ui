@@ -60,15 +60,15 @@
           <ul>
             <li>
               <b>{{ $t("message.share.read_perm") }}</b>{{
-                $t("message.share.share_guide_step2_read") }}
+                $t("message.share.read_perm_desc") }}
             </li>
             <li>
               <b>{{ $t("message.share.write_perm") }}</b>{{
-                $t("message.share.share_guide_step2_write") }}
+                $t("message.share.write_perm_desc") }}
             </li>
             <li>
               <b>{{ $t("message.share.view_perm") }}</b>{{
-                $t("message.share.share_guide_step2_view") }}
+                $t("message.share.view_perm_desc") }}
             </li>
           </ul>
         </div>
