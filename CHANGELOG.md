@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Refactor entries' files, IndexPage and IndexOIDCPage
+- (GL #1200) New terms for sharing permissions
 
 ## [2024.02.0]
 
