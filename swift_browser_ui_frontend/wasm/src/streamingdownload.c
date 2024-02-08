@@ -43,9 +43,9 @@ uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header)
     int fd = open(header, O_RDONLY);
 
     uint8_t *keys = NULL;
-    unsigned int nkeys = 0;
-    uint64_t *edit_list = NULL;
-    unsigned int edit_list_len = 0;
+    size_t nkeys = 0;
+    uint8_t *edit_list = NULL;
+    size_t edit_list_len = 0;
 
     ret = crypt4gh_header_parse(
         fd,

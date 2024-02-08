@@ -3,6 +3,9 @@ Upload process initialization functions.
 */
 
 #include "uptypes.h"
+#ifdef TEST
+#include "stub_ftw.h"
+#endif // TEST
 
 #ifndef SWIFT_UI_UPLOAD_UPINIT_INCLUDED
 #define SWIFT_UI_UPLOAD_UPINIT_INCLUDED

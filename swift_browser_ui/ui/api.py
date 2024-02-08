@@ -304,7 +304,7 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
     parsed = urllib.parse.urlparse(url)
     qs = urllib.parse.parse_qs(parsed.query)
     qs.update(request.query)  # type: ignore
-    parsed._replace(query=urllib.parse.urlencode(qs, dosec=True))  # type: ignore
+    parsed._replace(query=urllib.parse.urlencode(qs, doseq=True))  # type: ignore
     url = parsed.geturl()
 
     async with client.head(

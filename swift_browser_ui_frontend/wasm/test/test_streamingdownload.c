@@ -45,5 +45,4 @@ void test_decrypt_chunk_should_allocate_chunk_and_call_segment_decrypt(void)
     TEST_ASSERT(ret);
     TEST_ASSERT_NOT_EQUAL(ret->chunk, NULL);
     TEST_ASSERT_EQUAL(&c, ret);
-    free(ret->chunk);
 }
