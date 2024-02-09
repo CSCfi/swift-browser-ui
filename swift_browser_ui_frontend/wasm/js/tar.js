@@ -119,12 +119,11 @@ export function addTarFile(path, size) {
   let sizeStr = "";
   let maxOctal = 8589934592;
 
-  if (size < maxOctal) {
+  if (size <= maxOctal) {
     //display smaller sizes than 8GiB in octal
     sizeStr = size.toString(8).padStart(11, "0") + "\x00";
   } else {
     //use base256 (signed) for larger numbers
-    //TODO test this with downloads over maxOctal size
     let bytes = BigInt(size);
 
     let base256 = [];
@@ -149,8 +148,8 @@ export function addTarFile(path, size) {
       + "0000000\x00"
       // Owner GID, 7 bytes octal + padding NUL, default to root
       + "0000000\x00"
-      // Size in octal ASCII, 11 bytes + padding NUL
-      + sizeStr
+      // Path length in octal ASCII, 11 bytes + padding NUL
+      + (path.length + 1).toString(8).padStart(11, "0") + "\x00"
       // Last modification, not used, 11 bytes + padding NUL
       + "00000000000\x00"
       + "        "  // checksum placeholder
