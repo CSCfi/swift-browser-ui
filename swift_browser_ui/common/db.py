@@ -72,6 +72,7 @@ class BaseDBConn:
                 """SELECT *
                 FROM Tokens
                 WHERE token_owner = $1
+                AND created < NOW() - INTERVAL '1 day'
                 ;
                 """,
                 token_owner,
@@ -376,6 +377,21 @@ class SharingDBConn(BaseDBConn):
             return ret
         return []
 
+    async def prune_tokens(self, token_owner: str) -> None:
+        """Prune stale tokens from database."""
+        if self.pool is not None:
+            async with self.pool.acquire() as conn:
+                async with conn.transaction():
+                    await conn.execute(
+                        """
+                        DELETE FROM Tokens
+                        WHERE
+                            token_owner = $1 AND
+                            created < NOW() - INTERVAL '1 day'
+                        ;
+                        """
+                    )
+
     async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
         """Remove a token from the database."""
         if self.pool is not None:
@@ -403,9 +419,10 @@ class SharingDBConn(BaseDBConn):
                         INSERT INTO Tokens(
                             token_owner,
                             token,
-                            identifier
+                            identifier,
+                            created,
                         ) VALUES (
-                            $1, $2, $3
+                            $1, $2, $3, NOW()
                         )
                         ;
                         """,

@@ -181,6 +181,8 @@ async def handle_user_list_tokens(request: aiohttp.web.Request) -> aiohttp.web.R
     """Get project token listing."""
     project = request.match_info["project"]
     tokens = []
+    # Remove stale tokens from the DB
+    await request.app["db_conn"].prune_tokens(project)
     tokens = await request.app["db_conn"].get_tokens(project)
 
     # Return only the identifiers
