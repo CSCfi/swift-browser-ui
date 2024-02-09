@@ -428,7 +428,7 @@ let default_translations = {
       title: "@:accessibilityPage.service – Accessibility statement",
       intro1: "This accessibility statement applies to the" +
             " @:accessibilityPage.service service and was made on" +
-            " @:accessibilityPage.date . The service is subject to the Act" +
+            " @:accessibilityPage.date{'.'} The service is subject to the Act" +
             " on the Provision of Digital Services (306/2019), which requires"+
             " that public online services must be accessible.",
       intro2: "The accessibility of the service has been evaluated by" +
@@ -441,7 +441,7 @@ let default_translations = {
       part2: {
         heading: "Non-accessible content",
         text: "Despite our best efforts to ensure accessibility of" +
-            " @:accessibilityPage.service , the website is not yet fully" +
+            " @:accessibilityPage.service{','} the website is not yet fully" +
             " compliant with the requirements (WCAG 2.1) and there may be" +
             " some limitations.",
         subheading1: "Non-accessible content and its shortcomings",
@@ -979,8 +979,8 @@ let default_translations = {
       date: "dd.mm.yy",
       title: "@:accessibilityPage.service – Saavutettavuusseloste",
       intro1: "Tämä saavutettavuusseloste koskee" +
-            " @:accessibilityPage.service -palvelua ja se on päivätty" +
-            " @:accessibilityPage.date . Palveluun sovelletaan lakia" +
+            " @:accessibilityPage.service{'-'}palvelua ja se on päivätty" +
+            " @:accessibilityPage.date{'.'} Palveluun sovelletaan lakia" +
             " digitaalisten palvelujen tarjoamisesta (306/2019), jonka mukaan" +
             " julkisten verkkopalveluiden on oltava saavutettavia.",
       intro2: "Palvelun saavutettavuuden on arvioinut ulkopuolinen" +
@@ -993,7 +993,7 @@ let default_translations = {
       part2: {
         heading: "Ei-saavutettava osio",
         text: "Huolimatta pyrkimyksistämme varmistaa" +
-            " @:accessibilityPage.service -verkkosivuston saavutettavuus," +
+            " @:accessibilityPage.service{'-'}verkkosivuston saavutettavuus," +
             " sivusto ei ole vielä täysin vaatimusten (WCAG 2.1) mukainen ja" +
             " joidenkin osioiden saavutettavuudessa voi olla ongelmia.",
         subheading1: "Ei-saavutettava osio ja sen puutteet",
