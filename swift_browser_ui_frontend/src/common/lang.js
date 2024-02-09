@@ -193,10 +193,6 @@ let default_translations = {
           "delete the sharing permissions?",
         share_delete_confirm: "Delete permissions",
       },
-<<<<<<< HEAD
-=======
-      download: " Download",
->>>>>>> 5d637712 (Remove ustar limit checks)
       largeDownMessage:
         "No large (> 1GiB) downloads enabled. Click to " +
         "enable them for the duration of the session.",
