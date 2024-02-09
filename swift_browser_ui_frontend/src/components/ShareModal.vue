@@ -30,35 +30,22 @@
       class="modal-content-wrapper"
     >
       <c-container>
-        <c-row
-          justify="space-between"
-          align="center"
-          gap="10"
+        <c-flex
+          class="toggle-instructions"
         >
-          <h3 class="title is-5 has-text-dark">
-            {{ $t("message.share.share_other_projects") }}
-          </h3>
-          <c-flex
-            class="toggle-instructions"
+          <c-link
+            underline
+            tabindex="0"
+            :path="mdiInformationOutline"
             :aria-label="$t('label.shareid_instructions')"
             @click="toggleShareGuide"
             @keyup.enter="toggleShareGuide"
           >
-            <c-icon
-              :path="mdiInformationOutline"
-              alt=""
-              aria-hidden="true"
-            />
-            <c-link
-              underline
-              tabindex="0"
-            >
-              {{ openShareGuide ? $t("message.share.close_instructions")
-                : $t("message.share.instructions")
-              }}
-            </c-link>
-          </c-flex>
-        </c-row>
+            {{ openShareGuide ? $t("message.share.close_instructions")
+              : $t("message.share.instructions")
+            }}
+          </c-link>
+        </c-flex>
         <div
           v-show="openShareGuide"
           class="content guide-content"
@@ -69,15 +56,21 @@
           <!-- eslint-disable vue/no-v-html -->
           <p v-html="$t('message.share.share_guide_step1')" />
           <p v-html="$t('message.share.share_guide_step2')" />
-          <ul>
-            <li
-              v-for="(item, i) in
-                $tm('message.share.share_guide_step2_list')"
-              :key="i"
-              v-html="item"
-            />
-          </ul>
           <!-- eslint-enable vue/no-v-html -->
+          <ul>
+            <li>
+              <b>{{ $t("message.share.read_perm") }}</b>{{
+                $t("message.share.read_perm_desc") }}
+            </li>
+            <li>
+              <b>{{ $t("message.share.write_perm") }}</b>{{
+                $t("message.share.write_perm_desc") }}
+            </li>
+            <li>
+              <b>{{ $t("message.share.view_perm") }}</b>{{
+                $t("message.share.view_perm_desc") }}
+            </li>
+          </ul>
         </div>
         <TagInput
           id="share-ids"
@@ -99,24 +92,32 @@
             v-csc-control
             shadow="false"
             :label="$t('message.share.permissions')"
-            :items.prop="accessRights"
             :placeholder="$t('message.share.permissions')"
             hide-details
             @changeValue="onSelectPermission($event)"
             @mouseleave="resetHover()"
             @mouseover="calculateSelectPosition()"
             @click="calculateSelectPosition()"
-          />
-          <c-select hide-details />
-          <c-button
-            id="share-btn"
-            :loading="loading"
-            @click="shareSubmit"
-            @keyup.enter="shareSubmit"
           >
-            {{ $t('message.share.confirm') }}
-          </c-button>
+            <c-option
+              v-for="(perm, i) in accessRights"
+              :key="i"
+              :name="perm.name"
+              :value="perm.value"
+            >
+              <b>{{ perm.name }}</b>{{ perm.desc }}
+            </c-option>
+          </c-select>
+          <c-select hide-details />
         </c-row>
+        <c-button
+          id="share-btn"
+          :loading="loading"
+          @click="shareSubmit"
+          @keyup.enter="shareSubmit"
+        >
+          {{ $t('message.share.confirm') }}
+        </c-button>
       </c-container>
       <c-alert
         v-show="isShared || isPermissionRemoved || isPermissionUpdated"
@@ -271,16 +272,19 @@ export default {
     setAccessRights: function () {
       this.accessRights = [
         {
-          name: this.$t("message.share.view_perm"),
-          value: "view",
-        },
-        {
           name: this.$t("message.share.read_perm"),
           value: "read",
+          desc: this.$t("message.share.read_perm_desc"),
         },
         {
           name: this.$t("message.share.write_perm"),
           value: "read and write",
+          desc: this.$t("message.share.write_perm_desc"),
+        },
+        {
+          name: this.$t("message.share.view_perm"),
+          value: "view",
+          desc: this.$t("message.share.view_perm_desc"),
         },
       ];
     },
@@ -310,6 +314,7 @@ export default {
             this.closeSharedNotificationWithTimeout();
           }
           this.loading = false;
+          this.sharedAccessRight = null;
         },
       );
     },
@@ -624,7 +629,7 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  max-height: 60vh;
+  max-height: 65vh;
 }
 
 @media screen and (max-width: 767px), (max-height: 580px) {
@@ -665,7 +670,7 @@ c-container {
 }
 
 c-card-actions {
-  padding-bottom: 10px;
+  padding-top: 0.5rem;
 }
 
 c-card-actions > h2 {
@@ -682,10 +687,6 @@ c-card-actions > h2 {
   color: $csc-primary;
 }
 
-h3 {
-  margin: 0 !important;
-}
-
 .guide-content {
   margin-top: 1rem;
   background-color: $csc-primary-lighter;
@@ -699,6 +700,11 @@ h3 {
 
 c-select {
   color: var(--csc-dark);
+  width: 100%;
+  padding-bottom: 1.5rem;
+  & > * {
+    font-size: $body-size;
+  }
 }
 
 c-link {

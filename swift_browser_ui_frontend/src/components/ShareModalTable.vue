@@ -11,24 +11,29 @@
       id="perm-change-alert"
       type="warning"
     >
-      {{ $t("message.share.perm_change_text") +
-      "(" + getPermName(newPerms) + ")" +
-      $t("message.share.perm_change_text2") }}
-      <c-card-actions justify="end">
+    <c-row
+      align="center"
+      nowrap
+    >
+      <p>
+        <b>{{ getPermObj(newPerms).name }}</b>{{ getPermObj(newPerms).desc }}
+      </p>
+      <c-card-actions>
         <c-button
           outlined
-          @click="clearPermChange"
-          @keyup.enter="clearPermChange"
-        >
-          {{ $t("message.share.cancel") }}
-        </c-button>
-        <c-button
           @click="confirmPermChange"
           @keyup.enter="confirmPermChange"
         >
           {{ $t("message.share.perm_change_confirm") }}
         </c-button>
+        <c-button
+          @click="clearPermChange"
+          @keyup.enter="clearPermChange"
+        >
+          {{ $t("message.share.cancel") }}
+        </c-button>
       </c-card-actions>
+    </c-row>
     </c-alert>
     <c-alert
       v-show="clickedDelete"
@@ -207,13 +212,13 @@ export default {
                   value: item.access.length > 0
                     ? (
                       item.access.length > 1
-                        ? this.accessRights[2]
-                        : this.accessRights[1])
-                    : this.accessRights[0],
+                        ? this.accessRights[1]
+                        : this.accessRights[0])
+                    : this.accessRights[2],
                   onChangeValue: (e) =>  {
                     this.newPerms = this.getPermArray(e.detail.value);
-                    if (this.getPermName(this.newPerms)
-                      !== this.getPermName(item.access)) {
+                    if (this.getPermObj(this.newPerms).name
+                      !== this.getPermObj(item.access).name) {
                       //if different than current perms chosen
                       this.sharedTo = item.sharedTo;
                       this.clickedPermChange = true;
@@ -245,12 +250,12 @@ export default {
         },
       }));
     },
-    getPermName(permArray) {
+    getPermObj(permArray) {
       return permArray.length > 1
-        ? this.accessRights[2].name
-        : (this.accessRights[1].value[0] === permArray[0]
-          ? this.accessRights[1].name
-          : this.accessRights[0].name);
+        ? this.accessRights[1]
+        : (this.accessRights[0].value[0] === permArray[0]
+          ? this.accessRights[0]
+          : this.accessRights[2]);
     },
     clearPermChange() {
       this.clickedPermChange = false;
