@@ -1041,7 +1041,7 @@ let default_translations = {
           },
           {
             heading: "Ymmärrettävyys: Ongelmat kohdistamisessa",
-            text1: "Joissakin pudotusvalikoissa valikossa oleva sisältö" +
+            text1: "Joissakin pudotusvalikoissa oleva sisältö" +
                   " avautuu pelkästä kohdistuksesta käyttäjän tekemättä" +
                   " valintaa.",
             text2: "3.2.1 Kohdistaminen",

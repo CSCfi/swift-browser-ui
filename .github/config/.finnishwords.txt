@@ -661,8 +661,8 @@ seuraavilla
 siirry
 siirrä
 siirto
-siirtää
 siirtymisen
+siirtää
 siitä
 sinulle
 sinun
@@ -904,8 +904,8 @@ yhdelle
 yhden
 yhdistetty
 yhteenlaskettu
-yhteiskäyttö
 yhteensopivia
+yhteiskäyttö
 yhteydenottoosi
 yhteys
 yhteystiedot
