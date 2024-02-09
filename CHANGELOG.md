@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1126) Added download progress bar for direct downloads (Chrome)
 - (GL #1166) Added clarifying text about folder extension during download
 - (GL #1168) Added notifications for failed downloads
+- Update Finnish version for Accessibility statement
 
 ### Changed
 - Refactor entries' files, IndexPage and IndexOIDCPage
