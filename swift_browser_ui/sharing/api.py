@@ -153,6 +153,13 @@ async def handle_user_add_token(request: aiohttp.web.Request) -> aiohttp.web.Res
     identifier = request.match_info["id"]
 
     try:
+        name = request.query["name"]
+    except KeyError:
+        MODULE_LOGGER.log(logging.INFO, "No owner name configured")
+        MODULE_LOGGER.log(logging.INFO, "Using project id as project name")
+        name = project
+
+    try:
         token = request.query["token"]
     except KeyError:
         try:
@@ -162,7 +169,7 @@ async def handle_user_add_token(request: aiohttp.web.Request) -> aiohttp.web.Res
             MODULE_LOGGER.log(logging.ERROR, "No token present")
             raise aiohttp.web.HTTPBadRequest(reason="No token present")
 
-    await request.app["db_conn"].add_token(project, token, identifier)
+    await request.app["db_conn"].add_token(project, name, token, identifier)
 
     return aiohttp.web.Response(status=200)
 

@@ -72,7 +72,8 @@ class BaseDBConn:
                 """SELECT *
                 FROM Tokens
                 WHERE token_owner = $1
-                AND created < NOW() - INTERVAL '1 day'
+                OR token_owner_name = $1
+                AND created > NOW() - INTERVAL '1 day'
                 ;
                 """,
                 token_owner,
@@ -389,7 +390,8 @@ class SharingDBConn(BaseDBConn):
                             token_owner = $1 AND
                             created < NOW() - INTERVAL '1 day'
                         ;
-                        """
+                        """,
+                        token_owner,
                     )
 
     async def revoke_token(self, token_owner: str, token_identifier: str) -> None:
@@ -409,7 +411,9 @@ class SharingDBConn(BaseDBConn):
                         token_identifier,
                     )
 
-    async def add_token(self, token_owner: str, token: str, identifier: str) -> None:
+    async def add_token(
+        self, token_owner: str, token_owner_name: str, token: str, identifier: str
+    ) -> None:
         """Add a token to the database."""
         if self.pool is not None:
             async with self.pool.acquire() as conn:
@@ -418,15 +422,17 @@ class SharingDBConn(BaseDBConn):
                         """
                         INSERT INTO Tokens(
                             token_owner,
+                            token_owner_name,
                             token,
                             identifier,
-                            created,
+                            created
                         ) VALUES (
-                            $1, $2, $3, NOW()
+                            $1, $2, $3, $4, NOW()
                         )
                         ;
                         """,
                         token_owner,
+                        token_owner_name,
                         token,
                         identifier,
                     )

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1166) Added clarifying text about folder extension during download
 - (GL #1168) Added notifications for failed downloads
 - Update Finnish version for Accessibility statement
+- (GL #1180) Add enforcing token lifetimes to signature authentication middleware
 
 ### Changed
 - Refactor entries' files, IndexPage and IndexOIDCPage
