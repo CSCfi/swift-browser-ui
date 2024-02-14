@@ -92,16 +92,16 @@ release-job:
     description: 'Automated release for SD Connect'
     assets:
       links:
-        - name: sd-connect-ui-${RELEASE_VERSION} (artifactory)
+        - name: ${ARTIFACTORY_SERVER}/sds/sd-connect:${RELEASE_VERSION}
           url: https://${ARTIFACTORY_SERVER}/sds/sd-connect:${RELEASE_VERSION}
           link_type: image
-        - name: sd-connect-runner-${RELEASE_VERSION} (artifactory)
+        - name: ${ARTIFACTORY_SERVER}/sds/swiftui-upload-runner:${RELEASE_VERSION}
           url: https://${ARTIFACTORY_SERVER}/sds/swiftui-upload-runner:${RELEASE_VERSION}
           link_type: image
-        - name: sd-connect-sharing-${RELEASE_VERSION} (artifactory)
+        - name: ${ARTIFACTORY_SERVER}/sds/swift-x-account-sharing:${RELEASE_VERSION}
           url: https://${ARTIFACTORY_SERVER}/sds/swift-x-account-sharing:${RELEASE_VERSION}
           link_type: image
-        - name: sd-connect-request-${RELEASE_VERSION} (artifactory)
+        - name: ${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
           url: https://${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
           link_type: image
 
