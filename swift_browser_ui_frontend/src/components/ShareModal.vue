@@ -66,7 +66,6 @@
             keypath="message.share.share_guide_step2"
             tag="b"
           />
-          <!-- eslint-enable vue/no-v-html -->
           <ul>
             <li>
               <b>{{ $t("message.share.read_perm") }}</b>{{
@@ -79,16 +78,6 @@
             <li>
               <b>{{ $t("message.share.view_perm") }}</b>{{
                 $t("message.share.view_perm_desc") }}
-            </li>
-            <li
-              v-for="(item, i) in
-                $tm('message.share.share_guide_step2_list')"
-              :key="i"
-            >
-              <b>
-                {{ item.slice(0,item.indexOf(":")+1) }}
-              </b>
-              {{ item.slice(item.indexOf(":")+1, item.length) }}
             </li>
           </ul>
         </div>
