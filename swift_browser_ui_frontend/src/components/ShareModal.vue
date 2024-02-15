@@ -113,7 +113,7 @@
           >
             <c-option
               v-for="(perm, i) in accessRights"
-              :key="i"
+              :key="i+locale"
               :name="perm.name"
               :value="perm.value"
             >
