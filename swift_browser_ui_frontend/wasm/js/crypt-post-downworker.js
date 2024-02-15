@@ -471,47 +471,47 @@ async function beginDownloadInSession(
         return;
       }
     }
-
-    if (downloads[container].archive) {
-      // Write the end of the archive
-      if (downloads[container].direct) {
-        await fileStream.write(enc.encode("\x00".repeat(1024)));
-      } else {
-        fileStream.enqueue(enc.encode("\x00".repeat(1024)));
-      }
-    }
-
-    // Sync the file if downloading directly into file, otherwise finish
-    // the fetch request.
-    if (downloads[container].direct) {
-      await fileStream.close();
-    // downloads[container].handle.flush();
-    // downloads[container].handle.close();
-    } else {
-      fileStream.close();
-    }
-
-    if (downloads[container].direct) {
-    // Direct downloads need no further action, the resulting archive is
-    // already in the filesystem.
-      postMessage({
-        eventType: "finished",
-        direct: true,
-        container: container,
-      });
-    } else {
-    // Inform download with service worker finished
-      self.clients.matchAll().then(clients => {
-        clients.forEach(client =>
-          client.postMessage({
-            eventType: "downloadProgressFinished",
-            container: container,
-          }));
-      });
-    }
-    finishDownloadSession(container);
-    return;
   }
+
+  if (downloads[container].archive) {
+    // Write the end of the archive
+    if (downloads[container].direct) {
+      await fileStream.write(enc.encode("\x00".repeat(1024)));
+    } else {
+      fileStream.enqueue(enc.encode("\x00".repeat(1024)));
+    }
+  }
+
+  // Sync the file if downloading directly into file, otherwise finish
+  // the fetch request.
+  if (downloads[container].direct) {
+    await fileStream.close();
+  // downloads[container].handle.flush();
+  // downloads[container].handle.close();
+  } else {
+    fileStream.close();
+  }
+
+  if (downloads[container].direct) {
+  // Direct downloads need no further action, the resulting archive is
+  // already in the filesystem.
+    postMessage({
+      eventType: "finished",
+      direct: true,
+      container: container,
+    });
+  } else {
+  // Inform download with service worker finished
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client =>
+        client.postMessage({
+          eventType: "downloadProgressFinished",
+          container: container,
+        }));
+    });
+  }
+  finishDownloadSession(container);
+  return;
 }
 
 if (inServiceWorker) {
