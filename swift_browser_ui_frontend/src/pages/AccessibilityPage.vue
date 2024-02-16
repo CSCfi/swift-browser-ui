@@ -1,6 +1,6 @@
 <template>
   <c-main>
-    <MainToolbar />
+    <MainToolbar :user="user" />
     <c-row
       class="title-row"
       align="center"
@@ -69,6 +69,7 @@
         <i18n-t
           keypath="accessibilityPage.part4.text"
           tag="p"
+          scope="global"
         >
           <template #authorityName>
             <a
@@ -113,7 +114,12 @@
 </template>
 
 <script>
-export default {};
+import { getUser } from "@/common/api";
+export default {
+  async mounted() {
+    this.user = await getUser();
+  },
+};
 </script>
 
 <style lang="scss" scoped>

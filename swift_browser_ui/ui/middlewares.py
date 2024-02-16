@@ -56,7 +56,7 @@ async def check_session(
     """
     try:
         if request.path == "/" or any(
-            s in request.path for s in {"login", "static", "health"}
+            s in request.path for s in {"login", "static", "health", "accessibility"}
         ):
             return await handler(request)
 

@@ -1,7 +1,7 @@
 <template>
   <c-toolbar class="relative">
     <c-link
-      href="/"
+      :href="user ? '/browse' : '/'"
       target="_self"
       color="dark-grey"
       weight="400"
@@ -20,6 +20,7 @@ export default {
   components:{
     LanguageSelector,
   },
+  props: ["user"],
 };
 </script>
 
