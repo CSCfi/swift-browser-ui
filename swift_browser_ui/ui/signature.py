@@ -56,6 +56,7 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
 
     path = f"/token/{project}/{ident}"
     signature = await swift_browser_ui.ui._convenience.sign(3600, path)
+    signature["name"] = session["projects"][project]["name"]
 
     async with client.post(
         f"{sharing_api_address}{path}",
@@ -63,17 +64,6 @@ async def handle_ext_token_create(request: aiohttp.web.Request) -> aiohttp.web.R
         params=signature,
     ) as id_resp:
         if id_resp.status != 200:
-            raise aiohttp.web.HTTPInternalServerError(reason="Token creation failed")
-
-    path_name = f"/token/{session['projects'][project]['name']}/{ident}"
-    signature = await swift_browser_ui.ui._convenience.sign(3600, path_name)
-
-    async with client.post(
-        f"{sharing_api_address}{path_name}",
-        data={"token": token},
-        params=signature,
-    ) as name_resp:
-        if name_resp.status != 200:
             raise aiohttp.web.HTTPInternalServerError(reason="Token creation failed")
 
     resp = aiohttp.web.json_response(token, status=201)
@@ -103,14 +93,6 @@ async def handle_ext_token_remove(request: aiohttp.web.Request) -> aiohttp.web.R
 
     await client.delete(
         f"{sharing_api_address}{path}",
-        params=signature,
-    )
-
-    path_name = f"/token/{project}/{ident}"
-    signature = await swift_browser_ui.ui._convenience.sign(3600, path_name)
-
-    await client.delete(
-        f"{sharing_api_address}{path_name}",
         params=signature,
     )
 

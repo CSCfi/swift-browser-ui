@@ -308,7 +308,9 @@ let default_translations = {
           "Token will be displayed just this once " +
           "and recovering it is not be possible. " +
           "Please store the token somewhere " +
-          "safe before closing this modal.",
+          "safe before closing this modal. " +
+          "The token will be valid for 24 hours, and " +
+          "will be deleted after this time period.",
         tokenCopied: "Token copied.",
         tokenRemoved: "Token removed.",
         inUse: "Token identifier already in use.",
@@ -861,7 +863,9 @@ let default_translations = {
           "Avain näytetään vain tämän kerran, " +
           "eikä sen kopiointi tai palautus ole mahdollista jälkeenpäin. " +
           "Tallenna avain turvalliseen paikkaan " +
-          "ennen kuin suljet tämän ikkunan.",
+          "ennen kuin suljet tämän ikkunan. " +
+          "Avain on luomisen jälkeen voimassa 24 tuntia, jonka jälkeen " +
+          "se poistetaan automaattisesti.",
         tokenCopied: "Avain kopioitu.",
         tokenRemoved: "Avain poistettu.",
         creationFailed: "Avaimen luonti epäonnistui.",

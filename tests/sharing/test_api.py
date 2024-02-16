@@ -45,6 +45,7 @@ class APITestClass(unittest.IsolatedAsyncioTestCase):
                             "get_shared_container_details": unittest.mock.AsyncMock(),
                             "get_tokens": unittest.mock.AsyncMock([]),
                             "revoke_token": unittest.mock.AsyncMock(),
+                            "prune_tokens": unittest.mock.AsyncMock(),
                             "pool": None,
                         }
                     ),

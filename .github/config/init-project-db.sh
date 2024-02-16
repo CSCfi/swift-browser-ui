@@ -39,8 +39,10 @@ psql -v ON_ERROR_STOP=1 --username "sharing" --dbname "swiftbrowserdb" <<-EOSQL
     );
     CREATE TABLE IF NOT EXISTS Tokens(
         token_owner TEXT,
+        token_owner_name TEXT,
         token TEXT,
         identifier TEXT,
+        created TIMESTAMP,
         PRIMARY KEY(token_owner, identifier)
     );
 EOSQL
