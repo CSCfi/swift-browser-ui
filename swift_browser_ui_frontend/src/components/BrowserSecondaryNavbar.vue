@@ -59,6 +59,7 @@
           >
             <i18n-t
               keypath="message.share.share_id_tooltip"
+              scope="global"
             >
               <template #tooltipb>
                 <b>

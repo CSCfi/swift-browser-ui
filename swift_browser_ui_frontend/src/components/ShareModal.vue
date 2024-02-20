@@ -56,14 +56,17 @@
           <p>
             <i18n-t
               keypath="message.share.share_guide_step1b"
+              scope="global"
               tag="b"
             />
             <i18n-t
               keypath="message.share.share_guide_step1"
+              scope="global"
             />
           </p>
           <i18n-t
             keypath="message.share.share_guide_step2"
+            scope="global"
             tag="b"
           />
           <ul>
