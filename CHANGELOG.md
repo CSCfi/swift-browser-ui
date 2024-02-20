@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1180) Add enforcing token lifetimes to signature authentication middleware
 
 ### Changed
+- Refactor to remove eslint supression
+  - for sharing and sharing tooltip including language changes
+  - for share modal to comply Vue style guide
+  - no-prototype-builtins and camel case
+  - Cypress test related
 - Refactor entries' files, IndexPage and IndexOIDCPage
 - (GL #1200) New terms for sharing permissions
 

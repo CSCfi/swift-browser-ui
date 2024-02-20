@@ -2,7 +2,6 @@
   <div class="object-table-wrapper">
     <!-- Footer options needs to be in CamelCase,
     because csc-ui wont recognise it otherwise. -->
-    <!-- eslint-disable-->
     <c-data-table
       id="obj-table"
       :data.prop="objects"
@@ -21,7 +20,6 @@
       @paginate="getPage"
       @sort="onSort"
     />
-    <!-- eslint-enable-->
     <c-loader v-show="isLoaderVisible">
       {{ $t('message.upload.uploadedItems') }}
     </c-loader>

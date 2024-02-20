@@ -61,6 +61,8 @@
     "vue/require-prop-types": [0],
     "vue/no-deprecated-slot-attribute": [0],
     "vue/v-on-event-hyphenation": [0],
-    "vue/require-explicit-emits": [0]
+    "vue/require-explicit-emits": [0],
+    "vue/attribute-hyphenation": ["error", "always", { "ignore": ["footerOptions"]
+    }]
   }
 }

@@ -5,35 +5,34 @@
     </h3>
     <!-- Footer options needs to be in CamelCase,
     because csc-ui wont recognise it otherwise. -->
-    <!-- eslint-disable-->
     <c-alert
       v-show="clickedPermChange"
       id="perm-change-alert"
       type="warning"
     >
-    <c-row
-      align="center"
-      nowrap
-    >
-      <p>
-        <b>{{ getPermObj(newPerms).name }}</b>{{ getPermObj(newPerms).desc }}
-      </p>
-      <c-card-actions>
-        <c-button
-          outlined
-          @click="confirmPermChange"
-          @keyup.enter="confirmPermChange"
-        >
-          {{ $t("message.share.perm_change_confirm") }}
-        </c-button>
-        <c-button
-          @click="clearPermChange"
-          @keyup.enter="clearPermChange"
-        >
-          {{ $t("message.share.cancel") }}
-        </c-button>
-      </c-card-actions>
-    </c-row>
+      <c-row
+        align="center"
+        nowrap
+      >
+        <p>
+          <b>{{ getPermObj(newPerms).name }}</b>{{ getPermObj(newPerms).desc }}
+        </p>
+        <c-card-actions>
+          <c-button
+            outlined
+            @click="confirmPermChange"
+            @keyup.enter="confirmPermChange"
+          >
+            {{ $t("message.share.perm_change_confirm") }}
+          </c-button>
+          <c-button
+            @click="clearPermChange"
+            @keyup.enter="clearPermChange"
+          >
+            {{ $t("message.share.cancel") }}
+          </c-button>
+        </c-card-actions>
+      </c-row>
     </c-alert>
     <c-alert
       v-show="clickedDelete"
@@ -58,9 +57,9 @@
       </c-card-actions>
     </c-alert>
     <c-data-table
-      :key="newPerms"
-      id="shared-projects-table"
       v-if="tableData.length > 0"
+      id="shared-projects-table"
+      :key="newPerms"
       :data.prop="tableData"
       :headers.prop="headers"
       :no-data-text="$t('message.encrypt.empty')"
@@ -68,7 +67,6 @@
       :footerOptions.prop="footer"
       horizontal-scrolling
     />
-    <!-- eslint-enable-->
   </c-container>
 </template>
 

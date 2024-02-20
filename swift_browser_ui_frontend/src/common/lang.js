@@ -133,28 +133,29 @@ let default_translations = {
         share: "Share",
         share_id: "Share ID",
         share_id_copy: "Copy Share ID",
+        share_id_tooltipb: "currently selected",
         share_id_tooltip:
           "With this action, you can copy the Share ID: " +
-          "a unique 32-digit code associated with your <b>currently " +
-          "selected</b> project. Provide the Share ID to members " +
+          "a unique 32-digit code associated with your {tooltipb} " +
+          "project. Provide the Share ID to members " +
           "of other projects (e.g., via email) so that they can " +
           "share folders with you.",
         close: "Close",
         instructions: "How to share a folder",
         close_instructions: "Hide",
-        share_cont: "Share the folder",
         share_title: "Share folder",
         share_other_projects: "Share with other projects",
         share_guide_intro:
           "To share a folder with another project you need to:",
+        share_guide_step1b: "1. Enter the Share ID. ",
         share_guide_step1:
-          "1. <b>Enter the Share ID.</b> You need to know in advance " +
+          "You need to know in advance " +
           "the Share ID (a 32-digit code) associated " +
           "with the project you want to share a folder with. The " +
           "recipient can copy the Share ID from the user " +
           "interface and provide it to you via email. You can share " +
           "a folder with multiple projects.",
-        share_guide_step2: "2. <b>Select the permission rights:</b> ",
+        share_guide_step2: "2. Select the permission rights:",
         permissions: "Permissions",
         view_perm: "View",
         view_perm_desc:
@@ -688,26 +689,27 @@ let default_translations = {
         share: "Jaa",
         share_id: "Jakamistunnus",
         share_id_copy: "Kopioi jakamistunnus",
+        share_id_tooltipb: "valitsemaasi",
         share_id_tooltip:
           "Tällä toiminnolla voit kopioida jakamistunnuksen: uniikin " +
-          "32-numeroisen koodin, joka on yhdistetty <b>valitsemaasi</b> " +
+          "32-numeroisen koodin, joka on yhdistetty {tooltipb} " +
           "projektiin. Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa kansioita sinulle.",
         close: "Sulje",
         instructions: "Kuinka jaan kansion",
         close_instructions: "Sulje ohjeet",
-        share_cont: "Jaa säiliö",
         share_title: "Jaa kansio ",
         share_other_projects: "Jaa toisen projektin kanssa",
         share_guide_intro: "Kun haluat jakaa kansion toisen projektin kanssa: ",
+        share_guide_step1b: "1. Syötä jakamistunnus. ",
         share_guide_step1:
-          "1. <b>Syötä jakamistunnus.</b> Sinun tulee tietää " +
+          "Sinun tulee tietää " +
           "vastaanottavan projektin jakamistunnus (32-numeroinen " +
           "koodi). Vastaanottaja voi kopioida " +
           "jakamistunnuksen Kopioi jakamistunnus -napilla " +
           "ja lähettää sen sinulle esim. sähköpostilla. " +
           "Voit jakaa kansion useiden projektien kanssa.",
-        share_guide_step2: "2. <b>Valitse käyttöoikeudet:</b> ",
+        share_guide_step2: "2. Valitse käyttöoikeudet: ",
         permissions: "Käyttöoikeudet",
         view_perm: "Katsele",
         view_perm_desc:

@@ -71,7 +71,6 @@
       </c-alert>
       <!-- Footer options needs to be in CamelCase,
       because csc-ui wont recognise it otherwise. -->
-      <!-- eslint-disable-->
       <c-data-table
         sort-by="identifier"
         sort-direction="asc"
@@ -83,7 +82,6 @@
         :hide-footer="tokens.length <= tokensPerPage"
         @click="checkPage"
       />
-      <!-- eslint-enable-->
       <c-toasts
         id="token-toasts"
         data-testid="token-toasts"

@@ -53,10 +53,22 @@
           <p>
             {{ $t("message.share.share_guide_intro") }}
           </p>
-          <!-- eslint-disable vue/no-v-html -->
-          <p v-html="$t('message.share.share_guide_step1')" />
-          <p v-html="$t('message.share.share_guide_step2')" />
-          <!-- eslint-enable vue/no-v-html -->
+          <p>
+            <i18n-t
+              keypath="message.share.share_guide_step1b"
+              scope="global"
+              tag="b"
+            />
+            <i18n-t
+              keypath="message.share.share_guide_step1"
+              scope="global"
+            />
+          </p>
+          <i18n-t
+            keypath="message.share.share_guide_step2"
+            scope="global"
+            tag="b"
+          />
           <ul>
             <li>
               <b>{{ $t("message.share.read_perm") }}</b>{{
