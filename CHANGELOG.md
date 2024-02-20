@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- (GL #1220) Fix unstable sharing permission `c-select`
+- (GL #1218) Fix language not updating in sharing permission `c-select`
+
+## [2024.02.1]
+
 ### Added
 - (GL #1205) Add a route back to front page from top toolbar
 - (GL #1126) Added download progress bar for direct downloads (Chrome)
@@ -370,7 +376,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...main
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...main
+[2024.02.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.0...2024.02.1
 [2024.02.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...2024.02.0
 [2024.01.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/3.0.0...2024.01.0
 [2023.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/v2.0.0...3.0.0
