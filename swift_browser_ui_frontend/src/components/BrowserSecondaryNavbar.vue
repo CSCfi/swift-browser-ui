@@ -149,6 +149,9 @@ export default {
     downloadError() {
       return this.$store.state.downloadError;
     },
+    downloadCount() {
+      return this.$store.state.downloadCount;
+    },
   },
   watch: {
     container() {
@@ -173,7 +176,7 @@ export default {
       };
 
       if (itemId !== this.active.id) {
-        if (!this.isUploading) {
+        if (!this.isUploading && this.downloadCount < 1) {
           // Updates URL, and then refreshes the page
           this.$router.push(navigationParams).then(() => {
             this.$router.go(0);

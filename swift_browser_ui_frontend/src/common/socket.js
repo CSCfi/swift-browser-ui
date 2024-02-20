@@ -140,9 +140,9 @@ export default class UploadSocket {
             if (this.$store.state.downloadCount <= 0) {
               this.$store.commit("eraseDownloadProgress");
             }
-            this.$store.commit("addDownload");
             this.$store.commit("toggleDownloadNotification", true);
           }
+          this.$store.commit("addDownload");
           break;
         case "downloadProgressing":
           if (this.useServiceWorker) {
@@ -155,15 +155,6 @@ export default class UploadSocket {
                 await timeout(10000);
               }
             });
-          }
-          break;
-        case "downloadProgressFinished":
-          this.downloadFinished = true;
-          if (DEV) {
-            console.log(
-              `Finished a download in container ${e.data.container}
-                with service worker`,
-            );
           }
           break;
         case "notDecryptable":
@@ -184,6 +175,8 @@ export default class UploadSocket {
             this.$store.commit("toggleDownloadNotification", false);
             this.$store.commit("removeDownload", true);
             this.$store.commit("eraseDownloadProgress");
+          } else {
+            this.$store.commit("removeDownload");
           }
           break;
         case "progress":
@@ -195,14 +188,19 @@ export default class UploadSocket {
               `Finished a download in container ${e.data.container}`,
             );
           }
-          if (this.$store.state.downloadCount === 1) {
-            this.$store.commit("updateDownloadProgress", 1);
-            this.downWorker.postMessage({
-              command: "clear",
-            });
-            if (DEV) {
-              console.log("Clearing download progress interval");
+          if (!this.useServiceWorker) {
+            if (this.$store.state.downloadCount === 1) {
+              this.$store.commit("updateDownloadProgress", 1);
+              this.downWorker.postMessage({
+                command: "clear",
+              });
+              if (DEV) {
+                console.log("Clearing download progress interval");
+              }
             }
+          }
+          else {
+            this.downloadFinished = true;
           }
           this.$store.commit("removeDownload");
           break;
