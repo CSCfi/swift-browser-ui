@@ -34,13 +34,6 @@
       >
         <UploadModal />
       </c-modal>
-      <UploadNotification
-        v-if="displayUploadNotification"
-        @cancel-current-upload="cancelUpload"
-      />
-      <DownloadNotification
-        v-if="displayDownloadNotification"
-      />
       <c-modal
         id="edit-tags-modal"
         v-model="openEditTagsModal"
@@ -85,6 +78,13 @@
       >
         <TokenModal />
       </c-modal>
+      <UploadNotification
+        v-if="displayUploadNotification"
+        @cancel-current-upload="cancelUpload"
+      />
+      <DownloadNotification
+        v-if="displayDownloadNotification"
+      />
       <router-view class="content-wrapper" />
       <c-toasts
         id="copyFolder-toasts"
