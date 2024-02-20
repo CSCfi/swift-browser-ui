@@ -102,8 +102,8 @@
             :placeholder="$t('message.share.permissions')"
             hide-details
             @changeValue="onSelectPermission($event)"
-            @mouseenter="calculateSelectPosition"
-            @mouseleave="calculateSelectPosition"
+            @mouseenter="calculateSelectPosition(false)"
+            @mouseleave="calculateSelectPosition(true)"
           >
             <c-option
               v-for="(perm, i) in accessRights"
@@ -203,7 +203,6 @@ export default {
       timeout: null,
       mdiClose,
       mdiInformationOutline,
-      resetCSelect: false,
     };
   },
   computed: {
@@ -259,13 +258,13 @@ export default {
           break;
       }
     },
-    calculateSelectPosition: function() {
+    calculateSelectPosition: function(reset) {
       const div = document.getElementById("share-select");
       const divWidth = div.getBoundingClientRect().width;
       const cselect = document.getElementById("select-share-access");
       const cselectHeight = cselect.getBoundingClientRect().height;
 
-      if (this.resetCSelect) {
+      if (reset) {
         cselect.style.position = "relative";
         cselect.style.maxWidth = null;
         div.style.minHeight  = null;
@@ -280,7 +279,6 @@ export default {
           cselect.style.maxWidth = divWidth + "px";
         }
       }
-      this.resetCSelect = !this.resetCSelect;
     },
     setAccessRights: function () {
       this.accessRights = [
@@ -490,7 +488,6 @@ export default {
       this.sharedAccessRight = null;
       this.openShareGuide = false;
       this.tags = [];
-      this.resetCSelect = false;
       this.isShared = false;
       this.isPermissionRemoved = false;
       document.querySelector("#shareModal-toasts").removeToast("error-noperm");
