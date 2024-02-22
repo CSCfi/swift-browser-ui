@@ -393,9 +393,9 @@ async function beginDownloadInSession(
       .filter(path => path.length > 0)  // remove empty paths (root level files)
       .sort((a, b) => a.length - b.length)  // sort by path length as levels
       .reduce((unique, path) => {  // strip paths down to just the unique ones
-        let check = unique.find(item => item.join("/") === path.join("/"));
+        let check = unique.find(item => item === path.join("/"));
         if (check === undefined) {
-          unique.push(path);
+          unique.push(path.join("/"));
         }
         return unique;
       }, []);
