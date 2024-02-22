@@ -77,9 +77,6 @@ export default {
     };
   },
   computed: {
-    currentFile() {
-      return this.$store.state.encryptedFile;
-    },
     closable() {
       return this.$store.state.uploadNotification.closable;
     },

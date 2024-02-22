@@ -859,19 +859,12 @@ export default {
         this.recvkeys = this.recvkeys.concat([sharedKey]);
       }
 
-      // Clean up old stale upload if exists
-      this.$store.commit("abortCurrentUpload");
-      this.$store.commit("eraseCurrentUpload");
-
       const folderName = this.currentFolder ?
         this.currentFolder :
         this.inputFolder;
 
       this.$store.commit("setUploadFolderName", folderName);
       this.$store.commit("setNewFolder", folderName);
-
-      // Create a fresh session from scratch
-      this.$store.commit("createCurrentUploadAbort");
 
       this.socket.addUpload(
         folderName,

@@ -35,12 +35,9 @@ const store = createStore({
     ],
     client: undefined,
     requestClient: undefined,
-    resumableClient: undefined,
     socket: undefined,
     isUploading: false,
-    isChunking: false,
     encryptedFile: "",
-    encryptedFileProgress: undefined,
     uploadProgress: undefined,
     uploadNotification: {
       visible: false,
@@ -54,12 +51,8 @@ const store = createStore({
       maximized: true,
     },
     downloadError: false,
-    altContainer: undefined,
-    uploadInfo: undefined,
     uploadEndpoint: "",
-    transfer: [],
     pubkey: [],
-    currentPrefix: "",
     dropFiles: [],
     openConfirmRouteModal: false,
     routeTo: {},
@@ -68,7 +61,6 @@ const store = createStore({
     uploadFolderName: "",
     openUploadModal: false,
     openShareModal: false,
-    currentUpload: undefined,
     openEditTagsModal: false,
     selectedObjectName: "",
     openCopyFolderModal: false,
@@ -77,7 +69,6 @@ const store = createStore({
     deletableObjects: [],
     isFolderCopied: false,
     sourceProjectId: "",
-    uploadAbort: undefined,
     uploadAbortReason: undefined,
     renderedFolders: true,
     addUploadFiles: false,
@@ -109,9 +100,6 @@ const store = createStore({
     setRequestClient(state, newClient) {
       state.requestClient = newClient;
     },
-    setResumable(state, newClient) {
-      state.resumableClient = newClient;
-    },
     setUploading(state) {
       state.isUploading = true;
       if (!state.uploadNotification.visible) {
@@ -122,26 +110,8 @@ const store = createStore({
       state.isUploading = false;
       if (!cancelled) state.isLoaderVisible = true;
     },
-    setChunking(state) {
-      state.isChunking = true;
-      if (!state.uploadNotification.visible) {
-        state.uploadNotification.visible = true;
-      }
-    },
-    stopChunking(state) {
-      state.isChunking = false;
-    },
     setEncryptedFile(state, file) {
       state.encryptedFile = file;
-    },
-    eraseEncryptedFile(state) {
-      state.encryptedFile = "";
-    },
-    updateEncryptedFileProgress(state, progress) {
-      state.encryptedFileProgress = progress;
-    },
-    eraseEncryptedFileProgress(state) {
-      state.encryptedFileProgress = undefined;
     },
     toggleUploadNotification(state, payload) {
       state.uploadNotification.visible = payload;
@@ -179,18 +149,6 @@ const store = createStore({
     eraseDownloadProgress(state) {
       state.downloadProgress = undefined;
     },
-    setAltContainer(state, altContainer) {
-      state.altContainer = altContainer;
-    },
-    eraseAltContainer(state) {
-      state.altContainer = undefined;
-    },
-    setUploadInfo(state, uploadInfo) {
-      state.uploadInfo = uploadInfo;
-    },
-    eraseUploadInfo(state) {
-      state.uploadInfo = undefined;
-    },
     setUploadEndpoint(state, endpoint) {
       state.uploadEndpoint = endpoint;
     },
@@ -216,12 +174,6 @@ const store = createStore({
     erasePubKey(state) {
       state.pubkey = [];
     },
-    setPrefix(state, prefix) {
-      state.currentPrefix = prefix;
-    },
-    erasePrefix(state) {
-      state.currentPrefix = "";
-    },
     toggleConfirmRouteModal(state, payload) {
       state.openConfirmRouteModal = payload;
     },
@@ -245,30 +197,11 @@ const store = createStore({
     toggleShareModal(state, payload) {
       state.openShareModal = payload;
     },
-    setCurrentUpload(state, cur) {
-      state.currentUpload = cur;
-      state.uploadNotification.closable = false;
-    },
-    eraseCurrentUpload(state) {
-      delete state.currentUpload;
-      state.currentUpload = undefined;
-      state.uploadNotification.closable = true;
-    },
     setNotClosable(state) {
       state.uploadNotification.closable = false;
     },
     eraseNotClosable(state) {
       state.uploadNotification.closable = true;
-    },
-    createCurrentUploadAbort(state) {
-      state.uploadAbort = new AbortController();
-    },
-    abortCurrentUpload(state) {
-      if (state.uploadAbort !== undefined) {
-        state.uploadAbort.abort();
-      }
-      delete state.uploadAbort;
-      state.uploadAbort = undefined;
     },
     setUploadAbortReason(state, payload) {
       state.uploadAbortReason = payload;

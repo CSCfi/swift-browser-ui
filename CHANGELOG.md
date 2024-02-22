@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactor entries' files, IndexPage and IndexOIDCPage
 - (GL #1200) New terms for sharing permissions
 
+### Removed
+- (GL #1204) Remove old upload code from frontend
+
 ## [2024.02.0]
 
 ### Added
