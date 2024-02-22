@@ -145,16 +145,10 @@ function decryptChunk(container, path, enChunk) {
     ["number"],
     [chunk],
   );
-  // We need to clone the view to a new typed array, otherwise it'll get
-  // stale on return
-  let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
+  // Don't clone the view, as async writes can't happen in parallel.
+  // ServiceWorker download takes care of cloning as needed.
+  let ret = HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen);
   totalDone += chunkLen;
-  Module.ccall(
-    "free_chunk_nobuf",
-    "number",
-    ["number"],
-    [chunk],
-  );
 
   return ret;
 }
@@ -194,6 +188,7 @@ class FileSlicer {
     this.remainder = 0;
     this.bytes = 0;
     this.totalBytes = 0;
+    this.enChunkBuf = new Uint8Array(65564);
   }
 
   async getStart() {
@@ -205,19 +200,18 @@ class FileSlicer {
   }
 
   async getSlice() {
-    let enChunk = new Uint8Array(65564);
     this.bytes = 0;
 
     while (!this.done) {
       this.remainder = 65564 - this.bytes;
       let toSet = this.chunk.subarray(this.offset, this.offset + this.remainder);
-      enChunk.set(toSet, this.bytes);
+      this.enChunkBuf.set(toSet, this.bytes);
       this.bytes += toSet.length;
 
       if (this.chunk.length - this.offset > this.remainder) {
         this.offset += this.remainder;
         this.totalBytes += 65536;
-        return enChunk;
+        return this.enChunkBuf;
       } else {
         this.offset = 0;
         ({ value: this.chunk, done: this.done } = await this.reader.read());
@@ -226,7 +220,7 @@ class FileSlicer {
 
     if(this.bytes > 0) {
       this.totalBytes += this.bytes - 28;
-      return enChunk.slice(0, this.bytes);
+      return this.enChunkBuf.slice(0, this.bytes);
     }
 
     return undefined;
@@ -258,7 +252,10 @@ class FileSlicer {
       if (this.output instanceof WritableStream) {
         await this.output.write(this.chunk);
       } else {
-        this.output.enqueue(downloads[this.contaier].files[this.path].header);
+        while(this.output.desiredSize <= 0) {
+          await timeout(10);
+        }
+        this.output.enqueue(new Uint8Array(this.chunk));
       }
       this.totalBytes += this.chunk.length;
       ({ value: this.chunk, done: this.done } = await this.reader.read());
@@ -275,15 +272,15 @@ class FileSlicer {
     await this.getStart();
 
     // Slice the file and write decrypted content to output
-    let enChunk = await this.getSlice();
-    while (enChunk !== undefined) {
+    await this.getSlice();
+    while (this.bytes > 0) {
       if (this.output instanceof WritableStream) {
         // Write the decrypted contents directly in the file stream if
         // downloading to File System
         await this.output.write(decryptChunk(
           this.container,
           this.path,
-          enChunk,
+          this.enChunkBuf,
         ));
       } else {
         // Otherwise queue to the streamController since we're using a
@@ -291,11 +288,11 @@ class FileSlicer {
         while(this.output.desiredSize <= 0) {
           await timeout(10);
         }
-        this.output.enqueue(decryptChunk(
+        this.output.enqueue(new Uint8Array(decryptChunk(
           this.container,
           this.path,
-          enChunk,
-        ));
+          this.enChunkBuf,
+        )));
       }
       enChunk = await this.getSlice();
     }

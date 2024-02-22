@@ -31,6 +31,8 @@ Download service worker handlers.
 #include "include/streamingdownload.h"
 
 uint8_t chunk_buf[65536];
+// Reserve the chunk buffer
+CHUNK ret_buf;
 
 /*
 Open crypt4gh header for file decryption.
@@ -79,7 +81,7 @@ CHUNK *decrypt_chunk(
     uint8_t *segment,
     size_t len_segment)
 {
-    CHUNK *ret = allocate_chunk();
+    CHUNK *ret = &ret_buf;
     memset(chunk_buf, 0, 65536);
     ret->chunk = chunk_buf;
     int retc = crypt4gh_segment_decrypt(
