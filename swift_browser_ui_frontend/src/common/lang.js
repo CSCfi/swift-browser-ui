@@ -220,9 +220,6 @@ let default_translations = {
       upload: {
         duplicate: "Files with the same paths are not allowed.",
         sizeZero: "Empty files cannot be uploaded.",
-        upfinish: "Finished uploading ",
-        upfail: "Failed uploading ",
-        upnotsupported: "Uploading is not supported by your browser",
         hasStarted: "Uploading has started",
         inProgress: "Upload in progress",
         viewDestinationFolder: "View destination folder",
@@ -344,10 +341,6 @@ let default_translations = {
           "and all members in other projects which " +
           "have access to this shared folder.",
         advancedOptions: "Advanced encryption options",
-        enReady:
-          "Encryption engine is ready. Refresh the " +
-          "window to enable encryption.",
-        refresh: "Refresh",
       },
       route: {
         title: "Switch project",
@@ -773,9 +766,6 @@ let default_translations = {
       upload: {
         duplicate: "Tiedostot, joilla on samat polut, eivät ole sallittuja.",
         sizeZero: "Tyhjiä tiedostoja ei voi lähettää.",
-        upfinish: "Lähetettiin tiedosto ",
-        upfail: "Epäonnistuttiin lähettäessä tiedosto ",
-        upnotsupported: "Selain ei tue tiedostojen lähettämistä",
         hasStarted: "Lähetys aloitettu",
         inProgress: "Lähetys käynnissä",
         viewDestinationFolder: "Näytä kohdekansio",
@@ -900,10 +890,6 @@ let default_translations = {
           "ja myös kaikille jäsenille muissa projekteissa, " +
           "joilla on pääsy tähän jaettuun kansioon.",
         advancedOptions: "Edistyneitä salausvaihtoehtoja",
-        enReady:
-          "Salausohjelma on valmiina. Päivitä " +
-          "selainikkuna mahdollistaaksesi salauksen.",
-        refresh: "Päivitä",
       },
       route: {
         title: "Vaihda projektia",

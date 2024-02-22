@@ -86,7 +86,6 @@
         <TokenModal />
       </c-modal>
       <router-view class="content-wrapper" />
-      <c-toasts id="toasts" />
       <c-toasts
         id="copyFolder-toasts"
         vertical="top"

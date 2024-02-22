@@ -277,7 +277,6 @@ export default {
     // Lodash debounce to prevent the search execution from executing on
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
-    this.$store.commit("erasePrefix");
     this.setLocalizedContent();
     this.set;
   },

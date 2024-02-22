@@ -44,9 +44,6 @@ dependencies:
   luxon:
     specifier: ^3.4.4
     version: 3.4.4
-  resumablejs:
-    specifier: ^1.1.0
-    version: 1.1.0
   rxjs:
     specifier: ^7.8.1
     version: 7.8.1
@@ -5485,10 +5482,6 @@ packages:
       onetime: 5.1.2
       signal-exit: 3.0.7
     dev: true
-
-  /resumablejs@1.1.0:
-    resolution: {integrity: sha512-gUTWTtJ2aheRb5svHDGHMtQsBkGxTILpZApT11ODoxEe5D75GhYL7Nc/WYgCcJXY+5RVmm2BEsp2qriCkKWRRg==}
-    dev: false
 
   /reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}

@@ -38,9 +38,6 @@ import store from "@/common/store";
 // Import project css
 import "@/css/prod.scss";
 
-// Import resumable
-import Resumable from "resumablejs";
-
 // Upload notification handler
 import UploadNotification from "@/components/UploadNotification.vue";
 
@@ -105,9 +102,6 @@ const app = createApp({
     projects() {
       return this.$store.state.projects;
     },
-    currentUpload() {
-      return this.$store.state.currentUpload;
-    },
     multipleProjects() {
       return this.$store.state.multipleProjects;
     },
@@ -120,9 +114,6 @@ const app = createApp({
     user() {
       return this.$store.state.uname;
     },
-    isChunking() {
-      return this.$store.state.isChunking;
-    },
     isUploading() {
       return this.$store.state.isUploading;
     },
@@ -131,18 +122,6 @@ const app = createApp({
     },
     displayDownloadNotification() {
       return this.$store.state.downloadNotification.visible;
-    },
-    resumableClient() {
-      return this.$store.state.resumableClient;
-    },
-    altContainer() {
-      return this.$store.state.altContainer;
-    },
-    uploadInfo() {
-      return this.$store.state.uploadInfo;
-    },
-    prefix() {
-      return this.$store.state.currentPrefix;
     },
     openConfirmRouteModal: {
       get() {
@@ -230,20 +209,6 @@ const app = createApp({
   created() {
     document.title = this.$t("message.program_name");
 
-    navigator.serviceWorker.addEventListener("message", e => {
-      if (e.data.eventType == "wasmReady") {
-        document.querySelector("#refresh-toasts").addToast(
-          { type: "success",
-            message: "",
-            id: "refresh-toast",
-            progress: false,
-            persistent: true,
-            custom: true },
-        );
-      }
-    });
-
-    this.createUploadInstance();
     let initialize = async () => {
       let active;
       let user = await getUser();
@@ -354,20 +319,6 @@ const app = createApp({
   mounted() {
     document
       .getElementById("mainContainer")
-      .addEventListener("uploadComplete", () => {
-        document.querySelector("#toasts").addToast({
-          progress: false,
-          type: "success",
-          message: this.$t("message.upload.complete")},
-        );
-      });
-
-    document
-      .getElementById("mainContainer")
-      .addEventListener("keydown", this.onKeydown);
-
-    document
-      .getElementById("mainContainer")
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
@@ -409,179 +360,8 @@ const app = createApp({
     containerSyncWrapper: function () {
       syncContainerACLs(this.$store);
     },
-    // Following are the methods used for resumablejs, as the methods
-    // need to have access to the vue instance.
-    addFile: function () {
-      if (!this.isUploading) {
-        this.resumableClient.upload();
-      }
-    },
-    fileSuccessToast: function (file) {
-      this.removeUploadToast();
-
-      document.querySelector("#toasts").addToast({
-        id: "file-success",
-        type: "success",
-        progress: false,
-        horizontal: "center",
-        message: this.$t("message.upload.upfinish").concat(file.fileName),
-      });
-
-      if (this.$route.params.container != undefined) {
-        this.$store.dispatch("updateObjects", { route: this.$route });
-      }
-    },
-    fileFailureToast: function (file) {
-      this.removeUploadToast();
-
-      document.querySelector("#toasts").addToast({
-        id: "file-failure",
-        type: "error",
-        progress: false,
-        horizontal: "center",
-        message: this.$t("message.upload.upfail").concat(file.fileName),
-      });
-    },
-    removeUploadToast() {
-      const uploadToast = document.querySelector("#upload-toast");
-      if (uploadToast) {
-        document.querySelector("#upload-toast").removeToast("upload-toast");
-      }
-
-      this.$store.commit("toggleUploadNotification", false);
-    },
-    getUploadUrl: function (params) {
-      // Bake upload runner information to the resumable url parameters.
-      let retUrl = new URL(this.uploadInfo.url);
-
-      for (const param of params) {
-        let newParam = param.split("=");
-        // check if we should move the file under a pseudofolder
-        // using the current prefix defined in state for the url
-        if (
-          newParam[0].match("resumableRelativePath") &&
-          this.prefix != undefined
-        ) {
-          retUrl.searchParams.append(newParam[0], this.prefix + newParam[1]);
-        } else {
-          retUrl.searchParams.append(newParam[0], newParam[1]);
-        }
-      }
-      retUrl.searchParams.append("session", this.uploadInfo.id);
-      retUrl.searchParams.append("valid", this.uploadInfo.signature.valid);
-      retUrl.searchParams.append(
-        "signature",
-        this.uploadInfo.signature.signature,
-      );
-      return retUrl;
-    },
-    startUpload: function () {
-      this.$store.commit("setUploading");
-      window.onbeforeunload = function () {
-        return "";
-      };
-    },
-    endUpload: function () {
-      this.$store.commit("eraseAltContainer");
-      this.$store.commit("stopUploading");
-      this.$store.commit("eraseUploadInfo");
-      this.$store.dispatch("updateContainers");
-      window.onbeforeunload = undefined;
-    },
-    startChunking: function () {
-      this.$store.commit("setChunking");
-    },
-    stopChunking: function () {
-      this.$store.commit("stopChunking");
-    },
-    onComplete: function () {
-      this.endUpload();
-      this.stopChunking();
-      this.createUploadInstance(); // Allows new uploads
-      this.$store.commit("eraseProgress");
-    },
-    onCancel: function () {
-      document.querySelector("#toasts").addToast({
-        id: "upload-cancel",
-        type: "info",
-        progress: false,
-        horizontal: "center",
-        message: this.$t("message.upload.cancelled"),
-      });
-
-      this.onComplete();
-    },
     cancelUpload: function(container) {
       this.socket.cancelUpload(container);
-    },
-    updateProgress() {
-      this.$store.commit("updateProgress", this.resumableClient.progress());
-    },
-    createUploadInstance: function () {
-      let res = new Resumable({
-        target: this.getUploadUrl,
-        testTarget: this.getUploadUrl,
-        chunkSize: 10485760,
-        forceChunkSize: true,
-        simultaneousUploads: 1,
-      });
-
-      if (!res.support) {
-        document.querySelector("#toasts").addToast({
-          progress: false,
-          type: "error",
-          message: this.$("message.upload.upnotsupported"),
-        });
-        return;
-      }
-
-      // Set handlers
-      res.on("uploadStart", this.startUpload);
-      res.on("complete", this.onComplete);
-      res.on("cancel", this.onCancel);
-      res.on("filesAdded", this.addFile);
-      res.on("fileSuccess", this.fileSuccessToast);
-      res.on("fileError", this.fileFailureToast);
-      res.on("chunkingStart", this.startChunking);
-      res.on("chunkingComplete", this.stopChunking);
-      res.on("progress", this.updateProgress);
-
-      this.$store.commit("setResumable", res);
-    },
-    getRouteAsList: function () {
-      // Create a list representation of the current application route
-      // to be used in the initialization of the breadcrumb component
-      let retl = [];
-
-      retl.push({
-        alias: this.$store.state.uname,
-        address: { name: "DashboardView" },
-      });
-
-      if (this.$route.params.project != undefined) {
-        if (this.$route.path.match("sharing") != null) {
-          retl.push({
-            alias: this.$t("message.sharing") + this.$store.state.active.name,
-            address: { name: "SharedTo" },
-          });
-        } else {
-          retl.push({
-            alias:
-              this.$t("message.containers") + this.$store.state.active.name ||
-              "",
-            address: { name: "AllFolders" },
-          });
-        }
-      }
-
-      if (this.$route.params.container != undefined) {
-        retl.push({
-          alias: this.$route.params.container,
-          address: { name: "ObjectsView" },
-        });
-      }
-
-      return retl;
     },
     onKeydown: function (e) {
       if (e.key === "Tab" && this.prevActiveEl &&
