@@ -30,6 +30,8 @@ Download service worker handlers.
 
 #include "include/streamingdownload.h"
 
+uint8_t chunk_buf[65536];
+
 /*
 Open crypt4gh header for file decryption.
 */
@@ -41,9 +43,9 @@ uint8_t *get_session_key_from_header(const KEYPAIR *kp, const char *header)
     int fd = open(header, O_RDONLY);
 
     uint8_t *keys = NULL;
-    unsigned int nkeys = 0;
-    uint64_t *edit_list = NULL;
-    unsigned int edit_list_len = 0;
+    size_t nkeys = 0;
+    uint8_t *edit_list = NULL;
+    size_t edit_list_len = 0;
 
     ret = crypt4gh_header_parse(
         fd,
@@ -78,7 +80,8 @@ CHUNK *decrypt_chunk(
     size_t len_segment)
 {
     CHUNK *ret = allocate_chunk();
-    ret->chunk = malloc(65536 * sizeof(uint8_t));
+    memset(chunk_buf, 0, 65536);
+    ret->chunk = chunk_buf;
     int retc = crypt4gh_segment_decrypt(
         session_key,
         segment,

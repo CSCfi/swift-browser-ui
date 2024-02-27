@@ -166,3 +166,11 @@ void free_chunk(CHUNK *chunk)
     free(chunk);
     return;
 }
+
+/*
+Free chunk with stack buffer
+*/
+void free_chunk_nobuf(CHUNK *chunk) {
+    free(chunk);
+    return;
+}

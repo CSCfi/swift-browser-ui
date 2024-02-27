@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cypress test related
 - Refactor entries' files, IndexPage and IndexOIDCPage
 - (GL #1200) New terms for sharing permissions
+- (GL #1162) Change from ustar to gnu tar
 
 ### Removed
 - (GL #1204) Remove old upload code from frontend

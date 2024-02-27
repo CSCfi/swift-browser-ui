@@ -42,7 +42,6 @@ import {
   getPaginationOptions,
   toggleCopyFolderModal,
   checkIfItemIsLastOnPage,
-  checkIfCanDownloadTar,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
@@ -280,8 +279,8 @@ export default {
                       text: true,
                       size: "small",
                       title: this.$t("message.download.download"),
-                      onClick: async () => {
-                        await this.containerDownload(
+                      onClick: () => {
+                        this.beginDownload(
                           item.name,
                           item.owner ? item.owner : "",
                         );
@@ -521,28 +520,6 @@ export default {
       }).catch(() => {
         addErrorToastOnMain(this.$t("message.download.error"));
       });
-    },
-    async containerDownload(containerName, owner) {
-      let containerObjs = [];
-      if (owner) containerObjs = await getObjects(
-        this.active.id,
-        containerName,
-        "",
-        this.abortController.signal,
-        true,
-        owner,
-      );
-      else containerObjs = await getObjects(this.active.id, containerName);
-
-      const containerObjNames = containerObjs.map(obj => obj.name);
-
-      const canDownload = checkIfCanDownloadTar(
-        containerObjNames, false);
-      if (canDownload) {
-        this.beginDownload(containerName, owner);
-      } else {
-        addErrorToastOnMain(this.$t("message.download.files"));
-      }
     },
     getEmptyText() {
       if (this.$route.name == "SharedFrom") {

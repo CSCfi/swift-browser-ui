@@ -150,7 +150,7 @@ function decryptChunk(container, path, enChunk) {
   let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
   totalDone += chunkLen;
   Module.ccall(
-    "free_chunk",
+    "free_chunk_nobuf",
     "number",
     ["number"],
     [chunk],
@@ -288,6 +288,9 @@ class FileSlicer {
       } else {
         // Otherwise queue to the streamController since we're using a
         // ServiceWorker for downloading
+        while(this.output.desiredSize <= 0) {
+          await timeout(10);
+        }
         this.output.enqueue(decryptChunk(
           this.container,
           this.path,
@@ -307,7 +310,6 @@ class FileSlicer {
       ["number"],
       [downloads[this.container].files[this.path].key],
     );
-
     return true;
   }
 }
@@ -374,12 +376,13 @@ async function beginDownloadInSession(
   container,
 ) {
   aborted = false; //reset with download start
-  let fileStream = undefined;
 
+  let fileHandle = downloads[container].handle;
+  let fileStream;
   if (downloads[container].direct) {
-    fileStream = await downloads[container].handle.createWritable();
+    fileStream = await fileHandle.createWritable();
   } else {
-    fileStream = downloads[container].handle;
+    fileStream = fileHandle;
   }
 
   // Add the archive folder structure
@@ -390,9 +393,9 @@ async function beginDownloadInSession(
       .filter(path => path.length > 0)  // remove empty paths (root level files)
       .sort((a, b) => a.length - b.length)  // sort by path length as levels
       .reduce((unique, path) => {  // strip paths down to just the unique ones
-        let check = unique.find(item => item.join("/") === path.join("/"));
+        let check = unique.find(item => item === path.join("/"));
         if (check === undefined) {
-          unique.push(path);
+          unique.push(path.join("/"));
         }
         return unique;
       }, []);
@@ -400,10 +403,10 @@ async function beginDownloadInSession(
     for (const path of folderPaths) {
       if (downloads[container].direct) {
         await fileStream.write(
-          enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))),
+          addTarFolder(path),
         );
       } else {
-        fileStream.enqueue(enc.encode(addTarFolder(path.slice(-1)[0], path.slice(0, -1).join("/"))));
+        fileStream.enqueue(addTarFolder(path));
       }
     }
   }
@@ -431,23 +434,15 @@ async function beginDownloadInSession(
     }
 
     const response = await fetch(downloads[container].files[file].url);
+    let path = file.replace(".c4gh", "");
 
     if (downloads[container].archive) {
       const size = getFileSize(response, downloads[container].files[file].key);
-      let path = file.split("/");
-      let name = path.slice(-1)[0];
-      let prefix;
-      if (path.length > 1) {
-        prefix = path.slice(0, -1).join("/");
-      } else {
-        prefix = "";
-      }
 
-      let fileHeader = enc.encode(addTarFile(
-        downloads[container].files[file].key != 0 ? name.replace(".c4gh", ""): name,
-        prefix,
+      let fileHeader = addTarFile(
+        downloads[container].files[file].key != 0 ? path : file,
         size,
-      ));
+      );
 
       if (downloads[container].direct) {
         await fileStream.write(fileHeader);
@@ -476,47 +471,47 @@ async function beginDownloadInSession(
         return;
       }
     }
-
-    if (downloads[container].archive) {
-      // Write the end of the archive
-      if (downloads[container].direct) {
-        await fileStream.write(enc.encode("\x00".repeat(1024)));
-      } else {
-        fileStream.enqueue(enc.encode("\x00".repeat(1024)));
-      }
-    }
-
-    // Sync the file if downloading directly into file, otherwise finish
-    // the fetch request.
-    if (downloads[container].direct) {
-      await fileStream.close();
-    // downloads[container].handle.flush();
-    // downloads[container].handle.close();
-    } else {
-      fileStream.close();
-    }
-
-    if (downloads[container].direct) {
-    // Direct downloads need no further action, the resulting archive is
-    // already in the filesystem.
-      postMessage({
-        eventType: "finished",
-        direct: true,
-        container: container,
-      });
-    } else {
-    // Inform download with service worker finished
-      self.clients.matchAll().then(clients => {
-        clients.forEach(client =>
-          client.postMessage({
-            eventType: "downloadProgressFinished",
-            container: container,
-          }));
-      });
-    }
-    finishDownloadSession(container);
-    return;
   }
+
+  if (downloads[container].archive) {
+    // Write the end of the archive
+    if (downloads[container].direct) {
+      await fileStream.write(enc.encode("\x00".repeat(1024)));
+    } else {
+      fileStream.enqueue(enc.encode("\x00".repeat(1024)));
+    }
+  }
+
+  // Sync the file if downloading directly into file, otherwise finish
+  // the fetch request.
+  if (downloads[container].direct) {
+    await fileStream.close();
+  // downloads[container].handle.flush();
+  // downloads[container].handle.close();
+  } else {
+    fileStream.close();
+  }
+
+  if (downloads[container].direct) {
+  // Direct downloads need no further action, the resulting archive is
+  // already in the filesystem.
+    postMessage({
+      eventType: "finished",
+      direct: true,
+      container: container,
+    });
+  } else {
+  // Inform download with service worker finished
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client =>
+        client.postMessage({
+          eventType: "downloadProgressFinished",
+          container: container,
+        }));
+    });
+  }
+  finishDownloadSession(container);
+  return;
 }
 
 if (inServiceWorker) {

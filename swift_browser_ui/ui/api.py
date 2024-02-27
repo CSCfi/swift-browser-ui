@@ -299,6 +299,14 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
         "GET",
     )
 
+    # Append query string with query parameters from the request,
+    # mainly to allow ranged requests.
+    parsed = urllib.parse.urlparse(url)
+    qs = urllib.parse.parse_qs(parsed.query)
+    qs.update(request.query)  # type: ignore
+    parsed._replace(query=urllib.parse.urlencode(qs, doseq=True))  # type: ignore
+    url = parsed.geturl()
+
     async with client.head(
         f"{endpoint}/{container}/{object_name}",
         headers={
