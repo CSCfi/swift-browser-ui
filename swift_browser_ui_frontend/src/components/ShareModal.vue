@@ -92,12 +92,7 @@
           @addTag="addingTag"
           @deleteTag="deletingTag"
         />
-        <c-row
-          id="share-select-row"
-          justify="space-between"
-          align="start"
-          gap="10"
-        >
+        <div id="share-select">
           <c-select
             id="select-share-access"
             v-model="sharedAccessRight"
@@ -107,21 +102,19 @@
             :placeholder="$t('message.share.permissions')"
             hide-details
             @changeValue="onSelectPermission($event)"
-            @mouseleave="resetHover()"
-            @mouseover="calculateSelectPosition()"
-            @click="calculateSelectPosition()"
+            @mouseenter="calculateSelectPosition(false)"
+            @mouseleave="calculateSelectPosition(true)"
           >
             <c-option
               v-for="(perm, i) in accessRights"
-              :key="i"
+              :key="i+locale"
               :name="perm.name"
               :value="perm.value"
             >
               <b>{{ perm.name }}</b>{{ perm.desc }}
             </c-option>
           </c-select>
-          <c-select hide-details />
-        </c-row>
+        </div>
         <c-button
           id="share-btn"
           :loading="loading"
@@ -265,21 +258,27 @@ export default {
           break;
       }
     },
-    calculateSelectPosition: function() {
-      const row = document.getElementById("share-select-row");
-      const content = document.getElementById("mainContent");
-      let rowPosition = row.getBoundingClientRect();
-      let contentPosition = content.getBoundingClientRect();
-
-      let width = row.children[1].getBoundingClientRect().width;
-
-      row.children[0].style.top = rowPosition.top - contentPosition.top -
-        document.body.scrollTop + "px";
-      row.children[0].style.maxWidth = width + "px";
-    },
-    resetHover: function() {
+    calculateSelectPosition: function(reset) {
+      const div = document.getElementById("share-select");
+      const divWidth = div.getBoundingClientRect().width;
       const cselect = document.getElementById("select-share-access");
-      cselect.style.maxWidth = "none";
+      const cselectHeight = cselect.getBoundingClientRect().height;
+
+      if (reset) {
+        cselect.style.position = "relative";
+        cselect.style.maxWidth = "none";
+        div.style.minHeight  = "none";
+      }
+      else {
+        const content = document.getElementById("share-card-modal-content");
+        if (content.scrollTop <= 0) {
+          // don't apply fixed position if scrolled on modal
+          cselect.style.position = "fixed";
+          // fixed element leaves normal flow, adjust for it
+          div.style.minHeight = cselectHeight + "px";
+          cselect.style.maxWidth = divWidth + "px";
+        }
+      }
     },
     setAccessRights: function () {
       this.accessRights = [
@@ -663,18 +662,13 @@ export default {
   }
 }
 
-#select-share-access:hover {
-  position: fixed;
+#share-select {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+#select-share-access {
   z-index: 2;
-}
-
-#select-share-access ~ c-select {
-  display: none;
-}
-
-#select-share-access:hover ~ c-select {
-  display: unset;
-  visibility: hidden;
 }
 
 c-container {
@@ -713,7 +707,6 @@ c-card-actions > h2 {
 c-select {
   color: var(--csc-dark);
   width: 100%;
-  padding-bottom: 1.5rem;
   & > * {
     font-size: $body-size;
   }
