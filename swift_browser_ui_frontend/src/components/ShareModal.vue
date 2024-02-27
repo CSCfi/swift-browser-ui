@@ -266,8 +266,8 @@ export default {
 
       if (reset) {
         cselect.style.position = "relative";
-        cselect.style.maxWidth = null;
-        div.style.minHeight  = null;
+        cselect.style.maxWidth = "none";
+        div.style.minHeight  = "none";
       }
       else {
         const content = document.getElementById("share-card-modal-content");
