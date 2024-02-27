@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - (GL #1204) Remove old upload code from frontend
 
+### Fixed
+- (GL #1222) Fix `view destination folder` link not working with shared containers
+
 ## [2024.02.0]
 
 ### Added

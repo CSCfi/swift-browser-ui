@@ -23,14 +23,11 @@ export default {
   },
   emits: ["cancel-current-upload"],
   computed: {
-    project() {
-      return this.$store.state.active.id;
+    containerName() {
+      return this.$store.state.uploadFolder.name;
     },
-    user() {
-      return this.$store.state.uname;
-    },
-    container() {
-      return this.$store.state.uploadFolderName;
+    containerOwner() {
+      return this.$store.state.uploadFolder.owner;
     },
     upNotification() {
       return this.$store.state.uploadNotification;
@@ -41,7 +38,7 @@ export default {
       this.$store.commit("toggleUploadNotificationSize");
     },
     onCancel() {
-      this.$emit("cancel-current-upload", this.container);
+      this.$emit("cancel-current-upload", this.containerName);
       this.onClosed();
     },
     onClosed() {
@@ -50,17 +47,30 @@ export default {
       if (!this.upNotification.maximized) this.toggleNotification();
     },
     viewContainer() {
-      if (this.$route.params.container !== this.container
-        || this.$route.query.prefix) {
-        this.$router.push({
-          name: "ObjectsView",
-          params: {
-            user: this.user,
-            project: this.project,
-            container: this.container,
-          },
-          query: null,
-        });
+      if (this.$route.params.container === this.containerName) {
+        if (this.$route.query.prefix) {
+          //go to container root
+          this.$router.push({ query: null });
+        }
+      }
+      else {
+        if (this.containerOwner) {
+          this.$router.push({
+            name: "SharedObjects",
+            params: {
+              container: this.containerName,
+              owner: this.containerOwner,
+            },
+          });
+        }
+        else {
+          this.$router.push({
+            name: "ObjectsView",
+            params: {
+              container: this.containerName,
+            },
+          });
+        }
       }
     },
   },

@@ -863,7 +863,10 @@ export default {
         this.currentFolder :
         this.inputFolder;
 
-      this.$store.commit("setUploadFolderName", folderName);
+      this.$store.commit(
+        "setUploadFolder",
+        { name: folderName, owner: this.$route.params.owner },
+      );
       this.$store.commit("setNewFolder", folderName);
 
       this.socket.addUpload(

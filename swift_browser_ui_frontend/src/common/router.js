@@ -28,7 +28,7 @@ async function checkProject (to, from, next){
 }
 async function checkContainer (to, from, next){
 
-  if(to.params.container === store.state.uploadFolderName) {
+  if(to.params.container === store.state.uploadFolder.name) {
     //When new folder is created with upload but containers not updated yet
     next();
   }
