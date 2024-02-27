@@ -277,6 +277,10 @@ async def servinit(
                 "/download/{project}/{container}/{object:.*}",
                 swift_download_shared_object,
             ),
+            aiohttp.web.head(
+                "/download/{project}/{container}/{object:.*}",
+                swift_download_shared_object,
+            ),
         ]
     )
 
