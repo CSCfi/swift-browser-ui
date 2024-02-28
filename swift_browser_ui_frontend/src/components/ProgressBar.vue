@@ -1,13 +1,16 @@
 <template>
-  <div class="progress-bar">
+  <div
+    v-if="isOngoing"
+    class="progress-bar"
+  >
     <c-progress-bar
-      v-if="isOngoing && progress != undefined"
+      v-if="progress != undefined"
       :value="(progress * 100).toFixed()"
       single-line
       :label="$t('message.upload.progressLabel')"
     />
     <c-progress-bar
-      v-else-if="isOngoing"
+      v-else
       hide-details
     />
   </div>
@@ -16,15 +19,7 @@
 <script>
 export default {
   name: "ProgressBar",
-  props: {
-    type: {
-      type: String,
-      default: "upload",
-      validator (value) {
-        return value === "upload" || value === "download";
-      },
-    },
-  },
+  props: ["type"],
   computed: {
     isOngoing() {
       return this.type === "upload" ?
