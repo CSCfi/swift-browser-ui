@@ -157,7 +157,9 @@ export default defineConfig(({ command, mode }) => {
         },
       }),
       multipagePlugin(),
-      VueI18nPlugin(),
+      VueI18nPlugin({
+        runtimeOnly: false,
+      }),
       htmlPlugin(oidcEnabled),
     ],
     build: {

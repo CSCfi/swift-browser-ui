@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`
+- (GL #1215) Fix Accessibility Page not showing when user not logging in and not rendering the translation correctly in test page
 
 ## [2024.02.1]
 

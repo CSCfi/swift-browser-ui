@@ -16,7 +16,9 @@ async function fetchWithCookie({method, url, body, signal}) {
     .then(response => {
       switch (response.status) {
         case 401:
-          window.location.pathname = "/unauth";
+          if (window.location.pathname !== "/accessibility") {
+            window.location.pathname = "/unauth";
+          }
           break;
         case 403:
           window.location.pathname = "/forbid";
@@ -70,7 +72,13 @@ export async function getUser() {
   // Get username of the currently displayed user.
   let getUserURL = new URL("/api/username", document.location.origin);
   let uname = await GET(getUserURL);
-  return await uname.json();
+
+  if (uname.status !== 401) {
+    return await uname.json();
+  }
+  else {
+    return "";
+  }
 }
 
 export async function getProjects() {
