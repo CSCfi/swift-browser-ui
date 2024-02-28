@@ -157,15 +157,6 @@ export default class UploadSocket {
             });
           }
           break;
-        case "downloadProgressFinished":
-          this.downloadFinished = true;
-          if (DEV) {
-            console.log(
-              `Finished a download in container ${e.data.container}
-                with service worker`,
-            );
-          }
-          break;
         case "notDecryptable":
           if (DEV) {
             console.log(`Could not decrypt all files in container ${e.data.container}`);
@@ -195,16 +186,21 @@ export default class UploadSocket {
               `Finished a download in container ${e.data.container}`,
             );
           }
-          if (this.$store.state.downloadCount === 1) {
-            this.$store.commit("updateDownloadProgress", 1);
-            this.downWorker.postMessage({
-              command: "clear",
-            });
-            if (DEV) {
-              console.log("Clearing download progress interval");
+          if (!this.useServiceWorker) {
+            if (this.$store.state.downloadCount === 1) {
+              this.$store.commit("updateDownloadProgress", 1);
+              this.downWorker.postMessage({
+                command: "clear",
+              });
+              if (DEV) {
+                console.log("Clearing download progress interval");
+              }
             }
+            this.$store.commit("removeDownload");
           }
-          this.$store.commit("removeDownload");
+          else {
+            this.downloadFinished = true;
+          }
           break;
       }
     };
