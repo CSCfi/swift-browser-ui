@@ -65,21 +65,7 @@
           $t("message.download.complete") :
           $t("message.download.inProgress") }}
       </h3>
-      <div
-        v-if="progress != 1"
-        class="progress-bar"
-      >
-        <c-progress-bar
-          v-if="progress != undefined"
-          :value="(progress * 100).toFixed()"
-          single-line
-          :label="$t('message.upload.progressLabel')"
-        />
-        <c-progress-bar
-          v-else
-          hide-details
-        />
-      </div>
+      <ProgressBar type="download" />
       <div class="actions">
         <a @click="toggleSize">
           <i
@@ -100,9 +86,13 @@
 
 <script>
 import { moveToast } from "@/common/globalFunctions";
+import ProgressBar from "@/components/ProgressBar.vue";
 
 export default {
   name: "DownloadNotification",
+  components: {
+    ProgressBar,
+  },
   data() {
     return {
       toastMoved: false,

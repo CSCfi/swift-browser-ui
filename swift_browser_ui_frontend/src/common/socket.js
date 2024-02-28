@@ -141,7 +141,6 @@ export default class UploadSocket {
               this.$store.commit("eraseDownloadProgress");
             }
             this.$store.commit("addDownload");
-            this.$store.commit("toggleDownloadNotification", true);
           }
           break;
         case "downloadProgressing":
@@ -172,7 +171,6 @@ export default class UploadSocket {
         case "error":
           this.$store.commit("setDownloadError", true);
           if (!this.useServiceWorker) {
-            this.$store.commit("toggleDownloadNotification", false);
             this.$store.commit("removeDownload", true);
             this.$store.commit("eraseDownloadProgress");
           }

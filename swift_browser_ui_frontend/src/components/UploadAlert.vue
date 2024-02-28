@@ -18,7 +18,7 @@
           $t("message.upload.inProgress") }}
       </h3>
 
-      <ProgressBar />
+      <ProgressBar type="upload" />
 
       <a
         href="javascript:void(0)"
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import ProgressBar from "@/components/UploadProgressBar.vue";
+import ProgressBar from "@/components/ProgressBar.vue";
 
 export default {
   name: "UploadAlert",

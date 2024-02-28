@@ -38,7 +38,10 @@
           </a>
         </c-row>
 
-        <ProgressBar class="progress-bar" />
+        <ProgressBar
+          type="upload"
+          class="progress-bar"
+        />
 
         <c-button
           v-if="!closable"
@@ -63,7 +66,7 @@
 
 <script>
 import { moveToast } from "@/common/globalFunctions";
-import ProgressBar from "@/components/UploadProgressBar.vue";
+import ProgressBar from "@/components/ProgressBar.vue";
 
 export default {
   name: "UploadToast",
