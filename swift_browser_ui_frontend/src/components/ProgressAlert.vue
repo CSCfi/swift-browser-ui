@@ -1,6 +1,6 @@
 <template>
   <c-alert
-    :id="type === 'upload' ? 'upload-alert' : 'download-alert'"
+    :id="type + '-alert'"
     type="success"
   >
     <c-row
@@ -11,17 +11,20 @@
       <h3>
         <i
           slot="icon"
-          :class="type === 'upload' ?
-            'mdi mdi-tray-arrow-up' : 'mdi mdi-tray-arrow-down'"
+          :class="
+            type === 'upload'
+              ? 'mdi mdi-tray-arrow-up'
+              : 'mdi mdi-tray-arrow-down'
+          "
         />
-        {{ finished ?
-          (type === "upload" ?
-            $t("message.upload.complete") :
-            $t("message.download.complete"))
-          :
-          (type === "upload" ?
-            $t("message.upload.inProgress") :
-            $t("message.download.inProgress"))
+        {{
+          finished
+            ? type === "upload"
+              ? $t("message.upload.complete")
+              : $t("message.download.complete")
+            : type === "upload"
+              ? $t("message.upload.inProgress")
+              : $t("message.download.inProgress")
         }}
       </h3>
 
@@ -79,34 +82,32 @@ export default {
   },
   computed: {
     finished() {
-      return this.type === "upload" ?
-        this.$store.state.uploadNotification.closable :
-        this.$store.state.downloadCount < 1;
+      return this.type === "upload"
+        ? this.$store.state.uploadNotification.closable
+        : this.$store.state.downloadCount < 1;
     },
   },
   methods: {
     toggleSize() {
-      this.type === "upload" ?
-        this.$store.commit("toggleUploadNotificationSize") :
-        this.$store.commit("toggleDownloadNotificationSize");
+      this.type === "upload"
+        ? this.$store.commit("toggleUploadNotificationSize")
+        : this.$store.commit("toggleDownloadNotificationSize");
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-
 c-alert {
   margin: 1rem 5%;
-    h3 i {
-    margin-right: 0.5rem;
-  }
 }
 
 h3 {
   font-size: 18px;
+  i {
+    margin-right: 0.5rem;
+  }
 }
-
 .actions {
   display: inherit;
   flex-direction: inherit;
@@ -114,9 +115,8 @@ h3 {
 }
 
 @media screen and (max-width: 840px) {
-    .link-underline {
-      display: none;
-    }
+  .link-underline {
+    display: none;
   }
-
+}
 </style>

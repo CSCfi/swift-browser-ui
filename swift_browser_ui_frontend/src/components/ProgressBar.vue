@@ -22,23 +22,21 @@ export default {
   props: ["type"],
   computed: {
     isOngoing() {
-      return this.type === "upload" ?
-        this.$store.state.isUploading :
-        this.$store.state.downloadCount > 0;
+      return this.type === "upload"
+        ? this.$store.state.isUploading
+        : this.$store.state.downloadCount > 0;
     },
     progress() {
-      return this.type === "upload" ?
-        this.$store.state.uploadProgress :
-        this.$store.state.downloadProgress;
+      return this.type === "upload"
+        ? this.$store.state.uploadProgress
+        : this.$store.state.downloadProgress;
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
-
 .progress-bar {
-  flex: 1
+  flex: 1;
 }
-
 </style>

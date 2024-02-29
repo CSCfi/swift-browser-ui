@@ -27,7 +27,7 @@ export default {
     type: {
       type: String,
       default: "upload",
-      validator (value) {
+      validator(value) {
         return value === "upload" || value === "download";
       },
     },
@@ -35,9 +35,9 @@ export default {
   emits: ["cancel-current-upload"],
   computed: {
     maximized() {
-      return this.type === "upload" ?
-        this.$store.state.uploadNotification.maximized :
-        this.$store.state.downloadNotification.maximized;
+      return this.type === "upload"
+        ? this.$store.state.uploadNotification.maximized
+        : this.$store.state.downloadNotification.maximized;
     },
     uploadContName() {
       return this.$store.state.uploadFolder.name;
@@ -48,15 +48,15 @@ export default {
   },
   methods: {
     toggleNotification() {
-      this.type === "upload" ?
-        this.$store.commit("toggleUploadNotificationSize") :
-        this.$store.commit("toggleDownloadNotificationSize");
+      this.type === "upload"
+        ? this.$store.commit("toggleUploadNotificationSize")
+        : this.$store.commit("toggleDownloadNotificationSize");
     },
     onClose() {
       //close and reset to maximized
-      this.type === "upload" ?
-        this.$store.commit("toggleUploadNotification", false) :
-        this.$store.commit("toggleDownloadNotification", false);
+      this.type === "upload"
+        ? this.$store.commit("toggleUploadNotification", false)
+        : this.$store.commit("toggleDownloadNotification", false);
       if (!this.maximized) this.toggleNotification();
     },
     /* UPLOAD */
@@ -70,8 +70,7 @@ export default {
           //go to container root
           this.$router.push({ query: null });
         }
-      }
-      else {
+      } else {
         if (this.uploadContOwner) {
           this.$router.push({
             name: "SharedObjects",
@@ -80,8 +79,7 @@ export default {
               owner: this.uploadContOwner,
             },
           });
-        }
-        else {
+        } else {
           this.$router.push({
             name: "ObjectsView",
             params: {
@@ -96,13 +94,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 ::v-deep(h3) {
   color: $csc-dark;
   font-weight: 600;
 }
 
-::v-deep(.link-underline){
+::v-deep(.link-underline) {
   text-decoration: underline;
   color: $csc-blue;
 }
@@ -110,5 +107,4 @@ export default {
 ::v-deep(i) {
   font-size: 120%;
 }
-
 </style>

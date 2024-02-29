@@ -45,7 +45,7 @@
       </c-row>
 
       <div
-        v-if="type === 'download' && downloadOngoing"
+        v-if="type === 'download' && !finished"
         class="download-warning"
       >
         <p>{{ $t("message.download.warnWait") }}</p>
@@ -103,9 +103,6 @@ export default {
     },
     otherNotificationType() {
       return this.type === "upload" ? "download" : "upload";
-    },
-    downloadOngoing() {
-      return this.$store.state.downloadCount > 0;
     },
   },
   watch: {
