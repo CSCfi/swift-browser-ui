@@ -26,8 +26,8 @@ let totalDone = 0;
 let totalToDo = 0;
 let aborted = false;
 
-// Use a 25 MiB segment when downloading
-const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 25;
+// Use a 50 MiB segment when downloading
+const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 50;
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -199,11 +199,8 @@ class FileSlicer {
   }
 
   async getNextSegment() {
-    console.log(`Fetching next segment for file ${this.path}`);
-    console.log(`Segment offset: ${this.segmentOffset}`);
-    let range = `bytes=${this.segmentOffset}-${this.segmentOffset + DOWNLOAD_SEGMENT_SIZE}`;
-    console.log(`Segment range: ${range}`);
-    console.log(`Segment URL: ${downloads[this.container].files[this.path].url}`)
+    let end = this.segmentOffset + DOWNLOAD_SEGMENT_SIZE - 1;
+    let range = `bytes=${this.segmentOffset}-${end}`;
     let resp = await fetch(
       downloads[this.container].files[this.path].url,
       {
@@ -243,7 +240,6 @@ class FileSlicer {
         this.offset = 0;
         ({ value: this.chunk, done: this.done } = await this.reader.read());
         if (this.done && this.segmentOffset < downloads[this.container].files[this.path].realsize) {
-          console.log("Fetching the next 1 GiB segment for downloading.");
           await this.getNextSegment();
           ({ value: this.chunk, done: this.done } = await this.reader.read());
         }
@@ -444,7 +440,6 @@ async function beginDownloadInSession(
   //get total download size and periodically report download progress
     for (const file in downloads[container].files) {
       const res = await fetch(downloads[container].files[file].url, {method: "HEAD"});
-      console.log(`Caching file size for file ${file}`);
       downloads[container].files[file].size = getFileSize(res, downloads[container].files[file].key);
       downloads[container].files[file].realsize = getFileSize(res, 0)
       totalToDo += downloads[container].files[file].size;
@@ -482,7 +477,6 @@ async function beginDownloadInSession(
       }
     }
 
-    console.log(`Starting the file slicer for file ${file}`);
     const slicer = new FileSlicer(
       fileStream,
       container,
