@@ -19,7 +19,7 @@
               :key="ind"
             >
               <span
-                v-if="searchArray.includes(apart)"
+                v-if="searchArray.includes(apart.toLowerCase())"
                 class="hl-1"
               >
                 {{ apart }}
