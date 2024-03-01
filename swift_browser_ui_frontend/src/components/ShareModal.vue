@@ -13,6 +13,7 @@
       </h2>
       <c-button
         id="close-share-modal-btn"
+        data-testid="close-share-modal"
         text
         @click="toggleShareModal"
         @keyup.enter="toggleShareModal"
@@ -86,6 +87,7 @@
         </div>
         <TagInput
           id="share-ids"
+          data-testid="share-id-input"
           :tags="tags"
           aria-label="label.list_of_shareids"
           placeholder="message.share.field_placeholder"
@@ -97,7 +99,7 @@
             id="select-share-access"
             v-model="sharedAccessRight"
             v-csc-control
-            shadow="false"
+            data-testid="select-permissions"
             :label="$t('message.share.permissions')"
             :placeholder="$t('message.share.permissions')"
             hide-details
@@ -108,6 +110,7 @@
             <c-option
               v-for="(perm, i) in accessRights"
               :key="i+locale"
+              :data-testid="perm.value + '-perm'"
               :name="perm.name"
               :value="perm.value"
             >
@@ -117,6 +120,7 @@
         </div>
         <c-button
           id="share-btn"
+          data-testid="submit-share"
           :loading="loading"
           @click="shareSubmit"
           @keyup.enter="shareSubmit"
@@ -127,6 +131,7 @@
       <c-alert
         v-show="isShared || isPermissionRemoved || isPermissionUpdated"
         type="success"
+        data-testid="share-success-alert"
       >
         <div class="shared-notification">
           {{ isShared ? $t('message.share.shared_successfully')

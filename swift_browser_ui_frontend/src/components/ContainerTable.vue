@@ -3,6 +3,7 @@
   because csc-ui wont recognise it otherwise. -->
   <c-data-table
     id="container-table"
+    data-testid="container-table"
     :data.prop="containers"
     :headers.prop="hideTags ?
       headers.filter(header => header.key !== 'tags'): headers"

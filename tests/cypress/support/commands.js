@@ -75,6 +75,27 @@ Cypress.Commands.add("selectProject", (projectName) => {
     .click();
 });
 
+Cypress.Commands.add("switchProject", () => {
+  //confirm that there's 2 projects
+  cy.get("[data-testid='project-selector']")
+    .find("li")
+    .should("have.length", 2);
+
+  //get currently selected project
+  cy.get("[data-testid='project-selector']")
+    .find("input")
+    .invoke('attr', 'name')
+    .then($value => {
+      //click sibling of currently selected
+      cy.get("[data-testid='project-selector']")
+      .click()
+      .find("li")
+      .contains($value)
+      .siblings()
+      .click()
+  })
+});
+
 Cypress.Commands.add("deleteDB", () => {
   indexedDB.deleteDatabase("sd-connect");
 });

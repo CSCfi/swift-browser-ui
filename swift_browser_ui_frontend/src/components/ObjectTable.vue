@@ -16,6 +16,7 @@
             v-show="!owner"
             underline
             tabindex="0"
+            data-testid="edit-sharing"
             @click="toggleShareModal"
             @keydown.enter="toggleShareModal"
           >

@@ -14,7 +14,7 @@ describe("A folder is shared from project A to project B", function () {
       cy.log(copyId);
 
       //switch project
-      cy.selectProject("service");
+      cy.switchProject();
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -23,34 +23,46 @@ describe("A folder is shared from project A to project B", function () {
 
       //access folder
       cy.searchFolder(folderName);
-      cy.get(".media-content").contains(folderName).click({ force: true });
-      cy.wait(3000);
-
-      //edit sharing
-      cy.contains("Edit sharing").click({ force: true });
-
-      //type in swift-project's shareID
-      cy.get(":nth-child(1) > .tags-list > input").type(copyId, {
-        force: true,
-      });
-
-      //choose copy and download permission
-      cy.contains("Select permissions").click({ force: true });
-      cy.wait(3000);
-      cy.get(".c-input-menu__item-wrapper")
-        .find("ul")
-        .find("li")
-        .contains("Copy and download")
+      cy.get("[data-testid='search-result']")
+        .contains(folderName)
         .click({ force: true });
       cy.wait(3000);
 
+      //edit sharing
+      cy.get("[data-testid='edit-sharing']").click({ force: true });
+
+      //type in swift-project's shareID
+      cy.get("[data-testid='share-id-input']>input").type(copyId, {
+        force: true,
+      });
+
+      //choose read permission
+      cy.get("[data-testid='select-permissions']").click({ force: true });
+      cy.wait(3000);
+      cy.get("[data-testid='read-perm']").click({ force: true });
+      cy.wait(3000);
+
       //save sharing
-      cy.get("#share-btn").eq(0).click({ force: true });
+      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.wait(3000);
 
-      cy.contains("Folder was shared successfully").should("exist");
-      cy.contains(copyId).should("exist");
+      cy.get("[data-testid='share-success-alert']").should("exist");
 
-      //TODO switch project and check the folder is visible
+      //see if share id added to share table
+      cy.get("[data-testid='share-modal-table']").contains(copyId);
+
+      //Switch project and check the folder is visible
+
+      //close share modal
+      cy.get("[data-testid='close-share-modal']").click({ force: true });
+
+      //switch project
+      cy.switchProject();
+      cy.wait(3000);
+
+      cy.get("[data-testid='container-table']")
+        .contains(folderName)
+        .should("exist");
     });
   });
 });
@@ -71,7 +83,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       cy.log(copyId);
 
       //switch project
-      cy.selectProject("service");
+      cy.switchProject();
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -80,27 +92,30 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
       //access folder
       cy.searchFolder(folderName);
-      cy.get(".media-content").contains(folderName).click({ force: true });
-      cy.wait(3000);
-
-      //edit sharing
-      cy.contains("Edit sharing").click({ force: true });
-
-      //choose copy and download permission
-      cy.contains("Select permissions").click({ force: true });
-      cy.wait(3000);
-      cy.get(".c-input-menu__item-wrapper")
-        .find("ul")
-        .find("li")
-        .contains("Copy and download")
+      cy.get("[data-testid='search-result']")
+        .contains(folderName)
         .click({ force: true });
       cy.wait(3000);
 
-      //save sharing
-      cy.get("#share-btn").eq(0).click({ force: true });
+      //edit sharing
+      cy.get("[data-testid='edit-sharing']").click({ force: true });
 
-      cy.contains("Please enter at least one Share ID").should("exist");
-      cy.contains(copyId).should("not.exist");
+      //choose read permission
+      cy.get("[data-testid='select-permissions']").click({ force: true });
+      cy.wait(3000);
+      cy.get("[data-testid='read-perm']").click({ force: true });
+      cy.wait(3000);
+
+      //save sharing
+      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.wait(3000);
+
+      //see error toast
+      cy.get("[data-testid='shareModal-toasts']")
+        .find("c-toast")
+        .should("exist")
+        .and("have.class", "error");
+      cy.get("[data-testid='share-success-alert']").should("not.be.visible");
     });
   });
 
@@ -112,7 +127,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       cy.log(copyId);
 
       //switch project
-      cy.selectProject("service");
+      cy.switchProject();
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -121,21 +136,29 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
       //access folder
       cy.searchFolder(folderName);
-      cy.get(".media-content").contains(folderName).click({ force: true });
+      cy.get("[data-testid='search-result']")
+        .contains(folderName)
+        .click({ force: true });
       cy.wait(3000);
 
       //edit sharing
-      cy.contains("Edit sharing").click({ force: true });
+      cy.get("[data-testid='edit-sharing']").click({ force: true });
 
-      //type in swift-project's shareID
-      cy.get(":nth-child(1) > .tags-list > input").type(copyId, {
+      //type in service's shareID
+      cy.get("[data-testid='share-id-input']>input").type(copyId, {
         force: true,
       });
 
       //save sharing
-      cy.get("#share-btn").eq(0).click({ force: true });
+      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.wait(3000);
 
-      cy.contains("Please select permissions to grant").should("exist");
+      //see error toast
+      cy.get("[data-testid='shareModal-toasts']")
+        .find("c-toast")
+        .should("exist")
+        .and("have.class", "error");
+      cy.get("[data-testid='share-success-alert']").should("not.be.visible");
     });
   });
 });
@@ -146,7 +169,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
     cy.login(Cypress.env("username"), Cypress.env("password"));
   });
 
-  it("switch project, try to share folder without the same ID twice, fail", function () {
+  it("switch project, try to share folder with the same ID twice, fail", function () {
     cy.wait(3000);
 
     //take the ID appearing as the last part of url
@@ -155,7 +178,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
       cy.log(copyId);
 
       //switch project
-      cy.selectProject("service");
+      cy.switchProject();
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -164,56 +187,55 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
 
       //access folder
       cy.searchFolder(folderName);
-      cy.get(".media-content").contains(folderName).click({ force: true });
-      cy.wait(3000);
-
-      //edit sharing
-      cy.contains("Edit sharing").click({ force: true });
-
-      //type in swift-project's shareID
-      cy.get(":nth-child(1) > .tags-list > input").type(copyId, {
-        force: true,
-      });
-
-      //choose copy and download permission
-      cy.contains("Select permissions").click({ force: true });
-      cy.wait(3000);
-      cy.get(".c-input-menu__item-wrapper")
-        .find("ul")
-        .find("li")
-        .contains("Copy and download")
+      cy.get("[data-testid='search-result']")
+        .contains(folderName)
         .click({ force: true });
       cy.wait(3000);
 
+      //edit sharing
+      cy.get("[data-testid='edit-sharing']").click({ force: true });
+
+      //type in swift-project's shareID
+      cy.get("[data-testid='share-id-input']>input").type(copyId, {
+        force: true,
+      });
+
+      //choose read permission
+      cy.get("[data-testid='select-permissions']").click({ force: true });
+      cy.wait(3000);
+      cy.get("[data-testid='read-perm']").click({ force: true });
+      cy.wait(3000);
+
       //save sharing
-      cy.get("#share-btn").eq(0).click({ force: true });
+      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.wait(3000);
+
+      //share should be successful
+      cy.get("[data-testid='share-success-alert']").should("exist");
 
       //repeat sharing with same ID
-      cy.wait(3000);
-
-      //edit sharing
-      cy.contains("Edit sharing").click({ force: true });
 
       //type in swift-project's shareID
-      cy.get(":nth-child(1) > .tags-list > input").type(copyId, {
+      cy.get("[data-testid='share-id-input']>input").type(copyId, {
         force: true,
       });
 
-      //choose copy and download permission
-      cy.contains("Select permissions").click({ force: true });
+      //choose read permission
+      cy.get("[data-testid='select-permissions']").click({ force: true });
       cy.wait(3000);
-      cy.get(".c-input-menu__item-wrapper")
-        .find("ul")
-        .find("li")
-        .contains("Copy and download")
-        .click({ force: true });
+      cy.get("[data-testid='read-perm']").click({ force: true });
       cy.wait(3000);
 
       //save sharing
-      cy.get("#share-btn").eq(0).click({ force: true });
+      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.wait(3000);
 
-      // cy.contains("already has access").should("exist");
-      cy.contains("Folder was shared successfully").should("not.exist");
+      //see error toast
+      cy.get("[data-testid='shareModal-toasts']")
+        .find("c-toast")
+        .should("exist")
+        .and("have.class", "error");
+      cy.get("[data-testid='share-success-alert']").should("not.be.visible");
     });
   });
 });
@@ -228,7 +250,7 @@ describe("A folder cannot be shared with the invalid ID", function () {
     cy.wait(3000);
 
     //switch project
-    cy.selectProject("service");
+    cy.switchProject();
 
     //add folder
     const folderName = Math.random().toString(36).substring(2, 7);
@@ -237,32 +259,35 @@ describe("A folder cannot be shared with the invalid ID", function () {
 
     //access folder
     cy.searchFolder(folderName);
-    cy.get(".media-content").contains(folderName).click({ force: true });
-    cy.wait(3000);
-
-    //edit sharing
-    cy.contains("Edit sharing").click({ force: true });
-
-    //type in invalid shareID
-    const copyId = Math.random().toString(36).substring(2, 7);
-    cy.get(":nth-child(1) > .tags-list > input").type(copyId, {
-      force: true,
-    });
-
-    //choose copy and download permission
-    cy.contains("Select permissions").click({ force: true });
-    cy.wait(3000);
-    cy.get(".c-input-menu__item-wrapper")
-      .find("ul")
-      .find("li")
-      .contains("Copy and download")
+    cy.get("[data-testid='search-result']")
+      .contains(folderName)
       .click({ force: true });
     cy.wait(3000);
 
-    //save sharing
-    cy.get("#share-btn").eq(0).click({ force: true });
+    //edit sharing
+    cy.get("[data-testid='edit-sharing']").click({ force: true });
 
-    //cy.contains("already has access").should("exist");
-    cy.contains("Folder was shared successfully").should("not.exist");
+    //type in invalid shareID
+    const invalidId = Math.random().toString(36).substring(2, 7);
+    cy.get("[data-testid='share-id-input']>input").type(invalidId, {
+      force: true,
+    });
+
+    //choose read permission
+    cy.get("[data-testid='select-permissions']").click({ force: true });
+      cy.wait(3000);
+      cy.get("[data-testid='read-perm']").click({ force: true });
+      cy.wait(3000);
+
+    //save sharing
+    cy.get("[data-testid='submit-share']").click({ force: true });
+    cy.wait(3000);
+
+    //see error toast
+    cy.get("[data-testid='shareModal-toasts']")
+      .find("c-toast")
+      .should("exist")
+      .and("have.class", "error");
+    cy.get("[data-testid='share-success-alert']").should("not.be.visible");
   });
 });
