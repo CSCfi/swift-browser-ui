@@ -215,6 +215,7 @@
         {{ $t("message.encrypt.cancel") }}
       </c-button>
       <c-button
+        data-testid="start-upload"
         size="large"
         :loading="addingFiles || buttonAddingFiles"
         @click="onUploadClick"

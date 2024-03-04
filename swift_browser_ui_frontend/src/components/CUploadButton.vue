@@ -11,6 +11,7 @@ Inspired by https://github.com/buefy/buefy/blob/3b3ae60e448ddfd669f20570d40812fd
     </c-button>
     <input
       ref="input"
+      data-testid="select-files-input"
       :value="modelValue"
       type="file"
       multiple

@@ -2,12 +2,11 @@ describe("A folder is shared from project A to project B", function () {
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
+    cy.wait(3000);
   });
 
   //Happy test cases
   it("the folder is shared successfully, when other user logs in, shared folder is visible", function () {
-    cy.wait(3000);
-
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -16,6 +15,7 @@ describe("A folder is shared from project A to project B", function () {
       //switch user
       cy.logout();
       cy.login(Cypress.env("username2"), Cypress.env("password2"));
+      cy.wait(3000);
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -31,31 +31,19 @@ describe("A folder is shared from project A to project B", function () {
 
       //edit sharing
       cy.get("[data-testid='edit-sharing']").click({ force: true });
-
-      //type in swift-project's shareID
-      cy.get("[data-testid='share-id-input']>input").type(copyId, {
-        force: true,
-      });
-
-      //choose read permission
-      cy.get("[data-testid='select-permissions']").click({ force: true });
-      cy.wait(3000);
-      cy.get("[data-testid='read-perm']").click({ force: true });
-      cy.wait(3000);
-
-      //save sharing
-      cy.get("[data-testid='submit-share']").click({ force: true });
-      cy.wait(3000);
+      cy.share(copyId, "read");
+      cy.wait(2000);
 
       cy.get("[data-testid='share-success-alert']").should("exist");
 
       //see if share id added to share table
+      cy.wait(2000);
       cy.get("[data-testid='share-modal-table']").contains(copyId);
-
-      //Switch user and check the folder is visible
 
       //close share modal
       cy.get("[data-testid='close-share-modal']").click({ force: true });
+
+      //Switch user and check the folder is visible
 
       //switch user
       cy.logout();
@@ -74,11 +62,10 @@ describe("A folder cannot be shared without Share ID or if rights are not select
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
+    cy.wait(3000);
   });
 
   it("switch project, try to share folder without share ID, fail", function () {
-    cy.wait(3000);
-
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -101,16 +88,8 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
       //edit sharing
       cy.get("[data-testid='edit-sharing']").click({ force: true });
-
-      //choose read permission
-      cy.get("[data-testid='select-permissions']").click({ force: true });
-      cy.wait(3000);
-      cy.get("[data-testid='read-perm']").click({ force: true });
-      cy.wait(3000);
-
-      //save sharing
-      cy.get("[data-testid='submit-share']").click({ force: true });
-      cy.wait(3000);
+      cy.share("", "read");
+      cy.wait(2000);
 
       //see error toast
       cy.get("[data-testid='shareModal-toasts']")
@@ -122,7 +101,6 @@ describe("A folder cannot be shared without Share ID or if rights are not select
   });
 
   it("copy shareID, switch project, try to share folder without selecting rights, fail", function () {
-    cy.wait(3000);
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -145,14 +123,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
       //edit sharing
       cy.get("[data-testid='edit-sharing']").click({ force: true });
-
-      //type in service's shareID
-      cy.get("[data-testid='share-id-input']>input").type(copyId, {
-        force: true,
-      });
-
-      //save sharing
-      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.share(copyId, "");
       cy.wait(2000);
 
       //see error toast
@@ -169,11 +140,10 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
+    cy.wait(3000);
   });
 
   it("switch project, try to share folder with the same ID twice, fail", function () {
-    cy.wait(3000);
-
     //take the ID appearing as the last part of url
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
@@ -196,40 +166,14 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
 
       //edit sharing
       cy.get("[data-testid='edit-sharing']").click({ force: true });
-
-      //type in swift-project's shareID
-      cy.get("[data-testid='share-id-input']>input").type(copyId, {
-        force: true,
-      });
-
-      //choose read permission
-      cy.get("[data-testid='select-permissions']").click({ force: true });
-      cy.wait(3000);
-      cy.get("[data-testid='read-perm']").click({ force: true });
-      cy.wait(3000);
-
-      //save sharing
-      cy.get("[data-testid='submit-share']").click({ force: true });
-      cy.wait(3000);
+      cy.share(copyId, "read");
+      cy.wait(2000);
 
       //share should be successful
       cy.get("[data-testid='share-success-alert']").should("exist");
 
       //repeat sharing with same ID
-
-      //type in swift-project's shareID
-      cy.get("[data-testid='share-id-input']>input").type(copyId, {
-        force: true,
-      });
-
-      //choose read permission
-      cy.get("[data-testid='select-permissions']").click({ force: true });
-      cy.wait(3000);
-      cy.get("[data-testid='read-perm']").click({ force: true });
-      cy.wait(3000);
-
-      //save sharing
-      cy.get("[data-testid='submit-share']").click({ force: true });
+      cy.share(copyId, "read");
       cy.wait(2000);
 
       //see error toast
@@ -246,11 +190,10 @@ describe("A folder cannot be shared with an invalid ID", function () {
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
+    cy.wait(3000);
   });
 
   it("switch project, try to share folder with invalid share ID, fail", function () {
-    cy.wait(3000);
-
     //switch project
     cy.switchProject();
 
@@ -269,20 +212,9 @@ describe("A folder cannot be shared with an invalid ID", function () {
     //edit sharing
     cy.get("[data-testid='edit-sharing']").click({ force: true });
 
-    //type in invalid shareID
+    //get invalid shareID and share
     const invalidId = Math.random().toString(36).substring(2, 7);
-    cy.get("[data-testid='share-id-input']>input").type(invalidId, {
-      force: true,
-    });
-
-    //choose read permission
-    cy.get("[data-testid='select-permissions']").click({ force: true });
-      cy.wait(3000);
-      cy.get("[data-testid='read-perm']").click({ force: true });
-      cy.wait(3000);
-
-    //save sharing
-    cy.get("[data-testid='submit-share']").click({ force: true });
+    cy.share(invalidId, "read");
     cy.wait(2000);
 
     //see error toast

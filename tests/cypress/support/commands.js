@@ -85,15 +85,15 @@ Cypress.Commands.add("switchProject", () => {
   //get currently selected project
   cy.get("[data-testid='project-selector']")
     .find("input")
-    .invoke('attr', 'name')
+    .invoke("attr", "name")
     .then($value => {
       //click sibling of currently selected
       cy.get("[data-testid='project-selector']")
-      .click()
-      .find("li")
-      .contains($value)
-      .siblings()
-      .click()
+        .click()
+        .find("li")
+        .contains($value)
+        .siblings()
+        .click()
   })
 });
 
@@ -216,3 +216,22 @@ Cypress.Commands.add("generateFixture", (name) => {
     }),
   });
 });
+
+Cypress.Commands.add("share", (shareId, perm) => {
+  //type in shareID, choose permission, save sharing
+  //perms: read, read and write, view
+  if (shareId) {
+    cy.get("[data-testid='share-id-input']>input").type(shareId, {
+      force: true,
+    });
+  }
+
+  if (perm) {
+    cy.get("[data-testid='select-permissions']").click({ force: true });
+    cy.wait(2000);
+    cy.get(`[data-testid='${perm}-perm']`).click({ force: true });
+    cy.wait(2000);
+  }
+
+  cy.get("[data-testid='submit-share']").click({ force: true });
+})

@@ -299,6 +299,7 @@ export default {
                   component: {
                     tag: "c-button",
                     params: {
+                      testid: "share-container",
                       text: true,
                       size: "small",
                       title: this.$t("message.share.share"),
