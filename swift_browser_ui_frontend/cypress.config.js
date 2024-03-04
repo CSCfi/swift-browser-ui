@@ -65,5 +65,7 @@ module.exports = defineConfig({
     password: "veryfast",
     wrongusername: "swif11t",
     wrongpassword: "very11fast",
+    username2: "admin",
+    password2: "superuser",
   },
 });

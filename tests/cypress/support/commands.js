@@ -39,6 +39,7 @@ Cypress.Commands.add("login", (username, password) => {
 Cypress.Commands.add("logout", () => {
   cy.get('[data-testid="user-menu"]').click();
   cy.get("ul.c-menu-items").find("li").contains("Log out").click();
+  cy.visit(Cypress.config().baseUrl);
 });
 
 // CSC Design System renders inside of shadow DOM and therefore needs to be queried

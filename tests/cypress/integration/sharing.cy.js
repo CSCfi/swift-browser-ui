@@ -5,7 +5,7 @@ describe("A folder is shared from project A to project B", function () {
   });
 
   //Happy test cases
-  it("the folder is shared successfully, when we switch project, shared folder is visible", function () {
+  it("the folder is shared successfully, when other user logs in, shared folder is visible", function () {
     cy.wait(3000);
 
     //take the ID appearing as the last part of url
@@ -13,8 +13,9 @@ describe("A folder is shared from project A to project B", function () {
       const copyId = url.split("/")[5];
       cy.log(copyId);
 
-      //switch project
-      cy.switchProject();
+      //switch user
+      cy.logout();
+      cy.login(Cypress.env("username2"), Cypress.env("password2"));
 
       //add folder
       const folderName = Math.random().toString(36).substring(2, 7);
@@ -51,13 +52,14 @@ describe("A folder is shared from project A to project B", function () {
       //see if share id added to share table
       cy.get("[data-testid='share-modal-table']").contains(copyId);
 
-      //Switch project and check the folder is visible
+      //Switch user and check the folder is visible
 
       //close share modal
       cy.get("[data-testid='close-share-modal']").click({ force: true });
 
-      //switch project
-      cy.switchProject();
+      //switch user
+      cy.logout();
+      cy.login(Cypress.env("username"), Cypress.env("password"));
       cy.wait(3000);
 
       cy.get("[data-testid='container-table']")
@@ -151,7 +153,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
       //save sharing
       cy.get("[data-testid='submit-share']").click({ force: true });
-      cy.wait(3000);
+      cy.wait(2000);
 
       //see error toast
       cy.get("[data-testid='shareModal-toasts']")
@@ -228,7 +230,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
 
       //save sharing
       cy.get("[data-testid='submit-share']").click({ force: true });
-      cy.wait(3000);
+      cy.wait(2000);
 
       //see error toast
       cy.get("[data-testid='shareModal-toasts']")
@@ -240,7 +242,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
   });
 });
 
-describe("A folder cannot be shared with the invalid ID", function () {
+describe("A folder cannot be shared with an invalid ID", function () {
   beforeEach(() => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
@@ -281,7 +283,7 @@ describe("A folder cannot be shared with the invalid ID", function () {
 
     //save sharing
     cy.get("[data-testid='submit-share']").click({ force: true });
-    cy.wait(3000);
+    cy.wait(2000);
 
     //see error toast
     cy.get("[data-testid='shareModal-toasts']")
