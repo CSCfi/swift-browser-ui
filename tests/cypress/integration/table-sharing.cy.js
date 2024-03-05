@@ -47,12 +47,12 @@ describe("User can share folder from container table", function () {
       //switch user
       cy.logout();
       cy.login(Cypress.env("username"), Cypress.env("password"));
-      cy.wait(3000);
+      cy.wait(5000);
 
       //access folder
-      cy.get("[data-testid='container-table']")
-        .contains(folderName)
-        .click()
+      findFolder(folderName)
+      cy.contains(folderName)
+        .click({ force: true });
 
       //generate fixture
       const file = "text-file";
@@ -76,7 +76,11 @@ describe("User can share folder from container table", function () {
         .click();
       cy.wait(5000);
 
-      //check if the file name is on the page
+      //upload modal closes when upload starts successfully
+      cy.get("[data-testid='upload-modal']")
+        .should("not.be.visible");
+
+      //check if the file name is in the table
       cy.contains(file).should("exist");
     });
   });

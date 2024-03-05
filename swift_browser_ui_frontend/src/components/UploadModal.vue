@@ -2,6 +2,7 @@
   <c-card
     ref="uploadContainer"
     class="upload-card"
+    data-testid="upload-modal"
     @keydown="handleKeyDown"
   >
     <div
