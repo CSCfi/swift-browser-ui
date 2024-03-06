@@ -4,7 +4,7 @@ describe("Upload a file", function () {
 
   const file1 = "text-file-1";
   const file2 = "text-file-2";
-  const fileLocation = "cypress/fixtures/text-files/";
+  const fileLocation = Cypress.config("textFileLocation");
 
   beforeEach(() => {
     cy.visit(Cypress.config("baseUrl"));
@@ -17,6 +17,7 @@ describe("Upload a file", function () {
   //Happy scenarios
   //upload from folder
   it("Upload file from the folder page", () => {
+
     //create a folder and go inside it
     const folderName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(folderName);
@@ -28,21 +29,8 @@ describe("Upload a file", function () {
       .click({ force: true });
     cy.wait(5000);
 
-    //press upload button from folder
-    cy.get('[data-testid="upload-file"]').click();
-    cy.wait(3000);
-
-    //add the fixture file
-    cy.get('[data-testid="select-files-input"]')
-      .invoke("show")
-      .selectFile(fileLocation + file1 + ".txt");
-    cy.wait(3000);
-
-    //start upload
-    cy.get('[data-testid="start-upload"]')
-      .should("not.have.class", "disabled")
-      .click();
-    cy.wait(5000);
+    //upload file from destination folder
+    cy.uploadFileFromFolder(file1);
 
     //close upload toast
     cy.get('[data-testid="close-upload-toast"]')
@@ -67,30 +55,9 @@ describe("Upload a file", function () {
   //Upload from the main page
   it("Upload file from the main page to a new folder", () => {
 
-    //open upload modal
-    cy.get('[data-testid="upload-file"]').click();
-    cy.wait(3000);
-
-    //check that modal opened
-    cy.get("[data-testid='upload-modal']").should("be.visible");
-
-    //add folder name
+    //upload file and create a folder at the same time
     const folderName = Math.random().toString(36).substring(2, 7);
-    cy.get('[data-testid="upload-folder-input"]')
-      .find("input")
-      .type(folderName);
-
-    //add the fixture file
-    cy.get('[data-testid="select-files-input"]')
-      .invoke("show")
-      .selectFile(fileLocation + file1 + ".txt");
-    cy.wait(3000);
-
-    //start upload
-    cy.get('[data-testid="start-upload"]')
-      .should("not.have.class", "disabled")
-      .click();
-    cy.wait(5000);
+    cy.uploadFileFromMain(folderName, file1);
 
     //close upload toast
     cy.get('[data-testid="close-upload-toast"]')
@@ -159,12 +126,8 @@ describe("Upload a file", function () {
     cy.contains(file1).should("exist");
     cy.contains(file2).should("exist");
 
-    //delete the first file
-    cy.deleteFileCheckbox(file1);
-    cy.wait(3000);
-
-    //delete the second file
-    cy.deleteFileCheckbox(file2);
+    //delete both files
+    cy.deleteFilesOnPageCheckbox();
     cy.wait(3000);
 
     cy.get('[data-testid="object-table"]')
@@ -175,6 +138,7 @@ describe("Upload a file", function () {
   });
 
   it("Several files with different names can be uploaded to a folder one by one", () => {
+
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
     cy.addFolder(folderName);
@@ -187,48 +151,16 @@ describe("Upload a file", function () {
       .click({ force: true });
     cy.wait(5000);
 
-    //press upload button from folder
-    cy.get("[data-testid='upload-file']").click({ force: true });
-    cy.wait(3000);
-
-    //check that modal opened
-    cy.get("[data-testid='upload-modal']").should("be.visible");
-
-    //add the first fixture file
-    cy.get("[data-testid='select-files-input']")
-      .invoke("show")
-      .selectFile(fileLocation + file1 + ".txt")
-    cy.wait(3000);
-
-    //start upload
-    cy.get('[data-testid="start-upload"]')
-      .should("not.have.class", "disabled")
-      .click();
-    cy.wait(5000);
+    //upload first file
+    cy.uploadFileFromFolder(file1);
 
     //close toast
     cy.get('[data-testid="close-upload-toast"]')
       .should("exist")
       .click();
 
-    //press upload button from folder
-    cy.get('[data-testid="upload-file"]').click({ force: true });
-    cy.wait(3000);
-
-    //check that modal opened
-    cy.get("[data-testid='upload-modal']").should("be.visible");
-
-    //add another fixture file
-    cy.get('[data-testid="select-files-input"]')
-      .invoke("show")
-      .selectFile(fileLocation + file2 + ".txt");
-    cy.wait(3000);
-
-    //start upload
-    cy.get('[data-testid="start-upload"]')
-      .should("not.have.class", "disabled")
-      .click();
-    cy.wait(5000);
+    //upload second file
+    cy.uploadFileFromFolder(file2);
 
     //close toast
     cy.get('[data-testid="close-upload-toast"]')
@@ -239,12 +171,8 @@ describe("Upload a file", function () {
     cy.contains(file1).should("exist");
     cy.contains(file2).should("exist");
 
-    //delete the first file
-    cy.deleteFileCheckbox(file1);
-    cy.wait(3000);
-
-    //delete the second file
-    cy.deleteFileCheckbox(file2);
+    //delete both files
+    cy.deleteFilesOnPageCheckbox();
     cy.wait(3000);
 
     cy.get('[data-testid="object-table"]')

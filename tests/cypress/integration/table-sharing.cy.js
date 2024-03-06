@@ -58,23 +58,8 @@ describe("User can share folder from container table", function () {
       const file = "text-file";
       cy.generateFixture(file);
 
-      //press upload button from folder
-      cy.get('[data-testid="upload-file"]')
-        .should("not.have.class", "disabled")
-        .click();
-      cy.wait(3000);
-
-      //upload the fixture file
-      cy.get('[data-testid="select-files-input"]')
-        .invoke("show")
-        .selectFile(`cypress/fixtures/text-files/${file}.txt`);
-
-      cy.wait(3000);
-
-      cy.get('[data-testid="start-upload"]')
-        .should("not.have.class", "disabled")
-        .click();
-      cy.wait(5000);
+      //upload file from destination folder
+      cy.uploadFileFromFolder(file);
 
       //upload modal closes when upload starts successfully
       cy.get("[data-testid='upload-modal']")

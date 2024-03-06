@@ -4,6 +4,7 @@
   >
     <c-autocomplete
       v-csc-control
+      data-testid="search-box"
       :items.prop="searchResults"
       :aria-label="$t('label.searchbox')"
       :placeholder="$t('message.search.searchBy')"

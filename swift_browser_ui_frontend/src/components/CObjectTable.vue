@@ -270,6 +270,7 @@ export default {
               component: {
                 tag: "c-button",
                 params: {
+                  testid: "delete-object",
                   text: true,
                   size: "small",
                   title: "Delete object",

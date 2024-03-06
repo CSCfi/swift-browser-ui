@@ -29,7 +29,7 @@
 import { faker } from "../../../swift_browser_ui_frontend/node_modules/@faker-js/faker";
 
 Cypress.Commands.add("login", (username, password) => {
-  cy.get("c-login-card-actions.hydrated > .hydrated").click();
+  cy.get("c-login-card-actions > c-button").click();
   cy.url().should("include", "/login/");
   cy.get('#classicform > [type="text"]').type(username);
   cy.get('[type="password"]').type(password);
@@ -42,8 +42,6 @@ Cypress.Commands.add("logout", () => {
   cy.visit(Cypress.config().baseUrl);
 });
 
-// CSC Design System renders inside of shadow DOM and therefore needs to be queried
-// with .shadow() method.
 Cypress.Commands.add("changeLang", (locale) => {
   const locales = [
     { key: "en", label: "In English" },
@@ -145,33 +143,61 @@ Cypress.Commands.add("deleteFolder", (folderName) => {
 });
 
 Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
-  //press upload button from folder
-  cy.get('[data-testid="upload-file"]').click({ force: true });
-  cy.wait(5000);
+  //open upload modal
+  cy.get('[data-testid="upload-file"]').click();
+  cy.wait(3000);
 
-  //upload the fixture file
-  cy.get(".upload-btn-wrapper")
-    .find("input")
+  //check that modal opened
+  cy.get("[data-testid='upload-modal']").should("be.visible");
+
+  //add the file
+  cy.get('[data-testid="select-files-input"]')
     .invoke("show")
-    .selectFile(`cypress/fixtures/text-files/${fileName}.txt`);
-  cy.wait(8000);
-  cy.get(".upload-card > c-card-actions.hydrated > :nth-child(2)").click({
-    force: true,
-  });
-  cy.wait(8000);
+    .selectFile(Cypress.config("textFileLocation") + fileName + ".txt");
+  cy.wait(3000);
+
+  //start upload
+  cy.get('[data-testid="start-upload"]')
+    .should("not.have.class", "disabled")
+    .click();
+  cy.wait(5000);
 });
+
+Cypress.Commands.add("uploadFileFromMain", (folderName, fileName) => {
+  //open upload modal
+  cy.get('[data-testid="upload-file"]').click();
+  cy.wait(3000);
+
+  //check that modal opened
+  cy.get("[data-testid='upload-modal']").should("be.visible");
+
+  //insert folder name
+  cy.get('[data-testid="upload-folder-input"]')
+    .find("input")
+    .type(folderName);
+
+  //add the file
+  cy.get('[data-testid="select-files-input"]')
+    .invoke("show")
+    .selectFile(Cypress.config("textFileLocation") + fileName + ".txt");
+  cy.wait(3000);
+
+  //start upload
+  cy.get('[data-testid="start-upload"]')
+    .should("not.have.class", "disabled")
+    .click();
+  cy.wait(5000);
+})
 
 Cypress.Commands.add("deleteFile", (fileName) => {
   cy.contains(fileName)
     .parent()
     .parent()
-    .find("td")
-    .eq(2)
-    .find("button")
+    .find("[testid='delete-object']")
     .click();
-  cy.get("c-alert.hydrated > c-card-actions.hydrated > :nth-child(2)").click({
-    force: true,
-  });
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
 });
 
 Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
@@ -179,38 +205,38 @@ Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
   cy.contains(fileName)
     .parent()
     .parent()
-    .find("td")
-    .eq(5)
-    .find("button")
-    .eq(2)
-    .click({ force: true });
-  cy.get("#delete-objs-btn").eq(0).click({
-    force: true,
-  });
+    .find("c-checkbox")
+    .click();
+  //click delete
+  cy.get("[data-testid='delete-checked-files']").click();
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
+});
+
+Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
+  //delete all the files on the current page by checkbox
+  cy.get("[data-testid='object-table']")
+    .find("thead")
+    .find("c-checkbox")
+    .click();
+  //click delete
+  cy.get("[data-testid='delete-checked-files']").click();
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
 });
 
 Cypress.Commands.add("searchFolder", (folderName) => {
-  cy.get(".c-input--text")
-    .eq(0)
-    .children()
-    .eq(0)
-    .children()
-    .eq(0)
-    .children()
-    .eq(1)
-    .children()
-    .eq(1)
-    .children()
-    .eq(0)
+  cy.get("[data-testid='search-box']")
     .find("input")
     .eq(0)
     .type(folderName, { force: true });
-
   cy.wait(5000);
 });
 
 Cypress.Commands.add("generateFixture", (name) => {
-  cy.writeFile(`cypress/fixtures/text-files/${name}.txt`, {
+  cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
     hits: Cypress._.times(20, () => {
       return faker.lorem.paragraphs(50);
     }),

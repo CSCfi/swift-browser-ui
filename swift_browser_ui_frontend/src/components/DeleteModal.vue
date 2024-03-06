@@ -32,6 +32,7 @@
           </c-button>
           <c-button
             id="delete-objs-btn"
+            data-testid="confirm-delete-objects"
             @click="deleteObjects()"
             @keyup.enter="deleteObjects()"
           >
