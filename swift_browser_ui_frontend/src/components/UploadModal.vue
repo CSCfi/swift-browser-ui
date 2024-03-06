@@ -33,6 +33,7 @@
             id="upload-folder-input"
             v-model="inputFolder"
             v-csc-control
+            data-testid="upload-folder-input"
             :label="$t('message.container_ops.folderName')"
             aria-required="true"
             required
