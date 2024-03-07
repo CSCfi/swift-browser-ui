@@ -28,7 +28,10 @@
         }}
       </h3>
 
-      <ProgressBar :type="type" />
+      <ProgressBar
+        :type="type"
+        :finished="finished"
+      />
 
       <a
         v-if="type === 'upload'"

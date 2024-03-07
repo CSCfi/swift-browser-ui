@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isOngoing"
+    v-if="!finished"
     class="progress-bar"
   >
     <c-progress-bar
@@ -19,13 +19,8 @@
 <script>
 export default {
   name: "ProgressBar",
-  props: ["type"],
+  props: ["type", "finished"],
   computed: {
-    isOngoing() {
-      return this.type === "upload"
-        ? this.$store.state.isUploading
-        : this.$store.state.downloadCount > 0;
-    },
     progress() {
       return this.type === "upload"
         ? this.$store.state.uploadProgress

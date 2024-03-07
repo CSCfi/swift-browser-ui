@@ -26,7 +26,10 @@
         </c-icon-button>
       </c-row>
 
-      <ProgressBar :type="type" />
+      <ProgressBar
+        :type="type"
+        :finished="finished"
+      />
 
       <c-row
         v-if="type === 'upload'"
