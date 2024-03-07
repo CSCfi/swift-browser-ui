@@ -42,7 +42,6 @@ const store = createStore({
     uploadNotification: {
       visible: false,
       maximized: true,
-      closable: false,
     },
     downloadCount: 0,
     downloadProgress: undefined,
@@ -203,12 +202,6 @@ const store = createStore({
     },
     toggleShareModal(state, payload) {
       state.openShareModal = payload;
-    },
-    setNotClosable(state) {
-      state.uploadNotification.closable = false;
-    },
-    eraseNotClosable(state) {
-      state.uploadNotification.closable = true;
     },
     setUploadAbortReason(state, payload) {
       state.uploadAbortReason = payload;

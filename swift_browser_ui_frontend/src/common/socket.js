@@ -88,7 +88,6 @@ export default class UploadSocket {
         case "success":
           break;
         case "finished":
-          this.$store.commit("eraseNotClosable");
           this.$store.commit("eraseDropFiles");
           this.$store.commit("stopUploading");
           this.$store.commit("eraseProgress");
@@ -370,7 +369,6 @@ export default class UploadSocket {
 
     if (DEV) console.log("Pushed new files to the service worker.");
     this.$store.commit("setUploading");
-    this.$store.commit("setNotClosable");
   }
 
   // Schedule file/files for download

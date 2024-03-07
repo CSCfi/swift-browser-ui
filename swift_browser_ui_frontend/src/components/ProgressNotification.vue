@@ -40,7 +40,7 @@ export default {
   computed: {
     finished() {
       return this.type === "upload"
-        ? this.$store.state.uploadNotification.closable
+        ? !this.$store.state.isUploading
         : this.$store.state.downloadCount < 1;
     },
     maximized() {
