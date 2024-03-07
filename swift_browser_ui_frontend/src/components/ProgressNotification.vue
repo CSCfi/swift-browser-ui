@@ -2,6 +2,8 @@
   <ProgressToast
     v-if="maximized"
     :type="type"
+    :finished="finished"
+    @toggleSize="toggleSize"
     @close="onClose"
     @cancel-upload="onCancelUpload"
     @view-container="viewUploadContainer"
@@ -9,6 +11,8 @@
   <ProgressAlert
     v-else
     :type="type"
+    :finished="finished"
+    @toggleSize="toggleSize"
     @close="onClose"
     @view-container="viewUploadContainer"
   />
@@ -34,6 +38,11 @@ export default {
   },
   emits: ["cancel-current-upload"],
   computed: {
+    finished() {
+      return this.type === "upload"
+        ? this.$store.state.uploadNotification.closable
+        : this.$store.state.downloadCount < 1;
+    },
     maximized() {
       return this.type === "upload"
         ? this.$store.state.uploadNotification.maximized
@@ -47,7 +56,7 @@ export default {
     },
   },
   methods: {
-    toggleNotification() {
+    toggleSize() {
       this.type === "upload"
         ? this.$store.commit("toggleUploadNotificationSize")
         : this.$store.commit("toggleDownloadNotificationSize");
@@ -57,7 +66,7 @@ export default {
       this.type === "upload"
         ? this.$store.commit("toggleUploadNotification", false)
         : this.$store.commit("toggleDownloadNotification", false);
-      if (!this.maximized) this.toggleNotification();
+      if (!this.maximized) this.toggleSize();
     },
     /* UPLOAD */
     onCancelUpload() {

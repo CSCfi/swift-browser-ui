@@ -43,8 +43,8 @@
         <c-icon-button
           size="small"
           text
-          @click="toggleSize"
-          @keyup.enter="toggleSize"
+          @click="$emit('toggleSize')"
+          @keyup.enter="$emit('toggleSize')"
         >
           <c-icon :path="mdiArrowExpand" />
         </c-icon-button>
@@ -72,27 +72,13 @@ export default {
   components: {
     ProgressBar,
   },
-  props: ["type"],
-  emits: ["view-container", "close"],
+  props: ["type", "finished"],
+  emits: ["view-container", "close", "toggleSize"],
   data() {
     return {
       mdiClose,
       mdiArrowExpand,
     };
-  },
-  computed: {
-    finished() {
-      return this.type === "upload"
-        ? this.$store.state.uploadNotification.closable
-        : this.$store.state.downloadCount < 1;
-    },
-  },
-  methods: {
-    toggleSize() {
-      this.type === "upload"
-        ? this.$store.commit("toggleUploadNotificationSize")
-        : this.$store.commit("toggleDownloadNotificationSize");
-    },
   },
 };
 </script>

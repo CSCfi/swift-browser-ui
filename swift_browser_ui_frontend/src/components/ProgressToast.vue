@@ -82,8 +82,8 @@ export default {
   components: {
     ProgressBar,
   },
-  props: ["type"],
-  emits: ["view-container", "close", "cancel-upload"],
+  props: ["type", "finished"],
+  emits: ["view-container", "close", "cancel-upload", "toggleSize"],
   data() {
     return {
       mdiArrowCollapse,
@@ -91,11 +91,6 @@ export default {
     };
   },
   computed: {
-    finished() {
-      return this.type === "upload"
-        ? this.$store.state.uploadNotification.closable
-        : this.$store.state.downloadCount < 1;
-    },
     otherNotification() {
       return this.type === "upload"
         ? this.$store.state.downloadNotification
@@ -149,9 +144,7 @@ export default {
       this.$emit("cancel-upload");
     },
     toggleSize() {
-      this.type === "upload"
-        ? this.$store.commit("toggleUploadNotificationSize")
-        : this.$store.commit("toggleDownloadNotificationSize");
+      this.$emit("toggleSize");
       this.removeToast();
     },
     removeToast() {
