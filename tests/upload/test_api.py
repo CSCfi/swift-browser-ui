@@ -32,13 +32,6 @@ class APITestClass(tests.common.mockups.APITestBase):
                 "a_check_segment": unittest.mock.AsyncMock(return_value="check-success"),
             }
         )
-        self.mock_get_upload_instance = unittest.mock.AsyncMock(
-            return_value=self.mock_upload_instance
-        )
-        self.patch_get_upload_instance = unittest.mock.patch(
-            "swift_browser_ui.upload.api.get_upload_instance",
-            self.mock_get_upload_instance,
-        )
 
         self.mock_response = types.SimpleNamespace(
             **{
@@ -211,42 +204,11 @@ class APITestClass(tests.common.mockups.APITestBase):
             await swift_browser_ui.upload.api.handle_post_object_chunk(req)
         mock_handle_repl_container.assert_called_once()
 
-        # The actual test for uploaded object chunk post
-        mock_parse_multipart_in = unittest.mock.AsyncMock(
-            return_value=("example-query", "example-data")
-        )
-        patch_parse_multipart_in = unittest.mock.patch(
-            "swift_browser_ui.upload.api.parse_multipart_in", mock_parse_multipart_in
-        )
-
         req = tests.common.mockups.Mock_Request()
         req.set_match({"project": "test-project", "container": "test-container"})
 
-        with patch_parse_multipart_in, self.patch_get_upload_instance:
+        with self.assertRaises(aiohttp.web.HTTPGone):
             resp = await swift_browser_ui.upload.api.handle_post_object_chunk(req)
-
-        self.assertEqual(resp, "add-success")
-        mock_parse_multipart_in.assert_called_once()
-        self.mock_get_upload_instance.assert_called_once()
-        self.mock_upload_instance.a_add_chunk.assert_called_once_with(
-            "example-query", "example-data"
-        )
-
-    async def test_handle_get_object_chunk(self):
-        """Test swift_browser_ui.upload.api.handle_get_object_chunk."""
-        req = tests.common.mockups.Mock_Request()
-        req.set_match({"project": "test-project", "container": "test-container"})
-
-        with self.assertRaises(aiohttp.web.HTTPBadRequest), self.p_get_sess:
-            await swift_browser_ui.upload.api.handle_get_object_chunk(req)
-
-        req.set_query({"resumableChunkNumber": 100})
-
-        with self.p_get_sess, self.patch_get_upload_instance:
-            resp = await swift_browser_ui.upload.api.handle_get_object_chunk(req)
-
-        self.assertEqual(resp, "check-success")
-        self.mock_upload_instance.a_check_segment.assert_called_once_with(99)
 
     async def test_handle_post_object_options(self):
         """Test swift_browser_ui.upload.api.handle_post_object_options."""
@@ -254,43 +216,6 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.assertIsInstance(resp, aiohttp.web.Response)
         self.assertIn("Access-Control-Allow-Methods", resp.headers)
         self.assertIn("Access-Control-Max-Age", resp.headers)
-
-    async def test_handle_get_container(self):
-        """Test swift_browser_ui.upload.api.handle_get_container."""
-        # Handle edge case of uploaded object chunk check
-        self.mock_request.match_info["project"] = "test-project"
-        self.mock_request.match_info["container"] = "test-container"
-        self.mock_request.query["resumableChunkNumber"] = 1
-
-        mock_get_object_chunk = unittest.mock.AsyncMock(return_value="get-chunk-success")
-        patch_get_object_chunk = unittest.mock.patch(
-            "swift_browser_ui.upload.api.handle_get_object_chunk", mock_get_object_chunk
-        )
-        with patch_get_object_chunk:
-            resp = await swift_browser_ui.upload.api.handle_get_container(
-                self.mock_request,
-            )
-        self.assertEqual(resp, "get-chunk-success")
-
-        # Test normal behaviour
-        self.mock_request.query.pop("resumableChunkNumber")
-        patch_init_download = unittest.mock.patch(
-            "swift_browser_ui.upload.api.ContainerArchiveDownloadProxy",
-            self.mock_init_download,
-        )
-
-        with self.p_get_sess, self.patch_streamresponse, patch_init_download:
-            resp = await swift_browser_ui.upload.api.handle_get_container(
-                self.mock_request,
-            )
-
-        self.assertIs(resp, self.mock_response)
-        self.mock_download.a_write_to_response.assert_called_once()
-        self.mock_init_download.assert_called_once_with(
-            "placeholder", "test-project", "test-container"
-        )
-        self.assertEqual(resp.headers["Content-Type"], "application/x-tar")
-        self.assertIsNotNone(resp.headers["Content-Disposition"])
 
     async def test_handle_health_check(self):
         """Test swift_browser_ui.upload.api.handle_health_check."""

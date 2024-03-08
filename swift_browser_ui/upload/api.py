@@ -18,11 +18,6 @@ from swift_browser_ui.upload.common import (
     generate_download_url,
     get_download_host,
     get_session_id,
-    get_upload_instance,
-    parse_multipart_in,
-)
-from swift_browser_ui.upload.download import (
-    ContainerArchiveDownloadProxy,
 )
 from swift_browser_ui.upload.replicate import ObjectReplicationProxy
 
@@ -152,31 +147,7 @@ async def handle_post_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.
     if "from_container" in request.query.keys():
         return await handle_replicate_container(request)
 
-    project = request.match_info["project"]
-    container = request.match_info["container"]
-
-    query, data = await parse_multipart_in(request)
-
-    upload_session = await get_upload_instance(request, project, container, p_query=query)
-
-    return await upload_session.a_add_chunk(query, data)
-
-
-async def handle_get_object_chunk(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Handle a request for checking if a chunk exists."""
-    project = request.match_info["project"]
-    container = request.match_info["container"]
-
-    try:
-        # Infuriatingly resumable.js starts counting chunks from 1
-        # thus, reducing said 1 from the resulting chunk number
-        chunk_number = int(request.query["resumableChunkNumber"]) - 1
-    except KeyError:
-        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string")
-
-    upload_session = await get_upload_instance(request, project, container)
-
-    return await upload_session.a_check_segment(chunk_number)
+    raise aiohttp.web.HTTPGone()
 
 
 async def handle_post_object_options(
@@ -282,40 +253,6 @@ async def handle_upload_ws(
             LOGGER.error(msg.data)
 
     return ws
-
-
-async def handle_get_container(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.StreamResponse:
-    """Handle a request for getting container contents as an archive."""
-    if "resumableChunkNumber" in request.query.keys():
-        return await handle_get_object_chunk(request)
-
-    session = get_session_id(request)
-
-    resp = aiohttp.web.StreamResponse()
-
-    project = request.match_info["project"]
-    container = request.match_info["container"]
-
-    # Create headers
-    resp.headers["Content-Type"] = "application/x-tar"
-    # Don't give content length, as the content length depends on
-    # compressibility
-    # Suggest {project_name}-{container}.tar as file name
-    disp_header = f'attachment; filename="{project}-{container}.tar"'
-    resp.headers["Content-Disposition"] = disp_header
-
-    await resp.prepare(request)
-
-    download = ContainerArchiveDownloadProxy(request.app[session], project, container)
-
-    await download.a_begin_container_download()
-
-    # Create a task for writing the tarball into the StreamResponse
-    await download.a_write_to_response(resp)
-
-    return resp
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
