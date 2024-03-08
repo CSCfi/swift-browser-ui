@@ -28,6 +28,8 @@ let aborted = false;
 
 // Use a 50 MiB segment when downloading
 const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 50;
+// Don't segment downloads under 250 MiB
+const DOWNLOAD_MAX_NONSEGMENTED_SIZE = 1024 * 1024 * 250;
 
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
@@ -87,9 +89,16 @@ function createDownloadSession(container, handle, archive) {
   };
 }
 
+function getFileSize(size, key) {
+  // Use encrypted size as the total file size if the file can't be decrypted
+  return key !=0 ?
+    (Math.floor(size / 65564) * 65536) +
+    (size % 65564 > 0 ? size % 65564 - 28 : 0) :
+    size;
+}
 
 // Add a file to the download session
-function createDownloadSessionFile(container, path, header, url) {
+function createDownloadSessionFile(container, path, header, url, size) {
   if (checkPollutingName(path)) return;
 
   let headerPath = `header_${container}_`
@@ -110,6 +119,8 @@ function createDownloadSessionFile(container, path, header, url) {
   downloads[container].files[path] = {
     key: sessionKeyPtr,
     url: url,
+    size: getFileSize(size, sessionKeyPtr),
+    realsize: getFileSize(size, 0),
   };
 
   // Remove the header after parsing
@@ -156,15 +167,6 @@ function decryptChunk(container, path, enChunk) {
   return ret;
 }
 
-function getFileSize(response, key) {
-  // Use encrypted size as the total file size if the file can't be decrypted
-  const ensize = parseInt(response.headers.get("Content-Length"));
-  return key !=0 ?
-    (Math.floor(ensize / 65564) * 65536) +
-    (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-    ensize;
-}
-
 function startProgressInterval() {
   const interval = setInterval(() => {
     postMessage({
@@ -199,9 +201,23 @@ class FileSlicer {
   }
 
   async getNextSegment() {
+    let resp;
+
+    // Don't separate smaller downloads (< 250 MiB) into ranges
+    if (downloads[this.container].files[this.path].realsize < DOWNLOAD_MAX_NONSEGMENTED_SIZE) {
+      resp = await fetch(
+        downloads[this.container].files[this.path].url,
+      ).catch(e => {
+        console.log(e);
+      });
+      this.segmentOffset += DOWNLOAD_MAX_NONSEGMENTED_SIZE;
+      this.reader = resp.body.getReader();
+      return;
+    }
+
     let end = this.segmentOffset + DOWNLOAD_SEGMENT_SIZE - 1;
     let range = `bytes=${this.segmentOffset}-${end}`;
-    let resp = await fetch(
+    resp = await fetch(
       downloads[this.container].files[this.path].url,
       {
         headers: {
@@ -248,7 +264,6 @@ class FileSlicer {
 
     if(this.bytes > 0) {
       this.totalBytes += this.bytes - 28;
-      // return this.enChunkBuf.slice(0, this.bytes);
     }
 
     return;
@@ -287,6 +302,11 @@ class FileSlicer {
       }
       this.totalBytes += this.chunk.length;
       ({ value: this.chunk, done: this.done } = await this.reader.read());
+
+      if (this.done && this.segmentOffset < downloads[this.container].files[this.path].realsize) {
+        await this.getNextSegment();
+        ({ value: this.chunk, done: this.done } = await this.reader.read());
+      }
     }
 
     // Round up to a multiple of 512, because tar
@@ -298,31 +318,35 @@ class FileSlicer {
   async sliceFile() {
     // Get the first chunk from stream
     await this.getStart();
-    await this.getSlice();
 
     // Slice the file and write decrypted content to output
-    while (this.bytes > 0) {
+    while (!this.done) {
+      await this.getSlice();
+
       if (this.output instanceof WritableStream) {
         // Write the decrypted contents directly in the file stream if
         // downloading to File System
-        await this.output.write(decryptChunk(
-          this.container,
-          this.path,
-          this.enChunkBuf,
-        ));
+        if (this.bytes > 0) {
+          await this.output.write(decryptChunk(
+            this.container,
+            this.path,
+            this.enChunkBuf.subarray(0, this.bytes),
+          ));
+        }
       } else {
         // Otherwise queue to the streamController since we're using a
         // ServiceWorker for downloading
         while(this.output.desiredSize <= 0) {
           await timeout(10);
         }
-        this.output.enqueue(new Uint8Array(decryptChunk(
-          this.container,
-          this.path,
-          this.enChunkBuf,
+        if (this.bytes > 0) {
+          this.output.enqueue(new Uint8Array(decryptChunk(
+            this.container,
+            this.path,
+            this.enChunkBuf.subarray(0, this.bytes),
           )));
+        }
       }
-      await this.getSlice();
     }
 
     // Round up to a multiple of 512, because tar
@@ -387,11 +411,15 @@ async function addSessionFiles(
 ) {
   let undecryptable = false;
 
+  console.log(headers);
+
   for (const file in headers) {
-    if (!createDownloadSessionFile(container, file, headers[file].header, headers[file].url)) {
+    if (!createDownloadSessionFile(container, file, headers[file].header, headers[file].url, headers[file].size)) {
       undecryptable = true;
     }
   }
+
+  console.log(downloads);
 
   return undecryptable;
 }
@@ -437,11 +465,8 @@ async function beginDownloadInSession(
   }
 
   if (downloads[container].direct) {
-  //get total download size and periodically report download progress
+    //get total download size and periodically report download progress
     for (const file in downloads[container].files) {
-      const res = await fetch(downloads[container].files[file].url, {method: "HEAD"});
-      downloads[container].files[file].size = getFileSize(res, downloads[container].files[file].key);
-      downloads[container].files[file].realsize = getFileSize(res, 0)
       totalToDo += downloads[container].files[file].size;
     }
     if (!downProgressInterval) {

@@ -686,7 +686,7 @@ class ProxyFunctionsTestClass(tests.common.mockups.APITestBase):
         self.assertIn("test-signature", resp.headers["Location"])
         self.assertIn("test-valid", resp.headers["Location"])
         self.assertIn("test-endpoint", resp.headers["Location"])
-        self.assertEqual(303, resp.status)
+        self.assertEqual(307, resp.status)
 
     async def test_swift_download_container(self):
         """Test container download handler."""

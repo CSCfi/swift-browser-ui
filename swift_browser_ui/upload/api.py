@@ -76,31 +76,6 @@ async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.Respons
     return resp
 
 
-async def handle_head_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Handle a request for getting object metadata."""
-    session = request.app[get_session_id(request)]
-
-    project = request.match_info["project"]
-    container = request.match_info["container"]
-    object_name = request.match_info["object_name"]
-
-    async with request.app["client"].head(
-        generate_download_url(
-            get_download_host(session["endpoint"], project),
-            container=container,
-            object_name=object_name,
-        ),
-        headers={
-            "X-Auth-Token": session["token"],
-            "Accept-Encoding": "identity",
-        },
-    ) as resp:
-        return aiohttp.web.Response(
-            body=resp.read(),
-            headers=resp.headers,
-        )
-
-
 async def handle_replicate_container(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:

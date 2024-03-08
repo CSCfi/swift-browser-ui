@@ -24,7 +24,6 @@ from swift_browser_ui.upload.api import (
     handle_get_container,
     handle_get_object,
     handle_get_object_header,
-    handle_head_object,
     handle_health_check,
     handle_post_object_chunk,
     handle_post_object_options,
@@ -154,9 +153,6 @@ async def servinit() -> aiohttp.web.Application:
     app.add_routes(
         [
             aiohttp.web.get("/{project}/{container}/{object_name:.*}", handle_get_object),
-            aiohttp.web.head(
-                "/{project}/{container}/{object_name:.*}", handle_head_object
-            ),
             aiohttp.web.options(
                 "/{project}/{container}/{object_name:.*}",
                 handle_download_shared_object_options,
