@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - (GL #1206) Refactor upload and download notification components into reusable `ProgressBar`, `ProgressAlert`, `ProgressToast`, `ProgressNotification`
+- (GL #1206) Remade UploadToast, UploadAlert, UploadNotification, UploadProgressBar, DownloadNotification into type-based Progress- components
 
 ### Fixed
 - (GL #1220) Fix unstable sharing permission `c-select`
