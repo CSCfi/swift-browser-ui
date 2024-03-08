@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - (GL #1221) Warn about ongoing download when switching projects
 
+### Changed
+- (GL #1206) Refactor upload and download notification components into reusable `ProgressBar`, `ProgressAlert`, `ProgressToast`, `ProgressNotification`
+
 ### Fixed
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`

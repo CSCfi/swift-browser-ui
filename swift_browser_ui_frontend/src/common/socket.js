@@ -88,7 +88,6 @@ export default class UploadSocket {
         case "success":
           break;
         case "finished":
-          this.$store.commit("eraseNotClosable");
           this.$store.commit("eraseDropFiles");
           this.$store.commit("stopUploading");
           this.$store.commit("eraseProgress");
@@ -141,7 +140,6 @@ export default class UploadSocket {
               this.$store.commit("eraseDownloadProgress");
             }
             this.$store.commit("addDownload");
-            this.$store.commit("toggleDownloadNotification", true);
           }
           break;
         case "downloadProgressing":
@@ -172,7 +170,6 @@ export default class UploadSocket {
         case "error":
           this.$store.commit("setDownloadError", true);
           if (!this.useServiceWorker) {
-            this.$store.commit("toggleDownloadNotification", false);
             this.$store.commit("removeDownload", true);
             this.$store.commit("eraseDownloadProgress");
           }
@@ -372,7 +369,6 @@ export default class UploadSocket {
 
     if (DEV) console.log("Pushed new files to the service worker.");
     this.$store.commit("setUploading");
-    this.$store.commit("setNotClosable");
   }
 
   // Schedule file/files for download

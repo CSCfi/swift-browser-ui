@@ -38,10 +38,8 @@ import store from "@/common/store";
 // Import project css
 import "@/css/prod.scss";
 
-// Upload notification handler
-import UploadNotification from "@/components/UploadNotification.vue";
-
-import DownloadNotification from "@/components/DownloadNotification.vue";
+// Upload and direct download notification handler
+import ProgressNotification from "@/components/ProgressNotification.vue";
 
 //Custom footer element
 import CFooter from "@/components/CFooter.vue";
@@ -85,8 +83,7 @@ const app = createApp({
     ConfirmRouteModal,
     CreateFolderModal,
     UploadModal,
-    UploadNotification,
-    DownloadNotification,
+    ProgressNotification,
     EditTagsModal,
     ShareModal,
     CopyFolderModal,

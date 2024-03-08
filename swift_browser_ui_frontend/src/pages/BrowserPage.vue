@@ -78,12 +78,14 @@
       >
         <TokenModal />
       </c-modal>
-      <UploadNotification
+      <ProgressNotification
         v-if="displayUploadNotification"
+        type="upload"
         @cancel-current-upload="cancelUpload"
       />
-      <DownloadNotification
+      <ProgressNotification
         v-if="displayDownloadNotification"
+        type="download"
       />
       <router-view class="content-wrapper" />
       <c-toasts

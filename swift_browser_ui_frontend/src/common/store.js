@@ -42,7 +42,6 @@ const store = createStore({
     uploadNotification: {
       visible: false,
       maximized: true,
-      closable: false,
     },
     downloadCount: 0,
     downloadProgress: undefined,
@@ -135,9 +134,15 @@ const store = createStore({
     },
     setDownloadError(state, payload) {
       state.downloadError = payload;
+      if (state.downloadNotification.visible) {
+        state.downloadNotification.visible = false;
+      }
     },
     addDownload(state) {
       state.downloadCount += 1;
+      if (!state.downloadNotification.visible) {
+        state.downloadNotification.visible = true;
+      }
     },
     removeDownload(state, all = false) {
       if (all) state.downloadCount = 0;
@@ -197,12 +202,6 @@ const store = createStore({
     },
     toggleShareModal(state, payload) {
       state.openShareModal = payload;
-    },
-    setNotClosable(state) {
-      state.uploadNotification.closable = false;
-    },
-    eraseNotClosable(state) {
-      state.uploadNotification.closable = true;
     },
     setUploadAbortReason(state, payload) {
       state.uploadAbortReason = payload;
