@@ -89,7 +89,7 @@ wasm-test:
 release-job:
   extends: .automated-release
   release:
-    description: 'Automated release for SD Connect'
+    description: $(cat release_changes.md)
     assets:
       links:
         - name: ${ARTIFACTORY_SERVER}/sds/sd-connect:${RELEASE_VERSION}
