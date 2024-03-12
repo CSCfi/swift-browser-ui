@@ -13,8 +13,21 @@
               ? $t('message.search.container')
               : $t('message.search.object')
           }}: </b>
-          <!-- eslint-disable-next-line -->
-          <span v-html="getFilename()" />
+          <span v-if="retest(getFilename())">
+            <span
+              v-for="(apart, ind) in getParts(getFilename())"
+              :key="ind"
+            >
+              <span
+                v-if="searchArray.includes(apart.toLowerCase())"
+                class="hl-1"
+              >
+                {{ apart }}
+              </span>
+              <span v-else>{{ apart }}</span>
+            </span>
+          </span>
+          <span v-else>{{ getFilename() }}</span>
         </span>
         <br>
         <small>
@@ -25,14 +38,35 @@
           </span>
           <span v-if="!isSubfolder() && hasPath()">
             <b>{{ $t('message.search.folder') }}: </b>
-            <!-- eslint-disable-next-line -->
-            <span v-html="getFilePath()" />
+            <span v-if="retest(getFilePath())">
+              <span
+                v-for="(pathp, indx) in getParts(getFilePath())"
+                :key="indx"
+              >
+                <span
+                  v-if="searchArray.includes(pathp)"
+                  class="hl-1"
+                >
+                  {{ pathp }}
+                </span>
+                <span v-else>{{ pathp }}</span>
+              </span>
+            </span>
+            <span v-else>{{ getFilePath() }}</span>
             <br>
           </span>
           <span v-if="item.tags && item.tags.length">
             <b>{{ $t('message.search.tags') }}: </b>
-            <!-- eslint-disable-next-line -->
-            <span v-html="highlight(item.tags.join(', '))" />
+            <span
+              v-for="atag in getParts(item.tags.join(', '))"
+              :key="atag"
+            >
+              <span
+                v-if="retest(atag)"
+                class="hl-1"
+              >{{ atag }}</span>
+              <span v-else>{{ atag }}</span>
+            </span>
             <br>
           </span>
           <span>
@@ -51,9 +85,6 @@
 
 <script>
 import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
-
-const highlightTemplate =
-  "$1<span class='hl-1'>$2$3</span>";
 
 export default {
   name: "SearchResultItem",
@@ -84,7 +115,7 @@ export default {
         filename = this.$props.item.name;
       }
       filename = this.$props.item.name.replace(/^.*\//, "");
-      return this.highlight(filename);
+      return filename;
     },
     getFilePath: function() {
       let filePath = "";
@@ -96,16 +127,22 @@ export default {
       let str = this.$props.item.name.slice(0, index);
       //leave last subfolder
       filePath = str.slice(str.lastIndexOf("/")+1, str.length);
-      return this.highlight(filePath);
+      return filePath;
     },
-    highlight: function(text) {
+    retest: function(searched) {
       const searchFor = this.searchArray.join("|");
       const re = new RegExp(`(${tokenizerRE})(${searchFor})|(^${searchFor})`, "igu");
-
+      return re.test(searched);
+    },
+    getParts: function(text) {
+      let splits = [];
+      const searchFor = this.searchArray.join("|");
+      const re = new RegExp(`(${tokenizerRE})(${searchFor})|(^${searchFor})`, "igu");
+      // Return a non sparse array split by the searched
       if(re.test(text)) {
-        text = text.replace(re, highlightTemplate);
+        splits = text.split(re).filter(element => element);
       }
-      return text;
+      return splits;
     },
   },
 };
