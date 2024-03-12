@@ -2,18 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
 ### Added
+
 - (GL #1221) Warn about ongoing download when switching projects
 
 ### Changed
+
 - (GL #1206) Remade UploadToast, UploadAlert, UploadNotification, UploadProgressBar, DownloadNotification into type-based Progress- components
 
 ### Fixed
+
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`
 - (GL #1215) Fix Accessibility Page not showing when user not logging in and not rendering the translation correctly in test page
@@ -21,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2024.02.1]
 
 ### Added
+
 - (GL #1205) Add a route back to front page from top toolbar
 - (GL #1126) Added download progress bar for direct downloads (Chrome)
 - (GL #1166) Added clarifying text about folder extension during download
@@ -29,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1180) Add enforcing token lifetimes to signature authentication middleware
 
 ### Changed
+
 - (GL #1197) Refactor to remove eslint supression
   - for search replaced v-html with v-if and v-for
   - for sharing and sharing tooltip including language changes
@@ -40,24 +45,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (GL #1162) Change from ustar to gnu tar
 
 ### Removed
+
 - (GL #1204) Remove old upload code from frontend
 
 ### Fixed
+
 - (GL #1222) Fix `view destination folder` link not working with shared containers
 
 ## [2024.02.0]
 
 ### Added
+
 - (GL #1203) Add a warning when deleting files from a shared folder
 - (GL #1185) Add Accessibility page (English version)
 - (GL #1174) Download files that cannot be decrypted directly as is
 - (GL #1207) Make vault service id configurable via environment variable
 
 ### Changed
+
 - (GL #1202) Change the status text of unshared folder
 - Package dependency updates
 
 ### Fixed
+
 - (GL #1187) Trim whitespace from container names before creation
 - (GL #1182) Prevent folder icons in table from shrinking
 - (GL #1198) Faulty subfolders in route should lead to status 404
@@ -65,12 +75,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2024.01.0]
 
 ### Added
+
 - (GL #1192) Add link to privacy policy in footer
 
 ### Changed
+
 - Package dependency updates
 
 ### Fixed
+
 - (GL #1183) Downloaded containers having wrong sizes
 - (GL #1194) Fix upload functionality after cancelling large uploads
 - (GL #1196) Fix service worker stopping downloads for large containers and files
@@ -79,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2023.12.0]
 
 ### Added
+
 - (GH #642) Add support for decrypting downloaded files
 - Automate building wasm with npm
   - use `CSCfi/docker-emscripten-crypt4gh` image `1.2.0`
