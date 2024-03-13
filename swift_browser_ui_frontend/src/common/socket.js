@@ -237,11 +237,9 @@ export default class UploadSocket {
     // If files are specified, use only the specified file listing
     if (fileList.length >= 1) {
       dbContainerFiles = dbContainerFiles.filter(
-        item => fileList.find(item.name),
+        item => fileList.includes(item.name),
       );
     }
-
-    console.log(dbContainerFiles);
 
     let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
 

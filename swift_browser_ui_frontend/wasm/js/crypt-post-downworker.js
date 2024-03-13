@@ -207,9 +207,7 @@ class FileSlicer {
     if (downloads[this.container].files[this.path].realsize < DOWNLOAD_MAX_NONSEGMENTED_SIZE) {
       resp = await fetch(
         downloads[this.container].files[this.path].url,
-      ).catch(e => {
-        console.log(e);
-      });
+      ).catch(() => {});
       this.segmentOffset += DOWNLOAD_MAX_NONSEGMENTED_SIZE;
       this.reader = resp.body.getReader();
       return;
@@ -411,15 +409,11 @@ async function addSessionFiles(
 ) {
   let undecryptable = false;
 
-  console.log(headers);
-
   for (const file in headers) {
     if (!createDownloadSessionFile(container, file, headers[file].header, headers[file].url, headers[file].size)) {
       undecryptable = true;
     }
   }
-
-  console.log(downloads);
 
   return undecryptable;
 }
