@@ -9,14 +9,17 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- Simplify request proxying when downloading objects
 - (GL #1221) Warn about ongoing download when switching projects
 
 ### Changed
 
+- Reduce memory pressure in download implementation by removing unnecessary object cloning
 - (GL #1206) Remade UploadToast, UploadAlert, UploadNotification, UploadProgressBar, DownloadNotification into type-based Progress- components
 
 ### Fixed
 
+- Fix Chrome OOM issue with large downloads due to v8 gc not keeping up with the memory pressure of large requests
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`
 - (GL #1215) Fix Accessibility Page not showing when user not logging in and not rendering the translation correctly in test page
