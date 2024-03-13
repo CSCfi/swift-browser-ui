@@ -38,6 +38,7 @@ Cypress.Commands.add("login", (username, password) => {
 
 Cypress.Commands.add("logout", () => {
   cy.get('[data-testid="user-menu"]').click();
+  cy.wait(1000);
   cy.get("ul.c-menu-items").find("li").contains("Log out").click();
   cy.visit(Cypress.config().baseUrl);
 });
@@ -115,12 +116,10 @@ Cypress.Commands.add("navigateTableRowMenu", (index, menuItem) => {
 });
 
 Cypress.Commands.add("addFolder", (folderName) => {
-  cy.get('[data-testid="create-folder"]').click();
-  cy.wait(3000);
-  cy.get('[data-testid="folder-name"]').click({ force: true });
-  cy.get('[data-testid="folder-name"]').click({ force: true }).type(folderName);
-  cy.wait(3000);
-  cy.get('[data-testid="save-folder"]').click({ force: true });
+  cy.get("[data-testid='create-folder']").click();
+  cy.wait(1000);
+  cy.get("[data-testid='folder-name']").type(folderName);
+  cy.get("[data-testid='save-folder']").click();
 });
 
 Cypress.Commands.add("deleteFolder", (folderName) => {
@@ -260,4 +259,36 @@ Cypress.Commands.add("share", (shareId, perm) => {
   }
 
   cy.get("[data-testid='submit-share']").click({ force: true });
+})
+
+Cypress.Commands.add("addTags", (tags) => {
+  //modal should be open
+  cy.get("[data-testid='edit-tags-modal']").should("be.visible");
+
+  //input tags and save
+  cy.get("[data-testid='edit-tags-input']").type(tags.join("{enter} "));
+  cy.get("[data-testid='save-edit-tags']").click();
+})
+
+Cypress.Commands.add("removeAllTags", () => {
+  //modal should be open
+  cy.get("[data-testid='edit-tags-modal']").should("be.visible");
+
+  //remove tags and save
+  cy.get("[data-testid='edit-tags-input']")
+    .find("c-icon")
+    .as("icons")
+
+  cy.get("@icons")
+    .its("length")
+    .then((length) => {
+      for(let i = length - 1; i >= 0; i--) {
+        //start from highest: index changes when items are deleted
+        cy.get("@icons")
+          .eq(i)
+          .click();
+      }
+    });
+
+  cy.get("[data-testid='save-edit-tags']").click();
 })

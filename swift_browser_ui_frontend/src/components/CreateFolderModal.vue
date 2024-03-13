@@ -2,6 +2,7 @@
   <c-card
     ref="createFolderContainer"
     class="add-folder"
+    data-testid="create-folder-modal"
     @keydown="handleKeyDown"
   >
     <div

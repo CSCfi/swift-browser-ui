@@ -230,6 +230,7 @@ export default {
               component: {
                 tag: "c-button",
                 params: {
+                  testid: "download-object",
                   text: true,
                   size: "small",
                   title: "Download",
@@ -249,6 +250,7 @@ export default {
               component: {
                 tag: "c-button",
                 params: {
+                  testid: "edit-object-tags",
                   text: true,
                   size: "small",
                   title: "Edit tags",

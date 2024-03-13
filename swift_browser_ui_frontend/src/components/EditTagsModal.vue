@@ -2,6 +2,7 @@
   <c-card
     ref="editTagsContainer"
     class="edit-tags"
+    data-testid="edit-tags-modal"
     @keydown="handleKeyDown"
   >
     <h2 class="title is-4 has-text-dark">
@@ -10,6 +11,7 @@
     <c-card-content>
       <TagInput
         id="edit-tags-input"
+        data-testid="edit-tags-input"
         :tags="tags"
         @addTag="addingTag"
         @deleteTag="deletingTag"
@@ -25,6 +27,7 @@
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
+        data-testid="save-edit-tags"
         size="large"
         @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
         @keyup.enter="isObject ?
