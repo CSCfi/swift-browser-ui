@@ -309,7 +309,8 @@ export default {
           return obj.name.startsWith(getPrefix(this.$route));
         });
 
-      if (this.objs.length > 0 && filteredObjs.length == 0) {
+      if (this.objs.length > 0 && filteredObjs.length == 0 &&
+        !this.$store.state.openDeleteModal) {
         window.location.pathname = "/notfound";
       }
 
