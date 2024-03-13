@@ -31,32 +31,47 @@ import { faker } from "../../../swift_browser_ui_frontend/node_modules/@faker-js
 Cypress.Commands.add("login", (username, password) => {
   cy.get("c-login-card-actions > c-button").click();
   cy.url().should("include", "/login/");
-  cy.get('#classicform > [type="text"]').type(username);
-  cy.get('[type="password"]').type(password);
+  if (username) {
+    cy.get('#classicform > [type="text"]').type(username);
+  }
+  if (password) {
+    cy.get('[type="password"]').type(password);
+  }
   cy.get('#classicform > [type="submit"]').click();
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.get('[data-testid="user-menu"]').click();
-  cy.wait(1000);
-  cy.get("ul.c-menu-items").find("li").contains("Log out").click();
-  cy.visit(Cypress.config().baseUrl);
+  const buttonText =
+    { en: "Log out",
+      fi: "Kirjaudu ulos" };
+
+  cy.getCookie("OBJ_UI_LANG")
+    .should("have.property", "value")
+    .then(key => {
+      cy.get('[data-testid="user-menu"]').click();
+      cy.wait(1000);
+      cy.get("ul.c-menu-items")
+        .find("li")
+        .should("contain.text", buttonText[key]).click();
+      cy.visit(Cypress.config().baseUrl);
+    })
 });
 
-Cypress.Commands.add("changeLang", (locale) => {
-  const locales = [
-    { key: "en", label: "In English" },
-    { key: "fi", label: "Suomeksi" },
-  ];
+Cypress.Commands.add("changeLang", (key) => {
+  const langs =
+    { en: "In English" ,
+      fi: "Suomeksi" };
+
   cy.get('[data-testid="language-selector"]')
-    .click()
-    .find("li")
-    .contains(locales.find((item) => item.key === locale).label)
     .click();
-});
-
-Cypress.Commands.add("switchLang", (lang) => {
-  cy.get("ul.c-menu-items").find("li").contains(lang).click();
+  cy.wait(1000);
+  cy.get("c-menu-items")
+    .find("ul>li")
+    .contains(langs[key])
+    .click();
+  //verify
+  cy.get('[data-testid="language-selector"]')
+    .should("contain", langs[key]);
 });
 
 Cypress.Commands.add("navigateUserMenu", (menuItem) => {

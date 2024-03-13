@@ -49,6 +49,7 @@
       <c-sidenavigationitem
         v-for="item of navigationMenuItems"
         :key="item.title"
+        :data-testid="item.testid + '-mobile'"
       >
         <div slot="main">
           <span :class="'mdi ' + item.icon" />
@@ -64,7 +65,7 @@
             :key="subItem.title"
             :href="subItem.href"
             :target="subItem.href && '_blank'"
-            :data-testid="subItem.testid"
+            :data-testid="subItem.testid + '-mobile'"
             @click="() => {
               (subItem.route || subItem.href) && handleItemRoute(subItem);
               subItem.action && subItem.action();
@@ -260,7 +261,7 @@ c-menu {
 }
 
 @media screen and (min-width: 768px) {
-  c-navigationbutton {
+  c-navigationbutton, c-sidenavigation {
     display: none;
   }
 }
