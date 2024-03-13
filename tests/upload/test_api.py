@@ -75,21 +75,24 @@ class APITestClass(tests.common.mockups.APITestBase):
         self.mock_request.match_info["container"] = "test-container"
         self.mock_request.match_info["object_name"] = "test-object"
 
-        patch_init_download = unittest.mock.patch(
-            "swift_browser_ui.upload.api.FileDownloadProxy",
-            self.mock_init_download,
+        self.mock_request.app["test-id"] = {
+            "token": "test-token",
+            "endpoint": "http://test-endpoint",
+        }
+
+        self.mock_client_response.headers["Content-Type"] = "binary/octet-stream"
+        self.mock_client_response.headers["Content-Length"] = 123456
+
+        self.mock_client.get = unittest.mock.AsyncMock(
+            return_value=self.mock_client_response,
         )
 
-        with patch_init_download, self.p_get_sess, self.patch_streamresponse:
+        with self.p_get_sess:
             resp = await swift_browser_ui.upload.api.handle_get_object(self.mock_request)
 
-        self.assertIs(resp, self.mock_response)
-        self.mock_a_begin.assert_called_once_with(
-            "test-project", "test-container", "test-object"
-        )
-        self.mock_a_get_type.assert_called_once()
-        self.mock_a_get_size.assert_called_once()
-        self.mock_a_write.assert_called_once_with(resp)
+        self.assertIn("Content-Type", resp.headers)
+        self.assertIn("Content-Length", resp.headers)
+        self.mock_client.get.assert_awaited_once()
 
     async def test_handle_replicate_container(self):
         """Test swift_browser_ui.upload.api.handle_replicate_container."""

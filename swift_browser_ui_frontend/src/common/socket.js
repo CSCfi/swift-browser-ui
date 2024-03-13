@@ -220,26 +220,25 @@ export default class UploadSocket {
   async getHeaders(container, fileList, pubkey, owner, ownerName) {
     let headers = {};
 
-    // If no files are specified, get all files in the container
-    let files;
-    if (fileList.length < 1) {
-      let dbContainer = await getDB().containers
-        .get({
-          projectID: this.active.id,
-          name: container,
-        });
+    // Cache the container ID
+    let dbContainer = await getDB().containers
+      .get({
+        projectID: this.active.id,
+        name: container,
+      });
+    let dbContainerFiles = [];
+    while (dbContainerFiles.length < dbContainer.count) {
+      dbContainerFiles = await getDB().objects
+        .where({"containerID": dbContainer.id})
+        .toArray();
+      await timeout(250);
+    }
 
-      let objects = [];
-      while (objects.length < dbContainer.count) {
-        await timeout(250);
-        objects = await getDB().objects
-          .where({"containerID": dbContainer.id})
-          .toArray();
-      }
-
-      files = objects.map(item => item.name);
-    } else {
-      files = fileList;
+    // If files are specified, use only the specified file listing
+    if (fileList.length >= 1) {
+      dbContainerFiles = dbContainerFiles.filter(
+        item => fileList.includes(item.name),
+      );
     }
 
     let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
@@ -261,12 +260,12 @@ export default class UploadSocket {
       },
     );
 
-    for (const file of files) {
+    for (const file of dbContainerFiles) {
       // Get the file header
       let header = await signedFetch(
         "GET",
         this.$store.state.uploadEndpoint,
-        `/header/${this.active.name}/${container}/${file}`,
+        `/header/${this.active.name}/${container}/${file.name}`,
         undefined,
         {
           session: upInfo.id,
@@ -277,14 +276,15 @@ export default class UploadSocket {
 
       // Prepare the file URL
       let fileUrl = new URL(
-        `/download/${owner ? owner : this.active.id}/${container}/${file}`,
+        `/download/${owner ? owner : this.active.id}/${container}/${file.name}`,
         document.location.origin,
       );
       fileUrl.searchParams.append("project", this.active.id);
 
-      headers[file] = {
+      headers[file.name] = {
         header: Uint8Array.from(atob(header), c => c.charCodeAt(0)),
         url: fileUrl.toString(),
+        size: file.bytes,
       };
     }
 

@@ -825,7 +825,7 @@ async def swift_download_shared_object(
         + f"&valid={signature['valid']}"
     )
     return aiohttp.web.Response(
-        status=303,
+        status=307,
         headers={
             "Location": f"{setd['upload_external_endpoint']}{path}",
         },

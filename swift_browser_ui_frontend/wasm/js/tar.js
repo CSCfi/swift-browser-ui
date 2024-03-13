@@ -119,7 +119,7 @@ export function addTarFile(path, size) {
   let sizeStr = "";
   let maxOctal = 8589934592;
 
-  if (size <= maxOctal) {
+  if (size < maxOctal) {
     //display smaller sizes than 8GiB in octal
     sizeStr = size.toString(8).padStart(11, "0") + "\x00";
   } else {

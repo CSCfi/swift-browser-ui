@@ -15,13 +15,14 @@ import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
     VAULT_CLIENT,
+    generate_download_url,
+    get_download_host,
     get_session_id,
     get_upload_instance,
     parse_multipart_in,
 )
 from swift_browser_ui.upload.download import (
     ContainerArchiveDownloadProxy,
-    FileDownloadProxy,
 )
 from swift_browser_ui.upload.replicate import ObjectReplicationProxy
 
@@ -31,32 +32,47 @@ LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 CRYPTUPLOAD_Q_DEPTH = int(os.environ.get("SWIFTUI_UPLOAD_RUNNER_Q_DEPTH", 96))
 
 
-async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.StreamResponse:
+async def handle_get_object(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Handle a request for getting object content."""
-    session = get_session_id(request)
+    session = request.app[get_session_id(request)]
 
-    download = FileDownloadProxy(request.app[session])
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+    object_name = request.match_info["object_name"]
 
-    await download.a_begin_download(
-        request.match_info["project"],
-        request.match_info["container"],
-        request.match_info["object_name"],
+    LOGGER.info(
+        f"Downloading from project {project}, "
+        f"from container {container}, "
+        f"the file {object_name}"
     )
 
-    resp = aiohttp.web.StreamResponse()
+    headers = {
+        "X-Auth-Token": session["token"],
+        "Accept-Encoding": "identity",
+    }
+    if "Range" in request.headers:
+        headers["Range"] = request.headers["Range"]
+        LOGGER.info(
+            f"Downloading a byte range {headers['Range']} for object {object_name}"
+        )
 
-    # Create headers
-    resp.headers["Content-Type"] = await download.a_get_type()
-    resp.headers["Content-Length"] = str(await download.a_get_size())
+    obj = await request.app["client"].get(
+        generate_download_url(
+            get_download_host(session["endpoint"], project),
+            container=container,
+            object_name=object_name,
+        ),
+        headers=headers,
+        params=request.query,
+    )
 
-    if "origin" in request.headers:
-        resp.headers["Access-Control-Allow-Origin"] = request.headers["origin"]
-
-    await resp.prepare(request)
-
-    # Create a task for writing the output into the StreamResponse
-    await download.a_write_to_response(resp)
-
+    resp = aiohttp.web.Response(
+        body=obj.content.iter_chunked(131072),
+        headers={
+            "Content-Type": obj.headers["Content-Type"],
+            "Content-Length": obj.headers["Content-Length"],
+        },
+    )
     return resp
 
 
@@ -188,6 +204,21 @@ async def handle_upload_encrypted_object_options(
             "Access-Control-Allow-Headers": "Content-Type",
         }
     )
+    return resp
+
+
+async def handle_download_shared_object_options(
+    _: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Handle options for downloading shared objects."""
+    resp = aiohttp.web.Response(
+        headers={
+            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+            "Access-Control-Max-Age": "84600",
+            "Access-Control-Allow-Headers": "Content-Type, Range",
+        }
+    )
+
     return resp
 
 

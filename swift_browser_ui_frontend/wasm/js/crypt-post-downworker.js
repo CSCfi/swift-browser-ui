@@ -26,6 +26,11 @@ let totalDone = 0;
 let totalToDo = 0;
 let aborted = false;
 
+// Use a 50 MiB segment when downloading
+const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 50;
+// Don't segment downloads under 250 MiB
+const DOWNLOAD_MAX_NONSEGMENTED_SIZE = 1024 * 1024 * 250;
+
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
 worker. The former is to provide support for Firefox and Safari, which only
@@ -84,9 +89,16 @@ function createDownloadSession(container, handle, archive) {
   };
 }
 
+function getFileSize(size, key) {
+  // Use encrypted size as the total file size if the file can't be decrypted
+  return key !=0 ?
+    (Math.floor(size / 65564) * 65536) +
+    (size % 65564 > 0 ? size % 65564 - 28 : 0) :
+    size;
+}
 
 // Add a file to the download session
-function createDownloadSessionFile(container, path, header, url) {
+function createDownloadSessionFile(container, path, header, url, size) {
   if (checkPollutingName(path)) return;
 
   let headerPath = `header_${container}_`
@@ -107,6 +119,8 @@ function createDownloadSessionFile(container, path, header, url) {
   downloads[container].files[path] = {
     key: sessionKeyPtr,
     url: url,
+    size: getFileSize(size, sessionKeyPtr),
+    realsize: getFileSize(size, 0),
   };
 
   // Remove the header after parsing
@@ -145,27 +159,12 @@ function decryptChunk(container, path, enChunk) {
     ["number"],
     [chunk],
   );
-  // We need to clone the view to a new typed array, otherwise it'll get
-  // stale on return
-  let ret = new Uint8Array(HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen));
+  // Don't clone the view, as async writes can't happen in parallel.
+  // ServiceWorker download takes care of cloning as needed.
+  let ret = HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen);
   totalDone += chunkLen;
-  Module.ccall(
-    "free_chunk_nobuf",
-    "number",
-    ["number"],
-    [chunk],
-  );
 
   return ret;
-}
-
-function getFileSize(response, key) {
-  // Use encrypted size as the total file size if the file can't be decrypted
-  const ensize = parseInt(response.headers.get("Content-Length"));
-  return key !=0 ?
-    (Math.floor(ensize / 65564) * 65536) +
-    (ensize % 65564 > 0 ? ensize % 65564 - 28 : 0) :
-    ensize;
 }
 
 function startProgressInterval() {
@@ -179,12 +178,11 @@ function startProgressInterval() {
 }
 class FileSlicer {
   constructor(
-    input,
     output,
     container,
     path,
   ) {
-    this.reader = input;
+    this.reader = undefined;
     this.output = output;
     this.container = container;
     this.path = path;
@@ -194,9 +192,45 @@ class FileSlicer {
     this.remainder = 0;
     this.bytes = 0;
     this.totalBytes = 0;
+    this.enChunkBuf = new Uint8Array(65564);
+
+    // Cache total file size to properly iterate through responses
+    // as fetch bodies larger than 4 GiB can cause issues with memory
+    // management.
+    this.segmentOffset = 0;
+  }
+
+  async getNextSegment() {
+    let resp;
+
+    // Don't separate smaller downloads (< 250 MiB) into ranges
+    if (downloads[this.container].files[this.path].realsize < DOWNLOAD_MAX_NONSEGMENTED_SIZE) {
+      resp = await fetch(
+        downloads[this.container].files[this.path].url,
+      ).catch(() => {});
+      this.segmentOffset += DOWNLOAD_MAX_NONSEGMENTED_SIZE;
+      this.reader = resp.body.getReader();
+      return;
+    }
+
+    let end = this.segmentOffset + DOWNLOAD_SEGMENT_SIZE - 1;
+    let range = `bytes=${this.segmentOffset}-${end}`;
+    resp = await fetch(
+      downloads[this.container].files[this.path].url,
+      {
+        headers: {
+          "Range": range,
+        },
+      },
+    ).catch(e => {
+      console.log(e);
+    });
+    this.segmentOffset += DOWNLOAD_SEGMENT_SIZE;
+    this.reader = resp.body.getReader();
   }
 
   async getStart() {
+    await this.getNextSegment();
     ({ value: this.chunk, done: this.done } = await this.reader.read());
   }
 
@@ -205,31 +239,32 @@ class FileSlicer {
   }
 
   async getSlice() {
-    let enChunk = new Uint8Array(65564);
     this.bytes = 0;
 
     while (!this.done) {
       this.remainder = 65564 - this.bytes;
-      let toSet = this.chunk.subarray(this.offset, this.offset + this.remainder);
-      enChunk.set(toSet, this.bytes);
-      this.bytes += toSet.length;
+      this.enChunkBuf.set(this.chunk.subarray(this.offset, this.offset + this.remainder), this.bytes);
+      this.bytes += this.chunk.subarray(this.offset, this.offset + this.remainder).length;
 
       if (this.chunk.length - this.offset > this.remainder) {
         this.offset += this.remainder;
         this.totalBytes += 65536;
-        return enChunk;
+        return;
       } else {
         this.offset = 0;
         ({ value: this.chunk, done: this.done } = await this.reader.read());
+        if (this.done && this.segmentOffset < downloads[this.container].files[this.path].realsize) {
+          await this.getNextSegment();
+          ({ value: this.chunk, done: this.done } = await this.reader.read());
+        }
       }
     }
 
     if(this.bytes > 0) {
       this.totalBytes += this.bytes - 28;
-      return enChunk.slice(0, this.bytes);
     }
 
-    return undefined;
+    return;
   }
 
   async padFile() {
@@ -258,10 +293,18 @@ class FileSlicer {
       if (this.output instanceof WritableStream) {
         await this.output.write(this.chunk);
       } else {
-        this.output.enqueue(downloads[this.contaier].files[this.path].header);
+        while(this.output.desiredSize <= 0) {
+          await timeout(10);
+        }
+        this.output.enqueue(new Uint8Array(this.chunk));
       }
       this.totalBytes += this.chunk.length;
       ({ value: this.chunk, done: this.done } = await this.reader.read());
+
+      if (this.done && this.segmentOffset < downloads[this.container].files[this.path].realsize) {
+        await this.getNextSegment();
+        ({ value: this.chunk, done: this.done } = await this.reader.read());
+      }
     }
 
     // Round up to a multiple of 512, because tar
@@ -275,29 +318,33 @@ class FileSlicer {
     await this.getStart();
 
     // Slice the file and write decrypted content to output
-    let enChunk = await this.getSlice();
-    while (enChunk !== undefined) {
+    while (!this.done) {
+      await this.getSlice();
+
       if (this.output instanceof WritableStream) {
         // Write the decrypted contents directly in the file stream if
         // downloading to File System
-        await this.output.write(decryptChunk(
-          this.container,
-          this.path,
-          enChunk,
-        ));
+        if (this.bytes > 0) {
+          await this.output.write(decryptChunk(
+            this.container,
+            this.path,
+            this.enChunkBuf.subarray(0, this.bytes),
+          ));
+        }
       } else {
         // Otherwise queue to the streamController since we're using a
         // ServiceWorker for downloading
         while(this.output.desiredSize <= 0) {
           await timeout(10);
         }
-        this.output.enqueue(decryptChunk(
-          this.container,
-          this.path,
-          enChunk,
-        ));
+        if (this.bytes > 0) {
+          this.output.enqueue(new Uint8Array(decryptChunk(
+            this.container,
+            this.path,
+            this.enChunkBuf.subarray(0, this.bytes),
+          )));
+        }
       }
-      enChunk = await this.getSlice();
     }
 
     // Round up to a multiple of 512, because tar
@@ -363,7 +410,7 @@ async function addSessionFiles(
   let undecryptable = false;
 
   for (const file in headers) {
-    if (!createDownloadSessionFile(container, file, headers[file].header, headers[file].url)) {
+    if (!createDownloadSessionFile(container, file, headers[file].header, headers[file].url, headers[file].size)) {
       undecryptable = true;
     }
   }
@@ -412,10 +459,9 @@ async function beginDownloadInSession(
   }
 
   if (downloads[container].direct) {
-  //get total download size and periodically report download progress
+    //get total download size and periodically report download progress
     for (const file in downloads[container].files) {
-      const res = await fetch(downloads[container].files[file].url);
-      totalToDo += getFileSize(res, downloads[container].files[file].key);
+      totalToDo += downloads[container].files[file].size;
     }
     if (!downProgressInterval) {
       downProgressInterval = startProgressInterval();
@@ -433,11 +479,10 @@ async function beginDownloadInSession(
       });
     }
 
-    const response = await fetch(downloads[container].files[file].url);
     let path = file.replace(".c4gh", "");
 
     if (downloads[container].archive) {
-      const size = getFileSize(response, downloads[container].files[file].key);
+      const size = downloads[container].files[file].size;
 
       let fileHeader = addTarFile(
         downloads[container].files[file].key != 0 ? path : file,
@@ -452,7 +497,6 @@ async function beginDownloadInSession(
     }
 
     const slicer = new FileSlicer(
-      response.body.getReader(),
       fileStream,
       container,
       file);
