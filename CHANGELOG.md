@@ -19,6 +19,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- deleting a subfolder no longer results in a 404
 - Fix Chrome OOM issue with large downloads due to v8 gc not keeping up with the memory pressure of large requests
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`
