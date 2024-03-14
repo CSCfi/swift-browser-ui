@@ -7,8 +7,6 @@ import typing
 
 import aiohttp.web
 
-from swift_browser_ui.upload import upload
-
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
@@ -48,68 +46,6 @@ def get_session_id(request: aiohttp.web.Request) -> str:
             return request.query["session"]
         except KeyError:
             raise aiohttp.web.HTTPUnauthorized(reason="Missing runner session ID")
-
-
-async def parse_multipart_in(
-    request: aiohttp.web.Request,
-) -> typing.Tuple[typing.Dict[str, typing.Any], aiohttp.MultipartReader]:
-    """Parse the form headers into a dictionary and chunk data as reader."""
-    reader = await request.multipart()
-
-    ret_d = {}
-
-    while True:
-        field = await reader.next()
-        if field.name == "file":  # type: ignore
-            ret_d["filename"] = field.filename  # type: ignore
-            return ret_d, field  # type: ignore
-        if field.name == "resumableChunkNumber":  # type: ignore
-            ret_d["resumableChunkNumber"] = int(await field.text())  # type: ignore
-        else:
-            ret_d[
-                str(field.name)  # type: ignore
-            ] = await field.text()  # type: ignore
-
-
-async def get_upload_instance(
-    request: aiohttp.web.Request,
-    pro: str,
-    cont: str,
-    p_query: typing.Dict[str, typing.Any] | None = None,
-) -> upload.ResumableFileUploadProxy:
-    """Return the specific upload proxy for the resumable upload."""
-    session = get_session_id(request)
-
-    if p_query:
-        query: typing.Dict[str, typing.Any] = p_query
-    else:
-        query = request.query  # type: ignore
-
-    # Check the existence of the dictionary structure
-    try:
-        request.app[session]["uploads"][pro]
-    except KeyError:
-        request.app[session]["uploads"][pro] = {}
-
-    try:
-        request.app[session]["uploads"][pro][cont]
-    except KeyError:
-        request.app[session]["uploads"][pro][cont] = {}
-
-    try:
-        ident = query["resumableIdentifier"]
-    except KeyError:
-        raise aiohttp.web.HTTPBadRequest(reason="Malformed query string")
-    try:
-        upload_session = request.app[session]["uploads"][pro][cont][ident]
-    except KeyError:
-        upload_session = upload.ResumableFileUploadProxy(
-            request.app[session], query, request.match_info, request.app["client"]
-        )
-        await upload_session.a_check_container()
-        request.app[session]["uploads"][pro][cont][ident] = upload_session
-
-    return upload_session
 
 
 def get_path_from_list(to_parse: typing.List[str], path_prefix: str) -> str:

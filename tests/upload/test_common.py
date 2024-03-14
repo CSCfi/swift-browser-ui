@@ -70,48 +70,6 @@ class CommonTestClass(unittest.IsolatedAsyncioTestCase):
             "test_session_cookie", swift_browser_ui.upload.common.get_session_id(req)
         )
 
-    async def test_get_upload_instance(self):
-        """Test get_upload_instance function."""
-        mock_upload = unittest.mock.create_autospec(
-            swift_browser_ui.upload.common.upload.ResumableFileUploadProxy
-        )
-        patch_upload = unittest.mock.patch(
-            "swift_browser_ui.upload.common.upload.ResumableFileUploadProxy", mock_upload
-        )
-
-        req = tests.common.mockups.Mock_Request()
-        req.app["client"] = None
-        req.app["test-session"] = {}
-        req.app["test-session"]["uploads"] = {}
-        req.set_query({"session": "test-session"})
-
-        query = {
-            "resumableIdentifier": "test-identifier",
-        }
-
-        with patch_upload:
-            with self.assertRaises(aiohttp.web.HTTPBadRequest):
-                await swift_browser_ui.upload.common.get_upload_instance(
-                    req, "test-project", "test-container"
-                )
-
-        with patch_upload:
-            ret = await swift_browser_ui.upload.common.get_upload_instance(
-                req, "test-project", "test-container", p_query=query
-            )
-        self.assertIn("test-project", req.app["test-session"]["uploads"].keys())
-        self.assertIn(
-            "test-container", req.app["test-session"]["uploads"]["test-project"].keys()
-        )
-        self.assertIsNotNone(ret)
-
-        req.set_query(query)
-        with patch_upload:
-            ret = await swift_browser_ui.upload.common.get_upload_instance(
-                req, "test-project", "test-container"
-            )
-        self.assertIsNotNone(ret)
-
     async def test_get_path_from_list(self):
         """Test get_path_from_list function."""
         path = swift_browser_ui.upload.common.get_path_from_list(
