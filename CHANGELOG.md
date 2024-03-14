@@ -7,6 +7,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.03.0] - 2024-03-14
+
 ### Added
 
 - (GL #1188) Simplify request proxying when downloading objects
@@ -24,6 +26,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - (GL #1220) Fix unstable sharing permission `c-select`
 - (GL #1218) Fix language not updating in sharing permission `c-select`
 - (GL #1215) Fix Accessibility Page not showing when user not logging in and not rendering the translation correctly in test page
+
+### Removed
+
+- (GL #1208 #1217) Old download and upload session handling
+- (GL #1208 #1217) Old download and upload implementation, i.e. resumable.js and backend tar archive functionality
 
 ## [2024.02.1]
 
@@ -402,7 +409,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...HEAD
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...HEAD
+[2024.03.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...2024.03.0
 [2024.02.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.0...2024.02.1
 [2024.02.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...2024.02.0
 [2024.01.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/3.0.0...2024.01.0
