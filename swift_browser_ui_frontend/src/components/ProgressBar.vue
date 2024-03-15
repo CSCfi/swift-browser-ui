@@ -11,7 +11,8 @@
     />
     <c-progress-bar
       v-else
-      hide-details
+      single-line
+      indeterminate
     />
   </div>
 </template>

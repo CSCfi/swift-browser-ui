@@ -74,6 +74,7 @@ että
 etusivulle
 etusivun
 firefoxin
+haetaan
 haitta
 hakea
 haku
@@ -317,6 +318,7 @@ liiku
 liitä
 linkki
 lista
+listaa
 lisäksi
 lisätietoja
 lisättiin
@@ -742,6 +744,7 @@ teknologian
 tekstinä
 tiedosto
 tiedostoa
+tiedostoista
 tiedostoja
 tiedostojasi
 tiedostojen

@@ -97,6 +97,11 @@ export default class UploadSocket {
     let handleDownWorker = (e) => {
       switch(e.data.eventType) {
         case "getHeaders":
+          if (this.$store.state.dwonloadCount <= 0) {
+            this.$store.commit("eraseDownloadProgress");
+          }
+          this.$store.commit("addDownload");
+          this.$store.commit("toggleDownloadNotification", true);
           this.getHeaders(
             e.data.container,
             e.data.files,
@@ -104,6 +109,7 @@ export default class UploadSocket {
             e.data.owner,
             e.data.ownerName,
           ).then(() => {
+            this.$store.commit("updateDownloadProgress", 0);
             if (DEV) {
               console.log(
                 `Got headers for download in container ${e.data.container}`,
@@ -134,12 +140,6 @@ export default class UploadSocket {
               if (DEV) console.log(downloadUrl);
               window.open(downloadUrl, "_blank");
             }
-          } else {
-            //show download progress
-            if (this.$store.state.downloadCount <= 0) {
-              this.$store.commit("eraseDownloadProgress");
-            }
-            this.$store.commit("addDownload");
           }
           break;
         case "downloadProgressing":

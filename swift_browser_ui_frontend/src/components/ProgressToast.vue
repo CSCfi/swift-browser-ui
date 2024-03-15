@@ -13,7 +13,9 @@
                 : $t("message.download.complete")
               : type === "upload"
                 ? $t("message.upload.inProgress")
-                : $t("message.download.inProgress")
+                : isProgressing
+                  ? $t("message.download.inProgress")
+                  : $t("message.download.gathering")
           }}
         </h3>
         <c-icon-button
@@ -101,6 +103,9 @@ export default {
     },
     otherNotificationType() {
       return this.type === "upload" ? "download" : "upload";
+    },
+    isProgressing() {
+      return this.$store.state.downloadProgress !== undefined;
     },
   },
   watch: {
