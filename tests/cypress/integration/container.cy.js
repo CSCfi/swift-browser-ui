@@ -16,13 +16,15 @@ describe("Creates and shows a container with a random unique name", function () 
 
     //check the folder exists with search field
     cy.searchFolder(folderName);
-    cy.get(".media-content").contains(folderName).should("exist");
+    cy.get("[data-testid='search-result']")
+      .contains(folderName)
+      .should("exist");
   });
 });
 
 //A container with not unique name can't be created
 describe("Creating more than 1 container with the same name is not possible in a project", function () {
-  it("should not add not unique container into swift project", () => {
+  it("should not create a non-unique container", () => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
 
@@ -31,14 +33,15 @@ describe("Creating more than 1 container with the same name is not possible in a
 
     // add new folder with a unique name and show it
     cy.addFolder(folderName);
-
     cy.wait(3000);
 
     cy.addFolder(folderName);
 
-    //the name should be in use already
-    cy.contains("already in use");
-    cy.get(".add-folder > c-card-actions.hydrated > :nth-child(1)").click();
+    //folder name input field should have a validation error
+    cy.get("[data-testid='create-folder-modal']")
+      .find("c-message")
+      .should("be.visible");
+    cy.get("[data-testid='cancel-save-folder']").click();
   });
 });
 
@@ -61,22 +64,25 @@ describe("Several containers with different names are created and visible", () =
     //check the folder 1 exists with search field
     cy.searchFolder(nameOne);
     cy.wait(3000);
-    cy.get(".media-content").contains(nameOne).should("exist");
+    cy.get("[data-testid='search-result']")
+      .contains(nameOne)
+      .should("exist");
 
     cy.addFolder(nameTwo);
-    cy.wait(3000);
-
     cy.reload();
+    cy.wait(3000);
 
     //check the folder 2 exists with search field
     cy.searchFolder(nameTwo);
     cy.wait(3000);
-    cy.get(".media-content").contains(nameTwo).should("exist");
+    cy.get("[data-testid='search-result']")
+      .contains(nameTwo)
+      .should("exist");
 
     //check there are multiple folders in the project
-    cy.get("table")
-      .find("a.icon", { timeout: "3000" })
-      .should("have.length.greaterThan", 1);
+    cy.get("[data-testid='container-table']")
+      .find("c-link")
+      .should("have.length.gte", 2); //check
   });
 });
 
@@ -96,12 +102,17 @@ describe("A container can be deleted", () => {
 
     //check the folder exists with search field
     cy.searchFolder(folderName);
-    cy.get(".media-content").contains(folderName).should("exist");
+    cy.get("[data-testid='search-result']")
+      .contains(folderName)
+      .should("exist");
 
     //check the folder exists, then delete
     cy.deleteFolder(folderName);
-    cy.contains("Folder was deleted").should("exist");
-    cy.wait(3000);
+    cy.wait(1000);
+
+    cy.get("[data-testid='container-toasts']")
+      .find("c-toast")
+      .should("have.class", "success");
 
     //check it was deleted
     cy.reload();

@@ -67,6 +67,7 @@
       <c-button
         outlined
         size="large"
+        data-testid="cancel-save-folder"
         @click="toggleCreateFolderModal(false)"
         @keyup.enter="toggleCreateFolderModal(true)"
       >
