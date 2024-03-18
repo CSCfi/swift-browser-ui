@@ -28,6 +28,8 @@
 
 import { faker } from "../../../swift_browser_ui_frontend/node_modules/@faker-js/faker";
 
+/*NAV BAR COMMANDS */
+
 Cypress.Commands.add("login", (username, password) => {
   cy.get("c-login-card-actions > c-button").click();
   cy.url().should("include", "/login/");
@@ -74,14 +76,6 @@ Cypress.Commands.add("changeLang", (key) => {
     .should("contain", langs[key]);
 });
 
-Cypress.Commands.add("navigateUserMenu", (menuItem) => {
-  cy.get('[data-testid="user-menu"]')
-    .click()
-    .find("li")
-    .contains(menuItem)
-    .click();
-});
-
 Cypress.Commands.add("selectProject", (projectName) => {
   cy.get('[data-testid="project-selector"]')
     .click()
@@ -111,24 +105,7 @@ Cypress.Commands.add("switchProject", () => {
   })
 });
 
-Cypress.Commands.add("deleteDB", () => {
-  indexedDB.deleteDatabase("sd-connect");
-});
-
-// some exceptions like API reponse from delete we are not catching
-// and we don't need to, thus we ignore
-Cypress.on("uncaught:exception", () => {
-  return false;
-});
-
-Cypress.Commands.add("navigateTableRowMenu", (index, menuItem) => {
-  cy.get("tbody tr")
-    .eq(index)
-    .within(() => {
-      cy.get("c-menu").click();
-      cy.get("c-menu").find("li").contains(menuItem).click();
-    });
-});
+/* CONTAINER ACTIONS */
 
 Cypress.Commands.add("addFolder", (folderName) => {
   cy.get("[data-testid='create-folder']").click();
@@ -137,24 +114,74 @@ Cypress.Commands.add("addFolder", (folderName) => {
   cy.get("[data-testid='save-folder']").click();
 });
 
-Cypress.Commands.add("deleteFolder", (folderName) => {
-  cy.contains(folderName)
-    .parent()
-    .parent()
-    .parent()
-    .find("td")
-    .eq(6)
-    .find("div")
+Cypress.Commands.add("searchFolder", (folderName) => {
+  cy.get("[data-testid='search-box']")
+    .find("input")
     .eq(0)
-    .children(".children")
-    .eq(0)
-    .children("c-menu")
-    .eq(0)
-    .find("c-button")
-    .click();
-
-  cy.get("ul.c-menu-items").find("li").contains("Delete").click();
+    .type(folderName, { force: true });
+  cy.wait(5000);
 });
+
+/* DELETE */
+
+Cypress.Commands.add("deleteFolder", (folderName) => {
+  cy.get("c-data-table")
+      .contains(folderName)
+      .parent() //div
+      .parent() //td
+      .parent() //tr
+      .as("containerRow");
+
+    //click on options
+    cy.get("@containerRow")
+      .find("c-menu")
+      .click();
+
+    cy.get("c-menu-items")
+      .find("ul>li")
+      .contains("delete", { matchCase: false })
+      .click();
+});
+
+Cypress.Commands.add("deleteFile", (fileName) => {
+  cy.contains(fileName)
+    .parent()
+    .parent()
+    .find("[testid='delete-object']")
+    .click();
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
+});
+
+Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
+  //delete the file by checkbox
+  cy.contains(fileName)
+    .parent()
+    .parent()
+    .find("c-checkbox")
+    .click();
+  //click delete
+  cy.get("[data-testid='delete-checked-files']").click();
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
+});
+
+Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
+  //delete all the files on the current page by checkbox
+  cy.get("[data-testid='object-table']")
+    .find("thead")
+    .find("c-checkbox")
+    .click();
+  //click delete
+  cy.get("[data-testid='delete-checked-files']").click();
+  cy.wait(3000);
+  //confirm on delete modal
+  cy.get("[data-testid='confirm-delete-objects']").click();
+});
+
+/* UPLOAD */
 
 Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
   //open upload modal
@@ -201,61 +228,9 @@ Cypress.Commands.add("uploadFileFromMain", (folderName, fileName) => {
     .should("not.have.class", "disabled")
     .click();
   cy.wait(5000);
-})
-
-Cypress.Commands.add("deleteFile", (fileName) => {
-  cy.contains(fileName)
-    .parent()
-    .parent()
-    .find("[testid='delete-object']")
-    .click();
-  cy.wait(3000);
-  //confirm on delete modal
-  cy.get("[data-testid='confirm-delete-objects']").click();
 });
 
-Cypress.Commands.add("deleteFileCheckbox", (fileName) => {
-  //delete the file by checkbox
-  cy.contains(fileName)
-    .parent()
-    .parent()
-    .find("c-checkbox")
-    .click();
-  //click delete
-  cy.get("[data-testid='delete-checked-files']").click();
-  cy.wait(3000);
-  //confirm on delete modal
-  cy.get("[data-testid='confirm-delete-objects']").click();
-});
-
-Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
-  //delete all the files on the current page by checkbox
-  cy.get("[data-testid='object-table']")
-    .find("thead")
-    .find("c-checkbox")
-    .click();
-  //click delete
-  cy.get("[data-testid='delete-checked-files']").click();
-  cy.wait(3000);
-  //confirm on delete modal
-  cy.get("[data-testid='confirm-delete-objects']").click();
-});
-
-Cypress.Commands.add("searchFolder", (folderName) => {
-  cy.get("[data-testid='search-box']")
-    .find("input")
-    .eq(0)
-    .type(folderName, { force: true });
-  cy.wait(5000);
-});
-
-Cypress.Commands.add("generateFixture", (name) => {
-  cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
-    hits: Cypress._.times(20, () => {
-      return faker.lorem.paragraphs(50);
-    }),
-  });
-});
+/* SHARING */
 
 Cypress.Commands.add("share", (shareId, perm) => {
   //type in shareID, choose permission, save sharing
@@ -274,7 +249,9 @@ Cypress.Commands.add("share", (shareId, perm) => {
   }
 
   cy.get("[data-testid='submit-share']").click({ force: true });
-})
+});
+
+/*EDIT TAGS */
 
 Cypress.Commands.add("addTags", (tags) => {
   //modal should be open
@@ -283,7 +260,7 @@ Cypress.Commands.add("addTags", (tags) => {
   //input tags and save
   cy.get("[data-testid='edit-tags-input']").type(tags.join("{enter} "));
   cy.get("[data-testid='save-edit-tags']").click();
-})
+});
 
 Cypress.Commands.add("removeAllTags", () => {
   //modal should be open
@@ -306,4 +283,24 @@ Cypress.Commands.add("removeAllTags", () => {
     });
 
   cy.get("[data-testid='save-edit-tags']").click();
-})
+});
+
+/*OTHER */
+
+Cypress.Commands.add("generateFixture", (name) => {
+  cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
+    hits: Cypress._.times(20, () => {
+      return faker.lorem.paragraphs(50);
+    }),
+  });
+});
+
+Cypress.Commands.add("deleteDB", () => {
+  indexedDB.deleteDatabase("sd-connect");
+});
+
+// some exceptions like API reponse from delete we are not catching
+// and we don't need to, thus we ignore
+Cypress.on("uncaught:exception", () => {
+  return false;
+});
