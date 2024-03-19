@@ -81,8 +81,8 @@ const findFolder = (fname) => {
 
     cy.get("@pages")
       .its("length")
-      .then((len) => {
-        if (index >= len) return;
+      .then(($len) => {
+        if (index >= $len) return;
 
         cy.get("@pages").eq(index).click();
         cy.wait(3000);

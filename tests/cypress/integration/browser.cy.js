@@ -26,7 +26,7 @@ describe("Browse containers and test operations", function () {
       .first()
       .as("firstOption")
       .invoke("text")
-      .then(value => {
+      .then($value => {
         //click the first option
         cy.get("@firstOption")
           .click()
@@ -37,7 +37,7 @@ describe("Browse containers and test operations", function () {
           .find("tbody>tr")
           .its("length")
           //one row added for loader
-          .should("be.lte", parseInt(value+1));
+          .should("be.lte", parseInt($value+1));
       });
 
     //click on display options
@@ -231,13 +231,13 @@ describe("Browse containers and test operations", function () {
     //https://github.com/cypress-io/cypress/issues/2752
 
     //get shareId
-    cy.url().then((url) => {
-      const shareId = url.split("/")[5];
+    cy.url().then(($url) => {
+      const shareId = $url.split("/")[5];
 
-      cy.window().then((win) => {
+      cy.window().then(($win) => {
         //use spy to check if correct arg used when
         //writing to clipboard
-        cy.spy(win.navigator.clipboard, "writeText").as("writeText");
+        cy.spy($win.navigator.clipboard, "writeText").as("writeText");
       });
 
       //click to copy

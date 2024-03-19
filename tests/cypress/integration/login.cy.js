@@ -123,6 +123,6 @@ describe("Log in and switch language with mobile navigation", function () {
     //log out
     cy.get("@mobile-menu").click();
     cy.get("[data-testid='user-menu-mobile']").click();
-    cy.get('[data-testid="logout-mobile"]').click();
+    cy.get("[data-testid='logout-mobile']").click();
   });
 });

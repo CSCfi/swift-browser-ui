@@ -49,12 +49,12 @@ Cypress.Commands.add("logout", () => {
 
   cy.getCookie("OBJ_UI_LANG")
     .should("have.property", "value")
-    .then(key => {
-      cy.get('[data-testid="user-menu"]').click();
+    .then($key => {
+      cy.get("[data-testid='user-menu']").click();
       cy.wait(1000);
       cy.get("ul.c-menu-items")
         .find("li")
-        .should("contain.text", buttonText[key]).click();
+        .should("contain.text", buttonText[$key]).click();
       cy.visit(Cypress.config().baseUrl);
     })
 });
@@ -64,7 +64,7 @@ Cypress.Commands.add("changeLang", (key) => {
     { en: "In English" ,
       fi: "Suomeksi" };
 
-  cy.get('[data-testid="language-selector"]')
+  cy.get("[data-testid='language-selector']")
     .click();
   cy.wait(1000);
   cy.get("c-menu-items")
@@ -72,12 +72,12 @@ Cypress.Commands.add("changeLang", (key) => {
     .contains(langs[key])
     .click();
   //verify
-  cy.get('[data-testid="language-selector"]')
+  cy.get("[data-testid='language-selector']")
     .should("contain", langs[key]);
 });
 
 Cypress.Commands.add("selectProject", (projectName) => {
-  cy.get('[data-testid="project-selector"]')
+  cy.get("[data-testid='project-selector']")
     .click()
     .find("li")
     .contains(projectName)
@@ -185,20 +185,20 @@ Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
 
 Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
   //open upload modal
-  cy.get('[data-testid="upload-file"]').click();
+  cy.get("[data-testid='upload-file']").click();
   cy.wait(3000);
 
   //check that modal opened
   cy.get("[data-testid='upload-modal']").should("be.visible");
 
   //add the file
-  cy.get('[data-testid="select-files-input"]')
+  cy.get("[data-testid='select-files-input']")
     .invoke("show")
     .selectFile(Cypress.config("textFileLocation") + fileName + ".txt");
   cy.wait(3000);
 
   //start upload
-  cy.get('[data-testid="start-upload"]')
+  cy.get("[data-testid='start-upload']")
     .should("not.have.class", "disabled")
     .click();
   cy.wait(5000);
@@ -206,25 +206,25 @@ Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
 
 Cypress.Commands.add("uploadFileFromMain", (folderName, fileName) => {
   //open upload modal
-  cy.get('[data-testid="upload-file"]').click();
+  cy.get("[data-testid='upload-file']").click();
   cy.wait(3000);
 
   //check that modal opened
   cy.get("[data-testid='upload-modal']").should("be.visible");
 
   //insert folder name
-  cy.get('[data-testid="upload-folder-input"]')
+  cy.get("[data-testid='upload-folder-input']")
     .find("input")
     .type(folderName);
 
   //add the file
-  cy.get('[data-testid="select-files-input"]')
+  cy.get("[data-testid='select-files-input']")
     .invoke("show")
     .selectFile(Cypress.config("textFileLocation") + fileName + ".txt");
   cy.wait(3000);
 
   //start upload
-  cy.get('[data-testid="start-upload"]')
+  cy.get("[data-testid='start-upload']")
     .should("not.have.class", "disabled")
     .click();
   cy.wait(5000);
@@ -273,8 +273,8 @@ Cypress.Commands.add("removeAllTags", () => {
 
   cy.get("@icons")
     .its("length")
-    .then((length) => {
-      for(let i = length - 1; i >= 0; i--) {
+    .then(($length) => {
+      for(let i = $length - 1; i >= 0; i--) {
         //start from highest: index changes when items are deleted
         cy.get("@icons")
           .eq(i)

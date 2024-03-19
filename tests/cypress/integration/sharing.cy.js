@@ -8,8 +8,8 @@ describe("A folder is shared from project A to project B", function () {
   //Happy test cases
   it("the folder is shared successfully, when other user logs in, shared folder is visible", function () {
     //take the ID appearing as the last part of url
-    cy.url().then((url) => {
-      const copyId = url.split("/")[5];
+    cy.url().then(($url) => {
+      const copyId = $url.split("/")[5];
       cy.log(copyId);
 
       //switch user
@@ -67,8 +67,8 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
   it("switch project, try to share folder without share ID, fail", function () {
     //take the ID appearing as the last part of url
-    cy.url().then((url) => {
-      const copyId = url.split("/")[5];
+    cy.url().then(($url) => {
+      const copyId = $url.split("/")[5];
       cy.log(copyId);
 
       //switch project
@@ -102,8 +102,8 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
   it("copy shareID, switch project, try to share folder without selecting rights, fail", function () {
     //take the ID appearing as the last part of url
-    cy.url().then((url) => {
-      const copyId = url.split("/")[5];
+    cy.url().then(($url) => {
+      const copyId = $url.split("/")[5];
       cy.log(copyId);
 
       //switch project
@@ -145,8 +145,8 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
 
   it("switch project, try to share folder with the same ID twice, fail", function () {
     //take the ID appearing as the last part of url
-    cy.url().then((url) => {
-      const copyId = url.split("/")[5];
+    cy.url().then(($url) => {
+      const copyId = $url.split("/")[5];
       cy.log(copyId);
 
       //switch project
