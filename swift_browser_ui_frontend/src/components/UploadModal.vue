@@ -74,6 +74,7 @@
             v-if="error.show"
             :key="error.id"
             type="error"
+            data-testid="drop-files-error"
           >
             <div class="drop-file-notification">
               {{ $t(`message.upload.${error.id}`) }}

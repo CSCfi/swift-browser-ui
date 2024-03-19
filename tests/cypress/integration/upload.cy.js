@@ -33,7 +33,7 @@ describe("Upload a file", function () {
     cy.uploadFileFromFolder(file1);
 
     //close upload toast
-    cy.get('[data-testid="close-upload-toast"]')
+    cy.get("[data-testid='close-upload-toast']")
       .should("exist")
       .click();
     cy.wait(3000);
@@ -45,7 +45,7 @@ describe("Upload a file", function () {
     cy.deleteFileCheckbox(file1);
     cy.wait(3000);
 
-    cy.get('[data-testid="object-table"]')
+    cy.get("[data-testid='object-table']")
       .invoke("attr", "no-data-text")
       .then(($value) => {
         cy.contains($value).should("exist");
@@ -60,7 +60,7 @@ describe("Upload a file", function () {
     cy.uploadFileFromMain(folderName, file1);
 
     //close upload toast
-    cy.get('[data-testid="close-upload-toast"]')
+    cy.get("[data-testid='close-upload-toast']")
       .should("exist")
       .click();
     cy.wait(3000);
@@ -78,7 +78,7 @@ describe("Upload a file", function () {
     cy.deleteFileCheckbox(file1);
     cy.wait(3000);
 
-    cy.get('[data-testid="object-table"]')
+    cy.get("[data-testid='object-table']")
       .invoke("attr", "no-data-text")
       .then(($value) => {
         cy.contains($value).should("exist");
@@ -88,28 +88,28 @@ describe("Upload a file", function () {
   it("Several files with different names can be uploaded to a folder at once", () => {
 
     //open upload modal
-    cy.get('[data-testid="upload-file"]').click();
+    cy.get("[data-testid='upload-file']").click();
     cy.wait(3000);
 
     //add folder name
     const folderName = Math.random().toString(36).substring(2, 7);
-    cy.get('[data-testid="upload-folder-input"]')
+    cy.get("[data-testid='upload-folder-input']")
       .find("input")
       .type(folderName);
 
     //add the fixture files
-    cy.get('[data-testid="select-files-input"]')
+    cy.get("[data-testid='select-files-input']")
       .invoke("show")
       .selectFile(fileLocation + file1 + ".txt");
     cy.wait(3000);
 
-    cy.get('[data-testid="select-files-input"]')
+    cy.get("[data-testid='select-files-input']")
       .invoke("show")
       .selectFile(fileLocation + file2 + ".txt");
     cy.wait(3000);
 
     //start upload
-    cy.get('[data-testid="start-upload"]')
+    cy.get("[data-testid='start-upload']")
       .should("not.have.class", "disabled")
       .click();
     cy.wait(1000);
@@ -119,7 +119,7 @@ describe("Upload a file", function () {
     cy.wait(5000);
 
     //close upload toast
-    cy.get('[data-testid="close-upload-toast"]')
+    cy.get("[data-testid='close-upload-toast']")
       .should("exist")
       .click();
 
@@ -130,7 +130,7 @@ describe("Upload a file", function () {
     cy.deleteFilesOnPageCheckbox();
     cy.wait(3000);
 
-    cy.get('[data-testid="object-table"]')
+    cy.get("[data-testid='object-table']")
       .invoke("attr", "no-data-text")
       .then(($value) => {
         cy.contains($value).should("exist");
@@ -155,7 +155,7 @@ describe("Upload a file", function () {
     cy.uploadFileFromFolder(file1);
 
     //close toast
-    cy.get('[data-testid="close-upload-toast"]')
+    cy.get("[data-testid='close-upload-toast']")
       .should("exist")
       .click();
 
@@ -163,7 +163,7 @@ describe("Upload a file", function () {
     cy.uploadFileFromFolder(file2);
 
     //close toast
-    cy.get('[data-testid="close-upload-toast"]')
+    cy.get("[data-testid='close-upload-toast']")
       .should("exist")
       .click();
 
@@ -175,7 +175,7 @@ describe("Upload a file", function () {
     cy.deleteFilesOnPageCheckbox();
     cy.wait(3000);
 
-    cy.get('[data-testid="object-table"]')
+    cy.get("[data-testid='object-table']")
       .invoke("attr", "no-data-text")
       .then(($value) => {
         cy.contains($value).should("exist");
@@ -186,7 +186,7 @@ describe("Upload a file", function () {
   it("Two files with the same name can not be uploaded to a folder at the same time", () => {
 
     //open upload modal
-    cy.get('[data-testid="upload-file"]').click({ force: true });
+    cy.get("[data-testid='upload-file']").click({ force: true });
     cy.wait(3000);
 
     //check that modal opened
@@ -195,21 +195,25 @@ describe("Upload a file", function () {
     //create and insert new folder name
     const folderName = Math.random().toString(36).substring(2, 7);
 
-    cy.get('[data-testid="upload-folder-input"]')
+    cy.get("[data-testid='upload-folder-input'")
       .find("input")
       .type(folderName);
 
     //add the fixture file
-    cy.get('[data-testid="select-files-input"]')
+    cy.get("[data-testid='select-files-input']")
       .invoke("show")
       .selectFile(fileLocation + file1 + ".txt")
     cy.wait(2000);
 
     //try to add the same file second time
-    cy.get('[data-testid="select-files-input"]')
+    cy.get("[data-testid='select-files-input']")
       .invoke("show")
       .selectFile(fileLocation + file1 + ".txt")
-    cy.wait(2000);
+    cy.wait(1000);
+
+    //check for error alert
+    cy.get("[data-testid='drop-files-error']")
+      .should("be.visible");
 
     //check that file is added once
     cy.get("[data-testid='upload-modal']")
