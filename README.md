@@ -282,9 +282,14 @@ The frontend tests are run with `cypress`, and you will need
 
 1. Full backend running, as shown above
 2. Building the `wasm` code for encryption support
-3. using a specific command for generating data
+3. Having `Openstack command-line client` installed
+4. using a specific command for generating data (optional)
 
 The wasm code is built automatically when using `npm` commands. It can also be triggered by running `npm run build-wasm`
+
+`Openstack command-line client` can be installed with `pip` by running
+
+    pip install python-openstackclient
 
 > NOTE: Remember that the encrypted upload features cannot be used without
 > having trusted TLS set up on all backend services.
