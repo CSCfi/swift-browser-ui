@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# For best result, replace $OS_AUTH_URL with the real url from your .env file
+
 IFS=$'\n'
 
 CONTAINERS=$(openstack \

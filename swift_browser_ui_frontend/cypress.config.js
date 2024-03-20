@@ -19,6 +19,9 @@ module.exports = defineConfig({
       on("task", {
         async resetDB() {
           // Connect to Sharing DB from Node
+          /* 'host' and 'port' can be changed if you have configured
+            the Postgresql container to run in different host and port
+          */
           const client = new Client({
             database: "swiftbrowserdb",
             host: "localhost",
