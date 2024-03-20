@@ -75,6 +75,7 @@ openapi
 openrc
 openshift
 openstack
+openstackclient
 palletsprojects
 pem
 plaintext
