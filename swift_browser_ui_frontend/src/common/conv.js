@@ -244,6 +244,9 @@ function extractBytes(meta) {
   if ("X-Container-Bytes-Used" in meta[1]) {
     return meta[1]["X-Container-Bytes-Used"];
   }
+  if ("x-container-bytes-used" in meta[1]) {
+    return meta[1]["x-container-bytes-used"];
+  }
   return "";
 }
 
@@ -251,12 +254,18 @@ function extractObjectCount(meta) {
   if ("X-Container-Object-Count" in meta[1]) {
     return meta[1]["X-Container-Object-Count"];
   }
+  if ("x-container-object-count" in meta[1]) {
+    return meta[1]["x-container-object-count"];
+  }
   return "";
 }
 
 function extractContainerTimestamp(meta) {
   if ("X-Timestamp" in meta[1]) {
     return meta[1]["X-Timestamp"];
+  }
+  if ("x-timestamp" in meta[1]) {
+    return meta[1]["x-timestamp"];
   }
   return "";
 }
