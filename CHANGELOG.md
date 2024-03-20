@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- (GL #1224) Return correct shared container's items and size for test and production page
+
 ## [2024.03.0] - 2024-03-14
 
 ### Added
