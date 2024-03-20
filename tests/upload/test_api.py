@@ -208,7 +208,7 @@ class APITestClass(tests.common.mockups.APITestBase):
         req.set_match({"project": "test-project", "container": "test-container"})
 
         with self.assertRaises(aiohttp.web.HTTPGone):
-            resp = await swift_browser_ui.upload.api.handle_post_object_chunk(req)
+            await swift_browser_ui.upload.api.handle_post_object_chunk(req)
 
     async def test_handle_post_object_options(self):
         """Test swift_browser_ui.upload.api.handle_post_object_options."""

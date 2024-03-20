@@ -148,15 +148,29 @@ class CryptTestClass(tests.common.mockups.APITestBase):
 
     async def test_handle_begin_upload(self):
         """Test upload start handling."""
+        self.file_uploader = unittest.mock.AsyncMock()
+        self.upload_session.uploads["test-container"] = {
+            "test-object": self.file_uploader
+        }
+
+        # Case where upload needs to be aborted first
         mock_ws = unittest.mock.AsyncMock()
         mock_ws.closed = False
         self.upload_session.ws = mock_ws
         await self.upload_session.handle_begin_upload(self.msg)
-        mock_ws.send_bytes.assert_awaited_once()
-        self.upload_session.ws = self.mock_socket
-        self.upload_session.uploads = {}
-        await self.upload_session.handle_begin_upload(self.msg)
-        assert self.mock_socket.send_bytes.await_count == 2
+        self.file_uploader.abort_upload.assert_awaited_once()
+
+        # Test for completion of the method
+        FileUploadMock = unittest.mock.MagicMock()
+        add_header_mock = unittest.mock.AsyncMock()
+        FileUploadMock.return_value.add_header = add_header_mock
+        with unittest.mock.patch(
+            "swift_browser_ui.upload.cryptupload.FileUpload", FileUploadMock
+        ):
+            self.upload_session.ws = self.mock_socket
+            self.upload_session.uploads = {}
+            await self.upload_session.handle_begin_upload(self.msg)
+            add_header_mock.assert_awaited_once_with(b"")
 
     async def test_handle_upload_chunk(self):
         """Test addition of a new chunk."""
