@@ -71,7 +71,7 @@ export default {
     /* UPLOAD */
     onCancelUpload() {
       this.$emit("cancel-current-upload", this.uploadContName);
-      this.onClosed();
+      this.onClose();
     },
     viewUploadContainer() {
       if (this.$route.params.container === this.uploadContName) {
