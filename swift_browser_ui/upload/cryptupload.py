@@ -393,17 +393,8 @@ class UploadSession:
             and self.ws is not None
             and not self.ws.closed
         ):
-            await self.ws.send_bytes(
-                msgpack.packb(
-                    {
-                        "command": "abort",
-                        "container": container,
-                        "object": path,
-                        "reason": "Object is already being uploaded.",
-                    }
-                )
-            )
-            return
+            # abort previous upload quietly and continue
+            await self.uploads[container][path].abort_upload()
 
         if container not in self.uploads:
             self.uploads[container] = {}
