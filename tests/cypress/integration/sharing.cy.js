@@ -1,5 +1,7 @@
 describe("A folder is shared from project A to project B", function () {
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);
@@ -60,6 +62,8 @@ describe("A folder is shared from project A to project B", function () {
 //Unhappy test cases
 describe("A folder cannot be shared without Share ID or if rights are not selected", function () {
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);
@@ -138,6 +142,8 @@ describe("A folder cannot be shared without Share ID or if rights are not select
 
 describe("A folder cannot be shared with the same Share ID twice", function () {
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);
@@ -188,6 +194,8 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
 
 describe("A folder cannot be shared with an invalid ID", function () {
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);

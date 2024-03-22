@@ -4,20 +4,38 @@
 
 IFS=$'\n'
 
-CONTAINERS=$(openstack \
-    --os-auth-url $OS_AUTH_URL \
-    --os-username swift \
-    --os-project-name service \
-    --os-password veryfast \
-    --os-identity-api-version 3 \
-    container list --all --format value)
+USERS=(swift admin)
+PASSWORDS=(veryfast superuser)
+#OS_AUTH_URL=http://0.0.0.0:5000/v3
 
-for container in $CONTAINERS; do
-    openstack \
+for ((i=0; i<${#USERS[@]}; ++i )); do
+    PROJECTS=$(openstack \
         --os-auth-url $OS_AUTH_URL \
-        --os-username swift \
-        --os-project-name service \
-        --os-password veryfast \
+        --os-username ${USERS[i]} \
+        --os-password ${PASSWORDS[i]} \
         --os-identity-api-version 3 \
-        container delete --recursive $container
+        project list --format value)
+
+    for project in $PROJECTS; do
+        # project is "id name", remove id
+        PROJECT_NAME=${project##* }
+
+        CONTAINERS=$(openstack \
+            --os-auth-url $OS_AUTH_URL \
+            --os-username ${USERS[i]} \
+            --os-project-name $PROJECT_NAME \
+            --os-password ${PASSWORDS[i]}  \
+            --os-identity-api-version 3 \
+            container list --all --format value)
+
+        for container in $CONTAINERS; do
+            openstack \
+                --os-auth-url $OS_AUTH_URL \
+                --os-username ${USERS[i]} \
+                --os-project-name $PROJECT_NAME \
+                --os-password ${PASSWORDS[i]} \
+                --os-identity-api-version 3 \
+                container delete --recursive $container
+        done
+    done
 done

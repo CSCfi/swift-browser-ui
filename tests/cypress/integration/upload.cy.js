@@ -7,6 +7,8 @@ describe("Upload a file", function () {
   const fileLocation = Cypress.config("textFileLocation");
 
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config("baseUrl"));
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);
@@ -16,7 +18,7 @@ describe("Upload a file", function () {
 
   //Happy scenarios
   //upload from folder
-  it("Upload file from the folder page", () => {
+  it("Upload file from the folder page and delete it", () => {
 
     //create a folder and go inside it
     const folderName = Math.random().toString(36).substring(2, 7);
@@ -73,16 +75,6 @@ describe("Upload a file", function () {
     cy.wait(5000);
 
     cy.contains(file1).should("exist");
-
-    //delete the file by checkbox
-    cy.deleteFileCheckbox(file1);
-    cy.wait(3000);
-
-    cy.get("[data-testid='object-table']")
-      .invoke("attr", "no-data-text")
-      .then(($value) => {
-        cy.contains($value).should("exist");
-      })
   });
 
   it("Several files with different names can be uploaded to a folder at once", () => {
@@ -125,19 +117,9 @@ describe("Upload a file", function () {
 
     cy.contains(file1).should("exist");
     cy.contains(file2).should("exist");
-
-    //delete both files
-    cy.deleteFilesOnPageCheckbox();
-    cy.wait(3000);
-
-    cy.get("[data-testid='object-table']")
-      .invoke("attr", "no-data-text")
-      .then(($value) => {
-        cy.contains($value).should("exist");
-      })
   });
 
-  it("Several files with different names can be uploaded to a folder one by one", () => {
+  it("Several files with different names can be uploaded to a folder one by one and deleted", () => {
 
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);

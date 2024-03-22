@@ -1,5 +1,7 @@
 describe("User can share folder from container table", function () {
   beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.wait(3000);

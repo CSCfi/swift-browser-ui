@@ -1,11 +1,15 @@
 //container
 
-//A container with a unique name is created and visible
+describe("Create a container", function () {
 
-describe("Creates and shows a container with a random unique name", function () {
-  it("should show unique container in swift project", () => {
-    cy.visit(Cypress.config().baseUrl);
+  beforeEach(() => {
+    cy.task("resetDB");
+    cy.deleteDB();
+    cy.visit(Cypress.config("baseUrl"));
     cy.login(Cypress.env("username"), Cypress.env("password"));
+  });
+
+  it("Creates a container with a random unique name and deletes it", () => {
 
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
@@ -19,41 +23,22 @@ describe("Creates and shows a container with a random unique name", function () 
     cy.get("[data-testid='search-result']")
       .contains(folderName)
       .should("exist");
-  });
-});
 
-//A container with not unique name can't be created
-describe("Creating more than 1 container with the same name is not possible in a project", function () {
-  it("should not create a non-unique container", () => {
-    cy.visit(Cypress.config().baseUrl);
-    cy.login(Cypress.env("username"), Cypress.env("password"));
+    //then delete container
+    cy.deleteFolder(folderName);
+    cy.wait(1000);
 
-    //create a unique name
-    const folderName = Math.random().toString(36).substring(2, 7);
+    cy.get("[data-testid='container-toasts']")
+      .find("c-toast")
+      .should("have.class", "success");
 
-    // add new folder with a unique name and show it
-    cy.addFolder(folderName);
+    //check it was deleted
+    cy.reload();
     cy.wait(3000);
-
-    cy.addFolder(folderName);
-
-    //folder name input field should have a validation error
-    cy.get("[data-testid='create-folder-modal']")
-      .find("c-message")
-      .should("be.visible");
-    cy.get("[data-testid='cancel-save-folder']").click();
-  });
-});
-
-//Several containers are created and are visible
-
-describe("Several containers with different names are created and visible", () => {
-  before(() => {
-    cy.visit(Cypress.config().baseUrl);
-    cy.login(Cypress.env("username"), Cypress.env("password"));
+    cy.contains(folderName).should("not.exist");
   });
 
-  it("Several containers are visible", function () {
+  it("Several containers with different names are created and visible", function () {
     //create two folders
     const nameOne = Math.random().toString(36).substring(2, 7);
     const nameTwo = Math.random().toString(36).substring(2, 7);
@@ -84,15 +69,11 @@ describe("Several containers with different names are created and visible", () =
       .find("c-link")
       .should("have.length.gte", 2); //check
   });
-});
 
-describe("A container can be deleted", () => {
-  before(() => {
+  it("Creating more than 1 container with the same name is not possible in a project", () => {
     cy.visit(Cypress.config().baseUrl);
     cy.login(Cypress.env("username"), Cypress.env("password"));
-  });
 
-  it("creates and deletes a container", function () {
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
 
@@ -100,23 +81,12 @@ describe("A container can be deleted", () => {
     cy.addFolder(folderName);
     cy.wait(3000);
 
-    //check the folder exists with search field
-    cy.searchFolder(folderName);
-    cy.get("[data-testid='search-result']")
-      .contains(folderName)
-      .should("exist");
+    cy.addFolder(folderName);
 
-    //check the folder exists, then delete
-    cy.deleteFolder(folderName);
-    cy.wait(1000);
-
-    cy.get("[data-testid='container-toasts']")
-      .find("c-toast")
-      .should("have.class", "success");
-
-    //check it was deleted
-    cy.reload();
-    cy.wait(3000);
-    cy.contains(folderName).should("not.exist");
+    //folder name input field should have a validation error
+    cy.get("[data-testid='create-folder-modal']")
+      .find("c-message")
+      .should("be.visible");
+    cy.get("[data-testid='cancel-save-folder']").click();
   });
 });
