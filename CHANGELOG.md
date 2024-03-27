@@ -16,6 +16,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - Add configuration to reset all databases for Cypress tests
 
+### Changed
+
+- display indeterminate state on download progress bar while waiting for headers
+
 ## [2024.03.0] - 2024-03-14
 
 ### Added
