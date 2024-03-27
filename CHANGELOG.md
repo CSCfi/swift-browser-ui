@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (GL #1225) Fix upload not starting after last upload was interrupted with page refresh
 - (GL #1224) Return correct shared container's items and size for test and production page
 
 ### Added
