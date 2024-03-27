@@ -212,6 +212,7 @@ let default_translations = {
           "than 99 characters.",
         inProgress: "Download in progress",
         complete: "Download completed",
+        gathering: "Gathering a list of files",
         warnWait: "Please wait for the download to finish.",
         warnTempFiles: "Opening temporary files or folders " +
           "(.crdownload, .crswap) may interrupt the process.",
@@ -757,6 +758,7 @@ let default_translations = {
           "erikseen, koska tiedostojen tai alikansioiden nimet ovat " +
           "yli 99 merkkiä pitkiä.",
         inProgress: "Lataus käynnissä",
+        gathering: "Haetaan listaa tiedostoista",
         complete: "Lataus on valmis",
         warnWait: "Odota, kunnes lataus on valmis. ",
         warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +

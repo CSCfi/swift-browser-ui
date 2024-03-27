@@ -24,7 +24,9 @@
               : $t("message.download.complete")
             : type === "upload"
               ? $t("message.upload.inProgress")
-              : $t("message.download.inProgress")
+              : isProgressing
+                ? $t("message.download.inProgress")
+                : $t("message.download.gathering")
         }}
       </h3>
 
@@ -82,6 +84,11 @@ export default {
       mdiClose,
       mdiArrowExpand,
     };
+  },
+  computed: {
+    isProgressing() {
+      return this.$store.state.downloadProgress !== undefined;
+    },
   },
 };
 </script>

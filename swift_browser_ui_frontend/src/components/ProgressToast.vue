@@ -13,7 +13,9 @@
                 : $t("message.download.complete")
               : type === "upload"
                 ? $t("message.upload.inProgress")
-                : $t("message.download.inProgress")
+                : isProgressing
+                  ? $t("message.download.inProgress")
+                  : $t("message.download.gathering")
           }}
         </h3>
         <c-icon-button
@@ -48,7 +50,7 @@
       </c-row>
 
       <div
-        v-if="type === 'download' && !finished"
+        v-if="type === 'download' && !finished && !usingServiceWorker"
         class="download-warning"
       >
         <p>{{ $t("message.download.warnWait") }}</p>
@@ -101,6 +103,13 @@ export default {
     },
     otherNotificationType() {
       return this.type === "upload" ? "download" : "upload";
+    },
+    isProgressing() {
+      return this.$store.state.downloadProgress !== undefined;
+    },
+    usingServiceWorker() {
+      return "serviceWorker" in navigator
+        && window.showSaveFilePicker === undefined;
     },
   },
   watch: {
