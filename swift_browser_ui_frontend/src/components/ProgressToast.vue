@@ -50,7 +50,7 @@
       </c-row>
 
       <div
-        v-if="type === 'download' && !finished"
+        v-if="type === 'download' && !finished && !usingServiceWorker"
         class="download-warning"
       >
         <p>{{ $t("message.download.warnWait") }}</p>
@@ -106,6 +106,10 @@ export default {
     },
     isProgressing() {
       return this.$store.state.downloadProgress !== undefined;
+    },
+    usingServiceWorker() {
+      return "serviceWorker" in navigator
+        && window.showSaveFilePicker === undefined;
     },
   },
   watch: {
