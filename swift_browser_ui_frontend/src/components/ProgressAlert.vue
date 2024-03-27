@@ -55,7 +55,7 @@
         </c-icon-button>
 
         <c-icon-button
-          v-if="type === 'download' || finished"
+          v-if="finished"
           size="small"
           text
           @click="$emit('close')"

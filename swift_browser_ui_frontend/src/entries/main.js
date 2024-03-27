@@ -360,6 +360,9 @@ const app = createApp({
     cancelUpload: function(container) {
       this.socket.cancelUpload(container);
     },
+    cancelDownload: function() {
+      this.socket.cancelDownload();
+    },
     onKeydown: function (e) {
       if (e.key === "Tab" && this.prevActiveEl &&
         e.target === this.prevActiveEl) {

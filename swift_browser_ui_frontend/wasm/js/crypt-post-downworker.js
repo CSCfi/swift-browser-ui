@@ -370,17 +370,17 @@ function clear() {
   totalToDo = 0;
 }
 
-function abortDownloads(direct) {
+function abortDownloads(direct, abortReason) {
+  const msg = {
+    eventType: "abort",
+    reason: abortReason,
+  };
   if (direct) {
-    postMessage({
-      eventType: "error",
-    });
+    postMessage(msg);
   } else {
     self.clients.matchAll().then(clients => {
       clients.forEach(client =>
-        client.postMessage({
-          eventType: "error",
-        }));
+        client.postMessage(msg));
     });
   }
   clear();
@@ -511,7 +511,7 @@ async function beginDownloadInSession(
         return false;
       });
       if (!res) {
-        if (!aborted) abortDownloads(!inServiceWorker);
+        if (!aborted) abortDownloads(!inServiceWorker, "error");
         return;
       }
     }
@@ -707,6 +707,9 @@ self.addEventListener("message", async (e) => {
       break;
     case "clear":
       clear();
+      break;
+    case "cancel":
+      abortDownloads(!inServiceWorker, "cancel");
       break;
   }
 });

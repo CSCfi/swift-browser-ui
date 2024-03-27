@@ -49,7 +49,7 @@ const store = createStore({
       visible: false,
       maximized: true,
     },
-    downloadError: false,
+    downloadAbortReason: undefined,
     uploadEndpoint: "",
     pubkey: [],
     dropFiles: [],
@@ -132,8 +132,8 @@ const store = createStore({
     eraseProgress(state) {
       state.uploadProgress = undefined;
     },
-    setDownloadError(state, payload) {
-      state.downloadError = payload;
+    setDownloadAbortReason(state, payload) {
+      state.downloadAbortReason = payload;
       if (state.downloadNotification.visible) {
         state.downloadNotification.visible = false;
       }

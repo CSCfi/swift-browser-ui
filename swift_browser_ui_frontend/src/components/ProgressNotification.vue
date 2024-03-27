@@ -5,7 +5,7 @@
     :finished="finished"
     @toggleSize="toggleSize"
     @close="onClose"
-    @cancel-upload="onCancelUpload"
+    @cancel="onCancel"
     @view-container="viewUploadContainer"
   />
   <ProgressAlert
@@ -36,7 +36,7 @@ export default {
       },
     },
   },
-  emits: ["cancel-current-upload"],
+  emits: ["cancel-current-upload", "cancel-download"],
   computed: {
     finished() {
       return this.type === "upload"
@@ -68,9 +68,13 @@ export default {
         : this.$store.commit("toggleDownloadNotification", false);
       if (!this.maximized) this.toggleSize();
     },
-    /* UPLOAD */
-    onCancelUpload() {
-      this.$emit("cancel-current-upload", this.uploadContName);
+    onCancel() {
+      if (this.type === "upload") {
+        this.$emit("cancel-current-upload", this.uploadContName);
+      }
+      else {
+        this.$emit("cancel-download");
+      }
       this.onClose();
     },
     viewUploadContainer() {
