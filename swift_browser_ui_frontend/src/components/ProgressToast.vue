@@ -58,7 +58,7 @@
       </div>
 
       <c-button
-        v-if="!finished"
+        v-if="canCancel"
         outlined
         @click="cancel"
         @keyup.enter="cancel"
@@ -110,6 +110,12 @@ export default {
     usingServiceWorker() {
       return "serviceWorker" in navigator
         && window.showSaveFilePicker === undefined;
+    },
+    canCancel() {
+      //can cancel ongoing direct downloads or ongoing uploads
+      return !this.finished &&
+        (!this.usingServiceWorker ||
+          this.type === "upload");
     },
   },
   watch: {

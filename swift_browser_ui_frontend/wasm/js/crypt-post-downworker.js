@@ -65,6 +65,8 @@ if (inServiceWorker) {
 
 // Create a download session
 function createDownloadSession(container, handle, archive) {
+  aborted = false; //reset
+
   let keypairPtr = Module.ccall(
     "create_keypair",
     "number",
@@ -422,7 +424,6 @@ async function addSessionFiles(
 async function beginDownloadInSession(
   container,
 ) {
-  aborted = false; //reset with download start
 
   let fileHandle = downloads[container].handle;
   let fileStream;
@@ -674,6 +675,7 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "addHeaders":
+      if (aborted) return;
       addSessionFiles(e.data.container, e.data.headers).then(ret => {
         if (ret && inServiceWorker) {
           e.source.postMessage({
