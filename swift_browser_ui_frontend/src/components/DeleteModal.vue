@@ -9,7 +9,10 @@
       class="delete-modal"
       @keydown="handleKeyDown"
     >
-      <c-alert type="error">
+      <c-alert
+        v-if="!isDeleting"
+        type="error"
+      >
         <div slot="title">
           {{ $t("message.objects.deleteObjects") }}
         </div>
@@ -36,6 +39,18 @@
           </c-button>
         </c-card-actions>
       </c-alert>
+      <c-alert
+        v-else
+        type="success"
+      >
+        <div slot="title">
+          {{ $t("message.objects.deleteInProgress") }}
+        </div>
+        <c-progress-bar
+          single-line
+          indeterminate
+        />
+      </c-alert>
     </c-card>
   </c-card>
 </template>
@@ -54,6 +69,11 @@ import {
 
 export default {
   name: "DeleteModal",
+  data() {
+    return {
+      isDeleting: false,
+    };
+  },
   computed: {
     selectedObjects() {
       return this.$store.state.deletableObjects.length > 0
@@ -79,6 +99,14 @@ export default {
     renderedFolders() {
       return this.$store.state.renderedFolders;
     },
+    modalVisible() {
+      return this.$store.state.openDeleteModal;
+    },
+  },
+  watch: {
+    modalVisible() {
+      if (this.modalVisible) this.isDeleting = false;
+    },
   },
   methods: {
     toggleDeleteModal: function(keypress) {
@@ -97,6 +125,11 @@ export default {
       }
     },
     deleteObjects: async function () {
+      setTimeout(() => {
+        if (this.modalVisible) {
+          this.isDeleting = true;
+        }
+      }, 200);
       let to_remove = [];
       let segments_to_remove = []; // Array for segment objects to be deleted
       let segment_container = null;
@@ -282,6 +315,10 @@ export default {
 
 .delete-modal {
   padding: 0px;
+}
+
+c-progress-bar {
+  padding: 0.5rem;
 }
 
 </style>
