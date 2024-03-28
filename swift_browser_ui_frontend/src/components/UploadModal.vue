@@ -444,6 +444,7 @@ export default {
         //in case there's a delay in upload start
         //reset when modal visible
         this.clearExistingFiles();
+        this.objects = [];
         this.filesToOverwrite = [];
         this.recvkeys = [];
         this.inputFolder = "";
@@ -590,11 +591,11 @@ export default {
                       title: this.$t("message.delete"),
                       path: mdiDelete,
                       onClick: () => {
-                        this.$store.commit("eraseDropFile", file);
+                        this.deleteDropFile(file);
                       },
                       onKeyUp: (e) => {
                         if(e.keyCode === 13) {
-                          this.$store.commit("eraseDropFile", file);
+                          this.deleteDropFile(file);
                         }
                       },
                     },
@@ -614,6 +615,14 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
       this.getDropTablePage();
+    },
+    deleteDropFile(file) {
+      this.$store.commit("eraseDropFile", file);
+      const i = this.filesToOverwrite.findIndex(
+        (f) => f.relativePath === file.relativePath);
+      if (i > -1) {
+        this.filesToOverwrite.splice(i, 1);
+      }
     },
     overwriteFiles() {
       //if new duplicate files appear after confirmation
@@ -657,7 +666,6 @@ export default {
     },
     clearExistingFiles() {
       this.existingFiles = [];
-      this.objects = [];
     },
     checkFolderName: debounce(function () {
       this.errorMsg = validateFolderName(
