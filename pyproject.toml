@@ -43,7 +43,7 @@ docs = [
     "sphinx_rtd_theme==2.0.0",
 ]
 test = [
-    "black==23.12.1",
+    "black==24.3.0",
     "coverage==7.4.4",
     "flake8-docstrings==1.7.0",
     "flake8==7.0.0",
