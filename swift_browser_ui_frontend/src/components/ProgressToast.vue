@@ -58,10 +58,10 @@
       </div>
 
       <c-button
-        v-if="!finished && type === 'upload'"
+        v-if="canCancel"
         outlined
-        @click="cancelUpload"
-        @keyup.enter="cancelUpload"
+        @click="cancel"
+        @keyup.enter="cancel"
       >
         {{ $t("message.share.cancel") }}
       </c-button>
@@ -88,7 +88,7 @@ export default {
     ProgressBar,
   },
   props: ["type", "finished"],
-  emits: ["view-container", "close", "cancel-upload", "toggleSize"],
+  emits: ["view-container", "close", "cancel", "toggleSize"],
   data() {
     return {
       mdiArrowCollapse,
@@ -110,6 +110,12 @@ export default {
     usingServiceWorker() {
       return "serviceWorker" in navigator
         && window.showSaveFilePicker === undefined;
+    },
+    canCancel() {
+      //can cancel ongoing direct downloads or ongoing uploads
+      return !this.finished &&
+        (!this.usingServiceWorker ||
+          this.type === "upload");
     },
   },
   watch: {
@@ -151,9 +157,9 @@ export default {
       this.removeToast();
       this.$emit("close");
     },
-    cancelUpload() {
+    cancel() {
       this.removeToast();
-      this.$emit("cancel-upload");
+      this.$emit("cancel");
     },
     toggleSize() {
       this.$emit("toggleSize");

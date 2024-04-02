@@ -146,8 +146,8 @@ export default {
     client() {
       return this.$store.state.client;
     },
-    downloadError() {
-      return this.$store.state.downloadError;
+    downloadAbortReason() {
+      return this.$store.state.downloadAbortReason;
     },
     downloadCount() {
       return this.$store.state.downloadCount;
@@ -160,10 +160,10 @@ export default {
     client() {
       this.checkIfCanReadWrite();
     },
-    downloadError() {
-      if (this.downloadError) {
-        addErrorToastOnMain(this.$t("message.download.error"));
-        this.$store.commit("setDownloadError", false);
+    downloadAbortReason() {
+      if (this.downloadAbortReason) {
+        addErrorToastOnMain(this.$t(`message.download.${this.downloadAbortReason}`));
+        this.$store.commit("setDownloadAbortReason", undefined);
       }
     },
   },

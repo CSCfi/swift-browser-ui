@@ -65,6 +65,8 @@ if (inServiceWorker) {
 
 // Create a download session
 function createDownloadSession(container, handle, archive) {
+  aborted = false; //reset
+
   let keypairPtr = Module.ccall(
     "create_keypair",
     "number",
@@ -370,17 +372,17 @@ function clear() {
   totalToDo = 0;
 }
 
-function abortDownloads(direct) {
+function abortDownloads(direct, abortReason) {
+  const msg = {
+    eventType: "abort",
+    reason: abortReason,
+  };
   if (direct) {
-    postMessage({
-      eventType: "error",
-    });
+    postMessage(msg);
   } else {
     self.clients.matchAll().then(clients => {
       clients.forEach(client =>
-        client.postMessage({
-          eventType: "error",
-        }));
+        client.postMessage(msg));
     });
   }
   clear();
@@ -422,7 +424,6 @@ async function addSessionFiles(
 async function beginDownloadInSession(
   container,
 ) {
-  aborted = false; //reset with download start
 
   let fileHandle = downloads[container].handle;
   let fileStream;
@@ -511,7 +512,7 @@ async function beginDownloadInSession(
         return false;
       });
       if (!res) {
-        if (!aborted) abortDownloads(!inServiceWorker);
+        if (!aborted) abortDownloads(!inServiceWorker, "error");
         return;
       }
     }
@@ -674,6 +675,7 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "addHeaders":
+      if (aborted) return;
       addSessionFiles(e.data.container, e.data.headers).then(ret => {
         if (ret && inServiceWorker) {
           e.source.postMessage({
@@ -707,6 +709,9 @@ self.addEventListener("message", async (e) => {
       break;
     case "clear":
       clear();
+      break;
+    case "cancel":
+      abortDownloads(!inServiceWorker, "cancel");
       break;
   }
 });

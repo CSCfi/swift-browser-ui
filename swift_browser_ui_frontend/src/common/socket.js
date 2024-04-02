@@ -171,8 +171,8 @@ export default class UploadSocket {
             },
           );
           break;
-        case "error":
-          this.$store.commit("setDownloadError", true);
+        case "abort":
+          this.$store.commit("setDownloadAbortReason", e.data.reason);
           if (!this.useServiceWorker) {
             this.$store.commit("removeDownload", true);
             this.$store.commit("eraseDownloadProgress");
@@ -345,7 +345,12 @@ export default class UploadSocket {
     if (DEV) console.log("Close the websocket and cancel current upload");
   }
 
-  // Schecule file/files for upload
+  cancelDownload() {
+    this.downWorker.postMessage({ command: "cancel" });
+    if (DEV) console.log("Cancel direct downloads");
+  }
+
+  // Schedule file/files for upload
   addUpload(
     container,
     files,

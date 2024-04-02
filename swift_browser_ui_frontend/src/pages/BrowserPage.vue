@@ -86,6 +86,7 @@
       <ProgressNotification
         v-if="displayDownloadNotification"
         type="download"
+        @cancel-download="cancelDownload"
       />
       <router-view class="content-wrapper" />
       <c-toasts

@@ -217,6 +217,7 @@ let default_translations = {
         warnTempFiles: "Opening temporary files or folders " +
           "(.crdownload, .crswap) may interrupt the process.",
         error: "Download has failed. Please try again.",
+        cancel: "Download cancelled",
       },
       upload: {
         duplicate: "Files with the same paths are not allowed.",
@@ -764,6 +765,7 @@ let default_translations = {
         warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +
         "(.crdownload, .crswap) avaaminen voi keskeyttää latauksen.",
         error: "Lataus epäonnistui. Yritä uudelleen.",
+        cancel: "Lataus peruutettu",
       },
       upload: {
         duplicate: "Tiedostot, joilla on samat polut, eivät ole sallittuja.",
