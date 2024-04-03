@@ -292,6 +292,10 @@ class FileSlicer {
     await this.getStart();
 
     while (!this.done) {
+      if (aborted) {
+        //cancelled by user
+        return;
+      }
       if (this.output instanceof WritableStream) {
         await this.output.write(this.chunk);
       } else {
@@ -321,6 +325,10 @@ class FileSlicer {
 
     // Slice the file and write decrypted content to output
     while (!this.done) {
+      if (aborted) {
+        //cancelled by user
+        return;
+      }
       await this.getSlice();
 
       if (this.output instanceof WritableStream) {
@@ -361,6 +369,13 @@ class FileSlicer {
     );
     return true;
   }
+
+  async abortStream() {
+    if (this.output instanceof WritableStream) {
+      //stop writing to stream
+      await this.output.abort();
+    }
+  }
 }
 
 function clear() {
@@ -372,7 +387,7 @@ function clear() {
   totalToDo = 0;
 }
 
-function abortDownloads(direct, abortReason) {
+async function abortDownloads(direct, abortReason) {
   const msg = {
     eventType: "abort",
     reason: abortReason,
@@ -385,9 +400,12 @@ function abortDownloads(direct, abortReason) {
         client.postMessage(msg));
     });
   }
-  clear();
   aborted = true;
+  clear();
+
   for (let container in downloads) {
+    //remove temporary files
+    if (direct) await downloads[container].handle.remove();
     finishDownloadSession(container);
   }
 }
@@ -512,7 +530,8 @@ async function beginDownloadInSession(
         return false;
       });
       if (!res) {
-        if (!aborted) abortDownloads(!inServiceWorker, "error");
+        await slicer.abortStream();
+        await abortDownloads(!inServiceWorker, !aborted ? "error" : "cancel");
         return;
       }
     }
@@ -711,7 +730,7 @@ self.addEventListener("message", async (e) => {
       clear();
       break;
     case "cancel":
-      abortDownloads(!inServiceWorker, "cancel");
+      aborted = true;
       break;
   }
 });
