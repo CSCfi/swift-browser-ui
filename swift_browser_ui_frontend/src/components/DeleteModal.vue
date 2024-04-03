@@ -125,11 +125,12 @@ export default {
       }
     },
     deleteObjects: async function () {
+      let switchAlertType = false;
       setTimeout(() => {
-        if (this.modalVisible) {
-          this.isDeleting = true;
-        }
-      }, 200);
+        // to avoid alert flashing
+        // switch type only if mid-deletion after 100ms
+        switchAlertType = true;
+      }, 100);
       let to_remove = [];
       let segments_to_remove = []; // Array for segment objects to be deleted
       let segment_container = null;
@@ -145,6 +146,9 @@ export default {
       }
 
       for (let object of this.selectedObjects) {
+        if (switchAlertType && !this.isDeleting) {
+          this.isDeleting = true;
+        }
         // Only files are able to delete
         //or when objects are shown as paths
         if (isFile(object.name, this.$route)
