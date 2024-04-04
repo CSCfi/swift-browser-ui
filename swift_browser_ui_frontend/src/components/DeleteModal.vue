@@ -128,9 +128,9 @@ export default {
       let switchAlertType = false;
       setTimeout(() => {
         // to avoid alert flashing
-        // switch type only if mid-deletion after 100ms
+        // switch type only if mid-deletion after 250ms
         switchAlertType = true;
-      }, 100);
+      }, 250);
       let to_remove = [];
       let segments_to_remove = []; // Array for segment objects to be deleted
       let segment_container = null;
