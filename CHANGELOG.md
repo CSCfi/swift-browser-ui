@@ -15,6 +15,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- Show a waiting alert when objects are being deleted  
 - (GL #1228) Make direct downloads cancellable
 - Add configuration to reset all databases for Cypress tests
 
