@@ -230,8 +230,17 @@ export default class UploadSocket {
         projectID: this.active.id,
         name: container,
       });
+
+    const dbContainerFileCount = await getDB().objects
+      .where({"containerID": dbContainer.id})
+      .count();
+
     let dbContainerFiles = [];
-    while (dbContainerFiles.length < dbContainer.count) {
+
+    while (dbContainerFiles.length < dbContainerFileCount
+      || dbContainerFiles.length < dbContainer.count) {
+      //check both: container.count not updated in obj view, and
+      //obj count might not be updated in time if there's many
       dbContainerFiles = await getDB().objects
         .where({"containerID": dbContainer.id})
         .toArray();
