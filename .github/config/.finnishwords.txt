@@ -538,6 +538,7 @@ poistetaan
 poistettava
 poistettiin
 poistettu
+poisto
 poistut
 polku
 polkuina

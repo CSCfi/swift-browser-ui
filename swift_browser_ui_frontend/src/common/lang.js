@@ -282,6 +282,7 @@ let default_translations = {
         filterBy: "Filter by name or tag",
         deleteConfirm: "Delete items",
         deleteObjects: "Delete items",
+        deleteInProgress: "Deletion in progress",
         deleteManySuccess: " items deleted",
         deleteOneSuccess: " item deleted",
         deleteSharedObjects:
@@ -833,6 +834,7 @@ let default_translations = {
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
+        deleteInProgress: "Poisto käynnissä",
         deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",
         deleteSharedObjects:
