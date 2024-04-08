@@ -25,6 +25,7 @@ let downProgressInterval = undefined;
 let totalDone = 0;
 let totalToDo = 0;
 let aborted = false;
+let cancelled = false;
 
 // Use a 50 MiB segment when downloading
 const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 50;
@@ -66,6 +67,7 @@ if (inServiceWorker) {
 // Create a download session
 function createDownloadSession(container, handle, archive) {
   aborted = false; //reset
+  cancelled = false;
 
   let keypairPtr = Module.ccall(
     "create_keypair",
@@ -292,10 +294,7 @@ class FileSlicer {
     await this.getStart();
 
     while (!this.done) {
-      if (aborted) {
-        //cancelled by user
-        return;
-      }
+      if (cancelled) return;
       if (this.output instanceof WritableStream) {
         await this.output.write(this.chunk);
       } else {
@@ -325,10 +324,7 @@ class FileSlicer {
 
     // Slice the file and write decrypted content to output
     while (!this.done) {
-      if (aborted) {
-        //cancelled by user
-        return;
-      }
+      if (cancelled) return;
       await this.getSlice();
 
       if (this.output instanceof WritableStream) {
@@ -388,6 +384,7 @@ function clear() {
 }
 
 async function abortDownloads(direct, abortReason) {
+  aborted = true;
   const msg = {
     eventType: "abort",
     reason: abortReason,
@@ -400,12 +397,9 @@ async function abortDownloads(direct, abortReason) {
         client.postMessage(msg));
     });
   }
-  aborted = true;
   clear();
 
   for (let container in downloads) {
-    //remove temporary files
-    if (direct) await downloads[container].handle.remove();
     finishDownloadSession(container);
   }
 }
@@ -529,11 +523,18 @@ async function beginDownloadInSession(
       res = await slicer.sliceFile().catch(() => {
         return false;
       });
-      if (!res) {
-        await slicer.abortStream();
-        await abortDownloads(!inServiceWorker, !aborted ? "error" : "cancel");
-        return;
+    }
+    if (!res) {
+      await slicer.abortStream().then(async() => {
+        //remove temporary files
+        if (downloads[container].direct) {
+          await downloads[container].handle.remove();
+        }
+      });
+      if (!aborted) {
+        await abortDownloads(!inServiceWorker, cancelled ? "cancel" : "error");
       }
+      return;
     }
   }
 
@@ -730,7 +731,7 @@ self.addEventListener("message", async (e) => {
       clear();
       break;
     case "cancel":
-      aborted = true;
+      cancelled = true;
       break;
   }
 });
