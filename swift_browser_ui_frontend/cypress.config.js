@@ -60,6 +60,7 @@ module.exports = defineConfig({
     supportFile: "../tests/cypress/support/index.js",
     experimentalStudio: true,
     textFileLocation: "../tests/cypress/fixtures/text-files/",
+    downloadsFolder: "--/tests/cypress/fixtures/downloads/",
   },
   env: {
     username: "swift",
