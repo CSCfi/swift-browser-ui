@@ -15,13 +15,13 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
-- Show a waiting alert when objects are being deleted  
+- (GL #1227) Show a waiting alert when objects are being deleted
 - (GL #1228) Make direct downloads cancellable
 - Add configuration to reset all databases for Cypress tests
 
 ### Changed
 
-- display indeterminate state on download progress bar while waiting for headers
+- Display indeterminate state on download progress bar while waiting for headers
 
 ## [2024.03.0] - 2024-03-14
 
