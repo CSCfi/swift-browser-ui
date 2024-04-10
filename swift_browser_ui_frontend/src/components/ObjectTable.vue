@@ -113,18 +113,6 @@
       id="objects-toasts"
       data-testid="objects-toasts"
     />
-    <c-toasts
-      id="largeDownload-toasts"
-      data-testid="largeDownload-toasts"
-    >
-      <p>{{ $t("message.largeDownMessage") }}</p>
-      <c-button
-        text
-        @click="removeToast"
-      >
-        {{ $t("message.largeDownAction") }}
-      </c-button>
-    </c-toasts>
   </div>
 </template>
 
@@ -278,12 +266,10 @@ export default {
     // every keypress, thus blocking input
     this.debounceFilter = debounce(this.filter, 400);
     this.setLocalizedContent();
-    this.set;
   },
   beforeMount () {
     this.abortController = new AbortController();
     this.getDirectCurrentPage();
-    this.checkLargeDownloads();
   },
   mounted () {
     this.objsLoading = true;
@@ -441,11 +427,6 @@ export default {
         ),
       );
     },
-    checkLargeDownloads: function () {
-      if (document.cookie.match("ENA_DL")) {
-        this.allowLargeDownloads = true;
-      }
-    },
     addPageToURL: function (pageNumber) {
       if (this.$route.name == "SharedObjects") {
         this.$router.push({
@@ -474,30 +455,6 @@ export default {
           },
         });
       }
-    },
-    removeToast: function() {
-      this.enableDownload();
-      document.querySelector("#largeDownload-toasts")
-        .removeToast("largeDownload");
-    },
-    confirmDownload: function () {
-      document.querySelector("#largeDownload-toasts").addToast(
-        { type: "info",
-          message: "",
-          id: "largeDownload",
-          progress: false,
-          custom: true },
-      );
-    },
-    enableDownload: function () {
-      // Enables large downloads upon execution
-      this.allowLargeDownloads = true;
-      const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-      document.cookie = "ENA_DL=" +
-        this.allowLargeDownloads +
-        "; path=/; expires=" +
-        expiryDate.toUTCString();
     },
     getDirectCurrentPage: function () {
       this.currentPage = this.$route.query.page ?

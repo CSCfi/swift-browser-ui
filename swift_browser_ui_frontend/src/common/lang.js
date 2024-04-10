@@ -193,10 +193,6 @@ let default_translations = {
           "delete the sharing permissions?",
         share_delete_confirm: "Delete permissions",
       },
-      largeDownMessage:
-        "No large (> 1GiB) downloads enabled. Click to " +
-        "enable them for the duration of the session.",
-      largeDownAction: "Enable",
       emptyContainer: "This folder has no content.",
       emptyProject: {
         all: "There are no folders in this project.",
@@ -741,11 +737,6 @@ let default_translations = {
         share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
         share_delete_confirm: "Poista käyttöoikeus",
       },
-      largeDownMessage:
-        "Suurten tiedostojen (> 1Gt) lataus täytyy hyväksyä " +
-        "erikseen. Paina hyväksyäksesi suuret lataukset " +
-        "nykyisen kirjautumisen ajaksi.",
-      largeDownAction: "Hyväksy",
       emptyContainer: "Tämä kansio on tyhjä.",
       emptyProject: {
         all: "Tässä projektissa ei ole kansioita.",
