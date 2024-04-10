@@ -113,7 +113,9 @@ export default class UploadSocket {
               this.$store.commit("removeDownload");
               this.$store.commit("toggleDownloadNotification", false);
             } else {
-              this.$store.commit("updateDownloadProgress", 0);
+              if (this.$store.state.downloadProgress === undefined) {
+                this.$store.commit("updateDownloadProgress", 0);
+              }
             }
             if (DEV) {
               console.log(
