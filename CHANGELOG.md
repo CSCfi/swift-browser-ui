@@ -7,6 +7,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.04.0] - 2024-04-10
+
 ### Fixed
 
 - (GL #1232) Fix failure to download just-uploaded files
@@ -16,6 +18,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- (GL #1230) Remove temporary download files after direct download abort
 - (GL #1227) Show a waiting alert when objects are being deleted
 - (GL #1228) Make direct downloads cancellable
 - Add configuration to reset all databases for Cypress tests
@@ -426,7 +429,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...HEAD
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.04.0...HEAD
+[2024.04.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...2024.04.0
 [2024.03.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...2024.03.0
 [2024.02.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.0...2024.02.1
 [2024.02.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...2024.02.0
