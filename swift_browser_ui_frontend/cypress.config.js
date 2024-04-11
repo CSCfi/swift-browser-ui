@@ -50,6 +50,17 @@ module.exports = defineConfig({
 
           return null;
         },
+        extractArchive({ directory, archive }) {
+          const cp = spawn("bash",
+            ["../tests/cypress/support/extractArchive.sh"],
+            {env: { DIR: directory, ARCHIVE: archive }},
+          );
+
+          cp.stderr.on("data", (data) => {
+            console.error(`stderr: ${data}`);
+          });
+          return null;
+        },
       });
       return cloudPlugin(on, config);
     },
@@ -60,7 +71,7 @@ module.exports = defineConfig({
     supportFile: "../tests/cypress/support/index.js",
     experimentalStudio: true,
     textFileLocation: "../tests/cypress/fixtures/text-files/",
-    downloadsFolder: "--/tests/cypress/fixtures/downloads/",
+    downloadsFolder: "../tests/cypress/fixtures/downloads/",
   },
   env: {
     username: "swift",

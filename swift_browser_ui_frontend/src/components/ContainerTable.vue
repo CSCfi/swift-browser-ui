@@ -277,6 +277,7 @@ export default {
                   component: {
                     tag: "c-button",
                     params: {
+                      testid: "download-container",
                       text: true,
                       size: "small",
                       title: this.$t("message.download.download"),

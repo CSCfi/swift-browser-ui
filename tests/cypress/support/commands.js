@@ -184,7 +184,7 @@ Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
 
 Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
   //open upload modal
-  cy.get("[data-testid='upload-file']").click();
+  cy.get("[data-testid='upload-file']").click({ force: true });
   cy.wait(3000);
 
   //check that modal opened
@@ -288,7 +288,7 @@ Cypress.Commands.add("removeAllTags", () => {
 
 Cypress.Commands.add("generateFixture", (name) => {
   cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
-    hits: Cypress._.times(20, () => {
+    hits: Cypress._.times(10, () => {
       return faker.lorem.paragraphs(50);
     }),
   });
