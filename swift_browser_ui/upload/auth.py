@@ -1,6 +1,5 @@
 """Authorization handlers for swift-upload-runner."""
 
-
 import logging
 import os
 import secrets

@@ -1,6 +1,5 @@
 """Module for database interfaces using postgres."""
 
-
 import logging
 import os
 import typing

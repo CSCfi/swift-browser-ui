@@ -1,6 +1,5 @@
 """Module for testing server.py."""
 
-
 import unittest
 import aiohttp
 

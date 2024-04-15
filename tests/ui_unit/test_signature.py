@@ -1,6 +1,5 @@
 """Module for testing ``signature.py``."""
 
-
 import types
 import unittest
 

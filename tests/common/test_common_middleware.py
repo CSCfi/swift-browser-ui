@@ -1,6 +1,5 @@
 """Module for testing swift_browser_ui common middlewares."""
 
-
 import types
 import unittest
 import aiohttp.web

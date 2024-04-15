@@ -1,6 +1,5 @@
 """Handlers that can't easily be categorized."""
 
-
 import aiohttp.web
 import aiohttp_session
 
@@ -24,9 +23,9 @@ async def handle_bounce_direct_access_request(
         container = request.query["container"]
         owner = request.query["owner"]
         resp = aiohttp.web.Response(status=307)
-        resp.headers[
-            "Location"
-        ] = f"/browse/sharing/requestdirect?container={container}&owner={owner}"
+        resp.headers["Location"] = (
+            f"/browse/sharing/requestdirect?container={container}&owner={owner}"
+        )
         return resp
     except KeyError:
         raise aiohttp.web.HTTPBadRequest(reason="Query string missing parameters")

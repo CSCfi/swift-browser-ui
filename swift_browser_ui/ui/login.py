@@ -1,6 +1,5 @@
 """A module for handling the project login related tasks."""
 
-
 import base64
 import binascii
 import re

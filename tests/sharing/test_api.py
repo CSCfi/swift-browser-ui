@@ -1,6 +1,5 @@
 """Test sharing backend API functions."""
 
-
 from types import SimpleNamespace
 
 import unittest

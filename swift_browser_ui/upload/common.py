@@ -1,6 +1,5 @@
 """Common resources for swift-upload-runner."""
 
-
 import logging
 import os
 import typing

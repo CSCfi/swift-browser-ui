@@ -1,6 +1,5 @@
 """Common types in swift_browser_ui project."""
 
-
 import typing
 
 import aiohttp.web

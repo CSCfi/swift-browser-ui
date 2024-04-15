@@ -1,6 +1,5 @@
 """Class for session crypt upload/download websocket."""
 
-
 import asyncio
 import base64
 import logging

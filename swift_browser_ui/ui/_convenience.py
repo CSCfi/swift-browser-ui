@@ -4,7 +4,6 @@ Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
 """
 
-
 import logging
 import os
 import secrets

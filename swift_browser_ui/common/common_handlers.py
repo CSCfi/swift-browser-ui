@@ -1,6 +1,5 @@
 """Module containing handlers common to swift_browser_ui services."""
 
-
 import typing
 
 import aiohttp.web

@@ -33,7 +33,6 @@ The different configurations are also listed here:
 
 """
 
-
 import logging
 from os import environ
 from typing import Dict, Union

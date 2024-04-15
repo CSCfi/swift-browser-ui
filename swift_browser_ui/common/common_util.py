@@ -1,6 +1,5 @@
 """Module for swift_browser_ui common utility functions."""
 
-
 import asyncio
 import os
 import random

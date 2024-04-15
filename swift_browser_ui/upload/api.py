@@ -1,6 +1,5 @@
 """API handlers for swift-upload-runner."""
 
-
 import asyncio
 import base64
 import logging
@@ -92,9 +91,11 @@ async def handle_replicate_container(
         source_project,
         source_container,
         request.query["project_name"] if "project_name" in request.query else "",
-        request.query["from_project_name"]
-        if "from_project_name" in request.query
-        else "",
+        (
+            request.query["from_project_name"]
+            if "from_project_name" in request.query
+            else ""
+        ),
     )
 
     # Ensure that both containers exist
@@ -126,9 +127,11 @@ async def handle_replicate_object(request: aiohttp.web.Request) -> aiohttp.web.R
         source_project,
         source_container,
         request.query["project_name"] if "project_name" in request.query else "",
-        request.query["from_project_name"]
-        if "from_project_name" in request.query
-        else "",
+        (
+            request.query["from_project_name"]
+            if "from_project_name" in request.query
+            else ""
+        ),
     )
 
     # Ensure that both containers exist

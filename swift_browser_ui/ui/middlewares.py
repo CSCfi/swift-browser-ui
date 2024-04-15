@@ -1,6 +1,5 @@
 """Middlewares for the swift-browser-ui."""
 
-
 import time
 import typing
 

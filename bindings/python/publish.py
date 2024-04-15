@@ -1,4 +1,5 @@
 """Module for publishing directories / files in OS Swift."""
+
 # Made with Python fire for easy creation, may be improved in the future.
 
 

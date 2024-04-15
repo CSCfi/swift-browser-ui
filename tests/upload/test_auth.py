@@ -1,6 +1,5 @@
 """Unit tests for swift_browser_ui.upload.auth module."""
 
-
 import unittest
 
 import aiohttp.web

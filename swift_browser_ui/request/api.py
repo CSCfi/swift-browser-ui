@@ -1,6 +1,5 @@
 """Module for share request API handlers."""
 
-
 import logging
 import os
 

@@ -1,6 +1,5 @@
 """Module for testing ``swift_browser_ui.middlewares``."""
 
-
 import unittest
 import os
 

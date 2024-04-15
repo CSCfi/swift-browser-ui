@@ -1,6 +1,5 @@
 """Test common database functions."""
 
-
 import datetime
 import unittest
 from types import SimpleNamespace
@@ -127,7 +126,11 @@ class TestBaseDB(BaseDBConnTestClass):
 
     async def test_db_connection_error(self):
         """Test database when connection fails."""
-        with self.patch_asyncpg_pool_connection_error, self.patch_asyncio_sleep, self.patch_os_environ_get:
+        with (
+            self.patch_asyncpg_pool_connection_error,
+            self.patch_asyncio_sleep,
+            self.patch_os_environ_get,
+        ):
             with self.assertRaises(Exception):
                 await self.db.open()
                 self.asyncpg_connect_mock_connection_error.assert_called()
@@ -136,7 +139,11 @@ class TestBaseDB(BaseDBConnTestClass):
 
     async def test_db_invalid_password(self):
         """Test database when password is invalid."""
-        with self.patch_asyncpg_pool_invalid_password, self.patch_asyncio_sleep, self.patch_os_environ_get:
+        with (
+            self.patch_asyncpg_pool_invalid_password,
+            self.patch_asyncio_sleep,
+            self.patch_os_environ_get,
+        ):
             with self.assertRaises(Exception):
                 await self.db.open()
                 self.asyncpg_connect_mock_invalid_pwd.assert_called()

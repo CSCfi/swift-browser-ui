@@ -1,6 +1,5 @@
 """Sharing backend API specification and implementation."""
 
-
 import logging
 import os
 
