@@ -121,7 +121,8 @@ export default {
         || this.accessRights.length === 2;
     },
     isLoaderVisible() {
-      return this.$store.state.isLoaderVisible;
+      return this.$store.state.isLoaderVisible
+        && this.$store.state.uploadFolder.name === this.container;
     },
     owner() {
       return this.$route.params.owner;
