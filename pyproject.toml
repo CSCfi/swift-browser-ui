@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp-session==2.12.0",
-    "aiohttp==3.9.3",
+    "aiohttp==3.9.4",
     "redis==5.0.3",
     "asyncpg==0.29.0",
     "certifi==2024.2.2",
@@ -43,7 +43,7 @@ docs = [
     "sphinx_rtd_theme==2.0.0",
 ]
 test = [
-    "black==24.3.0",
+    "black==24.4.0",
     "coverage==7.4.4",
     "flake8-docstrings==1.7.0",
     "flake8==7.0.0",
@@ -61,7 +61,7 @@ dev = [
     "honcho==1.1.0",
     "pre-commit==3.7.0",
     "pyspelling==2.10",
-    "ruff==0.3.4",
+    "ruff==0.3.7",
     "types-certifi",
     "types-redis",
     "types-requests",
