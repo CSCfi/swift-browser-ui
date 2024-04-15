@@ -1,6 +1,5 @@
 """Test swift_browser_ui.upload.server module."""
 
-
 import unittest
 import aiohttp.web
 

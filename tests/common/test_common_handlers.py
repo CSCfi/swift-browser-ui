@@ -1,6 +1,5 @@
 """Module for testing common handlers."""
 
-
 import unittest
 import aiohttp
 

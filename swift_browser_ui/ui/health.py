@@ -1,6 +1,5 @@
 """Health check endpoint."""
 
-
 import time
 import typing
 

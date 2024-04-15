@@ -1,6 +1,5 @@
 """Container and object replication handlers using aiohttp."""
 
-
 import base64
 import logging
 import os

@@ -1,6 +1,5 @@
 """Endpoints for different server information discovery."""
 
-
 from typing import Union
 
 import aiohttp.web

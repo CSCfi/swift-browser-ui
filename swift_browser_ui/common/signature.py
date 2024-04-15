@@ -1,6 +1,5 @@
 """Authentication support module."""
 
-
 import hmac
 import logging
 import os

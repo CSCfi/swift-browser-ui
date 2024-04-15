@@ -1,6 +1,5 @@
 """Module for handling queries for a valid Sharing/Request API signature."""
 
-
 import logging
 import secrets
 

@@ -1,6 +1,5 @@
 """Module for creating a server with mock-up openstack."""
 
-
 import os
 import logging
 import typing

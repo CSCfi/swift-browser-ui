@@ -1,4 +1,5 @@
 """Vault c4ghtransit client."""
+
 import asyncio
 import logging
 import os

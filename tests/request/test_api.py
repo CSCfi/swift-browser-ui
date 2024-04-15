@@ -1,6 +1,5 @@
 """Module for testing sharing request API functions."""
 
-
 import unittest
 import unittest.mock
 from types import SimpleNamespace

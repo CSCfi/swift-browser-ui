@@ -1,6 +1,5 @@
 """Module for testing ``swift_browser_ui.front``."""
 
-
 import unittest
 import os
 import time

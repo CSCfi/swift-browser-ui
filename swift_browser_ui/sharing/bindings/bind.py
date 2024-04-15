@@ -1,6 +1,5 @@
 """Async Python bindings for the swift-x-account-sharing backend."""
 
-
 import json
 import logging
 import ssl

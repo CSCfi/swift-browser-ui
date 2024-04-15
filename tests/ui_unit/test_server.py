@@ -4,7 +4,6 @@ Module for testing ``swift_browser_ui.ui.server``.
 Contains the tests for ``front.py``.
 """
 
-
 import os
 import unittest
 import ssl

@@ -1,6 +1,5 @@
 """Module for testing swift_browser_ui common utility functions."""
 
-
 import unittest
 
 

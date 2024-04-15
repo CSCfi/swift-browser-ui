@@ -1,6 +1,5 @@
 """Module for testing singatures in bindings module."""
 
-
 import hmac
 import time
 

@@ -1,6 +1,5 @@
 """Test sharing backend server functions."""
 
-
 import unittest
 import aiohttp.web
 

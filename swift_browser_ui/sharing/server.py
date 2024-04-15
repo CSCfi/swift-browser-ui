@@ -1,6 +1,5 @@
 """Sharing backend server module."""
 
-
 import asyncio
 import logging
 import sys

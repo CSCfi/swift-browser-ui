@@ -1,6 +1,5 @@
 """CLI for configuring and launching the server."""
 
-
 import logging
 import sys
 import typing

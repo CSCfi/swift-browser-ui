@@ -1,6 +1,5 @@
 """Module for testing the bindings module / class."""
 
-
 import unittest
 from types import SimpleNamespace
 

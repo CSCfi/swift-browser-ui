@@ -1,6 +1,5 @@
 """Common API middleware."""
 
-
 import logging
 import os
 

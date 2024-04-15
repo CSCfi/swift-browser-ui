@@ -1,6 +1,5 @@
 """Unit tests for swift_browser_ui.upload.api module."""
 
-
 import json
 import types
 import unittest

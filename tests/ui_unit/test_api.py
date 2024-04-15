@@ -1,6 +1,5 @@
 """Module for testing ``swift_browser_ui.ui.api``."""
 
-
 import json
 import unittest
 import types
@@ -366,8 +365,10 @@ class APITestClass(tests.common.mockups.APITestBase):
 
         # Cover failure
         mock_object_meta_update.return_value = 404
-        with self.p_get_sess, patch_meta_update, self.assertRaises(
-            aiohttp.web.HTTPNotFound
+        with (
+            self.p_get_sess,
+            patch_meta_update,
+            self.assertRaises(aiohttp.web.HTTPNotFound),
         ):
             await swift_browser_ui.ui.api.swift_batch_update_object_metadata(
                 self.mock_request,

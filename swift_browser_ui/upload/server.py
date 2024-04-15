@@ -1,6 +1,5 @@
 """Server initialization functions."""
 
-
 import asyncio
 import logging
 import os
