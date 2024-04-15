@@ -122,6 +122,8 @@ export default class UploadSocket {
                 `Got headers for download in container ${e.data.container}`,
               );
             }
+          }).catch(() =>  {
+            this.downWorker.postMessage({ command: "abort", reason: "error" });
           });
           break;
         case "downloadStarted":
@@ -360,7 +362,7 @@ export default class UploadSocket {
   }
 
   cancelDownload() {
-    this.downWorker.postMessage({ command: "cancel" });
+    this.downWorker.postMessage({ command: "abort", reason: "cancel" });
     if (DEV) console.log("Cancel direct downloads");
   }
 

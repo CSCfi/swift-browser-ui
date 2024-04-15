@@ -25,7 +25,6 @@ let downProgressInterval = undefined;
 let totalDone = 0;
 let totalToDo = 0;
 let aborted = false;
-let cancelled = false;
 
 // Use a 50 MiB segment when downloading
 const DOWNLOAD_SEGMENT_SIZE = 1024 * 1024 * 50;
@@ -69,7 +68,6 @@ if (inServiceWorker) {
 // Create a download session
 function createDownloadSession(id, container, handle, archive) {
   aborted = false; //reset
-  cancelled = false;
 
   let keypairPtr = Module.ccall(
     "create_keypair",
@@ -297,7 +295,7 @@ class FileSlicer {
     await this.getStart();
 
     while (!this.done) {
-      if (cancelled) return;
+      if (aborted) return;
       if (this.output instanceof WritableStream) {
         await this.output.write(this.chunk);
       } else {
@@ -318,7 +316,7 @@ class FileSlicer {
     // Round up to a multiple of 512, because tar
     await this.padFile();
 
-    return;
+    return true;
   }
 
   async sliceFile() {
@@ -327,7 +325,7 @@ class FileSlicer {
 
     // Slice the file and write decrypted content to output
     while (!this.done) {
-      if (cancelled) return;
+      if (aborted) return;
       await this.getSlice();
 
       if (this.output instanceof WritableStream) {
@@ -368,13 +366,6 @@ class FileSlicer {
     );
     return true;
   }
-
-  async abortStream() {
-    if (this.output instanceof WritableStream) {
-      //stop writing to stream
-      await this.output.abort();
-    }
-  }
 }
 
 function clear() {
@@ -386,7 +377,7 @@ function clear() {
   totalToDo = 0;
 }
 
-async function abortDownloads(direct, abortReason) {
+function startAbort(direct, abortReason) {
   aborted = true;
   const msg = {
     eventType: "abort",
@@ -401,11 +392,16 @@ async function abortDownloads(direct, abortReason) {
     });
   }
   clear();
-  for (let id in downloads) {
-    finishDownloadSession(id);
-  }
 }
 
+async function abortDownload(id, stream = null) {
+  if (downloads[id].direct) {
+    //remove temp files
+    if (stream) await stream.abort();
+    await downloads[id].handle.remove();
+  }
+  finishDownloadSession(id);
+}
 
 // Safely free and remove a download session
 function finishDownloadSession(id) {
@@ -485,6 +481,10 @@ async function beginDownloadInSession(
   }
 
   for (const file in downloads[id].files) {
+    if (aborted) {
+      await abortDownload(id, fileStream);
+      return;
+    }
     if (inServiceWorker) {
       self.clients.matchAll().then(clients => {
         clients.forEach(client =>
@@ -527,15 +527,8 @@ async function beginDownloadInSession(
       });
     }
     if (!res) {
-      await slicer.abortStream().then(async() => {
-        //remove temporary files
-        if (downloads[id].direct) {
-          await downloads[id].handle.remove();
-        }
-      });
-      if (!aborted) {
-        await abortDownloads(!inServiceWorker, cancelled ? "cancel" : "error");
-      }
+      if (!aborted) startAbort(!inServiceWorker, "error");
+      await abortDownload(id, fileStream);
       return;
     }
   }
@@ -705,7 +698,6 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "addHeaders":
-      if (aborted) return;
       addSessionFiles(e.data.id, e.data.container, e.data.headers).then(ret => {
         if (ret && inServiceWorker) {
           e.source.postMessage({
@@ -718,6 +710,9 @@ self.addEventListener("message", async (e) => {
             container: e.data.container,
           });
         }
+      }).catch(async () => {
+        if (!aborted) startAbort(!inServiceWorker, "error");
+        await abortDownload(e.data.id);
       });
       if (inServiceWorker) {
         e.source.postMessage({
@@ -741,8 +736,8 @@ self.addEventListener("message", async (e) => {
     case "clear":
       clear();
       break;
-    case "cancel":
-      cancelled = true;
+    case "abort":
+      if (!aborted) startAbort(!inServiceWorker, e.data.reason);
       break;
   }
 });
