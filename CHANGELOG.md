@@ -11,6 +11,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - (GL #1234) Show after-upload object loader only in destination container
 
+### Removed
+
+- (GL #1233) Removed disused code enabling large downloads
+
 ## [2024.04.0] - 2024-04-10
 
 ### Fixed
