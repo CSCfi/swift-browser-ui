@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11-alpine3.17 as BACKEND
+FROM docker.io/python:3.12-alpine3.17 as BACKEND
 
 COPY pyproject.toml /root/swift_request/pyproject.toml
 COPY README.md /root/swift_request/README.md
@@ -12,13 +12,13 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip \
     && pip install /root/swift_request
 
-FROM docker.io/python:3.11-alpine3.17
+FROM docker.io/python:3.12-alpine3.17
 
 LABEL maintainer "CSC Developers"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.vcs-url="https://github.com/CSCFI/swift-sharing-request"
 
-COPY --from=BACKEND /usr/local/lib/python3.11 /usr/local/lib/python3.11/
+COPY --from=BACKEND /usr/local/lib/python3.12 /usr/local/lib/python3.12/
 
 COPY --from=BACKEND /usr/local/bin/gunicorn /usr/local/bin/
 
