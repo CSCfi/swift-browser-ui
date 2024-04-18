@@ -15,6 +15,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - (GL #1233) Removed disused code enabling large downloads
 
+### Changed
+
+- make use of python 3.12
+
 ## [2024.04.0] - 2024-04-10
 
 ### Fixed
