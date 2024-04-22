@@ -51,10 +51,9 @@ Cypress.Commands.add("logout", () => {
     .should("have.property", "value")
     .then($key => {
       cy.get("[data-testid='user-menu']").click();
-      cy.wait(1000);
-      cy.get("ul.c-menu-items")
-        .find("li")
-        .should("contain.text", buttonText[$key]).click();
+      cy.contains(buttonText[$key])
+        .should("be.visible")
+        .click();
       cy.visit(Cypress.config().baseUrl);
     })
 });
