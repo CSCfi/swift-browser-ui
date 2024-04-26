@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (GL #1231) Fix not being able to concurrently download multiple objects from a single container
 - (GL #1234) Show after-upload object loader only in destination container
 
 ### Removed
