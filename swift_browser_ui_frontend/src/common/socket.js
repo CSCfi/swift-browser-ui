@@ -102,6 +102,7 @@ export default class UploadSocket {
           }
           this.$store.commit("addDownload");
           this.getHeaders(
+            e.data.id,
             e.data.container,
             e.data.files,
             e.data.pubkey,
@@ -112,13 +113,17 @@ export default class UploadSocket {
               this.$store.commit("removeDownload");
               this.$store.commit("toggleDownloadNotification", false);
             } else {
-              this.$store.commit("updateDownloadProgress", 0);
+              if (this.$store.state.downloadProgress === undefined) {
+                this.$store.commit("updateDownloadProgress", 0);
+              }
             }
             if (DEV) {
               console.log(
                 `Got headers for download in container ${e.data.container}`,
               );
             }
+          }).catch(() =>  {
+            this.downWorker.postMessage({ command: "abort", reason: "error" });
           });
           break;
         case "downloadStarted":
@@ -131,14 +136,14 @@ export default class UploadSocket {
             this.downloadFinished = false;
             if (e.data.archive) {
               let downloadUrl = new URL(
-                `/archive/${e.data.container}.tar`,
+                `/archive/${e.data.id}/${e.data.container}.tar`,
                 document.location.origin,
               );
               if (DEV) console.log(downloadUrl);
               window.open(downloadUrl, "_blank");
             } else {
               let downloadUrl = new URL(
-                `/file/${e.data.container}/${e.data.path}`,
+                `/file/${e.data.id}/${e.data.container}/${e.data.path}`,
                 document.location.origin,
               );
               if (DEV) console.log(downloadUrl);
@@ -221,7 +226,7 @@ export default class UploadSocket {
   }
 
   // Get headers for download
-  async getHeaders(container, fileList, pubkey, owner, ownerName) {
+  async getHeaders(id, container, fileList, pubkey, owner, ownerName) {
     let headers = {};
 
     // Cache the container ID
@@ -314,6 +319,7 @@ export default class UploadSocket {
     if (!this.useServiceWorker) {
       this.downWorker.postMessage({
         command: "addHeaders",
+        id: id,
         container: container,
         headers: headers,
       });
@@ -321,6 +327,7 @@ export default class UploadSocket {
       navigator.serviceWorker.ready.then((reg) => {
         reg.active.postMessage({
           command: "addHeaders",
+          id: id,
           container: container,
           headers: headers,
         });
@@ -355,7 +362,7 @@ export default class UploadSocket {
   }
 
   cancelDownload() {
-    this.downWorker.postMessage({ command: "cancel" });
+    this.downWorker.postMessage({ command: "abort", reason: "cancel" });
     if (DEV) console.log("Cancel direct downloads");
   }
 
@@ -395,12 +402,15 @@ export default class UploadSocket {
     objects,
     owner = "",
   ) {
+
+    //get random id
+    const sessionId = Math.random().toString(36).slice(2, 8);
+
     let ownerName = "";
     if (owner) {
       let ids = await this.$store.state.client.projectCheckIDs(owner);
       ownerName = ids.name;
     }
-
     let fileHandle = undefined;
     if (objects.length == 1) {
       // Download directly into the file if available.
@@ -424,8 +434,10 @@ export default class UploadSocket {
           ];
         }
         fileHandle = await window.showSaveFilePicker(opts);
+
         this.downWorker.postMessage({
           command: "downloadFile",
+          id: sessionId,
           container: container,
           file: objects[0],
           handle: fileHandle,
@@ -439,6 +451,7 @@ export default class UploadSocket {
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             command: "downloadFile",
+            id: sessionId,
             container: container,
             file: objects[0],
             owner: owner,
@@ -463,6 +476,7 @@ export default class UploadSocket {
         });
         this.downWorker.postMessage({
           command: "downloadFiles",
+          id: sessionId,
           container: container,
           files: objects.length < 1 ? [] : objects,
           handle: fileHandle,
@@ -473,6 +487,7 @@ export default class UploadSocket {
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             command: "downloadFiles",
+            id: sessionId,
             container: container,
             files: objects.length < 1 ? [] : objects,
             owner: owner,
