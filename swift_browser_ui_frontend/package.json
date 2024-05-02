@@ -14,7 +14,7 @@
     "docker-build-devel": "vite build --mode development"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^3.0.1",
+    "@intlify/unplugin-vue-i18n": "^4.0.0",
     "@mdi/js": "^7.4.47",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vueuse/rxjs": "^10.9.0",
