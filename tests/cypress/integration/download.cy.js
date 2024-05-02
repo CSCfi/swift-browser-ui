@@ -99,12 +99,10 @@ describe("Downloads file/container, verifies content and checksum", function () 
     const folderName = Math.random().toString(36).substring(2, 7);
     //check file hashes before upload
     let hexHashUpload;
-    let uploadedContent;
 
     cy.fixture("text-files/" + fileName + ".txt", "utf-8").then(
       ($contentOnUpload) => {
         //check file hash before upload (encryption)
-        uploadedContent = $contentOnUpload;
         hexHashUpload = SparkMD5.hash($contentOnUpload);
 
         //open upload modal
@@ -187,10 +185,10 @@ describe("Downloads file/container, verifies content and checksum", function () 
         );
 
         //compare checksums and content with upload file
-        cy.fixture("downloads/" + fileName + ".txt", "utf-8").then(
+        cy.fixture("/downloads/" + fileName + ".txt", "utf-8").then(
           ($contentOnExtract) => {
             const hexHashDownload = SparkMD5.hash($contentOnExtract);
-            expect(uploadedContent).to.eq($contentOnExtract);
+            expect($contentOnUpload).to.eq($contentOnExtract);
             expect(hexHashUpload).to.eq(hexHashDownload);
           }
         );

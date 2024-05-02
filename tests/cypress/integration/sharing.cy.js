@@ -9,6 +9,9 @@ describe("A folder is shared from project A to project B", function () {
 
   //Happy test cases
   it("the folder is shared successfully, when other user logs in, shared folder is visible", function () {
+    const useServiceWorker =
+    "serviceWorker" in navigator && window.showSaveFilePicker === undefined;
+
     //take the ID appearing as the last part of url
     cy.url().then(($url) => {
       const copyId = $url.split("/")[5];
@@ -45,16 +48,51 @@ describe("A folder is shared from project A to project B", function () {
       //close share modal
       cy.get("[data-testid='close-share-modal']").click({ force: true });
 
-      //Switch user and check the folder is visible
+      //upload file
+      const fileName = Math.random().toString(36).substring(2, 7);
+      cy.generateFixture(fileName);
 
-      //switch user
-      cy.logout();
-      cy.login(Cypress.env("username"), Cypress.env("password"));
-      cy.wait(3000);
+      cy.fixture("text-files/" + fileName + ".txt", "utf-8").then(($contentOnUpload) => {
+        cy.uploadFileFromFolder(fileName);
 
-      cy.get("[data-testid='container-table']")
-        .contains(folderName)
-        .should("exist");
+        //Switch user and check the folder is visible
+
+        //switch user
+        cy.logout();
+        cy.login(Cypress.env("username"), Cypress.env("password"));
+        cy.wait(5000);
+
+        //go to shared folder
+        cy.searchFolder(folderName);
+        cy.get("[data-testid='search-result']")
+          .contains(folderName)
+          .click({ force: true });
+        cy.wait(3000);
+
+        //download file
+        cy.contains(fileName)
+          .parent()
+          .parent()
+          .find("[testid='download-object']")
+          .click({ force: true });
+        cy.wait(3000);
+
+        if (!useServiceWorker) {
+          //create a fixture file from OPFS file content
+          cy.getFileContentFromOPFS(fileName + ".txt").then(($contentOnDownload) => {
+            cy.writeFile(
+              Cypress.config("downloadsFolder") + "/" + fileName + ".txt",
+              $contentOnDownload
+            );
+          });
+        }
+
+        cy.fixture("/downloads/" + fileName + ".txt", "utf-8").then(
+          ($contentOnDownload) => {
+            //match full file content before and after
+            expect($contentOnUpload).to.eq($contentOnDownload);
+        });
+      });
     });
   });
 });
