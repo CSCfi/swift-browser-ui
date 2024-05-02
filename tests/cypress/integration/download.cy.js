@@ -16,8 +16,6 @@ describe("Downloads file/container, verifies content and checksum", function () 
     cy.generateFixture(fileName);
   });
 
-  //Cypress may not fully support the interactions with service workers and the showSaveFilePicker API (handleDownWorker) out of the box. Some other testing other than e2e might be required
-
   it("should download a file", () => {
 
     //create a folder
@@ -36,6 +34,7 @@ describe("Downloads file/container, verifies content and checksum", function () 
       "text-files/" + fileName + ".txt",
       "utf-8"
     ).then($contentOnUpload => {
+
       //check file hash before upload (encryption)
       const hexHashUpload = SparkMD5.hash($contentOnUpload);
       cy.log("Upload hash", hexHashUpload);
@@ -84,10 +83,30 @@ describe("Downloads file/container, verifies content and checksum", function () 
         });
       }
 
-      //TODO TEST DIRECT DOWNLOAD
+      //TEST DIRECT DOWNLOAD
+      //Since we cannot directly interact with user's file system through Cypress
+      //testing is done through OPFS which doesn't have strict security checks
       else {
         cy.log("Testing direct file download");
-      }
+
+        cy.contains(fileName)
+        .parent()
+        .parent()
+        .find("[testid='download-object']")
+        .as("download")
+        .click({force: true});
+
+        cy.wait(5000);
+
+        cy.getFileContentFromOPFS(fileName + ".txt").then(($contentOnDownload) => {
+          const hexHashDownload = SparkMD5.hash($contentOnDownload);
+          cy.log("Download hash", hexHashDownload);
+          //match full file content before and after
+          expect($contentOnUpload).to.eq($contentOnDownload);
+          //match file checksum before and after
+          expect(hexHashUpload).to.eq(hexHashDownload);
+        });
+      };
     });
   });
 

@@ -66,7 +66,7 @@ if (inServiceWorker) {
 }
 
 // Create a download session
-function createDownloadSession(id, container, handle, archive) {
+function createDownloadSession(id, container, handle, archive, test = false) {
   aborted = false; //reset
 
   let keypairPtr = Module.ccall(
@@ -91,6 +91,7 @@ function createDownloadSession(id, container, handle, archive) {
     archive: archive,
     container: container,
     files: {},
+    test: test,
   };
 }
 
@@ -557,6 +558,8 @@ async function beginDownloadInSession(
     postMessage({
       eventType: "finished",
       container: downloads[id].container,
+      test: downloads[id].test,
+      handle: downloads[id].handle,
     });
   } else {
   // Inform download with service worker finished
@@ -653,8 +656,7 @@ self.addEventListener("message", async (e) => {
           });
         }
       } else {
-        createDownloadSession(
-          e.data.id, e.data.container, e.data.handle, false);
+        createDownloadSession(e.data.container, e.data.handle, false, e.data.test);
         postMessage({
           eventType: "getHeaders",
           id: e.data.id,

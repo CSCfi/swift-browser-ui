@@ -286,6 +286,14 @@ Cypress.Commands.add("removeAllTags", () => {
 
 /*OTHER */
 
+Cypress.Commands.add("getFileContentFromOPFS", async (fileName) => {
+  //retrieves file content from OPFS
+  const testDirHandle = await navigator.storage.getDirectory();
+  const fileHandle = await testDirHandle.getFileHandle(fileName);
+  const file = await fileHandle.getFile();
+  return file.text();
+})
+
 Cypress.Commands.add("generateFixture", (name) => {
   cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
     hits: Cypress._.times(10, () => {
