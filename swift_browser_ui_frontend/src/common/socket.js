@@ -475,17 +475,25 @@ export default class UploadSocket {
       // Download directly into the archive if available.
       // Otherwise, use streaming + ServiceWorker.
       if (!this.useServiceWorker) {
-        fileHandle = await window.showSaveFilePicker({
-          suggestedName: `${container}_download.tar`,
-          types: [
-            {
-              description: "Tar archive (uncompressed)",
-              accept: {
-                "application/x-tar": [".tar"],
+        const fileName = `${container}_download.tar`;
+        if (test) {
+          //OPFS root for direct download e2e testing
+          const testDirHandle = await navigator.storage.getDirectory();
+          fileHandle =
+            await testDirHandle.getFileHandle(fileName, { create: true });
+        } else {
+          fileHandle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [
+              {
+                description: "Tar archive (uncompressed)",
+                accept: {
+                  "application/x-tar": [".tar"],
+                },
               },
-            },
-          ],
-        });
+            ],
+          });
+        }
         this.downWorker.postMessage({
           command: "downloadFiles",
           id: sessionId,
@@ -494,6 +502,7 @@ export default class UploadSocket {
           handle: fileHandle,
           owner: owner,
           ownerName: ownerName,
+          test: test,
         });
       } else {
         navigator.serviceWorker.ready.then(reg => {

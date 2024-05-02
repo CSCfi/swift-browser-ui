@@ -656,7 +656,8 @@ self.addEventListener("message", async (e) => {
           });
         }
       } else {
-        createDownloadSession(e.data.container, e.data.handle, false, e.data.test);
+        createDownloadSession(
+          e.data.id, e.data.container, e.data.handle, false, e.data.test);
         postMessage({
           eventType: "getHeaders",
           id: e.data.id,
@@ -688,7 +689,8 @@ self.addEventListener("message", async (e) => {
           });
         }
       } else {
-        createDownloadSession(e.data.id, e.data.container, e.data.handle, true);
+        createDownloadSession(
+          e.data.id, e.data.container, e.data.handle, true, e.data.test);
         postMessage({
           eventType: "getHeaders",
           id: e.data.id,
