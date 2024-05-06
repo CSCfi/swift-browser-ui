@@ -2,7 +2,6 @@
   "name": "swift_browser_ui_frontend_npm",
   "version": "2.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "serve": "./build_wasm.sh && vite serve --mode development",
     "build": "./build_wasm.sh && vite build --mode production",

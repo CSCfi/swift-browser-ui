@@ -7,6 +7,7 @@ describe("Upload a file", function () {
   const fileLocation = Cypress.config("textFileLocation");
 
   beforeEach(() => {
+    cy.deleteFixtures();
     cy.task("resetDB");
     cy.deleteDB();
     cy.visit(Cypress.config("baseUrl"));

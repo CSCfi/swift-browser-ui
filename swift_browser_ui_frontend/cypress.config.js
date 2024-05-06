@@ -2,6 +2,7 @@ const { defineConfig } = require("cypress");
 const { cloudPlugin } = require("cypress-cloud/plugin");
 const { Client } = require("pg");
 const { spawn } = require("node:child_process");
+const { rmdir, existsSync } = require("fs");
 
 module.exports = defineConfig({
   fixturesFolder: "../tests/cypress/fixtures",
@@ -61,6 +62,14 @@ module.exports = defineConfig({
           });
           return null;
         },
+        deleteFolder(folder) {
+          if (existsSync(folder)) {
+            rmdir(folder, { recursive: true }, (err) => {
+              if (err) console.error(err);
+            });
+          }
+          return null;
+        },
       });
       return cloudPlugin(on, config);
     },
@@ -72,6 +81,7 @@ module.exports = defineConfig({
     experimentalStudio: true,
     textFileLocation: "../tests/cypress/fixtures/text-files/",
     downloadsFolder: "../tests/cypress/fixtures/downloads/",
+    trashAssetsBeforeRuns: true,
   },
   env: {
     username: "swift",

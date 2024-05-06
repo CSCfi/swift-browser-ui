@@ -8,6 +8,7 @@ describe("Downloads file/container, verifies content and checksum", function () 
   const fileName = Math.random().toString(36).substring(2, 7);
 
   beforeEach(() => {
+    cy.deleteFixtures();
     cy.task("resetDB");
     cy.deleteDB();
     cy.visit(Cypress.config("baseUrl"));

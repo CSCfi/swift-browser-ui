@@ -284,6 +284,25 @@ Cypress.Commands.add("removeAllTags", () => {
   cy.get("[data-testid='save-edit-tags']").click();
 });
 
+/* FIXTURES */
+
+Cypress.Commands.add("generateFixture", (name) => {
+  cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
+    hits: Cypress._.times(10, () => {
+      return faker.lorem.paragraphs(50);
+    }),
+  });
+});
+
+Cypress.Commands.add("deleteFixtures", () => {
+  //add command because config allows assets to be trashed with "cypress run"
+  //but not "cypress open"
+  const downloaded = Cypress.config("downloadsFolder");
+  const generated = Cypress.config("textFileLocation");
+  cy.task("deleteFolder", downloaded);
+  cy.task("deleteFolder", generated);
+})
+
 /*OTHER */
 
 Cypress.Commands.add("getFileContentFromOPFS", async (fileName) => {
@@ -293,14 +312,6 @@ Cypress.Commands.add("getFileContentFromOPFS", async (fileName) => {
   const file = await fileHandle.getFile();
   return file.text();
 })
-
-Cypress.Commands.add("generateFixture", (name) => {
-  cy.writeFile(Cypress.config("textFileLocation") + name + ".txt", {
-    hits: Cypress._.times(10, () => {
-      return faker.lorem.paragraphs(50);
-    }),
-  });
-});
 
 Cypress.Commands.add("deleteDB", () => {
   indexedDB.deleteDatabase("sd-connect");

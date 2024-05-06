@@ -1,5 +1,6 @@
 describe("A folder is shared from project A to project B", function () {
   beforeEach(() => {
+    cy.deleteFixtures();
     cy.task("resetDB");
     cy.deleteDB();
     cy.visit(Cypress.config().baseUrl);
