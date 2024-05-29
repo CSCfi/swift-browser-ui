@@ -420,7 +420,7 @@ export default class UploadSocket {
         const fident = objects[0].replace(".c4gh", "")
           .match(/(?<!^)\.[^.]{1,}$/g);
         const opts = {
-          suggestedName: objects[0].replace(".c4gh", ""),
+          suggestedName: objects[0].split("/").at(-1).replace(".c4gh", ""),
         };
 
         if (fident) {

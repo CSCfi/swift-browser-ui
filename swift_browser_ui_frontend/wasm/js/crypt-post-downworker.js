@@ -611,7 +611,8 @@ if (inServiceWorker) {
       const response = new Response(stream);
       response.headers.append(
         "Content-Disposition",
-        "attachment; filename=\"" + fileName.replace(".c4gh", "") + "\"",
+        "attachment; filename=\"" +
+          fileName.split("/").at(-1).replace(".c4gh", "") + "\"",
       );
 
       // Map the streamController as the stream for the download
