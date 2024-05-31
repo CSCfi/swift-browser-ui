@@ -18,6 +18,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (GL #1237) Downloaded file names no longer include subfolders
 - make use of python 3.12
 
 ## [2024.04.0] - 2024-04-10
