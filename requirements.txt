@@ -8,6 +8,6 @@ cryptography==42.0.7
 gunicorn==22.0.0
 keystoneauth1==5.6.0
 oidcrp==2.1.4
-python-swiftclient==4.5.0
+python-swiftclient==4.6.0
 uvloop==0.19.0
 msgpack==1.0.8
