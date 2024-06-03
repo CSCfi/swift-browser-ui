@@ -52,7 +52,7 @@ export default async function checkIDB() {
 
   try {
     IDBKeyRange.only([1]);
-  } catch (e) {
+  } catch {
     if (DEV) console.log("Buggy Microsoft IndexedDB implementation");
     return false;
   }

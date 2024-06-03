@@ -2,11 +2,12 @@
   "name": "swift_browser_ui_frontend_npm",
   "version": "2.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "serve": "./build_wasm.sh && vite serve --mode development",
     "build": "./build_wasm.sh && vite build --mode production",
     "test": "vue-cli-service test:unit --config=jest.config.js",
-    "lint": "pnpm exec eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "lint": "pnpm exec eslint --fix src",
     "build-devel": "./build_wasm.sh && vite build --mode development",
     "serve-prod": "./build_wasm.sh && vite serve --mode production",
     "build-wasm": "./build_wasm.sh",
@@ -22,7 +23,7 @@
     "cli-highlight": "^2.1.11",
     "csc-ui": "0.9.5",
     "dexie": "^4.0.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.26.0",
     "eslint-utils": "^3.0.0",
     "lodash": "^4.17.21",
@@ -38,6 +39,8 @@
     "webpack-cli": "^5.1.4"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.4.0",
     "@faker-js/faker": "^8.4.1",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^6.4.5",
@@ -46,30 +49,9 @@
     "@vue/compiler-sfc": "^3.4.27",
     "cypress": "^13.10.0",
     "cypress-cloud": "^1.10.2",
+    "globals": "^15.3.0",
     "install": "^0.13.0",
     "jest": "^29.7.0",
     "pg": "^8.11.5"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {},
-    "overrides": [
-      {
-        "files": [
-          "**/__tests__/*.{j,t}s?(x)",
-          "**/*.spec.{j,t}s?(x)"
-        ],
-        "env": {
-          "jest": true
-        }
-      }
-    ]
   }
 }
