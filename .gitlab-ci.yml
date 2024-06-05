@@ -49,7 +49,7 @@ frontend-lint:
 
   image: $BUILD_IMAGE
   before_script:
-    - pnpm --prefix swift_browser_ui_frontend install --prod
+    - pnpm --prefix swift_browser_ui_frontend install
   script:
     - pnpm --prefix swift_browser_ui_frontend lint
 

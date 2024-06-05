@@ -93,6 +93,7 @@ typings/
 
 .DS_Store
 dist
+src/dist
 
 # local env files
 .env.local
