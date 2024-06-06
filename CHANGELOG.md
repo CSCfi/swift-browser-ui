@@ -14,6 +14,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Removed
 
+- old eslint config file
 - (GL #1233) Removed disused code enabling large downloads
 
 ### Changed
