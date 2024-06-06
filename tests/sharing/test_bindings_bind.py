@@ -19,6 +19,8 @@ class MockRequestContextManager(unittest.IsolatedAsyncioTestCase):
                 "url": "http://example",
             }
         )
+        self._testMethodName = "runTest"
+        self._asyncioRunner = None
 
     async def __aenter__(self, *args, **kwargs):
         """."""
@@ -48,6 +50,8 @@ class MockDeleteContextManager(unittest.IsolatedAsyncioTestCase):
         self.resp = SimpleNamespace(
             **{"status": 204, "url": "http://example", "reason": "reason"}
         )
+        self._testMethodName = "runTest"
+        self._asyncioRunner = None
 
     async def __aenter__(self, *args, **kwargs):
         """."""
