@@ -7,6 +7,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.6.0] - 2024-06-07
+
 ### Fixed
 
 - (GL #1231) Fix not being able to concurrently download multiple objects from a single container
@@ -21,6 +23,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - (GL #1237) Downloaded file names no longer include subfolders
 - make use of python 3.12
+
+### Added
+
+- (GL #947) Added download, upload, sharing end-to-end Cypress tests and updated existing ones
 
 ## [2024.04.0] - 2024-04-10
 
@@ -444,7 +450,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.04.0...HEAD
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.0...HEAD
+[2024.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.04.0...2024.6.0
 [2024.04.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...2024.04.0
 [2024.03.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...2024.03.0
 [2024.02.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.0...2024.02.1
