@@ -8,6 +8,7 @@
     <c-button
       v-for="tab in tabs"
       :key="tab.key"
+      :data-testid="tab.route.name"
       class="tab-button"
       @click="navigate(tab.route.name)"
       @keyup.enter="navigate(tab.route.name)"

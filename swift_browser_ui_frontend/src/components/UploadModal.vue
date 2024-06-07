@@ -2,6 +2,7 @@
   <c-card
     ref="uploadContainer"
     class="upload-card"
+    data-testid="upload-modal"
     @keydown="handleKeyDown"
   >
     <div
@@ -32,6 +33,7 @@
             id="upload-folder-input"
             v-model="inputFolder"
             v-csc-control
+            data-testid="upload-folder-input"
             :label="$t('message.container_ops.folderName')"
             aria-required="true"
             required
@@ -72,6 +74,7 @@
             v-if="error.show"
             :key="error.id"
             type="error"
+            data-testid="drop-files-error"
           >
             <div class="drop-file-notification">
               {{ $t(`message.upload.${error.id}`) }}
@@ -215,6 +218,7 @@
         {{ $t("message.encrypt.cancel") }}
       </c-button>
       <c-button
+        data-testid="start-upload"
         size="large"
         :loading="addingFiles || buttonAddingFiles"
         @click="onUploadClick"

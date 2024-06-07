@@ -2,7 +2,6 @@
   "name": "swift_browser_ui_frontend_npm",
   "version": "2.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "serve": "./build_wasm.sh && vite serve --mode development",
     "build": "./build_wasm.sh && vite build --mode production",
@@ -30,6 +29,7 @@
     "luxon": "^3.4.4",
     "rxjs": "^7.8.1",
     "sass": "^1.77.4",
+    "spark-md5": "^3.0.2",
     "vite": "^5.2.12",
     "vue": "^3.4.27",
     "vue-i18n": "^9.13.1",

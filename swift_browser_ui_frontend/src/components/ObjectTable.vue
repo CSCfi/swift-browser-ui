@@ -16,6 +16,7 @@
             v-show="!owner"
             underline
             tabindex="0"
+            data-testid="edit-sharing"
             @click="toggleShareModal"
             @keydown.enter="toggleShareModal"
           >
@@ -80,6 +81,7 @@
           v-for="button in selectionActionButtons"
           :id="`${button.label.toLowerCase()}-selections`"
           :key="button.label"
+          :data-testid="button.testid"
           inverted
           text
           @click="button.action"
@@ -602,11 +604,13 @@ export default {
         {
           label: this.$t("message.table.clearSelected"),
           icon: "mdi-refresh",
+          testid: "clear-checkboxes",
           action: () => this.clearSelections(),
         },
         {
           label: this.$t("message.table.deleteSelected"),
           icon: "mdi-trash-can-outline",
+          testid: "delete-checked-files",
           action: () => {
             this.onOpenDeleteModal(this.checkedRows);
             const deleteSelectionsBtn = document

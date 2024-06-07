@@ -2,6 +2,7 @@
   <c-card
     ref="createFolderContainer"
     class="add-folder"
+    data-testid="create-folder-modal"
     @keydown="handleKeyDown"
   >
     <div
@@ -66,6 +67,7 @@
       <c-button
         outlined
         size="large"
+        data-testid="cancel-save-folder"
         @click="toggleCreateFolderModal(false)"
         @keyup.enter="toggleCreateFolderModal(true)"
       >

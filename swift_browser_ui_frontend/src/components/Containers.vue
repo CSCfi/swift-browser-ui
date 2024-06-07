@@ -19,7 +19,7 @@
         <c-menu
           :key="optionsKey"
           :items.prop="tableOptions"
-          options-testid="table-options-selector"
+          data-testid="table-options-selector"
         >
           <span class="menu-active display-options-menu">
             <i class="mdi mdi-tune" />

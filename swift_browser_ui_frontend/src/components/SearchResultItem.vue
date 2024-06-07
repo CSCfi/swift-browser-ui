@@ -5,7 +5,10 @@
     <div
       class="media"
     >
-      <div class="media-content">
+      <div
+        class="media-content"
+        data-testid="search-result"
+      >
         <span>
           <b>{{
             isSubfolder() ? $t('message.search.folder') :

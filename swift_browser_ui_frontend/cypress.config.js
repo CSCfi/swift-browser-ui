@@ -2,6 +2,7 @@ const { defineConfig } = require("cypress");
 const { cloudPlugin } = require("cypress-cloud/plugin");
 const { Client } = require("pg");
 const { spawn } = require("node:child_process");
+const { rmdir, existsSync } = require("fs");
 
 module.exports = defineConfig({
   fixturesFolder: "../tests/cypress/fixtures",
@@ -50,19 +51,44 @@ module.exports = defineConfig({
 
           return null;
         },
+        extractArchive({ directory, archive }) {
+          const cp = spawn("bash",
+            ["../tests/cypress/support/extractArchive.sh"],
+            {env: { DIR: directory, ARCHIVE: archive }},
+          );
+
+          cp.stderr.on("data", (data) => {
+            console.error(`stderr: ${data}`);
+          });
+          return null;
+        },
+        deleteFolder(folder) {
+          if (existsSync(folder)) {
+            rmdir(folder, { recursive: true }, (err) => {
+              if (err) console.error(err);
+            });
+          }
+          return null;
+        },
       });
       return cloudPlugin(on, config);
     },
     // baseUrl: "https://172.17.0.1:8081/",
-    baseUrl: "https://sd-connect.dev:8000/",
+    baseUrl: "https://sd-connect.dev:8081/",
 
     specPattern: "../tests/cypress/integration/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "../tests/cypress/support/index.js",
+    experimentalStudio: true,
+    textFileLocation: "../tests/cypress/fixtures/text-files/",
+    downloadsFolder: "../tests/cypress/fixtures/downloads/",
+    trashAssetsBeforeRuns: true,
   },
   env: {
     username: "swift",
     password: "veryfast",
     wrongusername: "swif11t",
     wrongpassword: "very11fast",
+    username2: "admin",
+    password2: "superuser",
   },
 });

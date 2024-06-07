@@ -68,6 +68,7 @@
       <c-button
         v-else
         outlined
+        :data-testid="'close-' + type + '-toast'"
         @click="close"
         @keyup.enter="close"
       >

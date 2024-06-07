@@ -60,6 +60,7 @@
       v-if="tableData.length > 0"
       id="shared-projects-table"
       :key="newPerms"
+      data-testid="share-modal-table"
       :data.prop="tableData"
       :headers.prop="headers"
       :no-data-text="$t('message.encrypt.empty')"
