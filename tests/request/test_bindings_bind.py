@@ -15,6 +15,8 @@ class MockRequestContextManager(unittest.IsolatedAsyncioTestCase):
         self.resp = SimpleNamespace(
             **{"text": unittest.mock.AsyncMock(return_value="[]"), "status": 200}
         )
+        self._testMethodName = "runTest"
+        self._asyncioRunner = None
 
     async def __aenter__(self, *args, **kwargs):
         """."""

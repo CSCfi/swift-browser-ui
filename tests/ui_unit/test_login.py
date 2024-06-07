@@ -31,6 +31,10 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             "swift_browser_ui.ui.login.aiohttp_session.get_session",
             self.aiohttp_session_get_session_oidc_mock,
         )
+        self.p_new_sess = unittest.mock.patch(
+            "swift_browser_ui.ui.login.aiohttp_session.new_session",
+            unittest.mock.AsyncMock(return_value=self.session_return),
+        )
 
     async def test_oidc_start(self):
         """Test oidc initial request."""
