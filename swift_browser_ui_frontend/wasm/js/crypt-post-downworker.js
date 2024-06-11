@@ -308,6 +308,7 @@ class FileSlicer {
         this.output.enqueue(new Uint8Array(this.chunk));
       }
       this.totalBytes += this.chunk.length;
+      totalDone += this.chunk.length;
       ({ value: this.chunk, done: this.done } = await this.reader.read());
 
       if (this.done && this.segmentOffset < downloads[this.id].files[this.path].realsize) {
