@@ -24,11 +24,11 @@ classifiers = [
 dependencies = [
     "aiohttp-session==2.12.0",
     "aiohttp==3.9.5",
-    "redis==5.0.4",
+    "redis==5.0.6",
     "asyncpg==0.29.0",
     "certifi==2024.6.2",
     "click==8.1.7",
-    "cryptography==42.0.7",
+    "cryptography==42.0.8",
     "gunicorn==22.0.0",
     "keystoneauth1==5.6.0",
     "oidcrp==2.1.4",
@@ -50,8 +50,8 @@ test = [
     "mypy==1.10.0",
     "pytest-cov==4.1.0",
     "pytest-xdist==3.6.1",
-    "pytest==8.2.1",
-    "tox==4.15.0",
+    "pytest==8.2.2",
+    "tox==4.15.1",
     "setuptools==69.5.1",
 ]
 ui_test = [
@@ -62,7 +62,7 @@ dev = [
     "honcho==1.1.0",
     "pre-commit==3.7.1",
     "pyspelling==2.10",
-    "ruff==0.4.7",
+    "ruff==0.4.9",
     "types-certifi",
     "types-redis",
     "types-requests",
