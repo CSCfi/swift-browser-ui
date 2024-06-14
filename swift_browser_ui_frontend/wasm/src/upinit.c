@@ -49,7 +49,7 @@ int add_recv_key(
 
     if (flag == FTW_F)
     {
-        #ifdef C4GH_WASM_DEv
+        #ifdef C4GH_WASM_DEV
         printf("Adding receiver key in %s\n", path);
         #endif
         fd = open(path, O_RDONLY);
@@ -57,7 +57,7 @@ int add_recv_key(
         // Skip if couldn't read from the file or current session is NULL
         if (amount <= 0)
         {
-            #ifdef C4GH_WASM_DEv
+            #ifdef C4GH_WASM_DEV
             printf("Failed to open the receiver key.\n");
             #endif
             goto finalAddRecv;
