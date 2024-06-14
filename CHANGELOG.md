@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- typo in `upinit.c`
+
 ## [2024.6.0] - 2024-06-07
 
 ### Fixed
