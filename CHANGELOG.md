@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- skip adding headers if they're not defined, when downloading files without decryption
 - typo in `upinit.c`
 
 ## [2024.6.0] - 2024-06-07
