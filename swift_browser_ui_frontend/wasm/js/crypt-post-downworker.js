@@ -287,10 +287,12 @@ class FileSlicer {
   async concatFile() {
     // If the file can't be decrypted, add the header and concat the encrypted
     // file to the stream
-    if (this.output instanceof WritableStream) {
-      await this.output.write(downloads[this.id].files[this.path].header);
-    } else {
-      this.output.enqueue(downloads[this.id].files[this.path].header);
+    if (downloads[this.id].files[this.path].header.length > 0) {
+      if (this.output instanceof WritableStream) {
+        await this.output.write(downloads[this.id].files[this.path].header);
+      } else {
+        this.output.enqueue(downloads[this.id].files[this.path].header);
+      }
     }
 
     await this.getStart();
@@ -306,6 +308,7 @@ class FileSlicer {
         this.output.enqueue(new Uint8Array(this.chunk));
       }
       this.totalBytes += this.chunk.length;
+      totalDone += this.chunk.length;
       ({ value: this.chunk, done: this.done } = await this.reader.read());
 
       if (this.done && this.segmentOffset < downloads[this.id].files[this.path].realsize) {
