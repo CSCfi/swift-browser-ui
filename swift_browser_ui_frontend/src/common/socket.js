@@ -406,7 +406,7 @@ export default class UploadSocket {
   ) {
 
     //get random id
-    const sessionId = Math.random().toString(36).slice(2, 8);
+    const sessionId = window.crypto.randomUUID().slice(0, 8);
 
     let ownerName = "";
     if (owner) {
