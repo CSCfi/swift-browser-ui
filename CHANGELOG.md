@@ -7,10 +7,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.6.1] - 2024-06-28
+
 ### Fixed
 
 - skip adding headers if they're not defined, when downloading files without decryption
 - typo in `upinit.c`
+
+### Security
+
+- (GL #1238) Fix insecure randomness in download session ID
 
 ## [2024.6.0] - 2024-06-07
 
@@ -455,7 +461,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.0...HEAD
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.1...HEAD
+[2024.6.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.0...2024.6.1
 [2024.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.04.0...2024.6.0
 [2024.04.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...2024.04.0
 [2024.03.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.02.1...2024.03.0
