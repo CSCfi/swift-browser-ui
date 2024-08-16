@@ -30,8 +30,8 @@ importers:
         specifier: 0.9.5
         version: 0.9.5
       dexie:
-        specifier: ^4.0.0
-        version: 4.0.7
+        specifier: ^4.0.8
+        version: 4.0.8
       eslint:
         specifier: ^9.5.0
         version: 9.6.0
@@ -1477,8 +1477,8 @@ packages:
     resolution: {integrity: sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==}
     engines: {node: '>=8'}
 
-  dexie@4.0.7:
-    resolution: {integrity: sha512-M+Lo6rk4pekIfrc2T0o2tvVJwL6EAAM/B78DNfb8aaxFVoI1f8/rz5KTxuAnApkwqTSuxx7T5t0RKH7qprapGg==}
+  dexie@4.0.8:
+    resolution: {integrity: sha512-1G6cJevS17KMDK847V3OHvK2zei899GwpDiqfEXHP1ASvme6eWJmAp9AU4s1son2TeGkWmC0g3y8ezOBPnalgQ==}
 
   diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
@@ -5088,7 +5088,7 @@ snapshots:
 
   detect-newline@3.1.0: {}
 
-  dexie@4.0.7: {}
+  dexie@4.0.8: {}
 
   diff-sequences@29.6.3: {}
 
