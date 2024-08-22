@@ -9,6 +9,7 @@ import typing
 import aiohttp.client
 import aiohttp.web
 import certifi
+from aiohttp import ClientTimeout
 
 import swift_browser_ui.common.vault_client
 from swift_browser_ui.upload import common
@@ -103,7 +104,7 @@ class ObjectReplicationProxy:
                 "X-Auth-Token": self.token,
                 "Accept-Encoding": "identity",
             },
-            timeout=REPL_TIMEOUT,
+            timeout=ClientTimeout(total=REPL_TIMEOUT),
             ssl=ssl_context,
         ) as resp:
             if resp.status == 404:
@@ -136,7 +137,7 @@ class ObjectReplicationProxy:
                     "X-Auth-Token": self.token,
                     "Accept-Encoding": "identity",
                 },
-                timeout=REPL_TIMEOUT,
+                timeout=ClientTimeout(total=REPL_TIMEOUT),
                 ssl=ssl_context,
             ) as resp_g:
                 length = int(resp_g.headers["Content-Length"])
@@ -163,7 +164,7 @@ class ObjectReplicationProxy:
                     to_url,
                     data=resp_g.content.iter_chunked(65564),
                     headers=headers,
-                    timeout=REPL_TIMEOUT,
+                    timeout=ClientTimeout(total=REPL_TIMEOUT),
                     ssl=ssl_context,
                 ) as resp_p:
                     LOGGER.debug(f"Segment {segment} status {resp_p.status}")
@@ -189,7 +190,7 @@ class ObjectReplicationProxy:
                 "X-Auth-Token": self.token,
                 "Accept-Encoding": "identity",
             },
-            timeout=REPL_TIMEOUT,
+            timeout=ClientTimeout(total=REPL_TIMEOUT),
             ssl=ssl_context,
         ) as resp_g:
             # If the source object doesn't exist, abort
@@ -223,7 +224,7 @@ class ObjectReplicationProxy:
                     common.generate_download_url(self.host, self.container, object_name),
                     data=resp_g.content.iter_chunked(65564),
                     headers=headers,
-                    timeout=REPL_TIMEOUT,
+                    timeout=ClientTimeout(total=REPL_TIMEOUT),
                     ssl=ssl_context,
                 ) as resp_p:
                     if resp_p.status == 408:
@@ -252,7 +253,7 @@ class ObjectReplicationProxy:
                     ),
                     data=b"",
                     headers=headers,
-                    timeout=REPL_TIMEOUT,
+                    timeout=ClientTimeout(total=REPL_TIMEOUT),
                     ssl=ssl_context,
                 ) as resp:
                     if resp.status != 201:
@@ -307,7 +308,7 @@ class ObjectReplicationProxy:
             ),
             headers={"X-Auth-Token": self.token},
             params={"marker": marker} if marker else None,
-            timeout=REPL_TIMEOUT,
+            timeout=ClientTimeout(total=REPL_TIMEOUT),
             ssl=ssl_context,
         ) as resp:
             if resp.status >= 400:
