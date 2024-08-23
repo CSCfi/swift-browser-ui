@@ -7,9 +7,15 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.8.0] - 2024-08-23
+
 ### Fixed
 
 - (GL #1241) UI not displaying folders due to dexie v4 cache bug
+
+### Changed
+
+- Dependency updates
 
 ## [2024.6.1] - 2024-06-28
 
@@ -465,7 +471,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.1...HEAD
+[unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.8.0...HEAD
+[2024.8.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.1...2024.8.0
 [2024.6.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.6.0...2024.6.1
 [2024.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.04.0...2024.6.0
 [2024.04.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.03.0...2024.04.0
