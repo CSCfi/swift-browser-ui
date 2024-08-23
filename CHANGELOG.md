@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- (GL #1241) UI not displaying folders due to dexie v4 cache bug
+
 ## [2024.6.1] - 2024-06-28
 
 ### Fixed
