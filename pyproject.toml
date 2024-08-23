@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp-session==2.12.0",
-    "aiohttp==3.9.5",
+    "aiohttp==3.10.5",
     "redis==5.0.7",
     "asyncpg==0.29.0",
     "certifi==2024.7.4",
