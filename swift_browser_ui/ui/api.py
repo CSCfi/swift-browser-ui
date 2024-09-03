@@ -148,6 +148,42 @@ async def _check_last_modified(
     return container
 
 
+async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Acquire and serve EC2 credentials for the given project."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+
+    request.app["Log"].info(
+        f"API call for creating ec2 credentials from {request.remote}, sess {session}"
+    )
+
+    # Check if there are existing credentials, use the first one
+    async with client.get(
+        f"{setd['auth_endpoint_url']}/users/{session['uid']}/credentials/OS-EC2",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+    ) as ret:
+        creds = await ret.json()
+        keys = list(filter(lambda key: key["tenant_id"] == project, creds["credentials"]))
+
+    if len(keys) > 0:
+        return aiohttp.web.json_response(keys[0])
+
+    # Create new credentials if there are no existing ones
+    async with client.post(
+        f"{setd['auth_endpoint_url']}/users/{session['uid']}/credentials/OS-EC2",
+        headers={
+            "X-Auth-Token": session["projects"][project]["token"],
+        },
+        json={
+            "tenant_id": project,
+        },
+    ) as ret:
+        return aiohttp.web.json_response((await ret.json())["credential"])
+
+
 async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Create a new container from name."""
     session = await aiohttp_session.get_session(request)

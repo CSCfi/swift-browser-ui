@@ -27,6 +27,7 @@ from swift_browser_ui.ui.api import (
     get_os_user,
     get_shared_container_address,
     get_upload_session,
+    keystone_gen_ec2,
     modify_container_write_acl,
     os_list_projects,
     remove_container_acl,
@@ -239,6 +240,7 @@ async def servinit(
         [
             aiohttp.web.get("/api/username", get_os_user),
             aiohttp.web.get("/api/projects", os_list_projects),
+            aiohttp.web.get("/api/{project}/OS-EC2", keystone_gen_ec2),
             aiohttp.web.post(
                 "/api/access/{project}/{container}", add_project_container_acl
             ),
