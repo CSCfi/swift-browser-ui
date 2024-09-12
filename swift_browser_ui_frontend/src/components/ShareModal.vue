@@ -482,6 +482,8 @@ export default {
         );
       }
 
+      // signal to update sharing containers in container table
+      this.$store.commit("setSharingUpdated", true);
       return true;
     },
     toggleShareGuide: function () {

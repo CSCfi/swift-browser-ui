@@ -348,6 +348,7 @@ export default {
       this.$emit("removeSharedFolder", this.toDelete);
       await this.deleteFolderShare(this.toDelete);
       this.clearDelete();
+      this.$store.commit("setSharingUpdated", true);
     },
     clearDelete: function () {
       this.clickedDelete = false;

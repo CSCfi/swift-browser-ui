@@ -74,6 +74,7 @@ const store = createStore({
     isLoaderVisible: false,
     prevActiveEl: null,
     newFolder: "",
+    sharingUpdated: false,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -247,6 +248,9 @@ const store = createStore({
     },
     setNewFolder(state, payload) {
       state.newFolder = payload;
+    },
+    setSharingUpdated(state, payload) {
+      state.sharingUpdated = payload;
     },
   },
   actions: {
