@@ -98,11 +98,8 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    openShareModal: {
-      get() {
-        return this.$store.state.openShareModal;
-      },
-      set() {},
+    sharingUpdated () {
+      return this.$store.state.sharingUpdated;
     },
   },
   watch: {
@@ -124,11 +121,10 @@ export default {
       this.getPage();
       this.setPagination();
     },
-    openShareModal: function () {
-      if(!this.openShareModal) {
-        setTimeout(() => {
-          this.getSharingContainers().then(() => this.getPage());
-        }, 3000);
+    sharingUpdated() {
+      if (this.sharingUpdated) {
+        this.getSharingContainers().then(() => this.getPage());
+        this.$store.commit("setSharingUpdated", false);
       }
     },
   },
