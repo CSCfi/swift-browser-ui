@@ -7,6 +7,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2024.10.1] - 2024-10-08
+
+### Fixed
+
+- (admins) ignore missing id cache for view rights
+- (users) folders shared in the old UI were not visible in the new version
+- ignore missing id cache for view rights
+
 ## [2024.10.0] - 2024-10-02
 
 ### Changed
@@ -488,3 +496,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 [2024.02.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/2024.01.0...2024.02.0
 [2024.01.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/3.0.0...2024.01.0
 [2023.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/compare/v2.0.0...3.0.0
+
+
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.1...HEAD
+[2024.10.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/-/releases/2024.10.1
