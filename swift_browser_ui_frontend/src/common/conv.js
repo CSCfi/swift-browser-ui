@@ -112,31 +112,38 @@ export async function syncContainerACLs(store) {
       if (aclmeta[container][share].read) {
         // Check if the shared access only concerns view rights
         let tmpid = await client.projectCheckIDs(share);
+        let whitelisted = false;
 
-        let whitelistUrl = new URL(store.state.uploadEndpoint.concat(
-          `/check/${store.state.active.name}/${container}/${tmpid.name}`,
-        ));
-        let signatureUrl = new URL("/sign/3600", document.location.origin);
-        signatureUrl.searchParams.append(
-          "path",
-          `/check/${store.state.active.name}/${container}/${tmpid.name}`,
-        );
-        let signed = await GET(signatureUrl);
-        signed = await signed.json();
-        whitelistUrl.searchParams.append("valid", signed.valid);
-        whitelistUrl.searchParams.append("signature", signed.signature);
+        if (tmpid !== undefined) {
+          let whitelistUrl = new URL(store.state.uploadEndpoint.concat(
+            `/check/${store.state.active.name}/${container}/${tmpid.name}`,
+          ));
+          let signatureUrl = new URL("/sign/3600", document.location.origin);
+          signatureUrl.searchParams.append(
+            "path",
+            `/check/${store.state.active.name}/${container}/${tmpid.name}`,
+          );
+          let signed = await GET(signatureUrl);
+          signed = await signed.json();
+          whitelistUrl.searchParams.append("valid", signed.valid);
+          whitelistUrl.searchParams.append("signature", signed.signature);
 
-        let whitelisted = await fetch(
-          whitelistUrl,
-          {
-            method: "GET",
-          },
-        );
+          let whitelistedResp = await fetch(
+            whitelistUrl,
+            {
+              method: "GET",
+            },
+          );
 
-        if (whitelisted.status == 204) {
-          accesslist.push("v");
-        } else {
+          if (whitelistedResp.status == 200) {
+            whitelisted = true;
+          }
+        }
+
+        if (whitelisted) {
           accesslist.push("r");
+        } else {
+          accesslist.push("v");
         }
       }
       if (aclmeta[container][share].write) {
