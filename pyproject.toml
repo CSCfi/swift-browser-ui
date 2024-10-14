@@ -59,7 +59,7 @@ ui_test = [
     "pytest==8.3.3",
 ]
 dev = [
-    "honcho==1.1.0",
+    "honcho==2.0.0",
     "pre-commit==3.8.0",
     "pyspelling==2.10",
     "ruff==0.6.8",
