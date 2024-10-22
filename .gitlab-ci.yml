@@ -23,7 +23,7 @@ backend-lint:
   before_script:
     - pip install pre-commit tox mypy .[dev]
   script:
-    - pre-commit run --all-files -c .pre-commit-config.yaml --show-diff-on-failure --color never
+    - SKIP=no-commit-to-branch pre-commit run --all-files -c .pre-commit-config.yaml --show-diff-on-failure --color never
     - tox -e docs
     - tox -e bandit
 
