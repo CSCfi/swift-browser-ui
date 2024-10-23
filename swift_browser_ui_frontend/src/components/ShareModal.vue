@@ -735,11 +735,11 @@ c-flex, .shared-notification {
 
 c-alert[type="success"] {
   align-items: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
   & > .shared-notification {
     color: var(--csc-dark);
   };
-  margin-bottom: 1.5rem;
-  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
 }
 
 c-toasts {
@@ -748,11 +748,11 @@ c-toasts {
 
 c-alert[type="success"] {
   align-items: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
   & > .shared-notification {
     color: var(--csc-dark);
   };
-  margin-bottom: 1.5rem;
-  box-shadow: 2px 4px 4px 0px var(--csc-light-grey);
 }
 
 </style>

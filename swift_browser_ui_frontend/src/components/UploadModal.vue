@@ -960,12 +960,12 @@ c-card-actions {
 .dropArea {
   border: 1px dashed $csc-light-grey;
   padding: 2rem 0;
-  & > span:first-of-type {
-    margin-right: 1rem;
-  }
   display: flex;
   align-items: center;
   justify-content: center;
+  & > span:first-of-type {
+    margin-right: 1rem;
+  }
 }
 
 .over-dropArea {
