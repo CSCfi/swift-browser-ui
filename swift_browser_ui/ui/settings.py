@@ -67,6 +67,7 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "sharing_request_token": environ.get("SWIFT_UI_SHARING_REQUEST_TOKEN", None),
     "has_trust": environ.get("BROWSER_START_HAS_TRUST", False),
     "set_origin_address": environ.get("BROWSER_START_SET_ORIGIN_ADDRESS", None),
+    "tempurl_digest_type": environ.get("TEMPURL_USE_DIGEST", "sha1"),
     "os_user_domain": environ.get("OS_USER_DOMAIN_NAME", "Default"),
     "os_accepted_roles": environ.get("OS_ACCEPTED_ROLES", "object_store_user"),
     "force_restricted_mode": environ.get("SWIFT_UI_FORCE_RESTRICTED_MODE", False),

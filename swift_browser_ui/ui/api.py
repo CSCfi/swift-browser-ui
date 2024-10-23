@@ -297,6 +297,7 @@ async def swift_download_object(request: aiohttp.web.Request) -> aiohttp.web.Res
         600,  # Use 10 minute lifetime
         temp_url_key,
         "GET",
+        digest=setd["tempurl_digest_type"],
     )
 
     # Append query string with query parameters from the request,
