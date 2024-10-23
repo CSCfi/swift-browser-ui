@@ -7,6 +7,15 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- make the tempurl digest algorithm configurable
+
+### Changed
+
+- (admins) tempurl digest algorithm can now be configured if necessary
+- default to `sha1` instead of `sha256` when signing tempurls
+
 ## [2024.10.1] - 2024-10-08
 
 ### Fixed
