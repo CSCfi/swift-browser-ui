@@ -115,8 +115,8 @@ def run_server_devel(
 
 def main() -> None:
     """Run the server with the default run function."""
-    if sys.version_info < (3, 6):
-        logging.error("swift-x-account-sharing requires >= python3.6")
+    if sys.version_info < (3, 12):
+        logging.error("swift-x-account-sharing requires >= python3.12")
         sys.exit(1)
     run_server_devel(init_server())
 
