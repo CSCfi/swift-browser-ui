@@ -185,7 +185,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 6):
-        logging.error("swift-upload-runner requires >= python3.6")
+    if sys.version_info < (3, 12):
+        logging.error("swift-upload-runner requires >= python3.12")
         sys.exit(1)
     run_server(servinit())

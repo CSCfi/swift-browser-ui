@@ -377,7 +377,7 @@ def run_server_insecure(
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 6):
-        logging.error("swift-browser-ui requires >= python3.6")
+    if sys.version_info < (3, 12):
+        logging.error("swift-browser-ui requires >= python3.12")
         sys.exit(1)
     run_server_insecure(servinit())

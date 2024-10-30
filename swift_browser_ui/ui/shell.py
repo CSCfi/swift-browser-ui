@@ -140,7 +140,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 6):
+    if sys.version_info < (3, 12):
         logging.error("swift-browser-ui requires >= python3.6")
         sys.exit(1)
     main()
