@@ -1,7 +1,6 @@
 //container
 
 describe("Create a container", function () {
-
   beforeEach(() => {
     cy.task("resetDB");
     cy.deleteDB();
@@ -10,7 +9,6 @@ describe("Create a container", function () {
   });
 
   it("Creates a container with a random unique name and deletes it", () => {
-
     //create a unique name
     const folderName = Math.random().toString(36).substring(2, 7);
 
@@ -49,9 +47,7 @@ describe("Create a container", function () {
     //check the folder 1 exists with search field
     cy.searchFolder(nameOne);
     cy.wait(3000);
-    cy.get("[data-testid='search-result']")
-      .contains(nameOne)
-      .should("exist");
+    cy.get("[data-testid='search-result']").contains(nameOne).should("exist");
 
     cy.addFolder(nameTwo);
     cy.reload();
@@ -60,9 +56,7 @@ describe("Create a container", function () {
     //check the folder 2 exists with search field
     cy.searchFolder(nameTwo);
     cy.wait(3000);
-    cy.get("[data-testid='search-result']")
-      .contains(nameTwo)
-      .should("exist");
+    cy.get("[data-testid='search-result']").contains(nameTwo).should("exist");
 
     //check there are multiple folders in the project
     cy.get("[data-testid='container-table']")
@@ -84,9 +78,6 @@ describe("Create a container", function () {
     cy.addFolder(folderName);
 
     //folder name input field should have a validation error
-    cy.get("[data-testid='create-folder-modal']")
-      .find("c-message")
-      .should("be.visible");
-    cy.get("[data-testid='cancel-save-folder']").click();
+    cy.get("#error-newFolder-input_1").should("be.visible");
   });
 });
