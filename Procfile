@@ -1,6 +1,5 @@
 redis: docker run --rm --env-file ${PWD}/.env -p ${SWIFT_UI_REDIS_PORT}:${SWIFT_UI_REDIS_PORT} docker.io/redis:7-bullseye
 db: docker run --rm -v ${PWD}/.github/config/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh --env-file ${PWD}/.env -p 5432:5432 docker.io/postgres:14-bullseye
-keystone: docker run --rm -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
 vault: "${PWD}"/scripts/vault.sh
 
 # Commands to run without trusted TLS
@@ -9,8 +8,10 @@ upload:   gunicorn --reload --worker-class aiohttp.GunicornUVLoopWebWorker --wor
 sharing:  gunicorn --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${SHARING_PORT} swift_browser_ui.sharing.server:init_server
 request:  gunicorn --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${REQUEST_PORT} swift_browser_ui.request.server:init_server
 frontend: SWIFT_UI_SECURE_WEBSOCKET="" ALLOWED_HOSTS=${SWIFT_UI_FRONTEND_ALLOW_HOSTS} SWIFT_UI_TLS_PORT=${SWIFT_UI_TLS_PORT} SWIFT_UI_TLS_HOST=${SWIFT_UI_TLS_HOST} PORT=${FRONTEND_PORT} BACKEND_PORT=${BACKEND_PORT} pnpm --prefix swift_browser_ui_frontend/ run serve
+keystone: docker run --rm -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
 
 # Commands to run with trusted TLS
+# keystone: docker run --rm -v /home/sapenna/DevCA/devswift-cert:/ssl -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
 # ui:       gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${UI_PORT}      swift_browser_ui.ui.server:servinit
 # upload:   gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${UPLOAD_PORT}  swift_browser_ui.upload.server:servinit
 # sharing:  gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${SHARING_PORT} swift_browser_ui.sharing.server:init_server
