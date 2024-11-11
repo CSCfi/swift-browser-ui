@@ -629,3 +629,17 @@ export async function signedFetch(
 
   return resp;
 }
+
+// Get the EC2 credentials from backend, for S3 operations in frontend.
+export async function getEC2Credentials(
+  project,
+) {
+  let fetchURL = new URL(`/api/${encodeURI(project)}/OS-EC2`, document.location.origin);
+  let resp = await GET(fetchURL);
+
+  if (resp.status != 200) {
+    throw new Error("Failed to retrieve EC2 credentials.");
+  }
+
+  return await resp.json();
+}

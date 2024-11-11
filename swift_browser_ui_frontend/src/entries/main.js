@@ -49,6 +49,7 @@ import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
+import { validateLegacyS3Access, validateS3Access } from "@/common/dominate";
 
 checkIDB().then(result => {
   if (!result) {
@@ -307,6 +308,20 @@ const app = createApp({
       this.initSocket().then(
         () => {if (DEV) console.log("Initialized the websocket.");},
       );
+
+      await this.$store.dispatch("initSDSubmit");
+      if (DEV) {
+        if (
+          this.$store.state.submitReceivee.sd_submit_user === ""
+          && this.$store.state.submitReceivee.sd_submit_id === ""
+        ) {
+          console.log("SD Submit integration not configured");
+        } else {
+          console.log("SD Submit integration configured");
+        }
+      }
+
+      await validateS3Access(this.$store);
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");

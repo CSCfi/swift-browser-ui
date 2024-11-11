@@ -44,7 +44,11 @@ from swift_browser_ui.ui.api import (
     swift_replicate_container,
     swift_update_container_metadata,
 )
-from swift_browser_ui.ui.discover import handle_discover
+from swift_browser_ui.ui.discover import (
+    handle_discover,
+    handle_s3_discover,
+    handle_submit_discover,
+)
 from swift_browser_ui.ui.front import (
     accessibility,
     agg_swjs,
@@ -92,7 +96,12 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
     """Open a client session for download proxies."""
-    app["api_client"] = aiohttp.ClientSession()
+    if not setd["check_certificate"]:
+        app["api_client"] = aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(verify_ssl=False)
+        )
+    else:
+        app["api_client"] = aiohttp.ClientSession()
 
 
 async def kill_dload_client(app: aiohttp.web.Application) -> None:
@@ -308,7 +317,13 @@ async def servinit(
     )
 
     # Add discovery routes
-    app.add_routes([aiohttp.web.get("/discover", handle_discover)])
+    app.add_routes(
+        [
+            aiohttp.web.get("/discover", handle_discover),
+            aiohttp.web.get("/discover/s3", handle_s3_discover),
+            aiohttp.web.get("/discover/submit", handle_submit_discover),
+        ]
+    )
 
     # Add direct routes
     app.add_routes(

@@ -22,6 +22,8 @@ import {
   getContainerLastmodified,
   updateContainerLastmodified,
 } from "@/common/globalFunctions";
+import { discoverEndpoint } from "./s3conv";
+import { discoverSubmitConfiguration } from "./dominate";
 
 const store = createStore({
   state: {
@@ -75,6 +77,11 @@ const store = createStore({
     prevActiveEl: null,
     newBucket: "",
     sharingUpdated: false,
+    submitReceivee: {
+      sd_submit_user: "",
+      sd_submit_id: "",
+    },
+    s3endpoint: "",
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -251,6 +258,12 @@ const store = createStore({
     },
     setSharingUpdated(state, payload) {
       state.sharingUpdated = payload;
+    },
+    setSubmitReceivee(state, payload) {
+      state.submitReceivee = payload;
+    },
+    setS3Endpoint(state, payload) {
+      state.s3endpoint = payload;
     },
   },
   actions: {
@@ -635,6 +648,14 @@ const store = createStore({
         });
         await getDB().objects.bulkPut(newObjects);
       }
+    },
+    initSDSubmit: async function (
+      { state, commit },
+    ) {
+      let s3endpoint = await discoverEndpoint();
+      let submitConfig = await discoverSubmitConfiguration();
+      commit("setS3Endpoint", s3endpoint);
+      commit("setSubmitReceivee", submitConfig);
     },
   },
 });
