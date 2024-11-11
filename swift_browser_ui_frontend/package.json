@@ -20,8 +20,6 @@
     "@vueuse/rxjs": "^11.0.0",
     "@ygoe/msgpack": "^1.0.3",
     "@aws-sdk/client-s3": "3.637.0",
-    "minio": "^7.1.2",
-    "aws-sdk": "2.1691.0",
     "cli-highlight": "^2.1.11",
     "csc-ui": "0.9.5",
     "dexie": "^4.0.8",
