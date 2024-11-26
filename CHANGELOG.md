@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- change end-to-end test container.cy.js
+
 ## [2024.10.2] - 2024-10-30
 
 ### Added
