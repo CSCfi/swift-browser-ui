@@ -69,7 +69,7 @@ html_theme = "sphinx_rtd_theme"
 html_theme_options = {
     "collapse_navigation": True,
     "sticky_navigation": True,
-    "display_version": True,
+    "version_selector": True,
     "prev_next_buttons_location": "bottom",
 }
 
