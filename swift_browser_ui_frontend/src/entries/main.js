@@ -49,7 +49,8 @@ import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
-import { validateLegacyS3Access, validateS3Access } from "@/common/dominate";
+import { validateS3Access } from "@/common/dominate";
+import { getClient } from "@/common/s3conv";
 
 checkIDB().then(result => {
   if (!result) {
@@ -312,8 +313,9 @@ const app = createApp({
       await this.$store.dispatch("initSDSubmit");
       if (DEV) {
         if (
-          this.$store.state.submitReceivee.sd_submit_user === ""
-          && this.$store.state.submitReceivee.sd_submit_id === ""
+          this.$store.state.submitConfig.sd_submit_user === ""
+          && this.$store.state.submitConfig.sd_submit_id === ""
+          && this.$store.state.submitConfig.sd_submit_endpoint == ""
         ) {
           console.log("SD Submit integration not configured");
         } else {
@@ -321,7 +323,11 @@ const app = createApp({
         }
       }
 
-      await validateS3Access(this.$store);
+      let s3client = await getClient(
+        this.$store.state.active.id,
+        this.$store.state.s3endpoint,
+      );
+      this.$store.commit("setS3Client", s3client);
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");

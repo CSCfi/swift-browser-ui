@@ -77,11 +77,13 @@ const store = createStore({
     prevActiveEl: null,
     newBucket: "",
     sharingUpdated: false,
-    submitReceivee: {
+    submitConfig: {
       sd_submit_user: "",
       sd_submit_id: "",
+      sd_submit_endpoint: "",
     },
     s3endpoint: "",
+    s3client: undefined,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -259,11 +261,14 @@ const store = createStore({
     setSharingUpdated(state, payload) {
       state.sharingUpdated = payload;
     },
-    setSubmitReceivee(state, payload) {
-      state.submitReceivee = payload;
+    setSubmitConfig(state, payload) {
+      state.submitConfig = payload;
     },
     setS3Endpoint(state, payload) {
       state.s3endpoint = payload;
+    },
+    setS3Client(state, payload) {
+      state.s3client = payload;
     },
   },
   actions: {
@@ -655,7 +660,7 @@ const store = createStore({
       let s3endpoint = await discoverEndpoint();
       let submitConfig = await discoverSubmitConfiguration();
       commit("setS3Endpoint", s3endpoint);
-      commit("setSubmitReceivee", submitConfig);
+      commit("setSubmitConfig", submitConfig);
     },
   },
 });

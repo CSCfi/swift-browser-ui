@@ -41,5 +41,6 @@ async def handle_submit_discover(
         {
             "sd_submit_user": setd["sd_submit_user"],
             "sd_submit_id": setd["sd_submit_id"],
+            "sd_submit_endpoint": setd["sd_submit_endpoint"],
         }
     )

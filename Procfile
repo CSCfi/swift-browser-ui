@@ -11,7 +11,7 @@ frontend: SWIFT_UI_SECURE_WEBSOCKET="" ALLOWED_HOSTS=${SWIFT_UI_FRONTEND_ALLOW_H
 keystone: docker run --rm -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
 
 # Commands to run with trusted TLS
-# keystone: docker run --rm -v /home/sapenna/DevCA/devswift-cert:/ssl -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
+# keystone: docker run --rm -p $KEYSTONE_PORT:5000 -p $SWIFT_PORT:8080 --env S6_LOGGING=0 --name keystone-swift ghcr.io/cscfi/docker-keystone-swift:latest
 # ui:       gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${UI_PORT}      swift_browser_ui.ui.server:servinit
 # upload:   gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${UPLOAD_PORT}  swift_browser_ui.upload.server:servinit
 # sharing:  gunicorn --forwarded-allow-ips="${DOCKER_NETWORK_SEGMENT}" --reload --worker-class aiohttp.GunicornUVLoopWebWorker --workers 1 --log-level debug --graceful-timeout 60 --timeout 120 --bind ${HOST}:${SHARING_PORT} swift_browser_ui.sharing.server:init_server

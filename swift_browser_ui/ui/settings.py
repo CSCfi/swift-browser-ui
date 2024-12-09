@@ -90,6 +90,7 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "s3api_endpoint": environ.get("S3_ENDPOINT", "http://localhost:8080"),
     "sd_submit_user": environ.get("SD_SUBMIT_USER", ""),
     "sd_submit_id": environ.get("SD_SUBMIT_ID", ""),
+    "sd_submit_endpoint": environ.get("SD_SUBMIT_ENDPOINT", ""),
     "check_certificate": (
         False if environ.get("SWIFT_UI_CHECK_CERTIFICATES", "True") == "False" else True
     ),
