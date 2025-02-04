@@ -362,8 +362,9 @@ async def login_with_token(
     )
 
     if setd["oidc_enabled"] and (session.new or "oidc" not in session):
-        session.invalidate()
-        return aiohttp.web.Response(status=302, headers={"Location": "/"})
+        if "pouta_access_token" not in session["oidc"]["userinfo"]:
+            session.invalidate()
+            return aiohttp.web.Response(status=302, headers={"Location": "/"})
 
     session["at"] = time.time()
 
