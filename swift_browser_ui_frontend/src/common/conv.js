@@ -13,21 +13,6 @@ export default function getLangCookie() {
   return matches ? decodeURIComponent(matches[1]) : "en";
 }
 
-function shiftSizeDivision(vallist) {
-  "use strict";
-  // Javascript won't let us do anything but floating point division by
-  // default, so a different approach was chosen anyway.
-  //  ( right shift by ten is a faster alias to division by 1024,
-  //  decimal file sizes are heresy and thus can't be enabled )
-  switch (vallist[0] >>> 10) {
-    case 0:
-      return vallist;
-    default:
-      vallist[0] = vallist[0] >>> 10;
-      vallist[1] = vallist[1] + 1;
-      return shiftSizeDivision(vallist);
-  }
-}
 
 function check_duplicate(container, share, currentdetails) {
   for (let detail of currentdetails) {
@@ -163,63 +148,28 @@ export async function syncContainerACLs(store) {
 }
 
 export function getHumanReadableSize(val, locale) {
-  // Get a human readable version of the size, which is returned from the
-  // API as bytes
+  const BYTE_UNITS = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"];
 
-  const isLargeVal = val > 4294967296;
-  let largeNum;
-  let byteval = val;
-  let count = 0;
+  let size = val;
+  let unitIndex = 0;
 
-  if (isLargeVal) {
-    largeNum = val / 1073741824;
-    byteval = parseInt(largeNum);
-    count = 3;
+  while (size >= 1024 && unitIndex < BYTE_UNITS.length - 1) {
+    size /= 1024;
+    unitIndex++;
   }
 
-  const result = shiftSizeDivision([byteval, count]);
-  let ret = result[0].toString();
+  const decimalSize = size.toFixed(1);
+  let result = decimalSize.toString();
 
-  if (ret.length === 1 && ret !== "0") {
-    //display single digit results with one decimal rounded up
-    let decimal;
-    let retNum = result[0];
-
-    for (let i=count; i < result[1]; i++) {
-      retNum = retNum << 10;
-    }
-    if (isLargeVal) {
-      decimal = largeNum - retNum;
-    }
-    else {
-      let remainder = val ^ retNum;
-      decimal = remainder / Math.pow(1024, result[1]);
-    }
-    ret = (result[0] + decimal).toFixed(1).toString();
-
-    if (locale === "fi") {
-      ret = ret.replace(".", ",");
-    }
+  if (locale === "fi") {
+    result = result.replace(".", ",");
   }
-  switch (result[1]) {
-    case 0:
-      ret += " B";
-      break;
-    case 1:
-      ret += " KiB";
-      break;
-    case 2:
-      ret += " MiB";
-      break;
-    case 3:
-      ret += " GiB";
-      break;
-    case 4:
-      ret += " TiB";
-      break;
-  }
-  return ret;
+
+  return `${result} ${BYTE_UNITS[unitIndex]}`;
 }
+
+
+
 
 export async function computeSHA256(keyContent) {
   const msgUint8 = new TextEncoder().encode(keyContent);
