@@ -46,7 +46,9 @@ async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
     return response
 
 
-async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
+async def oidc_end(
+    request: aiohttp.web.Request,
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Finalize OIDC login and create a new session with the data from the OIDC provicer."""
     # Response from AAI must have the query params `state` and `code`
     if "state" in request.query and "code" in request.query:
@@ -97,6 +99,14 @@ async def oidc_end(request: aiohttp.web.Request) -> aiohttp.web.Response:
     if csc_projects is not None:
         session["csc-projects"] = csc_projects
     request.app["Log"].debug(session["oidc"])
+
+    if "pouta_access_token" in session["oidc"]["userinfo"]:
+        request.app["Log"].info(
+            "Got pouta access token from OIDC, using direct login chain."
+        )
+        # Get an unscoped token to Openstack using the Pouta token
+        session.changed()
+        return await aai_pouta_token_end(request, session)
 
     response = aiohttp.web.Response(
         status=302, headers={"Location": "/login"}, reason="Redirection to login"
@@ -235,6 +245,31 @@ def test_token(
     log.info("Got OS token in login return")
 
     return unscoped
+
+
+async def aai_pouta_token_end(
+    request: aiohttp.web.Request,
+    session: aiohttp_session.Session,
+) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
+    """Handle the login procedure with an AAI Pouta access token."""
+    log = request.app["Log"]
+    client = request.app["api_client"]
+    log.info("Logging in the user with an AAI Pouta token.")
+
+    pouta_token = session["oidc"]["userinfo"]["pouta_access_token"]
+
+    async with client.get(
+        f"{setd['auth_endpoint_url']}/OS-FEDERATION/identity_providers/oauth2_authentication/protocols/openid/auth",
+        headers={"Authorization": f"Bearer {pouta_token}"},
+    ) as resp:
+        log.debug(f"OIDC token auth response: {resp}")
+        if resp.status >= 400:
+            raise aiohttp.web.HTTPForbidden(
+                reason="Could not log in using the provided AAI token."
+            )
+        unscoped = resp.headers["X-Subject-Token"]
+
+    return await login_with_token(request, unscoped)
 
 
 async def credentials_login_end(
