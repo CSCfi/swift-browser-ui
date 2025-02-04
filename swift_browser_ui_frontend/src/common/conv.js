@@ -509,8 +509,8 @@ export function parseDateFromNow(locale, value, t) {
 // container.
 export function addSegmentContainerSize(container, containers) {
   let segments = containers.find(el => el.name === `${container.name}_segments`);
-  if (segments !== undefined && container.count > 0) {
-    container.bytes = segments.bytes;
+  if (segments !== undefined) {
+    container.bytes += segments.bytes;
   }
 }
 
