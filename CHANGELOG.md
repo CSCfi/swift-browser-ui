@@ -9,7 +9,12 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) remove the need to log in twice to enforce MFA
 - change end-to-end test container.cy.js
+
+### Added
+
+- support for logging in using SDS AAI provided token for Pouta
 
 ## [2024.10.2] - 2024-10-30
 
