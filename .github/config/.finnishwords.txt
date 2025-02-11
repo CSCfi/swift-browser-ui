@@ -575,6 +575,7 @@ projektitunnukset
 pudota
 pudotusvalikoissa
 puhelin
+purettava
 purkaa
 purkaminen
 puutteen

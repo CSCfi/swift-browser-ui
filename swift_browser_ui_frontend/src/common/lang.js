@@ -792,7 +792,7 @@ let default_translations = {
       copytime: "Se voi kestää muutaman sekunnin",
       copyfail: "Kansion kopiointi epäonnistui",
       notDecryptable:
-        "Jotkin tiedostot vaativat erillisen salauksenpurun latauksen " +
+        "Joidenkin tiedostojen salaus on purettava erikseen latauksen " +
         "jälkeen.",
       tagName: "Asiasanat",
       tagPlaceholder: "# Lisää asiasana ja paina rivinvaihtoa",
