@@ -7,14 +7,24 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2025.2.0] - 2025-02-11
+
 ### Changed
 
+- (users) (GL #1254) token modal text should be more clear now
+- dependency updates
 - (users) remove the need to log in twice to enforce MFA
 - change end-to-end test container.cy.js
 
 ### Added
 
+- (GL #1254) new item `tokenHint` for the token name formatting and make space for it by moving the token button a bit
 - support for logging in using SDS AAI provided token for Pouta
+
+### Fixed
+
+- (users) (GL #1249) Bucket sizes larger than 1TB no longer show inaccurate values
+- (users) Incorrect bucket size bug due to reading segment sizes
 
 ## [2024.10.2] - 2024-10-30
 
@@ -510,7 +520,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.2...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.2.0...HEAD
+[2025.2.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.2...2025.2.0
 [2024.10.2]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.1...2024.10.2
 [2024.10.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.0...2024.10.1
 [2024.10.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.8.0...2024.10.0
