@@ -2,6 +2,7 @@ aika
 aikana
 aina
 ajaksi
+aktiiviset
 alapuolisesta
 alaviiva
 alikansio
@@ -55,8 +56,10 @@ epäonnistui
 epäonnistunut
 epäonnistuttiin
 erikoismerkkejä
+erikoismerkkien
 erikseen
 erillinen
+erillisen
 erissä
 erityyppisiä
 esim
@@ -161,6 +164,7 @@ jos
 joskus
 jota
 jotka
+jotkin
 julkinen
 julkiset
 julkisia
@@ -405,6 +409,7 @@ ne
 niiden
 niin
 nimellä
+nimen
 nimet
 nimetä
 nimeä
@@ -570,6 +575,7 @@ projektitunnukset
 pudota
 pudotusvalikoissa
 puhelin
+purettava
 purkaa
 purkaminen
 puutteen
@@ -630,6 +636,7 @@ salasanasta
 salataan
 salattua
 salauksen
+salauksenpurun
 salaus
 salausavaimia
 salausohjelma
@@ -844,6 +851,7 @@ uusi
 uusia
 vaatii
 vaatimusten
+vaativat
 vaihda
 vaihtaa
 vaihto
@@ -907,6 +915,7 @@ vuoksi
 vähintään
 väliaikaiseen
 väliaikaisten
+vältä
 yhdelle
 yhden
 yhdistetty
@@ -919,6 +928,7 @@ yhteystiedot
 yhteyttä
 yhtään
 yksikkö
+yksilöllinen
 yksityinen
 yksityisen
 yksityisestä

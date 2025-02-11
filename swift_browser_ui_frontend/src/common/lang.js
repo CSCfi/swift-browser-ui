@@ -245,7 +245,7 @@ let default_translations = {
       copysuccess: "Copying in progress",
       copytime: "It may take few seconds",
       copyfail: "Failed to copy the folder",
-      notDecryptable: "Some requested files could not be decrypted.",
+      notDecryptable: "Some downloaded files need manual decryption.",
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
@@ -296,8 +296,10 @@ let default_translations = {
       tokens: {
         empty: "No API tokens created for the project",
         title: "Create API tokens",
-        identifier: "Token identifier",
-        identLabel: "Insert new token identifier",
+        identifier: "Active tokens for this project",
+        identLabel: "Name of the new token",
+        identHint:
+          "Token name needs to be unique. Please avoid special characters.",
         createToken: "Create token",
         latestToken: "Latest token: ",
         copy: "Copy token",
@@ -310,7 +312,7 @@ let default_translations = {
           "will be deleted after this time period.",
         tokenCopied: "Token copied.",
         tokenRemoved: "Token removed.",
-        inUse: "Token identifier already in use.",
+        inUse: "Token name already in use.",
         creationFailed: "Token creation failed.",
       },
       encrypt: {
@@ -789,7 +791,9 @@ let default_translations = {
       copysuccess: "Kansiota kopioidaan",
       copytime: "Se voi kestää muutaman sekunnin",
       copyfail: "Kansion kopiointi epäonnistui",
-      notDecryptable: "Salauksen purkaminen epäonnistui osassa tiedostoja.",
+      notDecryptable:
+        "Joidenkin tiedostojen salaus on purettava erikseen latauksen " +
+        "jälkeen.",
       tagName: "Asiasanat",
       tagPlaceholder: "# Lisää asiasana ja paina rivinvaihtoa",
       container_ops: {
@@ -843,8 +847,11 @@ let default_translations = {
       tokens: {
         empty: "Tälle projektille ei ole luotu API-avaimia",
         title: "Luo API-avaimia",
-        identifier: "Avainten tunnisteet",
-        identLabel: "Syötä tunniste uudelle API-avaimelle",
+        identifier: "Tämän projektin aktiiviset API-avaimet",
+        identLabel: "Uuden avaimen nimi",
+        identHint:
+          "Avaimen nimen on oltava yksilöllinen. Vältä erikoismerkkien " +
+          "käyttöä.",
         createToken: "Luo avain",
         latestToken: "Viimeisin avain: ",
         copy: "Kopioi avain",
@@ -858,7 +865,7 @@ let default_translations = {
         tokenCopied: "Avain kopioitu.",
         tokenRemoved: "Avain poistettu.",
         creationFailed: "Avaimen luonti epäonnistui.",
-        inUse: "Avaimen tunniste on jo käytössä.",
+        inUse: "Avaimen nimi on jo käytössä.",
       },
       encrypt: {
         uploadFiles: "Lataa tiedostoja",

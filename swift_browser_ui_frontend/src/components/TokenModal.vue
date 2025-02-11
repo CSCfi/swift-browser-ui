@@ -31,6 +31,7 @@
         v-model="newIdentifier"
         v-csc-control
         name="newIdentifier"
+        :hint="$t('message.tokens.identHint')"
         :label="$t('message.tokens.identLabel')"
       />
       <c-button
@@ -358,7 +359,7 @@ export default {
 
 #create-token-button {
   width: max-content;
-  margin-top: -2rem;
+  margin-top: -1rem;
 }
 
 #token {
