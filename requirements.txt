@@ -1,12 +1,12 @@
-aiohttp==3.11.2
+aiohttp==3.11.11
 aiohttp-session==2.12.1
-redis==5.2.0
+redis==5.2.1
 asyncpg==0.30.0
-certifi==2024.8.30
-click==8.1.7
+certifi==2024.12.14
+click==8.1.8
 cryptography==43.0.3
 gunicorn==23.0.0
-keystoneauth1==5.8.0
+keystoneauth1==5.9.1
 oidcrp==2.1.4
 python-swiftclient==4.6.0
 uvloop==0.21.0
