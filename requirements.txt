@@ -1,4 +1,4 @@
-aiohttp==3.11.11
+aiohttp==3.11.13
 aiohttp-session==2.12.1
 redis==5.2.1
 asyncpg==0.30.0
