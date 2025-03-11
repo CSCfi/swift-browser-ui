@@ -4,7 +4,7 @@ redis==5.2.1
 asyncpg==0.30.0
 certifi==2025.1.31
 click==8.1.8
-cryptography==44.0.1
+cryptography==44.0.2
 gunicorn==23.0.0
 keystoneauth1==5.9.1
 oidcrp==2.1.4
