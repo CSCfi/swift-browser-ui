@@ -9,7 +9,12 @@ from dataclasses import dataclass
 from typing import Any, Dict, List
 
 from aiohttp import ClientSession, ClientTimeout
-from aiohttp.web import HTTPError, HTTPGatewayTimeout, HTTPInternalServerError
+from aiohttp.web import (
+    HTTPError,
+    HTTPGatewayTimeout,
+    HTTPInternalServerError,
+    HTTPNotFound,
+)
 from yarl import URL
 
 from swift_browser_ui.ui.settings import setd
@@ -230,7 +235,7 @@ class VaultClient:
             message = "Unexpected issue when connecting to service provider."
             raise VaultServerError(text=message, reason=message) from exc
 
-    async def get_public_key(self, project: str) -> str:
+    async def get_public_key(self, project: str, skip_create: bool = False) -> str:
         """Get a project specific public key.
 
         If a key is not found for a project, creates a new one and fetches it.
@@ -249,7 +254,14 @@ class VaultClient:
 
         LOGGER.debug("Getting public key for project %r", project)
         key = await get_key()
-        if not key:
+        if not key and skip_create:
+            LOGGER.debug(
+                "No key: %s found for project % r, but not creating a new one for foreign access.",
+                key,
+                project,
+            )
+            raise HTTPNotFound
+        elif not key and not skip_create:
             LOGGER.debug(
                 "No key: %s found for project %r, creating a new one.", key, project
             )
