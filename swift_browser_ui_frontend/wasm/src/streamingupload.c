@@ -74,3 +74,71 @@ CHUNK *encrypt_chunk(
         &(ret->len));
     return ret;
 }
+
+/*
+Create a full header with the provided session key.
+*/
+CHUNK *create_header_from_key(
+    const uint8_t *session_key_path,
+    const uint8_t *session_key
+) {
+    // Get the list of parsed receivers
+    KEYPAIR *kp = create_keypair();
+    CHUNK *receivers = read_in_recv_keys_path(session_key_path);
+
+    CHUNK *ret = create_crypt4gh_header(
+        session_key,
+        kp->private,
+        receivers->chunk,
+        receivers->len
+    );
+
+    free_keypair(kp);
+    free_chunk(receivers);
+
+    return ret;
+}
+
+/*
+Encrypt a part of a file.
+*/
+CHUNK *encrypt_file_part(
+    const uint8_t *session_key,
+    size_t len_segment,
+    const uint8_t *fpath,
+    const size_t segment_offset
+)
+{
+    CHUNK *ret = allocate_chunk();
+
+    // Calculate the size of the encrypted segment.
+    size_t cipherlen_segment = len_segment / 65536 * 65564
+    if (len_segment % 65536 > 0) {
+        cipherlen_segment += len_segment % 65536 + 28;
+    }
+    ret->chunk = malloc(cipherlen_segment);
+
+    int fdinput = open(fpath, NULL, O_RDONLY);
+    if (input == NULL) {
+        return -1;
+    }
+    lseek(fdinput, segment_offset, SEEK_SET);
+
+    uint8_t srcbuf[65536];
+    int nread = 0;
+    int nwrite = 0;
+
+    for (let i = 0; i < cipherlen_segment; i + 65536) {
+        nread = read(fdinput, srcbuf, 65536);
+        crypt4gh_segment_encrypt(
+            session_key,
+            srcbuf,
+            nread,
+            ret->chunk + i,
+            &nwrite
+        );
+        ret->len += nwrite;
+    }
+
+    return ret;
+}

@@ -150,3 +150,6 @@ static
 devproxy/swiftui-proxy.*
 Procfile.*
 *.pem
+
+# Development build files
+**/.devres/

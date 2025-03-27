@@ -84,6 +84,8 @@ const store = createStore({
     },
     s3endpoint: "",
     s3client: undefined,
+    s3upload: undefined,
+    s3download: undefined,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -269,6 +271,12 @@ const store = createStore({
     },
     setS3Client(state, payload) {
       state.s3client = payload;
+    },
+    setS3Upload(state, payload) {
+      state.s3upload = payload;
+    },
+    setS3Download(state, payload) {
+      state.s3download = payload;
     },
   },
   actions: {

@@ -21,7 +21,7 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
-import { getUser, signedFetch } from "@/common/api";
+import { getEC2Credentials, getUser, signedFetch } from "@/common/api";
 import { getProjects } from "@/common/api";
 
 // Import SharingView and Request API
@@ -49,8 +49,12 @@ import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
-import { validateS3Access } from "@/common/dominate";
-import { getClient } from "@/common/s3conv";
+import {
+  discoverEndpoint,
+  getClient,
+  verifyS3ConnectionAvailable,
+} from "@/common/s3conv";
+import S3UploadSocket from "@/common/s3upload";
 
 checkIDB().then(result => {
   if (!result) {
@@ -323,11 +327,29 @@ const app = createApp({
         }
       }
 
+      // Initialize the frontend S3 client
       let s3client = await getClient(
         this.$store.state.active.id,
         this.$store.state.s3endpoint,
       );
+      await verifyS3ConnectionAvailable(s3client);
       this.$store.commit("setS3Client", s3client);
+
+      // Initialize the S3 upload implementation
+      let ec2creds = await getEC2Credentials(this.active.id);
+      let s3endpoint = await discoverEndpoint();
+      let s3upsocket = S3UploadSocket(
+        this.active.id,
+        this.active.name,
+        this.$store,
+        this.$t,
+        s3client,
+        ec2creds.access,
+        ec2creds.secret,
+        s3endpoint,
+      );
+      this.$store.state.commit("setS3Upload", s3upsocket);
+      // Same for s3download
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");

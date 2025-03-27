@@ -1,0 +1,3 @@
+[submodule "submodules/local-single-host-ceph"]
+	path = submodules/local-single-host-ceph
+	url = ssh://git@gitlab.ci.csc.fi:10022/sds-dev/sd-connect/local-single-host-ceph.git

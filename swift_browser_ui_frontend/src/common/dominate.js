@@ -3,7 +3,7 @@ SD Submit sharing functionality
 */
 
 import { PutBucketPolicyCommand } from "@aws-sdk/client-s3";
-import { GET, POST, updateContainerMeta, updateObjectMeta } from "./api";
+import { GET, updateContainerMeta, updateObjectMeta } from "./api";
 import { DEV } from "./conv";
 import { getCurrentISOtime } from "./globalFunctions";
 import { getDB } from "./db";
