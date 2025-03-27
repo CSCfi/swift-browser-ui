@@ -65,7 +65,10 @@ async def handle_validate_authentication(
     handler: swift_browser_ui.common.types.AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
+    # TODO: better configuration for conditional skipping of anonymous endpoints
     if request.path == "/health":
+        return await handler(request)
+    if "/ids/" in request.path and request.method in {"GET", "OPTIONS"}:
         return await handler(request)
 
     try:
