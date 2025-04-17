@@ -1,0 +1,14 @@
+FROM debian:latest
+
+RUN apt-get update && apt-get -y upgrade
+RUN apt-get -y install chromium ca-certificates xinit openssh-server
+RUN mkdir -p /root/.ssh
+
+ADD .devres/ca/devCA.crt /usr/local/share/ca-certificates/devCA.crt
+ADD .devres/ssh/chrome-dev.pub /root/.ssh/authorized_keys
+
+RUN update-ca-certificates
+RUN mkdir -p /run/sshd
+
+EXPOSE 22
+CMD ["/sbin/sshd", "-D"]
