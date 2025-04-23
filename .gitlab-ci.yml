@@ -86,6 +86,7 @@ wasm-test:
     - cd swift_browser_ui_frontend/wasm
     - ceedling
 
+# This job creates the automated releases
 release-job:
   extends: .automated-release
   release:
@@ -104,6 +105,18 @@ release-job:
         - name: ${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
           url: https://${ARTIFACTORY_SERVER}/sds/swift-sharing-request:${RELEASE_VERSION}
           link_type: image
+
+# This is a manual dry-run for developers to run in the merge request
+update-versions-dryrun:
+  extends: .update-versions-dryrun
+  variables:
+    UPDATE_VERSION_FILES_LIST: "docs/_static/openapi.yaml;docs/source/conf.py;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
+
+# This job updates the versions
+update-versions:
+  extends: .update-versions
+  variables:
+    UPDATE_VERSION_FILES_LIST: "docs/_static/openapi.yaml;docs/source/conf.py;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
 
 deploy:
   rules:
