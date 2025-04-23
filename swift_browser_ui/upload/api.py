@@ -282,7 +282,9 @@ async def handle_project_key(request: aiohttp.web.Request) -> aiohttp.web.Respon
     """Answer project specific encryption keys."""
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
-    public_key = await vault_client.get_public_key(project)
+    # Skip creating public keys for x-project access
+    skip_create = "for" in request.query
+    public_key = await vault_client.get_public_key(project, skip_create=skip_create)
 
     return aiohttp.web.Response(
         text=public_key,

@@ -65,7 +65,10 @@ async def handle_validate_authentication(
     handler: swift_browser_ui.common.types.AiohttpHandler,
 ) -> aiohttp.web.Response:
     """Handle the authentication of a response as a middleware function."""
+    # TODO: better configuration for conditional skipping of anonymous endpoints
     if request.path == "/health":
+        return await handler(request)
+    if "/ids/" in request.path and request.method in {"GET", "OPTIONS"}:
         return await handler(request)
 
     try:
@@ -83,7 +86,11 @@ async def handle_validate_authentication(
 
     if "db_conn" in request.app:
         project = ""
-        if "project" in request.match_info:
+        if "/keys" in request.path and request.method == "GET" and "for" in request.query:
+            project = request.query["for"]
+            LOGGER.debug("Using x-project access for project public key.")
+            LOGGER.debug(f"Using {project} as project for request token.")
+        elif "project" in request.match_info:
             LOGGER.debug(f"Using main project for {request}.")
             project = request.match_info["project"]
         elif "owner" in request.match_info:
