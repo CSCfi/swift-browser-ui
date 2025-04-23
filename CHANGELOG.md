@@ -7,6 +7,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2025.4.0] - 2025-04-23
+
+### Changed
+
+- (users) other projects name can now be queried from the API using the `Sharing ID`
+- allow fetching other projects public key if it exists in Vault
+- anonymous `GET` access to id cache is now allowed
+
 ## [2025.2.0] - 2025-02-11
 
 ### Changed
@@ -520,7 +528,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.2.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.0...HEAD
+[2025.4.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.2.0...2025.4.0
 [2025.2.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.2...2025.2.0
 [2024.10.2]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.1...2024.10.2
 [2024.10.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.0...2024.10.1
