@@ -7,6 +7,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2025.4.1] - 2025-04-24
+
+### Added
+
+- Automated version number updating procedure
+
+### Changed
+
+- Updated dependencies
+
 ## [2025.4.0] - 2025-04-23
 
 ### Changed
@@ -528,7 +538,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.1...HEAD
+[2025.4.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.0...2025.4.1
 [2025.4.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.2.0...2025.4.0
 [2025.2.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.2...2025.2.0
 [2024.10.2]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2024.10.1...2024.10.2
