@@ -1,0 +1,79 @@
+services:
+  dev-dns:
+    build:
+      context: ./devproxy
+      dockerfile: Dockerfile-dns
+    image: swiftui-dev-dns:dev-latest
+    volumes:
+      - ./devproxy/dev_dnsmasq.conf:/etc/dnsmasq.conf
+    expose:
+      - 53
+    cap_add:
+      - NET_ADMIN
+    networks:
+      sd-connect-dev:
+        ipv4_address: 172.31.2.2
+
+  dev-proxy:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-nginx
+    image: swiftui-dev-proxy:dev-latest
+    environment:
+      - DOCKER_NETWORK_GATEWAY=172.31.1.1
+      - DEV_CEPH_ADDRESS=172.31.0.5
+    networks:
+      sd-connect-dev:
+        ipv4_address: 172.31.2.3
+    dns: 172.31.2.2
+    ports:
+      - 7443:7443
+      - 8079:8079
+      - 8078:8078
+      - 8443:8443
+      - 9443:9443
+      - 10443:10443
+      - 11443:11443
+    expose:
+      - 7443
+      - 8079
+      - 8078
+      - 8443
+      - 9443
+      - 10443
+      - 11443
+
+  dev-ff:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-ff
+    image: swiftui-dev-ff:dev-latest
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    ports:
+      - 3022:22
+    expose:
+      - 22
+
+  dev-chrome:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-chrome
+    image: swiftui-dev-chrome:dev-latest
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    ports:
+      - 3122:22
+    expose:
+      - 22
+
+networks:
+  sd-connect-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.2.0/23
+          ip_range: 172.31.3.0/24
+          gateway: 172.31.2.1

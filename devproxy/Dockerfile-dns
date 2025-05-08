@@ -1,0 +1,11 @@
+FROM debian:bookworm
+
+
+RUN apt-get -y update && apt-get -y upgrade
+RUN apt-get -y install dnsmasq
+
+VOLUME /etc/dnsmasq
+
+EXPOSE 53 53/udp
+
+ENTRYPOINT [ "dnsmasq", "-k" ]

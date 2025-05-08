@@ -4,26 +4,34 @@ dev:
 	echo "Not yet implemented"
 
 dev-ff: dev-ca
-	mkdir -p .devres/ssh
-	ssh-keygen -t ed25519 -f .devres/ssh/ff-dev -q -N ""
-	docker build -t dev-ff -f devproxy/Dockerfile-ff .
-	docker run --rm -p 3022:22 -d --name development-ca-firefox dev-ff
-	ssh -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox
-	docker rm -f development-ca-firefox
+	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox
 
 dev-chromium: dev-ca
-	mkdir -p .devres/ssh
-	ssh-keygen -t ed25519 -f .devres/ssh/chrome-dev -q -N ""
-	docker build -t dev-chrome -f devproxy/Dockerfile-chrome .
-	docker run --rm -p 3122:22 -d --name development-ca-chrome dev-chrome
-	ssh -i .devres/ssh/chrome-dev -XC -p 3122 root@localhost chromium --no-sandbox
-	docker rm -f development-ca-chrome
+	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 root@localhost chromium --no-sandbox
 
 dev-ca:
 	mkdir -p $(PWD)/.devres/ca
+	mkdir -p $(PWD)/.devres/ssh
 	if [[ -z $$(ls $(PWD)/.devres/ca) ]]; then \
 		$(PWD)/scripts/gen_ca.sh; \
 	fi
+	if [[ -z $$(ls $(PWD)/.devres/ssh) ]]; then \
+		ssh-keygen -t ed25519 -f .devres/ssh/ff-dev -q -N ""; \
+		ssh-keygen -t ed25519 -f .devres/ssh/chrome-dev -q -N ""; \
+	fi
+
+dev-ca-clean:
+	rm -rf .devres
+	ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3022' ; ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3122'
+
+dev-docker-build:
+	docker compose -f docker-compose-dev.yml build
+
+dev-docker-up:
+	docker compose -f docker-compose-dev.yml up
+
+dev-docker-down:
+	docker compose -f docker-compose-dev.yml down
 
 ceph-up:
 	$(MAKE) -C submodules/local-single-host-ceph up || make ceph-bootstrap

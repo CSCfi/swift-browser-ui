@@ -1,14 +1,23 @@
 FROM debian:latest
 
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install firefox-esr ca-certificates xinit openssh-server
+RUN apt-get -y install firefox-esr ca-certificates xinit openssh-server libnss3-tools
 RUN mkdir -p /root/.ssh
 
-ADD .devres/ca/devCA.crt /usr/local/share/ca-certificates/devCA.crt
-ADD .devres/ssh/ff-dev.pub /root/.ssh/authorized_keys
+ADD ./.devres/ca/sd-connect.devca.crt /usr/local/share/ca-certificates/sd-connect.devca.crt
+ADD ./.devres/ca/sd-connect.devca.crt /usr/share/ca-certificates/mozilla/sd-connect.devca.crt
+ADD ./.devres/ca/sd-connect.devca.crt /root/.mozilla/certificates/sd-connect.devca.crt
+ADD ./.devres/ca/sd-connect.devca.crt /usr/lib/mozilla/certificates/sd-connect.devca.crt
+
+ADD ./.devres/ssh/ff-dev.pub /root/.ssh/authorized_keys
 
 RUN update-ca-certificates
 RUN mkdir -p /run/sshd
+
+RUN mkdir -p /etc/firefox/policies
+RUN echo '{"policies": {"Certificates": {"Install": ["/usr/local/share/ca-certificates/sd-connect.devca.crt"]}}}' > /etc/firefox/policies/policies.json
+
+RUN (firefox --headless &) ; sleep 5
 
 EXPOSE 22
 CMD ["/sbin/sshd", "-D"]
