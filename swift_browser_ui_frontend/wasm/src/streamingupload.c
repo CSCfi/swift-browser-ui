@@ -112,15 +112,15 @@ CHUNK *encrypt_file_part(
     CHUNK *ret = allocate_chunk();
 
     // Calculate the size of the encrypted segment.
-    size_t cipherlen_segment = len_segment / 65536 * 65564
+    size_t cipherlen_segment = len_segment / 65536 * 65564;
     if (len_segment % 65536 > 0) {
         cipherlen_segment += len_segment % 65536 + 28;
     }
     ret->chunk = malloc(cipherlen_segment);
 
-    int fdinput = open(fpath, NULL, O_RDONLY);
-    if (input == NULL) {
-        return -1;
+    int fdinput = open(fpath, O_RDONLY);
+    if (fdinput == 0) {
+        return NULL;
     }
     lseek(fdinput, segment_offset, SEEK_SET);
 
@@ -128,7 +128,7 @@ CHUNK *encrypt_file_part(
     int nread = 0;
     int nwrite = 0;
 
-    for (let i = 0; i < cipherlen_segment; i + 65536) {
+    for (int i = 0; i < cipherlen_segment; i + 65536) {
         nread = read(fdinput, srcbuf, 65536);
         crypt4gh_segment_encrypt(
             session_key,

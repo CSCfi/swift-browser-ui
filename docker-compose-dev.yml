@@ -20,7 +20,7 @@ services:
       dockerfile: devproxy/Dockerfile-nginx
     image: swiftui-dev-proxy:dev-latest
     environment:
-      - DOCKER_NETWORK_GATEWAY=172.31.1.1
+      - DOCKER_NETWORK_GATEWAY=172.31.2.1
       - DEV_CEPH_ADDRESS=172.31.0.5
     networks:
       sd-connect-dev:
