@@ -2,7 +2,7 @@ openapi: "3.0.3"
 info:
   title: "Swift Browser UI"
   description: "API for querying Openstack Swift as well as working with Openstack Swift ACLs in order to enable sharing action."
-  version: "2025.4.1"
+  version: "2025.6.0"
   license:
     name: MIT
 tags:
