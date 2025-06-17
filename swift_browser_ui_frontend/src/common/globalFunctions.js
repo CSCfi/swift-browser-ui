@@ -52,9 +52,13 @@ export async function getSharingContainers (projectId, signal) {
 }
 
 export async function getSharedContainers (projectId, signal) {
-  return store.state.client
+  let ret = store.state.client
     ? await store.state.client.getAccess(projectId, signal)
     : [];
+
+  return ret.filter(accessEntry => {
+    return accessEntry.owner != projectId;
+  });
 }
 
 export async function getAccessDetails (
