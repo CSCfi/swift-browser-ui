@@ -1,0 +1,12 @@
+FROM docker.io/hashicorp/vault:1.19
+
+VOLUME /gosrc
+
+RUN apk update && apk add go wget
+
+ADD ./scripts/vault-docker.sh /vault-docker.sh
+ADD ./.github/config/vault_policy.hcl /vault_policy.hcl
+
+RUN chmod a+x /vault-docker.sh
+
+ENTRYPOINT [ "/vault-docker.sh" ]

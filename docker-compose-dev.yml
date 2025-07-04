@@ -26,6 +26,8 @@ services:
       sd-connect-dev:
         ipv4_address: 172.31.2.3
     dns: 172.31.2.2
+    depends_on:
+      - dev-dns
     ports:
       - 7443:7443
       - 8079:8079
@@ -53,6 +55,8 @@ services:
     networks:
       - sd-connect-dev
     dns: 172.31.2.2
+    depends_on:
+      - dev-dns
     ports:
       - 3022:22
     expose:
@@ -66,10 +70,80 @@ services:
     networks:
       - sd-connect-dev
     dns: 172.31.2.2
+    depends_on:
+      - dev-dns
     ports:
       - 3122:22
     expose:
       - 22
+
+  dev-redis:
+    image: docker.io/redis:7-bullseye
+    networks:
+      - sd-connect-dev
+    ports:
+      - 6379
+    expose:
+      - 6379
+    env_file:
+      - .env
+
+  db-psql:
+    image: docker.io/postgres:14-bullseye
+    env_file:
+      - .env
+    networks:
+      - sd-connect-dev
+    volumes:
+      - ./.github/config/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    ports:
+      - 5432
+    expose:
+      - 5432
+
+  dev-ui:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-ui
+    image: swiftui-dev-ui:dev-latest
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    volumes:
+      - .:/src
+    env_file:
+      - .env
+    ports:
+      - 8000
+      - 8081
+      - 9090
+      - 9091
+      - 9092
+    expose:
+      - 8000
+      - 8081
+      - 9090
+      - 9091
+      - 9092
+
+  dev-vault:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-vault
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    image: swiftui-dev-vault:dev-latest
+    volumes:
+      - ./submodules/c4gh-transit:/gosrc
+    ports:
+      - 8200
+    expose:
+      - 8200
 
 networks:
   sd-connect-dev:

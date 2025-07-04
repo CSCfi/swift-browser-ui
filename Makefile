@@ -1,21 +1,21 @@
 SHELL := /bin/bash
 
 dev-up:
-	make ceph-up
-	docker compose -f docker-compose-dev.yml up -d
-	honcho start
+	# make ceph-up
+	docker compose -f docker-compose-dev.yml up
+	# honcho start
 
 dev-all:
 	@echo Building the whole development environment
 	make ceph-up
 	make dev-ca
 	docker compose -f docker-compose-dev.yml build
-	docker compose -f docker-compose-dev.yml up -d
-	honcho start
+	docker compose -f docker-compose-dev.yml up
+	# honcho start
 
 dev-down:
 	docker compose -f docker-compose-dev.yml down
-	ceph-down
+	# make ceph-down
 
 dev-ff: dev-ca
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox

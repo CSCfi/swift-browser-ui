@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:bookworm
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get -y install chromium ca-certificates xinit openssh-server libnss3-tools
@@ -14,6 +14,7 @@ RUN mkdir -p /run/sshd
 # sleep is necessary so chromium has time to fail and exit -> required to initialize browser configuration
 RUN (chromium --headless --no-sandbox &); sleep 5
 # Install the root CA to Chrome DB
+# RUN mkdir -p /root/.pki/nssdb && certutil -d /root/.pki/nssdb -N --empty-password
 RUN certutil -d sql:/root/.pki/nssdb -A -t "TCu" -n "sd-connect.devenv CA" -i /usr/local/share/ca-certificates/sd-connect.devca.crt
 
 EXPOSE 22
