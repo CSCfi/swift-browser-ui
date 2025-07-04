@@ -52,7 +52,7 @@ import { removeFocusClass } from "@/common/keyboardNavigation";
 import {
   discoverEndpoint,
   getClient,
-  verifyS3ConnectionAvailable,
+  listBuckets,
 } from "@/common/s3conv";
 import S3UploadSocket from "@/common/s3upload";
 
@@ -332,13 +332,13 @@ const app = createApp({
         this.$store.state.active.id,
         this.$store.state.s3endpoint,
       );
-      await verifyS3ConnectionAvailable(s3client);
+
       this.$store.commit("setS3Client", s3client);
 
       // Initialize the S3 upload implementation
       let ec2creds = await getEC2Credentials(this.active.id);
       let s3endpoint = await discoverEndpoint();
-      let s3upsocket = S3UploadSocket(
+      let s3upsocket = new S3UploadSocket(
         this.active.id,
         this.active.name,
         this.$store,
@@ -348,7 +348,7 @@ const app = createApp({
         ec2creds.secret,
         s3endpoint,
       );
-      this.$store.state.commit("setS3Upload", s3upsocket);
+      this.$store.commit("setS3Upload", s3upsocket);
       // Same for s3download
     };
     initialize().then(() => {

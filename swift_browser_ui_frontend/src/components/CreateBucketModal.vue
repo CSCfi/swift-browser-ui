@@ -56,7 +56,7 @@
           <b>{{ active.name }}</b>.
         </p>
         <c-link
-          :href="projectInfoLink"
+          :href="projectIn§ink"
           underline
           target="_blank"
         >
@@ -88,7 +88,6 @@
 </template>
 
 <script>
-import { swiftCreateContainer } from "@/common/api";
 import { tokenize, getTimestampForContainer } from "@/common/conv";
 import { getDB } from "@/common/db";
 
@@ -109,6 +108,7 @@ import BucketNameValidation from "./BucketNameValidation.vue";
 import { toRaw } from "vue";
 import { debounce } from "lodash";
 
+import { CreateBucketCommand } from "@aws-sdk/client-s3";
 
 export default {
   name: "CreateBucketModal",
@@ -137,6 +137,9 @@ export default {
     },
     modalVisible() {
       return this.$store.state.openCreateBucketModal;
+    },
+    s3client() {
+      return this.$store.state.s3client;
     },
   },
   watch: {
@@ -167,11 +170,15 @@ export default {
       let projectID = this.$route.params.project;
       const bucketName = toRaw(this.bucketName);
       const tags = toRaw(this.tags);
-      swiftCreateContainer(projectID, bucketName, tags.join(";"))
-        .then(async () => {
-          const containerTimestamp = await getTimestampForContainer(
-            projectID, bucketName, this.controller.signal);
 
+      const createBucketInput = {
+        Bucket: bucketName,
+      };
+      const createBucketCmd = new CreateBucketCommand(createBucketInput);
+      this.s3client.send(createBucketCmd).then(async () => {
+        const containerTimestamp = await getTimestampForContainer(
+          projectID, bucketName, this.controller.signal);
+        
           getDB().containers.add({
             projectID: projectID,
             name: bucketName,
@@ -181,44 +188,34 @@ export default {
             bytes: 0,
             last_modified: getCurrentISOtime(containerTimestamp*1000),
           });
-        }).then(() => {
-          swiftCreateContainer(projectID, `${bucketName}_segments`, [])
-            .then(() => {
-              getDB().containers.add({
-                projectID: projectID,
-                name: `${bucketName}_segments`,
-                tokens: [],
-                tags: [],
-                count: 0,
-                bytes: 0,
-              });
-            });
-          this.toggleCreateBucketModal(keypress);
+      }).then(() => {
+        this.toggleCreateBucketModal(keypress);
 
-          this.$router.push({
-            name: "AllBuckets",
-            params: {
-              project: this.active.id,
-              user: this.uname,
-            },
-          });
-          this.$store.commit("setNewBucket", bucketName);
-        })
-        .catch(err => {
-          let errorMessage = this.$t("message.error.createFail");
-          if (err.message.match("Container name already in use")) {
-            errorMessage = this.$t("message.error.inUseOtherPrj");
-          } else if (err.message.match("Invalid container or tag name")) {
-            errorMessage = this.$t("message.error.invalidName");
+        this.$router.push({
+          name: "AllBuckets",
+          params: {
+            project: this.active.id,
+            user: this.uname,
           }
-          document.querySelector("#createModal-toasts").addToast(
-            {
-              id: "create-toast",
-              progress: false,
-              type: "error",
-              message: errorMessage },
-          );
         });
+
+        this.$store.commit("setNewBucket", bucketName);
+      }).catch(err => {
+        let errorMessage = this.$t("message.error.createFail");
+        if (err.message.match("Container name already in use")) {
+          errorMessage = this.$t("message.error.inUseOtherPrj");
+        } else if (err.message.match("Invalid container or tag name")) {
+          errorMessage = this.$t("message.error.invalidName");
+        }
+        document.querySelector("#createModal-toasta").addToast(
+          {
+            id: "creat-toast",
+            progress: false,
+            type: "error",
+            message: errorMessage,
+          },
+        );
+      });
     },
     toggleCreateBucketModal: function (keypress) {
       this.$store.commit("toggleCreateBucketModal", false);

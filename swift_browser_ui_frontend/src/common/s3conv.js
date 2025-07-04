@@ -4,6 +4,7 @@
 import {
   S3Client,
   ListObjectsCommand,
+  ListBucketsCommand,
   PutBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
 import { getEC2Credentials, GET } from "./api";
@@ -17,28 +18,11 @@ export async function discoverEndpoint() {
   return resp.s3api_endpoint;
 }
 
-// Test that the S3 connection is available and working.
-export async function verifyS3ConnectionAvailable(client) {
-  if (DEV) {
-    const input = {
-      Bucket: "nonexistent-test-bucket",
-    };
-    const command = new ListObjectsCommand(input);
-    const response = await client.send(command);
-
-    console.log(response);
-  }
-}
-
 // Create a client for accessing the S3 API
 export async function getClient(project, endpoint) {
   let creds = await getEC2Credentials(project);
   let client = new S3Client({
-    region: "RegionOne",
-    stsRegionalEndpoints: "legacy",
-    s3UsEast1RegionalEndpoint: "legacy",
-    s3ForcePathStyle: true,
-    forcePathStyle: true,
+    region: "us-east-1",
     endpoint: endpoint,
     credentials: {
       accessKeyId: creds.access,
@@ -47,6 +31,17 @@ export async function getClient(project, endpoint) {
   });
 
   return client;
+}
+
+export async function listBuckets(client) {
+  const input = {
+    MaxBuckets: 1000,
+    BucketRegion: "us-east-1",
+  };
+
+  const command = new ListBucketsCommand(input);
+  const resp = await client.send(command);
+  console.log(resp);
 }
 
 async function checkOldPolicy(client, bucket) {
