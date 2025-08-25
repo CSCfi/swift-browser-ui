@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 dev-up:
 	# make ceph-up
-	docker compose -f docker-compose-dev.yml up
+	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 	# honcho start
 
 dev-all:
@@ -10,7 +10,7 @@ dev-all:
 	make ceph-up
 	make dev-ca
 	docker compose -f docker-compose-dev.yml build
-	docker compose -f docker-compose-dev.yml up
+	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 	# honcho start
 
 dev-down:
@@ -21,7 +21,7 @@ dev-ff: dev-ca
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox
 
 dev-chromium: dev-ca
-	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 root@localhost chromium --no-sandbox
+	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox
 
 dev-ca:
 	mkdir -p $(PWD)/.devres/ca
@@ -42,7 +42,7 @@ dev-docker-build:
 	docker compose -f docker-compose-dev.yml build
 
 dev-docker-up:
-	docker compose -f docker-compose-dev.yml up
+	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 
 dev-docker-down:
 	docker compose -f docker-compose-dev.yml down

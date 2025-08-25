@@ -33,6 +33,12 @@ const DOWNLOAD_UNENCRYPTED_SEGMENT_SIZE = 52428800; // 50 MiB
 
 let s3client = undefined;
 
+waitAsm().then(() => {
+  console.log("Assmebler initialized, initalizing entropy source...");
+  Module.ccall("libinit", undefined, undefined, undefined);
+  console.log("Entropy source initalized.");
+});
+
 /*
 This script supports being loaded both as a ServiceWorker and an ordinary
 worker. The former is to provide support for Firefox and Safari, which only

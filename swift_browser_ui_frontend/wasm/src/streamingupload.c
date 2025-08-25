@@ -109,6 +109,7 @@ CHUNK *encrypt_file_part(
     const size_t segment_offset
 )
 {
+    printf("Allocating encryption chunk\n");
     CHUNK *ret = allocate_chunk();
 
     // Calculate the size of the encrypted segment.
@@ -117,19 +118,27 @@ CHUNK *encrypt_file_part(
         cipherlen_segment += len_segment % 65536 + 28;
     }
     ret->chunk = malloc(cipherlen_segment);
+    printf("Segment length is %u\n", cipherlen_segment);
 
+    printf("Opening input file in path %s for encryption.\n", fpath);
     int fdinput = open(fpath, O_RDONLY);
     if (fdinput == 0) {
         return NULL;
     }
+    printf("Seeking %u bytes from file %s.\n", segment_offset, fpath);
     lseek(fdinput, segment_offset, SEEK_SET);
 
     uint8_t srcbuf[65536];
     int nread = 0;
-    int nwrite = 0;
+    size_t nwrite = 0;
 
-    for (int i = 0; i < cipherlen_segment; i + 65536) {
+    for (int i = 0; i < cipherlen_segment; i = i + 65564) {
         nread = read(fdinput, srcbuf, 65536);
+
+        if (nread < 0) {
+            printf("Failed to read file. Errno is %d.\n", errno);
+        }
+
         crypt4gh_segment_encrypt(
             session_key,
             srcbuf,
@@ -140,5 +149,6 @@ CHUNK *encrypt_file_part(
         ret->len += nwrite;
     }
 
+    printf("Successfully encrypted a segment of %u bytes for file %s.", cipherlen_segment, fpath);
     return ret;
 }

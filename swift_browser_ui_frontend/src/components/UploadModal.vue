@@ -326,6 +326,9 @@ export default {
     socket() {
       return this.$store.state.socket;
     },
+    s3socket() {
+      return this.$store.state.s3upload;
+    },
     abortReason() {
       return this.$store.state.uploadAbortReason;
     },
@@ -878,13 +881,19 @@ export default {
       );
       this.$store.commit("setNewBucket", bucketName);
 
-      this.socket.addUpload(
+      this.s3socket.addEncryptedUploads(
         bucketName,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
-        owner,
-        ownerName,
       );
+
+      // this.socket.addUpload(
+      //   folderName,
+      //   this.$store.state.dropFiles.map(item => item),
+      //   this.recvkeys.map(item => item),
+      //   owner,
+      //   ownerName,
+      // );
     },
     beginEncryptedUpload() {
       this.aBeginEncryptedUpload().then(() => {

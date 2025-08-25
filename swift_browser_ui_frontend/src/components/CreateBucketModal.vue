@@ -178,16 +178,16 @@ export default {
       this.s3client.send(createBucketCmd).then(async () => {
         const containerTimestamp = await getTimestampForContainer(
           projectID, bucketName, this.controller.signal);
-        
-          getDB().containers.add({
-            projectID: projectID,
-            name: bucketName,
-            tokens: tokenize(bucketName),
-            tags: tags,
-            count: 0,
-            bytes: 0,
-            last_modified: getCurrentISOtime(containerTimestamp*1000),
-          });
+
+        getDB().containers.add({
+          projectID: projectID,
+          name: bucketName,
+          tokens: tokenize(bucketName),
+          tags: tags,
+          count: 0,
+          bytes: 0,
+          last_modified: getCurrentISOtime(containerTimestamp*1000),
+        });
       }).then(() => {
         this.toggleCreateBucketModal(keypress);
 
@@ -196,7 +196,7 @@ export default {
           params: {
             project: this.active.id,
             user: this.uname,
-          }
+          },
         });
 
         this.$store.commit("setNewBucket", bucketName);

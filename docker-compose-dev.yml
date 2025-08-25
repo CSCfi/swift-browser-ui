@@ -54,6 +54,8 @@ services:
     image: swiftui-dev-ff:dev-latest
     networks:
       - sd-connect-dev
+    volumes:
+      - ./test-data:/root/test-data
     dns: 172.31.2.2
     depends_on:
       - dev-dns
@@ -67,13 +69,14 @@ services:
       context: .
       dockerfile: devproxy/Dockerfile-chrome
     image: swiftui-dev-chrome:dev-latest
+    user: chromeuser:chromeuser
     networks:
       - sd-connect-dev
     dns: 172.31.2.2
     depends_on:
       - dev-dns
     ports:
-      - 3122:22
+      - 3122:3122
     expose:
       - 22
 

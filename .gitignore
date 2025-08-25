@@ -153,3 +153,4 @@ Procfile.*
 
 # Development build files
 **/.devres/
+**/test-data/

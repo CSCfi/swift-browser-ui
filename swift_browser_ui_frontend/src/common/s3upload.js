@@ -36,6 +36,9 @@ import {
   CreateMultipartUploadCommand,
   CompleteMultipartUploadCommand,
 } from "@aws-sdk/client-s3";
+import {
+  timeout,
+} from "./globalFunctions";
 import { DEV } from "./conv";
 
 const MAX_UPLOAD_WORKERS = 8;
@@ -121,7 +124,7 @@ export default class S3UploadSocket {
 
     for (const worker of this.upWorkers) {
       worker.postMessage({
-        command: "openS3Client",
+        command: "createS3Client",
         access: this.s3access,
         secret: this.s3secret,
         endpoint: this.s3endpoint,
@@ -132,22 +135,37 @@ export default class S3UploadSocket {
   getUploadWorkerHandler(worker) {
     return (e) => {
       switch(e.data.eventType) {
-        case "uploadPartCompelete":
+        case "uploadPartComplete":
           if (DEV) {
             console.log(
-              `Multipart chunk ${e.data.orderNumber} for object ${e.data.key} was completed.`,
+              `A segment for ${e.data.bucket}/${e.data.key} was finished.`,
             );
           }
-          // eslint-disable-next-line
-          this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].done = true;
-          this.checkFinishedFile(e.data.bucket, e.data.key).then(() => {
-            if (DEV) console.log(`Checked if file ${bucket}/${key} is finished.`);
-          });
+          if (this.uploads[e.data.bucket][e.data.key].isMultipart) {
+            if (DEV) {
+              console.log(
+                `Multipart chunk ${e.data.orderNumber} for object ${e.data.key} was completed. ETag was ${e.data.ETag}`,
+              );
+            }
+
+            // eslint-disable-next-line
+            this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].ETag = e.data.ETag;
+            // eslint-disable-next-line
+            this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].done = true;
+
+            this.checkFinishedFile(e.data.bucket, e.data.key).then(() => {
+              if (DEV) console.log(`Checked if file ${e.data.bucket}/${e.data.key} is finished.`);
+            });
+          } else {
+            console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
+            this.uploads[e.data.bucket][e.data.key].finished = true;
+          }
 
           // Schedule next part if there's more to process,
           // otherwise check if we're done.
           if (this.parts.length > 0) {
-            worker.postMessage({ command: "next", part: this.parts.pop() });
+            console.log("Sending next part to worker.");
+            this.getNextPart(worker);
           } else {
             this.checkFinished().then(
               () => {
@@ -207,9 +225,25 @@ export default class S3UploadSocket {
     if (finished) {
       if (DEV) console.log(`File ${bucket}/${key} is finished, completing multipart.`);
       this.uploads[bucket][key].finished = true;
+
+      let parts = [];
+      for (
+        const entry of Object.entries(this.uploads[bucket][key].multipartParts)
+      ) {
+        parts.push({
+          PartNumber: Number(entry[0]),
+          ETag: entry[1].ETag.replaceAll("\"", ""),
+        });
+      }
+
+      console.log(parts);
+
       const input = {
         Bucket: bucket,
         Key: key,
+        MultipartUpload: {
+          Parts: parts,
+        },
         UploadId: this.uploads[bucket][key].multipartSession,
       };
       const command = new CompleteMultipartUploadCommand(input);
@@ -222,10 +256,25 @@ export default class S3UploadSocket {
 
   async getNextPart(worker) {
     let nextPart = this.parts.pop();
+
+    if (nextPart === undefined) {
+      return;
+    }
+
+    if (this.uploads[nextPart.bucket][nextPart.key].multipartKeyPending){
+      while (
+        this.uploads[nextPart.bucket][nextPart.key].multipartSession === ""
+      ) {
+        await timeout(250);
+      }
+    }
+
     if (
       this.uploads[nextPart.bucket][nextPart.key].isMultipart
       && this.uploads[nextPart.bucket][nextPart.key].multipartSession === ""
     ) {
+      this.uploads[nextPart.bucket][nextPart.key].multipartKeyPending = true;
+
       const input = {
         ACL: "bucket-owner-full-control",
         Bucket: nextPart.bucket,
@@ -237,7 +286,7 @@ export default class S3UploadSocket {
       this.uploads[nextPart.bucket][nextPart.key].multipartSession = response.UploadId;
 
       if (DEV) {
-        console.log(`Starting upload for ${nextPart} with upload id ${response.UploadId}`);
+        console.log(`Starting upload for ${nextPart.bucket}/${nextPart.key} with upload id ${response.UploadId}`);
       }
     }
     worker.postMessage({
@@ -267,10 +316,15 @@ export default class S3UploadSocket {
           bucket: bucket,
           key: key,
           secret: secret,
-          orderNumber: i,
+          orderNumber: i + 1,
           size: FILE_PART_SIZE,
           offset: i * FILE_PART_SIZE,
         });
+        this.uploads[bucket][key].multipartParts[i + 1] = {
+          offset: i * FILE_PART_SIZE,
+          size: FILE_PART_SIZE,
+          done: false,
+        };
       }
 
       if (finalPart > 0) {
@@ -282,6 +336,11 @@ export default class S3UploadSocket {
           size: finalPart,
           offset: partsTotal * FILE_PART_SIZE,
         });
+        this.uploads[bucket][key].multipartParts[partsTotal + 1] = {
+          offset: partsTotal * FILE_PART_SIZE,
+          size: finalPart,
+          done: false,
+        };
       }
     } else {
       this.parts.push({
@@ -314,30 +373,36 @@ export default class S3UploadSocket {
     }
     this.headersNeeded = files.length;
 
+    if (DEV) console.log("Adding the listed files to the worker filesystems.");
+    for (const worker of this.upWorkers) {
+      console.log(worker);
+      worker.postMessage({
+        command: "mountFiles",
+        bucket: bucket,
+        files: files,
+      });
+    }
+
     for (const file of files) {
       if (DEV) console.log(`Adding file ${file}`);
       this.uploads[bucket][file.relativePath] = {
         size: file.size,
         isMultipart: file.size > 100 * 1024 * 1024,
         multipartSession: "",
+        multipartKeyPending: false,
         multipartParts: {},
         finished: false,
         f: file,
       };
 
-      if (DEV) console.log(`Adding file ${file.relativePath} to the worker filesystems`);
-      for (worker of this.upWorkers) {
-        worker.postMessage(
-          { command: "mountFile", bucket: bucket, file: file },
-        );
-      }
+      console.log(this.uploads[bucket][file.relativePath]);
 
       this.headerWorker.postMessage({
         command: "createHeader",
         bucket: bucket,
         key: file.relativePath,
         receivers: receivers,
-        file: this.uploads[bucket][file.relativePath],
+        // file: this.uploads[bucket][file.relativePath],
       });
 
       this.totalSize += file.size;
