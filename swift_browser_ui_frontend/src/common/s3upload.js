@@ -39,6 +39,9 @@ import {
 import {
   timeout,
 } from "./globalFunctions";
+import {
+  signedFetch,
+} from "./api";
 import { DEV } from "./conv";
 
 const MAX_UPLOAD_WORKERS = 8;
@@ -240,7 +243,7 @@ export default class S3UploadSocket {
 
       const input = {
         Bucket: bucket,
-        Key: key,
+        Key: key.concat(".c4gh"),
         MultipartUpload: {
           Parts: parts,
         },
@@ -278,7 +281,7 @@ export default class S3UploadSocket {
       const input = {
         ACL: "bucket-owner-full-control",
         Bucket: nextPart.bucket,
-        Key: nextPart.key,
+        Key: nextPart.key.concat(".c4gh"),
       };
       const command = new CreateMultipartUploadCommand(input);
       const response = await this.client.send(command);
@@ -354,6 +357,17 @@ export default class S3UploadSocket {
     }
 
     if (DEV) console.log(`Header for ${bucket}/${key}: ${header}`);
+
+    // Push header to Vault
+    let headerBase = this.$store.state.uploadEndpoint;
+    let headerPath = `/header/${this.project}/${bucket}/${key}.c4gh`;
+    await signedFetch(
+      "PUT",
+      headerBase,
+      headerPath,
+      header,
+    );
+
     this.headersAdded++;
 
     if (this.headersNeeded == this.headersAdded) {

@@ -20,7 +20,7 @@ ADD ./.devres/ssh/chrome-dev.pub /home/chromeuser/.ssh/authorized_keys
 USER chromeuser
 RUN (chromium --headless --no-sandbox &); sleep 5
 # Install the root CA to Chrome DB
-RUN mkdir -p /home/chromeuser/.pki/nssdb && certutil -d /home/chromeuser/.pki/nssdb -N --empty-password
+# RUN mkdir -p /home/chromeuser/.pki/nssdb && certutil -d /home/chromeuser/.pki/nssdb -N --empty-password
 RUN certutil -d sql:/home/chromeuser/.pki/nssdb -A -t "TCu" -n "sd-connect.devenv CA" -i /usr/local/share/ca-certificates/sd-connect.devca.crt
 
 EXPOSE 3122

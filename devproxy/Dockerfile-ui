@@ -1,6 +1,12 @@
 FROM python:3.12-bookworm
 
-COPY . /tmpsrc
+COPY ./swift_browser_ui /tmpsrc/swift_browser_ui
+COPY ./swift_browser_ui_frontend /tmpsrc/swift_browser_ui_frontend
+COPY ./requirements.txt /tmpsrc/requirements.txt
+COPY ./pyproject.toml /tmpsrc/pyproject.toml
+COPY ./README.md /tmpsrc/README.md
+
+RUN rm /tmpsrc/swift_browser_ui/ui/static && mkdir /tmpsrc/swift_browser_ui/ui/static
 
 RUN cd tmpsrc && pip install --break-system-packages . && pip install --break-system-packages .[dev] && cd / && rm -rf tmpsrc
 

@@ -80,7 +80,7 @@ async function encryptSegment (e) {
       Body: enBody,
       Bucket: e.data.part.bucket,
       ContentLength: enChunkLen,
-      Key: e.data.part.key,
+      Key: e.data.part.key.concat(".c4gh"),
       PartNumber: e.data.part.orderNumber,
       UploadId: e.data.session,
     };
@@ -90,7 +90,7 @@ async function encryptSegment (e) {
       Body: enBody,
       Bucket: e.data.part.bucket,
       ContentLength: enChunkLen,
-      Key: e.data.part.key,
+      Key: e.data.part.key.concat(".c4gh"),
     }
     command = new PutObjectCommand(input);
   }
@@ -141,7 +141,7 @@ self.addEventListener("message", (e) => {
       console.log("Successfully added the listed files.");
       postMessage({
         eventType: "filesAdded",
-      })
+      });
       break;
     case "nextPart":
       encryptSegment(e).then(() => {});
