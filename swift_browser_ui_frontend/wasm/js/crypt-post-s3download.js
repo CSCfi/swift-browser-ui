@@ -623,7 +623,7 @@ self.addEventListener("message", async (e) => {
   if (checkPollutingName(e.data.bucket)) return;
 
   switch(e.data.command) {
-    case "initS3Client":
+    case "createS3Client":
       createS3Client(e.data.access, e.data.secret, e.data.endpoint);
       break;
     case "downloadFile":

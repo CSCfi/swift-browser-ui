@@ -55,6 +55,7 @@ import {
   listBuckets,
 } from "@/common/s3conv";
 import S3UploadSocket from "@/common/s3upload";
+import S3DownloadSocket from "@/common/s3download";
 
 checkIDB().then(result => {
   if (!result) {
@@ -349,7 +350,17 @@ const app = createApp({
         s3endpoint,
       );
       this.$store.commit("setS3Upload", s3upsocket);
-      // Same for s3download
+      // Initialize the S3 download implementation
+      let s3downsocket = new S3DownloadSocket(
+        this.active.id,
+        this.active.name,
+        this.$store,
+        this.$t,
+        ec2creds.access,
+        ec2creds.secret,
+        s3endpoint,
+      );
+      this.$store.commit("setS3Download", s3downsocket);
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");

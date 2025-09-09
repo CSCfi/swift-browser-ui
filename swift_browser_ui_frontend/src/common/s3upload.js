@@ -1,4 +1,4 @@
-// Functions for handling s3 upload and download worker communication
+// Functions for handling s3 upload and header worker communication
 
 /*
 Upload cache schema:
