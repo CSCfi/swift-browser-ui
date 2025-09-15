@@ -429,7 +429,7 @@ export default {
           })
           .map(item => item.name);
 
-        this.$store.state.socket.addDownload(
+        this.$store.state.s3download.addDownload(
           this.$route.params.container,
           folderFiles,
           this.$route.params.owner ? this.$route.params.owner : "",
@@ -440,7 +440,7 @@ export default {
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       } else {
-        this.$store.state.socket.addDownload(
+        this.$store.state.s3download.addDownload(
           this.$route.params.container,
           [object.name],
           this.$route.params.owner ? this.$route.params.owner : "",

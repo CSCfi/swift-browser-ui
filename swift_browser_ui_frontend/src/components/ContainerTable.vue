@@ -51,10 +51,10 @@ import {
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import {
-  getObjects,
-  swiftDeleteContainer,
-  swiftDeleteObjects,
-} from "@/common/api";
+  DeleteBucketCommand,
+  ListObjectsV2Command,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 export default {
   name: "ContainerTable",
@@ -461,28 +461,46 @@ export default {
       }
       else { //delete empty bucket without confirmation
         const projectID = this.$route.params.project;
-        swiftDeleteContainer(
-          projectID,
-          container,
-        ).then(async() => {
-          /*
-            In case the upload was initially cancelled and
-            regular container has no uploaded objects yet (0 item), but
-            segment container does have, we need to check and delete
-            segment objects first before deleting the segment container
-          */
-          const segment_objects =  await getObjects(
-            projectID,
-            `${container}_segments`,
-          );
-          if(segment_objects) {
-            await swiftDeleteObjects(
-              projectID,
-              `${container}_segments`,
-              segment_objects.map(obj => obj.name),
+        let deleteBucketCommand = new DeleteBucketCommand({
+          Bucket: container,
+        });
+        this.$store.state.s3client.send(
+          deleteBucketCommand,
+        ).then(async(resp) => {
+          // In case the bucket has a legacy segments bucket still in
+          // existence we should take care of that as well
+          const segmentsBucket = `${container}_segments`;
+          let segment_objects = [];
+          do {
+            // Fetch a new page of objects until we run out
+            for (const key of segment_objects) {
+              let objectDeleteCommand = DeleteObjectCommand({
+                Bucket: segmentsBucket,
+                Key: key.Key,
+              });
+              await $store.state.s3client.send(objectDeleteCommand);
+            }
+
+            let objectsListCommand = ListObjectsV2Command({
+              Bucket: segmentsBucket,
+              MaxKeys: 1000,
+            });
+            let objectListResp = await $store.state.s3client.send(
+              objectsListCommand,
             );
-            await swiftDeleteContainer(projectID, `${container}_segments`);
-          }
+            if (
+              objectListResp.Contents !== undefined
+              && objectListResp.length > 0
+            ) {
+              let segment_objects = objectListResp.Contents;
+            }
+          } while(segment_objects.length > 0);
+
+          // Finally delete the segments bucket
+          let deleteSegmentsBucketCommand = new DeleteBucketCommand({
+            Bucket: segmentsBucket,
+          });
+          await this.$store.state.s3client.send(deleteSegmentsBucketCommand);
 
           document.querySelector("#container-toasts").addToast(
             { progress: false,

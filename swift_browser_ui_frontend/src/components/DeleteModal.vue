@@ -57,7 +57,6 @@
 </template>
 
 <script>
-import { swiftDeleteObjects, getObjects } from "@/common/api";
 import { getDB } from "@/common/db";
 
 import { isFile } from "@/common/globalFunctions";
@@ -67,6 +66,10 @@ import {
   removeFocusClass,
   moveFocusOutOfModal,
 } from "@/common/keyboardNavigation";
+import {
+  DeleteObjectCommand,
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
 
 export default {
   name: "DeleteModal",
@@ -158,14 +161,21 @@ export default {
 
           if (segment_container) {
             // Equivalent object from segment container needs to be deleted
-            const segment_objects =  await getObjects(
-              this.owner ? this.owner : this.projectID,
-              segment_container.name,
+            // We can filter the deleted segments objects by prefix
+            let listSegmentsCommand = new ListObjectsV2Command({
+              Bucket: segment_container,
+              Prefix: object.name,
+            });
+            const segmentObjectsResp = await this.$store.state.s3client.send(
+              listSegmentsCommand,
             );
-            const filtered_segment_objects = segment_objects.filter(obj =>
-              obj.name.includes(`${object.name}/`));
-            for (const segment_obj of filtered_segment_objects) {
-              segments_to_remove.push(segment_obj.name);
+            if (
+              segmentObjectsResp.Contents !== undefined
+              && segmentObjectsResp.Contents.length > 0
+            ) {
+              for (const segment_obj of segmentObjectsResp.Contents) {
+                segments_to_remove.push(segment_obj.Key);
+              }
             }
           }
         } else {
@@ -182,26 +192,27 @@ export default {
       );
       await getDB().objects.bulkDelete(objIDs);
 
-      swiftDeleteObjects(
-        this.owner || this.projectID,
-        this.container,
-        to_remove,
-      ).then(async () => {
-        if (segments_to_remove.length > 0) {
-          await swiftDeleteObjects(
-            this.owner || this.projectID,
-            segment_container.name,
-            segments_to_remove,
-          );
-        }
+      for(const obj of to_remove) {
+        let deleteObjectCommand = new DeleteObjectCommand({
+          Bucket: this.container,
+          Key: obj,
+        });
+        await this.$store.state.s3client.send(deleteObjectCommand);
+      }
+      for(const obj of segments_to_remove) {
+        let deleteObjectCommand = new DeleteObjectCommand({
+          Bucket: segment_container.name,
+          Key: obj,
+        });
+        await this.$store.state.s3client.send(deleteObjectCommand);
+      }
 
-        const dataTable = document.getElementById("obj-table");
-        dataTable.clearSelections();
+      const dataTable = document.getElementById("obj-table");
+      dataTable.clearSelections();
 
-        this.toggleDeleteModal();
+      this.toggleDeleteModal();
 
-        this.getDeleteMessage(to_remove, selectedFolder);
-      });
+      this.getDeleteMessage(to_remove, selectedFolder);
     },
     getDeleteMessage: async function(to_remove, selectedFolder) {
       // Only files can be deleted

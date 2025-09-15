@@ -170,9 +170,9 @@
 
 <script>
 import {
-  GET,
-  addAccessControlMeta,
+  addAccessControlBucketPolicy,
   getSharedContainerAddress,
+  signedFetch,
 } from "@/common/api";
 
 import {
@@ -432,36 +432,17 @@ export default {
         rights.push("r");
       }
 
-      await addAccessControlMeta(
-        this.$route.params.project,
+      await addAccessControlBucketPolicy(
         bucket,
         rights,
         this.tags,
+        this.$store.state.s3client,
       );
-
-      await addAccessControlMeta(
-        this.$route.params.project,
-        `${this.bucketName}_segments`,
+      await addAccessControlBucketPolicy(
+        `${bucket}_segments`,
         rights,
         this.tags,
-      );
-
-      let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${bucket}`);
-      let signed = await GET(signatureUrl);
-      signed = await signed.json();
-
-      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
-        `/cryptic/${this.$store.state.active.name}/${bucket}`,
-      ));
-
-      whitelistUrl.searchParams.append(
-        "valid",
-        signed.valid,
-      );
-      whitelistUrl.searchParams.append(
-        "signature",
-        signed.signature,
+        this.$store.state.s3client,
       );
 
       let toShare = [];
@@ -473,12 +454,12 @@ export default {
 
       // Add access to cross-project sharing in case of read or read+write
       if (this.read | this.write) {
-        await fetch(
-          whitelistUrl,
-          {
-            method: "PUT",
-            body: JSON.stringify(toShare),
-          },
+        await signedFetch(
+          "PUT",
+          this.$store.state.uploadEndpoint,
+          `/cryptic/${this.$store.state.active.name}/${bucket}`,
+          JSON.stringify(toShare),
+          [],
         );
       }
 

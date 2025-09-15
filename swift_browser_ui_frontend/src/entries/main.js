@@ -311,10 +311,6 @@ const app = createApp({
         this.$store.commit("appendPubKey", key);
       }
 
-      this.initSocket().then(
-        () => {if (DEV) console.log("Initialized the websocket.");},
-      );
-
       await this.$store.dispatch("initSDSubmit");
       if (DEV) {
         if (
@@ -373,41 +369,6 @@ const app = createApp({
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
-    initSocket: async function () {
-      // Open the upload and download webworkers
-      let available = await navigator.storage.estimate();
-      // If there's less than 50GiB of storage available, try getting more.
-      // We're probably on Firefox, persisting should grant us more.
-      if (available.quota < 53687091200) {
-        await navigator.storage.persist();
-        if (await navigator.storage.persisted()) {
-          if (DEV) console.log("Storage persisted.");
-          // Update the quotas
-          available = await navigator.storage.estimate();
-        } else {
-          if (DEV) console.log(
-            "Couldn't persist storage, "
-            + "possible limited save space for downloads.",
-          );
-        }
-      }
-
-      if (DEV) console.log(
-        `${available.usage}/${available.quota} of available storage used.`,
-      );
-      if (DEV) console.log(
-        "Any downloads need to fit under this size when downloading.",
-      );
-
-      let workers = new UploadSocket(
-        this.$store.state.active,
-        this.$store.state.active.id,
-        this.$store,
-        this.$t,
-      );
-      workers.openSocket();
-      this.$store.commit("setSocket", workers);
-    },
     containerSyncWrapper: function () {
       syncContainerACLs(this.$store);
     },
