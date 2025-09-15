@@ -35,6 +35,8 @@ Parts cache schema:
 import {
   CreateMultipartUploadCommand,
   CompleteMultipartUploadCommand,
+  HeadBucketCommand,
+  CreateBucketCommand,
 } from "@aws-sdk/client-s3";
 import {
   timeout,
@@ -382,7 +384,45 @@ export default class S3UploadSocket {
 
   // Add files for encrypted upload
   async addEncryptedUploads(bucket, files, receivers) {
+    // If the upload is already defined, we're adding files to an ongoing
+    // upload – no need to check existence or initialization.
     if (this.uploads[bucket] === undefined) {
+      // Check that the bucket exists and can be accessed
+      let bucketAccessCmd = new HeadBucketCommand({
+        Bucket: bucket,
+      });
+      let bucketResponse = await this.client.send(bucketAccessCmd);
+      switch(bucketResponse.$metadata.httpStatusCode) {
+        // Skip success
+        case 200:
+          break;
+        case 404:
+          // Try creating the bucket if it doesn't exist
+          let bucketCreateCommand = new CreateBucketCommand({
+            Bucket: bucket,
+          });
+          await this.client.send(bucketCreateCommand).catch(err => {
+            // Couldn't create the bucket for some reason, abort the
+            // upload.
+            if (DEV) console.log(`Coudln't start upload, reason: ${err}`);
+            return;
+          });
+          break;
+        case 400:
+          if (DEV) {
+            console.log(`Couldn't access bucket ${bucket} due to client error.`);
+          }
+          return;
+        case 403:
+          if (DEV) {
+            console.log(`Coudln't access bucket ${bucket} due to no access.`);
+          }
+          if (DEV) {
+            console.log("The bucket is probably owned by someone else.");
+          }
+          return;
+      }
+
       this.uploads[bucket] = {};
     }
     this.headersNeeded = files.length;
