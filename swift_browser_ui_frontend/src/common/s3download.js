@@ -22,7 +22,7 @@ import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
-import { DEV } from "./conf";
+import { DEV } from "./conv";
 
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
