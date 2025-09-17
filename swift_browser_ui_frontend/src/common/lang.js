@@ -294,27 +294,28 @@ let default_translations = {
         copy_folder: "Copy folder: ",
         name_newFolder: "Name new folder",
       },
-      tokens: {
-        empty: "No API tokens created for the project",
-        title: "Create API tokens",
-        identifier: "Active tokens for this project",
-        identLabel: "Name of the new token",
+      apiKeys: {
+        empty: "There are no API keys in this project.",
+        title: "Create API keys",
+        identifier: "Active keys for this project",
+        identLabel: "Key name",
         identHint:
-          "Token name needs to be unique. Please avoid special characters.",
-        createToken: "Create token",
-        latestToken: "Latest token: ",
-        copy: "Copy token",
+          "Give a name to your API key. Name needs to be unique.",
+        create: "Create key",
+        latest: "Latest key: ",
+        copy: "Copy key",
         copyWarning:
-          "Token will be displayed just this once " +
+          "API key will be displayed just this once " +
           "and recovering it is not be possible. " +
-          "Please store the token somewhere " +
+          "Please store the key somewhere " +
           "safe before closing this modal. " +
-          "The token will be valid for 24 hours, and " +
+          "The key will be valid for 24 hours, and " +
           "will be deleted after this time period.",
-        tokenCopied: "Token copied.",
-        tokenRemoved: "Token removed.",
-        inUse: "Token name already in use.",
-        creationFailed: "Token creation failed.",
+        copied: "API key copied.",
+        removed: "API key removed.",
+        inUse: "API key name already in use",
+        required: "API key name is required",
+        creationFailed: "API key creation failed.",
       },
       encrypt: {
         uploadFiles: "Upload files",
@@ -390,7 +391,7 @@ let default_translations = {
         userGuideLink: "#",
         projectInfo: "Project information",
         projectInfoBaseLink: "#",
-        createTokens: "Create API tokens",
+        createAPIKeys: "Create API keys",
       },
       footerMenu: {
         title: "Swift browser",
@@ -847,16 +848,15 @@ let default_translations = {
         copy_folder: "Kopioi kansio: ",
         name_newFolder: "Nimeä uusi kansio",
       },
-      tokens: {
+      apiKeys: {
         empty: "Tälle projektille ei ole luotu API-avaimia",
         title: "Luo API-avaimia",
         identifier: "Tämän projektin aktiiviset API-avaimet",
-        identLabel: "Uuden avaimen nimi",
+        identLabel: "Avaimen nimi",
         identHint:
-          "Avaimen nimen on oltava yksilöllinen. Vältä erikoismerkkien " +
-          "käyttöä.",
-        createToken: "Luo avain",
-        latestToken: "Viimeisin avain: ",
+          "Anna avaimelle nimi. Avaimen nimen on oltava yksilöllinen.",
+        create: "Luo avain",
+        latest: "Viimeisin avain: ",
         copy: "Kopioi avain",
         copyWarning:
           "Avain näytetään vain tämän kerran, " +
@@ -865,10 +865,11 @@ let default_translations = {
           "ennen kuin suljet tämän ikkunan. " +
           "Avain on luomisen jälkeen voimassa 24 tuntia, jonka jälkeen " +
           "se poistetaan automaattisesti.",
-        tokenCopied: "Avain kopioitu.",
-        tokenRemoved: "Avain poistettu.",
+        copied: "Avain kopioitu.",
+        removed: "Avain poistettu.",
         creationFailed: "Avaimen luonti epäonnistui.",
-        inUse: "Avaimen nimi on jo käytössä.",
+        inUse: "Avaimen nimi on jo käytössä",
+        required: "Avaimen nimi on pakollinen",
       },
       encrypt: {
         uploadFiles: "Lataa tiedostoja",
@@ -943,7 +944,7 @@ let default_translations = {
         userGuideLink: "#",
         projectInfo: "Projektin tiedot",
         projectInfoBaseLink: "#",
-        createTokens: "Luo API-avaimia",
+        createAPIKeys: "Luo API-avaimia",
       },
       footerMenu: {
         title: "Swift browser",

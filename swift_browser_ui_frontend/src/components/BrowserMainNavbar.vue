@@ -168,8 +168,8 @@ export default {
               href: this.projectInfoLink,
             },
             {
-              title: this.$t("message.supportMenu.createTokens"),
-              action: () => this.openTokenModal(),
+              title: this.$t("message.supportMenu.createAPIKeys"),
+              action: () => this.openAPIKeyModal(),
             },
           ],
         },
@@ -208,18 +208,18 @@ export default {
         window.open(item.href, "_blank");
       }
     },
-    openTokenModal() {
-      this.$store.commit("toggleTokenModal", true);
+    openAPIKeyModal() {
+      this.$store.commit("toggleAPIKeyModal", true);
       setPrevActiveElement();
 
-      const tokenModal = document.getElementById("token-modal");
-      disableFocusOutsideModal(tokenModal);
+      const apiKeyModal = document.getElementById("api-key-modal");
+      disableFocusOutsideModal(apiKeyModal);
 
-      // Focus on token input field first when opening token modal
+      // Focus on API key input field first when opening the modal
       setTimeout(() => {
-        const tokenInput = document.getElementById("token-input")
+        const apiKeyInput = document.getElementById("api-key-input")
           .getElementsByTagName("input")[0];
-        tokenInput.focus();
+        apiKeyInput.focus();
       }, 300);
     },
   },

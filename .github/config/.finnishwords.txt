@@ -500,6 +500,7 @@ paikkaan
 paina
 painikkeella
 painikkeesta
+pakollinen
 pakollista
 palaa
 palautetta
