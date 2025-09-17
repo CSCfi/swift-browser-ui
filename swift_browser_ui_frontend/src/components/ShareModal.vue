@@ -647,7 +647,7 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  max-height: 65vh;
+  max-height: 75vh;
 }
 
 @media screen and (max-width: 767px), (max-height: 580px) {
