@@ -33,7 +33,7 @@ import {
   mdiTrayArrowDown,
   mdiShareVariantOutline,
   mdiDotsHorizontal,
-  mdiFolder,
+  mdiPail,
 } from "@mdi/js";
 import {
   toggleEditTagsModal,
@@ -202,7 +202,7 @@ export default {
                 params: {
                   href: "javascript:void(0)",
                   color: "dark-grey",
-                  path: mdiFolder,
+                  path: mdiPail,
                   iconFill: "primary",
                   iconStyle: {
                     marginRight: "1rem",
