@@ -261,7 +261,7 @@ let default_translations = {
         deleteSuccess: "Bucket was deleted.",
         folderName: "Bucket name",
       },
-      subfolders: {
+      folders: {
         deleteNote:
           "Folders are deleted by deleting all " + "items in them.",
         deleteOneSuccess: "Folder was deleted.",
@@ -813,7 +813,7 @@ let default_translations = {
         deleteSuccess: "Ämpäri poistettu",
         folderName: "Ämpärin nimi",
       },
-      subfolders: {
+      folders: {
         deleteNote:
           "Kansion poistaminen edellyttää sen kaikkien " +
           "tiedostojen poistamista.",

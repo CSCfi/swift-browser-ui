@@ -359,7 +359,7 @@ export default {
         toggleDeleteModal([item]);
         if (keypress) this.moveFocusToDeleteModal();
       } else {
-        addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
+        addErrorToastOnMain(this.$t("message.folders.deleteNote"));
       }
     },
     getCurrentContainer: function () {
@@ -505,7 +505,7 @@ export default {
         item => selection.indexOf(item.name) > -1,
       );
 
-      /* Subfolders should also be selected and then filtered out from
+      /* Folders should also be selected and then filtered out from
         deletableObjects later
       */
       if (this.checkedRows.length < selection.length) {
@@ -612,12 +612,12 @@ export default {
           icon: "mdi-trash-can-outline",
           testid: "delete-checked-files",
           action: () => {
-            // If only subfolders checked, don't show Delete modal
+            // If only folders checked, don't show Delete modal
             if (this.renderFolders) {
-              const subfoldersOnly = this.checkedRows.every((item) =>
+              const foldersOnly = this.checkedRows.every((item) =>
                 item.name.includes("/"));
-              if (subfoldersOnly) {
-                addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
+              if (foldersOnly) {
+                addErrorToastOnMain(this.$t("message.folders.deleteNote"));
                 this.clearSelections();
                 return;
               }

@@ -17,19 +17,19 @@
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
-        <span :class="subfolders === '' ? 'last' : 'default'">
+        <span :class="folders === '' ? 'last' : 'default'">
           &nbsp;{{ folder }}
         </span>
       </router-link>
 
       <router-link
-        v-for="item, i in subfolders"
+        v-for="item, i in folders"
         :key="item"
         :to="getPath(i)"
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
-        <span :class="i === subfolders.length-1 ? 'last': 'default'">
+        <span :class="i === folders.length-1 ? 'last': 'default'">
           &nbsp;{{ item }}
         </span>
       </router-link>
@@ -45,7 +45,7 @@ export default {
     folder() {
       return this.$route.params.container;
     },
-    subfolders() { //array of subfolder titles
+    folders() { //array of folder titles
       return this.$route.query.prefix != undefined ?
         this.$route.query.prefix.split("/") : "";
     },
@@ -58,7 +58,7 @@ export default {
       this.$emit("breadcrumbClicked", true);
     },
     getPath(index) {
-      if (index === this.subfolders.length-1) {
+      if (index === this.folders.length-1) {
 
         return { name: this.currentRoute, query:
           { prefix: this.$route.query.prefix }};

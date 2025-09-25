@@ -81,7 +81,7 @@ export default {
         ? this.$store.state.deletableObjects
         : [];
     },
-    subfolders() {
+    folders() {
       return this.$route.query.prefix ?
         this.$route.query.prefix.split("/") : [];
     },
@@ -135,7 +135,7 @@ export default {
       let to_remove = [];
       let segments_to_remove = []; // Array for segment objects to be deleted
       let segment_container = null;
-      let selectedSubfolder = false;
+      let selectedFolder = false;
 
       const isSegmentsContainer = this.container.endsWith("_segments");
 
@@ -169,9 +169,9 @@ export default {
             }
           }
         } else {
-          //flag if user is trying to delete a subfolder
+          //flag if user is trying to delete a folder
           //when folders rendered
-          selectedSubfolder = true;
+          selectedFolder = true;
         }
       }
 
@@ -200,12 +200,12 @@ export default {
 
         this.toggleDeleteModal();
 
-        this.getDeleteMessage(to_remove, selectedSubfolder);
+        this.getDeleteMessage(to_remove, selectedFolder);
       });
     },
-    getDeleteMessage: async function(to_remove, selectedSubfolder) {
+    getDeleteMessage: async function(to_remove, selectedFolder) {
       // Only files can be deleted
-      // Show warnings when deleting subfolders
+      // Show warnings when deleting folders
       if (to_remove.length > 0) {
         let msg;
         to_remove.length === 1?
@@ -213,34 +213,34 @@ export default {
           : msg = to_remove.length +
             this.$t("message.objects.deleteManySuccess");
 
-        if (this.subfolders.length && this.renderedFolders) {
-          //get all files uppermost subfolder contains
+        if (this.folders.length && this.renderedFolders) {
+          //get all files uppermost folder contains
           const folderFiles = await getDB().objects
-            .filter(obj => obj.name.startsWith(this.subfolders[0])
+            .filter(obj => obj.name.startsWith(this.folders[0])
               && obj.container === this.container)
             .toArray();
           if (folderFiles.length < 1) {
-            //if all subfolders empty, go to container
-            //see if more than one subfolder removed
-            this.subfolders.length > 1 ?
-              msg = this.$t("message.subfolders.deleteManySuccess") :
-              msg = this.$t("message.subfolders.deleteOneSuccess");
+            //if all folders empty, go to bucket
+            //see if more than one folder removed
+            this.folders.length > 1 ?
+              msg = this.$t("message.folders.deleteManySuccess") :
+              msg = this.$t("message.folders.deleteOneSuccess");
             this.$router.push({name: "ObjectsView"});
           }
           else {
             let newPrefix = this.prefix;
-            for (let level=0; level < this.subfolders.length; level++) {
+            for (let level=0; level < this.folders.length; level++) {
               let found = folderFiles.find(obj =>
                 obj.name.startsWith(newPrefix));
               if (found !== undefined) {
                 //if file with this prefix found
-                //go to containing subfolder
+                //go to containing folder
                 //files found at same level: leave "file(s) deleted" ^
-                //otherwise show "subfolder(s) deleted"
+                //otherwise show "folder(s) deleted"
                 if (level > 0) {
                   level > 1 ?
-                    msg = this.$t("message.subfolders.deleteManySuccess") :
-                    msg = this.$t("message.subfolders.deleteOneSuccess");
+                    msg = this.$t("message.folders.deleteManySuccess") :
+                    msg = this.$t("message.folders.deleteOneSuccess");
                   let path =
                     {name: "ObjectsView", query: { prefix: newPrefix}};
                   this.$router.push(path);
@@ -248,7 +248,7 @@ export default {
                 break;
               } else {
                 //files with this prefix not found
-                //go up a subfolder and check again
+                //go up a folder and check again
                 newPrefix = newPrefix
                   .substring(0, newPrefix.lastIndexOf("/"));
               }
@@ -262,13 +262,13 @@ export default {
           },
         );
       }
-      if (selectedSubfolder) {
-        //if selected files include subfolders
+      if (selectedFolder) {
+        //if selected files include folders
         document.querySelector("#objects-toasts").addToast(
           {
             progress: false,
             type: "error",
-            message: this.$t("message.subfolders.deleteNote"),
+            message: this.$t("message.folders.deleteNote"),
           },
         );
       }

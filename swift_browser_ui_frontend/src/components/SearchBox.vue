@@ -172,7 +172,7 @@ export default {
         .limit(1000)
         .toArray();
 
-      let subfolders = [];
+      let folders = [];
 
       const objForCount = await getDB().objects
         .filter(obj => containerIDs.includes(obj.containerID))
@@ -182,11 +182,11 @@ export default {
       objects.forEach(obj => {
         if (obj.name.includes("/")) {
           const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
-          const index = subfolders.findIndex(sub => sub.name === subName
+          const index = folders.findIndex(sub => sub.name === subName
             && sub.container === obj.container);
           if (index < 0) {
             let count = 0;
-            //add its subfolders' content
+            //add its folders' content
             const size = objForCount.reduce((result, o) => {
               if (o.name.startsWith(subName) && o.container === obj.container) {
                 count++;
@@ -195,19 +195,19 @@ export default {
               return result;
             }, 0);
 
-            let subfolder = {
+            let folder = {
               container: obj.container, name: subName,
-              subfolder: true, bytes: size, count: count,
+              folder: true, bytes: size, count: count,
               owner: obj.containerOwner,
             };
 
-            subfolders.push(subfolder);
+            folders.push(folder);
           }
         }
       });
 
       this.searchResults = this.searchResults
-        .concat(subfolders.map(item => ({
+        .concat(folders.map(item => ({
           ...item, value: item.name,
         })).sort(rankedSort).slice(0, 100))
         .concat(objects.map(item => ({
@@ -223,7 +223,7 @@ export default {
       let route = {};
 
       let prefix = null;
-      if (item.subfolder) prefix = item.name;
+      if (item.folder) prefix = item.name;
       else if (item.name.includes("/")) { //for objects
         prefix = item.name.slice(0, item.name.lastIndexOf("/"));
       }

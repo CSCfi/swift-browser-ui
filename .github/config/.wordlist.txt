@@ -96,8 +96,6 @@ slo
 ssl
 sso
 subcommands
-subfolder
-subfolders
 svg
 swiftbrowser
 swiftrequest
