@@ -45,7 +45,7 @@
           class="link-underline"
           @click="$emit('view-container')"
         >
-          {{ $t("message.upload.viewDestinationFolder") }}
+          {{ $t("message.upload.viewDestinationBucket") }}
         </a>
       </c-row>
 

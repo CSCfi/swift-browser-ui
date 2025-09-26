@@ -123,7 +123,7 @@ export default {
     },
     isLoaderVisible() {
       return this.$store.state.isLoaderVisible
-        && this.$store.state.uploadFolder.name === this.container;
+        && this.$store.state.uploadBucket.name === this.container;
     },
     owner() {
       return this.$route.params.owner;
@@ -325,31 +325,31 @@ export default {
         if (isFile(item.name, this.$route) || !this.renderFolders) {
           items.push(item);
         } else {
-          let subName = getFolderName(item.name, this.$route);
+          let name = getFolderName(item.name, this.$route);
           //check if folder already added
           if (items.find(el => getFolderName(el.name, this.$route)
-            === subName)) {
+            === name)) {
             return items;
           } else {
             //filter objs that would belong to folder
             let folderObjs = filteredObjs.filter(obj => {
               if (getFolderName(obj.name, this.$route) ===
-                subName) {
+                name) {
                 return obj;
               }
             });
             //sort by latest last_modified
             folderObjs.sort((a, b) => sortItems(
               a, b, "last_modified", "desc"));
-            const subSize = folderObjs.reduce((sum, obj) => {
+            const folderSize = folderObjs.reduce((sum, obj) => {
               return sum += obj.bytes;
             }, 0);
-            const fullSubName = getPrefix(this.$route) + subName + "/";
+            const fullName = getPrefix(this.$route) + name + "/";
             //add new folder
             const folder = {
               container: item.container,
-              name: fullSubName,
-              bytes: subSize,
+              name: fullName,
+              bytes: folderSize,
               last_modified: folderObjs[0].last_modified,
               tags: [],
               folder: true,

@@ -465,7 +465,7 @@ export function addSegmentContainerSize(container, containers) {
 }
 
 export function sortContainer(containers) {
-  // sort "_segments" folder before original folder
+  // sort "_segments" bucket before original bucket
   return containers.sort((a, b) => {
     if (a.name === `${b.name}_segments`) {
       return -1;

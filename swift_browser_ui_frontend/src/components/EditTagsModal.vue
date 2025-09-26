@@ -87,9 +87,9 @@ export default {
         ? this.$store.state.selectedObjectName
         : "";
     },
-    selectedFolderName() {
-      return this.$store.state.selectedFolderName.length > 0
-        ? this.$store.state.selectedFolderName
+    selectedBucketName() {
+      return this.$store.state.selectedBucketName.length > 0
+        ? this.$store.state.selectedBucketName
         : "";
     },
     projectID() {
@@ -109,7 +109,7 @@ export default {
           this.isObject = true;
           this.getObject();
         }
-        else if (this.selectedFolderName?.length > 0) {
+        else if (this.selectedBucketName?.length > 0) {
           this.isObject = false;
           this.getContainer();
         }
@@ -142,7 +142,7 @@ export default {
     getContainer: async function () {
       this.container = await getDB().containers.get({
         projectID: this.projectID,
-        name: this.selectedFolderName,
+        name: this.selectedBucketName,
       });
 
       if (!this.container?.tags) {
@@ -157,7 +157,7 @@ export default {
     toggleEditTagsModal: function (keypress) {
       this.$store.commit("toggleEditTagsModal", false);
       this.$store.commit("setObjectName", "");
-      this.$store.commit("setFolderName", "");
+      this.$store.commit("setBucketName", "");
       this.tags = [];
 
       /*

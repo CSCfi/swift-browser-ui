@@ -1,12 +1,12 @@
 <template>
   <c-card
-    ref="createFolderContainer"
-    class="add-folder"
-    data-testid="create-folder-modal"
+    ref="createBucketContainer"
+    class="add-bucket"
+    data-testid="create-bucket-modal"
     @keydown="handleKeyDown"
   >
     <div
-      id="createFolder-modal-content"
+      id="createBucket-modal-content"
       class="modal-content-wrapper"
     >
       <c-toasts
@@ -23,13 +23,13 @@
           {{ $t("message.container_ops.norename") }}
         </p>
         <c-text-field
-          id="newFolder-input"
-          v-model="folderName"
+          id="newBucket-input"
+          v-model="bucketName"
           v-csc-control
-          :label="$t('message.container_ops.folderName')"
-          name="foldername"
+          :label="$t('message.container_ops.bucketName')"
+          name="bucketname"
           aria-required="true"
-          data-testid="folder-name"
+          data-testid="bucket-name"
           :valid="errorMsg.length === 0"
           :validation="errorMsg"
           required
@@ -38,19 +38,19 @@
         />
         <label
           class="taginput-label"
-          label-for="create-folder-taginput"
+          label-for="create-bucket-taginput"
         >
           {{ $t('message.tagName') }}
         </label>
         <TagInput
-          id="create-folder-taginput"
+          id="create-bucket-taginput"
           :tags="tags"
-          data-testid="folder-tag"
+          data-testid="bucket-tag"
           @addTag="addingTag"
           @deleteTag="deletingTag"
         />
         <p class="info-text is-size-6">
-          {{ $t("message.container_ops.createdFolder") }}
+          {{ $t("message.container_ops.createdBucket") }}
           <b>{{ active.name }}</b>.
         </p>
         <c-link
@@ -67,15 +67,15 @@
       <c-button
         outlined
         size="large"
-        data-testid="cancel-save-folder"
-        @click="toggleCreateFolderModal(false)"
-        @keyup.enter="toggleCreateFolderModal(true)"
+        data-testid="cancel-save-bucket"
+        @click="toggleCreateBucketModal(false)"
+        @keyup.enter="toggleCreateBucketModal(true)"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
-        data-testid="save-folder"
+        data-testid="save-bucket"
         @click="createContainer(false)"
         @keyup.enter="createContainer(true)"
       >
@@ -94,7 +94,7 @@ import {
   addNewTag,
   deleteTag,
   getProjectNumber,
-  validateFolderName,
+  validateBucketName,
   getCurrentISOtime,
 } from "@/common/globalFunctions";
 import {
@@ -107,11 +107,11 @@ import TagInput from "@/components/TagInput.vue";
 import { toRaw } from "vue";
 
 export default {
-  name: "CreateFolderModal",
+  name: "CreateBucketModal",
   components: { TagInput },
   data() {
     return {
-      folderName: "",
+      bucketName: "",
       tags: [],
       projectInfoLink: "",
       interacted: false, //don't show error when opening modal
@@ -133,7 +133,7 @@ export default {
       return this.$store.state.prevActiveEl;
     },
     modalVisible() {
-      return this.$store.state.openCreateFolderModal;
+      return this.$store.state.openCreateBucketModal;
     },
   },
   watch: {
@@ -141,10 +141,10 @@ export default {
       this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
         + getProjectNumber(this.active);
     },
-    folderName: function () {
+    bucketName: function () {
       this.interacted ?
-        this.errorMsg = validateFolderName(
-          this.folderName, this.$t, this.containers) :
+        this.errorMsg = validateBucketName(
+          this.bucketName, this.$t, this.containers) :
         this.errorMsg = "";
     },
     modalVisible: async function() {
@@ -157,50 +157,50 @@ export default {
   },
   methods: {
     createContainer: function (keypress) {
-      this.folderName = this.folderName.trim();
-      this.errorMsg = validateFolderName(
-        this.folderName, this.$t, this.containers);
+      this.bucketName = this.bucketName.trim();
+      this.errorMsg = validateBucketName(
+        this.bucketName, this.$t, this.containers);
       if (this.errorMsg.length) return;
 
       let projectID = this.$route.params.project;
-      const folderName = toRaw(this.folderName);
+      const bucketName = toRaw(this.bucketName);
       const tags = toRaw(this.tags);
-      swiftCreateContainer(projectID, folderName, tags.join(";"))
+      swiftCreateContainer(projectID, bucketName, tags.join(";"))
         .then(async () => {
           const containerTimestamp = await getTimestampForContainer(
-            projectID, folderName, this.controller.signal);
+            projectID, bucketName, this.controller.signal);
 
           getDB().containers.add({
             projectID: projectID,
-            name: folderName,
-            tokens: tokenize(folderName),
+            name: bucketName,
+            tokens: tokenize(bucketName),
             tags: tags,
             count: 0,
             bytes: 0,
             last_modified: getCurrentISOtime(containerTimestamp*1000),
           });
         }).then(() => {
-          swiftCreateContainer(projectID, `${folderName}_segments`, [])
+          swiftCreateContainer(projectID, `${bucketName}_segments`, [])
             .then(() => {
               getDB().containers.add({
                 projectID: projectID,
-                name: `${folderName}_segments`,
+                name: `${bucketName}_segments`,
                 tokens: [],
                 tags: [],
                 count: 0,
                 bytes: 0,
               });
             });
-          this.toggleCreateFolderModal(keypress);
+          this.toggleCreateBucketModal(keypress);
 
           this.$router.push({
-            name: "AllFolders",
+            name: "AllBuckets",
             params: {
               project: this.active.id,
               user: this.uname,
             },
           });
-          this.$store.commit("setNewFolder", folderName);
+          this.$store.commit("setNewBucket", bucketName);
         })
         .catch(err => {
           let errorMessage = this.$t("message.error.createFail");
@@ -218,9 +218,9 @@ export default {
           );
         });
     },
-    toggleCreateFolderModal: function (keypress) {
-      this.$store.commit("toggleCreateFolderModal", false);
-      this.folderName = "";
+    toggleCreateBucketModal: function (keypress) {
+      this.$store.commit("toggleCreateBucketModal", false);
+      this.bucketName = "";
       this.tags = [];
       this.create = true;
       this.interacted = false;
@@ -236,7 +236,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.createFolderContainer.querySelectorAll(
+      const focusableList = this.$refs.createBucketContainer.querySelectorAll(
         "input, c-link, c-button",
       );
       const { first, last } = getFocusableElements(focusableList);
@@ -248,7 +248,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.add-folder {
+.add-bucket {
   padding: 3rem;
   position: absolute;
   top: -1rem;
@@ -258,20 +258,20 @@ export default {
 }
 
 @media screen and (max-width: 767px), (max-height: 580px) {
-   .add-folder {
+   .add-bucket {
     top: -5rem;
   }
 }
 
 @media screen and (max-height: 580px) and (max-width: 767px),
 (max-width: 525px) {
-  .add-folder {
+  .add-bucket {
     top: -9rem;
   }
 }
 
 @media screen and (max-height: 580px) and (max-width: 525px) {
-  .add-folder {
+  .add-bucket {
     top: -13rem;
   }
 }

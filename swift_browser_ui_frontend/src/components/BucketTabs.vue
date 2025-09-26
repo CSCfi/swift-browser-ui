@@ -2,8 +2,8 @@
   <c-tab-buttons
     :value="activeTab"
     :mandatory="true"
-    data-testid="folder-tabs"
-    :aria-label="$t('label.folder_tabs')"
+    data-testid="bucket-tabs"
+    :aria-label="$t('label.bucket_tabs')"
   >
     <c-button
       v-for="tab in tabs"
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  name: "FolderTabs",
+  name: "BucketTabs",
   data: function() {
     return {
       tabs: [],
@@ -48,15 +48,15 @@ export default {
     setTabs() {
       this.tabs = [
         {
-          key: "message.folderTabs.all",
-          route: { name: "AllFolders" },
+          key: "message.bucketTabs.all",
+          route: { name: "AllBuckets" },
         },
         {
-          key: "message.folderTabs.sharedFrom",
+          key: "message.bucketTabs.sharedFrom",
           route: { name: "SharedFrom" },
         },
         {
-          key: "message.folderTabs.sharedTo",
+          key: "message.bucketTabs.sharedTo",
           route: { name: "SharedTo" },
         },
       ];

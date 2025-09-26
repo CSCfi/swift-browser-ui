@@ -3,9 +3,9 @@
     class="container-box"
     role="region"
   >
-    <FolderTabs />
+    <BucketTabs />
     <div
-      v-for="component of folderComponents"
+      v-for="component of bucketComponents"
       :key="component.name"
     >
       <component
@@ -17,16 +17,16 @@
 </template>
 
 <script>
-import FolderTabs from "@/components/FolderTabs.vue";
-import AllFoldersTable from "@/components/AllFoldersTable.vue";
+import BucketTabs from "@/components/BucketTabs.vue";
+import AllBucketsTable from "@/components/AllBucketsTable.vue";
 import SharedOutTable from "@/components/SharedOutTable.vue";
 import SharedTable from "@/components/SharedTable.vue";
 
 import { markRaw } from "vue";
 
 export default {
-  name: "FoldersView",
-  components: { FolderTabs },
+  name: "BucketsView",
+  components: { BucketTabs },
 
   // values in the 'data' property are reactive by default
   // but components shouldn't be reactive, so we use `markRaw`
@@ -34,8 +34,8 @@ export default {
   data: function() {
     return {
       activeRouteName: "",
-      folderComponents: [
-        {type: markRaw(AllFoldersTable), name: "AllFolders"},
+      bucketComponents: [
+        {type: markRaw(AllBucketsTable), name: "AllBuckets"},
         {type: markRaw(SharedTable), name: "SharedTo"},
         {type: markRaw(SharedOutTable), name: "SharedFrom"},
       ],

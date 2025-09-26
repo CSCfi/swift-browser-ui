@@ -181,14 +181,14 @@ export default {
 
       objects.forEach(obj => {
         if (obj.name.includes("/")) {
-          const subName = obj.name.substring(0, obj.name.lastIndexOf("/"));
-          const index = folders.findIndex(sub => sub.name === subName
-            && sub.container === obj.container);
+          const name = obj.name.substring(0, obj.name.lastIndexOf("/"));
+          const index = folders.findIndex(folder => folder.name === name
+            && folder.container === obj.container);
           if (index < 0) {
             let count = 0;
             //add its folders' content
             const size = objForCount.reduce((result, o) => {
-              if (o.name.startsWith(subName) && o.container === obj.container) {
+              if (o.name.startsWith(name) && o.container === obj.container) {
                 count++;
                 result += o.bytes;
               }
@@ -196,7 +196,7 @@ export default {
             }, 0);
 
             let folder = {
-              container: obj.container, name: subName,
+              container: obj.container, name: name,
               folder: true, bytes: size, count: count,
               owner: obj.containerOwner,
             };

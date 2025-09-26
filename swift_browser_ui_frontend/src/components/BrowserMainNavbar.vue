@@ -3,7 +3,7 @@
     <div class="toolbar">
       <router-link
         v-if="uname && active?.id"
-        :to="{name: 'AllFolders', params: {user: uname, project: active.id }}"
+        :to="{name: 'AllBuckets', params: {user: uname, project: active.id }}"
         :aria-label="$t('label.logo')"
       >
         <c-row align="center">

@@ -49,10 +49,10 @@ export default {
         : this.$store.state.downloadNotification.maximized;
     },
     uploadContName() {
-      return this.$store.state.uploadFolder.name;
+      return this.$store.state.uploadBucket.name;
     },
     uploadContOwner() {
-      return this.$store.state.uploadFolder.owner;
+      return this.$store.state.uploadBucket.owner;
     },
   },
   methods: {

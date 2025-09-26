@@ -41,7 +41,7 @@ import {
   getSharedContainers,
   getAccessDetails,
   getPaginationOptions,
-  toggleCopyFolderModal,
+  toggleCopyBucketModal,
   checkIfItemIsLastOnPage,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
@@ -164,17 +164,17 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      const getSharedStatus = (folderName) => {
-        if (this.sharingContainers.indexOf(folderName) > -1) {
+      const getSharedStatus = (bucketName) => {
+        if (this.sharingContainers.indexOf(bucketName) > -1) {
           return this.$t("message.table.sharing");
         } else if (this.sharedContainers.findIndex(
-          cont => cont.container === folderName) > -1) {
+          cont => cont.container === bucketName) > -1) {
           return this.$t("message.table.shared");
         }
         return "";
       };
 
-      // Filter out segment folders for rendering
+      // Filter out segment buckets for rendering
       // Map the 'accessRights' to the container if it's a shared container
       const mappedContainers = await Promise.all(
         this.conts.filter(cont => !cont.name.endsWith("_segments"))
@@ -291,7 +291,7 @@ export default {
                     },
                   },
                 },
-                // Share button is disabled for Shared (with you) Folders
+                // Share button is disabled for Shared (with you) buckets
                 {
                   value: this.$t("message.share.share"),
                   component: {
@@ -321,12 +321,12 @@ export default {
                         {
                           name: this.$t("message.copy"),
                           action: () => {
-                            this.openCopyFolderModal(item.name, item.owner);
+                            this.openCopyBucketModal(item.name, item.owner);
                             const menuItems = document
                               .querySelector("c-menu-items");
                             menuItems.addEventListener("keydown", (e) =>{
                               if (e.keyCode === 13) {
-                                this.openCopyFolderModal(
+                                this.openCopyBucketModal(
                                   item.name, item.owner, true,
                                 );
                               }
@@ -387,7 +387,7 @@ export default {
       };
     },
     async onSort(event) {
-      this.$store.commit("setNewFolder", "");
+      this.$store.commit("setNewBucket", "");
 
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
@@ -459,7 +459,7 @@ export default {
       if (objects > 0) { //if container not empty
         addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
       }
-      else { //delete empty folder without confirmation
+      else { //delete empty bucket without confirmation
         const projectID = this.$route.params.project;
         swiftDeleteContainer(
           projectID,
@@ -541,7 +541,7 @@ export default {
     onOpenShareModal(itemName, keypress) {
       this.$store.commit("toggleShareModal", true);
       this.$store.commit(
-        "setFolderName", itemName);
+        "setBucketName", itemName);
 
       if (keypress) {
         setPrevActiveElement();
@@ -566,19 +566,19 @@ export default {
         editTagsInput.focus();
       }, 300);
     },
-    openCopyFolderModal(itemName, itemOwner, keypress) {
+    openCopyBucketModal(itemName, itemOwner, keypress) {
       itemOwner
-        ? toggleCopyFolderModal(itemName, itemOwner)
-        : toggleCopyFolderModal(itemName);
+        ? toggleCopyBucketModal(itemName, itemOwner)
+        : toggleCopyBucketModal(itemName);
       if (keypress) {
         setPrevActiveElement();
-        const copyFolderModal = document.getElementById("copy-folder-modal");
-        disableFocusOutsideModal(copyFolderModal);
+        const copyBucketModal = document.getElementById("copy-bucket-modal");
+        disableFocusOutsideModal(copyBucketModal);
       }
       setTimeout(() => {
-        const copyFolderInput = document
-          .querySelector("#new-copy-folderName input");
-        copyFolderInput.focus();
+        const copyBucketInput = document
+          .querySelector("#new-copy-bucketName input");
+        copyBucketInput.focus();
       }, 300);
     },
   },

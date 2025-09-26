@@ -5,11 +5,11 @@
       align="center"
     >
       <router-link
-        :to="{ name: 'AllFolders'}"
+        :to="{ name: 'AllBuckets'}"
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-home" />
-        <span>&nbsp;{{ $t("message.folderTabs.all") }}</span>
+        <span>&nbsp;{{ $t("message.bucketTabs.all") }}</span>
       </router-link>
       <router-link
         class="link"
@@ -18,7 +18,7 @@
       >
         <i class="mdi mdi-chevron-right" />
         <span :class="folders === '' ? 'last' : 'default'">
-          &nbsp;{{ folder }}
+          &nbsp;{{ bucket }}
         </span>
       </router-link>
 
@@ -42,7 +42,7 @@
 export default {
   name: "BreadcrumbNav",
   computed: {
-    folder() {
+    bucket() {
       return this.$route.params.container;
     },
     folders() { //array of folder titles

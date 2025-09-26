@@ -20,7 +20,7 @@
       </h2>
       <c-card-content>
         <div
-          v-if="!currentFolder"
+          v-if="!currentBucket"
           id="upload-to-root"
         >
           <h3 class="title is-6">
@@ -30,11 +30,11 @@
             {{ $t("message.container_ops.norename") }}
           </p>
           <c-text-field
-            id="upload-folder-input"
-            v-model="inputFolder"
+            id="upload-bucket-input"
+            v-model="inputBucket"
             v-csc-control
-            data-testid="upload-folder-input"
-            :label="$t('message.container_ops.folderName')"
+            data-testid="upload-bucket-input"
+            :label="$t('message.container_ops.bucketName')"
             aria-required="true"
             required
             :valid="errorMsg.length === 0"
@@ -48,7 +48,7 @@
         <div v-else>
           <p>
             <b>{{ $t("message.encrypt.uploadDestination") }}</b>
-            {{ currentFolder }}
+            {{ currentBucket }}
           </p>
         </div>
         <div
@@ -241,7 +241,7 @@ import { getDB } from "@/common/db";
 
 import {
   getProjectNumber,
-  validateFolderName,
+  validateBucketName,
   checkIfItemIsLastOnPage,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
@@ -266,7 +266,7 @@ export default {
   },
   data() {
     return {
-      inputFolder: "",
+      inputBucket: "",
       addRecvkey: "",
       recvkeys: [],
       recvHashedKeys: [],
@@ -310,7 +310,7 @@ export default {
     pubkey() {
       return this.$store.state.pubkey;
     },
-    currentFolder() {
+    currentBucket() {
       return this.$route.params.container;
     },
     modalVisible() {
@@ -444,20 +444,20 @@ export default {
   watch: {
     modalVisible: async function() {
       if (this.modalVisible) {
-        //inputFolder not cleared when modal toggled,
+        //inputBucket not cleared when modal toggled,
         //in case there's a delay in upload start
         //reset when modal visible
         this.clearExistingFiles();
         this.objects = [];
         this.filesToOverwrite = [];
         this.recvkeys = [];
-        this.inputFolder = "";
+        this.inputBucket = "";
         this.containers = await getDB().containers
           .where({ projectID: this.active.id })
           .toArray();
-        if (this.currentFolder) {
+        if (this.currentBucket) {
           const cont = this.containers.find(c =>
-            c.name === this.currentFolder);
+            c.name === this.currentBucket);
           this.objects = await getDB().objects
             .where({containerID: cont.id})
             .toArray();
@@ -470,9 +470,9 @@ export default {
         if (this.modalVisible) this.getDropTablePage();
       },
     },
-    inputFolder: function() {
-      if (this.inputFolder && this.interacted) {
-        this.checkFolderName();
+    inputBucket: function() {
+      if (this.inputBucket && this.interacted) {
+        this.checkBucketName();
       }
     },
     active: function () {
@@ -499,7 +499,7 @@ export default {
       if (this.abortReason !== undefined) {
         if (this.abortReason
           ?.match("Could not create or access the container.")) {
-          this.uploadError = this.currentFolder ?
+          this.uploadError = this.currentBucket ?
             this.$t("message.upload.accessFail")
             : this.$t("message.error.createFail")
               .concat(" ", this.$t("message.error.inUseOtherPrj"));
@@ -645,7 +645,7 @@ export default {
       let oldSegments = [];
       const segmentCont= await getDB().containers.get({
         projectID: this.active.id,
-        name: `${this.currentFolder}_segments`,
+        name: `${this.currentBucket}_segments`,
       });
       const segmentObjs =  await getObjects(
         this.owner ? this.owner : this.active.id,
@@ -671,9 +671,9 @@ export default {
     clearExistingFiles() {
       this.existingFiles = [];
     },
-    checkFolderName: debounce(function () {
-      this.errorMsg = validateFolderName(
-        this.inputFolder, this.$t, this.containers);
+    checkBucketName: debounce(function () {
+      this.errorMsg = validateBucketName(
+        this.inputBucket, this.$t, this.containers);
     }, 300),
     setFile: function (item, path) {
       let entry = undefined;
@@ -821,9 +821,9 @@ export default {
     onUploadClick() {
       this.toastMsg = this.checkIfCanUpload();
 
-      if (!this.currentFolder) {
-        this.inputFolder = this.inputFolder.trim();
-        this.errorMsg = validateFolderName(this.inputFolder, this.$t);
+      if (!this.currentBucket) {
+        this.inputBucket = this.inputBucket.trim();
+        this.errorMsg = validateBucketName(this.inputBucket, this.$t);
       }
       if (this.errorMsg) {
         return;
@@ -871,18 +871,18 @@ export default {
         this.recvkeys = this.recvkeys.concat([sharedKey]);
       }
 
-      const folderName = this.currentFolder ?
-        this.currentFolder :
-        this.inputFolder;
+      const bucketName = this.currentBucket ?
+        this.currentBucket :
+        this.inputBucket;
 
       this.$store.commit(
-        "setUploadFolder",
-        { name: folderName, owner: this.$route.params.owner },
+        "setUploadBucket",
+        { name: bucketName, owner: this.$route.params.owner },
       );
-      this.$store.commit("setNewFolder", folderName);
+      this.$store.commit("setNewBucket", bucketName);
 
       this.socket.addUpload(
-        folderName,
+        bucketName,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
         owner,

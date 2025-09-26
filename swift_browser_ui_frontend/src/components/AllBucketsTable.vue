@@ -6,7 +6,7 @@
 import Containers from "@/components/Containers.vue";
 
 export default {
-  name: "AllFoldersTable",
+  name: "AllBucketsTable",
   components: { Containers },
 };
 </script>

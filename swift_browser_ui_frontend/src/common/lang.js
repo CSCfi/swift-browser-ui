@@ -65,15 +65,15 @@ let default_translations = {
         "Web UI for browsing contents in Swift object " + "storage systems.",
       currentProj: "Project",
       selectProj: "Select project",
-      createFolder: "Create bucket",
+      createBucket: "Create bucket",
       uploadSecondaryNav: "Upload",
       logOut: "Log out",
-      folderTabs: {
+      bucketTabs: {
         all: "All buckets",
         sharedFrom: "Buckets you have shared",
         sharedTo: "Buckets shared with you",
       },
-      folderDetails: {
+      bucketDetails: {
         notShared: "This bucket isn't shared with other projects.",
         sharing_to_one_project: "This bucket is shared to one project.",
         sharing_to_many_projects: "This bucket is shared to multiple projects.",
@@ -114,9 +114,9 @@ let default_translations = {
         source_project_id: "Share ID of this bucket",
         date_of_sharing: "Date of sharing",
         unknown_date: "Unknown",
-        back_to_all_folders: "Back to all buckets",
-        back_to_sharing_folders: "Back to buckets you have shared",
-        back_to_shared_folders: "Back to buckets shared with you",
+        back_to_all_buckets: "Back to all buckets",
+        back_to_sharing_buckets: "Back to buckets you have shared",
+        back_to_shared_buckets: "Back to buckets shared with you",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -220,7 +220,7 @@ let default_translations = {
         sizeZero: "Empty files cannot be uploaded.",
         hasStarted: "Uploading has started",
         inProgress: "Upload in progress",
-        viewDestinationFolder: "View destination bucket",
+        viewDestinationBucket: "View destination bucket",
         maximize: "Maximize",
         minimize: "Minimize",
         estimate: "It may take few minutes.",
@@ -254,12 +254,12 @@ let default_translations = {
         norename:
           "Please note that bucket names cannot be modified " +
           "after creating a bucket.",
-        createdFolder:
+        createdBucket:
           "Created bucket will be shared with all project members in ",
         viewProjectMembers: "View project members",
         deleteNote: "Bucket must be empty before " + "it can be deleted.",
         deleteSuccess: "Bucket was deleted.",
-        folderName: "Bucket name",
+        bucketName: "Bucket name",
       },
       folders: {
         deleteNote:
@@ -291,8 +291,8 @@ let default_translations = {
           "Are you sure you want to proceed?",
       },
       replicate: {
-        copy_folder: "Copy bucket: ",
-        name_newFolder: "Name new bucket",
+        copy: "Copy bucket: ",
+        name: "Name new bucket",
       },
       apiKeys: {
         empty: "There are no API keys in this project.",
@@ -415,7 +415,7 @@ let default_translations = {
       shareid_tooltip: "tooltip for share id",
       shareid_instructions: "instructions for share id",
       list_of_shareids: "list of share ids",
-      folder_tabs: "different types of buckets",
+      bucket_tabs: "different types of buckets",
       searchbox: "search for buckets",
       tagsList: "list of tags",
       edit_tag: "edit tags",
@@ -611,15 +611,15 @@ let default_translations = {
         "selaamiseen Swift-objektitietojärjestelmissä.",
       currentProj: "Projekti",
       selectProj: "Valitse projekti",
-      createFolder: "Luo ämpäri",
+      createBucket: "Luo ämpäri",
       uploadSecondaryNav: "Lähetä",
       logOut: "Kirjaudu ulos",
-      folderTabs: {
+      bucketTabs: {
         all: "Kaikki ämpärit",
         sharedFrom: "Jakamasi ämpärit",
         sharedTo: "Sinulle jaetut ämpärit",
       },
-      folderDetails: {
+      bucketDetails: {
         notShared: "Tätä ämpäriä ei ole jaettu toiselle projektille.",
         sharing_to_one_project: "Tämä ämpäri on jaettu yhdelle projektille.",
         sharing_to_many_projects: "Tämä ämpäri on jaettu useille projekteille.",
@@ -646,7 +646,7 @@ let default_translations = {
         fileHash: "Tarkistussumma",
         fileType: "Tyyppi",
         fileDown: "Tiedoston lataus",
-        folderDetails: "Ei yksityiskohtia ämpäreille",
+        bucketDetails: "Ei yksityiskohtia ämpäreille",
         clearChecked: "Poista valinnat",
         tags: "Asiasanat",
         editTags: "Muokkaa asiasanoja",
@@ -667,9 +667,9 @@ let default_translations = {
         source_project_id: "Jakamistunnus",
         date_of_sharing: "Jakamispäivämäärä",
         unknown_date: "Tuntematon",
-        back_to_all_folders: "Takaisin",
-        back_to_sharing_folders: "Takaisin",
-        back_to_shared_folders: "Takaisin",
+        back_to_all_buckets: "Takaisin",
+        back_to_sharing_buckets: "Takaisin",
+        back_to_shared_buckets: "Takaisin",
       },
       tableOptions: {
         displayOptions: "Näyttöasetukset",
@@ -769,7 +769,7 @@ let default_translations = {
         sizeZero: "Tyhjiä tiedostoja ei voi lähettää.",
         hasStarted: "Lähetys aloitettu",
         inProgress: "Lähetys käynnissä",
-        viewDestinationFolder: "Näytä kohdeämpäri",
+        viewDestinationBucket: "Näytä kohdeämpäri",
         maximize: "Suurenna",
         minimize: "Pienennä",
         estimate: "Toiminto voi kestää muutamia minuutteja.",
@@ -805,13 +805,13 @@ let default_translations = {
         norename:
           "Ämpäriä ei voi nimetä uudelleen, " +
           "mutta sen voi kopioida uudella nimellä.",
-        createdFolder: "Luotu ämpäri jaetaan kaikille jäsenille projektissa ",
+        createdBucket: "Luotu ämpäri jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteNote:
           "Ämpärin poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
         deleteSuccess: "Ämpäri poistettu",
-        folderName: "Ämpärin nimi",
+        bucketName: "Ämpärin nimi",
       },
       folders: {
         deleteNote:
@@ -845,8 +845,8 @@ let default_translations = {
           "Haluatko varmasti poistaa nämä tiedostot?",
       },
       replicate: {
-        copy_folder: "Kopioi ämpäri: ",
-        name_newFolder: "Nimeä uusi ämpäri",
+        copy: "Kopioi ämpäri: ",
+        name: "Nimeä uusi ämpäri",
       },
       apiKeys: {
         empty: "Tälle projektille ei ole luotu API-avaimia",
@@ -968,7 +968,7 @@ let default_translations = {
       shareid_tooltip: "työkaluvinkki jaa tunnukselle",
       shareid_instructions: "ohjeita varten jaa tunnukselle",
       list_of_shareids: "lista jaa tunnuksista",
-      folder_tabs: "erityyppisiä ämpäreitä",
+      bucket_tabs: "erityyppisiä ämpäreitä",
       searchbox: "etsi ämpäreitä",
       tagsList: "luettelo tunnisteista",
       edit_tag: "muokata nykyisiä tunnisteita",

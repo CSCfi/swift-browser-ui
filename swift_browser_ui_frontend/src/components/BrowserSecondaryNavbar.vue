@@ -171,7 +171,7 @@ export default {
     changeActive(event) {
       const itemId = event.target.value;
       const navigationParams = {
-        name: "AllFolders",
+        name: "AllBuckets",
         params: {user: this.uname, project: itemId},
       };
 
@@ -195,15 +195,15 @@ export default {
       if (keypress) setPrevActiveElement();
       if (!this.container) {
         setTimeout(() => {
-          const uploadFolderInput = document
-            .querySelector("#upload-folder-input input");
-          uploadFolderInput.focus();
+          const uploadBucketInput = document
+            .querySelector("#upload-bucket-input input");
+          uploadBucketInput.focus();
         }, 300);
       }
     },
     checkIfCanReadWrite: async function () {
       //disable upload if user doesn't have rw perms
-      //in shared folder
+      //in shared bucket
       if (!this.owner) this.canUpload = true;
       else {
         const share = await getAccessDetails(
