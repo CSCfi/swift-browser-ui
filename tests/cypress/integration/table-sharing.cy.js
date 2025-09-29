@@ -1,4 +1,4 @@
-describe("User can share folder from container table", function () {
+describe("User can share bucket from container table", function () {
   beforeEach(() => {
     cy.deleteFixtures();
     cy.task("resetDB");
@@ -8,7 +8,7 @@ describe("User can share folder from container table", function () {
     cy.wait(3000);
   });
 
-  it("User can share folder with read and write, the receiver can upload files to it", () => {
+  it("User can share bucket with read and write, the receiver can upload files to it", () => {
     cy.url().then((url) => {
       const copyId = url.split("/")[5];
       cy.log(copyId);
@@ -17,22 +17,22 @@ describe("User can share folder from container table", function () {
       cy.logout();
       cy.login(Cypress.env("username2"), Cypress.env("password2"));
 
-      //add folders to get a minimum of 2 pages
+      //add buckets to get a minimum of 2 pages
       let i = 0;
       while (i < 12) {
-        const folderName = Math.random().toString(36).substring(2, 7);
-        cy.addFolder(folderName);
+        const bucketName = Math.random().toString(36).substring(2, 7);
+        cy.addBucket(bucketName);
         i++;
         cy.wait(1000);
       }
 
       const randomName = Math.random().toString(36).substring(2, 7);
 
-      const folderName = `x${randomName}`;
-      cy.addFolder(folderName);
-      findFolder(folderName);
+      const bucketName = `x${randomName}`;
+      cy.addBucket(bucketName);
+      findBucket(bucketName);
 
-      cy.contains(folderName)
+      cy.contains(bucketName)
         .parent()
         .parent()
         .parent()
@@ -52,17 +52,17 @@ describe("User can share folder from container table", function () {
       cy.login(Cypress.env("username"), Cypress.env("password"));
       cy.wait(5000);
 
-      //access folder
-      findFolder(folderName)
-      cy.contains(folderName)
+      //access bucket
+      findBucket(bucketName)
+      cy.contains(bucketName)
         .click({ force: true });
 
       //generate fixture
       const file = "text-file";
       cy.generateFixture(file);
 
-      //upload file from destination folder
-      cy.uploadFileFromFolder(file);
+      //upload file from destination bucket
+      cy.uploadFileFromBucket(file);
 
       //upload modal closes when upload starts successfully
       cy.get("[data-testid='upload-modal']")
@@ -74,7 +74,7 @@ describe("User can share folder from container table", function () {
   });
 });
 
-const findFolder = (fname) => {
+const findBucket = (fname) => {
   const findInPage = (index) => {
     let found = false;
 

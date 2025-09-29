@@ -56,24 +56,24 @@ describe("Browse containers and test operations", function () {
       .should("not.be.visible");
   });
 
-  it("should be able to create a new folder with tags", () => {
+  it("should be able to create a new bucket with tags", () => {
 
-    const folderName = Math.random().toString(36).substring(2, 7);
+    const bucketName = Math.random().toString(36).substring(2, 7);
     const tags = ["tag1", "tag2", "tag3"];
 
-    //create folder with tags
-    cy.get("[data-testid='create-folder']").click();
-    cy.get("[data-testid='folder-name']").type(folderName);
-    cy.get("[data-testid='folder-tag']").type(tags.join("{enter} "));
-    cy.get("[data-testid='save-folder']")
+    //create bucket with tags
+    cy.get("[data-testid='create-bucket']").click();
+    cy.get("[data-testid='bucket-name']").type(bucketName);
+    cy.get("[data-testid='bucket-tag']").type(tags.join("{enter} "));
+    cy.get("[data-testid='save-bucket']")
       .should("be.visible")
       .click();
     cy.wait(3000);
 
-    //check that modal closed, folder name and tags exist
-    cy.get("[data-testid='create-folder-modal']")
+    //check that modal closed, bucket name and tags exist
+    cy.get("[data-testid='create-bucket-modal']")
       .should("not.be.visible");
-    cy.contains(folderName).should("exist");
+    cy.contains(bucketName).should("exist");
 
     tags.forEach(tag => {
       cy.contains(tag).should("exist");
@@ -82,21 +82,21 @@ describe("Browse containers and test operations", function () {
 
   it("should be able to add and remove container tags", () => {
 
-    const folderName = Math.random().toString(36).substring(2, 7);
+    const bucketName = Math.random().toString(36).substring(2, 7);
     const tags = ["tag_1", "tag_2"];
 
-    //create a new folder
-    cy.addFolder(folderName);
+    //create a new bucket
+    cy.addBucket(bucketName);
     cy.wait(3000);
 
-    //check that modal closed, folder name exists
-    cy.get("[data-testid='create-folder-modal']")
+    //check that modal closed, bucket name exists
+    cy.get("[data-testid='create-bucket-modal']")
       .should("not.be.visible");
-    cy.contains(folderName).should("exist");
+    cy.contains(bucketName).should("exist");
 
     //get the right table row
     cy.get("c-data-table")
-      .contains(folderName)
+      .contains(bucketName)
       .parent() //div
       .parent() //td
       .parent() //tr
@@ -153,13 +153,13 @@ describe("Browse containers and test operations", function () {
 
   it("should display, add, remove object tags", () => {
 
-    const folderName = Math.random().toString(36).substring(2, 7);
+    const bucketName = Math.random().toString(36).substring(2, 7);
     const file = "text-file";
     const tags = ["obj_tag1", "obj_tag2", "obj_tag3"];
 
-    //upload file and create a folder at the same time
+    //upload file and create a bucket at the same time
     cy.generateFixture(file);
-    cy.uploadFileFromMain(folderName, file);
+    cy.uploadFileFromMain(bucketName, file);
     cy.wait(5000);
 
     //close upload toast
@@ -168,10 +168,10 @@ describe("Browse containers and test operations", function () {
       .click();
     cy.wait(3000);
 
-    //go to folder, check that file exists
-    cy.searchFolder(folderName);
+    //go to bucket, check that file exists
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click();
     cy.wait(5000);
 
@@ -213,9 +213,9 @@ describe("Browse containers and test operations", function () {
     });
   });
 
-  it("should navigate between all and shared folders with tab selectors", () => {
+  it("should navigate between all and shared buckets with tab selectors", () => {
     const testTabChange = (id, routeEnd) => {
-      cy.get("[data-testid='folder-tabs']")
+      cy.get("[data-testid='bucket-tabs']")
         .get(`[data-testid='${id}']`)
         .click();
       cy.wait(3000);

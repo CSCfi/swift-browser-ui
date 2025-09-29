@@ -106,26 +106,26 @@ Cypress.Commands.add("switchProject", () => {
 
 /* CONTAINER ACTIONS */
 
-Cypress.Commands.add("addFolder", (folderName) => {
-  cy.get("[data-testid='create-folder']").click();
+Cypress.Commands.add("addBucket", (bucketName) => {
+  cy.get("[data-testid='create-bucket']").click();
   cy.wait(1000);
-  cy.get("[data-testid='folder-name']").type(folderName);
-  cy.get("[data-testid='save-folder']").click();
+  cy.get("[data-testid='bucket-name']").type(bucketName);
+  cy.get("[data-testid='save-bucket']").click();
 });
 
-Cypress.Commands.add("searchFolder", (folderName) => {
+Cypress.Commands.add("searchBucket", (bucketName) => {
   cy.get("[data-testid='search-box']")
     .find("input")
     .eq(0)
-    .type(folderName, { force: true });
+    .type(bucketName, { force: true });
   cy.wait(5000);
 });
 
 /* DELETE */
 
-Cypress.Commands.add("deleteFolder", (folderName) => {
+Cypress.Commands.add("deleteBucket", (bucketName) => {
   cy.get("c-data-table")
-      .contains(folderName)
+      .contains(bucketName)
       .parent() //div
       .parent() //td
       .parent() //tr
@@ -182,7 +182,7 @@ Cypress.Commands.add("deleteFilesOnPageCheckbox", () => {
 
 /* UPLOAD */
 
-Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
+Cypress.Commands.add("uploadFileFromBucket", (fileName) => {
   //open upload modal
   cy.get("[data-testid='upload-file']").click({ force: true });
   cy.wait(3000);
@@ -203,7 +203,7 @@ Cypress.Commands.add("uploadFileFromFolder", (fileName) => {
   cy.wait(5000);
 });
 
-Cypress.Commands.add("uploadFileFromMain", (folderName, fileName) => {
+Cypress.Commands.add("uploadFileFromMain", (bucketName, fileName) => {
   //open upload modal
   cy.get("[data-testid='upload-file']").click();
   cy.wait(3000);
@@ -211,10 +211,10 @@ Cypress.Commands.add("uploadFileFromMain", (folderName, fileName) => {
   //check that modal opened
   cy.get("[data-testid='upload-modal']").should("be.visible");
 
-  //insert folder name
-  cy.get("[data-testid='upload-folder-input']")
+  //insert bucket name
+  cy.get("[data-testid='upload-bucket-input']")
     .find("input")
-    .type(folderName);
+    .type(bucketName);
 
   //add the file
   cy.get("[data-testid='select-files-input']")
@@ -299,8 +299,8 @@ Cypress.Commands.add("deleteFixtures", () => {
   //but not "cypress open"
   const downloaded = Cypress.config("downloadsFolder");
   const generated = Cypress.config("textFileLocation");
-  cy.task("deleteFolder", downloaded);
-  cy.task("deleteFolder", generated);
+  cy.task("deleteBucket", downloaded);
+  cy.task("deleteBucket", generated);
 })
 
 /*OTHER */

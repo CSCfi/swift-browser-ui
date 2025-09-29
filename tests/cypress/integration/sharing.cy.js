@@ -1,4 +1,4 @@
-describe("A folder is shared from project A to project B", function () {
+describe("A bucket is shared from project A to project B", function () {
   beforeEach(() => {
     cy.deleteFixtures();
     cy.task("resetDB");
@@ -9,7 +9,7 @@ describe("A folder is shared from project A to project B", function () {
   });
 
   //Happy test cases
-  it("the folder is shared successfully, when other user logs in, shared folder is visible", function () {
+  it("the bucket is shared successfully, when other user logs in, shared bucket is visible", function () {
     const useServiceWorker =
     "serviceWorker" in navigator && window.showSaveFilePicker === undefined;
 
@@ -23,15 +23,15 @@ describe("A folder is shared from project A to project B", function () {
       cy.login(Cypress.env("username2"), Cypress.env("password2"));
       cy.wait(3000);
 
-      //add folder
-      const folderName = Math.random().toString(36).substring(2, 7);
-      cy.addFolder(folderName);
+      //add bucket
+      const bucketName = Math.random().toString(36).substring(2, 7);
+      cy.addBucket(bucketName);
       cy.wait(3000);
 
-      //access folder
-      cy.searchFolder(folderName);
+      //access bucket
+      cy.searchBucket(bucketName);
       cy.get("[data-testid='search-result']")
-        .contains(folderName)
+        .contains(bucketName)
         .click({ force: true });
       cy.wait(3000);
 
@@ -54,19 +54,19 @@ describe("A folder is shared from project A to project B", function () {
       cy.generateFixture(fileName);
 
       cy.fixture("text-files/" + fileName + ".txt", "utf-8").then(($contentOnUpload) => {
-        cy.uploadFileFromFolder(fileName);
+        cy.uploadFileFromBucket(fileName);
 
-        //Switch user and check the folder is visible
+        //Switch user and check the bucket is visible
 
         //switch user
         cy.logout();
         cy.login(Cypress.env("username"), Cypress.env("password"));
         cy.wait(5000);
 
-        //go to shared folder
-        cy.searchFolder(folderName);
+        //go to shared bucket
+        cy.searchBucket(bucketName);
         cy.get("[data-testid='search-result']")
-          .contains(folderName)
+          .contains(bucketName)
           .click({ force: true });
         cy.wait(3000);
 
@@ -99,7 +99,7 @@ describe("A folder is shared from project A to project B", function () {
 });
 
 //Unhappy test cases
-describe("A folder cannot be shared without Share ID or if rights are not selected", function () {
+describe("A bucket cannot be shared without Share ID or if rights are not selected", function () {
   beforeEach(() => {
     cy.task("resetDB");
     cy.deleteDB();
@@ -108,7 +108,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
     cy.wait(3000);
   });
 
-  it("switch project, try to share folder without share ID, fail", function () {
+  it("switch project, try to share bucket without share ID, fail", function () {
     //take the ID appearing as the last part of url
     cy.url().then(($url) => {
       const copyId = $url.split("/")[5];
@@ -117,15 +117,15 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       //switch project
       cy.switchProject();
 
-      //add folder
-      const folderName = Math.random().toString(36).substring(2, 7);
-      cy.addFolder(folderName);
+      //add bucket
+      const bucketName = Math.random().toString(36).substring(2, 7);
+      cy.addBucket(bucketName);
       cy.wait(3000);
 
-      //access folder
-      cy.searchFolder(folderName);
+      //access bucket
+      cy.searchBucket(bucketName);
       cy.get("[data-testid='search-result']")
-        .contains(folderName)
+        .contains(bucketName)
         .click({ force: true });
       cy.wait(3000);
 
@@ -143,7 +143,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
     });
   });
 
-  it("copy shareID, switch project, try to share folder without selecting rights, fail", function () {
+  it("copy shareID, switch project, try to share bucket without selecting rights, fail", function () {
     //take the ID appearing as the last part of url
     cy.url().then(($url) => {
       const copyId = $url.split("/")[5];
@@ -152,15 +152,15 @@ describe("A folder cannot be shared without Share ID or if rights are not select
       //switch project
       cy.switchProject();
 
-      //add folder
-      const folderName = Math.random().toString(36).substring(2, 7);
-      cy.addFolder(folderName);
+      //add bucket
+      const bucketName = Math.random().toString(36).substring(2, 7);
+      cy.addBucket(bucketName);
       cy.wait(3000);
 
-      //access folder
-      cy.searchFolder(folderName);
+      //access bucket
+      cy.searchBucket(bucketName);
       cy.get("[data-testid='search-result']")
-        .contains(folderName)
+        .contains(bucketName)
         .click({ force: true });
       cy.wait(3000);
 
@@ -179,7 +179,7 @@ describe("A folder cannot be shared without Share ID or if rights are not select
   });
 });
 
-describe("A folder cannot be shared with the same Share ID twice", function () {
+describe("A bucket cannot be shared with the same Share ID twice", function () {
   beforeEach(() => {
     cy.task("resetDB");
     cy.deleteDB();
@@ -188,7 +188,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
     cy.wait(3000);
   });
 
-  it("switch project, try to share folder with the same ID twice, fail", function () {
+  it("switch project, try to share bucket with the same ID twice, fail", function () {
     //take the ID appearing as the last part of url
     cy.url().then(($url) => {
       const copyId = $url.split("/")[5];
@@ -197,15 +197,15 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
       //switch project
       cy.switchProject();
 
-      //add folder
-      const folderName = Math.random().toString(36).substring(2, 7);
-      cy.addFolder(folderName);
+      //add bucket
+      const bucketName = Math.random().toString(36).substring(2, 7);
+      cy.addBucket(bucketName);
       cy.wait(3000);
 
-      //access folder
-      cy.searchFolder(folderName);
+      //access bucket
+      cy.searchBucket(bucketName);
       cy.get("[data-testid='search-result']")
-        .contains(folderName)
+        .contains(bucketName)
         .click({ force: true });
       cy.wait(3000);
 
@@ -231,7 +231,7 @@ describe("A folder cannot be shared with the same Share ID twice", function () {
   });
 });
 
-describe("A folder cannot be shared with an invalid ID", function () {
+describe("A bucket cannot be shared with an invalid ID", function () {
   beforeEach(() => {
     cy.task("resetDB");
     cy.deleteDB();
@@ -240,19 +240,19 @@ describe("A folder cannot be shared with an invalid ID", function () {
     cy.wait(3000);
   });
 
-  it("switch project, try to share folder with invalid share ID, fail", function () {
+  it("switch project, try to share bucket with invalid share ID, fail", function () {
     //switch project
     cy.switchProject();
 
-    //add folder
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.addFolder(folderName);
+    //add bucket
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.addBucket(bucketName);
     cy.wait(3000);
 
-    //access folder
-    cy.searchFolder(folderName);
+    //access bucket
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click({ force: true });
     cy.wait(3000);
 

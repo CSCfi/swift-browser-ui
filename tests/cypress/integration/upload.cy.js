@@ -18,22 +18,22 @@ describe("Upload a file", function () {
   });
 
   //Happy scenarios
-  //upload from folder
-  it("Upload file from the folder page and delete it", () => {
+  //upload from bucket
+  it("Upload file from the bucket page and delete it", () => {
 
-    //create a folder and go inside it
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.addFolder(folderName);
+    //create a bucket and go inside it
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.addBucket(bucketName);
     cy.wait(3000);
 
-    cy.searchFolder(folderName);
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click({ force: true });
     cy.wait(5000);
 
-    //upload file from destination folder
-    cy.uploadFileFromFolder(file1);
+    //upload file from destination bucket
+    cy.uploadFileFromBucket(file1);
 
     //close upload toast
     cy.get("[data-testid='close-upload-toast']")
@@ -56,11 +56,11 @@ describe("Upload a file", function () {
   });
 
   //Upload from the main page
-  it("Upload file from the main page to a new folder", () => {
+  it("Upload file from the main page to a new bucket", () => {
 
-    //upload file and create a folder at the same time
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.uploadFileFromMain(folderName, file1);
+    //upload file and create a bucket at the same time
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.uploadFileFromMain(bucketName, file1);
 
     //close upload toast
     cy.get("[data-testid='close-upload-toast']")
@@ -68,27 +68,27 @@ describe("Upload a file", function () {
       .click();
     cy.wait(3000);
 
-    //check if the file name is on the folder page
-    cy.searchFolder(folderName);
+    //check if the file name is on the bucket page
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click({ force: true });
     cy.wait(5000);
 
     cy.contains(file1).should("exist");
   });
 
-  it("Several files with different names can be uploaded to a folder at once", () => {
+  it("Several files with different names can be uploaded to a bucket at once", () => {
 
     //open upload modal
     cy.get("[data-testid='upload-file']").click();
     cy.wait(3000);
 
-    //add folder name
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.get("[data-testid='upload-folder-input']")
+    //add bucket name
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.get("[data-testid='upload-bucket-input']")
       .find("input")
-      .type(folderName);
+      .type(bucketName);
 
     //add the fixture files
     cy.get("[data-testid='select-files-input']")
@@ -107,7 +107,7 @@ describe("Upload a file", function () {
       .click();
     cy.wait(1000);
 
-    //view destination folder
+    //view destination bucket
     cy.get("a.link-underline").click();
     cy.wait(5000);
 
@@ -120,22 +120,22 @@ describe("Upload a file", function () {
     cy.contains(file2).should("exist");
   });
 
-  it("Several files with different names can be uploaded to a folder one by one and deleted", () => {
+  it("Several files with different names can be uploaded to a bucket one by one and deleted", () => {
 
     //create a unique name
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.addFolder(folderName);
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.addBucket(bucketName);
     cy.wait(3000);
 
-    //access folder
-    cy.searchFolder(folderName);
+    //access bucket
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click({ force: true });
     cy.wait(5000);
 
     //upload first file
-    cy.uploadFileFromFolder(file1);
+    cy.uploadFileFromBucket(file1);
 
     //close toast
     cy.get("[data-testid='close-upload-toast']")
@@ -143,7 +143,7 @@ describe("Upload a file", function () {
       .click();
 
     //upload second file
-    cy.uploadFileFromFolder(file2);
+    cy.uploadFileFromBucket(file2);
 
     //close toast
     cy.get("[data-testid='close-upload-toast']")
@@ -166,7 +166,7 @@ describe("Upload a file", function () {
   });
 
   //Unhappy scenarios
-  it("Two files with the same name can not be uploaded to a folder at the same time", () => {
+  it("Two files with the same name can not be uploaded to a bucket at the same time", () => {
 
     //open upload modal
     cy.get("[data-testid='upload-file']").click({ force: true });
@@ -175,12 +175,12 @@ describe("Upload a file", function () {
     //check that modal opened
     cy.get("[data-testid='upload-modal']").should("be.visible");
 
-    //create and insert new folder name
-    const folderName = Math.random().toString(36).substring(2, 7);
+    //create and insert new bucket name
+    const bucketName = Math.random().toString(36).substring(2, 7);
 
-    cy.get("[data-testid='upload-folder-input'")
+    cy.get("[data-testid='upload-bucket-input'")
       .find("input")
-      .type(folderName);
+      .type(bucketName);
 
     //add the fixture file
     cy.get("[data-testid='select-files-input']")
