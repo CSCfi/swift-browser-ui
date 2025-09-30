@@ -7,6 +7,15 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- outdated syntax in ceedling config
+- aiohttp to version 3.12.15
+
+### Removed
+
+- stdout_pretty_tests_report in ceedling config
+
 ## [2025.6.0] - 2025-06-17
 
 ### Fixed
