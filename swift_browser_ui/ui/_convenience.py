@@ -42,7 +42,7 @@ async def sign(
 
 
 def disable_cache(
-    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]
+    response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Add cache disabling headers to an aiohttp response."""
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"

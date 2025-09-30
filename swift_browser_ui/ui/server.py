@@ -366,7 +366,7 @@ def run_server_secure(
 
 
 def run_server_insecure(
-    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
+    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application],
 ) -> None:
     """Run the server without https enabled."""
     aiohttp.web.run_app(
