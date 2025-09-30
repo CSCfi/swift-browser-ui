@@ -152,7 +152,7 @@ async def handle_login(
 
 
 async def sso_query_begin(
-    request: typing.Union[aiohttp.web.Request, None]
+    request: typing.Union[aiohttp.web.Request, None],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Display login page and initiate federated keystone authentication."""
     # Return the form based login page if the service isn't trusted
@@ -179,7 +179,7 @@ async def sso_query_begin(
 
 
 async def sso_query_begin_oidc(
-    request: typing.Union[aiohttp.web.Request, None]
+    request: typing.Union[aiohttp.web.Request, None],
 ) -> typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]:
     """Initiate a federated Keystone authentication with OIDC."""
     response: typing.Union[aiohttp.web.Response, aiohttp.web.FileResponse]

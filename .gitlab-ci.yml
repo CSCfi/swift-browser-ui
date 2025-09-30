@@ -84,7 +84,7 @@ wasm-test:
     - gem install ceedling
   script:
     - cd swift_browser_ui_frontend/wasm
-    - ceedling
+    - ceedling --verbosity debug
 
 # This job creates the automated releases
 release-job:

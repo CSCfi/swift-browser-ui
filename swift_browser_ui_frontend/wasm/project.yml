@@ -7,7 +7,7 @@
 
 :project:
   :use_exceptions: FALSE
-  :use_test_preprocessor: TRUE
+  :use_test_preprocessor: :all
   :use_auxiliary_dependencies: TRUE
   :build_root: build
 #  :release_build: TRUE
@@ -37,6 +37,8 @@
     - src/**
   :support:
     - test/support
+  :include:
+    - src/include
   :libraries: []
 
 :defines:
@@ -95,9 +97,8 @@
   :release: []
 
 :plugins:
-  :load_paths:
-    - "#{Ceedling.load_path}"
+  :load_paths: []
   :enabled:
-    - stdout_pretty_tests_report
+    # - stdout_pretty_tests_report
     - module_generator
 ...

@@ -169,7 +169,7 @@ async def kill_client(app: aiohttp.web.Application) -> None:
 
 
 def run_server(
-    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application]
+    app: typing.Coroutine[typing.Any, typing.Any, aiohttp.web.Application],
 ) -> None:
     """Run the server."""
     aiohttp.web.run_app(
