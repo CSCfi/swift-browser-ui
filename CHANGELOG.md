@@ -9,12 +9,23 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) Updated API key modal text and changed to inline error validation (#1262)
+- (users) Changed the text of removal button in upload modal table (#1262)
 - outdated syntax in ceedling config
 - aiohttp to version 3.12.15
 
 ### Removed
 
 - stdout_pretty_tests_report in ceedling config
+
+### Added
+
+- (users) Added a placeholder footer link for cookie policy (#1262)
+
+### Fixed
+
+- (users) Fixed sharing permissions not being visible without scrolling (#1255)
+- (users) Fixed attempting to delete subfolders only opening a confirmation modal (#1262)
 
 ## [2025.6.0] - 2025-06-17
 
