@@ -1,6 +1,7 @@
 import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
 import { getDB } from "@/common/db";
+import { swiftCheckContainerExists } from "@/common/api";
 
 export function toggleCreateBucketModal() {
   store.commit("toggleCreateBucketModal", true);
@@ -135,27 +136,29 @@ export function getPaginationOptions(t) {
   return paginationOptions;
 }
 
-export function validateBucketName(str, t, containers) {
-  //minimum length 3 chars
-  let error = "";
-  //forbid !"#$%&'()*+,/:;<=>?@[\]^`{|}~  allow .-_
-  const re = new RegExp("[!-,/:-@\\[-\\^`\\{-~]");
-  if (str.length <= 2) {
-    error = t("message.error.tooShort");
+export async function validateBucketName(input) {
+  let result = {
+    lowerCaseOrNum: undefined,
+    inputLength: undefined,
+    alphaNumHyphen: undefined,
+    ownable: undefined,
+  };
+  if (!input) return result;
+
+  result.lowerCaseOrNum = !!(
+    input[0].match(/[\p{L}0-9]/u) && input[0] === input[0].toLowerCase()
+  );
+  result.inputLength = input.length >= 3 && input.length <= 63;
+  result.alphaNumHyphen = !!input.match(/^[a-z0-9-]+$/g);
+  if (result.lowerCaseOrNum && result.inputLength && result.alphaNumHyphen) {
+    const containerExists = await swiftCheckContainerExists(
+      store.state.active.id, input);
+    // In undefined case allow user to attempt bucket creation
+    result.ownable = !containerExists;
+  } else {
+    result.ownable = false;
   }
-  else if (str.match(re)) {
-    error= t("message.error.forbiddenChars");
-  }
-  else if (str.endsWith("_segments")) {
-    error= t("message.error.segments");
-  }
-  else {
-    if (containers) {
-      const found = containers.find(cont => cont.name === str);
-      if (found) error = t("message.error.inUse");
-    }
-  }
-  return error;
+  return result;
 }
 
 export function getCurrentISOtime(time) {

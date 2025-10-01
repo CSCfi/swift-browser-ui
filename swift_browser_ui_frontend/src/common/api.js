@@ -375,6 +375,22 @@ export async function swiftCreateContainer(
   }
 }
 
+export async function swiftCheckContainerExists(
+  project,
+  container,
+) {
+  const fetchURL = new URL(
+    "/api/".concat(
+      encodeURI(project), "/",
+      encodeURI(container),
+    ),
+    document.location.origin,
+  );
+  const ret = await GET(fetchURL);
+  if (ret.status === 200 || ret.status === 403) return true;
+  if (ret.status === 404) return false;
+}
+
 export async function swiftDeleteContainer(
   project,
   container,

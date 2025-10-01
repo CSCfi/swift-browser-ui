@@ -77,7 +77,7 @@ describe("Create a container", function () {
 
     cy.addBucket(bucketName);
 
-    //bucket name input field should have a validation error
-    cy.get("#error-newBucket-input_1").should("be.visible");
+    //bucket name input field should have one validation error
+    cy.get("[data-testid='name-validation-error']").should("have.length", 1);
   });
 });

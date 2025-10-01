@@ -1,10 +1,13 @@
+aakkosia
 aika
 aikana
 aina
 ajaksi
+aksenttimerkkejä
 aktiiviset
 alapuolisesta
 alaviiva
+alkaa
 alkanut
 alla
 aloitettiin
@@ -109,6 +112,7 @@ ilmoittaa
 ilmoittaminen
 ilmoituksen
 informaatio
+isot
 ja
 jaa
 jaan
@@ -173,6 +177,7 @@ jäsenet
 jäsenille
 jäsenten
 kaikille
+kaikissa
 kaikki
 kaikkien
 kansio
@@ -199,6 +204,7 @@ kelvollisia
 kenttää
 kentällä
 kerran
+kesken
 keskeyttää
 keskus
 kestää
@@ -207,6 +213,8 @@ kielletty
 kiellettyä
 kielletyn
 kiinni
+kirjaimella
+kirjaimet
 kirjaudu
 kirjautua
 kirjautuaksesi
@@ -308,10 +316,12 @@ laskutuksesta
 laskutusyksiköiden
 laskutusysiköiden
 lataa
+lataamisen
 latauksen
 lataukset
 lataus
 latauslinkki
+latinalaisia
 leikepöydälle
 liiku
 liitä
@@ -332,9 +342,11 @@ luettelo
 luku
 lukuoikeus
 luo
+luodaan
 luomisen
 luonnin
 luonti
+luottamuksellisia
 luotu
 lupa
 lähetettiin
@@ -404,14 +416,18 @@ navigoitaessa
 ne
 niiden
 niin
+niissä
 nimellä
 nimen
 nimet
 nimetä
 nimeä
 nimi
+nimiä
 numeroinen
 numeroisen
+numeroita
+numerolla
 nykyinen
 nykyisen
 nykyisiä
@@ -520,12 +536,15 @@ pelkästä
 peruuta
 peruutettu
 pian
+pienellä
 pienemmissä
 pienennä
 pienillä
+pieniä
 piilota
 piste
 pitkiä
+pitkä
 poiketa
 pois
 poissa
@@ -593,6 +612,7 @@ päivätty
 päänäkymään
 pääsy
 pääsyä
+päätasolle
 päättyä
 rajan
 rajattu
@@ -761,6 +781,7 @@ tiedot
 tieteen
 tieto
 tietoa
+tietoja
 tietosivulta
 tietotekniikan
 tietotekniikkakeskus
@@ -837,6 +858,7 @@ ulkopuolinen
 ulos
 umpeutui
 uniikin
+uniikki
 useiden
 useille
 useisiin
@@ -912,6 +934,7 @@ vuoksi
 vähintään
 väliaikaiseen
 väliaikaisten
+väliviivaa
 vältä
 yhdelle
 yhden
@@ -939,6 +962,7 @@ ylläpitäjälle
 ymmärrettävyys
 yritit
 yritä
+ämpäreiden
 ämpäreille
 ämpäreitä
 ämpäri
@@ -949,3 +973,4 @@ yritä
 ämpäristä
 ämpärit
 ämpäriä
+åäöé

@@ -250,10 +250,7 @@ let default_translations = {
       tagName: "Tags (optional)",
       tagPlaceholder: "# Add a tag and press enter",
       container_ops: {
-        addContainer: "Create new bucket",
-        norename:
-          "Please note that bucket names cannot be modified " +
-          "after creating a bucket.",
+        addContainer: "Create a new bucket",
         createdBucket:
           "Created bucket will be shared with all project members in ",
         viewProjectMembers: "View project members",
@@ -261,9 +258,22 @@ let default_translations = {
         deleteSuccess: "Bucket was deleted.",
         bucketName: "Bucket name",
       },
+      nameValidation: {
+        lowerCaseOrNum:
+          "Bucket name should start with a lowercase letter or a number.",
+        inputLength:
+          "Bucket name should be between 3 and 63 characters long.",
+        alphaNumHyphen1:
+          "Use only lowercase Latin letters (a-z), numbers (0-9), and " +
+          "hyphens (-).",
+        alphaNumHyphen2: "Uppercase letters, underscore (_) and accent " +
+        "letters with diacritics or special marks (åäöé) are not allowed.",
+        ownable: "Bucket names must be unique across all existing buckets " +
+        "in all projects.",
+      },
       folders: {
         deleteNote:
-          "Folders are deleted by deleting all " + "items in them.",
+          "Folders are deleted by deleting all items in them.",
         deleteOneSuccess: "Folder was deleted.",
         deleteManySuccess: "Folders were deleted.",
       },
@@ -320,8 +330,15 @@ let default_translations = {
       encrypt: {
         uploadFiles: "Upload files",
         uploadDestination: "Destination bucket: ",
-        upload_step1: "Create a new bucket",
-        upload_step2: "Files to be uploaded",
+        uploadStep1: {
+          title: "Create a new bucket",
+          createAtRoot: "Bucket is created at the root level of your project.",
+          nonModifiable:
+            "Bucket names cannot be changed after " +
+            "creation or upload. Remember, all bucket names are public; " +
+            "please do not include any confidential information.",
+        },
+        uploadStep2: "Files to be uploaded",
         multipleReceivers: "Additional encryption keys (public keys only)",
         pubkey: "Paste public key",
         pubkeyLabel: "Public keys (SHA-256)",
@@ -802,9 +819,6 @@ let default_translations = {
       tagPlaceholder: "# Lisää asiasana ja paina rivinvaihtoa",
       container_ops: {
         addContainer: "Luo uusi ämpäri",
-        norename:
-          "Ämpäriä ei voi nimetä uudelleen, " +
-          "mutta sen voi kopioida uudella nimellä.",
         createdBucket: "Luotu ämpäri jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
         deleteNote:
@@ -812,6 +826,18 @@ let default_translations = {
           "tiedostojen poistamista ensin.",
         deleteSuccess: "Ämpäri poistettu",
         bucketName: "Ämpärin nimi",
+      },
+      nameValidation: {
+        lowerCaseOrNum:
+          "Ämpärin nimi alkaa pienellä kirjaimella tai numerolla.",
+        inputLength: "Ämpärin nimi on 3-63 merkkiä pitkä.",
+        alphaNumHyphen1: "Käytä vain latinalaisia pieniä aakkosia (a-z), " +
+        "numeroita (0-9) ja väliviivaa (-).",
+        alphaNumHyphen2: "Isot kirjaimet, alaviiva (_) ja kirjaimet, " +
+        "joissa on aksenttimerkkejä tai erikoismerkkejä (åäöé) eivät " +
+        "ole sallittuja.",
+        ownable: "Ämpärin nimen tulee olla uniikki kaikkien ämpäreiden " +
+        "kesken kaikissa projekteissa.",
       },
       folders: {
         deleteNote:
@@ -874,8 +900,14 @@ let default_translations = {
       encrypt: {
         uploadFiles: "Lataa tiedostoja",
         uploadDestination: "Kohdeämpäri: ",
-        upload_step1: "Luo uusi ämpäri",
-        upload_step2: "Ladattavat tiedostot",
+        uploadStep1: {
+          title: "Luo uusi ämpäri",
+          createAtRoot: "Ämpäri luodaan projektin päätasolle.",
+          nonModifiable: "Ämpärin nimiä ei voi " +
+          "muokata luomisen tai lataamisen jälkeen. Ämpäreiden nimet ovat " +
+          "julkisia ja niissä ei tulisi käyttää luottamuksellisia tietoja.",
+        },
+        uploadStep2: "Ladattavat tiedostot",
         multipleReceivers: "Lisää salausavaimia (vain julkiset avaimet)",
         addkey: "Lisää avain",
         pubkey: "Liitä julkinen avain",
