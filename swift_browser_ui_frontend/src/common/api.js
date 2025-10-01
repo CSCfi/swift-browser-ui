@@ -444,11 +444,11 @@ export async function swiftCopyContainer(
   return ret;
 }
 
-export async function createExtToken(
+export async function createAPIKey(
   project,
   id,
 ) {
-  // Tell backend to create a new project scoped API token
+  // Tell backend to create a new project scoped API key
   let fetchURL = new URL("/token/".concat(
     encodeURI(project), "/",
     encodeURI(id),
@@ -457,14 +457,14 @@ export async function createExtToken(
   let ret = await GET(fetchURL);
 
   if (ret.status != 201) {
-    throw new Error("Token creation failed");
+    throw new Error("API key creation failed");
   }
 
   return ret.json();
 }
 
-export async function listTokens(project) {
-  // Get all tokens created for the project by id
+export async function listAPIKeys(project) {
+  // Get all API keys created for the project by id
   let fetchURL = new URL(
     "/token/".concat(encodeURI(project)), document.location.origin,
   );
@@ -472,17 +472,17 @@ export async function listTokens(project) {
   let ret = await GET(fetchURL);
 
   if (ret.status != 200) {
-    throw new Error("Token listing fetch failed");
+    throw new Error("API key listing fetch failed");
   }
 
   return ret.json();
 }
 
-export async function removeToken(
+export async function removeAPIKey(
   project,
   id,
 ) {
-  // Tell backend to delete API tokens matching the ID
+  // Tell backend to delete API keys matching the ID
   let fetchURL = new URL("/token/".concat(
     encodeURI(project), "/",
     encodeURI(id),
@@ -491,7 +491,7 @@ export async function removeToken(
   let ret = await DELETE(fetchURL);
 
   if (ret.status != 204) {
-    throw new Error("Token deletion failed");
+    throw new Error("API key deletion failed");
   }
 }
 

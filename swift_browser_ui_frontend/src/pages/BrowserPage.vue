@@ -70,13 +70,13 @@
         <DeleteModal />
       </c-modal>
       <c-modal
-        id="token-modal"
-        v-model="openTokenModal"
+        id="api-key-modal"
+        v-model="openAPIKeyModal"
         v-csc-control
         disable-backdrop-blur
         width="64vw"
       >
-        <TokenModal />
+        <APIKeyModal />
       </c-modal>
       <ProgressNotification
         v-if="displayUploadNotification"

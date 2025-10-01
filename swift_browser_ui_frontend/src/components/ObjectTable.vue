@@ -612,6 +612,17 @@ export default {
           icon: "mdi-trash-can-outline",
           testid: "delete-checked-files",
           action: () => {
+            // If only subfolders checked, don't show Delete modal
+            if (this.renderFolders) {
+              const subfoldersOnly = this.checkedRows.every((item) =>
+                item.name.includes("/"));
+              if (subfoldersOnly) {
+                addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
+                this.clearSelections();
+                return;
+              }
+            }
+            // Otherwise get user confirmation from modal
             this.onOpenDeleteModal(this.checkedRows);
             const deleteSelectionsBtn = document
               .querySelector("#delete-selections");

@@ -108,7 +108,7 @@ export default {
           value: this.$t("message.share.share_id"),
           width: "50%",
           sortable: true,
-          align: "start",
+          align: "center",
           component: {
             tag: "div",
             params: {
@@ -205,7 +205,7 @@ export default {
                   style: {
                     width: "100%",
                     fontSize: "0.875rem",
-                    marginTop: "1rem",
+                    marginBottom: "-1.5rem",
                   },
                   items: this.accessRights,
                   value: item.access.length > 0

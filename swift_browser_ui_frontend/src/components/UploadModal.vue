@@ -586,13 +586,13 @@ export default {
             delete: {
               children: [
                 {
-                  value: this.$t("message.delete"),
+                  value: this.$t("message.upload.remove"),
                   component: {
                     tag: "c-button",
                     params: {
                       text: true,
                       size: "small",
-                      title: this.$t("message.delete"),
+                      title: this.$t("message.upload.remove"),
                       path: mdiDelete,
                       onClick: () => {
                         this.deleteDropFile(file);

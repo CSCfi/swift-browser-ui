@@ -1,7 +1,7 @@
 <template>
   <c-card
-    ref="tokenContainer"
-    class="token-card"
+    ref="apiKeyContainer"
+    class="api-key-card"
     @keydown="handleKeyDown"
   >
     <c-card-actions
@@ -9,13 +9,13 @@
       align="center"
     >
       <h2 class="title is-4">
-        {{ $t("message.tokens.title") }}
+        {{ $t("message.apiKeys.title") }}
       </h2>
       <c-button
-        id="close-token-modal-btn"
+        id="close-api-key-modal-btn"
         text
-        @click="closeTokenModal(false)"
-        @keyup.enter="closeTokenModal(true)"
+        @click="closeModal(false)"
+        @keyup.enter="closeModal(true)"
       >
         <c-icon
           :path="mdiClose"
@@ -26,66 +26,69 @@
       </c-button>
     </c-card-actions>
     <c-card-content>
+      <p>{{ $t("message.apiKeys.identHint") }}</p>
       <c-text-field
-        id="token-input"
+        id="api-key-input"
         v-model="newIdentifier"
         v-csc-control
         name="newIdentifier"
-        :hint="$t('message.tokens.identHint')"
-        :label="$t('message.tokens.identLabel')"
+        :label="$t('message.apiKeys.identLabel')"
+        :valid="!inputError"
+        :validation="inputError"
+        @changeValue="inputError = ''"
       />
       <c-button
-        id="create-token-button"
-        @click="addToken(newIdentifier)"
-        @keyup.enter="addToken(newIdentifier)"
+        id="create-api-key-button"
+        @click="addAPIKey(newIdentifier)"
+        @keyup.enter="addAPIKey(newIdentifier)"
       >
-        {{ $t('message.tokens.createToken') }}
+        {{ $t("message.apiKeys.create") }}
       </c-button>
       <c-row
-        v-show="latest.token"
+        v-show="latest.apiKey"
         align="start"
         justify="space-between"
       >
         <p>
-          <strong>{{ $t('message.tokens.latestToken') }}</strong>
+          <strong>{{ $t("message.apiKeys.latest") }}</strong>
         </p>
-        <div id="token">
-          <p>{{ latest.token }}</p>
+        <div id="api-key">
+          <p>{{ latest.apiKey }}</p>
         </div>
         <c-button
           size="small"
-          @click="copyLatestToken"
-          @keyup.enter="copyLatestToken"
+          @click="copyLatest"
+          @keyup.enter="copyLatest"
         >
           <i
             slot="icon"
             class="mdi mdi-content-copy"
           />
-          {{ $t('message.tokens.copy') }}
+          {{ $t('message.apiKeys.copy') }}
         </c-button>
       </c-row>
       <c-alert
-        v-show="latest.token"
+        v-show="latest.apiKey"
         type="warning"
       >
-        <p>{{ $t('message.tokens.copyWarning') }}</p>
+        <p>{{ $t('message.apiKeys.copyWarning') }}</p>
       </c-alert>
       <!-- Footer options needs to be in CamelCase,
       because csc-ui wont recognise it otherwise. -->
       <c-data-table
         sort-by="identifier"
         sort-direction="asc"
-        :no-data-text="$t('message.tokens.empty')"
-        :data.prop="tableTokens"
+        :no-data-text="$t('message.apiKeys.empty')"
+        :data.prop="tableAPIKeys"
         :headers.prop="headers"
-        :pagination.prop="tokenPagination"
+        :pagination.prop="apiKeyPagination"
         :footerOptions.prop="footer"
-        :hide-footer="tokens.length <= tokensPerPage"
+        :hide-footer="apiKeys.length <= apiKeysPerPage"
         @click="checkPage"
       />
       <c-toasts
-        id="token-toasts"
-        data-testid="token-toasts"
+        id="api-key-toasts"
+        data-testid="api-key-toasts"
       />
     </c-card-content>
   </c-card>
@@ -94,9 +97,9 @@
 <script>
 import { mdiClose, mdiDelete } from "@mdi/js";
 import {
-  createExtToken,
-  listTokens,
-  removeToken,
+  createAPIKey,
+  listAPIKeys,
+  removeAPIKey,
 } from "@/common/api";
 import {
   addFocusClass,
@@ -104,25 +107,26 @@ import {
   moveFocusOutOfModal,
 } from "@/common/keyboardNavigation";
 export default {
-  name: "TokenModal",
+  name: "APIKeyModal",
   data() {
     return {
-      tokens: [],
+      apiKeys: [],
       newIdentifier: "",
       latest: {
-        token: undefined,
+        apiKey: undefined,
         id: undefined,
       },
       copied: false,
-      tokensPerPage: 5,
+      apiKeysPerPage: 5,
       mdiClose,
       mdiDelete,
       currentPage: 1,
+      inputError: "",
     };
   },
   computed: {
     visible() {
-      return this.$store.state.openTokenModal;
+      return this.$store.state.openAPIKeyModal;
     },
     activeId() {
       return this.$store.state.active.id;
@@ -131,8 +135,8 @@ export default {
       return [
         {
           key: "identifier",
-          value: this.$t("message.tokens.identifier"),
-          sortable: this.tokens.length > 1,
+          value: this.$t("message.apiKeys.identifier"),
+          sortable: this.apiKeys.length > 1,
         },
         {
           key: "controls",
@@ -151,14 +155,14 @@ export default {
                   type: "error",
                   path: mdiDelete,
                   onClick: ({ data: { identifier }}) =>
-                    this.deleteToken(identifier.value),
+                    this.deleteAPIKey(identifier.value),
                   onKeyUp: (e) => {
                     if(e.keyCode === 13) {
                       // Get the row element of item that is to be removed
                       const row = e.target.closest("tr");
                       if (row !== undefined) {
                         const identifierValue = row.children[0]?.innerText;
-                        this.deleteToken(identifierValue);
+                        this.deleteAPIKey(identifierValue);
                       }
                     }
                   },
@@ -169,19 +173,19 @@ export default {
         },
       ];
     },
-    tableTokens () {
-      return this.tokens.map(token => {
+    tableAPIKeys () {
+      return this.apiKeys.map(apiKey => {
         return {
           identifier: {
-            value: token,
+            value: apiKey,
           },
         };
       });
     },
-    tokenPagination() {
+    apiKeyPagination() {
       return {
-        itemCount: this.tokens.length,
-        itemsPerPage: this.tokensPerPage,
+        itemCount: this.apiKeys.length,
+        itemsPerPage: this.apiKeysPerPage,
         currentPage: this.currentPage,
       };
     },
@@ -196,27 +200,28 @@ export default {
   },
   watch: {
     visible () {
-      if (this.visible) this.getTokens(this.activeId);
+      if (this.visible) this.getAPIKeys(this.activeId);
     },
   },
   methods: {
     checkPage: function(event){
       this.currentPage = event.target.pagination.currentPage;
     },
-    closeTokenModal: function (addFocus) {
+    closeModal: function (addFocus) {
       this.currentPage = 1;
-      this.$store.commit("toggleTokenModal", false);
+      this.$store.commit("toggleAPIKeyModal", false);
       this.newIdentifier = "";
-      this.latest = { token: undefined, id: undefined };
+      this.latest = { apiKey: undefined, id: undefined };
       this.copied = false;
-      document.querySelector("#token-toasts").removeToast("error-failed");
-      document.querySelector("#token-toasts").removeToast("error-in-use");
-      document.querySelector("#token-toasts").removeToast("success-copied");
-      document.querySelector("#token-toasts").removeToast("success-removed");
+      this.inputError = "";
+      document.querySelector("#api-key-toasts").removeToast("error-failed");
+      document.querySelector("#api-key-toasts").removeToast("error-in-use");
+      document.querySelector("#api-key-toasts").removeToast("success-copied");
+      document.querySelector("#api-key-toasts").removeToast("success-removed");
 
       /*
         Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Token Modal.
+        when we click it to open the modal.
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
@@ -224,56 +229,52 @@ export default {
         .querySelector("[data-testid='support-menu']");
       moveFocusOutOfModal(prevActiveElParent, true, addFocus);
     },
-    getTokens: function () {
-      listTokens(this.activeId).then((ret) => {this.tokens = ret;});
+    getAPIKeys: function () {
+      listAPIKeys(this.activeId).then((ret) => {this.apiKeys = ret;});
     },
-    addToken: function (identifier) {
-      if (!this.tokenExists(identifier)) {
-        createExtToken(
+    addAPIKey: function (identifier) {
+      if (!identifier) {
+        this.inputError = this.$t("message.apiKeys.required");
+      }
+      else if (this.apiKeyExists(identifier)) {
+        this.inputError = this.$t("message.apiKeys.inUse");
+      }
+      else {
+        createAPIKey(
           this.activeId,
           identifier,
         ).then((ret) => {
-          this.latest.token = ret;
+          this.latest.apiKey = ret;
           this.latest.id = this.newIdentifier;
           this.newIdentifier = "";
-          this.getTokens();
+          this.getAPIKeys();
         }).catch(() => {
-          document.querySelector("#token-toasts").addToast(
+          document.querySelector("#api-key-toasts").addToast(
             {
               id: "error-failed",
               type: "error",
               progress: false,
-              message: this.$t("message.tokens.creationFailed"),
+              message: this.$t("message.apiKeys.creationFailed"),
             },
           );
         });
       }
-      else {
-        document.querySelector("#token-toasts").addToast(
-          {
-            id: "error-in-use",
-            type: "error",
-            progress: false,
-            message: this.$t("message.tokens.inUse"),
-          },
-        );
-      }
     },
-    tokenExists: function (identifier) {
-      return this.tokens.includes(identifier) ? true : false;
+    apiKeyExists: function (identifier) {
+      return this.apiKeys.includes(identifier) ? true : false;
     },
-    copyLatestToken: function () {
+    copyLatest: function () {
       if (!this.copied) {
         navigator.clipboard.writeText(
-          this.latest.token,
+          this.latest.apiKey,
         ).then(() => {
           this.copied = true;
-          document.querySelector("#token-toasts").addToast(
+          document.querySelector("#api-key-toasts").addToast(
             {
               id: "success-copied",
               type: "success",
               progress: false,
-              message: this.$t("message.tokens.tokenCopied"),
+              message: this.$t("message.apiKeys.copied"),
             },
           );
           //like with ShareID copy button:
@@ -282,27 +283,27 @@ export default {
         });
       }
     },
-    deleteToken: function (identifier) {
-      removeToken(
+    deleteAPIKey: function (identifier) {
+      removeAPIKey(
         this.activeId,
         identifier,
       ).then(() => {
         if (identifier === this.latest.id) {
-          this.latest = {token: undefined, id: undefined};
+          this.latest = {apiKey: undefined, id: undefined};
         }
-        document.querySelector("#token-toasts").addToast(
+        document.querySelector("#api-key-toasts").addToast(
           {
             id: "success-removed",
             type: "success",
             progress: false,
-            message: this.$t("message.tokens.tokenRemoved"),
+            message: this.$t("message.apiKeys.removed"),
           },
         );
-        this.getTokens();
+        this.getAPIKeys();
       });
 
-      if(this.tokens.length - 1 == (this.currentPage - 1)
-        * this.tokensPerPage) {
+      if(this.apiKeys.length - 1 == (this.currentPage - 1)
+        * this.apiKeysPerPage) {
         this.currentPage--;
       }
     },
@@ -310,15 +311,15 @@ export default {
       const eTarget = e.target;
       const shadowDomTarget = eTarget.shadowRoot?.activeElement;
 
-      const first = document.getElementById("close-token-modal-btn");
+      const first = document.getElementById("close-api-key-modal-btn");
 
-      // last element is different between with or without token list
+      // last element is different between with or without API key list
       let last = null;
 
-      if (this.tableTokens.length === 0) {
-        last = document.getElementById("create-token-button");
+      if (this.tableAPIKeys.length === 0) {
+        last = document.getElementById("create-api-key-button");
       } else {
-        const table = this.$refs.tokenContainer.querySelector("c-data-table");
+        const table = this.$refs.apiKeyContainer.querySelector("c-data-table");
         const removeButtons = table.shadowRoot.querySelectorAll("c-button");
         last = removeButtons[removeButtons.length -1];
       }
@@ -347,7 +348,7 @@ export default {
 
 @import "@/css/prod.scss";
 
-.token-card {
+.api-key-card {
   padding: 3rem 2rem;
   position: absolute;
   top: 0;
@@ -357,32 +358,32 @@ export default {
   overflow-y: scroll;
 }
 
-#create-token-button {
+#create-api-key-button {
   width: max-content;
   margin-top: -1rem;
 }
 
-#token {
+#api-key {
   width: 70%;
   padding: 0rem 0.5rem;
   overflow-wrap: anywhere;
 }
 
 @media screen and (max-width: 1366px) {
-  #token {
+  #api-key {
     width: 100%;
     padding: 0.5rem 0;
   }
 }
 
 @media screen and (max-width: 992px) {
-  .token-card {
+  .api-key-card {
     max-height: 60vh;
   }
 }
 
 @media screen and (max-width: 576px) {
-  .token-card {
+  .api-key-card {
     padding: 1.5rem 1rem;
   }
 }
