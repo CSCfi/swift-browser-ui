@@ -33,11 +33,13 @@ class APITestClass(tests.common.mockups.APITestBase):
             [
                 {
                     "id": "test-id-0",
+                    "title": "",
                     "name": "test-name-0",
                     "tainted": False,
                 },
                 {
                     "id": "test-id-1",
+                    "title": "",
                     "name": "test-name-1",
                     "tainted": False,
                 },
