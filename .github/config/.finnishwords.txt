@@ -5,10 +5,6 @@ ajaksi
 aktiiviset
 alapuolisesta
 alaviiva
-alikansio
-alikansioiden
-alikansion
-alikansiot
 alkanut
 alla
 aloitettiin
@@ -224,9 +220,8 @@ kirjoitus
 kirjoitusoikeus
 klikkaa
 kohde
-kohdekansio
-kohdesäiliö
 kohdetta
+kohdeämpäri
 kohdistaminen
 kohdistamisessa
 kohdistettaessa
@@ -944,3 +939,13 @@ ylläpitäjälle
 ymmärrettävyys
 yritit
 yritä
+ämpäreille
+ämpäreitä
+ämpäri
+ämpäriin
+ämpärin
+ämpärisi
+ämpärissä
+ämpäristä
+ämpärit
+ämpäriä

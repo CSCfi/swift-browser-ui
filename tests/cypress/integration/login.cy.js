@@ -15,7 +15,7 @@ describe("Log in a user", () => {
   it("Login with correct credentials redirects to project browsing page", () => {
     cy.login(Cypress.env("username"), Cypress.env("password"));
     cy.url().should("include", "browse");
-    cy.get("[data-testid='create-folder']").should("be.visible");
+    cy.get("[data-testid='create-bucket']").should("be.visible");
     cy.getCookie("SWIFT_UI_SESSION").should("exist");
     cy.getCookie("OBJ_UI_LANG").should("have.property", "value", "en");
     cy.logout();

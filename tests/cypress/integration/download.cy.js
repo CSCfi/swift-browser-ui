@@ -2,7 +2,7 @@
 
 import SparkMD5 from "../../../swift_browser_ui_frontend/node_modules/spark-md5";
 
-describe("Downloads file/container, verifies content and checksum", function () {
+describe("Downloads file/bucket, verifies content and checksum", function () {
   const useServiceWorker =
     "serviceWorker" in navigator && window.showSaveFilePicker === undefined;
   const fileName = Math.random().toString(36).substring(2, 7);
@@ -17,15 +17,15 @@ describe("Downloads file/container, verifies content and checksum", function () 
   });
 
   it("should download a file", () => {
-    //create a folder
-    const folderName = Math.random().toString(36).substring(2, 7);
-    cy.addFolder(folderName);
+    //create a bucket
+    const bucketName = Math.random().toString(36).substring(2, 7);
+    cy.addBucket(bucketName);
     cy.wait(3000);
 
-    //access folder
-    cy.searchFolder(folderName);
+    //access bucket
+    cy.searchBucket(bucketName);
     cy.get("[data-testid='search-result']")
-      .contains(folderName)
+      .contains(bucketName)
       .click({ force: true });
     cy.wait(5000);
 
@@ -36,7 +36,7 @@ describe("Downloads file/container, verifies content and checksum", function () 
         cy.log("Upload hash", hexHashUpload);
 
         //upload the fixture file
-        cy.uploadFileFromFolder(fileName);
+        cy.uploadFileFromBucket(fileName);
 
         //close toast
         cy.get('[data-testid="close-upload-toast"]').should("exist").click();
@@ -97,7 +97,7 @@ describe("Downloads file/container, verifies content and checksum", function () 
   });
 
   it("should download an archive", () => {
-    const folderName = Math.random().toString(36).substring(2, 7);
+    const bucketName = Math.random().toString(36).substring(2, 7);
     //check file hashes before upload
     let hexHashUpload;
 
@@ -113,10 +113,10 @@ describe("Downloads file/container, verifies content and checksum", function () 
         //check that modal opened
         cy.get("[data-testid='upload-modal']").should("be.visible");
 
-        //insert folder name
-        cy.get("[data-testid='upload-folder-input']")
+        //insert bucket name
+        cy.get("[data-testid='upload-bucket-input']")
           .find("input")
-          .type(folderName);
+          .type(bucketName);
 
         //add the file
         cy.get("[data-testid='select-files-input']")
@@ -135,10 +135,10 @@ describe("Downloads file/container, verifies content and checksum", function () 
 
         cy.wait(3000);
 
-        cy.contains(folderName).should("exist");
+        cy.contains(bucketName).should("exist");
 
         //click download
-        cy.contains(folderName)
+        cy.contains(bucketName)
           .parent()
           .parent()
           .parent()
@@ -154,13 +154,13 @@ describe("Downloads file/container, verifies content and checksum", function () 
           //TEST DIRECT DOWNLOAD
           cy.log("Testing direct archive download");
 
-          cy.getFileContentFromOPFS(folderName + "_download.tar").then(
+          cy.getFileContentFromOPFS(bucketName + "_download.tar").then(
             ($contentOnDownload) => {
               //need to create a fixture file from file content in OPFS
               cy.writeFile(
                 Cypress.config("downloadsFolder") +
                   "/" +
-                  folderName +
+                  bucketName +
                   "_download.tar",
                 $contentOnDownload
               );
@@ -169,7 +169,7 @@ describe("Downloads file/container, verifies content and checksum", function () 
         }
 
         const downloadName =
-          folderName + (useServiceWorker ? ".tar" : "_download.tar");
+          bucketName + (useServiceWorker ? ".tar" : "_download.tar");
         //check that archive exists
         cy.readFile(Cypress.config("downloadsFolder") + "/" + downloadName);
 

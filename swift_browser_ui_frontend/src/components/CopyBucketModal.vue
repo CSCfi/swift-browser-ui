@@ -1,38 +1,38 @@
 <template>
   <c-card
-    ref="copyFolderContainer"
-    class="copy-folder"
+    ref="copyBucketContainer"
+    class="copy-bucket"
     @keydown="handleKeyDown"
   >
     <div class="modal-content-wrapper">
       <h2 class="title is-4">
         {{
-          $t("message.replicate.copy_folder") + selectedFolderName
+          $t("message.replicate.copy") + selectedBucketName
         }}
       </h2>
       <c-card-content>
-        <div id="folder-name-wrapper">
+        <div id="bucket-name-wrapper">
           <c-text-field
-            id="new-copy-folderName"
-            v-model="folderName"
+            id="new-copy-bucketName"
+            v-model="bucketName"
             v-csc-control
-            :label="$t('message.replicate.name_newFolder')"
-            name="foldername"
-            :valid="loadingFoldername || errorMsg.length === 0"
+            :label="$t('message.replicate.name')"
+            name="bucketname"
+            :valid="loadingBucketname || errorMsg.length === 0"
             :validation="errorMsg"
             aria-required="true"
             required
           />
-          <c-loader v-show="loadingFoldername" />
+          <c-loader v-show="loadingBucketname" />
         </div>
         <label
           class="taginput-label"
-          label-for="copy-folder-taginput"
+          label-for="copy-bucket-taginput"
         >
           {{ $t('message.tagName') }}
         </label>
         <TagInput
-          id="copy-folder-taginput"
+          id="copy-bucket-taginput"
           :tags="tags"
           @addTag="addingTag"
           @deleteTag="deletingTag"
@@ -71,7 +71,7 @@ import { getDB } from "@/common/db";
 import {
   addNewTag,
   deleteTag,
-  validateFolderName,
+  validateBucketName,
 } from "@/common/globalFunctions";
 import {
   getFocusableElements,
@@ -85,14 +85,14 @@ import TagInput from "@/components/TagInput.vue";
 import { toRaw } from "vue";
 
 export default {
-  name: "CopyFolderModal",
+  name: "CopyBucketModal",
   components: { TagInput },
   data() {
     return {
-      folderName: "",
-      loadingFoldername: true,
+      bucketName: "",
+      loadingBucketname: true,
       tags: [],
-      folders: [],
+      buckets: [],
       checkpointsCompleted: 0,
       errorMsg: "",
     };
@@ -101,52 +101,52 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    selectedFolderName() {
-      return this.$store.state.selectedFolderName.length > 0
-        ? this.$store.state.selectedFolderName
+    selectedBucketName() {
+      return this.$store.state.selectedBucketName.length > 0
+        ? this.$store.state.selectedBucketName
         : "";
     },
     sourceProjectId() {
       return this.$store.state.sourceProjectId;
     },
     visible() {
-      return this.$store.state.openCopyFolderModal;
+      return this.$store.state.openCopyBucketModal;
     },
   },
   watch: {
     visible: function () {
       if (this.visible) {
-        if (this.selectedFolderName && this.selectedFolderName.length > 0) {
-          this.fetchFolders().then(() => {
-            if(this.folders && this.folders.length > 0) {
-              this.getCopyFolder(this.selectedFolderName);
+        if (this.selectedBucketName && this.selectedBucketName.length > 0) {
+          this.fetchBuckets().then(() => {
+            if(this.buckets && this.buckets.length > 0) {
+              this.getCopyBucket(this.selectedBucketName);
             }
           });
         }
       }
     },
-    folderName() {
-      if (this.folderName) {
+    bucketName() {
+      if (this.bucketName) {
         this.checkValidity();
       }
     },
     checkpointsCompleted() {
       if (this.checkpointsCompleted > 1) {
-        this.$store.commit("setFolderCopiedStatus", true);
-        document.querySelector("#copyFolder-toasts")
+        this.$store.commit("setBucketCopiedStatus", true);
+        document.querySelector("#copyBucket-toasts")
           .removeToast("copy-in-progress");
       }
     },
   },
   methods: {
-    fetchFolders: async function () {
+    fetchBuckets: async function () {
       if (
         this.active.id === undefined &&
         this.$route.params.project === undefined
       ) {
         return;
       }
-      this.folders = useObservable(
+      this.buckets = useObservable(
         liveQuery(() =>
           getDB().containers
             .where({ projectID: this.$route.params.project })
@@ -159,54 +159,54 @@ export default {
         signal: null,
       });
     },
-    getCopyFolder: function (origFolderName) {
-      if (this.folders) {
-        // Check if current folder is a copy
+    getCopyBucket: function (origBucketName) {
+      if (this.buckets) {
+        // Check if current bucket is a copy
         const reg = new RegExp("\\b(copy)\\s(\\d+)\\b$", "i");
-        const isCopied = origFolderName.match(reg);
+        const isCopied = origBucketName.match(reg);
 
-        // Use a var to keep the folder as a copy name without copy version
-        let copiedFolder = "";
+        // Use a var to keep the bucket as a copy name without copy version
+        let copiedBucket = "";
         if (isCopied) {
-          copiedFolder = `${origFolderName.slice(0, isCopied["index"])}copy`;
+          copiedBucket = `${origBucketName.slice(0, isCopied["index"])}copy`;
         } else {
-          copiedFolder = `${origFolderName} copy`;
+          copiedBucket = `${origBucketName} copy`;
         }
 
-        const existingCopiedFolders = [];
-        for (let folder of this.folders) {
-          // Check if folder is one of the copy versions
+        const existingCopiedBuckets = [];
+        for (let bucket of this.buckets) {
+          // Check if bucket is one of the copy versions
           // which ends in the form 'copy + number'
-          const copiedReg = new RegExp(`\\b${copiedFolder}\\s(\\d+)\\b$`, "gi");
-          folder.name.match(copiedReg) ?
-            existingCopiedFolders.push(folder.name) : null;
+          const copiedReg = new RegExp(`\\b${copiedBucket}\\s(\\d+)\\b$`, "gi");
+          bucket.name.match(copiedReg) ?
+            existingCopiedBuckets.push(bucket.name) : null;
         }
 
-        if (existingCopiedFolders.length > 0) {
+        if (existingCopiedBuckets.length > 0) {
           // Sort the array in asc, the last item is the latest copy
           // then extract the copy version from it
-          existingCopiedFolders.sort();
-          const latestVer= existingCopiedFolders[
-            existingCopiedFolders.length-1].match(reg);
-          this.folderName = !isCopied ? `${copiedFolder} ${+latestVer[2] + 1}` : origFolderName.replace(/\d+$/, +latestVer[2]+1);
+          existingCopiedBuckets.sort();
+          const latestVer= existingCopiedBuckets[
+            existingCopiedBuckets.length-1].match(reg);
+          this.bucketName = !isCopied ? `${copiedBucket} ${+latestVer[2] + 1}` : origBucketName.replace(/\d+$/, +latestVer[2]+1);
         } else {
-          this.folderName = `${copiedFolder} 1`;
+          this.bucketName = `${copiedBucket} 1`;
         }
-        this.loadingFoldername = false;
+        this.loadingBucketname = false;
       }
     },
     cancelCopy: function (keypress) {
-      this.$store.commit("toggleCopyFolderModal", false);
-      this.$store.commit("setFolderName", "");
-      this.folderName = "";
+      this.$store.commit("toggleCopyBucketModal", false);
+      this.$store.commit("setBucketName", "");
+      this.bucketName = "";
       this.tags = [];
-      this.loadingFoldername = true;
+      this.loadingBucketname = true;
       this.errorMsg = "";
-      document.querySelector("#copyFolder-toasts").removeToast("copy-error");
+      document.querySelector("#copyBucket-toasts").removeToast("copy-error");
 
       /*
         Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Copy Folder Modal.
+        when we click it to open Copy Modal.
         Therefore, we need to make its focusable parent
         to be focused instead after we close the modal.
       */
@@ -216,14 +216,14 @@ export default {
       }
     },
     replicateContainer: function (keypress) {
-      this.folderName = this.folderName.trim();
+      this.bucketName = this.bucketName.trim();
       this.checkValidity();
       this.a_replicate_container(keypress).then(() => {});
     },
     a_replicate_container: async function (keypress) {
       if (this.errorMsg.length) return;
-      this.$store.commit("toggleCopyFolderModal", false);
-      document.querySelector("#copyFolder-toasts").addToast(
+      this.$store.commit("toggleCopyBucketModal", false);
+      document.querySelector("#copyBucket-toasts").addToast(
         {
           id: "copy-in-progress",
           type: "success",
@@ -245,9 +245,9 @@ export default {
       // Initiate the container replication operation
       await swiftCopyContainer(
         this.active.id,
-        this.folderName,
+        this.bucketName,
         this.sourceProjectId ? this.sourceProjectId : this.active.id,
-        this.selectedFolderName,
+        this.selectedBucketName,
         this.active.name,
         sourceProjectName,
       ).then(async () => {
@@ -262,25 +262,25 @@ export default {
         let metadata = {
           usertags: tags.join(";"),
         };
-        delay((id, folder, meta, tgs) => {
-          updateContainerMeta(id, folder, meta)
+        delay((id, bucket, meta, tgs) => {
+          updateContainerMeta(id, bucket, meta)
             .then(
               async () => {
                 await getDB().containers
                   .where({
                     projectID: id,
-                    name: folder,
+                    name: bucket,
                   })
                   .modify({ tgs });
               },
             );
 
           this.checkpointsCompleted++;
-        }, 5000, this.active.id, this.folderName, metadata, tags);
+        }, 5000, this.active.id, this.bucketName, metadata, tags);
 
         getObjects(
           this.sourceProjectId ? this.sourceProjectId : this.active.id,
-          this.selectedFolderName,
+          this.selectedBucketName,
         ).then(async (objects) => {
           const sleep =
             time => new Promise(resolve => setTimeout(resolve, time));
@@ -288,7 +288,7 @@ export default {
           let copiedObjects = undefined;
           while (copiedObjects === undefined ||
             copiedObjects.length < objects.length) {
-            const task = getObjects(this.active.id, this.folderName)
+            const task = getObjects(this.active.id, this.bucketName)
               .then((obj) => copiedObjects = obj );
 
             await Promise.all([task, sleep(2000)]);
@@ -298,7 +298,7 @@ export default {
           this.cancelCopy(keypress);
         });
       }).catch(() => {
-        document.querySelector("#copyFolder-toasts").addToast(
+        document.querySelector("#copyBucket-toasts").addToast(
           {
             id: "copy-error",
             type: "error",
@@ -317,11 +317,11 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     checkValidity: debounce(function () {
-      this.errorMsg = validateFolderName(
-        this.folderName, this.$t, this.folders);
+      this.errorMsg = validateBucketName(
+        this.bucketName, this.$t, this.buckets);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.copyFolderContainer.querySelectorAll(
+      const focusableList = this.$refs.copyBucketContainer.querySelectorAll(
         "input, c-icon, c-button",
       );
       const { first, last } = getFocusableElements(focusableList);
@@ -333,7 +333,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.copy-folder {
+.copy-bucket {
   padding: 3rem;
   position: absolute;
   top: -1rem;
@@ -343,20 +343,20 @@ export default {
 }
 
 @media screen and (max-width: 767px), (max-height: 580px) {
-   .copy-folder {
+   .copy-bucket {
     top: -5rem;
   }
 }
 
 @media screen and (max-height: 580px) and (max-width: 767px),
 (max-width: 525px) {
-  .copy-folder {
+  .copy-bucket {
     top: -9rem;
   }
 }
 
 @media screen and (max-height: 580px) and (max-width: 525px) {
-  .copy-folder {
+  .copy-bucket {
     top: -13rem;
   }
 }
@@ -374,7 +374,7 @@ c-card-actions > c-button {
   margin: 0;
 }
 
-#folder-name-wrapper {
+#bucket-name-wrapper {
   position: relative;
   padding-top: 0.5rem;
 }

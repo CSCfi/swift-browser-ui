@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import FoldersView from "@/views/Folders.vue";
+import BucketsView from "@/views/Buckets.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
 import {getProjects, getContainers} from "@/common/api.js";
@@ -28,8 +28,8 @@ async function checkProject (to, from, next){
 }
 async function checkContainer (to, from, next){
 
-  if(to.params.container === store.state.uploadFolder.name) {
-    //When new folder is created with upload but containers not updated yet
+  if(to.params.container === store.state.uploadBucket.name) {
+    //When new bucket is created with upload but containers not updated yet
     next();
   }
   else {
@@ -55,7 +55,7 @@ export default createRouter({
     {
       path: "/browse",
       name: "Browse",
-      component: FoldersView,
+      component: BucketsView,
     },
     {
       path: "/browse/:user/:project/:container/shared/:owner",
@@ -65,18 +65,18 @@ export default createRouter({
     {
       path: "/browse/:user/:project",
       beforeEnter: checkProject,
-      name: "AllFolders",
-      component: FoldersView,
+      name: "AllBuckets",
+      component: BucketsView,
     },
     {
       path: "/browse/:user/:project/shared/to",
       name: "SharedTo",
-      component: FoldersView,
+      component: BucketsView,
     },
     {
       path: "/browse/:user/:project/shared/from",
       name: "SharedFrom",
-      component: FoldersView,
+      component: BucketsView,
     },
     {
       path: "/browse/:user/:project/:container",

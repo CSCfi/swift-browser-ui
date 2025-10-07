@@ -11,7 +11,7 @@
       >
         <span>
           <b>{{
-            isSubfolder() ? $t('message.search.folder') :
+            isFolder() ? $t('message.search.folder') :
             isContainer()
               ? $t('message.search.container')
               : $t('message.search.object')
@@ -39,7 +39,7 @@
             {{ item.container }}
             <br>
           </span>
-          <span v-if="!isSubfolder() && hasPath()">
+          <span v-if="!isFolder() && hasPath()">
             <b>{{ $t('message.search.folder') }}: </b>
             <span v-if="retest(getFilePath())">
               <span
@@ -103,11 +103,11 @@ export default {
   },
   methods: {
     getHumanReadableSize,
-    isSubfolder: function() {
-      return this.$props.item.subfolder;
+    isFolder: function() {
+      return this.$props.item.folder;
     },
     isContainer: function() {
-      return !this.isSubfolder() && this.$props.item.count !== undefined;
+      return !this.isFolder() && this.$props.item.count !== undefined;
     },
     hasPath: function() {
       return this.$props.item.name.match("/");
@@ -128,7 +128,7 @@ export default {
       const index = this.$props.item.name.lastIndexOf("/");
       //remove actual file name
       let str = this.$props.item.name.slice(0, index);
-      //leave last subfolder
+      //leave last folder
       filePath = str.slice(str.lastIndexOf("/")+1, str.length);
       return filePath;
     },

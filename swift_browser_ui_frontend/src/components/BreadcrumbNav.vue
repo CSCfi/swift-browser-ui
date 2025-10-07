@@ -5,11 +5,11 @@
       align="center"
     >
       <router-link
-        :to="{ name: 'AllFolders'}"
+        :to="{ name: 'AllBuckets'}"
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-home" />
-        <span>&nbsp;{{ $t("message.folderTabs.all") }}</span>
+        <span>&nbsp;{{ $t("message.bucketTabs.all") }}</span>
       </router-link>
       <router-link
         class="link"
@@ -17,19 +17,19 @@
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
-        <span :class="subfolders === '' ? 'last' : 'default'">
-          &nbsp;{{ folder }}
+        <span :class="folders === '' ? 'last' : 'default'">
+          &nbsp;{{ bucket }}
         </span>
       </router-link>
 
       <router-link
-        v-for="item, i in subfolders"
+        v-for="item, i in folders"
         :key="item"
         :to="getPath(i)"
         @click="onClickBreadcrumb"
       >
         <i class="mdi mdi-chevron-right" />
-        <span :class="i === subfolders.length-1 ? 'last': 'default'">
+        <span :class="i === folders.length-1 ? 'last': 'default'">
           &nbsp;{{ item }}
         </span>
       </router-link>
@@ -42,10 +42,10 @@
 export default {
   name: "BreadcrumbNav",
   computed: {
-    folder() {
+    bucket() {
       return this.$route.params.container;
     },
-    subfolders() { //array of subfolder titles
+    folders() { //array of folder titles
       return this.$route.query.prefix != undefined ?
         this.$route.query.prefix.split("/") : "";
     },
@@ -58,7 +58,7 @@ export default {
       this.$emit("breadcrumbClicked", true);
     },
     getPath(index) {
-      if (index === this.subfolders.length-1) {
+      if (index === this.folders.length-1) {
 
         return { name: this.currentRoute, query:
           { prefix: this.$route.query.prefix }};

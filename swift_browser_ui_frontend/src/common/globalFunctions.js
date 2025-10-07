@@ -2,8 +2,8 @@ import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
 import { getDB } from "@/common/db";
 
-export function toggleCreateFolderModal() {
-  store.commit("toggleCreateFolderModal", true);
+export function toggleCreateBucketModal() {
+  store.commit("toggleCreateBucketModal", true);
 }
 
 export function toggleEditTagsModal(objectName, containerName) {
@@ -11,19 +11,19 @@ export function toggleEditTagsModal(objectName, containerName) {
     store.commit("setObjectName", objectName);
   }
   if (containerName) {
-    store.commit("setFolderName", containerName);
+    store.commit("setBucketName", containerName);
   }
   store.commit("toggleEditTagsModal", true);
 }
 
-export function toggleCopyFolderModal(folderName, sourceProjectId) {
-  if (folderName) {
-    store.commit("setFolderName", folderName);
+export function toggleCopyBucketModal(bucketName, sourceProjectId) {
+  if (bucketName) {
+    store.commit("setBucketName", bucketName);
   }
   if(sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
-  store.commit("toggleCopyFolderModal", true);
+  store.commit("toggleCopyBucketModal", true);
 }
 
 export function toggleDeleteModal(objects, containerName) {
@@ -31,7 +31,7 @@ export function toggleDeleteModal(objects, containerName) {
     store.commit("setDeletableObjects", objects);
   }
   if (containerName) {
-    store.commit("setFolderName", containerName);
+    store.commit("setBucketName", containerName);
   }
   store.commit("toggleDeleteModal", true);
 }
@@ -63,14 +63,14 @@ export async function getSharedContainers (projectId, signal) {
 
 export async function getAccessDetails (
   projectId,
-  folderName,
+  bucketName,
   sourceProjectId,
   signal)
 {
   return store.state.client
     ? await store.state.client.getAccessDetails(
       projectId,
-      folderName,
+      bucketName,
       sourceProjectId,
       signal)
     : [];
@@ -135,7 +135,7 @@ export function getPaginationOptions(t) {
   return paginationOptions;
 }
 
-export function validateFolderName(str, t, containers) {
+export function validateBucketName(str, t, containers) {
   //minimum length 3 chars
   let error = "";
   //forbid !"#$%&'()*+,/:;<=>?@[\]^`{|}~  allow .-_

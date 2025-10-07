@@ -19,12 +19,12 @@
         <ConfirmRouteModal />
       </c-modal>
       <c-modal
-        v-model="openCreateFolderModal"
+        v-model="openCreateBucketModal"
         v-csc-control
         disable-backdrop-blur
         width="64vw"
       >
-        <CreateFolderModal />
+        <CreateBucketModal />
       </c-modal>
       <c-modal
         v-model="openUploadModal"
@@ -53,13 +53,13 @@
         <ShareModal />
       </c-modal>
       <c-modal
-        id="copy-folder-modal"
-        v-model="openCopyFolderModal"
+        id="copy-bucket-modal"
+        v-model="openCopyBucketModal"
         v-csc-control
         disable-backdrop-blur
         width="64vw"
       >
-        <CopyFolderModal />
+        <CopyBucketModal />
       </c-modal>
       <c-modal
         id="delete-objs-modal"
@@ -90,7 +90,7 @@
       />
       <router-view class="content-wrapper" />
       <c-toasts
-        id="copyFolder-toasts"
+        id="copyBucket-toasts"
         vertical="top"
       >
         <div class="toasts-wrapper">
@@ -271,7 +271,7 @@ c-modal {
   border-radius: 6px;
 }
 
-#copyFolder-toasts {
+#copyBucket-toasts {
   position: sticky;
   bottom: 30vh;
 }

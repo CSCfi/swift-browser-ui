@@ -82,7 +82,7 @@ import { mdiDelete } from "@mdi/js";
 
 export default {
   name: "ShareModalTable",
-  props: ["sharedDetails", "folderName", "accessRights"],
+  props: ["sharedDetails", "bucketName", "accessRights"],
 
   data: function () {
     return {
@@ -275,28 +275,28 @@ export default {
 
       await modifyAccessControlMeta(
         this.projectId,
-        this.folderName,
+        this.bucketName,
         [sharedProjectId],
         this.newPerms,
       );
 
       await modifyAccessControlMeta(
         this.projectId,
-        `${this.folderName}_segments`,
+        `${this.bucketName}_segments`,
         [sharedProjectId],
         this.newPerms,
       );
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,
-        this.folderName,
+        this.bucketName,
         [sharedProjectId],
         this.newPerms,
       );
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,
-        `${this.folderName}_segments`,
+        `${this.bucketName}_segments`,
         [sharedProjectId],
         this.newPerms,
       );
@@ -305,12 +305,12 @@ export default {
       );
 
       let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.bucketName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
 
       let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
-        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
       ));
       whitelistUrl.searchParams.append(
         "valid",
@@ -342,11 +342,11 @@ export default {
           if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
         });
       }
-      this.$emit("updateSharedFolder");
+      this.$emit("updateSharedBucket");
     },
     confirmDelete: async function () {
-      this.$emit("removeSharedFolder", this.toDelete);
-      await this.deleteFolderShare(this.toDelete);
+      this.$emit("removeSharedBucket", this.toDelete);
+      await this.deleteBucketShare(this.toDelete);
       this.clearDelete();
       this.$store.commit("setSharingUpdated", true);
     },
@@ -354,40 +354,40 @@ export default {
       this.clickedDelete = false;
       this.toDelete = {};
     },
-    deleteFolderShare: async function (folderData) {
+    deleteBucketShare: async function (bucketData) {
       await removeAccessControlMeta(
         this.projectId,
-        this.folderName,
+        this.bucketName,
       );
 
       await removeAccessControlMeta(
         this.projectId,
-        `${this.folderName}_segments`,
+        `${this.bucketName}_segments`,
       );
 
       await this.$store.state.client.shareDeleteAccess(
         this.projectId,
-        this.folderName,
-        [folderData.projectId.value],
+        this.bucketName,
+        [bucketData.projectId.value],
       );
 
       await this.$store.state.client.shareDeleteAccess(
         this.projectId,
-        `${this.folderName}_segments`,
-        [folderData.projectId.value],
+        `${this.bucketName}_segments`,
+        [bucketData.projectId.value],
       );
 
       let projectIDs = await this.$store.state.client.projectCheckIDs(
-        folderData.projectId.value,
+        bucketData.projectId.value,
       );
 
       let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.folderName}`);
+      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.bucketName}`);
       let signed = await GET(signatureUrl);
       signed = await signed.json();
 
       let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
-        `/cryptic/${this.$store.state.active.name}/${this.folderName}`,
+        `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
       ));
       whitelistUrl.searchParams.append(
         "valid",
@@ -408,12 +408,12 @@ export default {
         },
       ).then(() => {
         if (DEV) console.log(
-          `Deleted sharing whitelist entry for ${folderData.projectId.value}`,
+          `Deleted sharing whitelist entry for ${bucketData.projectId.value}`,
         );
       },
       ).finally(() => {
         if (DEV) console.log(
-          `Share deletion for ${folderData.projectId.value} finished.`,
+          `Share deletion for ${bucketData.projectId.value} finished.`,
         );
       });
     },

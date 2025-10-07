@@ -3,12 +3,12 @@
     id="object-table"
   >
     <BreadcrumbNav @breadcrumbClicked="breadcrumbClickHandler" />
-    <div class="folder-info">
-      <div class="folder-info-heading">
-        <i class="mdi mdi-folder-outline" />
+    <div class="bucket-info">
+      <div class="bucket-info-heading">
+        <i class="mdi mdi-pail-outline" />
         <span>{{ containerName }}</span>
       </div>
-      <ul class="folder-details">
+      <ul class="bucket-details">
         <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}&nbsp;
@@ -172,7 +172,6 @@ export default {
       optionsKey: 1,
       abortController: null,
       filteredObjects: [],
-      inCurrentFolder: [],
       tableOptions: [],
       currentContainer: {},
       breadcrumbClicked: false,
@@ -199,13 +198,13 @@ export default {
     active () {
       return this.$store.state.active;
     },
-    openCreateFolderModal() {
-      return this.$store.state.openCreateFolderModal;
+    openCreateBucketModal() {
+      return this.$store.state.openCreateBucketModal;
     },
     locale () {
       return this.$i18n.locale;
     },
-    isFolderUploading() {
+    isBucketUploading() {
       return this.$store.state.isUploading;
     },
     owner() {
@@ -246,17 +245,17 @@ export default {
     },
     locale () {
       this.setLocalizedContent();
-      this.getFolderSharedStatus();
+      this.getBucketSharedStatus();
     },
-    isFolderUploading: function () {
-      if (!this.isFolderUploading) {
+    isBucketUploading: function () {
+      if (!this.isBucketUploading) {
         setTimeout(async () => {
           this.updateAfterUpload();
         }, 3000);
       }
     },
     shareModal: async function(){
-      if (!this.shareModal) await this.getFolderSharedStatus();
+      if (!this.shareModal) await this.getBucketSharedStatus();
     },
     oList() {
       if (this.objsLoading) setTimeout(() => this.objsLoading = false, 100);
@@ -286,7 +285,7 @@ export default {
   methods: {
     getData: async function () {
       await this.getSharedContainers();
-      await this.getFolderSharedStatus();
+      await this.getBucketSharedStatus();
       await this.updateObjects();
     },
     breadcrumbClickHandler(value) {
@@ -296,7 +295,7 @@ export default {
       this.sharedContainers =
         await getSharedContainers(this.active.id, this.abortController.signal);
     },
-    getFolderSharedStatus: async function() {
+    getBucketSharedStatus: async function() {
       if (this.client) {
         await this.client.getShareDetails(
           this.project,
@@ -307,9 +306,9 @@ export default {
             if (ret.length > 0) {
               ret.length === 1
                 ? this.sharedStatus
-                  = this.$t("message.folderDetails.sharing_to_one_project")
+                  = this.$t("message.bucketDetails.sharing_to_one_project")
                 : this.sharedStatus
-                  = this.$t("message.folderDetails.sharing_to_many_projects");
+                  = this.$t("message.bucketDetails.sharing_to_many_projects");
             }
             else if (ret.length === 0) {
               if (this.sharedContainers.findIndex(
@@ -327,15 +326,15 @@ export default {
                 switch (this.accessRights.length) {
                   case 0:
                     this.sharedStatus
-                      = this.$t("message.folderDetails.shared_with_view");
+                      = this.$t("message.bucketDetails.shared_with_view");
                     break;
                   case 1:
                     this.sharedStatus
-                      = this.$t("message.folderDetails.shared_with_read");
+                      = this.$t("message.bucketDetails.shared_with_read");
                     break;
                   case 2:
                     this.sharedStatus
-                      = this.$t("message.folderDetails.shared_with_read_write");
+                      = this.$t("message.bucketDetails.shared_with_read_write");
                     break;
                 }
                 this.ownerProject = sharedDetails.owner;
@@ -344,7 +343,7 @@ export default {
                     this.locale, sharedDetails.sharingDate, this.$t, true);
               }
               else this.sharedStatus
-                = this.$t("message.folderDetails.notShared");
+                = this.$t("message.bucketDetails.notShared");
             }
           },
         );
@@ -352,14 +351,14 @@ export default {
     },
     toggleShareModal: function () {
       this.$store.commit("toggleShareModal", true);
-      this.$store.commit("setFolderName", this.containerName);
+      this.$store.commit("setBucketName", this.containerName);
     },
     confirmDelete: function(item, keypress) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
         if (keypress) this.moveFocusToDeleteModal();
       } else {
-        addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
+        addErrorToastOnMain(this.$t("message.folders.deleteNote"));
       }
     },
     getCurrentContainer: function () {
@@ -505,7 +504,7 @@ export default {
         item => selection.indexOf(item.name) > -1,
       );
 
-      /* Subfolders should also be selected and then filtered out from
+      /* Folders should also be selected and then filtered out from
         deletableObjects later
       */
       if (this.checkedRows.length < selection.length) {
@@ -612,12 +611,12 @@ export default {
           icon: "mdi-trash-can-outline",
           testid: "delete-checked-files",
           action: () => {
-            // If only subfolders checked, don't show Delete modal
+            // If only folders checked, don't show Delete modal
             if (this.renderFolders) {
-              const subfoldersOnly = this.checkedRows.every((item) =>
+              const foldersOnly = this.checkedRows.every((item) =>
                 item.name.includes("/"));
-              if (subfoldersOnly) {
-                addErrorToastOnMain(this.$t("message.subfolders.deleteNote"));
+              if (foldersOnly) {
+                addErrorToastOnMain(this.$t("message.folders.deleteNote"));
                 this.clearSelections();
                 return;
               }
@@ -665,16 +664,16 @@ export default {
   flex: 0.4;
 }
 
-.folder-info {
+.bucket-info {
   border: 1px solid $csc-primary;
   margin: 0rem 0rem;
 }
 
-.folder-info-heading, .folder-details {
+.bucket-info-heading, .bucket-details {
   padding: 1rem 2rem;
 }
 
-.folder-info-heading {
+.bucket-info-heading {
   display: flex;
   color: #FFF;
   font-size: 1rem;
@@ -691,7 +690,7 @@ export default {
   }
 }
 
-.folder-details {
+.bucket-details {
   color: $csc-dark;
 
   & li {
