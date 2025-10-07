@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) Replaced `folder` with `bucket`, `subfolder` with `folder`
 - (users) Updated API key modal text and changed to inline error validation (#1262)
 - (users) Changed the text of removal button in upload modal table (#1262)
 - outdated syntax in ceedling config
