@@ -11,6 +11,7 @@
           v-bind="active"
           :items.prop="mappedProjects"
           :label="$t('message.selectProj')"
+          :style="{ width: selectWidth }"
           placeholder="Select project"
           return-value
           hide-details
@@ -20,13 +21,13 @@
       </div>
       <div
         v-if="!multipleProjects"
-        class="nav-item column"
+        class="nav-item single-project"
       >
         <p class="label">
           {{ $t("message.currentProj") }}
         </p>
-        <p class="project-number">
-          {{ active.name }}
+        <p class="project-full-title">
+          {{ getProjectStr(active) }}
         </p>
       </div>
       <div class="nav-item">
@@ -132,7 +133,19 @@ export default {
     // C-select component handles options by name and value props
     // Append value-prop to projects
     mappedProjects() {
-      return this.projects.map(project => ({ ...project, value: project.id }));
+      return this.projects.map((project) => ({
+        ...project,
+        name: this.getProjectStr(project),
+        value: project.id,
+      }));
+    },
+    selectWidth() {
+      const min = 300;
+      const max = 600;
+      const title = this.getProjectStr(this.active);
+      let width = Math.ceil(title.length / 10) * 100;
+      width = width > max ? max : width < min ? min : width;
+      return width + "px";
     },
     isUploading() {
       return this.$store.state.isUploading;
@@ -242,6 +255,13 @@ export default {
         });
       }
     },
+    getProjectStr: function (project) {
+      return project?.name
+        ? project?.title
+          ? project.name + " " + project.title
+          : project.name
+        : "";
+    },
   },
 };
 </script>
@@ -271,19 +291,12 @@ c-toasts {
   width: fit-content;
 }
 
-.select-project, .column {
-  min-width: 15rem;
-  flex: 0.5;
-}
-
-c-select {
-  flex: 1;
-}
-
 @media screen and (max-width: 767px) {
-  .select-project, .column {
+  .select-project, .single-project {
     width: 100%;
-    flex: auto;
+  }
+  .select-project c-select {
+    max-width: 100%;
   }
 }
 
@@ -343,14 +356,8 @@ c-select {
   border-bottom-color: $white;
 }
 
-.column {
-  flex-direction: column;
-  padding: 0 0 0 1.5rem;
-  color: var(--csc-dark);
-}
-
-.project-number {
-  font-size: 0.875rem;
+.project-full-title {
+  margin-top: 0.5rem;
 }
 
 .label {
