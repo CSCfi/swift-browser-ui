@@ -22,9 +22,9 @@ import {
   getContainerLastmodified,
   updateContainerLastmodified,
 } from "@/common/globalFunctions";
-import { discoverEndpoint } from "./s3conv";
+import { discoverEndpoint, getBucketMetadata } from "./s3conv";
 import { discoverSubmitConfiguration } from "./dominate";
-import {ListBucketsCommand } from "@aws-sdk/client-s3";
+import { ListBucketsCommand } from "@aws-sdk/client-s3";
 
 const store = createStore({
   state: {
@@ -315,15 +315,16 @@ const store = createStore({
         console.log(buckets);
 
         if (buckets?.Buckets?.length > 0) {
-          buckets.Buckets.forEach(bucket => {
+          buckets.Buckets.forEach(async (bucket) => {
+            const bucketMetadata = await getBucketMetadata(s3client, bucket);
             newBuckets.push({
               name: bucket.Name,
               tokens: tokenize(bucket.Name),
               projectID: projectID,
               tags: [],
-              last_modified: bucket.CreationDate.toISOString(),
-              bytes: 0,
-              count: 0,
+              last_modified: bucketMetadata.last_modified,
+              bytes: bucketMetadata.bytes,
+              count: bucketMetadata.count,
             });
           });
         }
@@ -570,6 +571,8 @@ const store = createStore({
           await getDB().objects.put(newObj);
         }
       }
+
+      if (owner) updateContainerLastmodified(projectID, container, newObjects);
 
       if (!isSegmentsContainer && updateTags) {
         await dispatch("updateObjectTags", {

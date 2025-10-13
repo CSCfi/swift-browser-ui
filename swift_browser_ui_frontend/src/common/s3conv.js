@@ -3,7 +3,7 @@
 
 import {
   S3Client,
-  ListObjectsCommand,
+  ListObjectsV2Command,
   ListBucketsCommand,
   PutBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
@@ -92,7 +92,7 @@ export async function addUserBucketReadPolicy(client, bucket, account) {
     Policy: JSON.stringify(policy),
   };
 
-  const command = PutBucketPolicyCommand(input);
+  const command = new PutBucketPolicyCommand(input);
   const resp = await client.send(command);
 
   return resp;
@@ -132,7 +132,7 @@ export async function addUserBucketWritePolicy(client, bucket, account) {
     Policy: JSON.stringify(policy),
   };
 
-  const command = PutBucketPolicyCommand(input);
+  const command = new PutBucketPolicyCommand(input);
   const resp = await client.send(command);
 
   return resp;
@@ -153,7 +153,7 @@ export async function removeUserBucketReadPolicy(client, bucket, account) {
     Policy: JSON.stringify(policy),
   };
 
-  const command = PutBucketPolicyCommand(input);
+  const command = new PutBucketPolicyCommand(input);
   const resp = await client.send(command);
 
   return resp;
@@ -174,8 +174,47 @@ export async function removeUserBucketWritePolicy(client, bucket, account) {
     Policy: JSON.stringify(policy),
   };
 
-  const command = PutBucketPolicyCommand(input);
+  const command = new PutBucketPolicyCommand(input);
   const resp = await client.send(command);
 
   return resp;
+}
+
+export async function getBucketMetadata(client, bucket) {
+  let continuationToken;
+  let lastModified = bucket.CreationDate;
+  let count = 0;
+  let bytes = 0;
+
+  try {
+    do {
+      const response = await client.send(new ListObjectsV2Command({
+        Bucket: bucket.Name,
+        ContinuationToken: continuationToken,
+      }));
+
+      if (response?.Contents) {
+        count += response.Contents.length;
+        response.Contents.forEach((obj) => {
+          bytes += obj.Size;
+          if (obj.LastModified > lastModified) {
+            lastModified = obj.LastModified;
+          }
+        });
+      }
+
+      continuationToken = response?.NextContinuationToken;
+
+    } while (continuationToken);
+  } catch (e) {
+    console.error(`Failed to get metadata for bucket "${bucket.Name}":`, e);
+  }
+
+  const metadata = {
+    last_modified: lastModified?.toISOString(),
+    bytes: bytes,
+    count: count,
+  };
+
+  return metadata;
 }
