@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) Implemented stricter bucket name validation criteria (#1263)
 - `/api/projects` returns additional field `title` for each project
 - (users) Replaced `folder` with `bucket`, `subfolder` with `folder`
 - (users) Updated API key modal text and changed to inline error validation (#1262)
