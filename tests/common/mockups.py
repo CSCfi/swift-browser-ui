@@ -251,6 +251,21 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                 ),
             }
         )
+        self.mock_ldap_server = unittest.mock.AsyncMock()
+        self.mock_ldap_connection = unittest.mock.AsyncMock()
+        self.mock_ldap_connection.__enter__.return_value = self.mock_ldap_connection
+        self.mock_ldap_connection.__exit__.return_value = False
+
+        class FakeEntry(dict):
+            def __getitem__(self, key):
+                return super().__getitem__(key)
+
+        self.mock_ldap_connection.entries = [
+            FakeEntry({"CSCPrjNum": "123", "CSCPrjTitle": "First Project"}),
+            FakeEntry({"CSCPrjNum": "456", "CSCPrjTitle": "Second Project"}),
+        ]
+        self.mock_ldap_connection.search.return_value = True
+
         super().setUp()
 
 

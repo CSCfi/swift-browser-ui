@@ -1,5 +1,6 @@
 """Module for testing ``swift_browser_ui.ui._convenience``."""
 
+import os
 import unittest
 
 import aiohttp.web
@@ -104,3 +105,35 @@ class TestConvenienceFunctions(
                 self.mock_request,
             )
         self.assertEqual(ret, "test-key")
+
+    async def test_ldap_get_project_titles(self):
+        os.environ["LDAP_SERVER_HOST"] = "host"
+        os.environ["LDAP_SERVER_PORT"] = "636"
+        os.environ["LDAP_SERVER_BIND"] = "bind"
+        os.environ["LDAP_SERVER_PASSWORD"] = "password"
+        os.environ["LDAP_SERVER_DISTINGUISHED_NAME"] = "dn"
+
+        p_server = unittest.mock.patch(
+            "swift_browser_ui.ui._convenience.Server",
+            return_value=self.mock_ldap_server,
+        )
+        p_connection = unittest.mock.patch(
+            "swift_browser_ui.ui._convenience.Connection",
+            return_value=self.mock_ldap_connection,
+        )
+        projects = {
+            "123abc": {"name": "project_123"},
+            "987zyx": {"name": "project_456"},
+        }
+        with p_server, p_connection:
+            ret = await swift_browser_ui.ui._convenience.ldap_get_project_titles(
+                projects,
+            )
+
+        self.assertEqual(
+            ret,
+            {
+                "123": "First Project",
+                "456": "Second Project",
+            },
+        )

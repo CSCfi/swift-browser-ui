@@ -15,6 +15,7 @@ import aiohttp.web
 import aiohttp_session
 import certifi
 import redis.asyncio as redis
+from ldap3 import Connection, Server
 from redis.asyncio.sentinel import Sentinel
 
 import swift_browser_ui.common.signature
@@ -208,3 +209,51 @@ async def get_redis_client() -> redis.Redis:
             redis_creds = f"{redis_user}:{redis_password}@"
         redis_client = redis.from_url(f"redis://{redis_creds}{redis_host}:{redis_port}")
     return redis_client
+
+
+async def ldap_get_project_titles(projects: dict[str, dict]) -> dict[str, str]:
+    """Fetch and return titles for given list of projects."""
+    address = str(os.environ.get("LDAP_SERVER_HOST", ""))
+    port = int(os.environ.get("LDAP_SERVER_PORT", "636"))
+    bind = str(os.environ.get("LDAP_SERVER_BIND", ""))
+    password = str(os.environ.get("LDAP_SERVER_PASSWORD", ""))
+    distinguished_name = str(os.environ.get("LDAP_SERVER_DISTINGUISHED_NAME", ""))
+
+    attributes = ["CSCPrjTitle", "CSCPrjNum"]
+    filter = "(&(objectClass=CSCProject)(|{projects}))"
+    project_template = "(CSCPrjNum={project})"  # goes inside FILTER many times
+
+    titles = {}
+    project_numbers = ""
+
+    for _, project in projects.items():
+        # LDAP wants only the integer part, not the "project_" prefix
+        project_number = project["name"].split("_")[-1]
+        titles[project_number] = ""
+        single_project = project_template.format(project=project_number)
+        project_numbers += single_project
+
+    if not address or not port or not bind or not password or not distinguished_name:
+        logging.error("Missing envs, unable to fetch project titles info from LDAP")
+        return titles
+
+    server = Server(
+        host=address,
+        port=port,
+        use_ssl=True,
+        connect_timeout=5,
+    )
+
+    with Connection(server=server, user=bind, password=password) as conn:
+
+        conn.search(
+            search_base=distinguished_name,
+            search_filter=filter.format(projects=project_numbers),
+            attributes=attributes,
+        )
+
+        # Extract titles
+        for entry in conn.entries:
+            titles[str(entry["CSCPrjNum"])] = str(entry["CSCPrjTitle"])
+
+    return titles
