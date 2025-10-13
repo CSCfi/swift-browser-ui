@@ -20,7 +20,7 @@
       </h2>
       <c-card-content>
         <p class="info-text is-size-6">
-          {{ $t("message.container_ops.norename") }}
+          {{ $t("message.encrypt.uploadStep1.nonModifiable") }}
         </p>
         <c-text-field
           id="newBucket-input"
@@ -30,11 +30,13 @@
           name="bucketname"
           aria-required="true"
           data-testid="bucket-name"
-          :valid="errorMsg.length === 0"
-          :validation="errorMsg"
+          hide-details
           required
-          validate-on-blur
-          @changeValue="interacted=true"
+          trim-whitespace
+          @changeValue="checkBucketName"
+        />
+        <BucketNameValidation
+          :result="validationResult"
         />
         <label
           class="taginput-label"
@@ -76,8 +78,8 @@
       <c-button
         size="large"
         data-testid="save-bucket"
-        @click="createContainer(false)"
-        @keyup.enter="createContainer(true)"
+        @click="() => createContainer(false)"
+        @keyup.enter="() => createContainer(true)"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -103,19 +105,20 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
-
+import BucketNameValidation from "./BucketNameValidation.vue";
 import { toRaw } from "vue";
+import { debounce } from "lodash";
+
 
 export default {
   name: "CreateBucketModal",
-  components: { TagInput },
+  components: { TagInput, BucketNameValidation },
   data() {
     return {
       bucketName: "",
       tags: [],
       projectInfoLink: "",
-      interacted: false, //don't show error when opening modal
-      errorMsg: "",
+      validationResult: {},
       containers: [],
     };
   },
@@ -141,12 +144,6 @@ export default {
       this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
         + getProjectNumber(this.active);
     },
-    bucketName: function () {
-      this.interacted ?
-        this.errorMsg = validateBucketName(
-          this.bucketName, this.$t, this.containers) :
-        this.errorMsg = "";
-    },
     modalVisible: async function() {
       if (this.modalVisible) {
         this.containers = await getDB().containers
@@ -156,11 +153,16 @@ export default {
     },
   },
   methods: {
-    createContainer: function (keypress) {
-      this.bucketName = this.bucketName.trim();
-      this.errorMsg = validateBucketName(
-        this.bucketName, this.$t, this.containers);
-      if (this.errorMsg.length) return;
+    checkBucketName: debounce(async function () {
+      this.validationResult = await validateBucketName(
+        this.bucketName);
+    }, 300),
+    createContainer: async function (keypress) {
+      this.validationResult = await validateBucketName(
+        this.bucketName);
+      const validationError =
+        Object.values(this.validationResult).some(val => !val);
+      if (validationError) return;
 
       let projectID = this.$route.params.project;
       const bucketName = toRaw(this.bucketName);
@@ -223,8 +225,7 @@ export default {
       this.bucketName = "";
       this.tags = [];
       this.create = true;
-      this.interacted = false;
-      this.errorMsg = "";
+      this.validationResult = {};
       document.querySelector("#createModal-toasts").removeToast("create-toast");
 
       if (keypress) moveFocusOutOfModal(this.prevActiveEl);

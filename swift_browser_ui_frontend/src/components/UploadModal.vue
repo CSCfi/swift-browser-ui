@@ -19,15 +19,15 @@
         {{ $t("message.encrypt.uploadFiles") }}
       </h2>
       <c-card-content>
-        <div
-          v-if="!currentBucket"
-          id="upload-to-root"
-        >
+        <div v-if="!currentBucket" class="content-div">
           <h3 class="title is-6">
-            1. {{ $t("message.encrypt.upload_step1") }}
+            1. {{ $t("message.encrypt.uploadStep1.title") }}
           </h3>
-          <p class="info-text is-size-6">
-            {{ $t("message.container_ops.norename") }}
+          <p>
+            {{ $t('message.encrypt.uploadStep1.createAtRoot') }}
+          </p>
+          <p>
+            {{ $t('message.encrypt.uploadStep1.nonModifiable') }}
           </p>
           <c-text-field
             id="upload-bucket-input"
@@ -36,13 +36,16 @@
             data-testid="upload-bucket-input"
             :label="$t('message.container_ops.bucketName')"
             aria-required="true"
+            hide-details
             required
-            :valid="errorMsg.length === 0"
-            :validation="errorMsg"
-            @changeValue="interacted = true"
+            trim-whitespace
+            @changeValue="checkBucketName"
+          />
+          <BucketNameValidation
+            :result="validationResult"
           />
           <h3 class="title is-6">
-            2. {{ $t("message.encrypt.upload_step2") }}
+            2. {{ $t("message.encrypt.uploadStep2") }}
           </h3>
         </div>
         <div v-else>
@@ -251,6 +254,7 @@ import {
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
+import BucketNameValidation from "./BucketNameValidation.vue";
 import { swiftDeleteObjects, getObjects, signedFetch } from "@/common/api";
 
 import { debounce, delay } from "lodash";
@@ -260,6 +264,7 @@ export default {
   name: "UploadModal",
   components: {
     CUploadButton,
+    BucketNameValidation,
   },
   filters: {
     truncate,
@@ -274,9 +279,8 @@ export default {
       projectInfoLink: "",
       addingFiles: false,
       buttonAddingFiles: false,
-      interacted: false,
       currentKeyPage: 1,
-      errorMsg: "",
+      validationResult: {},
       toastMsg : "",
       containers: [],
       objects: [],
@@ -469,11 +473,6 @@ export default {
       handler() {
         if (this.modalVisible) this.getDropTablePage();
       },
-    },
-    inputBucket: function() {
-      if (this.inputBucket && this.interacted) {
-        this.checkBucketName();
-      }
     },
     active: function () {
       this.projectInfoLink = this.$t("message.supportMenu.projectInfoBaseLink")
@@ -671,9 +670,9 @@ export default {
     clearExistingFiles() {
       this.existingFiles = [];
     },
-    checkBucketName: debounce(function () {
-      this.errorMsg = validateBucketName(
-        this.inputBucket, this.$t, this.containers);
+    checkBucketName: debounce(async function () {
+      this.validationResult = await validateBucketName(
+        this.inputBucket);
     }, 300),
     setFile: function (item, path) {
       let entry = undefined;
@@ -797,10 +796,9 @@ export default {
       this.addingFiles = false;
       this.tags = [];
       this.files = [];
-      this.interacted = false;
       this.addRecvkey = "";
       this.recvHashedKeys = [];
-      this.errorMsg = "";
+      this.validationResult = {};
       this.toastMsg = "";
       this.sortBy = "name";
       this.sortDirection = "asc";
@@ -813,22 +811,21 @@ export default {
       if (this.dropFiles.length === 0) {
         return this.$t("message.upload.addFiles");
       }
-      else if (!this.pubkey.length && !this.recvkeys.length) {
+      if (!this.pubkey.length && !this.recvkeys.length) {
         return this.$t("message.upload.error");
       }
-      else return "";
+      return "";
     },
-    onUploadClick() {
-      this.toastMsg = this.checkIfCanUpload();
-
+    async onUploadClick() {
       if (!this.currentBucket) {
-        this.inputBucket = this.inputBucket.trim();
-        this.errorMsg = validateBucketName(this.inputBucket, this.$t);
+        this.validationResult =
+          await validateBucketName(this.inputBucket);
+        const validationError =
+          Object.values(this.validationResult).some(val => !val);
+        if (validationError) return;
       }
-      if (this.errorMsg) {
-        return;
-      }
-      else if (this.toastMsg) {
+      this.toastMsg = this.checkIfCanUpload();
+      if (this.toastMsg) {
         document.querySelector("#uploadModal-toasts").addToast(
           {
             id: "upload-toast",
@@ -976,10 +973,6 @@ c-data-table.files-table {
   margin-top: -24px;
 }
 
-#upload-to-root p {
-  padding: 1rem 0 1rem 0;
-}
-
 c-data-table.publickey-table {
   margin-top: 1rem;
 }
@@ -993,8 +986,15 @@ c-data-table.publickey-table {
 c-accordion c-button {
   margin-top: 0.5rem;
 }
+
 c-accordion h3 {
   padding: 1rem 0;
+}
+
+.content-div {
+  & > * {
+    margin: 1rem 0;
+  }
 }
 
 </style>
