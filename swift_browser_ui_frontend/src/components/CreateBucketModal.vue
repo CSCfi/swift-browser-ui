@@ -38,7 +38,7 @@
         <BucketNameValidation
           :result="validationResult"
         />
-        <label
+        <!--<label
           class="taginput-label"
           label-for="create-bucket-taginput"
         >
@@ -50,7 +50,7 @@
           data-testid="bucket-tag"
           @addTag="addingTag"
           @deleteTag="deletingTag"
-        />
+        />-->
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdBucket") }}
           <b>{{ active.name }}</b>.
@@ -103,8 +103,9 @@ import {
   moveFocusOutOfModal,
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
-import TagInput from "@/components/TagInput.vue";
+// import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
+
 import { toRaw } from "vue";
 import { debounce } from "lodash";
 
@@ -112,7 +113,10 @@ import { CreateBucketCommand } from "@aws-sdk/client-s3";
 
 export default {
   name: "CreateBucketModal",
-  components: { TagInput, BucketNameValidation },
+  components: {
+    //TagInput,
+    BucketNameValidation,
+  },
   data() {
     return {
       bucketName: "",
