@@ -337,7 +337,7 @@ export default {
                           },
                           disabled: !item.bytes,
                         },
-                        {
+                        /*{
                           name: this.$t("message.editTags"),
                           action: () => {
                             this.openEditTagsModal(item.name);
@@ -350,7 +350,7 @@ export default {
                             });
                           },
                           disabled: item.owner,
-                        },
+                        },*/
                         {
                           name: this.$t("message.delete"),
                           action: () => this.delete(

@@ -36,9 +36,9 @@
 
     <c-row
       id="optionsbar"
-      justify="space-between"
+      justify="end"
     >
-      <c-text-field
+      <!--<c-text-field
         id="search"
         v-model="searchQuery"
         v-csc-control
@@ -50,7 +50,7 @@
           slot="pre"
           class="mdi mdi-filter-variant mdi-24px"
         />
-      </c-text-field>
+      </c-text-field>-->
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
@@ -100,7 +100,7 @@
         :breadcrumb-clicked-prop="breadcrumbClicked"
         :objs="filtering ? filteredObjects : oList"
         :disable-pagination="hidePagination"
-        :hide-tags="hideTags"
+        :hide-tags="true"
         :render-folders="renderFolders"
         :show-timestamp="showTimestamp"
         :access-rights="accessRights"
@@ -165,7 +165,7 @@ export default {
       showTimestamp: false,
       hidePagination: false,
       renderFolders: true,
-      hideTags: false,
+      //hideTags: false,
       searchQuery: "",
       currentPage: 1,
       checkedRows: [],
@@ -238,7 +238,7 @@ export default {
       if (savedDisplayOptions) {
         this.renderFolders = savedDisplayOptions.renderFolders;
         this.showTimestamp = savedDisplayOptions.showTimestamp;
-        this.hideTags = savedDisplayOptions.hideTags;
+        //this.hideTags = savedDisplayOptions.hideTags;
         this.hidePagination = savedDisplayOptions.hidePagination;
         this.setTableOptionsMenu();
       }
@@ -525,7 +525,7 @@ export default {
       const displayOptions = {
         renderFolders: this.renderFolders,
         showTimestamp: this.showTimestamp,
-        hideTags: this.hideTags,
+        //hideTags: this.hideTags,
         hidePagination: this.hidePagination,
       };
 
@@ -562,7 +562,7 @@ export default {
             this.setTableOptionsMenu();
           },
         },
-        {
+        /*{
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")
             : this.$t("message.tableOptions.hideTags"),
@@ -577,7 +577,7 @@ export default {
 
             this.setTableOptionsMenu();
           },
-        },
+        },*/
         {
           name: this.hidePagination
             ? this.$t("message.tableOptions.showPagination")
