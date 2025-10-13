@@ -23,6 +23,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- (users) Show project title along with the number in the project selector (#1263)
 - (admins) LDAP connection need five new environment variables to expose project name functionality - found in `.github/config/.env.test`
 - (users) Added a placeholder footer link for cookie policy (#1262)
 
