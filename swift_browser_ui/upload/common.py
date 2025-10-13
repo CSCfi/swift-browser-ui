@@ -29,11 +29,8 @@ def generate_download_url(
 
 
 def get_download_host(endpoint: str, project: str) -> str:
-    """Get the actual download host with shared container support."""
-    ret = endpoint
-    if project not in ret:
-        ret = ret.replace(ret.split("/")[-1], f"AUTH_{project}")
-    return str(ret)
+    """Return the catalog endpoint as-is."""
+    return str(endpoint)
 
 
 def get_session_id(request: aiohttp.web.Request) -> str:
