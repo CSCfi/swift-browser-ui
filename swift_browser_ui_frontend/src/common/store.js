@@ -458,11 +458,12 @@ const store = createStore({
         }
       }
 
-      await dispatch("updateContainerTags", {
+      // Tagging is disabled currently
+      /*await dispatch("updateContainerTags", {
         projectID: projectID,
         containers: newBuckets,
         signal,
-      });
+      });*/
       return containers_to_update_objects;
     },
     updateContainerTags: async function (_, {
@@ -574,14 +575,15 @@ const store = createStore({
 
       if (owner) updateContainerLastmodified(projectID, container, newObjects);
 
-      if (!isSegmentsContainer && updateTags) {
+      // Tagging is disabled currently
+      /*if (!isSegmentsContainer && updateTags) {
         await dispatch("updateObjectTags", {
           projectID,
           container,
           signal,
           owner,
         });
-      }
+      }*/
     },
     updateObjectTags: async function (
       _,
