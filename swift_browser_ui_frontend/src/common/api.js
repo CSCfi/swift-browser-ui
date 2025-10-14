@@ -565,7 +565,7 @@ export async function addAccessControlBucketPolicy(
         "AWS": `arn:aws:iam::${receiver}:root`,
       },
       "Action": actions,
-      "Resrouce": `arn:aws:s3:::${bucket}`,
+      "Resource": `arn:aws:s3:::${bucket}`,
     });
   }
 

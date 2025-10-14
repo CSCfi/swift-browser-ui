@@ -631,9 +631,9 @@ const store = createStore({
       { state, commit },
     ) {
       let s3endpoint = await discoverEndpoint();
-      let submitConfig = await discoverSubmitConfiguration();
+      // let submitConfig = await discoverSubmitConfiguration();
       commit("setS3Endpoint", s3endpoint);
-      commit("setSubmitConfig", submitConfig);
+      // commit("setSubmitConfig", submitConfig);
     },
   },
 });

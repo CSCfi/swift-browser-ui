@@ -361,7 +361,7 @@ const app = createApp({
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
     });
-    setTimeout(this.containerSyncWrapper, 10000);
+    // setTimeout(this.containerSyncWrapper, 10000);
   },
   mounted() {
     document
@@ -369,9 +369,9 @@ const app = createApp({
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
-    containerSyncWrapper: function () {
-      syncContainerACLs(this.$store);
-    },
+    // containerSyncWrapper: function () {
+    //   syncContainerACLs(this.$store);
+    // },
     cancelUpload: function(container) {
       this.socket.cancelUpload(container);
     },
