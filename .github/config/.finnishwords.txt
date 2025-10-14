@@ -613,6 +613,7 @@ päänäkymään
 pääsy
 pääsyä
 päätasolle
+päättyy
 päättyä
 rajan
 rajattu

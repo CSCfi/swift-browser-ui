@@ -8,6 +8,7 @@ import {
 
 import {
   GetBucketPolicyCommand,
+  HeadBucketCommand,
   PutBucketPolicyCommand,
   DeleteBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
@@ -283,22 +284,6 @@ export async function getSharedContainerAddress(project) {
 
   let ret = await GET(addrURL);
   return ret.json();
-}
-
-export async function swiftCheckContainerExists(
-  project,
-  container,
-) {
-  const fetchURL = new URL(
-    "/api/".concat(
-      encodeURI(project), "/",
-      encodeURI(container),
-    ),
-    document.location.origin,
-  );
-  const ret = await GET(fetchURL);
-  if (ret.status === 200 || ret.status === 403) return true;
-  if (ret.status === 404) return false;
 }
 
 export async function swiftCopyContainer(
@@ -661,4 +646,16 @@ export async function removeAccessControlBucketPolicy(
     Policy: JSON.stringify(policy),
   });
   await client.send(putBucketPolicyCommand);
+}
+
+export async function checkBucketExists(client, bucketName) {
+  try {
+    const resp = await client.send(new HeadBucketCommand({
+      Bucket: bucketName,
+    }));
+    if (resp?.$metadata?.httpStatusCode === 200) return true;
+  } catch (e) {
+    if (e?.$metadata?.httpStatusCode === 403) return true;
+    if (e?.$metadata?.httpStatusCode === 404) return false;
+  }
 }

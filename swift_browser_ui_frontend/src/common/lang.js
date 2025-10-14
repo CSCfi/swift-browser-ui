@@ -260,7 +260,8 @@ let default_translations = {
       },
       nameValidation: {
         lowerCaseOrNum:
-          "Bucket name should start with a lowercase letter or a number.",
+          "Bucket name should start and end with a lowercase letter or a " +
+          "number.",
         inputLength:
           "Bucket name should be between 3 and 63 characters long.",
         alphaNumHyphen1:
@@ -829,7 +830,7 @@ let default_translations = {
       },
       nameValidation: {
         lowerCaseOrNum:
-          "Ämpärin nimi alkaa pienellä kirjaimella tai numerolla.",
+          "Ämpärin nimi alkaa ja päättyy pienellä kirjaimella tai numerolla.",
         inputLength: "Ämpärin nimi on 3-63 merkkiä pitkä.",
         alphaNumHyphen1: "Käytä vain latinalaisia pieniä aakkosia (a-z), " +
         "numeroita (0-9) ja väliviivaa (-).",

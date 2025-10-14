@@ -1,7 +1,7 @@
 import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
 import { getDB } from "@/common/db";
-import { swiftCheckContainerExists } from "@/common/api";
+import { checkBucketExists } from "@/common/api";
 
 export function toggleCreateBucketModal() {
   store.commit("toggleCreateBucketModal", true);
@@ -145,16 +145,20 @@ export async function validateBucketName(input) {
   };
   if (!input) return result;
 
-  result.lowerCaseOrNum = !!(
-    input[0].match(/[\p{L}0-9]/u) && input[0] === input[0].toLowerCase()
-  );
+  function isLowerCaseOrNum(char) {
+    return /[\p{L}0-9]/u.test(char) && char === char.toLowerCase();
+  }
+
+  result.lowerCaseOrNum = isLowerCaseOrNum(input[0]) &&
+    isLowerCaseOrNum(input[input.length - 1]);
   result.inputLength = input.length >= 3 && input.length <= 63;
   result.alphaNumHyphen = !!input.match(/^[a-z0-9-]+$/g);
+
   if (result.lowerCaseOrNum && result.inputLength && result.alphaNumHyphen) {
-    const containerExists = await swiftCheckContainerExists(
-      store.state.active.id, input);
+    const bucketExists = await checkBucketExists(
+      store.state.s3client, input);
     // In undefined case allow user to attempt bucket creation
-    result.ownable = !containerExists;
+    result.ownable = !bucketExists;
   } else {
     result.ownable = false;
   }
