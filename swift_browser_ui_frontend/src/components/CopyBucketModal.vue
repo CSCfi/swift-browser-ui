@@ -18,10 +18,12 @@
             v-csc-control
             :label="$t('message.replicate.name')"
             name="bucketname"
-            :valid="loadingBucketname || errorMsg.length === 0"
-            :validation="errorMsg"
             aria-required="true"
+            trim-whitespace
             required
+          />
+          <BucketNameValidation
+            :result="validationResult"
           />
           <c-loader v-show="loadingBucketname" />
         </div>
@@ -81,12 +83,15 @@ import {
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 //import TagInput from "@/components/TagInput.vue";
-
+import BucketNameValidation from "./BucketNameValidation.vue";
 import { toRaw } from "vue";
 
 export default {
   name: "CopyBucketModal",
-  //components: { TagInput },
+  components: {
+    //TagInput,
+    BucketNameValidation,
+  },
   data() {
     return {
       bucketName: "",
@@ -94,7 +99,7 @@ export default {
       tags: [],
       buckets: [],
       checkpointsCompleted: 0,
-      errorMsg: "",
+      validationResult: {},
     };
   },
   computed: {
@@ -162,36 +167,32 @@ export default {
     getCopyBucket: function (origBucketName) {
       if (this.buckets) {
         // Check if current bucket is a copy
-        const reg = new RegExp("\\b(copy)\\s(\\d+)\\b$", "i");
-        const isCopied = origBucketName.match(reg);
+        const copySuffix = new RegExp("-(copy)-(\\d+)$", "i");
+        const hasCopySuffix = origBucketName.match(copySuffix);
 
         // Use a var to keep the bucket as a copy name without copy version
-        let copiedBucket = "";
-        if (isCopied) {
-          copiedBucket = `${origBucketName.slice(0, isCopied["index"])}copy`;
-        } else {
-          copiedBucket = `${origBucketName} copy`;
-        }
+        let newBucketName = hasCopySuffix ?
+          `${origBucketName.slice(0, hasCopySuffix["index"])}-copy` : `${origBucketName}-copy`;
 
         const existingCopiedBuckets = [];
         for (let bucket of this.buckets) {
           // Check if bucket is one of the copy versions
           // which ends in the form 'copy + number'
-          const copiedReg = new RegExp(`\\b${copiedBucket}\\s(\\d+)\\b$`, "gi");
+          const copiedReg = new RegExp(`^${newBucketName}-(\\d+)$`, "i");
           bucket.name.match(copiedReg) ?
             existingCopiedBuckets.push(bucket.name) : null;
         }
 
+        let nextVersion = 1;
         if (existingCopiedBuckets.length > 0) {
           // Sort the array in asc, the last item is the latest copy
           // then extract the copy version from it
           existingCopiedBuckets.sort();
-          const latestVer= existingCopiedBuckets[
-            existingCopiedBuckets.length-1].match(reg);
-          this.bucketName = !isCopied ? `${copiedBucket} ${+latestVer[2] + 1}` : origBucketName.replace(/\d+$/, +latestVer[2]+1);
-        } else {
-          this.bucketName = `${copiedBucket} 1`;
+          const latestVer = existingCopiedBuckets[
+            existingCopiedBuckets.length-1].match(copySuffix);
+          nextVersion = +latestVer[2] + 1;
         }
+        this.bucketName = `${newBucketName}-${nextVersion}`;
         this.loadingBucketname = false;
       }
     },
@@ -201,7 +202,7 @@ export default {
       this.bucketName = "";
       this.tags = [];
       this.loadingBucketname = true;
-      this.errorMsg = "";
+      this.validationResult = {};
       document.querySelector("#copyBucket-toasts").removeToast("copy-error");
 
       /*
@@ -215,13 +216,16 @@ export default {
         moveFocusOutOfModal(prevActiveElParent, true);
       }
     },
-    replicateContainer: function (keypress) {
-      this.bucketName = this.bucketName.trim();
-      this.checkValidity();
+    replicateContainer: async function (keypress) {
+      this.validationResult = await validateBucketName(
+        this.bucketName);
+      const validationError =
+        Object.values(this.validationResult).some(val => !val);
+      if (validationError) return;
+
       this.a_replicate_container(keypress).then(() => {});
     },
     a_replicate_container: async function (keypress) {
-      if (this.errorMsg.length) return;
       this.$store.commit("toggleCopyBucketModal", false);
       document.querySelector("#copyBucket-toasts").addToast(
         {
@@ -316,9 +320,9 @@ export default {
     deletingTag: function (e, tag) {
       this.tags = deleteTag(e, tag, this.tags);
     },
-    checkValidity: debounce(function () {
-      this.errorMsg = validateBucketName(
-        this.bucketName, this.$t, this.buckets);
+    checkValidity: debounce(async function () {
+      this.validationResult = await validateBucketName(
+        this.bucketName);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
       const focusableList = this.$refs.copyBucketContainer.querySelectorAll(
