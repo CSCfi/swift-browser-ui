@@ -3,6 +3,7 @@ import { createStore } from "vuex";
 import { isEqual, isEqualWith } from "lodash";
 
 import {
+  getContainers,
   getObjects,
 } from "@/common/api";
 import {
@@ -22,7 +23,8 @@ import {
   updateContainerLastmodified,
 } from "@/common/globalFunctions";
 import { discoverEndpoint } from "./s3conv";
-import { ListBucketsCommand } from "@aws-sdk/client-s3";
+import { discoverSubmitConfiguration } from "./dominate";
+import {ListBucketsCommand } from "@aws-sdk/client-s3";
 
 const store = createStore({
   state: {
@@ -36,6 +38,7 @@ const store = createStore({
     ],
     client: undefined,
     requestClient: undefined,
+    socket: undefined,
     isUploading: false,
     encryptedFile: "",
     uploadProgress: undefined,
@@ -215,6 +218,9 @@ const store = createStore({
     },
     setUploadAbortReason(state, payload) {
       state.uploadAbortReason = payload;
+    },
+    setSocket(state, payload) {
+      state.socket = payload;
     },
     toggleEditTagsModal(state, payload) {
       state.openEditTagsModal = payload;
@@ -631,9 +637,9 @@ const store = createStore({
       { state, commit },
     ) {
       let s3endpoint = await discoverEndpoint();
-      // let submitConfig = await discoverSubmitConfiguration();
+      let submitConfig = await discoverSubmitConfiguration();
       commit("setS3Endpoint", s3endpoint);
-      // commit("setSubmitConfig", submitConfig);
+      commit("setSubmitConfig", submitConfig);
     },
   },
 });

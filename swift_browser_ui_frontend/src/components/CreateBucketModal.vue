@@ -56,7 +56,7 @@
           <b>{{ active.name }}</b>.
         </p>
         <c-link
-          :href="projectIn§ink"
+          :href="projectInfoLink"
           underline
           target="_blank"
         >

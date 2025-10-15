@@ -9,6 +9,7 @@ import {
 import {
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
+  DeleteBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
 
 async function fetchWithCookie({method, url, body, signal}) {
@@ -532,8 +533,26 @@ export async function addAccessControlBucketPolicy(
   let getBucketPolicyCommand = new GetBucketPolicyCommand({
     Bucket: bucket,
   });
-  let currentPolicyResp = await client.send(getBucketPolicyCommand);
-  if (currentPolicyResp.Policy !== undefined) {
+  let currentPolicyResp = await client.send(getBucketPolicyCommand).catch(e => {
+    switch(e.name) {
+      case "NoSuchBucketPolicy":
+        if (DEV) console.log("No existing bucket policy could be retrieved.");
+        break;
+      case "NoSuchBucket":
+        if (DEV) {
+          console.log(
+            "Policy could not be retrieved due to nonexistent bucket.",
+          );
+        }
+        return "NoSuchBucket";
+      default:
+        throw e;
+    }
+  });
+  if (currentPolicyResp === "NoSuchBucket") {
+    return;
+  }
+  if (currentPolicyResp?.Policy !== undefined) {
     policy = JSON.parse(currentPolicyResp.Policy);
   }
 
@@ -541,20 +560,20 @@ export async function addAccessControlBucketPolicy(
   for (const receiver of receivers) {
     let actions = [];
     if (rights.indexOf("r") >= 0) {
-      actions.concat([
+      actions = actions.concat([
         "s3:GetObject",
-        "s3:ListObjects",
+        "s3:ListBucket",
         "s3:GetObjectTagging",
         "s3:GetObjectVersion",
       ]);
     }
     if (rights.indexOf("w") >= 0) {
-      actions.concat([
+      actions = actions.concat([
         "s3:PutObject",
         "s3:DeleteObject",
         "s3:AbortMultipartUpload",
-        "s3:CreateMultipartUpload",
-        "s3:CompleteMultipartUpload",
+        "s3:ListMultipartUploadParts",
+        "s3:ListBucketMultipartUploads",
       ]);
     }
 
@@ -584,23 +603,56 @@ export async function removeAccessControlBucketPolicy(
   client,
 ) {
   // Fetch the existing bucket policy
-  let policy = {};
+  let policy = {
+    Version: "2012-10-17",
+    Statement: [],
+  };
   let getBucketPolicyCommand = new GetBucketPolicyCommand({
     Bucket: bucket,
   });
-  let currentPolicyResp = await client.send(getBucketPolicyCommand);
-  if (currentPolicyResp.Policy !== undefined) {
-    policy = JSON.parse(currentPolicyResp.Policy);
-  } else {
-    if (DEV) console.log("Current policy could not be retrieved.");
+  let currentPolicyResp = await client.send(getBucketPolicyCommand).catch(
+    e => {
+      switch(e.name) {
+        // Policy has already been removed, we can skip the logic.
+        case "NoSuchBucketPolicy":
+          if (DEV) console.log("Current policy could not be retrieved.");
+          return;
+        case "NoSuchBucket":
+          if (DEV) {
+            console.log("Could not delete policy due to nonexistent bucket.");
+          }
+          return "NoSuchBucket";
+        default:
+          throw e;
+      }
+    },
+  );
+  if (currentPolicyResp === "NoSuchBucket") {
     return;
+  }
+  if (currentPolicyResp?.Policy !== undefined) {
+    policy = JSON.parse(currentPolicyResp.Policy);
   }
 
   // Filter out the old policy entries
   for (const receiver of receivers) {
-    policy = policy.Statement.filter(statement => {
-      return !(statement.Principal.AWS == `arn:aws:iam::${receiver}:root`);
+    policy.Statement = policy.Statement.filter(statement => {
+      console.log(statement);
+      console.log(receiver);
+      console.log(statement.Principal.AWS.match(receiver) == null);
+      return (statement.Principal.AWS.match(receiver) == null);
     });
+  }
+
+  if (policy.Statement.length === 0) {
+    let deleteBucketPolicyCommand = new DeleteBucketPolicyCommand({
+      Bucket: bucket,
+    });
+    await client.send(deleteBucketPolicyCommand).catch(e => {
+      if (DEV) console.log("Failed to delete bucket policy.");
+      if (DEV) console.log(e);
+    });
+    return;
   }
 
   // Override the old bucket policy

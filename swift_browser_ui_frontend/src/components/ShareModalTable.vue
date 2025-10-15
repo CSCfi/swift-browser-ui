@@ -272,7 +272,6 @@ export default {
       else return ["r", "w"];
     },
     editAccessRight: async function (sharedProjectId) {
-
       // Delete the old access rights and replace them with new ones.
       // Don't bother with editing on S3 API since in the frontend
       // the operations will end up being identical.
@@ -347,7 +346,7 @@ export default {
       this.clickedDelete = false;
       this.toDelete = {};
     },
-    deleteBucketrShare: async function (bucketData) {
+    deleteBucketShare: async function (bucketData) {
       await removeAccessControlBucketPolicy(
         this.bucketName,
         [this.projectId],
