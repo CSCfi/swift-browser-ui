@@ -64,7 +64,7 @@
 <script>
 import { debounce, delay } from "lodash";
 import {
-  swiftCopyContainer,
+  copyBucket,
   updateContainerMeta,
   getObjects,
 } from "@/common/api";
@@ -237,23 +237,10 @@ export default {
         },
       );
 
-      // Fetch the source project id if it exists
-      let sourceProjectName = "";
-      if (this.sourceProjectId) {
-        let ids = await this.$store.state.client.projectCheckIDs(
-          this.sourceProjectId,
-        );
-        sourceProjectName = ids.name;
-      }
-
-      // Initiate the container replication operation
-      await swiftCopyContainer(
+      await copyBucket(
         this.active.id,
         this.bucketName,
-        this.sourceProjectId ? this.sourceProjectId : this.active.id,
         this.selectedBucketName,
-        this.active.name,
-        sourceProjectName,
       ).then(async () => {
         await this.$store.dispatch("updateContainers", {
           projectID: this.$route.params.project,

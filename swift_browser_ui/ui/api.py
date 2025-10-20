@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import math
 import re
 import ssl
 import time
@@ -9,8 +10,10 @@ import typing
 import urllib.parse
 from datetime import datetime
 
+import aioboto3
 import aiohttp.web
 import aiohttp_session
+import botocore.exceptions
 import certifi
 from swiftclient.utils import generate_temp_url
 
@@ -148,16 +151,8 @@ async def _check_last_modified(
     return container
 
 
-async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response:
-    """Acquire and serve EC2 credentials for the given project."""
-    session = await aiohttp_session.get_session(request)
-    client = request.app["api_client"]
-    project = request.match_info["project"]
-
-    request.app["Log"].info(
-        f"API call for creating ec2 credentials from {request.remote}, sess {session}"
-    )
-
+async def _get_ec2_credentials(session, client, project) -> dict:
+    """Return access key and secret key for the given project."""
     # Check if there are existing credentials, use the first one
     async with client.get(
         f"{setd['auth_endpoint_url']}/users/{session['uid']}/credentials/OS-EC2",
@@ -169,7 +164,7 @@ async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response
         keys = list(filter(lambda key: key["tenant_id"] == project, creds["credentials"]))
 
     if len(keys) > 0:
-        return aiohttp.web.json_response(keys[0])
+        return keys[0]
 
     # Create new credentials if there are no existing ones
     async with client.post(
@@ -181,7 +176,21 @@ async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response
             "tenant_id": project,
         },
     ) as ret:
-        return aiohttp.web.json_response((await ret.json())["credential"])
+        return (await ret.json())["credential"]
+
+
+async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Acquire and serve EC2 credentials for the given project."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    project = request.match_info["project"]
+
+    request.app["Log"].info(
+        f"API call for creating ec2 credentials from {request.remote}, sess {session}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    return aiohttp.web.json_response(creds)
 
 
 async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -903,31 +912,135 @@ async def swift_download_container(
     )
 
 
-async def swift_replicate_container(
+async def _multipart_copy(s3_client, dest_bucket, source_bucket, obj):
+    size = obj["Size"]
+    upload_id = (
+        await s3_client.create_multipart_upload(Bucket=dest_bucket, Key=obj["Key"])
+    )["UploadId"]
+
+    part_size = 50 * 1024 * 1024
+    # See limits https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
+    max_part_count = 10000
+    if size > part_size * max_part_count:
+        part_size = math.ceil(size / max_part_count)
+    parts = []
+    part_number = 1
+    byte_position = 0
+
+    try:
+        while byte_position < size:
+            last_byte = min(byte_position + part_size - 1, size - 1)
+
+            part = await s3_client.upload_part_copy(
+                Bucket=dest_bucket,
+                Key=obj["Key"],
+                CopySource={"Bucket": source_bucket, "Key": obj["Key"]},
+                CopySourceRange=f"bytes={byte_position}-{last_byte}",
+                PartNumber=part_number,
+                UploadId=upload_id,
+            )
+
+            parts.append(
+                {"ETag": part["CopyPartResult"]["ETag"], "PartNumber": part_number}
+            )
+
+            byte_position += part_size
+            part_number += 1
+
+        await s3_client.complete_multipart_upload(
+            Bucket=dest_bucket,
+            Key=obj["Key"],
+            UploadId=upload_id,
+            MultipartUpload={"Parts": parts},
+        )
+    except Exception:
+        await s3_client.abort_multipart_upload(
+            Bucket=dest_bucket, Key=obj["Key"], UploadId=upload_id
+        )
+        raise
+
+
+async def _replicate_objects(s3_client, source_bucket, dest_bucket, logger):
+    # 100MiB single copy limit (recommended to use multipart copy for 100MB and over)
+    rec_single_copy_size = 100 * 1024 * 1024
+    paginator = s3_client.get_paginator("list_objects_v2")
+
+    async for page in paginator.paginate(Bucket=source_bucket):
+        for obj in page.get("Contents", []):
+            key = obj["Key"]
+            if obj["Size"] < rec_single_copy_size:
+                try:
+                    await s3_client.copy_object(
+                        CopySource={"Bucket": source_bucket, "Key": key},
+                        Bucket=dest_bucket,
+                        Key=key,
+                    )
+                except Exception as e:
+                    logger.exception(f"Failed to copy {key}: {e}")
+            else:
+                try:
+                    await _multipart_copy(s3_client, dest_bucket, source_bucket, obj)
+                except Exception as e:
+                    logger.exception(f"Failed to multipart-copy {key}: {e}")
+    logger.info(f"Replication task for {source_bucket} finished")
+
+
+async def replicate_bucket(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
-    """Point the user to container replication endpoint."""
+    """Replicate bucket using ec2 credentials."""
     session = await aiohttp_session.get_session(request)
-    request.app["Log"].info(
-        "API call for replication endpoint from "
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+    dest_bucket = request.match_info["bucket"]
+    source_bucket = request.query["from_bucket"]
+
+    logger.info(
+        f"API call to replicate bucket {source_bucket} to {dest_bucket} from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
-    runner_id = await open_upload_runner_session(request)
-    path = f"/{request.match_info['project']}/{request.match_info['container']}"
-    signature = await sign(3600, path)
-    path += (
-        f"?session={runner_id}"
-        + f"&signature={signature['signature']}"
-        + f"&valid={signature['valid']}"
+
+    creds = await _get_ec2_credentials(session, client, project)
+
+    session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
     )
-    for i in request.query.keys():
-        path += f"&{i}={request.query[i]}"
-    return aiohttp.web.Response(
-        status=307,
-        headers={
-            "Location": f"{setd['upload_external_endpoint']}{path}",
-        },
-    )
+
+    async with session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+
+        # Destination bucket should not already exist
+        try:
+            await s3_client.head_bucket(Bucket=dest_bucket)
+            raise aiohttp.web.HTTPConflict(text="Bucket already exists")
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "404":
+                # Create the destination bucket
+                try:
+                    await s3_client.create_bucket(Bucket=dest_bucket)
+                    logger.info(f"Created destination bucket {dest_bucket}")
+                except botocore.exceptions.ClientError:
+                    raise aiohttp.web.HTTPInternalServerError(
+                        text="Failed to create destination bucket"
+                    )
+            elif error_code == "403":
+                raise aiohttp.web.HTTPConflict(
+                    text="Bucket already exists (Access denied)"
+                )
+            else:
+                raise aiohttp.web.HTTPInternalServerError(
+                    text="Cannot create destination bucket"
+                )
+
+    asyncio.create_task(_replicate_objects(s3_client, source_bucket, dest_bucket, logger))
+    return aiohttp.web.HTTPAccepted(text="Replication started")
 
 
 async def get_upload_session(
