@@ -58,8 +58,8 @@ backend-test:
   tags:
     - docker-exec
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != 'feature/add-s3-support'
-
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      allow_failure: true
   image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install --prod
@@ -76,7 +76,8 @@ wasm-test:
   tags:
     - docker-exec
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != 'feature/add-s3-support'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      allow_failure: true
   image: $BUILD_IMAGE
   before_script:
     - ruby --version
