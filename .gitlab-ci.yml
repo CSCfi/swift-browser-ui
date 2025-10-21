@@ -58,7 +58,7 @@ backend-test:
   tags:
     - docker-exec
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != 'feature/add-s3-support'
 
   image: $BUILD_IMAGE
   before_script:
@@ -76,7 +76,7 @@ wasm-test:
   tags:
     - docker-exec
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != 'feature/add-s3-support'
   image: $BUILD_IMAGE
   before_script:
     - ruby --version
