@@ -92,6 +92,9 @@ export default {
     };
   },
   computed: {
+    s3client() {
+      return this.$store.state.s3client;
+    },
     locale () {
       return this.$i18n.locale;
     },
@@ -455,64 +458,63 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-    delete: async function (container, objects) {
-      if (objects > 0) { //if container not empty
+    delete: async function (bucket, objects) {
+      if (objects > 0) { // If bucket not empty
         addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
       }
-      else { //delete empty bucket without confirmation
-        const projectID = this.$route.params.project;
-        let deleteBucketCommand = new DeleteBucketCommand({
-          Bucket: container,
+      else { // Delete empty bucket without confirmation
+        const deleteBucketCommand = new DeleteBucketCommand({
+          Bucket: bucket,
         });
-        this.$store.state.s3client.send(
+        this.s3client.send(
           deleteBucketCommand,
-        ).then(async(resp) => {
+        ).then(async() => {
           // In case the bucket has a legacy segments bucket still in
           // existence we should take care of that as well
-          const segmentsBucket = `${container}_segments`;
-          let segment_objects = [];
+          const segmentsBucket = `${bucket}_segments`;
+          let segmentsBucketExists = false;
+          let segmentObjects = [];
+
           do {
-            // Fetch a new page of objects until we run out
-            for (const key of segment_objects) {
-              let objectDeleteCommand = DeleteObjectCommand({
+            for (const key of segmentObjects) {
+              const objectDeleteCommand = new DeleteObjectCommand({
                 Bucket: segmentsBucket,
                 Key: key.Key,
               });
-              await $store.state.s3client.send(objectDeleteCommand);
+              await this.s3client.send(objectDeleteCommand);
             }
 
-            let objectsListCommand = ListObjectsV2Command({
-              Bucket: segmentsBucket,
-              MaxKeys: 1000,
-            });
-            let objectListResp = await $store.state.s3client.send(
-              objectsListCommand,
-            );
-            if (
-              objectListResp.Contents !== undefined
-              && objectListResp.length > 0
-            ) {
-              let segment_objects = objectListResp.Contents;
+            // Fetch a new page of objects until we run out
+            try {
+              const objListResp = await this.s3client.send(
+                new ListObjectsV2Command({ Bucket: segmentsBucket }),
+              );
+              segmentsBucketExists = true;
+              segmentObjects = objListResp?.Contents || [];
+            } catch {
+              segmentObjects = [];
             }
-          } while(segment_objects.length > 0);
+          } while (segmentObjects.length > 0);
 
           // Finally delete the segments bucket
-          let deleteSegmentsBucketCommand = new DeleteBucketCommand({
-            Bucket: segmentsBucket,
-          });
-          await this.$store.state.s3client.send(deleteSegmentsBucketCommand);
+          if (segmentsBucketExists) {
+            const deleteSegmentsBucketCommand = new DeleteBucketCommand({
+              Bucket: segmentsBucket,
+            });
+            await this.s3client.send(deleteSegmentsBucketCommand);
+          }
 
           document.querySelector("#container-toasts").addToast(
             { progress: false,
               type: "success",
               message: this.$t("message.container_ops.deleteSuccess")},
           );
-          this.$emit("delete-container", container);
+          this.$emit("delete-container", bucket);
           // Delete stale shared containers if the deleted container
           // was shared with other projects
           const sharedDetails = await this.$store.state.client.getShareDetails(
-            projectID,
-            container,
+            this.$route.params.project,
+            bucket,
           );
           if (sharedDetails.length)
             await deleteStaleSharedContainers(this.$store);
