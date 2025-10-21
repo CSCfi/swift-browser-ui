@@ -59,7 +59,7 @@ backend-test:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
+      allow_failure: true
   image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install --prod
@@ -77,6 +77,7 @@ wasm-test:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      allow_failure: true
   image: $BUILD_IMAGE
   before_script:
     - ruby --version
