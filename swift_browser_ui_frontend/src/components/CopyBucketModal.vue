@@ -25,7 +25,7 @@
           />
           <c-loader v-show="loadingBucketname" />
         </div>
-        <label
+        <!--<label
           class="taginput-label"
           label-for="copy-bucket-taginput"
         >
@@ -36,7 +36,7 @@
           :tags="tags"
           @addTag="addingTag"
           @deleteTag="deletingTag"
-        />
+        />-->
       </c-card-content>
     </div>
     <c-card-actions justify="space-between">
@@ -80,13 +80,13 @@ import {
 } from "@/common/keyboardNavigation";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
-import TagInput from "@/components/TagInput.vue";
+//import TagInput from "@/components/TagInput.vue";
 
 import { toRaw } from "vue";
 
 export default {
   name: "CopyBucketModal",
-  components: { TagInput },
+  //components: { TagInput },
   data() {
     return {
       bucketName: "",

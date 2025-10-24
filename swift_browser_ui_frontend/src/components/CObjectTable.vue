@@ -245,7 +245,7 @@ export default {
                 },
               },
             },
-            {
+            /*{
               value: this.$t("message.table.editTags"),
               component: {
                 tag: "c-button",
@@ -266,7 +266,7 @@ export default {
                     (this.owner != undefined && this.accessRights.length <= 1),
                 },
               },
-            },
+            },*/
             {
               value: this.$t("message.delete"),
               component: {
