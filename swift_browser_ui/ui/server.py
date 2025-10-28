@@ -32,6 +32,7 @@ from swift_browser_ui.ui.api import (
     os_list_projects,
     remove_container_acl,
     remove_project_container_acl,
+    replicate_bucket,
     swift_create_container,
     swift_delete_container,
     swift_download_container,
@@ -41,7 +42,6 @@ from swift_browser_ui.ui.api import (
     swift_get_project_metadata,
     swift_list_containers,
     swift_list_objects,
-    swift_replicate_container,
     swift_update_container_metadata,
 )
 from swift_browser_ui.ui.discover import (
@@ -310,9 +310,7 @@ async def servinit(
     # Add replication routes
     app.add_routes(
         [
-            aiohttp.web.post(
-                "/replicate/{project}/{container}", swift_replicate_container
-            ),
+            aiohttp.web.post("/replicate/{project}/{bucket}", replicate_bucket),
         ]
     )
 

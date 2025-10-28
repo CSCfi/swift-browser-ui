@@ -286,34 +286,24 @@ export async function getSharedContainerAddress(project) {
   return ret.json();
 }
 
-export async function swiftCopyContainer(
+
+export async function copyBucket(
   project,
-  container,
-  source_project,
-  source_container,
-  project_name = "",
-  source_project_name = "",
+  bucket,
+  source_bucket,
 ) {
-  // Replicate the container from a specified source to the location
+  // Replicate the bucket from a specified source to the location
   let fetchURL = new URL("/replicate/".concat(
     encodeURI(project), "/",
-    encodeURI(container),
+    encodeURI(bucket),
   ), document.location.origin);
 
-  fetchURL.searchParams.append("from_project", source_project);
-  fetchURL.searchParams.append("from_container", source_container);
-
-  if (project_name !== "") {
-    fetchURL.searchParams.append("project_name", project_name);
-  }
-  if (source_project_name !== "") {
-    fetchURL.searchParams.append("from_project_name", source_project_name);
-  }
+  fetchURL.searchParams.append("from_bucket", source_bucket);
 
   let ret = await POST(fetchURL);
 
   if (ret.status != 202) {
-    throw new Error("Container replication not successful.");
+    throw new Error("Bucket replication not successful.");
   }
 
   return ret;
