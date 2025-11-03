@@ -45,6 +45,9 @@ import {
   signedFetch,
 } from "./api";
 import { DEV } from "./conv";
+import {
+  throttle,
+} from "lodash";
 
 const MAX_UPLOAD_WORKERS = 8;
 const FILE_PART_SIZE = 52428800;
@@ -182,6 +185,10 @@ export default class S3UploadSocket {
         case "filesAdded":
           if (DEV) console.log("Files added to WorkerFS");
           break;
+        case "progress":
+          this.totalCompleted += e.data.amount;
+          throttle(this.updateProgress, 250);
+          break;
         case "filesRemoved":
           if (DEV) console.log("File handles closed in the WorkerFS");
           break;
@@ -190,6 +197,11 @@ export default class S3UploadSocket {
           break;
       }
     };
+  }
+
+  // Wrapper for updating upload progress
+  updateProgress() {
+    this.$store.command("updateProgress", this.totalCompleted / this.totalSize);
   }
 
   // Check if all the parts are done
@@ -391,37 +403,33 @@ export default class S3UploadSocket {
       let bucketAccessCmd = new HeadBucketCommand({
         Bucket: bucket,
       });
-      let bucketResponse = await this.client.send(bucketAccessCmd);
-      switch(bucketResponse.$metadata.httpStatusCode) {
-        // Skip success
-        case 200:
-          break;
-        case 404:
-          // Try creating the bucket if it doesn't exist
-          let bucketCreateCommand = new CreateBucketCommand({
-            Bucket: bucket,
-          });
-          await this.client.send(bucketCreateCommand).catch(err => {
-            // Couldn't create the bucket for some reason, abort the
-            // upload.
-            if (DEV) console.log(`Coudln't start upload, reason: ${err}`);
+      await this.client.send(bucketAccessCmd).catch(async err => {
+        switch(err.$metadata.httpStatusCode) {
+          case 404:
+            if (DEV) {
+              console.log(`Creating bucket ${bucket}.`);
+            }
+            let bucketCreateCommand = new CreateBucketCommand({
+              Bucket: bucket,
+            });
+            await this.client.send(bucketCreateCommand).catch(err => {
+              if (DEV) console.log(`Couldn't start upload, reason: ${err}`);
+              return;
+            });
+            break;
+          case 400:
+            if (DEV) {
+              console.log(`Couldn't access bucket ${bucket} due to a client error.`);
+            }
             return;
-          });
-          break;
-        case 400:
-          if (DEV) {
-            console.log(`Couldn't access bucket ${bucket} due to client error.`);
-          }
-          return;
-        case 403:
-          if (DEV) {
-            console.log(`Coudln't access bucket ${bucket} due to no access.`);
-          }
-          if (DEV) {
-            console.log("The bucket is probably owned by someone else.");
-          }
-          return;
-      }
+          case 403:
+            if (DEV) {
+              console.log(`Coudln't access bucket ${bucket} due to it being forbidden.`);
+              console.log("The bucket is probably owned by someone else.");
+            }
+            return;
+        }
+      });
 
       this.uploads[bucket] = {};
     }

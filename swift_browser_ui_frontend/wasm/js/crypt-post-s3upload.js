@@ -98,7 +98,10 @@ async function encryptSegment (e) {
   console.log("Sending encrypted chunk via s3 client.")
   const completedPart = await s3client.send(command);
 
-  console.log(completedPart);
+  postMessage({
+    eventType: "progress",
+    amount: e.data.part.size,
+  });
 
   // Free the encrypted chunk content buffer
   console.log("Freeing encrypted chunk from buffer.");

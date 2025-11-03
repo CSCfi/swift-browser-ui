@@ -3,7 +3,6 @@ import { createStore } from "vuex";
 import { isEqual, isEqualWith } from "lodash";
 
 import {
-  getContainers,
   getObjects,
 } from "@/common/api";
 import {
@@ -20,7 +19,6 @@ import { getDB } from "@/common/db";
 import {
   getSharedContainers,
   getContainerLastmodified,
-  updateContainerLastmodified,
 } from "@/common/globalFunctions";
 import { discoverEndpoint, getBucketMetadata } from "./s3conv";
 import { discoverSubmitConfiguration } from "./dominate";

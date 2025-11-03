@@ -29,7 +29,7 @@ import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { syncContainerACLs, DEV } from "@/common/conv";
+import { DEV } from "@/common/conv";
 import checkIDB from "@/common/idb_support";
 
 // Import project state
@@ -45,14 +45,12 @@ import ProgressNotification from "@/components/ProgressNotification.vue";
 import CFooter from "@/components/CFooter.vue";
 
 import { getDB } from "@/common/db";
-import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
 import {
   discoverEndpoint,
   getClient,
-  listBuckets,
 } from "@/common/s3conv";
 import S3UploadSocket from "@/common/s3upload";
 import S3DownloadSocket from "@/common/s3download";
