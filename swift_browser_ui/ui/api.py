@@ -163,6 +163,10 @@ async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Re
     if tags:
         headers["X-Container-Meta-UserTags"] = tags
 
+    # Create the ACL entry for the project to preserve access after sharing
+    headers["X-Container-Read"] = f"{project}:*"
+    headers["X-Container-Write"] = f"{project}:*"
+
     async with client.put(
         f"{session['projects'][project]['endpoint']}/{container}",
         headers=headers,
@@ -645,10 +649,65 @@ async def get_access_control_metadata(
     )
 
 
+async def _ensure_owner_access_to_container(
+    request: aiohttp.web.Request,
+):
+    """Ensure that owner project will retain access to all files."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+
+    project = request.match_info["project"]
+    container = request.match_info["container"]
+
+    request.app["Log"].info(
+        f"Ensuring project {project} retains access to container"
+        f"{container} :: {time.ctime()}"
+    )
+
+    headers = {"X-Auth-Token": session["projects"][project]["token"]}
+
+    read_acl = ""
+    write_acl = ""
+    changed = False
+
+    async with client.head(
+        f"{session['projects'][project]['endpoint']}/{container}",
+        headers=headers,
+    ) as ret:
+        if "X-Container-Read" in ret.headers:
+            read_acl = ret.headers["X-Container-Read"]
+        if "X-Container-Write" in ret.headers:
+            write_acl = ret.headers["X-Container-Write"]
+
+    if project not in read_acl:
+        read_acl += f",{project}:*"
+        changed = True
+    if project not in write_acl:
+        write_acl += f",{project}:*"
+        changed = True
+
+    if changed:
+        headers["X-Container-Read"] = read_acl
+        headers["X-Container-Write"] = write_acl
+
+        async with client.post(
+            f"{session['projects'][project]['endpoint']}/{container}",
+            headers=headers,
+        ) as ret:
+            if ret.status == 204:
+                return
+            else:
+                raise aiohttp.web.HTTPForbidden(
+                    reason="Could not retain object access in container"
+                )
+
+
 async def remove_project_container_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Remove access from a project in container acl."""
+    await _ensure_owner_access_to_container(request)
+
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to remove container ACL from "
@@ -710,6 +769,7 @@ async def remove_container_acl(request: aiohttp.web.Request) -> aiohttp.web.Resp
         },
     ) as ret:
         if ret.status == 204:
+            await _ensure_owner_access_to_container(request)
             return aiohttp.web.Response(status=200)
         else:
             raise aiohttp.web.HTTPNotFound()
@@ -719,6 +779,8 @@ async def modify_container_write_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Modify write access for a project from container acl."""
+    await _ensure_owner_access_to_container(request)
+
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to modify projects fom container ACL from "
@@ -768,6 +830,8 @@ async def add_project_container_acl(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
     """Add access for a project in container acl."""
+    await _ensure_owner_access_to_container(request)
+
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call to add access for project in container from "
