@@ -103,13 +103,12 @@ import {
   moveFocusOutOfModal,
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
+import { createBucket } from "@/common/s3conv";
 // import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 
 import { toRaw } from "vue";
 import { debounce } from "lodash";
-
-import { CreateBucketCommand } from "@aws-sdk/client-s3";
 
 export default {
   name: "CreateBucketModal",
@@ -175,51 +174,55 @@ export default {
       const bucketName = toRaw(this.bucketName);
       const tags = toRaw(this.tags);
 
-      const createBucketInput = {
-        Bucket: bucketName,
-      };
-      const createBucketCmd = new CreateBucketCommand(createBucketInput);
-      this.s3client.send(createBucketCmd).then(async () => {
-        const containerTimestamp = await getTimestampForContainer(
-          projectID, bucketName, this.controller.signal);
-
-        getDB().containers.add({
-          projectID: projectID,
-          name: bucketName,
-          tokens: tokenize(bucketName),
-          tags: tags,
-          count: 0,
-          bytes: 0,
-          last_modified: getCurrentISOtime(containerTimestamp*1000),
-        });
-      }).then(() => {
-        this.toggleCreateBucketModal(keypress);
-
-        this.$router.push({
-          name: "AllBuckets",
-          params: {
-            project: this.active.id,
-            user: this.uname,
-          },
-        });
-
-        this.$store.commit("setNewBucket", bucketName);
-      }).catch(err => {
+      try {
+        // Frontend validation is key:
+        // When user already owns the bucket or creates a new one
+        // it returns 200 just the same in the North Virginia Region
+        await createBucket(this.s3client, bucketName);
+      } catch(e) {
+        const errorCode = e?.$metadata?.httpStatusCode;
         let errorMessage = this.$t("message.error.createFail");
-        if (err.message.match("Container name already in use")) {
+        // Unlikely errors due to validation
+        if (errorCode === 409) {
           errorMessage = this.$t("message.error.inUseOtherPrj");
-        } else if (err.message.match("Invalid container or tag name")) {
+        } else if (errorCode === 400) {
           errorMessage = this.$t("message.error.invalidName");
         }
-        document.querySelector("#createModal-toasta").addToast(
+        document.querySelector("#createModal-toasts").addToast(
           {
-            id: "creat-toast",
+            id: "create-toast",
             progress: false,
             type: "error",
             message: errorMessage,
           },
         );
+        return;
+      }
+
+      const containerTimestamp = await getTimestampForContainer(
+        projectID, bucketName, this.controller.signal);
+
+      getDB().containers.add({
+        projectID: projectID,
+        name: bucketName,
+        tokens: tokenize(bucketName),
+        tags: tags,
+        count: 0,
+        bytes: 0,
+        last_modified: getCurrentISOtime(containerTimestamp*1000),
       });
+
+      this.toggleCreateBucketModal(keypress);
+
+      this.$router.push({
+        name: "AllBuckets",
+        params: {
+          project: this.active.id,
+          user: this.uname,
+        },
+      });
+
+      this.$store.commit("setNewBucket", bucketName);
     },
     toggleCreateBucketModal: function (keypress) {
       this.$store.commit("toggleCreateBucketModal", false);
