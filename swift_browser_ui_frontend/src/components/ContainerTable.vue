@@ -536,7 +536,7 @@ export default {
       //automated testing creates untrusted events
       const test = eventTrusted === undefined ? false : !eventTrusted;
 
-      this.$store.state.socket.addDownload(
+      this.$store.state.s3download.addDownload(
         container,
         [],
         owner,

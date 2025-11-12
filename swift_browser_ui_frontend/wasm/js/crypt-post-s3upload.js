@@ -18,7 +18,7 @@ import { checkPollutingName } from "./nameCheck";
 let s3client = undefined;
 
 waitAsm().then(() => {
-  console.log("Assmebler initialized, initalizing entropy source...");
+  console.log("Assembler initialized, initalizing entropy source...");
   Module.ccall("libinit", undefined, undefined, undefined);
   console.log("Entropy source initalized.");
 });

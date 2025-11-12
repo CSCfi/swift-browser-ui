@@ -437,6 +437,9 @@ export default {
         ).then(() => {
           if (DEV) console.log(`Started downloading folder ${object.name}`);
         }).catch(() => {
+          if (DEV) {
+            console.log(error);
+          }
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       } else {
@@ -447,7 +450,10 @@ export default {
           test,
         ).then(() => {
           if (DEV) console.log(`Started downloading object ${object.name}`);
-        }).catch(() => {
+        }).catch((error) => {
+          if (DEV) {
+            console.log(error);
+          }
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       }

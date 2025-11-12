@@ -1,7 +1,7 @@
 // JS code for the header creation worker
 
 waitAsm().then(() => {
-  console.log("Assmebler initialized, initalizing entropy source...");
+  console.log("Assembler initialized, initalizing entropy source...");
   Module.ccall("libinit", undefined, undefined, undefined);
   console.log("Entropy source initalized.");
 });

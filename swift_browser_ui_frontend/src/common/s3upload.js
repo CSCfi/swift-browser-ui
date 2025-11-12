@@ -35,6 +35,7 @@ Parts cache schema:
 import {
   CreateMultipartUploadCommand,
   CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
   HeadBucketCommand,
   CreateBucketCommand,
 } from "@aws-sdk/client-s3";
@@ -45,9 +46,6 @@ import {
   signedFetch,
 } from "./api";
 import { DEV } from "./conv";
-import {
-  throttle,
-} from "lodash";
 
 const MAX_UPLOAD_WORKERS = 8;
 const FILE_PART_SIZE = 52428800;
@@ -186,8 +184,9 @@ export default class S3UploadSocket {
           if (DEV) console.log("Files added to WorkerFS");
           break;
         case "progress":
+          if (DEV) console.log(`Incrementing completed amount by ${e.data.amount}`);
           this.totalCompleted += e.data.amount;
-          throttle(this.updateProgress, 250);
+          this.updateProgress();
           break;
         case "filesRemoved":
           if (DEV) console.log("File handles closed in the WorkerFS");
@@ -201,7 +200,11 @@ export default class S3UploadSocket {
 
   // Wrapper for updating upload progress
   updateProgress() {
-    this.$store.command("updateProgress", this.totalCompleted / this.totalSize);
+    if (DEV) {
+      `Updating progress to ${this.totalCompleted / this.totalSize}`;
+    }
+
+    this.$store.commit("updateProgress", this.totalCompleted / this.totalSize);
   }
 
   // Check if all the parts are done
@@ -217,6 +220,10 @@ export default class S3UploadSocket {
     }
 
     if (finished) {
+      if (DEV) {
+        console.log("Upload has finished.");
+      }
+
       this.$store.commit("eraseDropFiles");
       this.$store.commit("stopUploading");
       this.$store.commit("eraseProgress");
@@ -273,6 +280,8 @@ export default class S3UploadSocket {
 
   async getNextPart(worker) {
     let nextPart = this.parts.pop();
+
+    this.$store.commit("setEncryptedFile", nextPart.key);
 
     if (nextPart === undefined) {
       return;
@@ -388,6 +397,7 @@ export default class S3UploadSocket {
       if (DEV) console.log("All headers are done, starting upload");
       this.headersAdded = 0;
       this.headersNeeded = 0;
+      this.$store.commit("updateProgress", 0);
       this.beginUpload().then(() => {
         if (DEV) console.log("Upload started successfully.");
       });
@@ -445,6 +455,8 @@ export default class S3UploadSocket {
       });
     }
 
+    this.$store.commit("setEncryptedFile", "file pending...");
+
     for (const file of files) {
       if (DEV) console.log(`Adding file ${file}`);
       this.uploads[bucket][file.relativePath] = {
@@ -470,6 +482,38 @@ export default class S3UploadSocket {
       this.totalSize += file.size;
     }
     if (DEV) console.log(`Scheduled files for uploading in bucket ${bucket}`);
+    this.$store.commit("eraseProgress");
     this.$store.commit("setUploading");
+  }
+
+  // Cancel the ongoing upload in bucket
+  async cancelUpload(bucket) {
+    // Remove the ongoing parts in bucket
+    this.parts = this.parts.filter(part => part.bucket == bucket);
+
+    // Cancel each file that's being uploaded
+    if (DEV) console.log(`Terminating uploads in ${bucket}`);
+    for (const key in this.uploads[bucket]) {
+      // Mark the object as finished to stop uploading
+      this.uploads[bucket][key].finished = true;
+      // Cancel the multipart process
+      const input = {
+        Bucket: bucket,
+        UploadId: this.uploads[bucket][key].multipartSession,
+        Key: key.concat(".c4gh"),
+      };
+      let abortMultipart = new AbortMultipartUploadCommand(input);
+      await this.client.send(abortMultipart).catch(err => {
+        if (DEV) {
+          console.log("Failed to abort multipart on cancel.");
+          console.log(err);
+        }
+      });
+    }
+
+    // End the upload progress tracking
+    this.$store.commit("stopUploading", true);
+    this.$store.commit("setEncryptedFile", "");
+    this.$store.commit("eraseProgress");
   }
 }

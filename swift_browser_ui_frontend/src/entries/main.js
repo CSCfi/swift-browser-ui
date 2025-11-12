@@ -188,8 +188,11 @@ const app = createApp({
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
-    socket() {
-      return this.$store.state.socket;
+    s3download() {
+      return this.$store.state.s3download;
+    },
+    s3upload() {
+      return this.$store.state.s3upload;
     },
   },
   watch: {
@@ -370,11 +373,11 @@ const app = createApp({
     // containerSyncWrapper: function () {
     //   syncContainerACLs(this.$store);
     // },
-    cancelUpload: function(container) {
-      this.socket.cancelUpload(container);
+    cancelUpload: function(bucket) {
+      this.s3upload.cancelUpload(bucket);
     },
     cancelDownload: function() {
-      this.socket.cancelDownload();
+      this.s3download.cancelDownload();
     },
     onKeydown: function (e) {
       if (e.key === "Tab" && this.prevActiveEl &&

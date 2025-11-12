@@ -23,6 +23,7 @@ import {
   signedFetch,
 } from "./api";
 import { DEV } from "./conv";
+import { getDB } from "./db";
 
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
@@ -81,53 +82,65 @@ export default class S3DownloadSocket {
     let handleDownloadWorker = (e) => {
       switch(e.data.eventType) {
         case "getHeaders":
+          if (DEV) console.log("Socket got call to retrieve headers");
+          if (DEV) console.log(`Fetching headers for bucket ${e.data.bucket}`);
+          if (DEV) console.log(`Fetching headers for files: ${e.data.files}`);
           if (this.$store.state.downloadCount >= 0) {
+            if (DEV) {
+              console.log(
+                "Overriding existing download progress with the new one.",
+              );
+            }
             this.$store.commit("eraseDownloadProgress");
-            this.$store.commit("addDownload");
-            this.getHeaders(
-              e.data.id,
-              e.data.bucket,
-              e.data.files,
-              e.data.pubkey,
-              e.data.ownerName,
-            ).then(() => {
-              if (this.useServiceWorker) {
-                this.$store.commit("removeDownload");
-                this.$store.commit("toggleDownloadNotification", false);
-              } else {
-                if (this.$store.state.downloadProgress === undefined) {
-                  this.$store.commit("updateDownloadProgress", 0);
-                }
-              }
-              if (DEV) {
-                console.log(
-                  `Got headers for download in bucket ${e.data.bucket}`,
-                );
-              }
-            }).catch(() => {
-              this.downWorker.postMessage({
-                command: "abort",
-                reason: "error",
-              });
-            });
           }
+          this.$store.commit("addDownload");
+          this.getHeaders(
+            e.data.id,
+            e.data.bucket,
+            e.data.files,
+            e.data.pubkey,
+            e.data.ownerName,
+          ).then(() => {
+            if (this.useServiceWorker) {
+              this.$store.commit("removeDownload");
+              this.$store.commit("toggleDownloadNotification", false);
+            } else {
+              if (this.$store.state.downloadProgress === undefined) {
+                this.$store.commit("updateDownloadProgress", 0);
+              }
+            }
+            if (DEV) {
+              console.log(
+                `Got headers for download in bucket ${e.data.bucket}`,
+              );
+            }
+          }).catch(err => {
+            if (DEV) {
+              console.log(err);
+            }
+            this.downWorker.postMessage({
+              command: "abort",
+              reason: "error",
+            });
+          });
           break;
         case "downloadStarted":
           if (DEV) console.log(`Started download in ${e.data.bucket}`);
           if (this.useServiceWorker) {
             this.downloadFinished = false;
+            let downloadUrl = undefined;
             if (e.data.archive) {
-              let downloadUrl = new URL(
-                `/archive/${e.data.uuid}7${e.data.bucket}.tar`,
+              downloadUrl = new URL(
+                `/archive/${e.data.uuid}/${e.data.bucket}.tar`,
                 document.location.origin,
               );
             } else {
-              let downloadUrl = new URL(
-                `/file/${e.data.id}/${e.data.bucket}/${e.data.key}`,
+              downloadUrl = new URL(
+                `/file/${e.data.id}/${e.data.bucket}/${e.data.path}`,
                 document.location.origin,
               );
             }
-            if(DEV) console.log(downloadUrl);
+            if (DEV) console.log(downloadUrl);
             window.open(downloadUrl, "_blank");
           }
           break;
@@ -199,7 +212,7 @@ export default class S3DownloadSocket {
         handleDownloadWorker,
       );
     } else if (window.showSaveFilePicker !== undefined) {
-      this.downWorker.onmessage = handleDownWorker;
+      this.downWorker.onmessage = handleDownloadWorker;
     }
 
     // Initialize the S3 client
@@ -228,12 +241,12 @@ export default class S3DownloadSocket {
     // Cache the bucket id
     let dbBucket = await getDB().containers
       .get({
-        projectID: this.active.id,
+        projectID: this.active,
         name: bucket,
       });
 
     const dbBucketFileCount = await getDB().objects
-      .where({"containerID": dbContainer.id})
+      .where({"containerID": dbBucket.id})
       .count();
 
     let dbBucketFiles = [];
@@ -256,7 +269,7 @@ export default class S3DownloadSocket {
 
     let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
     let upInfo = await getUploadEndpoint(
-      this.active.id,
+      this.active,
       this.project,
       bucket,
     );
@@ -276,7 +289,7 @@ export default class S3DownloadSocket {
       let header = await signedFetch(
         "GET",
         this.$store.state.uploadEndpoint,
-        `/header/${this.active.name}/${container}/${file.name}`,
+        `/header/${this.active.name}/${bucket}/${file.name}`,
         undefined,
         {
           session: upInfo.id,
@@ -286,7 +299,7 @@ export default class S3DownloadSocket {
       header = await header.text();
 
       headers[file.name] = {
-        header: Uint8Array.from(atob(header), c => c,charCodeAt(0)),
+        header: Uint8Array.from(atob(header), c => c.charCodeAt(0)),
         size: file.bytes,
       };
     }
@@ -333,14 +346,15 @@ export default class S3DownloadSocket {
   ) {
     // get random id
     const sessionId = window.crypto.randomUUID();
+    if (DEV) {
+      console.log(`Beginning download session with UUID ${sessionId}`);
+    }
 
     let ownerName = "";
     if (owner) {
       let ids = await this.$store.state.client.projectCheckIDs(owner);
       ownerName = ids.name;
     }
-
-    let fileList = this.getFileListWithHeaders(bucket, objects, owner);
 
     let fileHandle = undefined;
     if (objects.length == 1) {
@@ -365,7 +379,7 @@ export default class S3DownloadSocket {
           if (fident) {
             opts.types = [
               {
-                description: "Genericc file",
+                description: "Generic file",
                 accept: {
                   "application/octet-stream": [fident],
                 },
@@ -374,6 +388,8 @@ export default class S3DownloadSocket {
           }
           fileHandle = await window.showSaveFilePicker(opts);
         }
+
+        if (DEV) console.log(`Posting file ${fileName} to download worker`);
         this.downWorker.postMessage({
           command: "downloadFile",
           id: sessionId,
@@ -384,6 +400,8 @@ export default class S3DownloadSocket {
           ownerName: ownerName,
           test: test,
         });
+
+        if (DEV) console.log(`Posted file ${fileName} to download worker`);
       } else {
         if (DEV) {
           console.log(
