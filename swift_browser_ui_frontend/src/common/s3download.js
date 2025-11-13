@@ -131,7 +131,7 @@ export default class S3DownloadSocket {
             let downloadUrl = undefined;
             if (e.data.archive) {
               downloadUrl = new URL(
-                `/archive/${e.data.uuid}/${e.data.bucket}.tar`,
+                `/archive/${e.data.id}/${e.data.bucket}.tar`,
                 document.location.origin,
               );
             } else {
