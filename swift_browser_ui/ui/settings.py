@@ -94,6 +94,9 @@ setd: Dict[str, Union[str, int, bool, None]] = {
     "check_certificate": (
         False if environ.get("SWIFT_UI_CHECK_CERTIFICATES", "True") == "False" else True
     ),
+    "web_app_cors_origin": environ.get(
+        "WEB_APP_CORS_ORIGIN", "https://sd-connect.sdqa.csc.fi"
+    ),
 }
 
 

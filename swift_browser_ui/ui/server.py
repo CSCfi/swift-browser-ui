@@ -20,6 +20,10 @@ import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.api import (
     add_project_container_acl,
+    aws_bulk_update_bucket_cors,
+    aws_create_bucket,
+    aws_list_buckets,
+    aws_update_bucket_cors,
     close_upload_session,
     get_access_control_metadata,
     get_crypted_upload_session,
@@ -241,6 +245,16 @@ async def servinit(
             aiohttp.web.get("/token/{project}/{id}", handle_ext_token_create),
             aiohttp.web.delete("/token/{project}/{id}", handle_ext_token_remove),
             aiohttp.web.get("/token/{project}", handle_ext_token_list),
+        ]
+    )
+
+    # Add S3 CORS compatibility routes
+    app.add_routes(
+        [
+            aiohttp.web.get("/api/s3/{project}", aws_list_buckets),
+            aiohttp.web.post("/api/s3/{project}/cors", aws_bulk_update_bucket_cors),
+            aiohttp.web.put("/api/s3/{project}/{bucket}", aws_create_bucket),
+            aiohttp.web.post("/api/s3/{project}/{bucket}/cors", aws_update_bucket_cors),
         ]
     )
 

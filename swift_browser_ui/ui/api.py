@@ -104,6 +104,267 @@ async def swift_list_containers(
         )
 
 
+async def aws_list_buckets(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Proxy bucket list request to a compatible AWS API."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+
+    continuation_token = request.query.get("continuation_token", "")
+    max_buckets = request.query.get("max_buckets", 1000)
+
+    logger.info(
+        f"API call to list buckets in {project} from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    s3session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
+    )
+
+    async with s3session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+        try:
+            bucket_page = await s3_client.list_buckets(
+                MaxBuckets=max_buckets, ContinuationToken=continuation_token
+            )
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "404":
+                raise aiohttp.web.HTTPNotFound(
+                    text="Project doesn't have any buckets or storage access."
+                )
+            elif error_code == "401":
+                raise aiohttp.web.HTTPUnauthorized(
+                    text="Unauthorized. Credentials might be stale."
+                )
+            else:
+                raise aiohttp.web.HTTPInternalServerError(
+                    text="Coudln't retrieve the bucket page from storage."
+                )
+
+    bucket_page["Buckets"] = [
+        {
+            "Name": bucket["Name"],
+            "CreationDate": bucket["CreationDate"].isoformat(),
+        }
+        for bucket in bucket_page["Buckets"]
+    ]
+
+    return aiohttp.web.json_response(bucket_page)
+
+
+async def aws_create_bucket(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Proxy bucket creation request to a compatible AWS API."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+    bucket = request.match_info["bucket"]
+
+    logger.info(
+        f"API call to create bucket {bucket} in {project} from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    s3session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
+    )
+
+    async with s3session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+        try:
+            await s3_client.create_bucket(Bucket=bucket)
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == 403 or error_code == 409:
+                raise aiohttp.web.HTTPConflict(text="Bucket already exists")
+            if error_code == 400:
+                raise aiohttp.web.HTTPClientError
+            else:
+                raise aiohttp.web.HTTPInternalServerError(
+                    text="Could not create requested bucket."
+                )
+
+    # Add CORS entries for the newly created bucket to allow access via browser
+    await _update_bucket_cors(logger, s3session, bucket)
+
+    return aiohttp.web.Response(status=204, body="")
+
+
+async def _update_bucket_cors(
+    logger,
+    s3session: aioboto3.Session,
+    bucket: str,
+):
+    """Update single bucket cors entry."""
+    async with s3session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+        # Fetch the existing bucket CORS information
+        cors_list = []
+        try:
+            cors_response = await s3_client.get_bucket_cors(Bucket=bucket)
+            cors_list = cors_response.get("CORSRules", [])
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == 404 or error_code == "NoSuchCORSConfiguration":
+                # 404 means there's no existing CORS
+                logger.debug(f"No existing CORS in {bucket}, creating from scratch.")
+                pass
+            elif error_code == 400:
+                raise aiohttp.web.HTTPClientError
+            else:
+                raise aiohttp.web.HTTPInternalServerError
+        except botocore.exceptions.ParamValidationError:
+            # We don't need to care about the bucket name validation errors for old buckets.
+            return
+
+        # Skip immediately if the required CORS entry already exists
+        for cors in cors_list:
+            if setd["web_app_cors_origin"] in cors["AllowedOrigins"]:
+                return
+
+        # Append the SD Connect UI to the CORS listing
+        try:
+            cors_list.append(
+                {
+                    "AllowedHeaders": [
+                        "*",
+                    ],
+                    "AllowedMethods": [
+                        "PUT",
+                        "GET",
+                        "DELETE",
+                        "POST",
+                        "HEAD",
+                    ],
+                    "AllowedOrigins": [
+                        setd["web_app_cors_origin"],
+                        "setd['web_app_cors_origin']/",
+                    ],
+                    "ExposeHeaders": [
+                        "*",
+                    ],
+                    "MaxAgeSeconds": 3600,
+                }
+            )
+            await s3_client.put_bucket_cors(
+                Bucket=bucket,
+                CORSConfiguration={
+                    "CORSRules": cors_list,
+                },
+            )
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            raise aiohttp.web.HTTPInternalServerError(
+                text=f"Could not add the CORS entry to bucket {bucket}, status {error_code}"
+            )
+
+
+async def aws_update_bucket_cors(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Update a bucket acl to allow access from the configured UI address."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+    bucket = request.match_info["bucket"]
+
+    logger.info(
+        f"API call to update {bucket} CORS in {project} from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    s3session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
+    )
+
+    await _update_bucket_cors(logger, s3session, bucket)
+
+    return aiohttp.web.Response(status=204, body="")
+
+
+async def aws_bulk_update_bucket_cors(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Update project buckets with project UI cors."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+
+    logger.info(
+        f"API call to allow CORS for all buckets in {project} from "
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    s3session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
+    )
+
+    async with s3session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+        continuation_token = ""  # nosec
+        try:
+            # Using the anti-pattern while since we need to check the continuation token
+            # in the end of loop execution, not start
+            while True:
+                bucket_page = await s3_client.list_buckets(
+                    MaxBuckets=100, ContinuationToken=continuation_token
+                )
+
+                # Immediately apply new cors to the bucket
+                for bucket in bucket_page["Buckets"]:
+                    await _update_bucket_cors(logger, s3session, bucket["Name"])
+
+                # End execution if API tells us there's no more pages
+                if (
+                    "ContinuationToken" in bucket_page
+                    and bucket_page["ContinuationToken"]
+                ):
+                    continuation_token = bucket_page["ContinuationToken"]
+                else:
+                    break
+
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            raise aiohttp.web.HTTPInternalServerError(
+                text=f"Could not retrieve bucket page for {project}, status {error_code}"
+            )
+
+    return aiohttp.web.Response(status=204, body="")
+
+
 async def _check_last_modified(
     request: aiohttp.web.Request, container: typing.Dict[str, typing.Any]
 ) -> typing.Dict[str, typing.Any]:
@@ -153,6 +414,10 @@ async def _check_last_modified(
 
 async def _get_ec2_credentials(session, client, project) -> dict:
     """Return access key and secret key for the given project."""
+    # Return credentials from cache if they exist
+    if "ec2" in session["projects"][project]:
+        return session["projects"][project]["ec2"]
+
     # Check if there are existing credentials, use the first one
     async with client.get(
         f"{setd['auth_endpoint_url']}/users/{session['uid']}/credentials/OS-EC2",
@@ -176,7 +441,9 @@ async def _get_ec2_credentials(session, client, project) -> dict:
             "tenant_id": project,
         },
     ) as ret:
-        return (await ret.json())["credential"]
+        session["projects"][project]["ec"] = (await ret.json())["credential"]
+        session.changed()
+        return session["projects"][project]["ec2"]
 
 
 async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -186,11 +453,11 @@ async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response
     project = request.match_info["project"]
 
     request.app["Log"].info(
-        f"API call for creating ec2 credentials from {request.remote}, sess {session}"
+        f"API call for fetching ec2 credentials from {request.remote}, sess {session}"
     )
 
-    creds = await _get_ec2_credentials(session, client, project)
-    return aiohttp.web.json_response(creds)
+    # Fetch the ec2 credentials if they're not already cached in the session.
+    return aiohttp.web.json_response(await _get_ec2_credentials(session, client, project))
 
 
 async def swift_create_container(request: aiohttp.web.Request) -> aiohttp.web.Response:
@@ -1003,12 +1270,12 @@ async def replicate_bucket(
 
     creds = await _get_ec2_credentials(session, client, project)
 
-    session = aioboto3.Session(
+    s3session = aioboto3.Session(
         aws_access_key_id=creds["access"],
         aws_secret_access_key=creds["secret"],
     )
 
-    async with session.client(
+    async with s3session.client(
         "s3",
         region_name="us-east-1",
         endpoint_url=setd["s3api_endpoint"],

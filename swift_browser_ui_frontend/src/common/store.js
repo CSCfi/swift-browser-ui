@@ -4,6 +4,7 @@ import { isEqual, isEqualWith } from "lodash";
 
 import {
   getObjects,
+  awsListBuckets,
 } from "@/common/api";
 import {
   getTagsForContainer,
@@ -22,7 +23,6 @@ import {
 } from "@/common/globalFunctions";
 import { discoverEndpoint, getBucketMetadata } from "./s3conv";
 import { discoverSubmitConfiguration } from "./dominate";
-import { ListBucketsCommand } from "@aws-sdk/client-s3";
 
 const store = createStore({
   state: {
@@ -299,21 +299,15 @@ const store = createStore({
       }
 
       let buckets;
-      let continuationToken = "";
+      let continuationToken = undefined;
       let newBuckets = [];
       do {
         buckets = [];
-        const input = {
-          MaxBuckets: 1000,
-          BucketRegion: "us-east-1",
-          ...(continuationToken && {ContinuationToken: continuationToken}),
-        };
-        const command = new ListBucketsCommand(input);
-        buckets = await s3client.send(command).catch(() => {});
-        console.log(buckets);
+
+        buckets = await awsListBuckets(projectID, continuationToken);
 
         if (buckets?.Buckets?.length > 0) {
-          buckets.Buckets.forEach(async (bucket) => {
+          for (const bucket of buckets.Buckets) {
             const bucketMetadata = await getBucketMetadata(s3client, bucket);
             newBuckets.push({
               name: bucket.Name,
@@ -324,16 +318,20 @@ const store = createStore({
               bytes: bucketMetadata.bytes,
               count: bucketMetadata.count,
             });
-          });
+          }
         }
 
         if (buckets?.ContinuationToken) {
           continuationToken = buckets.ContinuationToken;
+        } else {
+          break;
         }
         if (buckets?.Buckets?.length < 1000) {
           break;
         }
       } while (buckets?.Buckets?.length > 0);
+
+      console.log(newBuckets);
 
       await getDB()
         .containers.bulkPut(newBuckets)

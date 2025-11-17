@@ -103,12 +103,12 @@ import {
   moveFocusOutOfModal,
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
-import { createBucket } from "@/common/s3conv";
 // import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 
 import { toRaw } from "vue";
 import { debounce } from "lodash";
+import { awsCreateBucket } from "@/common/api";
 
 export default {
   name: "CreateBucketModal",
@@ -174,20 +174,18 @@ export default {
       const bucketName = toRaw(this.bucketName);
       const tags = toRaw(this.tags);
 
-      try {
-        // Frontend validation is key:
-        // When user already owns the bucket or creates a new one
-        // it returns 200 just the same in the North Virginia Region
-        await createBucket(this.s3client, bucketName);
-      } catch(e) {
-        const errorCode = e?.$metadata?.httpStatusCode;
-        let errorMessage = this.$t("message.error.createFail");
-        // Unlikely errors due to validation
-        if (errorCode === 409) {
+      let resp = await awsCreateBucket(projectID, bucketName);
+      let errorMessage = this.$t("message.error.createFail");
+      switch (resp) {
+        case 409:
           errorMessage = this.$t("message.error.inUseOtherPrj");
-        } else if (errorCode === 400) {
+          break;
+        case 400:
           errorMessage = this.$t("message.error.invalidName");
-        }
+          break;
+      }
+
+      if (resp.status != 204) {
         document.querySelector("#createModal-toasts").addToast(
           {
             id: "create-toast",
@@ -196,6 +194,7 @@ export default {
             message: errorMessage,
           },
         );
+
         return;
       }
 
