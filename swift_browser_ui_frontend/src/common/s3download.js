@@ -63,7 +63,7 @@ export default class S3DownloadSocket {
       });
       this.downWorker = undefined;
     } else if (window.showSaveFilePicker !== undefined) {
-      this.downWorker = new Worker("/s3downworker.js");
+      this.downWorker = new Worker("/static/s3downworker.js");
       if (DEV) {
         console.log("Created a conventional worker for downloads.");
       }
