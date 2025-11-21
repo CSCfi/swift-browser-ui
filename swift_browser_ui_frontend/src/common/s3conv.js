@@ -3,7 +3,6 @@
 
 import {
   S3Client,
-  CreateBucketCommand,
   ListObjectsV2Command,
   ListBucketsCommand,
   PutBucketPolicyCommand,

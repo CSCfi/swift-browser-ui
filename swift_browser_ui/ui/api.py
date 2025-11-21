@@ -114,11 +114,15 @@ async def aws_list_buckets(
     project = request.match_info["project"]
 
     continuation_token = request.query.get("continuation_token", "")
-    max_buckets = request.query.get("max_buckets", 1000)
+    max_buckets = int(request.query.get("max_buckets", 1000))
 
     logger.info(
         f"API call to list buckets in {project} from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+    logger.debug(
+        f"Using {max_buckets} as max buckets and {continuation_token} "
+        "as the continuation token."
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -261,7 +265,7 @@ async def _update_bucket_cors(
                     ],
                     "AllowedOrigins": [
                         setd["web_app_cors_origin"],
-                        "setd['web_app_cors_origin']/",
+                        f"{setd['web_app_cors_origin']}/",
                     ],
                     "ExposeHeaders": [
                         "*",
@@ -317,6 +321,8 @@ async def aws_bulk_update_bucket_cors(
     logger = request.app["Log"]
     project = request.match_info["project"]
 
+    buckets = request.query.get("buckets", "").split(";")
+
     logger.info(
         f"API call to allow CORS for all buckets in {project} from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
@@ -334,6 +340,14 @@ async def aws_bulk_update_bucket_cors(
         endpoint_url=setd["s3api_endpoint"],
         verify=setd["check_certificate"],
     ) as s3_client:
+        # If we got a list of buckets, just use that instead of paging
+        # through the whole project
+        if buckets:
+            for bucket in buckets:
+                await _update_bucket_cors(logger, s3session, bucket)
+
+            return aiohttp.web.Response(status=204, body="")
+
         continuation_token = ""  # nosec
         try:
             # Using the anti-pattern while since we need to check the continuation token
@@ -344,8 +358,8 @@ async def aws_bulk_update_bucket_cors(
                 )
 
                 # Immediately apply new cors to the bucket
-                for bucket in bucket_page["Buckets"]:
-                    await _update_bucket_cors(logger, s3session, bucket["Name"])
+                for aws_bucket in bucket_page["Buckets"]:
+                    await _update_bucket_cors(logger, s3session, aws_bucket["Name"])
 
                 # End execution if API tells us there's no more pages
                 if (

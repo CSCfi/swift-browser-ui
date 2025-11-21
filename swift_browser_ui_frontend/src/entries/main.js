@@ -266,9 +266,6 @@ const app = createApp({
       }
       this.$store.commit("setActive", active);
 
-      // Fix bucket cors for access in frontend
-      await awsBulkAddBucketCors(active.id);
-
       if (document.location.pathname == "/browse") {
         this.$router.replace({
           name: "AllBuckets",

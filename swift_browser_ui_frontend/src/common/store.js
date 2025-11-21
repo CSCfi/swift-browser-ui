@@ -5,6 +5,7 @@ import { isEqual, isEqualWith } from "lodash";
 import {
   getObjects,
   awsListBuckets,
+  awsBulkAddBucketListCors,
 } from "@/common/api";
 import {
   getTagsForContainer,
@@ -23,6 +24,7 @@ import {
 } from "@/common/globalFunctions";
 import { discoverEndpoint, getBucketMetadata } from "./s3conv";
 import { discoverSubmitConfiguration } from "./dominate";
+import { DEV } from "@/common/conv";
 
 const store = createStore({
   state: {
@@ -301,15 +303,24 @@ const store = createStore({
       let buckets;
       let continuationToken = undefined;
       let newBuckets = [];
+      let newBucketsPage = [];
+
       do {
         buckets = [];
 
-        buckets = await awsListBuckets(projectID, continuationToken);
+        // Get a list of buckets and check bucket CORS
+        buckets = await awsListBuckets(projectID, continuationToken, 10);
+        if (buckets?.Buckets?.length > 0) {
+          await awsBulkAddBucketListCors(projectID, buckets.Buckets.map(
+            bucket => bucket.Name,
+          ));
+        }
 
         if (buckets?.Buckets?.length > 0) {
           for (const bucket of buckets.Buckets) {
             const bucketMetadata = await getBucketMetadata(s3client, bucket);
-            newBuckets.push({
+
+            let newBucket = {
               name: bucket.Name,
               tokens: tokenize(bucket.Name),
               projectID: projectID,
@@ -317,7 +328,20 @@ const store = createStore({
               last_modified: bucketMetadata.last_modified,
               bytes: bucketMetadata.bytes,
               count: bucketMetadata.count,
-            });
+            };
+            newBucketsPage.push(newBucket);
+
+            if (newBucketsPage.length >= 10) {
+              try {
+                await getDB().containers.bulkPut(newBucketsPage);
+              } catch (err) {
+                if (DEV) console.log(err);
+              }
+
+              newBucketsPage = [];
+            }
+
+            newBuckets.push(newBucket);
           }
         }
 
@@ -326,16 +350,12 @@ const store = createStore({
         } else {
           break;
         }
-        if (buckets?.Buckets?.length < 1000) {
+        // May be unnecessary, S3 should omit the continuation token on
+        // final page
+        if (buckets?.Buckets?.length < 10) {
           break;
         }
       } while (buckets?.Buckets?.length > 0);
-
-      console.log(newBuckets);
-
-      await getDB()
-        .containers.bulkPut(newBuckets)
-        .catch(() => {});
 
       const sharedContainers = await getSharedContainers(projectID, signal);
 
