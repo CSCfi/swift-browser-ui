@@ -281,11 +281,11 @@ export default class S3UploadSocket {
   async getNextPart(worker) {
     let nextPart = this.parts.pop();
 
-    this.$store.commit("setEncryptedFile", nextPart.key);
-
     if (nextPart === undefined) {
       return;
     }
+
+    this.$store.commit("setEncryptedFile", nextPart.key);
 
     if (this.uploads[nextPart.bucket][nextPart.key].multipartKeyPending){
       while (

@@ -153,7 +153,7 @@ self.addEventListener("message", (e) => {
       createS3Client(e.data.access, e.data.secret, e.data.endpoint);
       break;
     case "uploadFinished":
-      FS.umount(`/${e.data.bucket}`);
+      FS.unmount(`/${e.data.bucket}`);
       FS.rmdir(`/${e.data.bucket}`);
       postMessage({
         eventType: "filesRemoved",

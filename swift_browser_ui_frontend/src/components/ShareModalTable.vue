@@ -282,6 +282,7 @@ export default {
       );
       await addAccessControlBucketPolicy(
         this.bucketName,
+        this.newPerms,
         [sharedProjectId],
         this.$store.state.s3client,
       );
@@ -292,6 +293,7 @@ export default {
       );
       await addAccessControlBucketPolicy(
         `${this.bucketName}_segments`,
+        this.newPerms,
         [sharedProjectId],
         this.$store.state.s3client,
       );
