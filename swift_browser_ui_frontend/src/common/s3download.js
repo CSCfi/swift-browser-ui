@@ -267,7 +267,7 @@ export default class S3DownloadSocket {
       );
     }
 
-    let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
+    let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
       this.active,
       this.project,
@@ -289,7 +289,7 @@ export default class S3DownloadSocket {
       let header = await signedFetch(
         "GET",
         this.$store.state.uploadEndpoint,
-        `/header/${this.active.name}/${bucket}/${file.name}`,
+        `/header/${this.project}/${bucket}/${file.name}`,
         undefined,
         {
           session: upInfo.id,
