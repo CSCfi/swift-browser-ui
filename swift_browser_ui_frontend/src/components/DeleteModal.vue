@@ -70,6 +70,7 @@ import {
   DeleteObjectCommand,
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
+import { DEV } from "@/common/conv";
 
 export default {
   name: "DeleteModal",
@@ -163,18 +164,23 @@ export default {
             // Equivalent object from segment container needs to be deleted
             // We can filter the deleted segments objects by prefix
             let listSegmentsCommand = new ListObjectsV2Command({
-              Bucket: segment_container,
+              Bucket: segment_container.name,
               Prefix: object.name,
             });
-            const segmentObjectsResp = await this.$store.state.s3client.send(
-              listSegmentsCommand,
-            );
-            if (
-              segmentObjectsResp.Contents !== undefined
-              && segmentObjectsResp.Contents.length > 0
-            ) {
-              for (const segment_obj of segmentObjectsResp.Contents) {
-                segments_to_remove.push(segment_obj.Key);
+            try {
+              const segmentObjectsResp = await this.$store.state.s3client.send(
+                listSegmentsCommand,
+              );
+              if (
+                segmentObjectsResp?.Contents?.length > 0
+              ) {
+                for (const segment_obj of segmentObjectsResp.Contents) {
+                  segments_to_remove.push(segment_obj.Key);
+                }
+              }
+            } catch (e) {
+              if (DEV) {
+                console.log(e);
               }
             }
           }
