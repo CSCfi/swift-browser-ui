@@ -94,7 +94,14 @@ export default class S3UploadSocket {
       i < window.navigator.hardwareConcurrency && i < MAX_UPLOAD_WORKERS;
       i++
     ) {
-      this.upWorkers.push(new Worker("/static/s3upworker.js"));
+      if (DEV) {
+        // Load the workers from frontend work directory when in
+        // development mode
+        this.upWorkers.push(new Worker("/s3upworker.js"));
+      } else {
+        // In production workers are defined in the static folder
+        this.upWorkers.push(new Worker("/static/s3upworker.js"));
+      }
     }
     if (DEV) {
       console.log(`${this.upWorkers.length} upload worker threads were created`);
@@ -102,7 +109,14 @@ export default class S3UploadSocket {
     }
 
     // Initialize the header worker
-    this.headerWorker = new Worker("/static/s3headerworker.js");
+    if (DEV) {
+      // Load the workers from frontend work directory when in
+      // development mode
+      this.headerWorker = new Worker("/s3headerworker.js");
+    } else {
+      // In production the worker is defined in the static folder
+      this.headerWorker = new Worker("/static/s3headerworker.js");
+    }
 
     let headerWorkerHandler = (e) => {
       switch(e.data.eventType) {

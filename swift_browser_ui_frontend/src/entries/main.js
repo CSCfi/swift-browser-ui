@@ -26,7 +26,6 @@ import {
   getUser,
   signedFetch,
   getProjects,
-  awsBulkAddBucketCors,
 } from "@/common/api";
 
 // Import SharingView and Request API
