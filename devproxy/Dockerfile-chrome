@@ -14,6 +14,7 @@ RUN mkdir -p /run/sshd
 RUN adduser --home /home/chromeuser --uid 1111 --disabled-password chromeuser
 
 RUN chown -R chromeuser:chromeuser /etc/ssh
+RUN mkdir /home/chromeuser/test-data
 
 ADD ./.devres/ssh/chrome-dev.pub /home/chromeuser/.ssh/authorized_keys
 # sleep is necessary so chromium has time to fail and exit -> required to initialize browser configuration
