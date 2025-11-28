@@ -83,7 +83,7 @@ services:
       - 22
 
   dev-redis:
-    image: docker.io/redis:7-bullseye
+    image: docker.io/redis:8-bookworm
     networks:
       - sd-connect-dev
     ports:
