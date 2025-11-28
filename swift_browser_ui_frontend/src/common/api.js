@@ -531,7 +531,7 @@ export async function awsCreateBucket(
   let fetchURL = new URL(`/api/s3/${encodeURI(project)}/${encodeURI(bucket)}`, document.location.origin);
   let resp = await PUT(fetchURL);
 
-  return resp.status;
+  return resp;
 }
 
 // Update all bucket cors
