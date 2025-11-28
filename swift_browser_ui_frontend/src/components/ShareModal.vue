@@ -438,12 +438,14 @@ export default {
         this.tags,
         this.$store.state.s3client,
       );
-      await addAccessControlBucketPolicy(
-        `${bucket}_segments`,
-        rights,
-        this.tags,
-        this.$store.state.s3client,
-      );
+      try {
+        await addAccessControlBucketPolicy(
+          `${bucket}_segments`,
+          rights,
+          this.tags,
+          this.$store.state.s3client,
+        );
+      } catch {}
 
       let toShare = [];
       for (const item of this.tags) {

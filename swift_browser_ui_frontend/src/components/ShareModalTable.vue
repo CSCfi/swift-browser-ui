@@ -286,17 +286,19 @@ export default {
         [sharedProjectId],
         this.$store.state.s3client,
       );
-      await removeAccessControlBucketPolicy(
-        `${this.bucketName}_segments`,
-        [sharedProjectId],
-        this.$store.state.s3client,
-      );
-      await addAccessControlBucketPolicy(
-        `${this.bucketName}_segments`,
-        this.newPerms,
-        [sharedProjectId],
-        this.$store.state.s3client,
-      );
+      try {
+        await removeAccessControlBucketPolicy(
+          `${this.bucketName}_segments`,
+          [sharedProjectId],
+          this.$store.state.s3client,
+        );
+        await addAccessControlBucketPolicy(
+          `${this.bucketName}_segments`,
+          this.newPerms,
+          [sharedProjectId],
+          this.$store.state.s3client,
+        );
+      } catch {}
 
       await this.$store.state.client.shareEditAccess(
         this.projectId,
@@ -354,11 +356,13 @@ export default {
         [this.projectId],
         this.$store.state.s3client,
       );
-      await removeAccessControlBucketPolicy(
-        `${this.bucketName}_segments`,
-        [this.projectId],
-        this.$store.state.s3client,
-      );
+      try {
+        await removeAccessControlBucketPolicy(
+          `${this.bucketName}_segments`,
+          [this.projectId],
+          this.$store.state.s3client,
+        );
+      } catch {}
 
       await this.$store.state.client.shareDeleteAccess(
         this.projectId,
