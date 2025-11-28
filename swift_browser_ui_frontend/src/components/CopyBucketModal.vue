@@ -67,6 +67,7 @@ import {
   copyBucket,
   updateContainerMeta,
   getObjects,
+  awsAddBucketCors,
 } from "@/common/api";
 import { getDB } from "@/common/db";
 
@@ -242,6 +243,7 @@ export default {
         this.bucketName,
         this.selectedBucketName,
       ).then(async () => {
+        await awsAddBucketCors(this.active.id, this.bucketName);
         await this.$store.dispatch("updateContainers", {
           projectID: this.$route.params.project,
           signal: null,
