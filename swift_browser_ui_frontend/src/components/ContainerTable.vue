@@ -55,6 +55,7 @@ import {
   ListObjectsV2Command,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { getBucketMetadata } from "@/common/s3conv";
 
 export default {
   name: "ContainerTable",
@@ -158,7 +159,7 @@ export default {
       let offset = 0;
       let limit = this.conts?.length;
 
-      if (!this.disablePagination || this.conts?.length > 500) {
+      if (!this.disablePagination || this.conts?.length > 100) {
         offset =
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
@@ -192,152 +193,170 @@ export default {
               ? {...cont, accessRights} : {...cont};
           }));
 
-      this.containers = mappedContainers
-        .slice(offset, offset + limit).reduce((
-          items,
-          item,
-        ) => {
-          items.push({
-            name: {
-              value: truncate(item.name),
-              component: {
-                tag: "c-link",
-                params: {
-                  href: "javascript:void(0)",
-                  color: "dark-grey",
-                  path: mdiPail,
-                  iconFill: "primary",
-                  iconStyle: {
-                    marginRight: "1rem",
-                    flexShrink: "0",
-                  },
-                  onClick: () => {
-                    if(item.owner) {
-                      this.$router.push({
-                        name: "SharedObjects",
-                        params: {
-                          container: item.name,
-                          owner: item.owner,
-                        },
-                      });
-                    } else {
-                      this.$router.push({
-                        name: "ObjectsView",
-                        params: {
-                          container: item.name,
-                        },
-                      });
-                    }
-                  },
-                },
+      let containersPage = [];
+
+      await Promise.all(
+        mappedContainers
+          .slice(offset, offset + limit).map(async (
+            item,
+          ) => {
+            let bucketMetadata = await getBucketMetadata(
+              this.$store.state.s3client,
+              {
+                Name: item.name,
+                CreationDate: new Date(item.last_modified),
               },
-            },
-            items: {
-              value: item.count,
-            },
-            size: {
-              value: getHumanReadableSize(item.bytes, this.locale),
-            },
-            ...(this.hideTags ? {} : {
-              tags: {
-                value: null,
-                children: [
-                  ...(item.tags || []).map((tag, index) => ({
-                    key: "tag_" + index + "",
-                    value: tag,
-                    component: {
-                      tag: "c-tag",
-                      params: {
-                        flat: true,
-                      },
+            );
+
+            containersPage.push({
+              name: {
+                value: truncate(item.name),
+                component: {
+                  tag: "c-link",
+                  params: {
+                    href: "javascript:void(0)",
+                    color: "dark-grey",
+                    path: mdiPail,
+                    iconFill: "primary",
+                    iconStyle: {
+                      marginRight: "1rem",
+                      flexShrink: "0",
                     },
-                  })),
-                  ...(item.tags && !item.tags?.length
-                    ? [{ key: "no_tags", value: "-" }]
-                    : []),
-                ],
-              },
-            }),
-            sharing: {
-              value: getSharedStatus(item.name),
-            },
-            last_activity: {
-              value: this.showTimestamp? parseDateTime(
-                this.locale, item.last_modified, this.$t, false) :
-                parseDateFromNow(this.locale, item.last_modified, this.$t),
-            },
-            actions: {
-              value: null,
-              sortable: null,
-              align: "end",
-              children: [
-                {
-                  value: this.$t("message.download.download"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      testid: "download-container",
-                      text: true,
-                      size: "small",
-                      title: this.$t("message.download.download"),
-                      onClick: ({ event }) => {
-                        this.beginDownload(
-                          item.name,
-                          item.owner ? item.owner : "",
-                          event.isTrusted,
-                        );
-                      },
-                      target: "_blank",
-                      path: mdiTrayArrowDown,
-                      disabled: (item.owner && item.accessRights?.length === 0)
-                        || !item.bytes,
-                    },
-                  },
-                },
-                // Share button is disabled for Shared (with you) buckets
-                {
-                  value: this.$t("message.share.share"),
-                  component: {
-                    tag: "c-button",
-                    params: {
-                      testid: "share-container",
-                      text: true,
-                      size: "small",
-                      title: this.$t("message.share.share"),
-                      path: mdiShareVariantOutline,
-                      onClick: () =>
-                        this.onOpenShareModal(item.name),
-                      onKeyUp: (event) => {
-                        if(event.keyCode === 13)
-                          this.onOpenShareModal(item.name, true);
-                      },
-                      disabled: item.owner,
-                    },
-                  },
-                },
-                {
-                  value: null,
-                  component: {
-                    tag: "c-menu",
-                    params: {
-                      items: [
-                        {
-                          name: this.$t("message.copy"),
-                          action: () => {
-                            this.openCopyBucketModal(item.name, item.owner);
-                            const menuItems = document
-                              .querySelector("c-menu-items");
-                            menuItems.addEventListener("keydown", (e) =>{
-                              if (e.keyCode === 13) {
-                                this.openCopyBucketModal(
-                                  item.name, item.owner, true,
-                                );
-                              }
-                            });
+                    onClick: () => {
+                      if(item.owner) {
+                        this.$router.push({
+                          name: "SharedObjects",
+                          params: {
+                            container: item.name,
+                            owner: item.owner,
                           },
-                          disabled: !item.bytes,
+                        });
+                      } else {
+                        this.$router.push({
+                          name: "ObjectsView",
+                          params: {
+                            container: item.name,
+                          },
+                        });
+                      }
+                    },
+                  },
+                },
+              },
+              items: {
+                value: bucketMetadata.count,
+              },
+              size: {
+                value: getHumanReadableSize(
+                  bucketMetadata.bytes,
+                  this.locale,
+                ),
+              },
+              ...(this.hideTags ? {} : {
+                tags: {
+                  value: null,
+                  children: [
+                    ...(item.tags || []).map((tag, index) => ({
+                      key: "tag_" + index + "",
+                      value: tag,
+                      component: {
+                        tag: "c-tag",
+                        params: {
+                          flat: true,
                         },
-                        /*{
+                      },
+                    })),
+                    ...(item.tags && !item.tags?.length
+                      ? [{ key: "no_tags", value: "-" }]
+                      : []),
+                  ],
+                },
+              }),
+              sharing: {
+                value: getSharedStatus(item.name),
+              },
+              last_activity: {
+                value: this.showTimestamp? parseDateTime(
+                  this.locale, bucketMetadata.last_modified, this.$t, false) :
+                  parseDateFromNow(
+                    this.locale,
+                    bucketMetadata.last_modified,
+                    this.$t,
+                  ),
+              },
+              actions: {
+                value: null,
+                sortable: null,
+                align: "end",
+                children: [
+                  {
+                    value: this.$t("message.download.download"),
+                    component: {
+                      tag: "c-button",
+                      params: {
+                        testid: "download-container",
+                        text: true,
+                        size: "small",
+                        title: this.$t("message.download.download"),
+                        onClick: ({ event }) => {
+                          this.beginDownload(
+                            item.name,
+                            item.owner ? item.owner : "",
+                            event.isTrusted,
+                          );
+                        },
+                        target: "_blank",
+                        path: mdiTrayArrowDown,
+                        disabled: (
+                          item.owner && item.accessRights?.length === 0
+                        ) || !bucketMetadata.bytes,
+                      },
+                    },
+                  },
+                  // Share button is disabled for Shared (with you) buckets
+                  {
+                    value: this.$t("message.share.share"),
+                    component: {
+                      tag: "c-button",
+                      params: {
+                        testid: "share-container",
+                        text: true,
+                        size: "small",
+                        title: this.$t("message.share.share"),
+                        path: mdiShareVariantOutline,
+                        onClick: () =>
+                          this.onOpenShareModal(item.name),
+                        onKeyUp: (event) => {
+                          if(event.keyCode === 13)
+                            this.onOpenShareModal(item.name, true);
+                        },
+                        disabled: item.owner,
+                      },
+                    },
+                  },
+                  {
+                    value: null,
+                    component: {
+                      tag: "c-menu",
+                      params: {
+                        items: [
+                          {
+                            name: this.$t("message.copy"),
+                            action: () => {
+                              this.openCopyBucketModal(item.name, item.owner);
+                              const menuItems = document
+                                .querySelector("c-menu-items");
+                              menuItems.addEventListener("keydown", (e) =>{
+                                if (e.keyCode === 13) {
+                                  this.openCopyBucketModal(
+                                    item.name, item.owner, true,
+                                  );
+                                }
+                              });
+                            },
+                            disabled: !bucketMetadata.bytes,
+                          },
+                          /*{
                           name: this.$t("message.editTags"),
                           action: () => {
                             this.openEditTagsModal(item.name);
@@ -351,38 +370,43 @@ export default {
                           },
                           disabled: item.owner,
                         },*/
-                        {
-                          name: this.$t("message.delete"),
-                          action: () => this.delete(
-                            item.name, item.count,
-                          ),
-                          disabled: item.owner,
-                        },
-                      ],
-                      customTrigger: {
-                        value: this.$t("message.options"),
-                        component: {
-                          tag: "c-button",
-                          params: {
-                            text: true,
-                            path: mdiDotsHorizontal,
-                            title: this.$t("message.options"),
-                            size: "small",
-                            disabled: (item.owner &&
-                              (item.accessRights?.length === 0 ||
-                                !item.bytes)),
+                          {
+                            name: this.$t("message.delete"),
+                            action: () => this.delete(
+                              item.name, bucketMetadata.count,
+                            ),
+                            disabled: item.owner,
+                          },
+                        ],
+                        customTrigger: {
+                          value: this.$t("message.options"),
+                          component: {
+                            tag: "c-button",
+                            params: {
+                              text: true,
+                              path: mdiDotsHorizontal,
+                              title: this.$t("message.options"),
+                              size: "small",
+                              disabled: (item.owner &&
+                                (item.accessRights?.length === 0 ||
+                                  !bucketMetadata.bytes)),
+                            },
                           },
                         },
                       },
                     },
                   },
-                },
-              ],
-            },
-          });
+                ],
+              },
+            });
+          }));
 
-          return items;
-        }, []);
+      // Remember to sort the page to preserve order lost with promises
+      containersPage = containersPage.sort((a, b) => {
+        return a.name.value.localeCompare(b.name.value);
+      });
+
+      this.containers = containersPage;
 
       this.paginationOptions = {
         ...this.paginationOptions,

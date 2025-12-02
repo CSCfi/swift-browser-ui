@@ -22,7 +22,7 @@ import {
   getSharedContainers,
   getContainerLastmodified,
 } from "@/common/globalFunctions";
-import { discoverEndpoint, getBucketMetadata } from "./s3conv";
+import { discoverEndpoint } from "./s3conv";
 import { discoverSubmitConfiguration } from "./dominate";
 import { DEV } from "@/common/conv";
 
@@ -318,16 +318,16 @@ const store = createStore({
 
         if (buckets?.Buckets?.length > 0) {
           for (const bucket of buckets.Buckets) {
-            const bucketMetadata = await getBucketMetadata(s3client, bucket);
+            // const bucketMetadata = await getBucketMetadata(s3client, bucket);
 
             let newBucket = {
               name: bucket.Name,
               tokens: tokenize(bucket.Name),
               projectID: projectID,
               tags: [],
-              last_modified: bucketMetadata.last_modified,
-              bytes: bucketMetadata.bytes,
-              count: bucketMetadata.count,
+              last_modified: bucket.CreationDate.toISOString(),
+              bytes: 0,
+              count: 0,
             };
             newBucketsPage.push(newBucket);
 
