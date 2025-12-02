@@ -19,6 +19,9 @@ import {
   timeout,
 } from "./globalFunctions";
 import {
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
+import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
@@ -34,6 +37,7 @@ export default class S3DownloadSocket {
     project = "", // project name
     store, // shared vuex store
     t, // i18n bindings
+    client, // s3 client
     s3access,
     s3secret,
     s3endpoint,
@@ -42,6 +46,7 @@ export default class S3DownloadSocket {
     this.project = project;
     this.$store = store;
     this.$t = t;
+    this.client = client;
     this.s3access = s3access;
     this.s3secret = s3secret;
     this.s3endpoint = s3endpoint;
@@ -245,31 +250,43 @@ export default class S3DownloadSocket {
   async getHeaders(uuid, bucket, fileList, pubkey, ownerName) {
     let headers = {};
 
-    // Cache the bucket id
-    let dbBucket = await getDB().containers
-      .get({
-        projectID: this.active,
-        name: bucket,
-      });
+    // Retrieve the bucket objects
+    let continuationToken;
+    let bucketFiles = [];
+    try {
+      do {
+        const response = await this.client.send(new ListObjectsV2Command({
+          Bucket: bucket,
+          continuationToken: continuationToken,
+        }));
 
-    const dbBucketFileCount = await getDB().objects
-      .where({"containerID": dbBucket.id})
-      .count();
+        console.log(response);
 
-    let dbBucketFiles = [];
+        if (response?.Contents) {
+          response.Contents.map(obj => {
+            bucketFiles.push({
+              name: obj.Key,
+              bytes: obj.Size,
+              last_modified: obj.LastModified,
+            });
+          });
+        }
 
-    while (dbBucketFiles.length < dbBucketFileCount
-      || dbBucketFiles.length < dbBucket.count)
-    {
-      dbBucketFiles = await getDB().objects
-        .where({"containerID": dbBucket.id})
-        .toArray();
-      await timeout(250);
+        continuationToken = response?.NextContinuationToken;
+      } while (continuationToken);
+    } catch (e) {
+      if (DEV) {
+        console.log(
+          `Failed to retrieve objects for download in bucket ${bucket}: `,
+          e,
+        );
+      }
+      throw e;
     }
 
     // If files are specified, use only the specified file listing
     if (fileList.length >= 1) {
-      dbBucketFiles = dbBucketFiles.filter(
+      bucketFiles = bucketFiles.filter(
         item => fileList.includes(item.name),
       );
     }
@@ -291,7 +308,7 @@ export default class S3DownloadSocket {
       },
     );
 
-    for (const file of dbBucketFiles) {
+    for (const file of bucketFiles) {
       // Get the file header
       let header = await signedFetch(
         "GET",

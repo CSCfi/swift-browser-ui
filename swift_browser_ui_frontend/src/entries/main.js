@@ -357,6 +357,7 @@ const app = createApp({
         this.active.name,
         this.$store,
         this.$t,
+        s3client,
         ec2creds.access,
         ec2creds.secret,
         s3endpoint,
