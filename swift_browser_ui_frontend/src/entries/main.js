@@ -329,6 +329,9 @@ const app = createApp({
         }
       }
 
+      let s3endpoint = await discoverEndpoint();
+      this.$store.commit("setS3Endpoint", s3endpoint);
+
       // Initialize the frontend S3 client
       let s3client = await getClient(
         this.$store.state.active.id,
@@ -339,7 +342,6 @@ const app = createApp({
 
       // Initialize the S3 upload implementation
       let ec2creds = await getEC2Credentials(this.active.id);
-      let s3endpoint = await discoverEndpoint();
       let s3upsocket = new S3UploadSocket(
         this.active.id,
         this.active.name,
