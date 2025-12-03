@@ -316,7 +316,6 @@ const app = createApp({
         this.$store.commit("appendPubKey", key);
       }
 
-      await this.$store.dispatch("initSDSubmit");
       if (DEV) {
         if (
           this.$store.state.submitConfig.sd_submit_user === ""

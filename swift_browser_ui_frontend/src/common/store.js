@@ -3,7 +3,6 @@ import { createStore } from "vuex";
 import { isEqual, isEqualWith } from "lodash";
 
 import {
-  getObjects,
   awsListBuckets,
   awsBulkAddBucketListCors,
 } from "@/common/api";
@@ -11,7 +10,6 @@ import {
   getTagsForContainer,
   getMetadataForSharedContainer,
   getTagsForObjects,
-  makeGetObjectsMetaURL,
   tokenize,
   addSegmentContainerSize,
   sortContainer,
@@ -289,7 +287,6 @@ const store = createStore({
         await new Promise(r => setTimeout(r, 25));
         console.log("Waiting for s3 client to initialize.");
       }
-      let s3client = state.s3client;
 
       const existingContainers = await getDB()
         .containers.where({ projectID })
@@ -309,7 +306,7 @@ const store = createStore({
         buckets = [];
 
         // Get a list of buckets and check bucket CORS
-        buckets = await awsListBuckets(projectID, continuationToken, 10);
+        buckets = await awsListBuckets(projectID, continuationToken, 100);
         if (buckets?.Buckets?.length > 0) {
           await awsBulkAddBucketListCors(projectID, buckets.Buckets.map(
             bucket => bucket.Name,
@@ -331,7 +328,7 @@ const store = createStore({
             };
             newBucketsPage.push(newBucket);
 
-            if (newBucketsPage.length >= 10) {
+            if (newBucketsPage.length >= 100) {
               try {
                 await getDB().containers.bulkPut(newBucketsPage);
               } catch (err) {
@@ -355,7 +352,7 @@ const store = createStore({
         if (buckets?.Buckets?.length < 10) {
           break;
         }
-      } while (buckets?.Buckets?.length > 0);
+      } while (buckets?.Buckets?.length > 0 && continuationToken);
 
       const sharedContainers = await getSharedContainers(projectID, signal);
 
@@ -508,159 +505,6 @@ const store = createStore({
           });
         }
       }
-    },
-    updateObjects: async function (
-      { dispatch, state },
-      { projectID, owner, container, signal, updateTags },
-    ) {
-      const isSegmentsContainer = container.name.endsWith("_segments");
-      const existingObjects = await getDB().objects
-        .where({ containerID: container.id })
-        .toArray();
-      let newObjects = [];
-      let objects;
-      let marker = "";
-
-      if (!signal) {
-        const controller = new AbortController();
-        signal = controller.signal;
-      }
-
-      do {
-        if (owner) {
-          objects = await getObjects(
-            projectID,
-            container.name,
-            marker,
-            signal,
-            true,
-            owner,
-          );
-        } else {
-          objects = await getObjects(
-            projectID, container.name, marker, signal);
-        }
-
-        if (objects.length > 0) {
-          objects.forEach(obj => {
-            obj.container = container.name;
-            obj.containerID = container.id;
-            obj.tokens = isSegmentsContainer ? [] : tokenize(obj.name);
-            if (owner) {
-              obj.containerOwner = container.owner;
-            }
-          });
-          newObjects = newObjects.concat(objects);
-          marker = objects[objects.length - 1].name;
-        }
-      } while (objects.length > 0);
-
-      let toDelete = [];
-
-      for (let i = 0; i < existingObjects.length; i++) {
-        const oldObj = existingObjects[i];
-        if (!newObjects.find(obj => obj.name === oldObj.name &&
-          obj.containerID === oldObj.containerID)
-        ) {
-          toDelete.push(oldObj.id);
-        }
-      }
-
-      if (toDelete.length) {
-        await getDB().objects.bulkDelete(toDelete);
-      }
-
-      for (let i = 0; i < newObjects.length; i++) {
-        const newObj = newObjects[i];
-        let oldObj = existingObjects.find(obj => obj.name === newObj.name &&
-          obj.containerID === newObj.containerID,
-        );
-
-        // Check if oldObj and newObj have the same properties
-        // except the key "id", because key "id" comes from oldObj in IDB
-        const isEqualObject = isEqualWith(oldObj, newObj, (oldObj, newObj) => {
-          if (oldObj?.id && !newObj?.id) return true;
-        });
-
-        if (oldObj) {
-          if (isEqualObject) await getDB().objects.update(oldObj.id, newObj);
-        } else {
-          await getDB().objects.put(newObj);
-        }
-      }
-
-      if (owner) updateContainerLastmodified(projectID, container, newObjects);
-
-      // Tagging is disabled currently
-      /*if (!isSegmentsContainer && updateTags) {
-        await dispatch("updateObjectTags", {
-          projectID,
-          container,
-          signal,
-          owner,
-        });
-      }*/
-    },
-    updateObjectTags: async function (
-      _,
-      { projectID, container, signal, owner },
-    ) {
-      let objectList = [];
-      const allTags = [];
-
-      const objects = await getDB().objects
-        .where({ containerID: container.id })
-        .toArray();
-
-      for (let i = 0; i < objects.length; i++) {
-        // Object names end up in the URL, which has hard length limits.
-        // The aiohttp complains at 8190. The maximum size
-        // for object name is 1024. Set it to a safe enough amount.
-        // We split the requests to prevent reaching said limits.
-        objectList.push(objects[i].name);
-
-        if (
-          i === objects.length - 1 ||
-          makeGetObjectsMetaURL(projectID, container.name, [
-            ...objectList,
-            objects[i + 1].name,
-          ]).href.length >= 8190
-        ) {
-          const url = makeGetObjectsMetaURL(
-            projectID,
-            container.name,
-            objectList,
-          );
-
-          let tags = await getTagsForObjects(
-            projectID,
-            container.name,
-            objectList,
-            url,
-            signal,
-            owner,
-          );
-
-          allTags.push(tags);
-          objectList = [];
-        }
-      }
-
-      if (allTags.flat().length > 0) {
-        const newObjects = objects.map((obj, index) => {
-          const tags = allTags.flat()[index][1];
-          return {...obj, tags};
-        });
-        await getDB().objects.bulkPut(newObjects);
-      }
-    },
-    initSDSubmit: async function (
-      { state, commit },
-    ) {
-      let s3endpoint = await discoverEndpoint();
-      let submitConfig = await discoverSubmitConfiguration();
-      commit("setS3Endpoint", s3endpoint);
-      commit("setSubmitConfig", submitConfig);
     },
   },
 });

@@ -137,13 +137,12 @@ import {
   addFocusClass,
 } from "@/common/keyboardNavigation";
 import { getDB } from "@/common/db";
-import { liveQuery } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 import { DEV } from "@/common/conv";
+import { ListObjectsV2Command } from "@aws-sdk/client-s3";
 
 export default {
   name: "ObjectTable",
@@ -408,25 +407,49 @@ export default {
         }
         await this.updateAfterUpload();
       }
-      else {
-        let params = {
-          projectID: this.project,
-          container: this.currentContainer,
-          signal: this.abortController.signal,
-        };
 
-        if (this.owner) params.owner = this.owner;
-
-        await this.$store.dispatch("updateObjects", params);
+      // Delay checking objects if the s3 client is not yet ready
+      if (this.$store.state.s3client === undefined) {
+        console.log("Waiting for the s3 client to be configured.");
+        setTimeout(this.updateObjects, 250);
+        return;
       }
 
-      this.oList = useObservable(
-        liveQuery(() =>
-          getDB().objects
-            .where({"containerID": this.currentContainer.id})
-            .toArray(),
-        ),
-      );
+      let continuationToken;
+      let objects = [];
+
+      // Retrieve an object listing from the object storage
+      try {
+        do {
+          const response = await this.$store.state.s3client.send(
+            new ListObjectsV2Command({
+              Bucket: this.containerName,
+              ContinuationToken: continuationToken,
+            }),
+          );
+
+          if (response?.Contents) {
+            response.Contents.map(item => {
+              objects.push({
+                name: item.Key,
+                bytes: item.Size,
+                last_modified: item.LastModified.toISOString(),
+              });
+            });
+          }
+
+          continuationToken = response?.NextContinuationToken;
+        } while (continuationToken);
+      } catch (e) {
+        console.error(
+          `Failed to list objects for bucket ${this.containerName}`,
+          e,
+        );
+      }
+
+      // csc ui table rendering fails if we do paged updates,
+      // use single override after update to only initiate render once.
+      this.oList = objects;
     },
     addPageToURL: function (pageNumber) {
       if (this.$route.name == "SharedObjects") {
