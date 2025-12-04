@@ -1,15 +1,11 @@
 // Vuex store for the variables that need to be globally available.
 import { createStore } from "vuex";
-import { isEqual, isEqualWith } from "lodash";
 
 import {
   awsListBuckets,
   awsBulkAddBucketListCors,
 } from "@/common/api";
 import {
-  getTagsForContainer,
-  getMetadataForSharedContainer,
-  getTagsForObjects,
   tokenize,
   addSegmentContainerSize,
   sortContainer,
@@ -20,8 +16,6 @@ import {
   getSharedContainers,
   getContainerLastmodified,
 } from "@/common/globalFunctions";
-import { discoverEndpoint } from "./s3conv";
-import { discoverSubmitConfiguration } from "./dominate";
 import { DEV } from "@/common/conv";
 
 const store = createStore({
@@ -359,17 +353,11 @@ const store = createStore({
       if (sharedContainers.length > 0) {
         for (let i in sharedContainers) {
           let cont = sharedContainers[i];
-          const { bytes, count } = await getMetadataForSharedContainer(
-            projectID,
-            cont.container,
-            signal,
-            cont.owner,
-          );
           cont.tokens =  cont.container.endsWith("_segments") ?
             [] : tokenize(cont.container);
           cont.projectID = projectID;
-          cont.bytes = bytes;
-          cont.count = count;
+          cont.bytes = 0;
+          cont.count = 0;
           cont.name = cont.container;
 
           const idb_last_modified = getContainerLastmodified(
@@ -478,33 +466,6 @@ const store = createStore({
         signal,
       });*/
       return containers_to_update_objects;
-    },
-    updateContainerTags: async function (_, {
-      projectID, containers, signal,
-    }) {
-      const idbContainers = await getDB()
-        .containers.where({ projectID })
-        .toArray();
-
-      for (let i = 0; i < containers.length; i++) {
-        const container = containers[i];
-        // Update tags for non-segment containers and for those that
-        // have difference between new tags and existing tags from IDB
-        if (!container.name.endsWith("_segments")) {
-          const tags =
-          (await getTagsForContainer(
-            projectID, container.name, signal, container.owner)) ||
-          null;
-
-          idbContainers.forEach(async (cont) => {
-            if (cont.name === container.name && !isEqual(tags, cont.tags)) {
-              await getDB().containers
-                .where({ projectID, name: container.name })
-                .modify({ tags });
-            }
-          });
-        }
-      }
     },
   },
 });

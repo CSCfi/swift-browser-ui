@@ -19,14 +19,11 @@ import {
   timeout,
 } from "./globalFunctions";
 import {
-  ListObjectsV2Command,
-} from "@aws-sdk/client-s3";
-import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
 import { DEV } from "./conv";
-import { getDB } from "./db";
+import { awsListObjects } from "./s3conv";
 
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
@@ -251,37 +248,12 @@ export default class S3DownloadSocket {
     let headers = {};
 
     // Retrieve the bucket objects
-    let continuationToken;
-    let bucketFiles = [];
-    try {
-      do {
-        const response = await this.client.send(new ListObjectsV2Command({
-          Bucket: bucket,
-          continuationToken: continuationToken,
-        }));
-
-        console.log(response);
-
-        if (response?.Contents) {
-          response.Contents.map(obj => {
-            bucketFiles.push({
-              name: obj.Key,
-              bytes: obj.Size,
-              last_modified: obj.LastModified,
-            });
-          });
-        }
-
-        continuationToken = response?.NextContinuationToken;
-      } while (continuationToken);
-    } catch (e) {
+    let bucketFiles = await awsListObjects(this.client, bucket);
+    if (bucketFiles.length == 0) {
       if (DEV) {
-        console.log(
-          `Failed to retrieve objects for download in bucket ${bucket}: `,
-          e,
-        );
+        console.log(`No objects for bucket ${bucket}, aborting`);
       }
-      throw e;
+      this.downWorker.postMessage({ command: "abort", reason: "error" });
     }
 
     // If files are specified, use only the specified file listing

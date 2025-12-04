@@ -41,13 +41,8 @@
 
 <script>
 import {
-  updateObjectMeta,
-  updateContainerMeta,
-} from "@/common/api";
-
-import {
-  getTagsForObjects,
-  getTagsForContainer,
+// getTagsForObjects,
+// getTagsForContainer,
 } from "@/common/conv";
 import { getDB } from "@/common/db";
 
@@ -146,10 +141,10 @@ export default {
       });
 
       if (!this.container?.tags) {
-        this.tags = await getTagsForContainer(
-          this.projectID,
-          this.container?.name,
-        );
+        // this.tags = await getTagsForContainer(
+        //   this.projectID,
+        //   this.container?.name,
+        // );
       } else {
         this.tags = this.container.tags;
       }
@@ -204,20 +199,6 @@ export default {
       });
     },
     saveContainerTags: function (keypress) {
-      const tags = toRaw(this.tags);
-      const containerName = this.container.name;
-      let meta = {
-        usertags: tags.join(";"),
-      };
-      updateContainerMeta(this.projectID, containerName, meta)
-        .then(async () => {
-          await getDB().containers
-            .where({
-              projectID: this.projectID,
-              name: containerName,
-            })
-            .modify({ tags, last_modified: getCurrentISOtime() });
-        });
       this.toggleEditTagsModal(keypress);
     },
     addingTag: function (e, onBlur) {

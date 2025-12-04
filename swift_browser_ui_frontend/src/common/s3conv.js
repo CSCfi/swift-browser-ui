@@ -5,10 +5,8 @@ import {
   S3Client,
   ListObjectsV2Command,
   ListBucketsCommand,
-  PutBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
 import { getEC2Credentials, GET } from "./api";
-import { DEV } from "./conv";
 
 // Fetch S3 endpoint from backend
 export async function discoverEndpoint() {
@@ -44,140 +42,45 @@ export async function listBuckets(client) {
   console.log(resp);
 }
 
-async function checkOldPolicy(client, bucket) {
-  const input = {
-    Bucket: bucket,
-  };
-  const command = new GetBucketPolicyCommand(input);
-  const resp = await client.send(command);
+export async function awsListObjects(client, bucket, prefix = undefined) {
+  let continuationToken;
+  let objects = [];
 
-  if (resp.Policy !== undefined && resp.Policy !== "") {
-    return JSON.parse(resp.Policy);
+  try {
+    do {
+      let listObjectsCommandParams = {
+        Bucket: bucket,
+        ContinuationToken: continuationToken,
+      };
+      if (prefix !== undefined) {
+        listObjectsCommandParams.Prefix = prefix;
+      }
+
+      const response = await client.send(
+        new ListObjectsV2Command(listObjectsCommandParams),
+      );
+
+      if (response?.Contents) {
+        response.Contents.map(item => {
+          objects.push({
+            name: item.Key,
+            bytes: item.Size,
+            last_modified: item.LastModified.toISOString(),
+          });
+        });
+      }
+
+      continuationToken = response?.NextContinuationToken;
+    } while (continuationToken);
+  } catch (e) {
+    if (DEV) console.error(
+      `Failed to list objects for bucket ${bucket}`,
+      e,
+    );
+    if (DEV) console.error(`Returning empty listing for bucket ${bucket}`);
   }
 
-  return {
-    Version: "2012-10-17",
-    Statement: [],
-  };
-}
-
-// Add an AWS ARN to the bucket read policy
-export async function addUserBucketReadPolicy(client, bucket, account) {
-  let d = new Date();
-  let version = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`;
-  let policy = await checkOldPolicy(client, bucket);
-
-  // For now use dirtier way adding statement for each user.
-  // In future move to single statment and parse the Principal list.
-  policy.Version = version;
-  policy.Statement.push({
-    Sid: `AllowReadForAccount${account}`,
-    Principal: {
-      "AWS": [
-        `arn:aws:iam::${account}`,
-      ],
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket",
-        "s3:GetObject",
-        "s3:HeadObject",
-        "s3:HeadBucket",
-      ],
-      "Resource": [`arn:aws:s3::${bucket}`],
-    },
-  });
-
-  const input = {
-    Bucket: bucket,
-    Policy: JSON.stringify(policy),
-  };
-
-  const command = new PutBucketPolicyCommand(input);
-  const resp = await client.send(command);
-
-  return resp;
-}
-
-// Add an AWS ARN to the bucket write policy
-export async function addUserBucketWritePolicy(client, bucket, account) {
-  let d = new Date();
-  let version = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`;
-  let policy = await checkOldPolicy(client, bucket);
-
-  // For now use dirtier way adding statement for each user.
-  // In future move to single statment and parse the Principal list.
-  policy.Version = version;
-  // Grant the required rights a user needs for writing,
-  // e.g. multipart uploads
-  policy.Statement.push({
-    Sid: `AllowWriteForAccount${account}`,
-    Principal: {
-      "AWS": [
-        `arn:aws:iam::${account}`,
-      ],
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject",
-        "s3:CreateMultipartUpload",
-        "s3:UploadPart",
-        "s3:CompleteMultipartUpload",
-        "s3:AbortMultipartUpload",
-      ],
-      "Resource": [`arn:aws:s3::${bucket}`],
-    },
-  });
-
-  const input = {
-    Bucket: bucket,
-    Policy: JSON.stringify(policy),
-  };
-
-  const command = new PutBucketPolicyCommand(input);
-  const resp = await client.send(command);
-
-  return resp;
-}
-
-// Remove an AWS ARN from the bucket read policy
-export async function removeUserBucketReadPolicy(client, bucket, account) {
-  let d = new Date();
-  let version = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`;
-  let policy = await checkOldPolicy(client, bucket);
-
-  policy.Version = version;
-  // Dump the matching statement with a filter
-  policy.Statement = policy.Statement.filter(s => s.Sid !== `AllowReadForAccount${account}`);
-
-  const input = {
-    Bucket: bucket,
-    Policy: JSON.stringify(policy),
-  };
-
-  const command = new PutBucketPolicyCommand(input);
-  const resp = await client.send(command);
-
-  return resp;
-}
-
-// Remove an AWS ARN from the bucket write policy
-export async function removeUserBucketWritePolicy(client, bucket, account) {
-  let d = new Date();
-  let version = `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}`;
-  let policy = await checkOldPolicy(client, bucket);
-
-  policy.Version = version;
-  // Dump the matching statement with a filter
-  policy.Statement = policy.Statement.filter(s => s.Sid !== `AllowWriteForAccount${account}`);
-
-  const input = {
-    Bucket: bucket,
-    Policy: JSON.stringify(policy),
-  };
-
-  const command = new PutBucketPolicyCommand(input);
-  const resp = await client.send(command);
-
-  return resp;
+  return objects;
 }
 
 export async function getBucketMetadata(client, bucket) {

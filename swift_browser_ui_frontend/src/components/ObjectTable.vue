@@ -142,7 +142,7 @@ import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 import { DEV } from "@/common/conv";
-import { ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { awsListObjects } from "@/common/s3conv";
 
 export default {
   name: "ObjectTable",
@@ -410,46 +410,17 @@ export default {
 
       // Delay checking objects if the s3 client is not yet ready
       if (this.$store.state.s3client === undefined) {
-        console.log("Waiting for the s3 client to be configured.");
+        if (DEV) {
+          console.log("Waiting for the s3 client to be configured.");
+        }
         setTimeout(this.updateObjects, 250);
         return;
       }
 
-      let continuationToken;
-      let objects = [];
-
-      // Retrieve an object listing from the object storage
-      try {
-        do {
-          const response = await this.$store.state.s3client.send(
-            new ListObjectsV2Command({
-              Bucket: this.containerName,
-              ContinuationToken: continuationToken,
-            }),
-          );
-
-          if (response?.Contents) {
-            response.Contents.map(item => {
-              objects.push({
-                name: item.Key,
-                bytes: item.Size,
-                last_modified: item.LastModified.toISOString(),
-              });
-            });
-          }
-
-          continuationToken = response?.NextContinuationToken;
-        } while (continuationToken);
-      } catch (e) {
-        console.error(
-          `Failed to list objects for bucket ${this.containerName}`,
-          e,
-        );
-      }
-
-      // csc ui table rendering fails if we do paged updates,
-      // use single override after update to only initiate render once.
-      this.oList = objects;
+      this.oList = await awsListObjects(
+        this.$store.state.s3client,
+        this.containerName,
+      );
     },
     addPageToURL: function (pageNumber) {
       if (this.$route.name == "SharedObjects") {

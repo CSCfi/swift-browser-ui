@@ -52,10 +52,9 @@ import {
 import { toRaw } from "vue";
 import {
   DeleteBucketCommand,
-  ListObjectsV2Command,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import { getBucketMetadata } from "@/common/s3conv";
+import { awsListObjects, getBucketMetadata } from "@/common/s3conv";
 
 export default {
   name: "ContainerTable",
@@ -497,28 +496,28 @@ export default {
           // existence we should take care of that as well
           const segmentsBucket = `${bucket}_segments`;
           let segmentsBucketExists = false;
-          let segmentObjects = [];
 
-          do {
-            for (const key of segmentObjects) {
+          // List and delete all segment objects matching the deleted bucket.
+          const segmentListResp = await awsListObjects(
+            this.$store.state.client,
+            segmentsBucket,
+          );
+          for (const key of segmentListResp) {
+            try {
               const objectDeleteCommand = new DeleteObjectCommand({
                 Bucket: segmentsBucket,
-                Key: key.Key,
+                Key: key.name,
               });
               await this.s3client.send(objectDeleteCommand);
+            } catch (e) {
+              if (DEV) {
+                console.log(
+                  `Failed deleting object ${key.name} in ${segmentsBucket}: `,
+                  e,
+                );
+              }
             }
-
-            // Fetch a new page of objects until we run out
-            try {
-              const objListResp = await this.s3client.send(
-                new ListObjectsV2Command({ Bucket: segmentsBucket }),
-              );
-              segmentsBucketExists = true;
-              segmentObjects = objListResp?.Contents || [];
-            } catch {
-              segmentObjects = [];
-            }
-          } while (segmentObjects.length > 0);
+          }
 
           // Finally delete the segments bucket
           if (segmentsBucketExists) {

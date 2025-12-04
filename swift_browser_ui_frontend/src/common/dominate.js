@@ -3,7 +3,7 @@ SD Submit sharing functionality
 */
 
 import { PutBucketPolicyCommand } from "@aws-sdk/client-s3";
-import { GET, updateContainerMeta, updateObjectMeta } from "./api";
+import { GET } from "./api";
 import { DEV } from "./conv";
 import { getCurrentISOtime } from "./globalFunctions";
 import { getDB } from "./db";
@@ -97,11 +97,6 @@ export async function submit_bucket(
   }
   let bucketTags = bucket.tags;
   tags.push("submitted");
-  await updateContainerMeta(
-    project.id,
-    bucket.name,
-    { usertags: bucketTags.join(";")},
-  );
   await getDB().containers
     .where({
       projectID: project.id,

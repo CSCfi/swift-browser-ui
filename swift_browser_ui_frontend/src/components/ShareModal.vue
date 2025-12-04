@@ -171,7 +171,6 @@
 <script>
 import {
   addAccessControlBucketPolicy,
-  getSharedContainerAddress,
   signedFetch,
 } from "@/common/api";
 
@@ -225,6 +224,9 @@ export default {
     },
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
+    },
+    s3endpoint() {
+      return this.$store.state.s3endpoint;
     },
   },
   watch: {
@@ -398,14 +400,14 @@ export default {
           bucket,
           this.tags,
           rights,
-          await getSharedContainerAddress(this.$route.params.project),
+          this.s3endpoint,
         );
         await this.$store.state.client.shareNewAccess(
           this.$store.state.active.id,
           `${this.bucketName}_segments`,
           this.tags,
           rights,
-          await getSharedContainerAddress(this.$route.params.project),
+          this.s3endpoint,
         );
       }
       catch(error) {
