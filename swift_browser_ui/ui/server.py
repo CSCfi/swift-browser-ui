@@ -19,34 +19,18 @@ from oidcrp.rp_handler import RPHandler
 import swift_browser_ui.ui.middlewares
 from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.api import (
-    add_project_container_acl,
     aws_bulk_update_bucket_cors,
     aws_create_bucket,
     aws_list_buckets,
     aws_update_bucket_cors,
     close_upload_session,
-    get_access_control_metadata,
     get_crypted_upload_session,
-    get_crypted_upload_socket_info,
     get_os_user,
-    get_shared_container_address,
     get_upload_session,
     keystone_gen_ec2,
-    modify_container_write_acl,
     os_list_projects,
-    remove_container_acl,
-    remove_project_container_acl,
     replicate_bucket,
-    swift_create_container,
-    swift_delete_container,
-    swift_download_container,
-    swift_download_object,
-    swift_download_shared_object,
-    swift_get_metadata_container,
-    swift_get_project_metadata,
     swift_list_containers,
-    swift_list_objects,
-    swift_update_container_metadata,
 )
 from swift_browser_ui.ui.discover import (
     handle_discover,
@@ -264,44 +248,7 @@ async def servinit(
             aiohttp.web.get("/api/username", get_os_user),
             aiohttp.web.get("/api/projects", os_list_projects),
             aiohttp.web.get("/api/{project}/OS-EC2", keystone_gen_ec2),
-            aiohttp.web.post(
-                "/api/access/{project}/{container}", add_project_container_acl
-            ),
-            aiohttp.web.delete("/api/access/{project}/{container}", remove_container_acl),
-            aiohttp.web.delete(
-                "/api/access/{project}/{container}/{receiver}",
-                remove_project_container_acl,
-            ),
-            aiohttp.web.put(
-                "/api/access/{project}/{container}", modify_container_write_acl
-            ),
-            aiohttp.web.get("/api/meta/{project}", swift_get_project_metadata),
-            aiohttp.web.get(
-                "/api/meta/{project}/{container}", swift_get_metadata_container
-            ),
             aiohttp.web.get("/api/{project}", swift_list_containers),
-            aiohttp.web.get("/api/{project}/acl", get_access_control_metadata),
-            aiohttp.web.get("/api/{project}/address", get_shared_container_address),
-            aiohttp.web.put("/api/{project}/{container}", swift_create_container),
-            aiohttp.web.delete("/api/{project}/{container}", swift_delete_container),
-            aiohttp.web.get("/api/{project}/{container}", swift_list_objects),
-            aiohttp.web.get(
-                "/api/{project}/{container}/{object:.*}", swift_download_object
-            ),
-            aiohttp.web.post(
-                "/api/{project}/{container}", swift_update_container_metadata
-            ),
-        ]
-    )
-
-    # Add download routes
-    app.add_routes(
-        [
-            aiohttp.web.get("/download/{project}/{container}", swift_download_container),
-            aiohttp.web.get(
-                "/download/{project}/{container}/{object:.*}",
-                swift_download_shared_object,
-            ),
         ]
     )
 
@@ -313,10 +260,6 @@ async def servinit(
             aiohttp.web.get(
                 "/enupload/{project}/{container}/{object_name:.*}",
                 get_crypted_upload_session,
-            ),
-            aiohttp.web.get(
-                "/enupload/{project}",
-                get_crypted_upload_socket_info,
             ),
         ]
     )
