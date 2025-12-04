@@ -128,7 +128,6 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
-  updateObjectsAndObjectTags,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
@@ -249,8 +248,8 @@ export default {
     isBucketUploading: function () {
       if (!this.isBucketUploading) {
         setTimeout(async () => {
-          this.updateAfterUpload();
-        }, 3000);
+          await this.updateAfterUpload();
+        }, 1000);
       }
     },
     shareModal: async function(){
@@ -368,17 +367,8 @@ export default {
         });
     },
     updateAfterUpload: async function () {
-      const containersToUpdateObjs = {
-        key: this.currentContainer.id,
-        container: {...this.currentContainer},
-      };
-
-      await updateObjectsAndObjectTags(
-        [containersToUpdateObjs],
-        this.active.id,
-        this.abortController.signal,
-        false, // No need to update object tags in this case
-      );
+      await this.updateObjects();
+      this.$store.commit("setLoaderVisible", false);
     },
     updateObjects: async function () {
       if (
