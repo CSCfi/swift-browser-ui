@@ -44,8 +44,10 @@ import {
 import {
   signedFetch,
   awsCreateBucket,
+  awsAddBucketCors,
 } from "./api";
 import { DEV } from "./conv";
+import { mdiArrowDownBoldHexagonOutline } from "../../node_modules/@mdi/js/mdi";
 
 const MAX_UPLOAD_WORKERS = 8;
 const FILE_PART_SIZE = 52428800;
@@ -428,54 +430,48 @@ export default class S3UploadSocket {
       let bucketAccessCmd = new HeadBucketCommand({
         Bucket: bucket,
       });
-      await this.client.send(bucketAccessCmd).catch(async err => {
-        // If there's no metadata, we're likely running to a CORS error
-        // CORS error likely means the bucket doesn't exist, let's try
-        // to create it
-        if (err.$metadata === undefined) {
-          let resp = await awsCreateBucket(this.project, bucket).catch(err => {
-            if (DEV) console.log(`Couldn't start upload, reason ${err}`);
-          });
+
+      try {
+        await this.client.send(bucketAccessCmd);
+      } catch (e) {
+        // If there's no metadata, we're likely running into a CORS
+        // error. It may mean that the bucket doesn't exist, or that
+        // the bucket CORS doesn't exist. Let's try implicitly creating
+        // the bucket, and fixing CORS if that doesn't help.
+        try {
+          let resp = await awsCreateBucket(this.active, bucket);
           switch (resp) {
             case 400:
               if (DEV) {
-                console.log(`Couldn't access bucket ${bucket} due to a client error.`);
+                console.log(`Couldn't create bucket ${bucket} due to a client error.`);
               }
               return;
             case 403:
               if (DEV) {
-                console.log(`Couldn't access bucket ${bucket} due to it being forbidden.`);
-                console.log("The bucket is probably owned by someone else.");
+                console.log(
+                  `Couldn't create bucket ${bucket} due to it being forbidden.`,
+                );
+                console.log(
+                  "The bucket is probably owned by some other project.",
+                );
               }
               return;
           }
+        } catch (e) {
+          if (DEV) console.log("Coudln't start upload, reason: ", e);
+          return;
         }
-        else {
-          switch(err.$metadata.httpStatusCode) {
-            // This handling is probably no longer needed, as we only
-            // get a response for successful CORS
-            case 404:
-              if (DEV) {
-                console.log(`Creating bucket ${bucket}.`);
-              }
-              await awsCreateBucket(this.project, bucket).catch(err => {
-                if (DEV) console.log(`Couldn't start upload, reason ${err}`);
-              });
-              break;
-            case 400:
-              if (DEV) {
-                console.log(`Couldn't access bucket ${bucket} due to a client error.`);
-              }
-              return;
-            case 403:
-              if (DEV) {
-                console.log(`Couldn't access bucket ${bucket} due to it being forbidden.`);
-                console.log("The bucket is probably owned by someone else.");
-              }
-              return;
+
+        // After creating the bucket, ensure we have CORS access
+        try {
+          await awsAddBucketCors(this.active, bucket);
+        } catch (e) {
+          if (DEV) {
+            console.error(`Couldn't add CORS for bucket ${bucket}`);
           }
+          return;
         }
-      });
+      }
 
       this.uploads[bucket] = {};
     }
