@@ -176,13 +176,6 @@ export default {
         }
       }
 
-      // Delete objects from IDB
-      const objIDs = this.selectedObjects.filter(
-        obj => obj.name && to_remove.includes(obj.name)).reduce(
-        (prev, obj) => [...prev, obj.id], [],
-      );
-      await getDB().objects.bulkDelete(objIDs);
-
       for(const obj of to_remove) {
         let deleteObjectCommand = new DeleteObjectCommand({
           Bucket: this.container,
