@@ -47,7 +47,6 @@ import {
   awsAddBucketCors,
 } from "./api";
 import { DEV } from "./conv";
-import { mdiArrowDownBoldHexagonOutline } from "../../node_modules/@mdi/js/mdi";
 
 const MAX_UPLOAD_WORKERS = 8;
 const FILE_PART_SIZE = 52428800;
