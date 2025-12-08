@@ -3,7 +3,6 @@ import { createStore } from "vuex";
 import { isEqual, isEqualWith } from "lodash";
 
 import {
-  getContainers,
   getObjects,
 } from "@/common/api";
 import {
@@ -20,8 +19,10 @@ import { getDB } from "@/common/db";
 import {
   getSharedContainers,
   getContainerLastmodified,
-  updateContainerLastmodified,
 } from "@/common/globalFunctions";
+import { discoverEndpoint, getBucketMetadata } from "./s3conv";
+import { discoverSubmitConfiguration } from "./dominate";
+import { ListBucketsCommand } from "@aws-sdk/client-s3";
 
 const store = createStore({
   state: {
@@ -75,6 +76,15 @@ const store = createStore({
     prevActiveEl: null,
     newBucket: "",
     sharingUpdated: false,
+    submitConfig: {
+      sd_submit_user: "",
+      sd_submit_id: "",
+      sd_submit_endpoint: "",
+    },
+    s3endpoint: "",
+    s3client: undefined,
+    s3upload: undefined,
+    s3download: undefined,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -252,12 +262,33 @@ const store = createStore({
     setSharingUpdated(state, payload) {
       state.sharingUpdated = payload;
     },
+    setSubmitConfig(state, payload) {
+      state.submitConfig = payload;
+    },
+    setS3Endpoint(state, payload) {
+      state.s3endpoint = payload;
+    },
+    setS3Client(state, payload) {
+      state.s3client = payload;
+    },
+    setS3Upload(state, payload) {
+      state.s3upload = payload;
+    },
+    setS3Download(state, payload) {
+      state.s3download = payload;
+    },
   },
   actions: {
     updateContainers: async function (
-      { dispatch },
+      { dispatch, state },
       { projectID, signal, routeContainer = undefined },
     ) {
+      while (state.s3client === undefined) {
+        await new Promise(r => setTimeout(r, 25));
+        console.log("Waiting for s3 client to initialize.");
+      }
+      let s3client = state.s3client;
+
       const existingContainers = await getDB()
         .containers.where({ projectID })
         .toArray();
@@ -267,27 +298,46 @@ const store = createStore({
         signal = controller.signal;
       }
 
-      let containers;
-      let marker = "";
-      let newContainers = [];
+      let buckets;
+      let continuationToken = "";
+      let newBuckets = [];
       do {
-        containers = [];
-        containers = await getContainers(projectID, marker, signal)
-          .catch(() => {});
+        buckets = [];
+        const input = {
+          MaxBuckets: 1000,
+          BucketRegion: "us-east-1",
+          ...(continuationToken && {ContinuationToken: continuationToken}),
+        };
+        const command = new ListBucketsCommand(input);
+        buckets = await s3client.send(command).catch(() => {});
+        console.log(buckets);
 
-        if (containers?.length > 0) {
-          containers.forEach(cont => {
-            cont.tokens = cont.name.endsWith("_segments") ?
-              [] : tokenize(cont.name);
-            cont.projectID = projectID;
-            cont.last_modified =  cont.name.endsWith("_segments") ?
-              cont.last_modified :
-              getContainerLastmodified(existingContainers, cont);
+        if (buckets?.Buckets?.length > 0) {
+          buckets.Buckets.forEach(async (bucket) => {
+            const bucketMetadata = await getBucketMetadata(s3client, bucket);
+            newBuckets.push({
+              name: bucket.Name,
+              tokens: tokenize(bucket.Name),
+              projectID: projectID,
+              tags: [],
+              last_modified: bucketMetadata.last_modified,
+              bytes: bucketMetadata.bytes,
+              count: bucketMetadata.count,
+            });
           });
-          newContainers = newContainers.concat(containers);
-          marker = containers[containers.length - 1].name;
         }
-      } while (containers?.length > 0);
+
+        if (buckets?.ContinuationToken) {
+          continuationToken = buckets.ContinuationToken;
+        }
+        if (buckets?.Buckets?.length < 1000) {
+          break;
+        }
+      } while (buckets?.Buckets?.length > 0);
+
+      await getDB()
+        .containers.bulkPut(newBuckets)
+        .catch(() => {});
 
       const sharedContainers = await getSharedContainers(projectID, signal);
 
@@ -317,14 +367,13 @@ const store = createStore({
         await getDB()
           .containers.bulkPut(sharedContainers)
           .catch(() => {});
-        newContainers = newContainers.concat(sharedContainers);
+        newBuckets = newBuckets.concat(sharedContainers);
       }
-
 
       const toDelete = [];
       for (let i = 0; i < existingContainers.length; i++) {
         const oldCont = existingContainers[i];
-        if (!newContainers.find(cont => cont.name == oldCont.name)) {
+        if (!newBuckets.find(cont => cont.name == oldCont.name)) {
           toDelete.push(oldCont.id);
         }
       }
@@ -339,15 +388,15 @@ const store = createStore({
 
       // sort "_segments" bucket before original bucket
       // so that "_segments" bucket could be updated first
-      newContainers = sortContainer(newContainers);
+      newBuckets = sortContainer(newBuckets);
 
-      for (let i = 0; i < newContainers.length; i++) {
-        addSegmentContainerSize(newContainers[i], newContainers);
+      for (let i = 0; i < newBuckets.length; i++) {
+        addSegmentContainerSize(newBuckets[i], newBuckets);
       }
 
       let containers_to_update_objects = [];
-      for (let i = 0; i < newContainers.length; i++) {
-        const container = newContainers[i];
+      for (let i = 0; i < newBuckets.length; i++) {
+        const container = newBuckets[i];
         const oldContainer = containersFromDB.find(
           cont => cont.name === container.name,
         );
@@ -407,11 +456,12 @@ const store = createStore({
         }
       }
 
-      await dispatch("updateContainerTags", {
+      // Tagging is disabled currently
+      /*await dispatch("updateContainerTags", {
         projectID: projectID,
-        containers: newContainers,
+        containers: newBuckets,
         signal,
-      });
+      });*/
       return containers_to_update_objects;
     },
     updateContainerTags: async function (_, {
@@ -502,59 +552,6 @@ const store = createStore({
         await getDB().objects.bulkDelete(toDelete);
       }
 
-      if (!isSegmentsContainer) {
-        const segment_objects = await getObjects(
-          projectID,
-          `${container.name}_segments`,
-          "",
-          signal,
-          !!owner,
-          owner ? owner : "",
-        );
-
-        if (newObjects.length === segment_objects.length) {
-          // Find the segments of an object and
-          // update the original objects size accordingly
-          for (let i = 0; i < newObjects.length; i++) {
-            if (segment_objects[i] && newObjects[i].bytes === 0) {
-              newObjects[i].bytes = segment_objects[i].bytes;
-            }
-            else if (!segment_objects[i] && state.isLoaderVisible) {
-            /* When cancelling the upload of large amount of files
-              or big files sizes, the original bucket could have
-              more objects than segment bucket which results in the
-              last updated file has size 0 (segment bucket doesn't have it)
-              Therefore it's better to remove that file.
-            */
-              newObjects.splice(i, 1);
-            }
-          }
-        } else if (segment_objects.length > newObjects.length) {
-          /*
-            For uploaded objects having size > 5GiB,
-            their equivalent segment_objects are split off into
-            multiple segments (~5GiB/each) of which combined size
-            in total is roughly equal to the original uploaded file.
-            The regular objects are not separated into segments, hence
-            the number of segment_objects > regular objects.
-          */
-          for (let i = 0; i < newObjects.length; i++) {
-            // Filter equivalent segment objects
-            const filteredSegmentObjects = segment_objects.filter(obj =>
-              obj.name.includes(newObjects[i].name),
-            );
-            // Calculate total size of equivalent segment objects
-            const totalSegmentSize = filteredSegmentObjects.reduce(
-              (totalSize, obj) =>
-                obj.name.includes(newObjects[i].name) ?
-                  totalSize + obj.bytes : null, 0,
-            );
-            newObjects[i].bytes = totalSegmentSize;
-          }
-        }
-        updateContainerLastmodified(projectID, container, newObjects);
-      }
-
       for (let i = 0; i < newObjects.length; i++) {
         const newObj = newObjects[i];
         let oldObj = existingObjects.find(obj => obj.name === newObj.name &&
@@ -574,14 +571,17 @@ const store = createStore({
         }
       }
 
-      if (!isSegmentsContainer && updateTags) {
+      if (owner) updateContainerLastmodified(projectID, container, newObjects);
+
+      // Tagging is disabled currently
+      /*if (!isSegmentsContainer && updateTags) {
         await dispatch("updateObjectTags", {
           projectID,
           container,
           signal,
           owner,
         });
-      }
+      }*/
     },
     updateObjectTags: async function (
       _,
@@ -635,6 +635,14 @@ const store = createStore({
         });
         await getDB().objects.bulkPut(newObjects);
       }
+    },
+    initSDSubmit: async function (
+      { state, commit },
+    ) {
+      let s3endpoint = await discoverEndpoint();
+      let submitConfig = await discoverSubmitConfiguration();
+      commit("setS3Endpoint", s3endpoint);
+      commit("setSubmitConfig", submitConfig);
     },
   },
 });

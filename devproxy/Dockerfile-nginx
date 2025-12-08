@@ -1,12 +1,20 @@
 FROM docker.io/nginx:latest
-COPY nginx.conf /etc/nginx/nginx.conf.template
 
-COPY swiftui-proxy.key /etc/ssl/swiftui-proxy.key
-COPY swiftui-proxy.crt /etc/ssl/swiftui-proxy.crt
+COPY ./devproxy/nginx.conf /etc/nginx/nginx.conf.template
 
-RUN chown nginx:nginx /etc/ssl/swiftui-proxy.key
-RUN chown nginx:nginx /etc/ssl/swiftui-proxy.crt
-RUN chmod 400 /etc/ssl/swiftui-proxy.key
-RUN chmod 400 /etc/ssl/swiftui-proxy.crt
+COPY ./.devres/pki/sd-connect.devenv.key /etc/ssl/sd-connect.devenv.key
+COPY ./.devres/pki/sd-connect.devenv.crt /etc/ssl/sd-connect.devenv.crt
 
-ENTRYPOINT ["/bin/bash", "-c", "envsubst '${DOCKER_NETWORK_GATEWAY}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
+COPY ./.devres/pki/rgw.devenv.key /etc/ssl/rgw.devenv.key
+COPY ./.devres/pki/rgw.devenv.crt /etc/ssl/rgw.devenv.crt
+
+RUN chown nginx:nginx /etc/ssl/sd-connect.devenv.key
+RUN chown nginx:nginx /etc/ssl/sd-connect.devenv.crt
+RUN chown nginx:nginx /etc/ssl/rgw.devenv.key
+RUN chown nginx:nginx /etc/ssl/rgw.devenv.crt
+RUN chmod 400 /etc/ssl/sd-connect.devenv.key
+RUN chmod 400 /etc/ssl/sd-connect.devenv.crt
+RUN chmod 400 /etc/ssl/rgw.devenv.key
+RUN chmod 400 /etc/ssl/rgw.devenv.crt
+
+ENTRYPOINT ["/bin/bash", "-c", "envsubst '${DOCKER_NETWORK_GATEWAY}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf.tmp && envsubst '${DEV_CEPH_ADDRESS}' < /etc/nginx/nginx.conf.tmp > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]

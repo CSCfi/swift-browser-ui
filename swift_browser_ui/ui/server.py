@@ -27,10 +27,12 @@ from swift_browser_ui.ui.api import (
     get_os_user,
     get_shared_container_address,
     get_upload_session,
+    keystone_gen_ec2,
     modify_container_write_acl,
     os_list_projects,
     remove_container_acl,
     remove_project_container_acl,
+    replicate_bucket,
     swift_create_container,
     swift_delete_container,
     swift_download_container,
@@ -40,10 +42,13 @@ from swift_browser_ui.ui.api import (
     swift_get_project_metadata,
     swift_list_containers,
     swift_list_objects,
-    swift_replicate_container,
     swift_update_container_metadata,
 )
-from swift_browser_ui.ui.discover import handle_discover
+from swift_browser_ui.ui.discover import (
+    handle_discover,
+    handle_s3_discover,
+    handle_submit_discover,
+)
 from swift_browser_ui.ui.front import (
     accessibility,
     agg_swjs,
@@ -91,7 +96,12 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
     """Open a client session for download proxies."""
-    app["api_client"] = aiohttp.ClientSession()
+    if not setd["check_certificate"]:
+        app["api_client"] = aiohttp.ClientSession(
+            connector=aiohttp.TCPConnector(verify_ssl=False)
+        )
+    else:
+        app["api_client"] = aiohttp.ClientSession()
 
 
 async def kill_dload_client(app: aiohttp.web.Application) -> None:
@@ -239,6 +249,7 @@ async def servinit(
         [
             aiohttp.web.get("/api/username", get_os_user),
             aiohttp.web.get("/api/projects", os_list_projects),
+            aiohttp.web.get("/api/{project}/OS-EC2", keystone_gen_ec2),
             aiohttp.web.post(
                 "/api/access/{project}/{container}", add_project_container_acl
             ),
@@ -299,14 +310,18 @@ async def servinit(
     # Add replication routes
     app.add_routes(
         [
-            aiohttp.web.post(
-                "/replicate/{project}/{container}", swift_replicate_container
-            ),
+            aiohttp.web.post("/replicate/{project}/{bucket}", replicate_bucket),
         ]
     )
 
     # Add discovery routes
-    app.add_routes([aiohttp.web.get("/discover", handle_discover)])
+    app.add_routes(
+        [
+            aiohttp.web.get("/discover", handle_discover),
+            aiohttp.web.get("/discover/s3", handle_s3_discover),
+            aiohttp.web.get("/discover/submit", handle_submit_discover),
+        ]
+    )
 
     # Add direct routes
     app.add_routes(

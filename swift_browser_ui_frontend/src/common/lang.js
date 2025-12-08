@@ -44,14 +44,9 @@ let default_translations = {
         Forbidden_text:
           "You are seeing this page because you were " +
           "trying to perform an action that you are not allowed to.",
-        inUse: "Bucket name is already in use.",
         inUseOtherPrj: "Bucket name is already in use by another project.",
-        invalidName: "Bucket name or tag is invalid.",
+        invalidName: "Bucket name is invalid.",
         createFail: "Bucket creation failed.",
-        tooShort: "Please enter at least 3 characters",
-        forbiddenChars: "Bucket name cannot contain special " +
-        "characters other than dot(.), hyphen(-), and underscore(_)",
-        segments: "Bucket name cannot end with '_segments'",
         idb: "Firefox in private mode is not supported.",
         idb_text:
           "Firefox is not supported in private mode. " +
@@ -260,7 +255,8 @@ let default_translations = {
       },
       nameValidation: {
         lowerCaseOrNum:
-          "Bucket name should start with a lowercase letter or a number.",
+          "Bucket name should start and end with a lowercase letter or a " +
+          "number.",
         inputLength:
           "Bucket name should be between 3 and 63 characters long.",
         alphaNumHyphen1:
@@ -606,14 +602,9 @@ let default_translations = {
         Forbidden_text:
           "Näet tämän sivun, koska yritit suorittaa " +
           "kielletyn toiminnon.",
-        inUse: "Ämpärin nimi on jo käytössä.",
         inUseOtherPrj: "Ämpärin nimi on jo käytössä toisessa projektissa.",
-        invalidName: "Ämpärin nimi tai asiasana ei kelpaa.",
+        invalidName: "Ämpärin nimi ei kelpaa.",
         createFail: "Ämpärin luonti epäonnistui.",
-        tooShort: "Anna vähintään 3 merkkiä",
-        forbiddenChars: "Ämpärin nimi ei voi sisältää muita " +
-        "erikoismerkkejä kuin piste(.), viiva(-) ja alaviiva(_)",
-        segments: "Ämpärin nimi ei saa päättyä '_segments'",
         idb: "Firefoxin yksityinen selaus ei ole tuettu.",
         idb_text:
           "Firefoxin yksityinen selaustila ei ole tuettu." +
@@ -829,7 +820,7 @@ let default_translations = {
       },
       nameValidation: {
         lowerCaseOrNum:
-          "Ämpärin nimi alkaa pienellä kirjaimella tai numerolla.",
+          "Ämpärin nimi alkaa ja päättyy pienellä kirjaimella tai numerolla.",
         inputLength: "Ämpärin nimi on 3-63 merkkiä pitkä.",
         alphaNumHyphen1: "Käytä vain latinalaisia pieniä aakkosia (a-z), " +
         "numeroita (0-9) ja väliviivaa (-).",

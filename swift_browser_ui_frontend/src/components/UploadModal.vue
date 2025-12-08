@@ -255,7 +255,7 @@ import {
 } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
-import { swiftDeleteObjects, getObjects, signedFetch } from "@/common/api";
+import { signedFetch } from "@/common/api";
 
 import { debounce, delay } from "lodash";
 import { mdiDelete } from "@mdi/js";
@@ -302,9 +302,6 @@ export default {
     };
   },
   computed: {
-    res() {
-      return this.$store.state.resumableClient;
-    },
     active() {
       return this.$store.state.active;
     },
@@ -323,8 +320,8 @@ export default {
     owner() {
       return this.$route.params.owner;
     },
-    socket() {
-      return this.$store.state.socket;
+    s3socket() {
+      return this.$store.state.s3upload;
     },
     abortReason() {
       return this.$store.state.uploadAbortReason;
@@ -636,37 +633,6 @@ export default {
       }
       this.clearExistingFiles();
     },
-    async deleteSegments() {
-      //old file segments need to be deleted because
-      //they are not overwritten
-      if (!this.filesToOverwrite.length) return;
-
-      let oldSegments = [];
-      const segmentCont= await getDB().containers.get({
-        projectID: this.active.id,
-        name: `${this.currentBucket}_segments`,
-      });
-      const segmentObjs =  await getObjects(
-        this.owner ? this.owner : this.active.id,
-        segmentCont.name,
-      );
-
-      if (segmentCont) {
-        for (let i = 0; i < this.filesToOverwrite.length; i++) {
-          const segment = segmentObjs.filter(obj =>
-            obj.name.includes(`${this.filesToOverwrite[i].name}.c4gh/`))[0];
-          if (segment) oldSegments.push(segment.name);
-        }
-      }
-
-      if (oldSegments.length) {
-        await swiftDeleteObjects(
-          this.owner || this.active.id,
-          segmentCont.name,
-          oldSegments,
-        );
-      }
-    },
     clearExistingFiles() {
       this.existingFiles = [];
     },
@@ -838,7 +804,6 @@ export default {
         return;
       }
       else {
-        this.deleteSegments();
         this.beginEncryptedUpload();
       }
     },
@@ -878,12 +843,10 @@ export default {
       );
       this.$store.commit("setNewBucket", bucketName);
 
-      this.socket.addUpload(
+      this.s3socket.addEncryptedUploads(
         bucketName,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
-        owner,
-        ownerName,
       );
     },
     beginEncryptedUpload() {

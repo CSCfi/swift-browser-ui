@@ -1,6 +1,5 @@
 import {
   getContainerMeta,
-  getAccessControlMeta,
   getObjectsMeta,
   GET,
 } from "@/common/api";
@@ -45,7 +44,6 @@ function check_stale(detail, access) {
 
 export async function deleteStaleSharedContainers (store) {
   const project = store.state.active.id;
-  const acl = await getAccessControlMeta(project);
   const aclmeta = acl.access;
   const client = store.state.client;
 

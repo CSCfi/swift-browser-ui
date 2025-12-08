@@ -18,3 +18,6 @@ swift_browser_ui_frontend/node_modules
 
 **/*.zip
 **/*.tar*
+
+**/submodules
+**/*.qcow2

@@ -74,3 +74,81 @@ CHUNK *encrypt_chunk(
         &(ret->len));
     return ret;
 }
+
+/*
+Create a full header with the provided session key.
+*/
+CHUNK *create_header_from_key(
+    const uint8_t *session_key_path,
+    const uint8_t *session_key
+) {
+    // Get the list of parsed receivers
+    KEYPAIR *kp = create_keypair();
+    CHUNK *receivers = read_in_recv_keys_path(session_key_path);
+
+    CHUNK *ret = create_crypt4gh_header(
+        session_key,
+        kp->private,
+        receivers->chunk,
+        receivers->len
+    );
+
+    free_keypair(kp);
+    free_chunk(receivers);
+
+    return ret;
+}
+
+/*
+Encrypt a part of a file.
+*/
+CHUNK *encrypt_file_part(
+    const uint8_t *session_key,
+    size_t len_segment,
+    const uint8_t *fpath,
+    const size_t segment_offset
+)
+{
+    printf("Allocating encryption chunk\n");
+    CHUNK *ret = allocate_chunk();
+
+    // Calculate the size of the encrypted segment.
+    size_t cipherlen_segment = len_segment / 65536 * 65564;
+    if (len_segment % 65536 > 0) {
+        cipherlen_segment += len_segment % 65536 + 28;
+    }
+    ret->chunk = malloc(cipherlen_segment);
+    printf("Segment length is %u\n", cipherlen_segment);
+
+    printf("Opening input file in path %s for encryption.\n", fpath);
+    int fdinput = open(fpath, O_RDONLY);
+    if (fdinput == 0) {
+        return NULL;
+    }
+    printf("Seeking %u bytes from file %s.\n", segment_offset, fpath);
+    lseek(fdinput, segment_offset, SEEK_SET);
+
+    uint8_t srcbuf[65536];
+    int nread = 0;
+    size_t nwrite = 0;
+
+    for (int i = 0; i < cipherlen_segment; i = i + 65564) {
+        nread = read(fdinput, srcbuf, 65536);
+
+        if (nread < 0) {
+            printf("Failed to read file. Errno is %d.\n", errno);
+        }
+
+        crypt4gh_segment_encrypt(
+            session_key,
+            srcbuf,
+            nread,
+            ret->chunk + i,
+            &nwrite
+        );
+        ret->len += nwrite;
+    }
+
+    printf("Successfully encrypted a segment of %u bytes for file %s.", cipherlen_segment, fpath);
+    return ret;
+}

@@ -12,3 +12,4 @@ python-swiftclient==4.7.0
 uvloop==0.21.0
 msgpack==1.1.0
 ldap3==2.9.1
+aioboto3==15.2.0

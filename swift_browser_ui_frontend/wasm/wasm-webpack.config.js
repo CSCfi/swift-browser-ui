@@ -19,5 +19,20 @@ module.exports = {
             filename: "./build/upworker-post.js",
             chunkLoading: false,
         },
+        s3upworker: {
+            import: "./js/crypt-post-s3upload.js",
+            filename: "./build/crypt-post-s3upload.js",
+            chunkLoading: false,
+        },
+        s3downworker: {
+            import: "./js/crypt-post-s3download.js",
+            filename: "./build/crypt-post-s3download.js",
+            chunkLoading: false,
+        },
+        s3headerworker: {
+            import: "./js/crypt-post-headers.js",
+            filename: "./build/crypt-post-headers.js",
+            chunkLoading: false,
+        },
     },
 };

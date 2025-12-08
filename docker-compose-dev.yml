@@ -1,0 +1,158 @@
+services:
+  dev-dns:
+    build:
+      context: ./devproxy
+      dockerfile: Dockerfile-dns
+    image: swiftui-dev-dns:dev-latest
+    volumes:
+      - ./devproxy/dev_dnsmasq.conf:/etc/dnsmasq.conf
+    expose:
+      - 53
+    cap_add:
+      - NET_ADMIN
+    networks:
+      sd-connect-dev:
+        ipv4_address: 172.31.2.2
+
+  dev-proxy:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-nginx
+    image: swiftui-dev-proxy:dev-latest
+    environment:
+      - DOCKER_NETWORK_GATEWAY=172.31.2.1
+      - DEV_CEPH_ADDRESS=172.31.0.5
+    networks:
+      sd-connect-dev:
+        ipv4_address: 172.31.2.3
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    ports:
+      - 7443:7443
+      - 8079:8079
+      - 8078:8078
+      - 8443:8443
+      - 9443:9443
+      - 10443:10443
+      - 11443:11443
+    expose:
+      - 7443
+      - 8079
+      - 8078
+      - 8443
+      - 9443
+      - 10443
+      - 11443
+      - 443
+      - 80
+
+  dev-ff:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-ff
+    image: swiftui-dev-ff:dev-latest
+    networks:
+      - sd-connect-dev
+    volumes:
+      - ./test-data:/root/test-data
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    ports:
+      - 3022:22
+    expose:
+      - 22
+
+  dev-chrome:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-chrome
+    image: swiftui-dev-chrome:dev-latest
+    user: chromeuser:chromeuser
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    ports:
+      - 3122:3122
+    expose:
+      - 22
+
+  dev-redis:
+    image: docker.io/redis:7-bullseye
+    networks:
+      - sd-connect-dev
+    ports:
+      - 6379
+    expose:
+      - 6379
+    env_file:
+      - .env
+
+  db-psql:
+    image: docker.io/postgres:14-bullseye
+    env_file:
+      - .env
+    networks:
+      - sd-connect-dev
+    volumes:
+      - ./.github/config/init-project-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    ports:
+      - 5432
+    expose:
+      - 5432
+
+  dev-ui:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-ui
+    image: swiftui-dev-ui:dev-latest
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    volumes:
+      - .:/src
+    env_file:
+      - .env
+    ports:
+      - 8000
+      - 8081
+      - 9090
+      - 9091
+      - 9092
+    expose:
+      - 8000
+      - 8081
+      - 9090
+      - 9091
+      - 9092
+
+  dev-vault:
+    build:
+      context: .
+      dockerfile: devproxy/Dockerfile-vault
+    networks:
+      - sd-connect-dev
+    dns: 172.31.2.2
+    depends_on:
+      - dev-dns
+    image: swiftui-dev-vault:dev-latest
+    volumes:
+      - ./submodules/c4gh-transit:/gosrc
+    ports:
+      - 8200
+    expose:
+      - 8200
+
+networks:
+  sd-connect-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.31.2.0/23
+          ip_range: 172.31.3.0/24
+          gateway: 172.31.2.1

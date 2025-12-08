@@ -51,10 +51,10 @@ import {
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import {
-  getObjects,
-  swiftDeleteContainer,
-  swiftDeleteObjects,
-} from "@/common/api";
+  DeleteBucketCommand,
+  ListObjectsV2Command,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 export default {
   name: "ContainerTable",
@@ -92,6 +92,9 @@ export default {
     };
   },
   computed: {
+    s3client() {
+      return this.$store.state.s3client;
+    },
     locale () {
       return this.$i18n.locale;
     },
@@ -334,7 +337,7 @@ export default {
                           },
                           disabled: !item.bytes,
                         },
-                        {
+                        /*{
                           name: this.$t("message.editTags"),
                           action: () => {
                             this.openEditTagsModal(item.name);
@@ -347,7 +350,7 @@ export default {
                             });
                           },
                           disabled: item.owner,
-                        },
+                        },*/
                         {
                           name: this.$t("message.delete"),
                           action: () => this.delete(
@@ -455,33 +458,50 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-    delete: async function (container, objects) {
-      if (objects > 0) { //if container not empty
+    delete: async function (bucket, objects) {
+      if (objects > 0) { // If bucket not empty
         addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
       }
-      else { //delete empty bucket without confirmation
-        const projectID = this.$route.params.project;
-        swiftDeleteContainer(
-          projectID,
-          container,
+      else { // Delete empty bucket without confirmation
+        const deleteBucketCommand = new DeleteBucketCommand({
+          Bucket: bucket,
+        });
+        this.s3client.send(
+          deleteBucketCommand,
         ).then(async() => {
-          /*
-            In case the upload was initially cancelled and
-            regular container has no uploaded objects yet (0 item), but
-            segment container does have, we need to check and delete
-            segment objects first before deleting the segment container
-          */
-          const segment_objects =  await getObjects(
-            projectID,
-            `${container}_segments`,
-          );
-          if(segment_objects) {
-            await swiftDeleteObjects(
-              projectID,
-              `${container}_segments`,
-              segment_objects.map(obj => obj.name),
-            );
-            await swiftDeleteContainer(projectID, `${container}_segments`);
+          // In case the bucket has a legacy segments bucket still in
+          // existence we should take care of that as well
+          const segmentsBucket = `${bucket}_segments`;
+          let segmentsBucketExists = false;
+          let segmentObjects = [];
+
+          do {
+            for (const key of segmentObjects) {
+              const objectDeleteCommand = new DeleteObjectCommand({
+                Bucket: segmentsBucket,
+                Key: key.Key,
+              });
+              await this.s3client.send(objectDeleteCommand);
+            }
+
+            // Fetch a new page of objects until we run out
+            try {
+              const objListResp = await this.s3client.send(
+                new ListObjectsV2Command({ Bucket: segmentsBucket }),
+              );
+              segmentsBucketExists = true;
+              segmentObjects = objListResp?.Contents || [];
+            } catch {
+              segmentObjects = [];
+            }
+          } while (segmentObjects.length > 0);
+
+          // Finally delete the segments bucket
+          if (segmentsBucketExists) {
+            const deleteSegmentsBucketCommand = new DeleteBucketCommand({
+              Bucket: segmentsBucket,
+            });
+            await this.s3client.send(deleteSegmentsBucketCommand);
           }
 
           document.querySelector("#container-toasts").addToast(
@@ -489,12 +509,12 @@ export default {
               type: "success",
               message: this.$t("message.container_ops.deleteSuccess")},
           );
-          this.$emit("delete-container", container);
+          this.$emit("delete-container", bucket);
           // Delete stale shared containers if the deleted container
           // was shared with other projects
           const sharedDetails = await this.$store.state.client.getShareDetails(
-            projectID,
-            container,
+            this.$route.params.project,
+            bucket,
           );
           if (sharedDetails.length)
             await deleteStaleSharedContainers(this.$store);
@@ -516,7 +536,7 @@ export default {
       //automated testing creates untrusted events
       const test = eventTrusted === undefined ? false : !eventTrusted;
 
-      this.$store.state.socket.addDownload(
+      this.$store.state.s3download.addDownload(
         container,
         [],
         owner,

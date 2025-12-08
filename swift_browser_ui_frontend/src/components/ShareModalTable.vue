@@ -73,9 +73,9 @@
 
 <script>
 import {
-  modifyAccessControlMeta,
-  removeAccessControlMeta,
-  GET,
+  removeAccessControlBucketPolicy,
+  addAccessControlBucketPolicy,
+  signedFetch,
 } from "@/common/api";
 import { DEV } from "@/common/conv";
 import { mdiDelete } from "@mdi/js";
@@ -272,19 +272,30 @@ export default {
       else return ["r", "w"];
     },
     editAccessRight: async function (sharedProjectId) {
-
-      await modifyAccessControlMeta(
-        this.projectId,
+      // Delete the old access rights and replace them with new ones.
+      // Don't bother with editing on S3 API since in the frontend
+      // the operations will end up being identical.
+      await removeAccessControlBucketPolicy(
         this.bucketName,
         [sharedProjectId],
-        this.newPerms,
+        this.$store.state.s3client,
       );
-
-      await modifyAccessControlMeta(
-        this.projectId,
+      await addAccessControlBucketPolicy(
+        this.bucketName,
+        this.newPerms,
+        [sharedProjectId],
+        this.$store.state.s3client,
+      );
+      await removeAccessControlBucketPolicy(
         `${this.bucketName}_segments`,
         [sharedProjectId],
+        this.$store.state.s3client,
+      );
+      await addAccessControlBucketPolicy(
+        `${this.bucketName}_segments`,
         this.newPerms,
+        [sharedProjectId],
+        this.$store.state.s3client,
       );
 
       await this.$store.state.client.shareEditAccess(
@@ -304,40 +315,23 @@ export default {
         sharedProjectId,
       );
 
-      let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.bucketName}`);
-      let signed = await GET(signatureUrl);
-      signed = await signed.json();
-
-      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
-        `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
-      ));
-      whitelistUrl.searchParams.append(
-        "valid",
-        signed.valid,
-      );
-      whitelistUrl.searchParams.append(
-        "signature",
-        signed.signature,
-      );
-
       if (this.newPerms.length === 1 && this.newPerms[0] === "v") {
-        await fetch(
-          whitelistUrl,
-          {
-            method: "DELETE",
-            body: JSON.stringify([projectIDs.name]),
-          },
+        await signedFetch(
+          "DELETE",
+          this.$store.state.uploadEndpoint,
+          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+          JSON.stringify([projectIDs.name]),
+          [],
         ).then(() => {
           if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
         });
       } else {
-        await fetch(
-          whitelistUrl,
-          {
-            method: "PUT",
-            body: JSON.stringify([projectIDs]),
-          },
+        await signedFetch(
+          "PUT",
+          this.$store.state.uploadEndpoint,
+          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+          JSON.stringify([projectIDs]),
+          [],
         ).then(() => {
           if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
         });
@@ -355,14 +349,15 @@ export default {
       this.toDelete = {};
     },
     deleteBucketShare: async function (bucketData) {
-      await removeAccessControlMeta(
-        this.projectId,
+      await removeAccessControlBucketPolicy(
         this.bucketName,
+        [this.projectId],
+        this.$store.state.s3client,
       );
-
-      await removeAccessControlMeta(
-        this.projectId,
+      await removeAccessControlBucketPolicy(
         `${this.bucketName}_segments`,
+        [this.projectId],
+        this.$store.state.s3client,
       );
 
       await this.$store.state.client.shareDeleteAccess(
@@ -370,7 +365,6 @@ export default {
         this.bucketName,
         [bucketData.projectId.value],
       );
-
       await this.$store.state.client.shareDeleteAccess(
         this.projectId,
         `${this.bucketName}_segments`,
@@ -381,37 +375,19 @@ export default {
         bucketData.projectId.value,
       );
 
-      let signatureUrl = new URL("/sign/3600", document.location.origin);
-      signatureUrl.searchParams.append("path", `/cryptic/${this.$store.state.active.name}/${this.bucketName}`);
-      let signed = await GET(signatureUrl);
-      signed = await signed.json();
-
-      let whitelistUrl = new URL(this.$store.state.uploadEndpoint.concat(
+      await signedFetch(
+        "DELETE",
+        this.$store.state.uploadEndpoint,
         `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
-      ));
-      whitelistUrl.searchParams.append(
-        "valid",
-        signed.valid,
-      );
-      whitelistUrl.searchParams.append(
-        "signature",
-        signed.signature,
-      );
-
-      fetch(
-        whitelistUrl,
-        {
-          method: "DELETE",
-          body: JSON.stringify([
-            projectIDs.name,
-          ]),
-        },
+        JSON.stringify([
+          projectIDs.name,
+        ]),
+        [],
       ).then(() => {
         if (DEV) console.log(
           `Deleted sharing whitelist entry for ${bucketData.projectId.value}`,
         );
-      },
-      ).finally(() => {
+      }).finally(() => {
         if (DEV) console.log(
           `Share deletion for ${bucketData.projectId.value} finished.`,
         );

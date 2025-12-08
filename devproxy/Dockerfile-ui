@@ -1,0 +1,23 @@
+FROM python:3.12-bookworm
+
+COPY ./swift_browser_ui /tmpsrc/swift_browser_ui
+COPY ./swift_browser_ui_frontend /tmpsrc/swift_browser_ui_frontend
+COPY ./requirements.txt /tmpsrc/requirements.txt
+COPY ./pyproject.toml /tmpsrc/pyproject.toml
+COPY ./README.md /tmpsrc/README.md
+
+RUN rm /tmpsrc/swift_browser_ui/ui/static && mkdir /tmpsrc/swift_browser_ui/ui/static
+
+RUN cd tmpsrc && pip install --break-system-packages . && pip install --break-system-packages .[dev] && cd / && rm -rf tmpsrc
+
+RUN apt-get -y update && apt-get -y upgrade && apt-get -y install
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+RUN bash -l -c "nvm install 22 && npm install --global corepack@latest && corepack enable npm"
+RUN echo "PATH=/emsdk:/emsdk/upstream/emscripten:/emsdk/node/18.20.3_64bit/bin:${PATH}" > /etc/environment
+
+COPY --from=ghcr.io/cscfi/docker-emscripten-crypt4gh /emsdk /emsdk
+
+VOLUME [ "/src" ]
+WORKDIR /src
+
+CMD [ "bash", "-l", "-c", "honcho start" ]

@@ -21,7 +21,7 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
-import { getUser, signedFetch } from "@/common/api";
+import { getEC2Credentials, getUser, signedFetch } from "@/common/api";
 import { getProjects } from "@/common/api";
 
 // Import SharingView and Request API
@@ -29,7 +29,7 @@ import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { syncContainerACLs, DEV } from "@/common/conv";
+import { DEV } from "@/common/conv";
 import checkIDB from "@/common/idb_support";
 
 // Import project state
@@ -45,10 +45,15 @@ import ProgressNotification from "@/components/ProgressNotification.vue";
 import CFooter from "@/components/CFooter.vue";
 
 import { getDB } from "@/common/db";
-import UploadSocket from "@/common/socket";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
+import {
+  discoverEndpoint,
+  getClient,
+} from "@/common/s3conv";
+import S3UploadSocket from "@/common/s3upload";
+import S3DownloadSocket from "@/common/s3download";
 
 checkIDB().then(result => {
   if (!result) {
@@ -183,8 +188,11 @@ const app = createApp({
     prevActiveEl() {
       return this.$store.state.prevActiveEl;
     },
-    socket() {
-      return this.$store.state.socket;
+    s3download() {
+      return this.$store.state.s3download;
+    },
+    s3upload() {
+      return this.$store.state.s3upload;
     },
   },
   watch: {
@@ -304,14 +312,57 @@ const app = createApp({
         this.$store.commit("appendPubKey", key);
       }
 
-      this.initSocket().then(
-        () => {if (DEV) console.log("Initialized the websocket.");},
+      await this.$store.dispatch("initSDSubmit");
+      if (DEV) {
+        if (
+          this.$store.state.submitConfig.sd_submit_user === ""
+          && this.$store.state.submitConfig.sd_submit_id === ""
+          && this.$store.state.submitConfig.sd_submit_endpoint == ""
+        ) {
+          console.log("SD Submit integration not configured");
+        } else {
+          console.log("SD Submit integration configured");
+        }
+      }
+
+      // Initialize the frontend S3 client
+      let s3client = await getClient(
+        this.$store.state.active.id,
+        this.$store.state.s3endpoint,
       );
+
+      this.$store.commit("setS3Client", s3client);
+
+      // Initialize the S3 upload implementation
+      let ec2creds = await getEC2Credentials(this.active.id);
+      let s3endpoint = await discoverEndpoint();
+      let s3upsocket = new S3UploadSocket(
+        this.active.id,
+        this.active.name,
+        this.$store,
+        this.$t,
+        s3client,
+        ec2creds.access,
+        ec2creds.secret,
+        s3endpoint,
+      );
+      this.$store.commit("setS3Upload", s3upsocket);
+      // Initialize the S3 download implementation
+      let s3downsocket = new S3DownloadSocket(
+        this.active.id,
+        this.active.name,
+        this.$store,
+        this.$t,
+        ec2creds.access,
+        ec2creds.secret,
+        s3endpoint,
+      );
+      this.$store.commit("setS3Download", s3downsocket);
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
     });
-    setTimeout(this.containerSyncWrapper, 10000);
+    // setTimeout(this.containerSyncWrapper, 10000);
   },
   mounted() {
     document
@@ -319,49 +370,14 @@ const app = createApp({
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
-    initSocket: async function () {
-      // Open the upload and download webworkers
-      let available = await navigator.storage.estimate();
-      // If there's less than 50GiB of storage available, try getting more.
-      // We're probably on Firefox, persisting should grant us more.
-      if (available.quota < 53687091200) {
-        await navigator.storage.persist();
-        if (await navigator.storage.persisted()) {
-          if (DEV) console.log("Storage persisted.");
-          // Update the quotas
-          available = await navigator.storage.estimate();
-        } else {
-          if (DEV) console.log(
-            "Couldn't persist storage, "
-            + "possible limited save space for downloads.",
-          );
-        }
-      }
-
-      if (DEV) console.log(
-        `${available.usage}/${available.quota} of available storage used.`,
-      );
-      if (DEV) console.log(
-        "Any downloads need to fit under this size when downloading.",
-      );
-
-      let workers = new UploadSocket(
-        this.$store.state.active,
-        this.$store.state.active.id,
-        this.$store,
-        this.$t,
-      );
-      workers.openSocket();
-      this.$store.commit("setSocket", workers);
-    },
-    containerSyncWrapper: function () {
-      syncContainerACLs(this.$store);
-    },
-    cancelUpload: function(container) {
-      this.socket.cancelUpload(container);
+    // containerSyncWrapper: function () {
+    //   syncContainerACLs(this.$store);
+    // },
+    cancelUpload: function(bucket) {
+      this.s3upload.cancelUpload(bucket);
     },
     cancelDownload: function() {
-      this.socket.cancelDownload();
+      this.s3download.cancelDownload();
     },
     onKeydown: function (e) {
       if (e.key === "Tab" && this.prevActiveEl &&

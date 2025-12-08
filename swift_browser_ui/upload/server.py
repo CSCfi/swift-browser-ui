@@ -78,7 +78,15 @@ async def servinit() -> aiohttp.web.Application:
     app.on_shutdown.append(swift_browser_ui.common.db.db_graceful_close)
 
     # Add client session for aiohttp requests
-    http_client = aiohttp.client.ClientSession()
+    if (
+        os.environ.get("SWIFT_UPLOAD_RUNNER_DISABLE_CHECK_CERTIFICATES", "True")
+        == "False"
+    ):
+        http_client = aiohttp.client.ClientSession(
+            connector=aiohttp.TCPConnector(verify_ssl=False)
+        )
+    else:
+        http_client = aiohttp.client.ClientSession()
     app["client"] = http_client
     app[VAULT_CLIENT] = VaultClient(http_client)
 

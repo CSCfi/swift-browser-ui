@@ -6,6 +6,13 @@ import {
   DEV,
 } from "@/common/conv";
 
+import {
+  GetBucketPolicyCommand,
+  HeadBucketCommand,
+  PutBucketPolicyCommand,
+  DeleteBucketPolicyCommand,
+} from "@aws-sdk/client-s3";
+
 async function fetchWithCookie({method, url, body, signal}) {
   return fetch(url, {
     method,
@@ -266,73 +273,6 @@ export async function getProjectMeta(project) {
   return ret;
 }
 
-export async function getAccessControlMeta(project) {
-  // Fetch the ACL metadata for all project containers.
-  let metaURL = new URL(
-    "/api/".concat(encodeURI(project), "/acl"), document.location.origin,
-  );
-  let ret = await GET(metaURL);
-  return await ret.json();
-}
-
-export async function removeAccessControlMeta(
-  project,
-  container,
-  receiver = undefined,
-) {
-  // Remove access control metadata from the specified container
-  let url = "/api/access/".concat(
-    encodeURI(project), "/",
-    encodeURI(container),
-  );
-  if (receiver) {
-    url.concat("/", encodeURI(receiver));
-  }
-  let aclURL = new URL(url, document.location.origin);
-  await DELETE(aclURL);
-}
-
-export async function modifyAccessControlMeta(
-  project,
-  container,
-  receivers,
-  rights,
-) {
-  // Modify access control metadata from the specified container
-  let url = "/api/access/".concat(
-    encodeURI(project), "/",
-    encodeURI(container),
-  );
-  const projects_csv = receivers.toString();
-  const aclURL = new URL(url, document.location.origin);
-  aclURL.searchParams.append("rights", rights);
-  aclURL.searchParams.append("projects", projects_csv);
-
-  await PUT(aclURL);
-}
-
-export async function addAccessControlMeta(
-  project,
-  container,
-  rights,
-  receivers,
-) {
-  // Add access control metadata to a container for the specified projects
-  let aclURL = new URL(
-    "/api/access/".concat(
-      encodeURI(project), "/",
-      encodeURI(container),
-    ),
-    document.location.origin,
-  );
-  let projects_csv = receivers.toString();
-  let rights_str = rights.toString().replace(",", "");
-  aclURL.searchParams.append("projects", projects_csv);
-  aclURL.searchParams.append("rights", rights_str);
-
-  await POST(aclURL);
-}
-
 export async function getSharedContainerAddress(project) {
   // Get the project specific address for container sharing
   let addrURL = new URL(
@@ -346,115 +286,24 @@ export async function getSharedContainerAddress(project) {
   return ret.json();
 }
 
-export async function swiftCreateContainer(
+
+export async function copyBucket(
   project,
-  container,
-  tags,
+  bucket,
+  source_bucket,
 ) {
-  // Create a container matching the specified name.
-  let fetchURL = new URL(
-    "/api/".concat(
-      encodeURI(project), "/",
-      encodeURI(container),
-    ),
-    document.location.origin,
-  );
-  let body = {
-    tags,
-  };
-  let ret = await PUT(fetchURL, JSON.stringify(body));
-  if (ret.status != 201) {
-    if (ret.status == 409 || ret.status == 202) {
-      //name used in other projects or current
-      throw new Error("Container name already in use.");
-    }
-    if (ret.status == 400 || ret.status == 405) {
-      throw new Error("Invalid container or tag name.");
-    }
-    throw new Error("Container creation unsuccessful.");
-  }
-}
-
-export async function swiftCheckContainerExists(
-  project,
-  container,
-) {
-  const fetchURL = new URL(
-    "/api/".concat(
-      encodeURI(project), "/",
-      encodeURI(container),
-    ),
-    document.location.origin,
-  );
-  const ret = await GET(fetchURL);
-  if (ret.status === 200 || ret.status === 403) return true;
-  if (ret.status === 404) return false;
-}
-
-export async function swiftDeleteContainer(
-  project,
-  container,
-) {
-  // Delete a container.
-  let fetchURL = new URL("/api/".concat(
-    encodeURI(project), "/",
-    encodeURI(container),
-  ), document.location.origin);
-
-  let ret = await DELETE(fetchURL);
-  if (ret.status != 204) {
-    throw new Error("Container deletion not successful.");
-  }
-}
-
-export async function swiftDeleteObjects(
-  project,
-  container,
-  objects,
-) {
-  let fetchURL = new URL("/api/".concat(
-    encodeURI(project), "/",
-    encodeURI(container),
-  ), document.location.origin);
-  fetchURL.searchParams.append("objects", true);
-
-  let ret = await DELETE(
-    fetchURL, JSON.stringify(objects),
-  );
-
-  if (ret.status != 200) {
-    throw new Error("Object / objects deletion not successful.");
-  }
-}
-
-export async function swiftCopyContainer(
-  project,
-  container,
-  source_project,
-  source_container,
-  project_name = "",
-  source_project_name = "",
-) {
-  // Replicate the container from a specified source to the location
+  // Replicate the bucket from a specified source to the location
   let fetchURL = new URL("/replicate/".concat(
     encodeURI(project), "/",
-    encodeURI(container),
+    encodeURI(bucket),
   ), document.location.origin);
 
-  fetchURL.searchParams.append("from_project", source_project);
-  fetchURL.searchParams.append("from_container", source_container);
-
-  if (project_name !== "") {
-    fetchURL.searchParams.append("project_name", project_name);
-  }
-  if (source_project_name !== "") {
-    fetchURL.searchParams.append("from_project_name", source_project_name);
-  }
+  fetchURL.searchParams.append("from_bucket", source_bucket);
 
   let ret = await POST(fetchURL);
 
   if (ret.status != 202) {
-    throw new Error("Container replication not successful.");
+    throw new Error("Bucket replication not successful.");
   }
 
   return ret;
@@ -628,4 +477,175 @@ export async function signedFetch(
   );
 
   return resp;
+}
+
+// Get the EC2 credentials from backend, for S3 operations in frontend.
+export async function getEC2Credentials(
+  project,
+) {
+  let fetchURL = new URL(`/api/${encodeURI(project)}/OS-EC2`, document.location.origin);
+  let resp = await GET(fetchURL);
+
+  if (resp.status != 200) {
+    throw new Error("Failed to retrieve EC2 credentials.");
+  }
+
+  return await resp.json();
+}
+
+// Add the bucket policy for receivers without touching existing policies
+export async function addAccessControlBucketPolicy(
+  bucket,
+  rights,
+  receivers,
+  client,
+) {
+  // Fetch the existing bucket policy as a baseline
+  let policy = {
+    "Version": "2012-10-17",
+    "Statement": [],
+  };
+  let getBucketPolicyCommand = new GetBucketPolicyCommand({
+    Bucket: bucket,
+  });
+  let currentPolicyResp = await client.send(getBucketPolicyCommand).catch(e => {
+    switch(e.name) {
+      case "NoSuchBucketPolicy":
+        if (DEV) console.log("No existing bucket policy could be retrieved.");
+        break;
+      case "NoSuchBucket":
+        if (DEV) {
+          console.log(
+            "Policy could not be retrieved due to nonexistent bucket.",
+          );
+        }
+        return "NoSuchBucket";
+      default:
+        throw e;
+    }
+  });
+  if (currentPolicyResp === "NoSuchBucket") {
+    return;
+  }
+  if (currentPolicyResp?.Policy !== undefined) {
+    policy = JSON.parse(currentPolicyResp.Policy);
+  }
+
+  // Expand the policy with the new policy entries.
+  for (const receiver of receivers) {
+    let actions = [];
+    if (rights.indexOf("r") >= 0) {
+      actions = actions.concat([
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetObjectTagging",
+        "s3:GetObjectVersion",
+      ]);
+    }
+    if (rights.indexOf("w") >= 0) {
+      actions = actions.concat([
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:AbortMultipartUpload",
+        "s3:ListMultipartUploadParts",
+        "s3:ListBucketMultipartUploads",
+      ]);
+    }
+
+    policy.Statement.push({
+      "Sid": "GrantSDConnectSharedAccessToProject",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": `arn:aws:iam::${receiver}:root`,
+      },
+      "Action": actions,
+      "Resource": `arn:aws:s3:::${bucket}`,
+    });
+  }
+
+  // Override the old bucket policy
+  let putBucketPolicyCommand = new PutBucketPolicyCommand({
+    Bucket: bucket,
+    Policy: JSON.stringify(policy),
+  });
+  await client.send(putBucketPolicyCommand);
+}
+
+// Remove thebucket policy for receivers without purging other policies
+export async function removeAccessControlBucketPolicy(
+  bucket,
+  receivers,
+  client,
+) {
+  // Fetch the existing bucket policy
+  let policy = {
+    Version: "2012-10-17",
+    Statement: [],
+  };
+  let getBucketPolicyCommand = new GetBucketPolicyCommand({
+    Bucket: bucket,
+  });
+  let currentPolicyResp = await client.send(getBucketPolicyCommand).catch(
+    e => {
+      switch(e.name) {
+        // Policy has already been removed, we can skip the logic.
+        case "NoSuchBucketPolicy":
+          if (DEV) console.log("Current policy could not be retrieved.");
+          return;
+        case "NoSuchBucket":
+          if (DEV) {
+            console.log("Could not delete policy due to nonexistent bucket.");
+          }
+          return "NoSuchBucket";
+        default:
+          throw e;
+      }
+    },
+  );
+  if (currentPolicyResp === "NoSuchBucket") {
+    return;
+  }
+  if (currentPolicyResp?.Policy !== undefined) {
+    policy = JSON.parse(currentPolicyResp.Policy);
+  }
+
+  // Filter out the old policy entries
+  for (const receiver of receivers) {
+    policy.Statement = policy.Statement.filter(statement => {
+      console.log(statement);
+      console.log(receiver);
+      console.log(statement.Principal.AWS.match(receiver) == null);
+      return (statement.Principal.AWS.match(receiver) == null);
+    });
+  }
+
+  if (policy.Statement.length === 0) {
+    let deleteBucketPolicyCommand = new DeleteBucketPolicyCommand({
+      Bucket: bucket,
+    });
+    await client.send(deleteBucketPolicyCommand).catch(e => {
+      if (DEV) console.log("Failed to delete bucket policy.");
+      if (DEV) console.log(e);
+    });
+    return;
+  }
+
+  // Override the old bucket policy
+  let putBucketPolicyCommand = new PutBucketPolicyCommand({
+    Bucket: bucket,
+    Policy: JSON.stringify(policy),
+  });
+  await client.send(putBucketPolicyCommand);
+}
+
+export async function checkBucketExists(client, bucketName) {
+  try {
+    const resp = await client.send(new HeadBucketCommand({
+      Bucket: bucketName,
+    }));
+    if (resp?.$metadata?.httpStatusCode === 200) return true;
+  } catch (e) {
+    if (e?.$metadata?.httpStatusCode === 403) return true;
+    if (e?.$metadata?.httpStatusCode === 404) return false;
+  }
 }

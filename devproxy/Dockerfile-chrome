@@ -1,0 +1,27 @@
+FROM debian:bookworm
+
+RUN apt-get update && apt-get -y upgrade
+RUN apt-get -y install chromium ca-certificates xinit openssh-server libnss3-tools
+RUN mkdir -p /root/.ssh
+
+ADD ./.devres/ca/sd-connect.devca.crt /usr/local/share/ca-certificates/sd-connect.devca.crt
+ADD ./.devres/ca/sd-connect.devca.crt /usr/share/ca-certificates/mozilla/sd-connect.devca.crt
+ADD ./.devres/ssh/chrome-dev.pub /root/.ssh/authorized_keys
+
+RUN update-ca-certificates
+RUN mkdir -p /run/sshd
+
+RUN adduser --home /home/chromeuser --uid 1111 --disabled-password chromeuser
+
+RUN chown -R chromeuser:chromeuser /etc/ssh
+
+ADD ./.devres/ssh/chrome-dev.pub /home/chromeuser/.ssh/authorized_keys
+# sleep is necessary so chromium has time to fail and exit -> required to initialize browser configuration
+USER chromeuser
+RUN (chromium --headless --no-sandbox &); sleep 10
+# Install the root CA to Chrome DB
+# RUN mkdir -p /home/chromeuser/.pki/nssdb && certutil -d /home/chromeuser/.pki/nssdb -N --empty-password
+RUN certutil -d sql:/home/chromeuser/.pki/nssdb -A -t "TCu" -n "sd-connect.devenv CA" -i /usr/local/share/ca-certificates/sd-connect.devca.crt
+
+EXPOSE 3122
+CMD ["/sbin/sshd", "-D", "-p 3122"]

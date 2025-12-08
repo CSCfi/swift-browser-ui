@@ -370,6 +370,7 @@ async def login_with_token(
 
     session["referer"] = request.url.host
     uname = ""
+    uid = ""
 
     taint = True if setd["force_restricted_mode"] else False
 
@@ -435,6 +436,9 @@ async def login_with_token(
             if not uname:
                 uname = ret["token"]["user"]["name"]
 
+            if not uid:
+                uid = ret["token"]["user"]["id"]
+
             session["projects"][project["id"]] = {
                 "id": project["id"],
                 "name": project["name"],
@@ -445,6 +449,7 @@ async def login_with_token(
 
     session["token"] = token
     session["uname"] = uname
+    session["uid"] = uid
 
     # the intersection of sdConnectProjects and Allas projects is empty
     # in practice this might happen if there are sd connect projects that

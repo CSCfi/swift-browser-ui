@@ -38,7 +38,7 @@
         <BucketNameValidation
           :result="validationResult"
         />
-        <label
+        <!--<label
           class="taginput-label"
           label-for="create-bucket-taginput"
         >
@@ -50,7 +50,7 @@
           data-testid="bucket-tag"
           @addTag="addingTag"
           @deleteTag="deletingTag"
-        />
+        />-->
         <p class="info-text is-size-6">
           {{ $t("message.container_ops.createdBucket") }}
           <b>{{ active.name }}</b>.
@@ -88,7 +88,6 @@
 </template>
 
 <script>
-import { swiftCreateContainer } from "@/common/api";
 import { tokenize, getTimestampForContainer } from "@/common/conv";
 import { getDB } from "@/common/db";
 
@@ -104,15 +103,19 @@ import {
   moveFocusOutOfModal,
   keyboardNavigationInsideModal,
 } from "@/common/keyboardNavigation";
-import TagInput from "@/components/TagInput.vue";
+import { createBucket } from "@/common/s3conv";
+// import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
+
 import { toRaw } from "vue";
 import { debounce } from "lodash";
 
-
 export default {
   name: "CreateBucketModal",
-  components: { TagInput, BucketNameValidation },
+  components: {
+    //TagInput,
+    BucketNameValidation,
+  },
   data() {
     return {
       bucketName: "",
@@ -137,6 +140,9 @@ export default {
     },
     modalVisible() {
       return this.$store.state.openCreateBucketModal;
+    },
+    s3client() {
+      return this.$store.state.s3client;
     },
   },
   watch: {
@@ -167,58 +173,56 @@ export default {
       let projectID = this.$route.params.project;
       const bucketName = toRaw(this.bucketName);
       const tags = toRaw(this.tags);
-      swiftCreateContainer(projectID, bucketName, tags.join(";"))
-        .then(async () => {
-          const containerTimestamp = await getTimestampForContainer(
-            projectID, bucketName, this.controller.signal);
 
-          getDB().containers.add({
-            projectID: projectID,
-            name: bucketName,
-            tokens: tokenize(bucketName),
-            tags: tags,
-            count: 0,
-            bytes: 0,
-            last_modified: getCurrentISOtime(containerTimestamp*1000),
-          });
-        }).then(() => {
-          swiftCreateContainer(projectID, `${bucketName}_segments`, [])
-            .then(() => {
-              getDB().containers.add({
-                projectID: projectID,
-                name: `${bucketName}_segments`,
-                tokens: [],
-                tags: [],
-                count: 0,
-                bytes: 0,
-              });
-            });
-          this.toggleCreateBucketModal(keypress);
+      try {
+        // Frontend validation is key:
+        // When user already owns the bucket or creates a new one
+        // it returns 200 just the same in the North Virginia Region
+        await createBucket(this.s3client, bucketName);
+      } catch(e) {
+        const errorCode = e?.$metadata?.httpStatusCode;
+        let errorMessage = this.$t("message.error.createFail");
+        // Unlikely errors due to validation
+        if (errorCode === 409) {
+          errorMessage = this.$t("message.error.inUseOtherPrj");
+        } else if (errorCode === 400) {
+          errorMessage = this.$t("message.error.invalidName");
+        }
+        document.querySelector("#createModal-toasts").addToast(
+          {
+            id: "create-toast",
+            progress: false,
+            type: "error",
+            message: errorMessage,
+          },
+        );
+        return;
+      }
 
-          this.$router.push({
-            name: "AllBuckets",
-            params: {
-              project: this.active.id,
-              user: this.uname,
-            },
-          });
-          this.$store.commit("setNewBucket", bucketName);
-        })
-        .catch(err => {
-          let errorMessage = this.$t("message.error.createFail");
-          if (err.message.match("Container name already in use")) {
-            errorMessage = this.$t("message.error.inUseOtherPrj");
-          } else if (err.message.match("Invalid container or tag name")) {
-            errorMessage = this.$t("message.error.invalidName");
-          }
-          document.querySelector("#createModal-toasts").addToast(
-            {
-              id: "create-toast",
-              progress: false,
-              type: "error",
-              message: errorMessage },
-          );
-        });
+      const containerTimestamp = await getTimestampForContainer(
+        projectID, bucketName, this.controller.signal);
+
+      getDB().containers.add({
+        projectID: projectID,
+        name: bucketName,
+        tokens: tokenize(bucketName),
+        tags: tags,
+        count: 0,
+        bytes: 0,
+        last_modified: getCurrentISOtime(containerTimestamp*1000),
+      });
+
+      this.toggleCreateBucketModal(keypress);
+
+      this.$router.push({
+        name: "AllBuckets",
+        params: {
+          project: this.active.id,
+          user: this.uname,
+        },
+      });
+
+      this.$store.commit("setNewBucket", bucketName);
     },
     toggleCreateBucketModal: function (keypress) {
       this.$store.commit("toggleCreateBucketModal", false);

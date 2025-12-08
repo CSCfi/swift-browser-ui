@@ -245,7 +245,7 @@ export default {
                 },
               },
             },
-            {
+            /*{
               value: this.$t("message.table.editTags"),
               component: {
                 tag: "c-button",
@@ -266,7 +266,7 @@ export default {
                     (this.owner != undefined && this.accessRights.length <= 1),
                 },
               },
-            },
+            },*/
             {
               value: this.$t("message.delete"),
               component: {
@@ -429,7 +429,7 @@ export default {
           })
           .map(item => item.name);
 
-        this.$store.state.socket.addDownload(
+        this.$store.state.s3download.addDownload(
           this.$route.params.container,
           folderFiles,
           this.$route.params.owner ? this.$route.params.owner : "",
@@ -437,17 +437,23 @@ export default {
         ).then(() => {
           if (DEV) console.log(`Started downloading folder ${object.name}`);
         }).catch(() => {
+          if (DEV) {
+            console.log(error);
+          }
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       } else {
-        this.$store.state.socket.addDownload(
+        this.$store.state.s3download.addDownload(
           this.$route.params.container,
           [object.name],
           this.$route.params.owner ? this.$route.params.owner : "",
           test,
         ).then(() => {
           if (DEV) console.log(`Started downloading object ${object.name}`);
-        }).catch(() => {
+        }).catch((error) => {
+          if (DEV) {
+            console.log(error);
+          }
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       }

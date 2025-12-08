@@ -2,9 +2,9 @@
   <div class="contents">
     <c-row
       id="optionsbar"
-      justify="space-between"
+      justify="end"
     >
-      <SearchBox :containers="renderingContainers" />
+      <!--<SearchBox :containers="renderingContainers" />-->
       <div class="row-end">
         <c-button
           size="small"
@@ -34,7 +34,7 @@
         :conts="renderingContainers"
         :show-timestamp="showTimestamp"
         :disable-pagination="hidePagination"
-        :hide-tags="hideTags"
+        :hide-tags="true"
         @delete-container="(cont) => removeContainer(cont)"
       />
       <c-loader v-show="contsLoading" />
@@ -57,14 +57,14 @@ import {
   toggleCreateBucketModal,
 } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
-import SearchBox from "@/components/SearchBox.vue";
+//import SearchBox from "@/components/SearchBox.vue";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 
 export default {
   name: "ContainersView",
   components: {
     ContainerTable,
-    SearchBox,
+    //SearchBox,
   },
   data: function () {
     return {
@@ -72,7 +72,7 @@ export default {
       currentProject: {},
       showTimestamp: false,
       hidePagination: false,
-      hideTags: false,
+      //hideTags: false,
       selected: undefined,
       isPaginated: true,
       perPage: 15,
@@ -111,7 +111,7 @@ export default {
     currentProject: function() {
       const savedDisplayOptions = this.currentProject.displayOptions;
       if (savedDisplayOptions) {
-        this.hideTags = savedDisplayOptions.hideTags;
+        //this.hideTags = savedDisplayOptions.hideTags;
         this.hidePagination = savedDisplayOptions.hidePagination;
         this.showTimestamp = savedDisplayOptions.showTimestamp;
         this.updateTableOptions();
@@ -194,7 +194,7 @@ export default {
     updateTableOptions: function () {
       const displayOptions = {
         showTimestamp: this.showTimestamp,
-        hideTags: this.hideTags,
+        //hideTags: this.hideTags,
         hidePagination: this.renderFolders,
       };
       this.tableOptions = [
@@ -217,7 +217,7 @@ export default {
             this.updateTableOptions();
           },
         },
-        {
+        /*{
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")
             : this.$t("message.tableOptions.hideTags"),
@@ -235,7 +235,7 @@ export default {
 
             this.updateTableOptions();
           },
-        },
+        },*/
         {
           name: this.hidePagination
             ? this.$t("message.tableOptions.showPagination")
