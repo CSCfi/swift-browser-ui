@@ -32,6 +32,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- (admins) Configuration parameter for allowed CORS entry now exists
+- (users) CORS entries for SD Connect implicitly upon login
+- Configuration parameter for allowed CORS entry now exists
+- CORS entries for SD Connect implicitly upon login
 - s3 API as object storage source
 - ec2 credential access
 - (users) Show project title along with the number in the project selector (#1263)
