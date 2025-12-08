@@ -9,6 +9,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) sharing now uses S3 bucket policies, which should improve shared bucket performance
+- (users) multithreaded uploads provide increased upload performance
+- sharing now uses s3 bucket policies instead of Swift ACLs
+- Uploads are now multithreaded and use S3 multipart uploads for larger files
 - (users) Implemented stricter bucket name validation criteria (#1263)
 - `/api/projects` returns additional field `title` for each project
 - (users) Replaced `folder` with `bucket`, `subfolder` with `folder`
@@ -19,10 +23,17 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Removed
 
+- (admins) deprecation warning -> `request` microservice will be removed before SD Connect v3 launch. This change will be reflected in the Helm charts in time.
+- Bucket creation no longer creates segments buckets as with S3 they're not required (segments buckets are still handled in deletion as they may exist for older buckets)
+- Backend API for proxying Allas Openstack Swift API
+- Old backend bucket replication runner
+- Swift API usage
 - stdout_pretty_tests_report in ceedling config
 
 ### Added
 
+- s3 API as object storage source
+- ec2 credential access
 - (users) Show project title along with the number in the project selector (#1263)
 - (admins) LDAP connection need five new environment variables to expose project name functionality - found in `.github/config/.env.test`
 - (users) Added a placeholder footer link for cookie policy (#1262)
