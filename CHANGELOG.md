@@ -23,6 +23,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Removed
 
+- much of old swift related code from backend and frontend
 - (admins) deprecation warning -> `request` microservice will be removed before SD Connect v3 launch. This change will be reflected in the Helm charts in time.
 - Bucket creation no longer creates segments buckets as with S3 they're not required (segments buckets are still handled in deletion as they may exist for older buckets)
 - Backend API for proxying Allas Openstack Swift API
@@ -44,6 +45,19 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) loading screen gets stuck when objects are refreshed after upload
+- (users) uploads not starting correctly from the bucket listing view
+- (users) downloads occasionally missing files due to an ongoing refresh
+- (users) uploaded objects not being immediately viewable
+- (users) downloads not starting with Firefox in SD Connect v3
+- loading screen gets stuck when objects are refreshed after upload
+- downloads missing files due to stale IndexedDB (by removing most of the IndexedDB)
+- objects being fetched using the old API calls
+- database refresh latency causing errating table rendering
+- firefox downloads not accessible due to trying to load ServiceWorker from incorrect URL
+- uploads started from bucket listing view now correctly check for access and create a new bucket with cors
+- bucket deletion incorrectly deleting buckets from DB, where they no longer exist
+- bucket creation modal doesn't implicitly add CORS info to fresh buckets
 - (users) Fixed sharing permissions not being visible without scrolling (#1255)
 - (users) Fixed attempting to delete subfolders only opening a confirmation modal (#1262)
 
