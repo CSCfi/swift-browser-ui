@@ -21,8 +21,12 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
-import { getEC2Credentials, getUser, signedFetch } from "@/common/api";
-import { getProjects } from "@/common/api";
+import {
+  getEC2Credentials,
+  getUser,
+  signedFetch,
+  getProjects,
+} from "@/common/api";
 
 // Import SharingView and Request API
 import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";

@@ -63,7 +63,14 @@ export default class S3DownloadSocket {
       });
       this.downWorker = undefined;
     } else if (window.showSaveFilePicker !== undefined) {
-      this.downWorker = new Worker("/s3downworker.js");
+      if (DEV) {
+        // Load the workers from frontend work directory when in
+        // development mode
+        this.downWorker = new Worker("/s3downworker.js");
+      } else {
+        // In production worker is defined in the static folder
+        this.downWorker = new Worker("/static/s3downworker.js");
+      }
       if (DEV) {
         console.log("Created a conventional worker for downloads.");
       }
@@ -267,7 +274,7 @@ export default class S3DownloadSocket {
       );
     }
 
-    let whitelistPath = `/cryptic/${this.active.name}/whitelist`;
+    let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
       this.active,
       this.project,
@@ -289,7 +296,7 @@ export default class S3DownloadSocket {
       let header = await signedFetch(
         "GET",
         this.$store.state.uploadEndpoint,
-        `/header/${this.active.name}/${bucket}/${file.name}`,
+        `/header/${this.project}/${bucket}/${file.name}`,
         undefined,
         {
           session: upInfo.id,

@@ -493,6 +493,87 @@ export async function getEC2Credentials(
   return await resp.json();
 }
 
+// Proxy ListBuckets command through the backend
+export async function awsListBuckets(
+  project,
+  continuation_token = undefined,
+  max_buckets = undefined,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}`, document.location.origin);
+
+  if (continuation_token !== undefined) {
+    fetchURL.searchParams.append("continuation_token", continuation_token);
+  }
+  if (max_buckets !== undefined && max_buckets > 0) {
+    fetchURL.searchParams.append("max_buckets", max_buckets);
+  }
+
+  let resp = await GET(fetchURL);
+  if (resp.status != 200) {
+    throw new Error("Failed to retrieve the bucket page.");
+  }
+
+  let ret = await resp.json();
+  for (const bucket of ret.Buckets) {
+    bucket.CreationDate = new Date(bucket.CreationDate);
+  }
+
+  if (DEV) console.log(ret);
+
+  return ret;
+}
+
+// Proxy CreateBucket command through the backend
+export async function awsCreateBucket(
+  project,
+  bucket,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}/${encodeURI(bucket)}`, document.location.origin);
+  let resp = await PUT(fetchURL);
+
+  return resp;
+}
+
+// Update all bucket cors
+export async function awsBulkAddBucketCors(
+  project,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}/cors`, document.location.origin);
+  let resp = await POST(fetchURL);
+
+  if (resp.status != 204) {
+    throw new Error("Failed to fix the bucket cors in all buckets.");
+  }
+}
+
+// Update CORS for a list of buckets
+export async function awsBulkAddBucketListCors(
+  project,
+  buckets,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}/cors`, document.location.origin);
+  fetchURL.searchParams.append("buckets", buckets);
+
+  let resp = await POST(fetchURL);
+
+  if (resp.status != 204) {
+    throw new Error("Failed to fix the bucket cors in the listed buckets.");
+  }
+}
+
+// Update single bucket cors
+export async function awsAddBucketCors(
+  project,
+  bucket,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}/${bucket}/cors`, document.location.origin);
+  let resp = await POST(fetchURL);
+
+  if (resp.status != 204) {
+    throw new Error("Failed to fix the bucket cors.");
+  }
+}
+
 // Add the bucket policy for receivers without touching existing policies
 export async function addAccessControlBucketPolicy(
   bucket,
@@ -559,7 +640,7 @@ export async function addAccessControlBucketPolicy(
         "AWS": `arn:aws:iam::${receiver}:root`,
       },
       "Action": actions,
-      "Resource": `arn:aws:s3:::${bucket}`,
+      "Resource": [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`],
     });
   }
 

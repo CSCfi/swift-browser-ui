@@ -37,13 +37,13 @@ import {
   CompleteMultipartUploadCommand,
   AbortMultipartUploadCommand,
   HeadBucketCommand,
-  CreateBucketCommand,
 } from "@aws-sdk/client-s3";
 import {
   timeout,
 } from "./globalFunctions";
 import {
   signedFetch,
+  awsCreateBucket,
 } from "./api";
 import { DEV } from "./conv";
 
@@ -94,7 +94,14 @@ export default class S3UploadSocket {
       i < window.navigator.hardwareConcurrency && i < MAX_UPLOAD_WORKERS;
       i++
     ) {
-      this.upWorkers.push(new Worker("/s3upworker.js"));
+      if (DEV) {
+        // Load the workers from frontend work directory when in
+        // development mode
+        this.upWorkers.push(new Worker("/s3upworker.js"));
+      } else {
+        // In production workers are defined in the static folder
+        this.upWorkers.push(new Worker("/static/s3upworker.js"));
+      }
     }
     if (DEV) {
       console.log(`${this.upWorkers.length} upload worker threads were created`);
@@ -102,7 +109,15 @@ export default class S3UploadSocket {
     }
 
     // Initialize the header worker
-    this.headerWorker = new Worker("/s3headerworker.js");
+    if (DEV) {
+      // Load the workers from frontend work directory when in
+      // development mode
+      this.headerWorker = new Worker("/s3headerworker.js");
+    } else {
+      // In production the worker is defined in the static folder
+      this.headerWorker = new Worker("/static/s3headerworker.js");
+    }
+
     let headerWorkerHandler = (e) => {
       switch(e.data.eventType) {
         case "headerDone":
@@ -414,30 +429,51 @@ export default class S3UploadSocket {
         Bucket: bucket,
       });
       await this.client.send(bucketAccessCmd).catch(async err => {
-        switch(err.$metadata.httpStatusCode) {
-          case 404:
-            if (DEV) {
-              console.log(`Creating bucket ${bucket}.`);
-            }
-            let bucketCreateCommand = new CreateBucketCommand({
-              Bucket: bucket,
-            });
-            await this.client.send(bucketCreateCommand).catch(err => {
-              if (DEV) console.log(`Couldn't start upload, reason: ${err}`);
+        // If there's no metadata, we're likely running to a CORS error
+        // CORS error likely means the bucket doesn't exist, let's try
+        // to create it
+        if (err.$metadata === undefined) {
+          let resp = await awsCreateBucket(this.project, bucket).catch(err => {
+            if (DEV) console.log(`Couldn't start upload, reason ${err}`);
+          });
+          switch (resp) {
+            case 400:
+              if (DEV) {
+                console.log(`Couldn't access bucket ${bucket} due to a client error.`);
+              }
               return;
-            });
-            break;
-          case 400:
-            if (DEV) {
-              console.log(`Couldn't access bucket ${bucket} due to a client error.`);
-            }
-            return;
-          case 403:
-            if (DEV) {
-              console.log(`Coudln't access bucket ${bucket} due to it being forbidden.`);
-              console.log("The bucket is probably owned by someone else.");
-            }
-            return;
+            case 403:
+              if (DEV) {
+                console.log(`Couldn't access bucket ${bucket} due to it being forbidden.`);
+                console.log("The bucket is probably owned by someone else.");
+              }
+              return;
+          }
+        }
+        else {
+          switch(err.$metadata.httpStatusCode) {
+            // This handling is probably no longer needed, as we only
+            // get a response for successful CORS
+            case 404:
+              if (DEV) {
+                console.log(`Creating bucket ${bucket}.`);
+              }
+              await awsCreateBucket(this.project, bucket).catch(err => {
+                if (DEV) console.log(`Couldn't start upload, reason ${err}`);
+              });
+              break;
+            case 400:
+              if (DEV) {
+                console.log(`Couldn't access bucket ${bucket} due to a client error.`);
+              }
+              return;
+            case 403:
+              if (DEV) {
+                console.log(`Couldn't access bucket ${bucket} due to it being forbidden.`);
+                console.log("The bucket is probably owned by someone else.");
+              }
+              return;
+          }
         }
       });
 

@@ -50,6 +50,7 @@
 import { liveQuery } from "dexie";
 import { getDB } from "@/common/db";
 import { useObservable } from "@vueuse/rxjs";
+import { throttle } from "lodash";
 import { mdiPlus } from "@mdi/js";
 import {
   getSharingContainers,
@@ -117,7 +118,8 @@ export default {
         this.updateTableOptions();
       }
     },
-    containers: function() {
+    // Throttle the updates to reduce rendering bugs
+    containers: throttle(function() {
       if (this.$route.name === "SharedFrom") {
         getSharingContainers(
           this.$route.params.project,
@@ -136,6 +138,10 @@ export default {
       } else {
         this.renderingContainers = this.containers;
 
+        // Explicitly toggle container loading off if we're done with
+        // the first page
+        if (this.containers?.length > 10) this.contsLoading = false;
+
         if (this.containers && this.newBucket) {
           const idx = this.containers.findIndex(c => c.name === this.newBucket);
           if (idx > 0) {
@@ -144,7 +150,7 @@ export default {
           }
         }
       }
-    },
+    }, 500),
     $route: function(to) {
       if (to.name !== "AllBuckets") {
         this.$store.commit("setNewBucket", "");
@@ -268,12 +274,6 @@ export default {
         id: this.active.id,
       });
 
-      this.containersToUpdateObjs = await this.$store
-        .dispatch("updateContainers", {
-          projectID: this.active.id,
-          signal: this.abortController.signal,
-        });
-
       this.containers = useObservable(
         liveQuery(() =>
           getDB().containers
@@ -281,6 +281,12 @@ export default {
             .toArray(),
         ),
       );
+
+      this.containersToUpdateObjs = await this.$store
+        .dispatch("updateContainers", {
+          projectID: this.active.id,
+          signal: this.abortController.signal,
+        });
     },
     removeContainer: async function(container) {
       await getDB().containers.where({

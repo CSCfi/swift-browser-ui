@@ -3,7 +3,6 @@
 
 import {
   S3Client,
-  CreateBucketCommand,
   ListObjectsV2Command,
   ListBucketsCommand,
   PutBucketPolicyCommand,
@@ -218,12 +217,4 @@ export async function getBucketMetadata(client, bucket) {
   };
 
   return metadata;
-}
-
-export async function createBucket(client, bucket) {
-  let createBucketInput = { Bucket: bucket };
-  const createBucketCmd = new CreateBucketCommand(createBucketInput);
-  const resp = await client.send(createBucketCmd);
-
-  return resp;
 }
