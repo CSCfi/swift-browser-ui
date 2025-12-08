@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import BucketsView from "@/views/Buckets.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
-import {getProjects, getContainers} from "@/common/api.js";
+import {getProjects} from "@/common/api.js";
 import { getDB } from "@/common/db";
 import store from "@/common/store";
 
@@ -26,6 +26,7 @@ async function checkProject (to, from, next){
   }
   next();
 }
+
 async function checkContainer (to, from, next){
 
   if(to.params.container === store.state.uploadBucket.name) {
@@ -33,13 +34,17 @@ async function checkContainer (to, from, next){
     next();
   }
   else {
-    let containers = await getDB()
+    let buckets = await getDB()
       .containers.where({projectID: to.params.project} )
       .toArray();
-    if(containers.length === 0){
-      containers = await getContainers();
+    if(buckets.length === 0) {
+      await store.dispatch("updateContainers", to.params.project);
+      buckets = await getDB()
+        .containers.where({projectID: to.params.project} )
+        .toArray();
     }
-    const val = containers.find(item =>
+
+    const val = buckets.find(item =>
       item.name === to.params.container);
     if(val === undefined) {
       window.location.pathname = "/notfound";

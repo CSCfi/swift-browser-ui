@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { tokenize, getTimestampForContainer } from "@/common/conv";
+import { DEV, tokenize } from "@/common/conv";
 import { getDB } from "@/common/db";
 
 import {
@@ -108,7 +108,7 @@ import BucketNameValidation from "./BucketNameValidation.vue";
 
 import { toRaw } from "vue";
 import { debounce } from "lodash";
-import { awsCreateBucket } from "@/common/api";
+import { awsAddBucketCors, awsCreateBucket } from "@/common/api";
 
 export default {
   name: "CreateBucketModal",
@@ -184,6 +184,15 @@ export default {
           errorMessage = this.$t("message.error.invalidName");
           break;
       }
+      try {
+        await awsAddBucketCors(projectID, bucketName);
+      } catch (e) {
+        if (DEV) {
+          console.error(
+            `Failed to update CORS for the new bucket ${bucketName}`,
+          );
+        }
+      }
 
       if (resp.status != 204) {
         document.querySelector("#createModal-toasts").addToast(
@@ -198,8 +207,9 @@ export default {
         return;
       }
 
-      const containerTimestamp = await getTimestampForContainer(
-        projectID, bucketName, this.controller.signal);
+      // We won't get the timestamp immediately from the backend with S3
+      // Let's just assume current time :)
+      // Seen below as the bare getCurrentISOtime() call.
 
       getDB().containers.add({
         projectID: projectID,
@@ -208,7 +218,7 @@ export default {
         tags: tags,
         count: 0,
         bytes: 0,
-        last_modified: getCurrentISOtime(containerTimestamp*1000),
+        last_modified: getCurrentISOtime(),
       });
 
       this.toggleCreateBucketModal(keypress);

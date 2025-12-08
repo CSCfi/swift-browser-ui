@@ -128,7 +128,6 @@ import {
   getAccessDetails,
   toggleDeleteModal,
   isFile,
-  updateObjectsAndObjectTags,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
@@ -137,13 +136,12 @@ import {
   addFocusClass,
 } from "@/common/keyboardNavigation";
 import { getDB } from "@/common/db";
-import { liveQuery } from "dexie";
-import { useObservable } from "@vueuse/rxjs";
 import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 import { DEV } from "@/common/conv";
+import { awsListObjects } from "@/common/s3conv";
 
 export default {
   name: "ObjectTable",
@@ -250,8 +248,8 @@ export default {
     isBucketUploading: function () {
       if (!this.isBucketUploading) {
         setTimeout(async () => {
-          this.updateAfterUpload();
-        }, 3000);
+          await this.updateAfterUpload();
+        }, 1000);
       }
     },
     shareModal: async function(){
@@ -369,17 +367,8 @@ export default {
         });
     },
     updateAfterUpload: async function () {
-      const containersToUpdateObjs = {
-        key: this.currentContainer.id,
-        container: {...this.currentContainer},
-      };
-
-      await updateObjectsAndObjectTags(
-        [containersToUpdateObjs],
-        this.active.id,
-        this.abortController.signal,
-        false, // No need to update object tags in this case
-      );
+      await this.updateObjects();
+      this.$store.commit("setLoaderVisible", false);
     },
     updateObjects: async function () {
       if (
@@ -408,24 +397,19 @@ export default {
         }
         await this.updateAfterUpload();
       }
-      else {
-        let params = {
-          projectID: this.project,
-          container: this.currentContainer,
-          signal: this.abortController.signal,
-        };
 
-        if (this.owner) params.owner = this.owner;
-
-        await this.$store.dispatch("updateObjects", params);
+      // Delay checking objects if the s3 client is not yet ready
+      if (this.$store.state.s3client === undefined) {
+        if (DEV) {
+          console.log("Waiting for the s3 client to be configured.");
+        }
+        setTimeout(this.updateObjects, 250);
+        return;
       }
 
-      this.oList = useObservable(
-        liveQuery(() =>
-          getDB().objects
-            .where({"containerID": this.currentContainer.id})
-            .toArray(),
-        ),
+      this.oList = await awsListObjects(
+        this.$store.state.s3client,
+        this.containerName,
       );
     },
     addPageToURL: function (pageNumber) {

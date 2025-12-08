@@ -68,9 +68,8 @@ import {
 } from "@/common/keyboardNavigation";
 import {
   DeleteObjectCommand,
-  ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
-import { DEV } from "@/common/conv";
+import { awsListObjects } from "@/common/s3conv";
 
 export default {
   name: "DeleteModal",
@@ -163,26 +162,12 @@ export default {
           if (segment_container) {
             // Equivalent object from segment container needs to be deleted
             // We can filter the deleted segments objects by prefix
-            let listSegmentsCommand = new ListObjectsV2Command({
-              Bucket: segment_container.name,
-              Prefix: object.name,
-            });
-            try {
-              const segmentObjectsResp = await this.$store.state.s3client.send(
-                listSegmentsCommand,
-              );
-              if (
-                segmentObjectsResp?.Contents?.length > 0
-              ) {
-                for (const segment_obj of segmentObjectsResp.Contents) {
-                  segments_to_remove.push(segment_obj.Key);
-                }
-              }
-            } catch (e) {
-              if (DEV) {
-                console.log(e);
-              }
-            }
+            let segments = await awsListObjects(
+              this.$store.state.s3client,
+              segment_container.name,
+              object.name,
+            );
+            segments.map(segment => {segments_to_remove.push(segment.name);});
           }
         } else {
           //flag if user is trying to delete a folder
@@ -190,13 +175,6 @@ export default {
           selectedFolder = true;
         }
       }
-
-      // Delete objects from IDB
-      const objIDs = this.selectedObjects.filter(
-        obj => obj.name && to_remove.includes(obj.name)).reduce(
-        (prev, obj) => [...prev, obj.id], [],
-      );
-      await getDB().objects.bulkDelete(objIDs);
 
       for(const obj of to_remove) {
         let deleteObjectCommand = new DeleteObjectCommand({

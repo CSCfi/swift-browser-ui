@@ -62,11 +62,9 @@
 </template>
 
 <script>
-import { debounce, delay } from "lodash";
+import { debounce } from "lodash";
 import {
   copyBucket,
-  updateContainerMeta,
-  getObjects,
   awsAddBucketCors,
 } from "@/common/api";
 import { getDB } from "@/common/db";
@@ -86,6 +84,7 @@ import { liveQuery } from "dexie";
 //import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 import { toRaw } from "vue";
+import { awsListObjects } from "@/common/s3conv";
 
 export default {
   name: "CopyBucketModal",
@@ -251,45 +250,27 @@ export default {
 
         this.checkpointsCompleted = 0;
 
-        const tags = toRaw(this.tags);
-        let metadata = {
-          usertags: tags.join(";"),
-        };
-        delay((id, bucket, meta, tgs) => {
-          updateContainerMeta(id, bucket, meta)
-            .then(
-              async () => {
-                await getDB().containers
-                  .where({
-                    projectID: id,
-                    name: bucket,
-                  })
-                  .modify({ tgs });
-              },
-            );
-
-          this.checkpointsCompleted++;
-        }, 5000, this.active.id, this.bucketName, metadata, tags);
-
-        getObjects(
-          this.sourceProjectId ? this.sourceProjectId : this.active.id,
+        let objects = await awsListObjects(
+          this.$store.state.s3client,
           this.selectedBucketName,
-        ).then(async (objects) => {
-          const sleep =
-            time => new Promise(resolve => setTimeout(resolve, time));
+        );
+        const sleep =
+          time => new Promise(resolve => setTimeout(resolve, time));
 
-          let copiedObjects = undefined;
-          while (copiedObjects === undefined ||
-            copiedObjects.length < objects.length) {
-            const task = getObjects(this.active.id, this.bucketName)
-              .then((obj) => copiedObjects = obj );
+        let copiedObjects;
+        while (
+          copiedObjects === undefined
+          || copiedObjects.length < objects.length
+        ) {
+          copiedObjects = await awsListObjects(
+            this.$store.state.s3client,
+            this.bucketName,
+          );
+          await sleep(2000);
+        }
 
-            await Promise.all([task, sleep(2000)]);
-          }
-
-          this.checkpointsCompleted++;
-          this.cancelCopy(keypress);
-        });
+        this.checkpointsCompleted++;
+        this.cancelCopy(keypress);
       }).catch(() => {
         document.querySelector("#copyBucket-toasts").addToast(
           {

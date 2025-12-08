@@ -1,6 +1,4 @@
 import {
-  getContainerMeta,
-  getObjectsMeta,
   GET,
 } from "@/common/api";
 import { DateTime } from "luxon";
@@ -166,9 +164,6 @@ export function getHumanReadableSize(val, locale) {
   return `${result} ${BYTE_UNITS[unitIndex]}`;
 }
 
-
-
-
 export async function computeSHA256(keyContent) {
   const msgUint8 = new TextEncoder().encode(keyContent);
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
@@ -187,59 +182,6 @@ function extractTags(meta) {
     return meta[1]["usertags"].split(";");
   }
   return [];
-}
-
-export async function getTagsForContainer(
-  project, containerName, signal, owner) {
-  let meta = await getContainerMeta(project, containerName, signal, owner);
-  return extractTags(meta);
-}
-
-function extractBytes(meta) {
-  if ("X-Container-Bytes-Used" in meta[1]) {
-    return meta[1]["X-Container-Bytes-Used"];
-  }
-  if ("x-container-bytes-used" in meta[1]) {
-    return meta[1]["x-container-bytes-used"];
-  }
-  return "";
-}
-
-function extractObjectCount(meta) {
-  if ("X-Container-Object-Count" in meta[1]) {
-    return meta[1]["X-Container-Object-Count"];
-  }
-  if ("x-container-object-count" in meta[1]) {
-    return meta[1]["x-container-object-count"];
-  }
-  return "";
-}
-
-function extractContainerTimestamp(meta) {
-  if ("X-Timestamp" in meta[1]) {
-    return meta[1]["X-Timestamp"];
-  }
-  if ("x-timestamp" in meta[1]) {
-    return meta[1]["x-timestamp"];
-  }
-  return "";
-}
-
-export async function getTimestampForContainer(project, containerName, signal) {
-  const meta = await getContainerMeta(project, containerName, signal);
-  return extractContainerTimestamp(meta);
-}
-
-export async function getMetadataForSharedContainer(
-  project,
-  containerName,
-  signal,
-  owner,
-) {
-  let meta = await getContainerMeta(project, containerName, signal, owner);
-  const bytes = extractBytes(meta);
-  const count = extractObjectCount(meta);
-  return { bytes: Number(bytes), count: Number(count) };
 }
 
 export async function getTagsForObjects(

@@ -316,7 +316,6 @@ const app = createApp({
         this.$store.commit("appendPubKey", key);
       }
 
-      await this.$store.dispatch("initSDSubmit");
       if (DEV) {
         if (
           this.$store.state.submitConfig.sd_submit_user === ""
@@ -329,6 +328,9 @@ const app = createApp({
         }
       }
 
+      let s3endpoint = await discoverEndpoint();
+      this.$store.commit("setS3Endpoint", s3endpoint);
+
       // Initialize the frontend S3 client
       let s3client = await getClient(
         this.$store.state.active.id,
@@ -339,7 +341,6 @@ const app = createApp({
 
       // Initialize the S3 upload implementation
       let ec2creds = await getEC2Credentials(this.active.id);
-      let s3endpoint = await discoverEndpoint();
       let s3upsocket = new S3UploadSocket(
         this.active.id,
         this.active.name,
@@ -357,6 +358,7 @@ const app = createApp({
         this.active.name,
         this.$store,
         this.$t,
+        s3client,
         ec2creds.access,
         ec2creds.secret,
         s3endpoint,
