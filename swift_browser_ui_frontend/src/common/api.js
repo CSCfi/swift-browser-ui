@@ -312,7 +312,7 @@ export async function awsBulkAddBucketListCors(
   buckets,
 ) {
   let fetchURL = new URL(`/api/s3/${encodeURI(project)}/cors`, document.location.origin);
-  fetchURL.searchParams.append("buckets", buckets);
+  fetchURL.searchParams.append("buckets", buckets.join(";"));
 
   let resp = await POST(fetchURL);
 
