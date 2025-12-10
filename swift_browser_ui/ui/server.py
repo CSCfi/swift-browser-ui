@@ -44,13 +44,19 @@ from swift_browser_ui.ui.front import (
     down_swasm,
     down_swjs,
     forbid,
+    head_swasm,
+    head_swjs,
     index,
     loginpassword,
     map_down_swjs,
+    map_head_swjs,
+    map_up_swjs,
     notfound,
     select,
     uidown,
     unauth,
+    up_swasm,
+    up_swjs,
 )
 from swift_browser_ui.ui.health import handle_health_check
 from swift_browser_ui.ui.login import (
@@ -170,6 +176,12 @@ async def servinit(
             aiohttp.web.get("/s3downworker.js", down_swjs),
             aiohttp.web.get("/s3downworker.wasm", down_swasm),
             aiohttp.web.get("/s3downworker-post.js.map", map_down_swjs),
+            aiohttp.web.get("/s3upworker.js", up_swjs),
+            aiohttp.web.get("/s3upworker.wasm", up_swasm),
+            aiohttp.web.get("/crypt-post-s3upload.js.map", map_up_swjs),
+            aiohttp.web.get("/s3headerworker.js", head_swjs),
+            aiohttp.web.get("/s3headerworker.wasm", head_swasm),
+            aiohttp.web.get("/crypt-post-headers.js.map", map_head_swjs),
             aiohttp.web.get("/loginpassword", loginpassword),
             aiohttp.web.get("/browse", browse),
             # Route all URLs prefixed by /browse to the browser page, as this is

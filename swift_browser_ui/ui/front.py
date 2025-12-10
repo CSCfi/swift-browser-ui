@@ -9,6 +9,84 @@ from cryptography.fernet import InvalidToken
 from swift_browser_ui.ui.settings import setd
 
 
+async def up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/s3upworker.js",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def up_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/s3upworker.wasm",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def map_up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/crypt-post-s3upload.js.map",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/s3headerworker.js",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def head_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/s3headerworker.js.map",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
+async def map_head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
+    """."""
+    return aiohttp.web.FileResponse(
+        str(setd["static_directory"]) + "/crypt-post-headers.js.map",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Service-Worker-Allowed": "/",
+        },
+    )
+
+
 async def down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
     return aiohttp.web.FileResponse(
@@ -38,7 +116,7 @@ async def down_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 async def map_down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
     """Serve worker js in worker scope."""
     return aiohttp.web.FileResponse(
-        str(setd["static_directory"]) + "/s3downworker-post.js.map",
+        str(setd["static_directory"]) + "/crypt-post-s3download.js.map",
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
