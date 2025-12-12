@@ -2,154 +2,61 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
 .tox/
 .coverage
 .coverage.*
-.cache
-nosetests.xml
 coverage.xml
-*.cover
-.hypothesis/
 .pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
+# Documentation builds, Sphynx and mkdocs
 docs/_build/
-docs/source/swift_browser_ui.ui
-docs/source/swift_browser_ui.sharing
-docs/source/swift_browser_ui.request
-docs/source/swift_browser_ui.upload
-docs/source/swift_browser_ui.common
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
+docs/build/
+site/
 
 # Environments
 .env*
 .venv
 env/
 venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
 
 # mypy
 .mypy_cache/
 
-### Python Patch ###
-.venv/
-
-### VSCode ###
+# VSCode
 .vscode/
 
-src/server.py
-
-# dia temporary files
-*.dia~
-
-# environment variable files
-setenvs*
 swift_browser_ui_frontend/src/common/swift_sharing_request_bind.js
 swift_browser_ui_frontend/src/common/swift_x_account_sharing_bind.js
 
-# Tests
-tests/ui_front/swift-browser-ui
-
+## Tests
 # ignore pyspelling
 dictionary.dic
 
+# Cypress screenshots and fixtures
 swift_browser_ui_frontend/cypress
-
+tests/cypress/fixtures
 
 # Node files
 **/node_modules/
 **/.node_modules/
 
 # wasm build files
+swift_browser_ui_frontend/wasm/build/
 swift_browser_ui_frontend/wasm/src/libupload.js
 swift_browser_ui_frontend/wasm/src/libupload.wasm
-swift_browser_ui_frontend/public/libupload.js
-swift_browser_ui_frontend/public/libupload.wasm
+swift_browser_ui_frontend/public/*.js
+swift_browser_ui_frontend/public/*.js.map
+swift_browser_ui_frontend/public/*.wasm
 
 private
 static
 
-devproxy/swiftui-proxy.*
 Procfile.*
 *.pem
+*.log
 
 # Development build files
 **/.devres/
