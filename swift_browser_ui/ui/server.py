@@ -175,7 +175,7 @@ async def servinit(
             # Worker routes
             aiohttp.web.get("/s3downworker.js", down_swjs),
             aiohttp.web.get("/s3downworker.wasm", down_swasm),
-            aiohttp.web.get("/s3downworker-post.js.map", map_down_swjs),
+            aiohttp.web.get("/crypt-post-s3download.js.map", map_down_swjs),
             aiohttp.web.get("/s3upworker.js", up_swjs),
             aiohttp.web.get("/s3upworker.wasm", up_swasm),
             aiohttp.web.get("/crypt-post-s3upload.js.map", map_up_swjs),
