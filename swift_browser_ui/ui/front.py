@@ -10,7 +10,7 @@ from swift_browser_ui.ui.settings import setd
 
 
 async def up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve upload worker js in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3upworker.js",
         headers={
@@ -23,7 +23,7 @@ async def up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def up_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve upload worker wasm in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3upworker.wasm",
         headers={
@@ -36,7 +36,7 @@ async def up_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def map_up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve upload worker js dev map in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/crypt-post-s3upload.js.map",
         headers={
@@ -49,7 +49,7 @@ async def map_up_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve header worker js in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3headerworker.js",
         headers={
@@ -62,7 +62,7 @@ async def head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def head_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve header worker wasm in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3headerworker.js.map",
         headers={
@@ -75,7 +75,7 @@ async def head_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def map_head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """."""
+    """Serve header worker js dev map in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/crypt-post-headers.js.map",
         headers={
@@ -88,7 +88,7 @@ async def map_head_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """Serve worker js in worker scope."""
+    """Serve download worker js in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3downworker.js",
         headers={
@@ -101,7 +101,7 @@ async def down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def down_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """Serve worker wasm in worker scope."""
+    """Serve download worker wasm in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/s3downworker.wasm",
         headers={
@@ -114,7 +114,7 @@ async def down_swasm(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
 
 
 async def map_down_swjs(_: aiohttp.web.Request) -> aiohttp.web.FileResponse:
-    """Serve worker js in worker scope."""
+    """Serve download worker js dev map in worker scope."""
     return aiohttp.web.FileResponse(
         str(setd["static_directory"]) + "/crypt-post-s3download.js.map",
         headers={
