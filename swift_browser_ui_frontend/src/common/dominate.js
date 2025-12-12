@@ -66,9 +66,6 @@ export async function submit_bucket(
       bucket.name,
       [object.name, {usertags: tags.join(";")}],
     );
-    await getDB().objects
-      .where(":id").equals(object.id)
-      .modify({ tags, last_modified: getCurrentISOtime() });
 
     // Add a formatted file entry for the submission file list
     files.push({

@@ -239,14 +239,9 @@ const app = createApp({
       });
       if (toDelete.length) {
         await getDB().projects.bulkDelete(toDelete);
-        const containersCollection = await getDB().containers
+        await getDB().containers
           .where("projectID")
-          .anyOf(toDelete);
-        const containers = await containersCollection.primaryKeys();
-        await containersCollection.delete();
-        await getDB().objects
-          .where("containerID")
-          .anyOf(containers)
+          .anyOf(toDelete)
           .delete();
       }
 

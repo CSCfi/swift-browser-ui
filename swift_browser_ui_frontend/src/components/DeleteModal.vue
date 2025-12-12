@@ -76,6 +76,7 @@ export default {
   data() {
     return {
       isDeleting: false,
+      bucketObjects: [],
     };
   },
   computed: {
@@ -108,8 +109,12 @@ export default {
     },
   },
   watch: {
-    modalVisible() {
-      if (this.modalVisible) this.isDeleting = false;
+    async modalVisible() {
+      if (this.modalVisible) {
+        this.isDeleting = false;
+        // Object listing needed for correct behaviour after deletion
+        this.bucketObjects = await awsListObjects(this.$store.state.s3client, this.container);
+      }
     },
   },
   methods: {
@@ -209,12 +214,9 @@ export default {
             this.$t("message.objects.deleteManySuccess");
 
         if (this.folders.length && this.renderedFolders) {
-          //get all files uppermost folder contains
-          const folderFiles = await getDB().objects
-            .filter(obj => obj.name.startsWith(this.folders[0])
-              && obj.container === this.container)
-            .toArray();
-          if (folderFiles.length < 1) {
+          const folderExists = this.bucketObjects
+            .find(obj => obj.name.startsWith(this.folders[0]));
+          if (folderExists) {
             //if all folders empty, go to bucket
             //see if more than one folder removed
             this.folders.length > 1 ?
@@ -225,7 +227,7 @@ export default {
           else {
             let newPrefix = this.prefix;
             for (let level=0; level < this.folders.length; level++) {
-              let found = folderFiles.find(obj =>
+              let found = this.bucketObjects.find(obj =>
                 obj.name.startsWith(newPrefix));
               if (found !== undefined) {
                 //if file with this prefix found

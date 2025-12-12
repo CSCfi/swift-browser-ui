@@ -50,8 +50,8 @@ export default [
             "comma-dangle": ["error", "always-multiline"],
 
             "max-len": ["error", {
-                code: 80,
-                comments: 80,
+                code: 100,
+                comments: 100,
                 ignoreTemplateLiterals: true,
                 ignoreUrls: true,
             }],

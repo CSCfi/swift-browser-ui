@@ -54,7 +54,6 @@ import { throttle } from "lodash";
 import { mdiPlus } from "@mdi/js";
 import {
   getSharingContainers,
-  updateObjectsAndObjectTags,
   toggleCreateBucketModal,
 } from "@/common/globalFunctions";
 import ContainerTable from "@/components/ContainerTable.vue";
@@ -174,14 +173,6 @@ export default {
     locale: function () {
       this.updateTableOptions();
     },
-    containersToUpdateObjs: async function () {
-      if (this.contsLoading) setTimeout(() => this.contsLoading = false, 100);
-      await updateObjectsAndObjectTags(
-        this.containersToUpdateObjs,
-        this.active.id,
-        this.abortController.signal,
-      );
-    },
   },
   created() {
     this.updateTableOptions();
@@ -282,11 +273,12 @@ export default {
         ),
       );
 
-      this.containersToUpdateObjs = await this.$store
-        .dispatch("updateContainers", {
-          projectID: this.active.id,
-          signal: this.abortController.signal,
-        });
+      await this.$store.dispatch("updateContainers", {
+        projectID: this.active.id,
+        signal: this.abortController.signal,
+      });
+
+      this.contsLoading = false;
     },
     removeContainer: async function(container) {
       await getDB().containers.where({

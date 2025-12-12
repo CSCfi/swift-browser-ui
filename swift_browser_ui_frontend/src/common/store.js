@@ -274,8 +274,8 @@ const store = createStore({
   },
   actions: {
     updateContainers: async function (
-      { dispatch, state },
-      { projectID, signal, routeContainer = undefined },
+      { state },
+      { projectID, signal },
     ) {
       while (state.s3client === undefined) {
         await new Promise(r => setTimeout(r, 25));
@@ -309,7 +309,6 @@ const store = createStore({
 
         if (buckets?.Buckets?.length > 0) {
           for (const bucket of buckets.Buckets) {
-            // const bucketMetadata = await getBucketMetadata(s3client, bucket);
 
             let newBucket = {
               name: bucket.Name,
@@ -383,7 +382,6 @@ const store = createStore({
 
       if (toDelete.length) {
         await getDB().containers.bulkDelete(toDelete);
-        await getDB().objects.where("containerID").anyOf(toDelete).delete();
       }
       const containersFromDB = await getDB()
         .containers.where({ projectID })
@@ -397,75 +395,18 @@ const store = createStore({
         addSegmentContainerSize(newBuckets[i], newBuckets);
       }
 
-      let containers_to_update_objects = [];
       for (let i = 0; i < newBuckets.length; i++) {
         const container = newBuckets[i];
         const oldContainer = containersFromDB.find(
           cont => cont.name === container.name,
         );
-        let key;
-        let updateObjects = true;
-        let dbObjects = 0;
 
         if (oldContainer !== undefined) {
-          key = oldContainer.id;
-          dbObjects = await getDB()
-            .objects.where({ containerID: oldContainer.id })
-            .count();
-        }
-
-        if (oldContainer !== undefined) {
-          if (
-            container.count === oldContainer.count &&
-            container.bytes === oldContainer.bytes &&
-            !(dbObjects === 0)
-          ) {
-            updateObjects = false;
-          }
-
-          if (container.count === 0) {
-            updateObjects = false;
-            await getDB()
-              .objects.where({ containerID: oldContainer.id })
-              .delete();
-          }
-
-          // Check if shared containers should be updated objects
-          if (
-            container.count === oldContainer.count &&
-            container.bytes === oldContainer.bytes &&
-            container.owner && dbObjects === 0
-          ) {
-            updateObjects = false;
-          }
           await getDB().containers.update(oldContainer.id, container);
         } else {
-          key = await getDB().containers.put(container);
-        }
-
-        if (routeContainer && container.owner) {
-          if (container.name !== routeContainer &&
-            container.name !== `${routeContainer}_segments`) {
-          //Update the object cache only for shared container and segments
-          //in current route to avoid objects flashing in UI
-            updateObjects = false;
-          }
-        }
-
-        if (updateObjects && !container.name.endsWith("_segments") ) {
-          // Have a separate array contained containers that
-          // their objects should be updated
-          containers_to_update_objects.push({ container, key });
+          await getDB().containers.put(container);
         }
       }
-
-      // Tagging is disabled currently
-      /*await dispatch("updateContainerTags", {
-        projectID: projectID,
-        containers: newBuckets,
-        signal,
-      });*/
-      return containers_to_update_objects;
     },
   },
 });
