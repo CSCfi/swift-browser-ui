@@ -7,6 +7,7 @@ import {
   ListBucketsCommand,
 } from "@aws-sdk/client-s3";
 import { getEC2Credentials, GET } from "./api";
+import { DEV } from "./conv";
 
 // Fetch S3 endpoint from backend
 export async function discoverEndpoint() {
