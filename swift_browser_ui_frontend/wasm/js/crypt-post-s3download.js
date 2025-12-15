@@ -74,6 +74,13 @@ function createS3Client(access, secret, endpoint) {
   });
 }
 
+// Example: https://devenv:8443/file/session-id/test-container/examplefile.txt.c4gh
+const fileUrl = new RegExp("/file/[^/]*/[^/]*/.*$");
+// Example: https://devenv:8443/archive/session-id/test-container.tar
+const archiveUrl = new RegExp("/archive/[^/]*/[^/]*\\.tar$");
+const fileUrlStart = new RegExp("/file/[^/]*/[^/]*/");
+const archiveUrlStart = new RegExp("/archive/[^/]*/");
+
 if (inServiceWorker) {
   self.addEventListener("install", (event) => {
     event.waitUntil(waitAsm());
