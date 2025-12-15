@@ -46,6 +46,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) qa downloads now work with Firefox as well
+- service worker path logic was missed in refactoring
 - header issues in nginx conf
 - (users) loading screen gets stuck when objects are refreshed after upload
 - (users) uploads not starting correctly from the bucket listing view
