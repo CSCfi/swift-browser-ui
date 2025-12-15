@@ -33,6 +33,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- frontend handlers for fetching upload and header worker scripts.
 - (admins) Configuration parameter for allowed CORS entry now exists
 - (users) CORS entries for SD Connect implicitly upon login
 - Configuration parameter for allowed CORS entry now exists
