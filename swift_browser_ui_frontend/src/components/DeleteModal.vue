@@ -58,7 +58,6 @@
 
 <script>
 import { getDB } from "@/common/db";
-
 import { isFile } from "@/common/globalFunctions";
 import {
   getFocusableElements,
@@ -181,19 +180,27 @@ export default {
         }
       }
 
-      for(const obj of to_remove) {
-        let deleteObjectCommand = new DeleteObjectCommand({
-          Bucket: this.container,
-          Key: obj,
-        });
-        await this.$store.state.s3client.send(deleteObjectCommand);
-      }
-      for(const obj of segments_to_remove) {
-        let deleteObjectCommand = new DeleteObjectCommand({
-          Bucket: segment_container.name,
-          Key: obj,
-        });
-        await this.$store.state.s3client.send(deleteObjectCommand);
+      if (to_remove.length) {
+        this.$store.commit("setDeleting", true);
+        try {
+          for(const obj of to_remove) {
+            let deleteObjectCommand = new DeleteObjectCommand({
+              Bucket: this.container,
+              Key: obj,
+            });
+            await this.$store.state.s3client.send(deleteObjectCommand);
+          }
+          for(const obj of segments_to_remove) {
+            let deleteObjectCommand = new DeleteObjectCommand({
+              Bucket: segment_container.name,
+              Key: obj,
+            });
+            await this.$store.state.s3client.send(deleteObjectCommand);
+          }
+          this.bucketObjects = this.bucketObjects.filter(item => !to_remove.includes(item.name));
+        } finally {
+          this.$store.commit("setDeleting", false);
+        }
       }
 
       const dataTable = document.getElementById("obj-table");
@@ -216,7 +223,7 @@ export default {
         if (this.folders.length && this.renderedFolders) {
           const folderExists = this.bucketObjects
             .find(obj => obj.name.startsWith(this.folders[0]));
-          if (folderExists) {
+          if (!folderExists) {
             //if all folders empty, go to bucket
             //see if more than one folder removed
             this.folders.length > 1 ?

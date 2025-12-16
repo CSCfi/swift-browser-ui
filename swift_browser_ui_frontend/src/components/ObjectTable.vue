@@ -205,6 +205,9 @@ export default {
     isBucketUploading() {
       return this.$store.state.isUploading;
     },
+    isDeletingObjects() {
+      return this.$store.state.isDeleting;
+    },
     owner() {
       return this.$route.params.owner;
     },
@@ -248,7 +251,17 @@ export default {
     isBucketUploading: function () {
       if (!this.isBucketUploading) {
         setTimeout(async () => {
-          await this.updateAfterUpload();
+          await this.updateObjects();
+          this.$store.commit("setLoaderVisible", false);
+        }, 1000);
+      }
+    },
+    isDeletingObjects: function () {
+      if (!this.isDeletingObjects) {
+        this.objsLoading = true;
+        setTimeout(async () => {
+          await this.updateObjects();
+          this.objsLoading = false;
         }, 1000);
       }
     },
@@ -366,10 +379,6 @@ export default {
           name: this.containerName,
         });
     },
-    updateAfterUpload: async function () {
-      await this.updateObjects();
-      this.$store.commit("setLoaderVisible", false);
-    },
     updateObjects: async function () {
       if (
         this.containerName === undefined
@@ -380,7 +389,6 @@ export default {
       ) {
         return;
       }
-
       this.currentContainer = await this.getCurrentContainer();
 
       if (this.currentContainer === undefined) {
@@ -395,7 +403,6 @@ export default {
           if (DEV) console.log("Error with uploaded container");
           return;
         }
-        await this.updateAfterUpload();
       }
 
       // Delay checking objects if the s3 client is not yet ready
@@ -598,7 +605,7 @@ export default {
             // If only folders checked, don't show Delete modal
             if (this.renderFolders) {
               const foldersOnly = this.checkedRows.every((item) =>
-                item.name.includes("/"));
+                !isFile(item.name, this.$route));
               if (foldersOnly) {
                 addErrorToastOnMain(this.$t("message.folders.deleteNote"));
                 this.clearSelections();

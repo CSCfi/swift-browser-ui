@@ -32,6 +32,7 @@ const store = createStore({
     requestClient: undefined,
     socket: undefined,
     isUploading: false,
+    isDeleting: false,
     encryptedFile: "",
     uploadProgress: undefined,
     uploadNotification: {
@@ -113,6 +114,9 @@ const store = createStore({
     stopUploading(state, cancelled = false) {
       state.isUploading = false;
       if (!cancelled) state.isLoaderVisible = true;
+    },
+    setDeleting(state, payload) {
+      state.isDeleting = payload;
     },
     setEncryptedFile(state, file) {
       state.encryptedFile = file;
@@ -279,7 +283,7 @@ const store = createStore({
     ) {
       while (state.s3client === undefined) {
         await new Promise(r => setTimeout(r, 25));
-        console.log("Waiting for s3 client to initialize.");
+        if (DEV) console.log("Waiting for s3 client to initialize.");
       }
 
       const existingContainers = await getDB()

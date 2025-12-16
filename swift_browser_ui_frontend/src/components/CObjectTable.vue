@@ -51,7 +51,7 @@ import {
 } from "@/common/keyboardNavigation";
 import {
   mdiTrayArrowDown,
-  mdiPencilOutline,
+  //mdiPencilOutline,
   mdiDeleteOutline,
   mdiFolder ,
 } from "@mdi/js";
