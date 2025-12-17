@@ -22,7 +22,6 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 // Project JS functions
 import { i18n } from "@/common/i18n";
 import {
-  getEC2Credentials,
   getUser,
   signedFetch,
   getProjects,
@@ -52,12 +51,7 @@ import { getDB } from "@/common/db";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
-import {
-  discoverEndpoint,
-  getClient,
-} from "@/common/s3conv";
-import S3UploadSocket from "@/common/s3upload";
-import S3DownloadSocket from "@/common/s3download";
+import { initS3 } from "@/common/s3init";
 
 checkIDB().then(result => {
   if (!result) {
@@ -322,43 +316,7 @@ const app = createApp({
           console.log("SD Submit integration configured");
         }
       }
-
-      let s3endpoint = await discoverEndpoint();
-      this.$store.commit("setS3Endpoint", s3endpoint);
-
-      // Initialize the frontend S3 client
-      let s3client = await getClient(
-        this.$store.state.active.id,
-        this.$store.state.s3endpoint,
-      );
-
-      this.$store.commit("setS3Client", s3client);
-
-      // Initialize the S3 upload implementation
-      let ec2creds = await getEC2Credentials(this.active.id);
-      let s3upsocket = new S3UploadSocket(
-        this.active.id,
-        this.active.name,
-        this.$store,
-        this.$t,
-        s3client,
-        ec2creds.access,
-        ec2creds.secret,
-        s3endpoint,
-      );
-      this.$store.commit("setS3Upload", s3upsocket);
-      // Initialize the S3 download implementation
-      let s3downsocket = new S3DownloadSocket(
-        this.active.id,
-        this.active.name,
-        this.$store,
-        this.$t,
-        s3client,
-        ec2creds.access,
-        ec2creds.secret,
-        s3endpoint,
-      );
-      this.$store.commit("setS3Download", s3downsocket);
+      await initS3(this.active.id, this.active.name, this.$store, this.$t);
     };
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
