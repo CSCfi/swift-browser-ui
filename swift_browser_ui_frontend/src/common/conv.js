@@ -1,9 +1,6 @@
-import {
-  GET,
-} from "@/common/api";
 import { DateTime } from "luxon";
 import { getDB } from "@/common/db";
-import { GetBucketPolicyCommand } from "@aws-sdk/client-s3";
+import { getBucketPolicyStatements } from "./s3commands";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -31,24 +28,10 @@ export async function deleteStaleSharedContainers (store) {
   return { project, client, acl, aclmeta };
 }
 
-async function getBucketPolicyStatements(s3client, bucket) {
-  // Get a list of bucket policy statements from S3
-  let policy = {};
-  const getBucketPolicyCommand = new GetBucketPolicyCommand({
-    Bucket: bucket,
-  });
-  const currentPolicyResp = await s3client.send(getBucketPolicyCommand);
-  if (currentPolicyResp?.Policy !== undefined) {
-    policy = JSON.parse(currentPolicyResp.Policy);
-  }
-  return policy?.Statement ?? [];
-}
-
 export async function syncBucketPolicies(store) {
   // Sync bucket policies to sharind DB according to s3 bucket policies
   const project = store.state.active.id;
   const client = store.state.client;
-  const s3client = store.state.s3client;
 
   const buckets = await getDB()
     .containers
@@ -73,7 +56,7 @@ export async function syncBucketPolicies(store) {
     const shareDetails = await client.getShareDetails(project, bucket);
     let statements = [];
     try {
-      statements = await getBucketPolicyStatements(s3client, bucket);
+      statements = await getBucketPolicyStatements(bucket);
     } catch (e) {
       if (DEV) console.log(e.message);
     }

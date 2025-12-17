@@ -65,10 +65,7 @@ import {
   removeFocusClass,
   moveFocusOutOfModal,
 } from "@/common/keyboardNavigation";
-import {
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
-import { awsListObjects } from "@/common/s3conv";
+import { awsDeleteObject, awsListObjects } from "@/common/s3commands";
 
 export default {
   name: "DeleteModal",
@@ -112,7 +109,7 @@ export default {
       if (this.modalVisible) {
         this.isDeleting = false;
         // Object listing needed for correct behaviour after deletion
-        this.bucketObjects = await awsListObjects(this.$store.state.s3client, this.container);
+        this.bucketObjects = await awsListObjects(this.container);
       }
     },
   },
@@ -167,7 +164,6 @@ export default {
             // Equivalent object from segment container needs to be deleted
             // We can filter the deleted segments objects by prefix
             let segments = await awsListObjects(
-              this.$store.state.s3client,
               segment_container.name,
               object.name,
             );
@@ -184,18 +180,10 @@ export default {
         this.$store.commit("setDeleting", true);
         try {
           for(const obj of to_remove) {
-            let deleteObjectCommand = new DeleteObjectCommand({
-              Bucket: this.container,
-              Key: obj,
-            });
-            await this.$store.state.s3client.send(deleteObjectCommand);
+            await awsDeleteObject(this.container, obj);
           }
           for(const obj of segments_to_remove) {
-            let deleteObjectCommand = new DeleteObjectCommand({
-              Bucket: segment_container.name,
-              Key: obj,
-            });
-            await this.$store.state.s3client.send(deleteObjectCommand);
+            await awsDeleteObject(segment_container.name, obj);
           }
           this.bucketObjects = this.bucketObjects.filter(item => !to_remove.includes(item.name));
         } finally {

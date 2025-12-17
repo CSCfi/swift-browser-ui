@@ -141,9 +141,6 @@ export default {
     modalVisible() {
       return this.$store.state.openCreateBucketModal;
     },
-    s3client() {
-      return this.$store.state.s3client;
-    },
   },
   watch: {
     active: function () {

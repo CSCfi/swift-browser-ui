@@ -72,12 +72,9 @@
 </template>
 
 <script>
-import {
-  removeAccessControlBucketPolicy,
-  addAccessControlBucketPolicy,
-  signedFetch,
-} from "@/common/api";
+import { signedFetch } from "@/common/api";
 import { DEV } from "@/common/conv";
+import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 
 export default {
@@ -278,25 +275,21 @@ export default {
       await removeAccessControlBucketPolicy(
         this.bucketName,
         [sharedProjectId],
-        this.$store.state.s3client,
       );
       await addAccessControlBucketPolicy(
         this.bucketName,
         this.newPerms,
         [sharedProjectId],
-        this.$store.state.s3client,
       );
       try {
         await removeAccessControlBucketPolicy(
           `${this.bucketName}_segments`,
           [sharedProjectId],
-          this.$store.state.s3client,
         );
         await addAccessControlBucketPolicy(
           `${this.bucketName}_segments`,
           this.newPerms,
           [sharedProjectId],
-          this.$store.state.s3client,
         );
       } catch {}
 
@@ -354,13 +347,11 @@ export default {
       await removeAccessControlBucketPolicy(
         this.bucketName,
         [this.projectId],
-        this.$store.state.s3client,
       );
       try {
         await removeAccessControlBucketPolicy(
           `${this.bucketName}_segments`,
           [this.projectId],
-          this.$store.state.s3client,
         );
       } catch {}
 

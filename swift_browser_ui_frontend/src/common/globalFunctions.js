@@ -1,7 +1,7 @@
 import store from "@/common/store";
 import { taginputConfirmKeys } from "@/common/conv";
 import { getDB } from "@/common/db";
-import { checkBucketExists } from "@/common/api";
+import { checkBucketExists } from "@/common/s3commands";
 
 export function toggleCreateBucketModal() {
   store.commit("toggleCreateBucketModal", true);
@@ -155,8 +155,7 @@ export async function validateBucketName(input) {
   result.alphaNumHyphen = !!input.match(/^[a-z0-9-]+$/g);
 
   if (result.lowerCaseOrNum && result.inputLength && result.alphaNumHyphen) {
-    const bucketExists = await checkBucketExists(
-      store.state.s3client, input);
+    const bucketExists = await checkBucketExists(input);
     // In undefined case allow user to attempt bucket creation
     result.ownable = !bucketExists;
   } else {
