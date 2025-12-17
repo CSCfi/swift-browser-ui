@@ -65,6 +65,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - (users) Fixed sharing permissions not being visible without scrolling (#1255)
 - (users) Fixed attempting to delete subfolders only opening a confirmation modal (#1262)
 
+### Deprecated
+
+- Purge remaining reliance on IDB objects (#1271)
+
 ## [2025.6.0] - 2025-06-17
 
 ### Fixed
