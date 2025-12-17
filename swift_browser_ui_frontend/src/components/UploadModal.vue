@@ -256,6 +256,7 @@ import {
 import CUploadButton from "@/components/CUploadButton.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 import { signedFetch } from "@/common/api";
+import { awsListObjects } from "@/common/s3conv";
 
 import { debounce, delay } from "lodash";
 import { mdiDelete } from "@mdi/js";
@@ -457,11 +458,7 @@ export default {
           .where({ projectID: this.active.id })
           .toArray();
         if (this.currentBucket) {
-          const cont = this.containers.find(c =>
-            c.name === this.currentBucket);
-          this.objects = await getDB().objects
-            .where({containerID: cont.id})
-            .toArray();
+          this.objects = await awsListObjects(this.$store.state.s3client, this.currentBucket);
         }
       }
     },

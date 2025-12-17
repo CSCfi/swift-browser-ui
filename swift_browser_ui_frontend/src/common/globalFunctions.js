@@ -226,34 +226,6 @@ export function checkIfItemIsLastOnPage(paginationOptions){
   return paginationOptions.currentPage;
 }
 
-export async function updateObjectsAndObjectTags(
-  containers,
-  projectID,
-  signal,
-  updateTags = true, // Obj tags don't need to be updated when uploading objs
-) {
-  if (containers.length > 0) {
-    for (let i = 0; i < containers.length; i++) {
-      const currentContainer = containers[i];
-
-      await store.dispatch("updateObjects", {
-        projectID,
-        owner: currentContainer.container.owner,
-        container: {
-          id: currentContainer.key,
-          ...currentContainer.container,
-        },
-        signal,
-        updateTags,
-      });
-
-      if (i === containers.length - 1) {
-        store.commit("setLoaderVisible", false);
-      }
-    }
-  }
-}
-
 export function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

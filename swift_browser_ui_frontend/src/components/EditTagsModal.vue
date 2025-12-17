@@ -1,3 +1,4 @@
+<!--NOT up-to-date: tags not in use-->
 <template>
   <c-card
     ref="editTagsContainer"
@@ -117,7 +118,7 @@ export default {
         projectID: this.projectID,
         name: this.containerName,
       });
-
+      // Objects no longer in IDB
       this.object = await getDB().objects.get({
         containerID: this.container.id,
         name: this.selectedObjectName,
@@ -183,11 +184,8 @@ export default {
         objectMeta,
       ).then(async () => {
         const currentTime = getCurrentISOtime();
-        await getDB().objects
-          .where(":id").equals(this.object.id)
-          .modify({ tags, last_modified: currentTime });
 
-        // Also update container's last_modified in IDB
+        // Update container's last_modified in IDB
         await getDB().containers
           .where({
             projectID: this.projectID,

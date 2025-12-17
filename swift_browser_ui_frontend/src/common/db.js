@@ -6,7 +6,6 @@ function initDB() {
   db.version(1).stores({
     projects: "&id, name",
     containers: "++id, &[projectID+name], *tags, *tokens",
-    objects: "++id, &[containerID+name], *tags, *tokens",
     preferences: "id",
   });
   db.preferences.count((count) => {

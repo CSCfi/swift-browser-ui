@@ -1,3 +1,4 @@
+<!--NOT up-to-date: search not in use-->
 <template>
   <div
     class="search"
@@ -163,7 +164,7 @@ export default {
 
       //get IDs of containers whose objects should be included in results
       const containerIDs = conts.map(({ id }) => id);
-
+      // Objects no longer in IDB
       const objects = await getDB().objects
         .filter(obj => obj.tokens?.find(t => t.match(re))
           || obj.tags?.find(t => t.match(re)))
@@ -173,7 +174,7 @@ export default {
         .toArray();
 
       let folders = [];
-
+      // Objects no longer in IDB
       const objForCount = await getDB().objects
         .filter(obj => containerIDs.includes(obj.containerID))
         .limit(1000)

@@ -170,9 +170,8 @@ export default class S3UploadSocket {
               );
             }
 
-            // eslint-disable-next-line
-            this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].ETag = e.data.ETag;
-            // eslint-disable-next-line
+            this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].ETag =
+            e.data.ETag;
             this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].done = true;
 
             this.checkFinishedFile(e.data.bucket, e.data.key).then(() => {
@@ -324,7 +323,7 @@ export default class S3UploadSocket {
       };
       const command = new CreateMultipartUploadCommand(input);
       const response = await this.client.send(command);
-      // eslint-disable-next-line
+
       this.uploads[nextPart.bucket][nextPart.key].multipartSession = response.UploadId;
 
       if (DEV) {
