@@ -31,7 +31,7 @@ export async function deleteStaleSharedContainers (store) {
   return { project, client, acl, aclmeta };
 }
 
-async function getBucketPolicies(s3client, bucket) {
+async function getBucketPolicyStatements(s3client, bucket) {
   // Get a list of bucket policy statements from S3
   let policy = {};
   const getBucketPolicyCommand = new GetBucketPolicyCommand({
@@ -71,7 +71,12 @@ export async function syncBucketPolicies(store) {
   for (let bucket of bucketnames) {
     // Get sharing information for bucket
     const shareDetails = await client.getShareDetails(project, bucket);
-    const bucketPolicies = await getBucketPolicies(s3client, bucket);
+    let statements = [];
+    try {
+      statements = await getBucketPolicyStatements(s3client, bucket);
+    } catch (e) {
+      if (DEV) console.log(e.message);
+    }
     // Build dict of current share recipients and their access rights (from db)
     let currentPolicies = {};
     for (let shareDetail of shareDetails) {
@@ -87,7 +92,7 @@ export async function syncBucketPolicies(store) {
     let toBeDeleted = Object.keys(currentPolicies);
 
     // compare current sharing db data with s3 bucketpolicy data, prune old data
-    for (let statement of bucketPolicies) {
+    for (let statement of statements) {
       const principal = statement.Principal.AWS;
       const shareID = principal.match(/::([0-9a-fA-F]+):root$/)[1];
       const currentPolicy = currentPolicies[shareID];
