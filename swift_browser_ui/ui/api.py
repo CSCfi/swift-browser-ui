@@ -340,7 +340,12 @@ async def aws_bulk_update_bucket_cors(
         # through the whole project
         if buckets:
             for bucket in buckets:
-                await _update_bucket_cors(logger, s3session, bucket)
+                try:
+                    await _update_bucket_cors(logger, s3session, bucket)
+                except Exception as e:
+                    request.app["Log"].error(
+                        f"Failed to bulk add CORS to bucket {bucket} for reason {e}",
+                    )
 
             return aiohttp.web.Response(status=204, body="")
 
@@ -355,7 +360,12 @@ async def aws_bulk_update_bucket_cors(
 
                 # Immediately apply new cors to the bucket
                 for aws_bucket in bucket_page["Buckets"]:
-                    await _update_bucket_cors(logger, s3session, aws_bucket["Name"])
+                    try:
+                        await _update_bucket_cors(logger, s3session, aws_bucket["Name"])
+                    except Exception as e:
+                        request.app["Log"].error(
+                            f"Failed to bulk add CORS to bucket {bucket} for reason {e}",
+                        )
 
                 # End execution if API tells us there's no more pages
                 if (
