@@ -7,6 +7,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2025.12.0] - 2025-12-18
+
 ### Changed
 
 - (users) sharing now uses S3 bucket policies, which should improve shared bucket performance
@@ -608,7 +610,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.6.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.12.0...HEAD
+[2025.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.6.0...2025.12.0
 [2025.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.1...2025.6.0
 [2025.4.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.0...2025.4.1
 [2025.4.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.2.0...2025.4.0
