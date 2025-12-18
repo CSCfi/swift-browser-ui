@@ -46,6 +46,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- catch exceptions on listing based bulk cors update requests, previously caused issues on fresh projects.
 - (users) qa downloads now work with Firefox as well
 - service worker path logic was missed in refactoring
 - header issues in nginx conf
