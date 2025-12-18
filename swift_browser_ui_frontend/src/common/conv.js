@@ -2,42 +2,14 @@ import {
   GET,
 } from "@/common/api";
 import { DateTime } from "luxon";
+import { getDB } from "@/common/db";
+import { GetBucketPolicyCommand } from "@aws-sdk/client-s3";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
     new RegExp("(?:^|; )" + "OBJ_UI_LANG" + "=([^;]*)"),
   );
   return matches ? decodeURIComponent(matches[1]) : "en";
-}
-
-
-function check_duplicate(container, share, currentdetails) {
-  for (let detail of currentdetails) {
-    if (detail.container == container && detail.sharedTo == share) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function check_acl_mismatch(acl_cur, acl_sharing) {
-  // Check if the ACLs mismatch
-  if (
-    !("read" in acl_sharing && acl_cur.access.includes("r")) ||
-    !("write" in acl_sharing && acl_cur.access.includes("w"))
-  ) {
-    return true;
-  }
-  return false;
-}
-
-function check_stale(detail, access) {
-  // Check if access detail entry has become stale
-  if (!(detail.sharedTo in access)) {
-    return true; // is stale
-  }
-  // Additionally check ACL mismatch
-  return check_acl_mismatch(detail, access[detail.sharedTo]);
 }
 
 export async function deleteStaleSharedContainers (store) {
@@ -59,88 +31,121 @@ export async function deleteStaleSharedContainers (store) {
   return { project, client, acl, aclmeta };
 }
 
-export async function syncContainerACLs(store) {
-  let amount = 0;
+async function getBucketPolicyStatements(s3client, bucket) {
+  // Get a list of bucket policy statements from S3
+  let policy = {};
+  const getBucketPolicyCommand = new GetBucketPolicyCommand({
+    Bucket: bucket,
+  });
+  const currentPolicyResp = await s3client.send(getBucketPolicyCommand);
+  if (currentPolicyResp?.Policy !== undefined) {
+    policy = JSON.parse(currentPolicyResp.Policy);
+  }
+  return policy?.Statement ?? [];
+}
 
-  const { project, acl, client, aclmeta } =
-    await deleteStaleSharedContainers(store);
+export async function syncBucketPolicies(store) {
+  // Sync bucket policies to sharind DB according to s3 bucket policies
+  const project = store.state.active.id;
+  const client = store.state.client;
+  const s3client = store.state.s3client;
+
+  const buckets = await getDB()
+    .containers
+    .where({ projectID : project })
+    .toArray();
+  const bucketnames = buckets.map(b => b.name);
 
   // Refresh current sharing information
-  let currentsharing = await client.getShare(project);
-  // Prune stale shared user access entries from the database
-  for (let container of currentsharing) {
-    let containerDetails = await client.getShareDetails(project, container);
-    for (let detail of containerDetails) {
-      if (check_stale(detail, aclmeta[container])) {
-        await client.shareDeleteAccess(project, container, [detail.sharedTo]);
-      }
+  let currentSharingDB = await client.getShare(project);
+  // Prune any entries outside of current up-to-date bucket list
+  for (let container of currentSharingDB) {
+    if (!bucketnames.includes(container)) {
+      const shareDetails = await client.getShareDetails(project, container);
+      const shares = shareDetails.map(item => item.sharedTo);
+      await client.shareDeleteAccess(project, container, shares);
     }
   }
 
-  // Refresh current sharing information
-  currentsharing = await client.getShare(project);
-  // Sync potential new shares into the sharing database
-  for (let container of Object.keys(aclmeta)) {
-    let currentdetails = [];
-    if (currentsharing.includes(container)) {
-      currentdetails = await client.getShareDetails(project, container);
+  // Check bucket policies and sync sharing db
+  for (let bucket of bucketnames) {
+    // Get sharing information for bucket
+    const shareDetails = await client.getShareDetails(project, bucket);
+    let statements = [];
+    try {
+      statements = await getBucketPolicyStatements(s3client, bucket);
+    } catch (e) {
+      if (DEV) console.log(e.message);
     }
-    for (let share of Object.keys(aclmeta[container])) {
-      if (check_duplicate(container, share, currentdetails)) {
+    // Build dict of current share recipients and their access rights (from db)
+    let currentPolicies = {};
+    for (let shareDetail of shareDetails) {
+      const shareRecipient = shareDetail.sharedTo;
+      const sharePolicy = {
+        read: shareDetail.access.includes("r"),
+        write: shareDetail.access.includes("w"),
+      };
+      currentPolicies[shareRecipient] = sharePolicy;
+    }
+
+    // Keep track of unused shares
+    let toBeDeleted = Object.keys(currentPolicies);
+
+    // compare current sharing db data with s3 bucketpolicy data, prune old data
+    for (let statement of statements) {
+      const principal = statement.Principal.AWS;
+      if (principal === undefined) {
         continue;
       }
-      let accesslist = [];
-      if (aclmeta[container][share].read) {
-        // Check if the shared access only concerns view rights
-        let tmpid = await client.projectCheckIDs(share);
-        let whitelisted = false;
+      const shareID = principal.match(/::([0-9a-fA-F]+):root$/)[1];
+      const currentPolicy = currentPolicies[shareID];
+      const bucketPolicy = {
+        read: statement.Action.includes("s3:GetObject"),
+        write: statement.Action.includes("s3:PutObject"),
+      };
 
-        if (tmpid !== undefined) {
-          let whitelistUrl = new URL(store.state.uploadEndpoint.concat(
-            `/check/${store.state.active.name}/${container}/${tmpid.name}`,
-          ));
-          let signatureUrl = new URL("/sign/3600", document.location.origin);
-          signatureUrl.searchParams.append(
-            "path",
-            `/check/${store.state.active.name}/${container}/${tmpid.name}`,
-          );
-          let signed = await GET(signatureUrl);
-          signed = await signed.json();
-          whitelistUrl.searchParams.append("valid", signed.valid);
-          whitelistUrl.searchParams.append("signature", signed.signature);
+      toBeDeleted = toBeDeleted.filter(item => item !== shareID);
 
-          let whitelistedResp = await fetch(
-            whitelistUrl,
-            {
-              method: "GET",
-            },
-          );
-
-          if (whitelistedResp.status == 200) {
-            whitelisted = true;
-          }
-        }
-
-        if (whitelisted) {
-          accesslist.push("r");
-        } else {
-          accesslist.push("v");
-        }
+      if (
+        bucketPolicy.read == currentPolicy?.read &&
+        bucketPolicy.write == currentPolicy?.write
+      ) {
+        // Policies match, no action needed
+        continue;
       }
-      if (aclmeta[container][share].write) {
+
+      let accesslist = [];
+      if (bucketPolicy.read) {
+        accesslist.push("r");
+      }
+      if (bucketPolicy.write) {
         accesslist.push("w");
       }
-      await client.shareNewAccess(
-        project,
-        container,
-        [share],
-        accesslist,
-        acl.address,
-      );
-      amount++;
+
+      if (currentPolicies?.shareID) {
+        // Existing shares need to be edited
+        await client.shareEditAccess(
+          project,
+          bucket,
+          [shareID],
+          accesslist,
+          "none",
+        );
+      } else {
+        await client.shareNewAccess(
+          project,
+          bucket,
+          [shareID],
+          accesslist,
+          "none",
+        );
+      }
+    }
+    // delete unusued shares
+    if (toBeDeleted.length !== 0) {
+      await client.shareDeleteAccess(project, bucket, toBeDeleted);
     }
   }
-  return amount;
 }
 
 export function getHumanReadableSize(val, locale) {

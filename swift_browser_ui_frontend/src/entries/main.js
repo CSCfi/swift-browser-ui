@@ -33,7 +33,7 @@ import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { DEV } from "@/common/conv";
+import { syncBucketPolicies, DEV } from "@/common/conv";
 import checkIDB from "@/common/idb_support";
 
 // Import project state
@@ -363,7 +363,7 @@ const app = createApp({
     initialize().then(() => {
       if(DEV) console.log("Initialized successfully.");
     });
-    // setTimeout(this.containerSyncWrapper, 10000);
+    setTimeout(this.containerSyncWrapper, 10000);
   },
   mounted() {
     document
@@ -371,9 +371,9 @@ const app = createApp({
       .addEventListener("keydown", this.onKeydown);
   },
   methods: {
-    // containerSyncWrapper: function () {
-    //   syncContainerACLs(this.$store);
-    // },
+    containerSyncWrapper: function () {
+      syncBucketPolicies(this.$store);
+    },
     cancelUpload: function(bucket) {
       this.s3upload.cancelUpload(bucket);
     },
