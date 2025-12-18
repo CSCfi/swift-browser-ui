@@ -94,6 +94,9 @@ export async function syncBucketPolicies(store) {
     // compare current sharing db data with s3 bucketpolicy data, prune old data
     for (let statement of statements) {
       const principal = statement.Principal.AWS;
+      if (principal === undefined) {
+        continue;
+      }
       const shareID = principal.match(/::([0-9a-fA-F]+):root$/)[1];
       const currentPolicy = currentPolicies[shareID];
       const bucketPolicy = {
