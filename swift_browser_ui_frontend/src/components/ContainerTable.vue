@@ -303,7 +303,7 @@ export default {
                         path: mdiTrayArrowDown,
                         disabled: (
                           item.owner && item.accessRights?.length === 0
-                        ) || !bucketMetadata.bytes,
+                        ) || !bucketMetadata.count,
                       },
                     },
                   },
