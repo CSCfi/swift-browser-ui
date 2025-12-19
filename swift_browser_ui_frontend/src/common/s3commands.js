@@ -9,6 +9,7 @@ import {
   DeleteObjectCommand,
   GetBucketPolicyCommand,
   HeadBucketCommand,
+  HeadObjectCommand,
   ListObjectsV2Command,
   PutBucketPolicyCommand,
 } from "@aws-sdk/client-s3";
@@ -115,6 +116,15 @@ export async function getBucketMetadata(bucket, creationDate) {
 
 export async function awsDeleteObject(bucket, object) {
   const command = new DeleteObjectCommand({
+    Bucket: bucket,
+    Key: object,
+  });
+  const response = await sendS3Command(command);
+  return response;
+}
+
+export async function awsHeadObject(bucket, object) {
+  const command = new HeadObjectCommand({
     Bucket: bucket,
     Key: object,
   });

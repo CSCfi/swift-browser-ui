@@ -22,7 +22,7 @@ import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
-import { DEV } from "./conv";
+import { DEV, ensureObjectSizes } from "./conv";
 import { awsListObjects } from "./s3commands";
 
 // Use 50 MiB as download slice size
@@ -260,6 +260,10 @@ export default class S3DownloadSocket {
         item => fileList.includes(item.name),
       );
     }
+
+    // Swift objects don't have a size on S3 side before retrieval
+    // Run function to check legacy object sizes for listing
+    bucketFiles = await ensureObjectSizes(bucket, bucketFiles);
 
     let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
