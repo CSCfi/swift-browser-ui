@@ -83,8 +83,7 @@ import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 //import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
-import { toRaw } from "vue";
-import { awsListObjects } from "@/common/s3conv";
+import { awsListObjects } from "@/common/s3commands";
 
 export default {
   name: "CopyBucketModal",
@@ -251,7 +250,6 @@ export default {
         this.checkpointsCompleted = 0;
 
         let objects = await awsListObjects(
-          this.$store.state.s3client,
           this.selectedBucketName,
         );
         const sleep =
@@ -262,10 +260,7 @@ export default {
           copiedObjects === undefined
           || copiedObjects.length < objects.length
         ) {
-          copiedObjects = await awsListObjects(
-            this.$store.state.s3client,
-            this.bucketName,
-          );
+          copiedObjects = await awsListObjects(this.bucketName);
           await sleep(2000);
         }
 

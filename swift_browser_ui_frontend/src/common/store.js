@@ -279,14 +279,9 @@ const store = createStore({
   },
   actions: {
     updateContainers: async function (
-      { state },
+      {},
       { projectID, signal },
     ) {
-      while (state.s3client === undefined) {
-        await new Promise(r => setTimeout(r, 25));
-        if (DEV) console.log("Waiting for s3 client to initialize.");
-      }
-
       const existingContainers = await getDB()
         .containers.where({ projectID })
         .toArray();

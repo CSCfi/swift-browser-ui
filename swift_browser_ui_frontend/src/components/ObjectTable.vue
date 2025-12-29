@@ -141,7 +141,7 @@ import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 import { DEV } from "@/common/conv";
-import { awsListObjects } from "@/common/s3conv";
+import { awsListObjects } from "@/common/s3commands";
 
 export default {
   name: "ObjectTable",
@@ -405,17 +405,7 @@ export default {
         }
       }
 
-      // Delay checking objects if the s3 client is not yet ready
-      if (this.$store.state.s3client === undefined) {
-        if (DEV) {
-          console.log("Waiting for the s3 client to be configured.");
-        }
-        setTimeout(this.updateObjects, 250);
-        return;
-      }
-
       this.oList = await awsListObjects(
-        this.$store.state.s3client,
         this.containerName,
       );
     },

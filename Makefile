@@ -24,12 +24,12 @@ dev-chromium: dev-ca
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox
 
 dev-ca:
-	mkdir -p $(PWD)/.devres/ca
-	mkdir -p $(PWD)/.devres/ssh
-	if [[ -z $$(ls $(PWD)/.devres/ca) ]]; then \
-		$(PWD)/scripts/gen_ca.sh; \
+	mkdir -p $(CURDIR)/.devres/ca
+	mkdir -p $(CURDIR)/.devres/ssh
+	if [[ -z $$(ls $(CURDIR)/.devres/ca) ]]; then \
+		$(CURDIR)/scripts/gen_ca.sh; \
 	fi
-	if [[ -z $$(ls $(PWD)/.devres/ssh) ]]; then \
+	if [[ -z $$(ls $(CURDIR)/.devres/ssh) ]]; then \
 		ssh-keygen -t ed25519 -f .devres/ssh/ff-dev -q -N ""; \
 		ssh-keygen -t ed25519 -f .devres/ssh/chrome-dev -q -N ""; \
 	fi
@@ -63,7 +63,7 @@ ceph-attach:
 	$(MAKE) -C submodules/local-single-host-ceph attach-vm
 
 ceph-install-ssl:
-	SD_CONNECT_REPO_LOCATION="$(PWD)" $(MAKE) -C submodules/local-single-host-ceph install-ssl
+	SD_CONNECT_REPO_LOCATION="$(CURDIR)" $(MAKE) -C submodules/local-single-host-ceph install-ssl
 
 clean:
 	make dev-ca-clean

@@ -32,20 +32,14 @@ Parts cache schema:
 }
 */
 
+import { timeout } from "./globalFunctions";
+import { signedFetch, awsCreateBucket, awsAddBucketCors } from "./api";
 import {
-  CreateMultipartUploadCommand,
-  CompleteMultipartUploadCommand,
-  AbortMultipartUploadCommand,
-  HeadBucketCommand,
-} from "@aws-sdk/client-s3";
-import {
-  timeout,
-} from "./globalFunctions";
-import {
-  signedFetch,
-  awsCreateBucket,
-  awsAddBucketCors,
-} from "./api";
+  checkBucketAccessible,
+  awsCreateMultipartUpload,
+  awsCompleteMultipartUpload,
+  awsAbortMultipartUpload,
+} from "./s3commands";
 import { DEV } from "./conv";
 
 const MAX_UPLOAD_WORKERS = 8;
@@ -57,7 +51,6 @@ export default class S3UploadSocket {
     project = "", // project name
     store, // shared vuex store
     t, // i18n bindings
-    client, // s3 client
     s3access,
     s3secret,
     s3endpoint,
@@ -66,7 +59,6 @@ export default class S3UploadSocket {
     this.project = project;
     this.$store = store;
     this.$t = t;
-    this.client = client;
     this.s3access = s3access;
     this.s3secret = s3secret;
     this.s3endpoint = s3endpoint;
@@ -266,27 +258,21 @@ export default class S3UploadSocket {
       this.uploads[bucket][key].finished = true;
 
       let parts = [];
-      for (
-        const entry of Object.entries(this.uploads[bucket][key].multipartParts)
-      ) {
+      for (const entry of Object.entries(
+        this.uploads[bucket][key].multipartParts,
+      )) {
         parts.push({
           PartNumber: Number(entry[0]),
           ETag: entry[1].ETag.replaceAll("\"", ""),
         });
       }
 
-      console.log(parts);
-
-      const input = {
-        Bucket: bucket,
-        Key: key.concat(".c4gh"),
-        MultipartUpload: {
-          Parts: parts,
-        },
-        UploadId: this.uploads[bucket][key].multipartSession,
-      };
-      const command = new CompleteMultipartUploadCommand(input);
-      const response = await this.client.send(command);
+      const response = await awsCompleteMultipartUpload(
+        bucket,
+        key.concat(".c4gh"),
+        parts,
+        this.uploads[bucket][key].multipartSession,
+      );
       if (DEV) {
         console.log(`Got following response when completing multipart upload ${this.uploads[bucket][key]}: ${response}`);
       }
@@ -316,13 +302,11 @@ export default class S3UploadSocket {
     ) {
       this.uploads[nextPart.bucket][nextPart.key].multipartKeyPending = true;
 
-      const input = {
-        ACL: "bucket-owner-full-control",
-        Bucket: nextPart.bucket,
-        Key: nextPart.key.concat(".c4gh"),
-      };
-      const command = new CreateMultipartUploadCommand(input);
-      const response = await this.client.send(command);
+      const response = await awsCreateMultipartUpload(
+        nextPart.bucket,
+        nextPart.key.concat(".c4gh"),
+        "bucket-owner-full-control",
+      );
 
       this.uploads[nextPart.bucket][nextPart.key].multipartSession = response.UploadId;
 
@@ -425,13 +409,8 @@ export default class S3UploadSocket {
     // upload – no need to check existence or initialization.
     if (this.uploads[bucket] === undefined) {
       // Check that the bucket exists and can be accessed
-      let bucketAccessCmd = new HeadBucketCommand({
-        Bucket: bucket,
-      });
-
-      try {
-        await this.client.send(bucketAccessCmd);
-      } catch (e) {
+      const accessible = await checkBucketAccessible(bucket);
+      if (!accessible) {
         // If there's no metadata, we're likely running into a CORS
         // error. It may mean that the bucket doesn't exist, or that
         // the bucket CORS doesn't exist. Let's try implicitly creating
@@ -527,13 +506,11 @@ export default class S3UploadSocket {
       // Mark the object as finished to stop uploading
       this.uploads[bucket][key].finished = true;
       // Cancel the multipart process
-      const input = {
-        Bucket: bucket,
-        UploadId: this.uploads[bucket][key].multipartSession,
-        Key: key.concat(".c4gh"),
-      };
-      let abortMultipart = new AbortMultipartUploadCommand(input);
-      await this.client.send(abortMultipart).catch(err => {
+      await awsAbortMultipartUpload(
+        bucket,
+        key.concat(".c4gh"),
+        this.uploads[bucket][key].multipartSession,
+      ).catch((err) => {
         if (DEV) {
           console.log("Failed to abort multipart on cancel.");
           console.log(err);

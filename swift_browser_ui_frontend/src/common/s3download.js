@@ -23,7 +23,7 @@ import {
   signedFetch,
 } from "./api";
 import { DEV } from "./conv";
-import { awsListObjects } from "./s3conv";
+import { awsListObjects } from "./s3commands";
 
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
@@ -34,7 +34,6 @@ export default class S3DownloadSocket {
     project = "", // project name
     store, // shared vuex store
     t, // i18n bindings
-    client, // s3 client
     s3access,
     s3secret,
     s3endpoint,
@@ -43,7 +42,6 @@ export default class S3DownloadSocket {
     this.project = project;
     this.$store = store;
     this.$t = t;
-    this.client = client;
     this.s3access = s3access;
     this.s3secret = s3secret;
     this.s3endpoint = s3endpoint;
@@ -248,7 +246,7 @@ export default class S3DownloadSocket {
     let headers = {};
 
     // Retrieve the bucket objects
-    let bucketFiles = await awsListObjects(this.client, bucket);
+    let bucketFiles = await awsListObjects(bucket);
     if (bucketFiles.length == 0) {
       if (DEV) {
         console.log(`No objects for bucket ${bucket}, aborting`);

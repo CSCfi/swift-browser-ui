@@ -51,10 +51,11 @@ import {
 } from "@/common/keyboardNavigation";
 import { toRaw } from "vue";
 import {
-  DeleteBucketCommand,
-  DeleteObjectCommand,
-} from "@aws-sdk/client-s3";
-import { awsListObjects, getBucketMetadata } from "@/common/s3conv";
+  awsDeleteBucket,
+  awsDeleteObject,
+  awsListObjects,
+  getBucketMetadata,
+} from "@/common/s3commands";
 
 export default {
   name: "ContainerTable",
@@ -92,9 +93,6 @@ export default {
     };
   },
   computed: {
-    s3client() {
-      return this.$store.state.s3client;
-    },
     locale () {
       return this.$i18n.locale;
     },
@@ -200,11 +198,8 @@ export default {
             item,
           ) => {
             let bucketMetadata = await getBucketMetadata(
-              this.$store.state.s3client,
-              {
-                Name: item.name,
-                CreationDate: new Date(item.last_modified),
-              },
+              item.name,
+              new Date(item.last_modified),
             );
 
             containersPage.push({
@@ -486,29 +481,17 @@ export default {
         addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
       }
       else { // Delete empty bucket without confirmation
-        const deleteBucketCommand = new DeleteBucketCommand({
-          Bucket: bucket,
-        });
-        this.s3client.send(
-          deleteBucketCommand,
-        ).then(async() => {
+        awsDeleteBucket(bucket).then(async() => {
           // In case the bucket has a legacy segments bucket still in
           // existence we should take care of that as well
           const segmentsBucket = `${bucket}_segments`;
           let segmentsBucketExists = false;
 
           // List and delete all segment objects matching the deleted bucket.
-          const segmentListResp = await awsListObjects(
-            this.$store.state.client,
-            segmentsBucket,
-          );
+          const segmentListResp = await awsListObjects(segmentsBucket);
           for (const key of segmentListResp) {
             try {
-              const objectDeleteCommand = new DeleteObjectCommand({
-                Bucket: segmentsBucket,
-                Key: key.name,
-              });
-              await this.s3client.send(objectDeleteCommand);
+              await awsDeleteObject(segmentsBucket, key.name);
             } catch (e) {
               if (DEV) {
                 console.log(
@@ -521,10 +504,7 @@ export default {
 
           // Finally delete the segments bucket
           if (segmentsBucketExists) {
-            const deleteSegmentsBucketCommand = new DeleteBucketCommand({
-              Bucket: segmentsBucket,
-            });
-            await this.s3client.send(deleteSegmentsBucketCommand);
+            await awsDeleteBucket(segmentsBucket);
           }
 
           document.querySelector("#container-toasts").addToast(

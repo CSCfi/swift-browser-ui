@@ -169,11 +169,7 @@
 </template>
 
 <script>
-import {
-  addAccessControlBucketPolicy,
-  signedFetch,
-} from "@/common/api";
-
+import { signedFetch } from "@/common/api";
 import {
   addNewTag,
   deleteTag,
@@ -183,6 +179,7 @@ import {
   removeFocusClass,
   moveFocusOutOfModal,
 } from "@/common/keyboardNavigation";
+import { addAccessControlBucketPolicy } from "@/common/s3commands";
 import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose, mdiInformationOutline } from "@mdi/js";
@@ -438,14 +435,12 @@ export default {
         bucket,
         rights,
         this.tags,
-        this.$store.state.s3client,
       );
       try {
         await addAccessControlBucketPolicy(
           `${bucket}_segments`,
           rights,
           this.tags,
-          this.$store.state.s3client,
         );
       } catch {}
 
