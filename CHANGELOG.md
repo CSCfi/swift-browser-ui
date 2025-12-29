@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Reorganized s3client initialization and wrapped frontend s3 commands (#1273)
+
 ## [2025.12.0] - 2025-12-18
 
 ### Changed
