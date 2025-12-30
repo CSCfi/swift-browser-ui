@@ -461,7 +461,7 @@ async def _get_ec2_credentials(session, client, project) -> dict:
             "tenant_id": project,
         },
     ) as ret:
-        session["projects"][project]["ec"] = (await ret.json())["credential"]
+        session["projects"][project]["ec2"] = (await ret.json())["credential"]
         session.changed()
         return session["projects"][project]["ec2"]
 
