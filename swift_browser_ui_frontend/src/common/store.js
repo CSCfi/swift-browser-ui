@@ -72,11 +72,6 @@ const store = createStore({
     prevActiveEl: null,
     newBucket: "",
     sharingUpdated: false,
-    submitConfig: {
-      sd_submit_user: "",
-      sd_submit_id: "",
-      sd_submit_endpoint: "",
-    },
     s3endpoint: "",
     s3client: undefined,
     s3upload: undefined,
@@ -260,9 +255,6 @@ const store = createStore({
     },
     setSharingUpdated(state, payload) {
       state.sharingUpdated = payload;
-    },
-    setSubmitConfig(state, payload) {
-      state.submitConfig = payload;
     },
     setS3Endpoint(state, payload) {
       state.s3endpoint = payload;
