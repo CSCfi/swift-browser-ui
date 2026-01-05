@@ -188,17 +188,8 @@ export default defineConfig(({ command, mode }) => {
         "@": root,
       },
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: `
-            @import "./src/css/prod.scss";
-          `,
-        },
-      },
-    },
     define: {
       "global": {},
-    }
+    },
   };
 });

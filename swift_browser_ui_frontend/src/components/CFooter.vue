@@ -65,14 +65,14 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 footer{
   padding: 40px 60px;
 }
 
 footer, footer > * div {
-  background-color: $csc-lightest-grey !important;
+  background-color: var(--csc-footer-grey);
 }
 
 .footer{
@@ -111,7 +111,7 @@ footer, footer > * div {
   font-weight: 600;
   font-size: 16px;
   line-height: 19px;
-  color: $csc-dark;
+  color: var(--csc-dark);
 }
 
 .smalltext{
@@ -119,15 +119,15 @@ footer, footer > * div {
   font-weight: 400;
   font-size: 14px;
   line-height: 18px;
-  color: $csc-grey;
+  color: var(--csc-grey);
 }
 
 .footer-start .smalltext a {
-  color: $csc-dark;
+  color: var(--csc-dark);
 }
 
 .linktext {
-  color: $csc-grey;
+  color: var(--csc-grey);
   font-weight: 400;
 }
 

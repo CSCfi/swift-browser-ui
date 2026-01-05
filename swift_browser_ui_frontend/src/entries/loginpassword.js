@@ -13,7 +13,7 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 
 
 // Import project css
-import "@/css/prod.scss";
+import "@/assets/main.css";
 
 applyPolyfills().then(() => {
   defineCustomElements();

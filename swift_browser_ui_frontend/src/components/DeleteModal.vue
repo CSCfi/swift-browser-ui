@@ -301,14 +301,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-
-@import "@/css/prod.scss";
-
-.mdi-alert-circle {
-  font-size: 2.0em;
-  color: $csc-red;
-}
+<style scoped>
 
 .delete-modal {
   padding: 0px;

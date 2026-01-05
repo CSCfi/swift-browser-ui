@@ -106,15 +106,15 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 ::v-deep(h3) {
-  color: $csc-dark;
+  color: var(--csc-dark);
   font-weight: 600;
 }
 
 ::v-deep(.link-underline) {
   text-decoration: underline;
-  color: $csc-blue;
+  color: var(--csc-blue);
 }
 
 ::v-deep(i) {

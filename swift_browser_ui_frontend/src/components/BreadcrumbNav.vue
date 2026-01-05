@@ -74,10 +74,10 @@ export default {
 
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 i, p {
-  color: $csc-primary;
+  color: var(--csc-primary);
 }
 
 .breadcrumb {
@@ -86,7 +86,7 @@ i, p {
 
 .breadcrumb a {
   align-items: center;
-  color: $csc-primary;
+  color: var(--csc-primary);
   display: flex;
   justify-content: center;
   padding: 0;

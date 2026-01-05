@@ -53,9 +53,6 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
-      sass:
-        specifier: ^1.77.8
-        version: 1.87.0
       spark-md5:
         specifier: ^3.0.2
         version: 3.0.2
@@ -6343,6 +6340,7 @@ snapshots:
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
+    optional: true
 
   chrome-trace-event@1.0.4: {}
 
@@ -7190,7 +7188,8 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  immutable@5.1.1: {}
+  immutable@5.1.1:
+    optional: true
 
   import-fresh@3.3.1:
     dependencies:
@@ -8200,7 +8199,8 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  readdirp@4.1.2: {}
+  readdirp@4.1.2:
+    optional: true
 
   rechoir@0.8.0:
     dependencies:
@@ -8298,6 +8298,7 @@ snapshots:
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.5.1
+    optional: true
 
   schema-utils@4.3.0:
     dependencies:

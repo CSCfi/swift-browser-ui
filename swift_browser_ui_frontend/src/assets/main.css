@@ -1,0 +1,74 @@
+@charset "utf-8";
+@import "csc-ui/dist/styles/variables.css";
+
+/* CSS file for integrating CSC brand colors */
+
+:root {
+  --csc-blue: #025b96;
+  --csc-dark: #2E3438;
+  --csc-grey: #595959;
+  --csc-info: #025b97;
+  --csc-primary-light: #c2dbdf;
+  --csc-primary-lighter: #d8e8ea;
+  --body-font-size: 16px;
+  --csc-footer-grey: #dfe1e3;
+}
+
+* {
+  font-family: var(--csc-font-family);
+}
+
+.hl-1 {
+  margin: 0 0.08rem;
+  background-color: #006778 !important;
+  color: #f5f5f5 !important;
+}
+
+a {
+  color: var(--csc-link);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--csc-link);
+}
+
+.pr-3 {
+  padding-right: 0.75rem !important;
+}
+
+.pr-4 {
+  padding-right: 1rem !important;
+}
+
+.has-text-weight-semibold {
+  font-weight: 600 !important;
+}
+
+html {
+  background-color: white;
+  font-size: var(--body-font-size);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  min-width: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-rendering: optimizeLegibility;
+  text-size-adjust: 100%;
+}
+
+article,
+footer {
+  display: block;
+}
+
+.content ul {
+  list-style: disc outside;
+  margin-left: 2em;
+  margin-top: 1em;
+}
+
+.content p {
+  margin-bottom: 1em;
+}

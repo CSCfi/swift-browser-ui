@@ -392,7 +392,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 h3 {
   margin-top: 1rem;

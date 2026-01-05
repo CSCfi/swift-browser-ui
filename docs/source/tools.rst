@@ -22,8 +22,7 @@ following libraries are used in writing the frontend:
 * `Vue.js for site functionality and DOM manipulation <https://vuejs.org/>`_
 * `Vue router for site routing support <https://router.vuejs.org/>`_
 * `Vue i18n for language support <https://router.vuejs.org/>`_
-* `Buefy for site styling and components <https://buefy.org/>`_
-* `Buefy also comes with bulma for css framework <https://bulma.io/>`_
+* `csc-ui for site styling and components <https://design-system.csc.fi/>`_
 * `Lodash for mostly debouncing functions to improve responsivity <https://lodash.com/>`_
 
 Tests

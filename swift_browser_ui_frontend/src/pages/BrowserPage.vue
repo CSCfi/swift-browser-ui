@@ -125,7 +125,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style>
 
 html, body {
   height: 100vh;
@@ -206,7 +206,7 @@ c-modal {
 
 .menu-active,
 .menu-icon {
-  color: $csc-primary;
+  color: var(--csc-primary);
 }
 
 .menu-icon {
@@ -214,7 +214,7 @@ c-modal {
 }
 
 .menu-active, .menu-icon {
-  color: $csc-primary;
+  color: var(--csc-primary);
 }
 
 .hero-body #login-center{

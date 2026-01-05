@@ -93,7 +93,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 c-alert {
   margin: 1rem 5%;
 }

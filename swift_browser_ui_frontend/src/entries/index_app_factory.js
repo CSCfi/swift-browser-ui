@@ -10,7 +10,7 @@ import { vControl } from "@/common/csc-ui-vue-directive";
 import CFooter from "@/components/CFooter.vue";
 import MainToolbar from "@/components/MainToolbar.vue";
 
-import "@/css/prod.scss";
+import "@/assets/main.css";
 
 applyPolyfills().then(() => {
   defineCustomElements();

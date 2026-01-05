@@ -39,7 +39,7 @@ import checkIDB from "@/common/idb_support";
 import store from "@/common/store";
 
 // Import project css
-import "@/css/prod.scss";
+import "@/assets/main.css";
 
 // Upload and direct download notification handler
 import ProgressNotification from "@/components/ProgressNotification.vue";

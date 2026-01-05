@@ -57,9 +57,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-
-@import "@/css/prod.scss";
+<style scoped>
 
 .confirm-route-modal {
   padding: 0px;
