@@ -37,6 +37,21 @@ export async function getAccessDetails (
     : [];
 }
 
+export async function deleteStaleShares(project, bucket) {
+  // Delete share entries of a deleted bucket in DB
+  const client = store.state.client;
+
+  async function deleteShareEntries(bucketName) {
+    const shareDetails = await client.getShareDetails(project, bucketName);
+    const shares = shareDetails.map(item => item.sharedTo);
+    if (shares.length) await client.shareDeleteAccess(project, bucketName, shares);
+  }
+
+  await deleteShareEntries(bucket);
+  // Delete corresponding _segments shares
+  await deleteShareEntries(`${bucket}_segments`);
+}
+
 export async function syncBucketPolicies(project) {
   // Sync bucket policies to sharing DB according to s3 bucket policies
   const client = store.state.client;

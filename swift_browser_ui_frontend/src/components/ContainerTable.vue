@@ -42,6 +42,7 @@ import {
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
+  deleteStaleShares,
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
@@ -520,7 +521,7 @@ export default {
             this.$route.params.project,
             bucket,
           );
-          //if (sharedDetails.length) // TODO
+          if (sharedDetails.length) await deleteStaleShares(this.active.id, bucket);
         });
       }
       this.paginationOptions.currentPage =
