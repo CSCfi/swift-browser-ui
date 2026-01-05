@@ -87,7 +87,8 @@
 </template>
 
 <script>
-import { getHumanReadableSize, tokenizerRE } from "@/common/conv";
+import { getHumanReadableSize } from "@/common/tableFunctions";
+import { tokenizerRE } from "@/common/globalFunctions";
 
 export default {
   name: "SearchResultItem",

@@ -16,13 +16,14 @@ and consumed.
 */
 
 import {
+  DEV,
+  ensureObjectSizes,
   timeout,
 } from "./globalFunctions";
 import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
-import { DEV, ensureObjectSizes } from "./conv";
 import { awsListObjects } from "./s3commands";
 
 // Use 50 MiB as download slice size

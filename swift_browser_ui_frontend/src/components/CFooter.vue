@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { DEV } from "@/common/conv";
+import { DEV } from "@/common/globalFunctions";
 
 export default {
   name:"CFooter",

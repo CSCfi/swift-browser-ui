@@ -48,14 +48,13 @@
 
 <script>
 import { liveQuery } from "dexie";
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
+import { updateContainers } from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
 import { throttle } from "lodash";
 import { mdiPlus } from "@mdi/js";
-import {
-  getSharingContainers,
-  toggleCreateBucketModal,
-} from "@/common/globalFunctions";
+import { toggleCreateBucketModal } from "@/common/globalFunctions";
+import { getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
@@ -273,11 +272,7 @@ export default {
         ),
       );
 
-      await this.$store.dispatch("updateContainers", {
-        projectID: this.active.id,
-        signal: this.abortController.signal,
-      });
-
+      await updateContainers(this.active.id, this.abortController.signal);
       this.contsLoading = false;
     },
     removeContainer: async function(container) {

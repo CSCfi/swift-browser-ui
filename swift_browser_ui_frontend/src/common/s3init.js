@@ -2,7 +2,7 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { GET } from "./api";
-import { DEV } from "./conv";
+import { DEV } from "./globalFunctions";
 import S3UploadSocket from "./s3upload";
 import S3DownloadSocket from "./s3download";
 

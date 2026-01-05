@@ -1,6 +1,6 @@
 // API fetch functions.
 
-import { DEV } from "@/common/conv";
+import { DEV } from "@/common/globalFunctions";
 
 async function fetchWithCookie({method, url, body, signal}) {
   return fetch(url, {

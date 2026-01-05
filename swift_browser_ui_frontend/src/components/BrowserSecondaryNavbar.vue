@@ -98,10 +98,8 @@
 </template>
 
 <script>
-import {
-  addErrorToastOnMain,
-  getAccessDetails,
-} from "@/common/globalFunctions";
+import { addErrorToastOnMain } from "@/common/globalFunctions";
+import { getAccessDetails } from "@/common/share";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import {
   mdiInformationOutline,

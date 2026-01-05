@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
 import { isFile } from "@/common/globalFunctions";
 import {
   getFocusableElements,

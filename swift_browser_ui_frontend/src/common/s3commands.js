@@ -16,7 +16,7 @@ import {
 import { i18n } from "./i18n";
 import { initS3 } from "./s3init";
 import store from "./store";
-import { DEV } from "./conv";
+import { DEV } from "./globalFunctions";
 
 async function sendS3Command(command) {
   // Wrapper for S3 commands

@@ -73,7 +73,7 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { DEV } from "@/common/conv";
+import { DEV } from "@/common/globalFunctions";
 import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 

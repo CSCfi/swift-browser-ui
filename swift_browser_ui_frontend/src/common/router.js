@@ -2,8 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import BucketsView from "@/views/Buckets.vue";
 import ObjectsView from "@/views/Objects.vue";
 import SharedObjects from "@/views/SharedObjects.vue";
-import {getProjects} from "@/common/api.js";
-import { getDB } from "@/common/db";
+import { getProjects } from "@/common/api.js";
+import { getDB } from "@/common/idb";
+import { updateContainers } from "./idbFunctions";
 import store from "@/common/store";
 
 async function checkProject (to, from, next){
@@ -38,7 +39,7 @@ async function checkContainer (to, from, next){
       .containers.where({projectID: to.params.project} )
       .toArray();
     if(buckets.length === 0) {
-      await store.dispatch("updateContainers", to.params.project);
+      await updateContainers(to.params.project);
       buckets = await getDB()
         .containers.where({projectID: to.params.project} )
         .toArray();
