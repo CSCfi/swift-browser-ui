@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { getDB } from "@/common/db";
-import { getBucketPolicyStatements } from "./s3commands";
+import { getBucketPolicyStatements, awsHeadObject } from "./s3commands";
 
 export default function getLangCookie() {
   let matches = document.cookie.match(
@@ -401,4 +401,23 @@ export function sortContainer(containers) {
       return 1;
     }
   });
+}
+
+
+// Ensure that the objects that are marked as empty actually are
+// This is required for v2 object compatibility
+export async function ensureObjectSizes(
+  bucket,
+  objects,
+) {
+  return await Promise.all(objects.map(async(object) => {
+    // If the object size is 0, try correcting the object size by forcing
+    // content parsing in s3 storage
+    if (object.bytes == 0) {
+      const objectMetadata = await awsHeadObject(bucket, object.name);
+      object.bytes = objectMetadata.ContentLength;
+    }
+    // Otherwise just return the object as is
+    return object;
+  }));
 }
