@@ -291,7 +291,7 @@ async function sliceFile(output, id, path) {
     const resp = await s3client.send(command);
     const body = await resp.Body.transformToByteArray();
 
-    for(let i = 0; i + 65564 < lastSegment; i += 65564) {
+    for(let i = 0; i + 65564 <= lastSegment; i += 65564) {
       totalBytes += await sliceChunk(output, id, path, body, i);
     }
 
