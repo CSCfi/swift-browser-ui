@@ -11,6 +11,13 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - Reorganized s3client initialization and wrapped frontend s3 commands (#1273)
 
+### Fixed
+
+- (users) v2 buckets can now be downloaded if they contain objects, even if the size shows up as zero
+- (users) v2 object downloads now work in v3 UI unless bucket names break even lax s3 naming conventions (like contain spaces for example)
+- retrieve file sizes for old object downloads with `HeadObject` so the slicer uses correct length for retrieval
+- don't block downloads if file size is 0, instead allow based on object count
+
 ## [2025.12.0] - 2025-12-18
 
 ### Changed
