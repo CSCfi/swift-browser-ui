@@ -291,7 +291,7 @@ async function sliceFile(output, id, path) {
     const resp = await s3client.send(command);
     const body = await resp.Body.transformToByteArray();
 
-    for(let i = 0; i < lastSegment; i += 65564) {
+    for(let i = 0; i + 65564 <= lastSegment; i += 65564) {
       totalBytes += await sliceChunk(output, id, path, body, i);
     }
 
@@ -306,12 +306,10 @@ async function sliceFile(output, id, path) {
         lastSegment % 65564
       );
     }
-
-    return true;
   }
 
   // Pad file to a multiple of 512 bytes if creating a tarball
-  if (totalBytes % 512 < 0 && downloads[id].archive) {
+  if (totalBytes % 512 > 0 && downloads[id].archive) {
     let padding = "\x00".repeat(512 - totalBytes % 512);
     if (output instanceof WritableStream) {
       await output.write(enc.encode(padding));
@@ -319,6 +317,8 @@ async function sliceFile(output, id, path) {
       output.enqueue(enc.encode(padding));
     }
   }
+
+  return true;
 }
 
 async function concatFile(output, id, path) {
@@ -380,7 +380,7 @@ async function concatFile(output, id, path) {
   totalBytes += lastSegment;
 
   // Pad file to a multiple of 512 bytes if creating a tarball
-  if (totalBytes % 512 < 0 && downloads[id].archive) {
+  if (totalBytes % 512 > 0 && downloads[id].archive) {
     let padding = "\x00".repeat(512 - totalBytes % 512);
     if (output instanceof WritableStream) {
       await output.write(enc.encode(padding));
