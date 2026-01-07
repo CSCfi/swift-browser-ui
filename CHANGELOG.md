@@ -13,6 +13,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) smaller files are now correctly padded to fix incorrectly formatted tar archives
+- smaller files are now correctly padded to fix incorrectly formatted tar archives
 - (users) v2 buckets can now be downloaded if they contain objects, even if the size shows up as zero
 - (users) v2 object downloads now work in v3 UI unless bucket names break even lax s3 naming conventions (like contain spaces for example)
 - retrieve file sizes for old object downloads with `HeadObject` so the slicer uses correct length for retrieval
