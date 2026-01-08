@@ -20,6 +20,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - retrieve file sizes for old object downloads with `HeadObject` so the slicer uses correct length for retrieval
 - don't block downloads if file size is 0, instead allow based on object count
 
+### Removed
+
+- Purge SD Submit related code (#1275)
+
 ## [2025.12.0] - 2025-12-18
 
 ### Changed
