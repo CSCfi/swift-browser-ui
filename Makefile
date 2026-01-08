@@ -18,10 +18,10 @@ dev-down:
 	# make ceph-down
 
 dev-ff: dev-ca
-	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox
+	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox --width 1920 --height 1080 https://sd-connect.devenv
 
 dev-chromium: dev-ca
-	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox
+	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox --window-size=1920,1080 --window-position=0,0 https://sd-connect.devenv
 
 dev-ca:
 	mkdir -p $(CURDIR)/.devres/ca
