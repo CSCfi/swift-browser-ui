@@ -150,7 +150,7 @@
           @paginate="getDropTablePage"
         />
         <p
-          class="info-text is-size-6"
+          class="info-text is-6"
         >
           {{ $t("message.encrypt.uploadedFiles") }}
           <b>{{ active.name }}</b>{{ !owner ? "." : " (" }}
@@ -915,7 +915,7 @@ c-card-actions {
 }
 
 .dropArea {
-  border: 1px dashed var(--csc-light-grey);
+  border: 1px dashed var(--csc-medium-grey);
   padding: 2rem 0;
   display: flex;
   align-items: center;
