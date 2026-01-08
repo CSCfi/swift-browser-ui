@@ -42,6 +42,7 @@ dev-docker-build:
 	docker compose -f docker-compose-dev.yml build
 
 dev-docker-up:
+	make volumes
 	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 
 dev-docker-down:
@@ -65,6 +66,28 @@ ceph-attach:
 ceph-install-ssl:
 	SD_CONNECT_REPO_LOCATION="$(CURDIR)" $(MAKE) -C submodules/local-single-host-ceph install-ssl
 
+test-data:
+	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-1.bin bs=1M count=128
+	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-2.bin bs=1M count=256
+	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-3.bin bs=1M count=512
+	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-4.bin bs=1M count=768
+
+volumes:
+	mkdir -p .docker-volumes/test-data
+	# Create volume mounts for firefox
+	mkdir -p .docker-volumes/config-ff
+	mkdir -p .docker-volumes/cache-ff
+	mkdir -p .docker-volumes/local-ff
+	# Create volume mounts for chrome
+	mkdir -p .docker-volumes/config-chrome
+	mkdir -p .docker-volumes/cache-chrome
+	mkdir -p .docker-volumes/local-chrome
+	# We need to use the chromeuser uid for the chrome volumes to preserve rights
+	sudo chown -R 1111:1111 .docker-volumes/config-chrome
+	sudo chown -R 1111:1111 .docker-volumes/cache-chrome
+	sudo chown -R 1111:1111 .docker-volumes/local-chrome
+
 clean:
+	rm -rf .docker-volumes
 	make dev-ca-clean
 	make ceph-clean

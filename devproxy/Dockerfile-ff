@@ -16,6 +16,11 @@ RUN mkdir -p /run/sshd
 
 RUN mkdir /root/test-data
 
+# Add held state for the browser
+RUN mkdir /root/.config
+RUN mkdir /root/.cache
+RUN mkdir /root/.local
+
 RUN mkdir -p /etc/firefox/policies
 RUN echo '{"policies": {"Certificates": {"Install": ["/usr/local/share/ca-certificates/sd-connect.devca.crt"]}}}' > /etc/firefox/policies/policies.json
 
