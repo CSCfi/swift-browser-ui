@@ -639,14 +639,14 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 
 #search {
   flex: 0.4;
 }
 
 .bucket-info {
-  border: 1px solid $csc-primary;
+  border: 1px solid var(--csc-primary);
   margin: 0rem 0rem;
 }
 
@@ -659,7 +659,7 @@ export default {
   color: #FFF;
   font-size: 1rem;
   font-weight: 700;
-  background: $csc-primary;
+  background: var(--csc-primary);
   align-items: center;
   & .mdi {
     font-size: 1.5rem;
@@ -672,7 +672,7 @@ export default {
 }
 
 .bucket-details {
-  color: $csc-dark;
+  color: var(--csc-dark);
 
   & li {
     padding: .25rem 0;
@@ -684,7 +684,7 @@ export default {
   flex-wrap: wrap;
   align-items: center;
   color: #FFF;
-  background: $csc-blue;
+  background: var(--csc-blue);
   border-radius: .25rem;
   padding: 0 1rem;
   margin: 1.5rem 0 0;

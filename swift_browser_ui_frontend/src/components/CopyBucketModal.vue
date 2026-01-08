@@ -300,7 +300,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 .copy-bucket {
   padding: 3rem;

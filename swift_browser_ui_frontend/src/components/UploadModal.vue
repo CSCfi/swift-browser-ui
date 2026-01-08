@@ -871,7 +871,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 .upload-card {
   padding: 3rem;
@@ -915,7 +915,7 @@ c-card-actions {
 }
 
 .dropArea {
-  border: 1px dashed $csc-light-grey;
+  border: 1px dashed var(--csc-light-grey);
   padding: 2rem 0;
   display: flex;
   align-items: center;

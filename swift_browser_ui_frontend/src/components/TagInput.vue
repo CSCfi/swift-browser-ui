@@ -56,9 +56,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-
-@import "@/css/prod.scss";
+<style scoped>
 
 .tags-list {
   min-height: 3rem;
@@ -73,7 +71,7 @@ export default {
 }
 
 .tags-list:focus-within {
-  border: 2px solid $csc-primary;
+  border: 2px solid var(--csc-primary);
 }
 
 .tags-list input {

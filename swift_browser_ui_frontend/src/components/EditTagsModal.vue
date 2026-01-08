@@ -216,7 +216,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 .edit-tags {
   padding: 3rem;

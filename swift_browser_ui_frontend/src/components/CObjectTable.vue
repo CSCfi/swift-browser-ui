@@ -508,10 +508,10 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
- .object-table-wrapper{
-    position: relative;
-  }
+.object-table-wrapper{
+  position: relative;
+}
 
 </style>

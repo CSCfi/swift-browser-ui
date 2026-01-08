@@ -257,7 +257,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 .add-bucket {
   padding: 3rem;

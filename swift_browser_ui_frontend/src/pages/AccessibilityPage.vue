@@ -122,12 +122,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 c-main {
   height: unset;
   min-height: 100vh;
   justify-content: space-between;
-  background-color: $white;
+  background-color: white;
 }
 .content {
   height: 100%;
@@ -138,7 +138,7 @@ c-main {
   margin: 0 20%;
   padding: 1rem 0 4rem 0;
   :deep(.title), p, li, h3, h5, h6 {
-    color: $csc-dark;
+    color: var(--csc-dark);
   }
   :deep(.title) { margin: 0 !important}
   & h3 { line-height: 4rem !important; }
@@ -151,10 +151,10 @@ c-row {
   &.title-row {
     margin: 0;
     padding: 2rem 0;
-    background-color: $csc-primary;
+    background-color: var(--csc-primary);
     & h1 {
       margin: 0;
-      color: $white;
+      color: white;
     }
   }
 }

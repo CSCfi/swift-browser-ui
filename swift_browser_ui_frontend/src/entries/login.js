@@ -4,7 +4,7 @@ import LoginPage from "@/pages/LoginPage.vue";
 import { i18n } from "@/common/i18n";
 
 // Import project css
-import "@/css/prod.scss";
+import "@/assets/main.css";
 
 const app = createApp({
   data: function() {

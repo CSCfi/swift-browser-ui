@@ -226,11 +226,11 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 .toolbar {
   z-index: 31;
-  color: $csc-grey;
+  color: var(--csc-grey);
   height: 71px;
   display: flex;
   column-gap: 12px;
@@ -240,7 +240,7 @@ export default {
 }
 
 .app-name {
-  color: $csc-grey;
+  color: var(--csc-grey);
   font-size: 1.25rem;
   margin-left: 2rem;
 }

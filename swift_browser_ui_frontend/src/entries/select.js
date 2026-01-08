@@ -9,7 +9,7 @@ import { i18n } from "@/common/i18n";
 import { getProjects } from "@/common/api";
 
 // Import project css
-import "@/css/prod.scss";
+import "@/assets/main.css";
 
 applyPolyfills().then(() => {
   defineCustomElements();

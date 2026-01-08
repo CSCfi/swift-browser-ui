@@ -185,13 +185,13 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .toast-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  color: $csc-dark;
+  color: var(--csc-dark);
 }
 
 h3 {
