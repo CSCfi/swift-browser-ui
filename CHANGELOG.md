@@ -22,6 +22,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Removed
 
+- Remove bulma remnants and sass dependency (#1292)
 - Purge SD Submit related code (#1275)
 
 ## [2025.12.0] - 2025-12-18
