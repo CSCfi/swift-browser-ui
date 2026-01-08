@@ -35,7 +35,6 @@ from swift_browser_ui.ui.api import (
 from swift_browser_ui.ui.discover import (
     handle_discover,
     handle_s3_discover,
-    handle_submit_discover,
 )
 from swift_browser_ui.ui.front import (
     accessibility,
@@ -280,7 +279,6 @@ async def servinit(
         [
             aiohttp.web.get("/discover", handle_discover),
             aiohttp.web.get("/discover/s3", handle_s3_discover),
-            aiohttp.web.get("/discover/submit", handle_submit_discover),
         ]
     )
 

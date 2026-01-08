@@ -304,18 +304,6 @@ const app = createApp({
         key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
         this.$store.commit("appendPubKey", key);
       }
-
-      if (DEV) {
-        if (
-          this.$store.state.submitConfig.sd_submit_user === ""
-          && this.$store.state.submitConfig.sd_submit_id === ""
-          && this.$store.state.submitConfig.sd_submit_endpoint == ""
-        ) {
-          console.log("SD Submit integration not configured");
-        } else {
-          console.log("SD Submit integration configured");
-        }
-      }
       await initS3(this.active.id, this.active.name, this.$store, this.$t);
     };
     initialize().then(() => {
