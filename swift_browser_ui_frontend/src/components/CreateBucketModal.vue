@@ -19,7 +19,7 @@
         {{ $t("message.container_ops.addContainer") }}
       </h2>
       <c-card-content>
-        <p class="info-text is-size-6">
+        <p class="info-text">
           {{ $t("message.encrypt.uploadStep1.nonModifiable") }}
         </p>
         <c-text-field
@@ -51,7 +51,7 @@
           @addTag="addingTag"
           @deleteTag="deletingTag"
         />-->
-        <p class="info-text is-size-6">
+        <p class="info-text is-6">
           {{ $t("message.container_ops.createdBucket") }}
           <b>{{ active.name }}</b>.
         </p>

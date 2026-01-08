@@ -12,6 +12,85 @@
   --csc-primary-lighter: #d8e8ea;
   --body-font-size: 16px;
   --csc-footer-grey: #dfe1e3;
+  --csc-medium-grey: #757575;
+}
+
+html,
+body,
+p,
+ol,
+ul,
+li,
+hr,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+ul {
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+}
+
+* {
+  &,
+  &::before,
+  &::after {
+    box-sizing: inherit;
+  }
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  word-break: break-word;
+  font-weight: 600;
+  line-height: 1.125;
+  font-size: 2rem;
+}
+
+.is-1 {
+  font-size: 3rem;
+}
+.is-2 {
+  font-size: 2.5rem;
+}
+.is-3 {
+  font-size: 2rem;
+}
+.is-4 {
+  font-size: 1.5rem;
+}
+.is-5 {
+  font-size: 1.25rem;
+}
+.is-6 {
+  font-size: 1rem;
 }
 
 * {
@@ -47,6 +126,7 @@ a:hover {
 }
 
 html {
+  box-sizing: border-box;
   background-color: white;
   font-size: var(--body-font-size);
   -moz-osx-font-smoothing: grayscale;
