@@ -125,10 +125,20 @@ export default class S3DownloadSocket {
             if (DEV) {
               console.log(err);
             }
-            this.downWorker.postMessage({
-              command: "abort",
-              reason: "error",
-            });
+            if (this.useServiceWorker) {
+              navigator.serviceWorker.ready.then((reg) => {
+                reg.active.postMessage({
+                  command: "abort",
+                  reason: "error",
+                });
+              });
+            }
+            else {
+              this.downWorker.postMessage({
+                command: "abort",
+                reason: "error",
+              });
+            }
           });
           break;
         case "downloadStarted":
@@ -248,10 +258,7 @@ export default class S3DownloadSocket {
     // Retrieve the bucket objects
     let bucketFiles = await awsListObjects(bucket);
     if (bucketFiles.length == 0) {
-      if (DEV) {
-        console.log(`No objects for bucket ${bucket}, aborting`);
-      }
-      this.downWorker.postMessage({ command: "abort", reason: "error" });
+      throw new Error(`No objects for bucket ${bucket}, aborting`);
     }
 
     // If files are specified, use only the specified file listing

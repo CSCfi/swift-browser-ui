@@ -320,18 +320,29 @@ export default {
     },
     shareSubmit: function () {
       this.loading = true;
-      this.shareContainer(this.bucketName).then(
-        (ret) => {
-          if (ret) {
-            this.getSharedDetails();
-            this.closeSharedNotification();
-            this.isShared = true;
-            this.closeSharedNotificationWithTimeout();
-          }
-          this.loading = false;
-          this.sharedAccessRight = null;
-        },
-      );
+      this.shareContainer(this.bucketName).then((ret) => {
+        if (ret) {
+          this.getSharedDetails();
+          this.closeSharedNotification();
+          this.isShared = true;
+          this.closeSharedNotificationWithTimeout();
+        }
+        this.sharedAccessRight = null;
+      }).catch(() => {
+        // In case of uncaught errors, show generic error
+        document.querySelector("#shareModal-toasts").addToast(
+          {
+            id: "error-fail",
+            type: "error",
+            duration: 5000,
+            persistent: false,
+            progress: false,
+            message: this.$t("message.share.fail_generic"),
+          },
+        );
+      }).finally(() => {
+        this.loading = false;
+      });
     },
     shareContainer: async function (bucket) {
       let rights = [];

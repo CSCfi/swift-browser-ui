@@ -180,6 +180,7 @@ let default_translations = {
         fail_noperm: "Please select permissions to grant.",
         fail_noid: "Please enter at least one Share ID.",
         fail_duplicate: "The project already has access to the bucket.",
+        fail_generic: "Sharing has failed. Please try again.",
         invalid_share_id: " is not a valid Share ID. Please remove it.",
         invalid_share_ids: " are not valid Share IDs. Please remove them.",
         perm_change_confirm: "Change permissions",
@@ -743,6 +744,7 @@ let default_translations = {
         fail_noperm: "Valitse käyttöoikeudet.",
         fail_noid: "Anna vähintään yhden projektin jakamistunnus.",
         fail_duplicate: "Ämpäri on jo jaettu kyseiselle projektille.",
+        fail_generic: "Jakaminen epäonnistui. Yritä uudelleen.",
         invalid_share_id: " ei ole kelvollinen jakamistunnus. Poistakaa se.",
         invalid_share_ids:
           " eivät ole kelvollisia jakamistunnuksia. Poistakaa ne.",

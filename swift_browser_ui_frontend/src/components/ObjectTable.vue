@@ -252,7 +252,6 @@ export default {
       if (!this.isBucketUploading) {
         setTimeout(async () => {
           await this.updateObjects();
-          this.$store.commit("setLoaderVisible", false);
         }, 1000);
       }
     },
@@ -408,6 +407,7 @@ export default {
       this.oList = await awsListObjects(
         this.containerName,
       );
+      this.$store.commit("setLoaderVisible", false);
     },
     addPageToURL: function (pageNumber) {
       if (this.$route.name == "SharedObjects") {
