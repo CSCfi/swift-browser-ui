@@ -13,6 +13,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fix share modal loader being stuck on sharing fail (#1290)
+- Fix EC2 credential retrieval fail (#1280)
+- Fix HeadBucket commands failing
+- Fix hanging "gathering files" notification on Firefox on download abort
+- Fix persistent loader after project-level upload (#1288)
 - (users) smaller files are now correctly padded to fix incorrectly formatted tar archives
 - smaller files are now correctly padded to fix incorrectly formatted tar archives
 - (users) v2 buckets can now be downloaded if they contain objects, even if the size shows up as zero
