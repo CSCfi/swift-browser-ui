@@ -87,7 +87,9 @@ volumes:
 	sudo chown -R 1111:1111 .docker-volumes/cache-chrome
 	sudo chown -R 1111:1111 .docker-volumes/local-chrome
 
+clean-browsers:
+	sudo rm -rf .docker-volumes
+
 clean:
-	rm -rf .docker-volumes
 	make dev-ca-clean
 	make ceph-clean
