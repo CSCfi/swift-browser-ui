@@ -104,8 +104,8 @@ const htmlPlugin = (oidc) => {
     return {
       name: "html-transform",
       transformIndexHtml: {
-        enforce: "pre",
-        transform: (html, {path}) => {
+        order: "pre",
+        handler: (html, {path}) => {
           if (path.endsWith("index.html")) {
             return html.replace("index.js", "index_oidc.js");
           }
