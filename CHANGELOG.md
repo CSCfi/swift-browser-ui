@@ -13,6 +13,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fix Vite htmlPlugin returning undefined with Vite v7
 - Fix share modal loader being stuck on sharing fail (#1290)
 - Fix EC2 credential retrieval fail (#1280)
 - Fix HeadBucket commands failing
