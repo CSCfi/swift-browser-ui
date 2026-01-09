@@ -31,7 +31,7 @@ async function sendS3Command(command) {
     return resp;
   } catch (e) {
     if (DEV) {
-      console.error(`Error executing ${command?.serialize?.name?.slice(3)} on bucket ${command?.input?.Bucket}`);
+      console.error(`Error executing ${command?.constructor?.name} on bucket ${command?.input?.Bucket}`);
     }
     throw e;
   }
