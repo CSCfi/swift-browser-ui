@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- dev browser now opens directly into the UI address
 - Reorganized s3client initialization and wrapped frontend s3 commands (#1273)
 
 ### Fixed
@@ -30,6 +31,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - Remove bulma remnants and sass dependency (#1292)
 - Purge SD Submit related code (#1275)
+
+### Added
+
+- dev browser files are now persisted using docker volumes
 
 ## [2025.12.0] - 2025-12-18
 
