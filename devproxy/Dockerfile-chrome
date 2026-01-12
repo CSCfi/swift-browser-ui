@@ -17,9 +17,9 @@ RUN chown -R chromeuser:chromeuser /etc/ssh
 RUN mkdir /home/chromeuser/test-data
 
 # Add held state for the browser
-RUN mkdir /home/chromeuser/.config
-RUN mkdir /home/chromeuser/.cache
-RUN mkdir /home/chromeuser/.local
+RUN mkdir -p /home/chromeuser/.config
+RUN mkdir -p /home/chromeuser/.cache
+RUN mkdir -p /home/chromeuser/.local
 RUN chown -R chromeuser:chromeuser /home/chromeuser/.config
 RUN chown -R chromeuser:chromeuser /home/chromeuser/.cache
 RUN chown -R chromeuser:chromeuser /home/chromeuser/.local

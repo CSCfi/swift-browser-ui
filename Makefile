@@ -9,6 +9,7 @@ dev-all:
 	@echo Building the whole development environment
 	make ceph-up
 	make dev-ca
+	make volumes
 	docker compose -f docker-compose-dev.yml build
 	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 	# honcho start
@@ -78,6 +79,7 @@ volumes:
 	mkdir -p .docker-volumes/config-ff
 	mkdir -p .docker-volumes/cache-ff
 	mkdir -p .docker-volumes/local-ff
+	mkdir -p .docker-volumes/mozilla-ff
 	# Create volume mounts for chrome
 	mkdir -p .docker-volumes/config-chrome
 	mkdir -p .docker-volumes/cache-chrome

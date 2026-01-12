@@ -57,6 +57,7 @@ services:
       - .docker-volumes/config-ff:/root/.config
       - .docker-volumes/cache-ff:/root/.cache
       - .docker-volumes/local-ff:/root/.local
+      - .docker-volumes/mozilla-ff:/root/.mozilla
     dns: 172.31.2.2
     depends_on:
       - dev-dns
