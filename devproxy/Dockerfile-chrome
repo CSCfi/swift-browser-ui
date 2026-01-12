@@ -16,10 +16,18 @@ RUN adduser --home /home/chromeuser --uid 1111 --disabled-password chromeuser
 RUN chown -R chromeuser:chromeuser /etc/ssh
 RUN mkdir /home/chromeuser/test-data
 
+# Add held state for the browser
+RUN mkdir -p /home/chromeuser/.config
+RUN mkdir -p /home/chromeuser/.cache
+RUN mkdir -p /home/chromeuser/.local
+RUN chown -R chromeuser:chromeuser /home/chromeuser/.config
+RUN chown -R chromeuser:chromeuser /home/chromeuser/.cache
+RUN chown -R chromeuser:chromeuser /home/chromeuser/.local
+
 ADD ./.devres/ssh/chrome-dev.pub /home/chromeuser/.ssh/authorized_keys
 # sleep is necessary so chromium has time to fail and exit -> required to initialize browser configuration
 USER chromeuser
-RUN (chromium --headless --no-sandbox &); sleep 10
+RUN (chromium --headless --no-sandbox --disable-crash-reporter --no-crashpad &); sleep 10
 # Install the root CA to Chrome DB
 # RUN mkdir -p /home/chromeuser/.pki/nssdb && certutil -d /home/chromeuser/.pki/nssdb -N --empty-password
 RUN certutil -d sql:/home/chromeuser/.pki/nssdb -A -t "TCu" -n "sd-connect.devenv CA" -i /usr/local/share/ca-certificates/sd-connect.devca.crt

@@ -53,7 +53,11 @@ services:
     networks:
       - sd-connect-dev
     volumes:
-      - ./test-data:/root/test-data
+      - .docker-volumes/test-data:/root/test-data
+      - .docker-volumes/config-ff:/root/.config
+      - .docker-volumes/cache-ff:/root/.cache
+      - .docker-volumes/local-ff:/root/.local
+      - .docker-volumes/mozilla-ff:/root/.mozilla
     dns: 172.31.2.2
     depends_on:
       - dev-dns
@@ -71,7 +75,10 @@ services:
     networks:
       - sd-connect-dev
     volumes:
-      - ./test-data:/home/chromeuser/test-data
+      - .docker-volumes/test-data:/home/chromeuser/test-data
+      - .docker-volumes/config-chrome:/home/chromeuser/.config
+      - .docker-volumes/cache-chrome:/home/chromeuser/.cache
+      - .docker-volumes/local-chrome:/home/chromeuser/.local
     dns: 172.31.2.2
     depends_on:
       - dev-dns
