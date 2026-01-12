@@ -6,15 +6,15 @@ import { getBucketPolicyStatements } from "./s3commands";
 
 export async function getSharingContainers (projectId, signal) {
   // Get buckets a project has shared
-  return store.state.client && projectId
-    ? await store.state.client.getShare(projectId, signal)
+  return store.state.sharingClient && projectId
+    ? await store.state.sharingClient.getShare(projectId, signal)
     : [];
 }
 
 export async function getSharedContainers (projectId, signal) {
   // Get buckets shared to a project
-  let ret = store.state.client
-    ? await store.state.client.getAccess(projectId, signal)
+  let ret = store.state.sharingClient
+    ? await store.state.sharingClient.getAccess(projectId, signal)
     : [];
 
   return ret.filter(accessEntry => {
@@ -28,8 +28,8 @@ export async function getAccessDetails (
   sourceProjectId,
   signal)
 {
-  return store.state.client
-    ? await store.state.client.getAccessDetails(
+  return store.state.sharingClient
+    ? await store.state.sharingClient.getAccessDetails(
       projectId,
       bucketName,
       sourceProjectId,
@@ -39,7 +39,7 @@ export async function getAccessDetails (
 
 export async function deleteStaleShares(project, bucket) {
   // Delete share entries of a deleted bucket in DB
-  const client = store.state.client;
+  const client = store.state.sharingClient;
 
   async function deleteShareEntries(bucketName) {
     const shareDetails = await client.getShareDetails(project, bucketName);
@@ -54,7 +54,7 @@ export async function deleteStaleShares(project, bucket) {
 
 export async function syncBucketPolicies(project) {
   // Sync bucket policies to sharing DB according to s3 bucket policies
-  const client = store.state.client;
+  const client = store.state.sharingClient;
 
   const buckets = await getDB()
     .containers

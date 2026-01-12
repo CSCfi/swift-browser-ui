@@ -11,7 +11,7 @@ const store = createStore({
       { ph: "In English", value: "en" },
       { ph: "Suomeksi", value: "fi" },
     ],
-    client: undefined,
+    sharingClient: undefined,
     requestClient: undefined,
     socket: undefined,
     isUploading: false,
@@ -78,7 +78,7 @@ const store = createStore({
       state.uname = newUname;
     },
     setSharingClient(state, newClient) {
-      state.client = newClient;
+      state.sharingClient = newClient;
     },
     setRequestClient(state, newClient) {
       state.requestClient = newClient;

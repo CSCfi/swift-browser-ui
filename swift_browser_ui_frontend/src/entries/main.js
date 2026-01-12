@@ -275,7 +275,7 @@ const app = createApp({
         );
 
         // Cache id information
-        await this.$store.state.client.projectCacheIDs(
+        await this.$store.state.sharingClient.projectCacheIDs(
           this.$store.state.active.id,
           this.$store.state.active.name,
         );

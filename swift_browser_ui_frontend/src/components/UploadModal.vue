@@ -811,7 +811,7 @@ export default {
       if (this.pubkey.length > 0 && !(this.$route.params.owner)) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
       } else if (this.$route.params.owner) {
-        let ids = await this.$store.state.client.projectCheckIDs(
+        let ids = await this.$store.state.sharingClient.projectCheckIDs(
           this.$route.params.owner,
         );
         owner = ids.id;

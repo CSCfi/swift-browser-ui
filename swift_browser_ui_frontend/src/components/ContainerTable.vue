@@ -517,7 +517,7 @@ export default {
           this.$emit("delete-container", bucket);
           // Delete stale shares if the deleted bucket
           // was shared with other projects
-          const sharedDetails = await this.$store.state.client.getShareDetails(
+          const sharedDetails = await this.$store.state.sharingClient.getShareDetails(
             this.$route.params.project,
             bucket,
           );

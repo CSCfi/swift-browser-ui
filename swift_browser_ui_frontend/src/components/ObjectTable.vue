@@ -190,8 +190,8 @@ export default {
     containerName () {
       return this.$route.params.container;
     },
-    client () {
-      return this.$store.state.client;
+    sharingClient () {
+      return this.$store.state.sharingClient;
     },
     active () {
       return this.$store.state.active;
@@ -219,7 +219,7 @@ export default {
     active: function() {
       this.getData();
     },
-    client: function() {
+    sharingClient: function() {
       this.getData();
     },
     containerName: function() {
@@ -306,8 +306,8 @@ export default {
         await getSharedContainers(this.active.id, this.abortController.signal);
     },
     getBucketSharedStatus: async function() {
-      if (this.client) {
-        await this.client.getShareDetails(
+      if (this.sharingClient) {
+        await this.sharingClient.getShareDetails(
           this.project,
           this.containerName,
           this.abortController.signal,

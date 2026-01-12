@@ -358,7 +358,7 @@ export default class S3DownloadSocket {
 
     let ownerName = "";
     if (owner) {
-      let ids = await this.$store.state.client.projectCheckIDs(owner);
+      let ids = await this.$store.state.sharingClient.projectCheckIDs(owner);
       ownerName = ids.name;
     }
 

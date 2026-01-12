@@ -154,8 +154,8 @@ export default {
     container() {
       return this.$route.params.container;
     },
-    client() {
-      return this.$store.state.client;
+    sharingClient() {
+      return this.$store.state.sharingClient;
     },
     downloadAbortReason() {
       return this.$store.state.downloadAbortReason;
@@ -168,7 +168,7 @@ export default {
     container() {
       this.checkIfCanReadWrite();
     },
-    client() {
+    sharingClient() {
       this.checkIfCanReadWrite();
     },
     downloadAbortReason() {

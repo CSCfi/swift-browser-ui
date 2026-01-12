@@ -403,14 +403,14 @@ export default {
         return false;
       }
       try {
-        await this.$store.state.client.shareNewAccess(
+        await this.$store.state.sharingClient.shareNewAccess(
           this.$store.state.active.id,
           bucket,
           this.tags,
           rights,
           this.s3endpoint,
         );
-        await this.$store.state.client.shareNewAccess(
+        await this.$store.state.sharingClient.shareNewAccess(
           this.$store.state.active.id,
           `${this.bucketName}_segments`,
           this.tags,
@@ -458,7 +458,7 @@ export default {
       let toShare = [];
       for (const item of this.tags) {
         toShare.push(
-          await this.$store.state.client.projectCheckIDs(item),
+          await this.$store.state.sharingClient.projectCheckIDs(item),
         );
       }
 
@@ -509,7 +509,7 @@ export default {
       this.isPermissionUpdated = false;
     },
     getSharedDetails: function () {
-      this.$store.state.client.getShareDetails(
+      this.$store.state.sharingClient.getShareDetails(
         this.$route.params.project,
         this.bucketName,
       ).then((ret) => {
