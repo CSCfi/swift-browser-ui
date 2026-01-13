@@ -36,6 +36,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - dev browser files are now persisted using docker volumes
 
+### Security
+
+- (admins) update docker base images to something currently supported
+- update docker base images to something currently supported
+
 ## [2025.12.0] - 2025-12-18
 
 ### Changed
