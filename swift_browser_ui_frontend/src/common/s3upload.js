@@ -42,6 +42,7 @@ import {
 } from "./s3commands";
 
 const MAX_UPLOAD_WORKERS = 8;
+const MAX_SIMULTANEOUS_HEADER_UPLOADS = 32;
 const FILE_PART_SIZE = 52428800;
 
 export default class S3UploadSocket {
@@ -75,6 +76,8 @@ export default class S3UploadSocket {
     this.totalCompleted = 0;
     this.headersNeeded = 0;
     this.headersAdded = 0;
+
+    this.headerUploads = 0;
 
     // Initialize the workers.
     // Upload workers will use each available logical thread, maximum
@@ -379,6 +382,14 @@ export default class S3UploadSocket {
 
     if (DEV) console.log(`Header for ${bucket}/${key}: ${header}`);
 
+    // Throttle header pushes to stay under fetch pending request limit
+    while (this.headerUploads >= MAX_SIMULTANEOUS_HEADER_UPLOADS) {
+      // Wait for a random amount of ms to stagger header upload waits
+      await timeout(Math.floor(1 + Math.random() * 100));
+    }
+
+    this.headerUploads++;
+
     // Push header to Vault
     let headerBase = this.$store.state.uploadEndpoint;
     let headerPath = `/header/${this.project}/${bucket}/${key}.c4gh`;
@@ -389,6 +400,7 @@ export default class S3UploadSocket {
       header,
     );
 
+    this.headerUploads--;
     this.headersAdded++;
 
     if (this.headersNeeded == this.headersAdded) {
