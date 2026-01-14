@@ -21,3 +21,5 @@ swift_browser_ui_frontend/node_modules
 
 **/submodules
 **/*.qcow2
+
+**/.docker-volumes
