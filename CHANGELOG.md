@@ -9,11 +9,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- Reorganize /common files for clarity
 - dev browser now opens directly into the UI address
 - Reorganized s3client initialization and wrapped frontend s3 commands (#1273)
 
 ### Fixed
 
+- Fix s3 command error logging
+- Fixed stale share deletion after bucket deletion (#1291)
 - Fix Vite htmlPlugin returning undefined with Vite v7
 - Fix share modal loader being stuck on sharing fail (#1290)
 - Fix EC2 credential retrieval fail (#1280)
