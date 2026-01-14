@@ -9,12 +9,15 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- add `.docker-volumes` to `.dockerignore` to reduce image build context size if there's a lot of test data
 - Reorganize /common files for clarity
 - dev browser now opens directly into the UI address
 - Reorganized s3client initialization and wrapped frontend s3 commands (#1273)
 
 ### Fixed
 
+- (users) header upload should no longer crash when hundreds of files are uploaded
+- header upload no longer overflows the event loop due to too many headers
 - Fix s3 command error logging
 - Fixed stale share deletion after bucket deletion (#1291)
 - Fix Vite htmlPlugin returning undefined with Vite v7
