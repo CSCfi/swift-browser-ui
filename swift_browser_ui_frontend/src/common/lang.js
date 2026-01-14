@@ -69,6 +69,8 @@ let default_translations = {
         sharedTo: "Buckets shared with you",
       },
       bucketDetails: {
+        size: "Bucket size",
+        created: "Created",
         notShared: "This bucket isn't shared with other projects.",
         sharing_to_one_project: "This bucket is shared to one project.",
         sharing_to_many_projects: "This bucket is shared to multiple projects.",
@@ -87,7 +89,6 @@ let default_translations = {
         objects: "Objects",
         size: "Size",
         modified: "Last modified",
-        activity: "Last activity",
         paginated: "Paginated",
         pageNb: "per page",
         tags: "Tags",
@@ -252,7 +253,9 @@ let default_translations = {
         createdBucket:
           "Created bucket will be shared with all project members in ",
         viewProjectMembers: "View project members",
-        deleteNote: "Bucket must be empty before " + "it can be deleted.",
+        downloadNotEmpty: "An empty bucket cannot be downloaded.",
+        copyNotEmpty: "An empty bucket cannot be copied.",
+        deleteEmpty: "Bucket must be empty before it can be deleted.",
         deleteSuccess: "Bucket was deleted.",
         bucketName: "Bucket name",
       },
@@ -631,6 +634,8 @@ let default_translations = {
         sharedTo: "Sinulle jaetut ämpärit",
       },
       bucketDetails: {
+        size: "Ämpärin koko",
+        created: "Luotu",
         notShared: "Tätä ämpäriä ei ole jaettu toiselle projektille.",
         sharing_to_one_project: "Tämä ämpäri on jaettu yhdelle projektille.",
         sharing_to_many_projects: "Tämä ämpäri on jaettu useille projekteille.",
@@ -651,7 +656,6 @@ let default_translations = {
         objects: "Objekteja",
         size: "Koko",
         modified: "Muokattu viimeksi",
-        activity: "Viimeisin toiminta",
         paginated: "Sivutus",
         pageNb: "sivulla",
         fileHash: "Tarkistussumma",
@@ -818,7 +822,9 @@ let default_translations = {
         addContainer: "Luo uusi ämpäri",
         createdBucket: "Luotu ämpäri jaetaan kaikille jäsenille projektissa ",
         viewProjectMembers: "Näytä projektin jäsenet",
-        deleteNote:
+        downloadNotEmpty: "Tyhjää ämpäriä ei voi ladata.",
+        copyNotEmpty: "Tyhjää ämpäriä ei voi kopioida.",
+        deleteEmpty:
           "Ämpärin poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
         deleteSuccess: "Ämpäri poistettu",

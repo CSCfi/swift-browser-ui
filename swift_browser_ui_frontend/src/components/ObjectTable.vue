@@ -10,6 +10,10 @@
       </div>
       <ul class="bucket-details">
         <li>
+            <span><b>{{ $t("message.bucketDetails.size") }}: </b>{{ bucketSize }}</span>
+            <span id="count"><b>{{ $t("message.table.items") }}: </b>{{ metadata.count }}</span>
+        </li>
+        <li>
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}&nbsp;
           <c-link
@@ -31,6 +35,10 @@
           <b>{{ $t("message.table.date_of_sharing") }}: </b>
           {{ dateOfSharing }}
         </li>
+        <li v-show="!owner">
+          <b>{{ $t("message.bucketDetails.created") }}: </b>{{ bucketCreated }}
+        </li>
+        <li><b>{{ $t("message.table.modified") }}: </b>{{ bucketLastModified }}</li>
       </ul>
     </div>
 
@@ -129,14 +137,18 @@ import {
   getSharedContainers,
   getAccessDetails,
 } from "@/common/share";
-import { parseDateTime, truncate } from "@/common/tableFunctions";
+import {
+  parseDateTime,
+  getHumanReadableSize,
+  truncate,
+} from "@/common/tableFunctions";
 import {
   setPrevActiveElement,
   disableFocusOutsideModal,
   addFocusClass,
 } from "@/common/keyboardNavigation";
 import { getDB } from "@/common/idb";
-import { updateContainers } from "@/common/idbFunctions";
+import { getBucketMetadata, saveBucketMetadata, updateContainers } from "@/common/idbFunctions";
 import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
@@ -175,6 +187,12 @@ export default {
       breadcrumbClicked: false,
       objsLoading: false,
       filtering: false,
+      metadata: {
+        count: 0,
+        bytes: 0,
+        created: null,
+        last_modified: null,
+      },
     };
   },
   computed: {
@@ -214,6 +232,15 @@ export default {
     shareModal() {
       return this.$store.state.openShareModal;
     },
+    bucketSize() {
+      return getHumanReadableSize(this.metadata.bytes, this.locale);
+    },
+    bucketCreated() {
+      return parseDateTime(this.locale, this.metadata.created, this.$t, true);
+    },
+    bucketLastModified() {
+      return parseDateTime(this.locale, this.metadata.last_modified, this.$t, true);
+    },
   },
   watch: {
     active: function() {
@@ -251,7 +278,7 @@ export default {
     isBucketUploading: function () {
       if (!this.isBucketUploading) {
         setTimeout(async () => {
-          await this.updateObjects();
+          await this.updateObjectsAndMetadata();
         }, 1000);
       }
     },
@@ -259,7 +286,7 @@ export default {
       if (!this.isDeletingObjects) {
         this.objsLoading = true;
         setTimeout(async () => {
-          await this.updateObjects();
+          await this.updateObjectsAndMetadata();
           this.objsLoading = false;
         }, 1000);
       }
@@ -294,9 +321,14 @@ export default {
   },
   methods: {
     getData: async function () {
-      await this.getSharedContainers();
-      await this.getBucketSharedStatus();
-      await this.updateObjects();
+      if (this.containerName && this.active.id) {
+        // First look for bucket metadata in idb; it is updated after objects are fetched
+        const idbMetadata = await getBucketMetadata(this.active.id, this.containerName);
+        if (idbMetadata) this.metadata = {...idbMetadata};
+        await this.getSharedContainers();
+        await this.getBucketSharedStatus();
+        await this.updateObjectsAndMetadata();
+      }
     },
     breadcrumbClickHandler(value) {
       this.breadcrumbClicked = value;
@@ -378,7 +410,7 @@ export default {
           name: this.containerName,
         });
     },
-    updateObjects: async function () {
+    updateObjectsAndMetadata: async function () {
       if (
         this.containerName === undefined
         || (
@@ -405,6 +437,29 @@ export default {
         this.containerName,
       );
       this.$store.commit("setLoaderVisible", false);
+
+      // Update bucket metadata if needed
+      await this.updateBucketMetadata();
+    },
+    updateBucketMetadata: async function () {
+      let updated = { ...this.metadata, bytes: 0 };
+      if (this.oList?.length) {
+        updated.count = this.oList.length;
+
+        this.oList.forEach((obj) => {
+          updated.bytes += obj.bytes;
+          if (!updated.last_modified || obj.last_modified > updated.last_modified) {
+            updated.last_modified = obj.last_modified;
+          }
+        });
+      }
+      if (updated.count === this.metadata.count &&
+        updated.bytes === this.metadata.bytes &&
+        updated.last_modified === this.metadata.last_modified) {
+        return;
+      }
+      await saveBucketMetadata(this.active.id, this.containerName, updated);
+      this.metadata = { ...updated } ;
     },
     addPageToURL: function (pageNumber) {
       if (this.$route.name == "SharedObjects") {
@@ -637,6 +692,10 @@ export default {
 </script>
 
 <style scoped>
+
+#count {
+  margin-left: 1.5rem;
+}
 
 #search {
   flex: 0.4;

@@ -17,7 +17,7 @@ export function checkIfItemIsLastOnPage(paginationOptions){
 export function getHumanReadableSize(val, locale) {
   const BYTE_UNITS = ["B", "KiB", "MiB", "GiB", "TiB", "PiB"];
 
-  let size = val;
+  let size = val ?? 0;
   let unitIndex = 0;
 
   while (size >= 1024 && unitIndex < BYTE_UNITS.length - 1) {

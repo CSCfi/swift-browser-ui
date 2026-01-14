@@ -22,11 +22,8 @@
 <script>
 import {
   checkIfItemIsLastOnPage,
-  getHumanReadableSize,
   getPaginationOptions,
   sortObjects,
-  parseDateTime,
-  parseDateFromNow,
   truncate,
 } from "@/common/tableFunctions";
 import {
@@ -56,7 +53,7 @@ import {
   awsDeleteBucket,
   awsDeleteObject,
   awsListObjects,
-  getBucketMetadata,
+  checkBucketEmpty,
 } from "@/common/s3commands";
 
 export default {
@@ -194,208 +191,146 @@ export default {
 
       let containersPage = [];
 
-      await Promise.all(
-        mappedContainers
-          .slice(offset, offset + limit).map(async (
-            item,
-          ) => {
-            let bucketMetadata = await getBucketMetadata(
-              item.name,
-              new Date(item.last_modified),
-            );
-
-            containersPage.push({
-              name: {
-                value: truncate(item.name),
-                component: {
-                  tag: "c-link",
-                  params: {
-                    href: "javascript:void(0)",
-                    color: "dark-grey",
-                    path: mdiPail,
-                    iconFill: "primary",
-                    iconStyle: {
-                      marginRight: "1rem",
-                      flexShrink: "0",
-                    },
-                    onClick: () => {
-                      if(item.owner) {
-                        this.$router.push({
-                          name: "SharedObjects",
-                          params: {
-                            container: item.name,
-                            owner: item.owner,
-                          },
-                        });
-                      } else {
-                        this.$router.push({
-                          name: "ObjectsView",
-                          params: {
-                            container: item.name,
-                          },
-                        });
-                      }
-                    },
+      mappedContainers
+        .slice(offset, offset + limit).map((
+          item,
+        ) => {
+          containersPage.push({
+            name: {
+              value: truncate(item.name),
+              component: {
+                tag: "c-link",
+                params: {
+                  href: "javascript:void(0)",
+                  color: "dark-grey",
+                  path: mdiPail,
+                  iconFill: "primary",
+                  iconStyle: {
+                    marginRight: "1rem",
+                    flexShrink: "0",
                   },
-                },
-              },
-              items: {
-                value: bucketMetadata.count,
-              },
-              size: {
-                value: getHumanReadableSize(
-                  bucketMetadata.bytes,
-                  this.locale,
-                ),
-              },
-              ...(this.hideTags ? {} : {
-                tags: {
-                  value: null,
-                  children: [
-                    ...(item.tags || []).map((tag, index) => ({
-                      key: "tag_" + index + "",
-                      value: tag,
-                      component: {
-                        tag: "c-tag",
+                  onClick: () => {
+                    if(item.owner) {
+                      this.$router.push({
+                        name: "SharedObjects",
                         params: {
-                          flat: true,
+                          container: item.name,
+                          owner: item.owner,
                         },
-                      },
-                    })),
-                    ...(item.tags && !item.tags?.length
-                      ? [{ key: "no_tags", value: "-" }]
-                      : []),
-                  ],
+                      });
+                    } else {
+                      this.$router.push({
+                        name: "ObjectsView",
+                        params: {
+                          container: item.name,
+                        },
+                      });
+                    }
+                  },
                 },
-              }),
-              sharing: {
-                value: getSharedStatus(item.name),
               },
-              last_activity: {
-                value: this.showTimestamp? parseDateTime(
-                  this.locale, bucketMetadata.last_modified, this.$t, false) :
-                  parseDateFromNow(
-                    this.locale,
-                    bucketMetadata.last_modified,
-                    this.$t,
-                  ),
-              },
-              actions: {
-                value: null,
-                sortable: null,
-                align: "end",
-                children: [
-                  {
-                    value: this.$t("message.download.download"),
-                    component: {
-                      tag: "c-button",
-                      params: {
-                        testid: "download-container",
-                        text: true,
-                        size: "small",
-                        title: this.$t("message.download.download"),
-                        onClick: ({ event }) => {
-                          this.beginDownload(
-                            item.name,
-                            item.owner ? item.owner : "",
-                            event.isTrusted,
-                          );
-                        },
-                        target: "_blank",
-                        path: mdiTrayArrowDown,
-                        disabled: (
-                          item.owner && item.accessRights?.length === 0
-                        ) || !bucketMetadata.count,
+            },
+            sharing: {
+              value: getSharedStatus(item.name),
+            },
+            actions: {
+              value: null,
+              sortable: null,
+              align: "end",
+              children: [
+                {
+                  value: this.$t("message.download.download"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      testid: "download-container",
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.download.download"),
+                      onClick: ({ event }) => {
+                        this.handleDownloadClick(
+                          item.name,
+                          item.owner ? item.owner : "",
+                          event.isTrusted,
+                        );
                       },
+                      target: "_blank",
+                      path: mdiTrayArrowDown,
+                      disabled: (
+                        item.owner && item.accessRights?.length === 0
+                      ),
                     },
                   },
-                  // Share button is disabled for Shared (with you) buckets
-                  {
-                    value: this.$t("message.share.share"),
-                    component: {
-                      tag: "c-button",
-                      params: {
-                        testid: "share-container",
-                        text: true,
-                        size: "small",
-                        title: this.$t("message.share.share"),
-                        path: mdiShareVariantOutline,
-                        onClick: () =>
-                          this.onOpenShareModal(item.name),
-                        onKeyUp: (event) => {
-                          if(event.keyCode === 13)
-                            this.onOpenShareModal(item.name, true);
-                        },
-                        disabled: item.owner,
+                },
+                // Share button is disabled for Shared (with you) buckets
+                {
+                  value: this.$t("message.share.share"),
+                  component: {
+                    tag: "c-button",
+                    params: {
+                      testid: "share-container",
+                      text: true,
+                      size: "small",
+                      title: this.$t("message.share.share"),
+                      path: mdiShareVariantOutline,
+                      onClick: () =>
+                        this.onOpenShareModal(item.name),
+                      onKeyUp: (event) => {
+                        if(event.keyCode === 13)
+                          this.onOpenShareModal(item.name, true);
                       },
+                      disabled: item.owner,
                     },
                   },
-                  {
-                    value: null,
-                    component: {
-                      tag: "c-menu",
-                      params: {
-                        items: [
-                          {
-                            name: this.$t("message.copy"),
-                            action: () => {
-                              this.openCopyBucketModal(item.name, item.owner);
-                              const menuItems = document
-                                .querySelector("c-menu-items");
-                              menuItems.addEventListener("keydown", (e) =>{
-                                if (e.keyCode === 13) {
-                                  this.openCopyBucketModal(
-                                    item.name, item.owner, true,
-                                  );
-                                }
-                              });
-                            },
-                            disabled: !bucketMetadata.bytes,
-                          },
-                          /*{
-                          name: this.$t("message.editTags"),
+                },
+                {
+                  value: null,
+                  component: {
+                    tag: "c-menu",
+                    params: {
+                      items: [
+                        {
+                          name: this.$t("message.copy"),
                           action: () => {
-                            this.openEditTagsModal(item.name);
+                            this.handleCopyClick(item.name, item.owner);
                             const menuItems = document
                               .querySelector("c-menu-items");
                             menuItems.addEventListener("keydown", (e) =>{
                               if (e.keyCode === 13) {
-                                this.openEditTagsModal(item.name, true);
+                                this.handleCopyClick(
+                                  item.name, item.owner, true,
+                                );
                               }
                             });
                           },
+                        },
+                        {
+                          name: this.$t("message.delete"),
+                          action: () => this.handleDeleteClick(item.name),
                           disabled: item.owner,
-                        },*/
-                          {
-                            name: this.$t("message.delete"),
-                            action: () => this.delete(
-                              item.name, bucketMetadata.count,
-                            ),
-                            disabled: item.owner,
-                          },
-                        ],
-                        customTrigger: {
-                          value: this.$t("message.options"),
-                          component: {
-                            tag: "c-button",
-                            params: {
-                              text: true,
-                              path: mdiDotsHorizontal,
-                              title: this.$t("message.options"),
-                              size: "small",
-                              disabled: (item.owner &&
-                                (item.accessRights?.length === 0 ||
-                                  !bucketMetadata.bytes)),
-                            },
+                        },
+                      ],
+                      customTrigger: {
+                        value: this.$t("message.options"),
+                        component: {
+                          tag: "c-button",
+                          params: {
+                            text: true,
+                            path: mdiDotsHorizontal,
+                            title: this.$t("message.options"),
+                            size: "small",
+                            disabled: item.owner &&
+                              (item.accessRights?.length === 0),
                           },
                         },
                       },
                     },
                   },
-                ],
-              },
-            });
-          }));
+                },
+              ],
+            },
+          });
+        });
 
       // Remember to sort the page to preserve order lost with promises
       containersPage = containersPage.sort((a, b) => {
@@ -439,30 +374,11 @@ export default {
           key: "name",
           value: this.$t("message.table.name"),
           sortable: true,
-        },
-        {
-          key: "items",
-          value: this.$t("message.table.items"),
-          sortable: true,
-        },
-        {
-          key: "size",
-          value: this.$t("message.table.size"),
-          sortable: true,
-        },
-        {
-          key: "tags",
-          value: this.$t("message.table.tags"),
-          sortable: true,
+          width: "50%",
         },
         {
           key: "sharing",
           value: this.$t("message.table.shared_status"),
-          sortable: true,
-        },
-        {
-          key: "last_activity",
-          value: this.$t("message.table.activity"),
           sortable: true,
         },
         {
@@ -478,10 +394,19 @@ export default {
       const paginationOptions = getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
-    delete: async function (bucket, objects) {
-      if (objects > 0) { // If bucket not empty
-        addErrorToastOnMain(this.$t("message.container_ops.deleteNote"));
+    ensureBucketState: async function (bucket, shouldBeEmpty, errorMsg) {
+      const isEmpty = await checkBucketEmpty(bucket);
+      if (isEmpty === shouldBeEmpty) {
+        return true;
       }
+      addErrorToastOnMain(errorMsg);
+      return false;
+    },
+    handleDeleteClick: async function (bucket) {
+      // Show error if attempting to delete a non-empty bucket
+      const bucketEmpty = await this.ensureBucketState(
+        bucket, true, this.$t("message.container_ops.deleteEmpty"));
+      if (!bucketEmpty) return;
       else { // Delete empty bucket without confirmation
         awsDeleteBucket(bucket).then(async() => {
           // In case the bucket has a legacy segments bucket still in
@@ -534,7 +459,12 @@ export default {
             this.paginationOptions.itemCount - 1,
         });
     },
-    beginDownload(container, owner, eventTrusted) {
+    handleDownloadClick: async function(container, owner, eventTrusted) {
+      // Don't attempt to download an empty bucket
+      const bucketHasContent = await this.ensureBucketState(
+        container, false, this.$t("message.container_ops.downloadNotEmpty"));
+      if (!bucketHasContent) return;
+
       //add test param to test direct downloads
       //by using origin private file system (OPFS)
       //automated testing creates untrusted events
@@ -590,10 +520,15 @@ export default {
         editTagsInput.focus();
       }, 300);
     },
-    openCopyBucketModal(itemName, itemOwner, keypress) {
-      itemOwner
-        ? toggleCopyBucketModal(itemName, itemOwner)
-        : toggleCopyBucketModal(itemName);
+    handleCopyClick: async function(bucket, owner, keypress) {
+      // Don't attempt to copy an empty bucket
+      const bucketHasContent = await this.ensureBucketState(
+        bucket, false, this.$t("message.container_ops.copyNotEmpty"));
+      if (!bucketHasContent) return;
+
+      owner
+        ? toggleCopyBucketModal(bucket, owner)
+        : toggleCopyBucketModal(bucket);
       if (keypress) {
         setPrevActiveElement();
         const copyBucketModal = document.getElementById("copy-bucket-modal");

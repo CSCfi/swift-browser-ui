@@ -72,46 +72,6 @@ export async function checkBucketExists(bucket) {
   }
 }
 
-export async function getBucketMetadata(bucket, creationDate) {
-  let continuationToken;
-  let lastModified = creationDate;
-  let count = 0;
-  let bytes = 0;
-
-  try {
-    do {
-      const command = new ListObjectsV2Command({
-        Bucket: bucket,
-        ContinuationToken: continuationToken,
-      });
-      const response = await sendS3Command(command);
-
-      if (response?.Contents) {
-        count += response.Contents.length;
-        response.Contents.forEach((obj) => {
-          bytes += obj.Size;
-          if (obj.LastModified > lastModified) {
-            lastModified = obj.LastModified;
-          }
-        });
-      }
-
-      continuationToken = response?.NextContinuationToken;
-
-    } while (continuationToken);
-  } catch (e) {
-    console.error(`Failed to get metadata for bucket "${bucket}":`, e);
-  }
-
-  const metadata = {
-    last_modified: lastModified?.toISOString(),
-    bytes: bytes,
-    count: count,
-  };
-
-  return metadata;
-}
-
 /** OBJECTS */
 
 export async function awsDeleteObject(bucket, object) {
@@ -166,6 +126,15 @@ export async function awsListObjects(bucket, prefix = undefined) {
     if (DEV) console.error(`Returning empty listing for bucket ${bucket}`);
   }
   return objects;
+}
+
+export async function checkBucketEmpty(bucket) {
+  const command = new ListObjectsV2Command({
+    Bucket: bucket,
+    MaxKeys: 1,
+  });
+  const response = await sendS3Command(command);
+  return response?.Contents?.length ? false : true;
 }
 
 /**UPLOAD */

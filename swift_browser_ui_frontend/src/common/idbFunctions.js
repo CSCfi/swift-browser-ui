@@ -202,3 +202,14 @@ export async function updateContainerLastmodified(
       .modify({ last_modified: cont_last_modified });
   }
 }
+
+export async function saveBucketMetadata(projectID, bucket, metadata) {
+  await getDB().containers
+    .where({ projectID: projectID, name: bucket})
+    .modify(metadata);
+}
+
+export async function getBucketMetadata(projectID, bucket) {
+  return await getDB().containers
+    .get({ projectID: projectID, name: bucket});
+}
