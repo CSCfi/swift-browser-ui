@@ -67,8 +67,8 @@ import {
   copyBucket,
   awsAddBucketCors,
 } from "@/common/api";
-import { getDB } from "@/common/db";
-
+import { getDB } from "@/common/idb";
+import { updateContainers } from "@/common/idbFunctions";
 import {
   addNewTag,
   deleteTag,
@@ -158,10 +158,7 @@ export default {
         ),
       );
 
-      await this.$store.dispatch("updateContainers", {
-        projectID: this.$route.params.project,
-        signal: null,
-      });
+      await updateContainers(this.$route.params.project);
     },
     getCopyBucket: function (origBucketName) {
       if (this.buckets) {
@@ -242,10 +239,7 @@ export default {
         this.selectedBucketName,
       ).then(async () => {
         await awsAddBucketCors(this.active.id, this.bucketName);
-        await this.$store.dispatch("updateContainers", {
-          projectID: this.$route.params.project,
-          signal: null,
-        });
+        await updateContainers(this.$route.params.project);
 
         this.checkpointsCompleted = 0;
 

@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import { tokenize } from "@/common/conv";
-import { getDB } from "@/common/db";
+import { tokenize } from "@/common/globalFunctions";
+import { getDB } from "@/common/idb";
 import escapeRegExp from "lodash/escapeRegExp";
 import SearchResultItem from "@/components/SearchResultItem.vue";
 import debounce from "lodash/debounce";

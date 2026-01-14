@@ -120,27 +120,27 @@
 
 <script>
 import {
-  truncate,
-  parseDateTime,
-} from "@/common/conv";
-import {
-  getSharedContainers,
-  getAccessDetails,
+  DEV,
   toggleDeleteModal,
   isFile,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
+  getSharedContainers,
+  getAccessDetails,
+} from "@/common/share";
+import { parseDateTime, truncate } from "@/common/tableFunctions";
+import {
   setPrevActiveElement,
   disableFocusOutsideModal,
   addFocusClass,
 } from "@/common/keyboardNavigation";
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
+import { updateContainers } from "@/common/idbFunctions";
 import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
-import { DEV } from "@/common/conv";
 import { awsListObjects } from "@/common/s3commands";
 
 export default {
@@ -190,8 +190,8 @@ export default {
     containerName () {
       return this.$route.params.container;
     },
-    client () {
-      return this.$store.state.client;
+    sharingClient () {
+      return this.$store.state.sharingClient;
     },
     active () {
       return this.$store.state.active;
@@ -219,7 +219,7 @@ export default {
     active: function() {
       this.getData();
     },
-    client: function() {
+    sharingClient: function() {
       this.getData();
     },
     containerName: function() {
@@ -306,8 +306,8 @@ export default {
         await getSharedContainers(this.active.id, this.abortController.signal);
     },
     getBucketSharedStatus: async function() {
-      if (this.client) {
-        await this.client.getShareDetails(
+      if (this.sharingClient) {
+        await this.sharingClient.getShareDetails(
           this.project,
           this.containerName,
           this.abortController.signal,
@@ -393,10 +393,7 @@ export default {
       if (this.currentContainer === undefined) {
         //container not in DB when clicking "view destination"
         // while / right after uploading
-        await this.$store.dispatch("updateContainers", {
-          projectID: this.active.id,
-          signal: this.abortController.signal,
-        });
+        await updateContainers(this.active.id, this.abortController.signal);
         this.currentContainer = await this.getCurrentContainer();
         if (this.currentContainer === undefined) {
           if (DEV) console.log("Error with uploaded container");

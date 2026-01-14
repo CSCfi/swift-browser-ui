@@ -98,10 +98,8 @@
 </template>
 
 <script>
-import {
-  addErrorToastOnMain,
-  getAccessDetails,
-} from "@/common/globalFunctions";
+import { addErrorToastOnMain } from "@/common/globalFunctions";
+import { getAccessDetails } from "@/common/share";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import {
   mdiInformationOutline,
@@ -156,8 +154,8 @@ export default {
     container() {
       return this.$route.params.container;
     },
-    client() {
-      return this.$store.state.client;
+    sharingClient() {
+      return this.$store.state.sharingClient;
     },
     downloadAbortReason() {
       return this.$store.state.downloadAbortReason;
@@ -170,7 +168,7 @@ export default {
     container() {
       this.checkIfCanReadWrite();
     },
-    client() {
+    sharingClient() {
       this.checkIfCanReadWrite();
     },
     downloadAbortReason() {

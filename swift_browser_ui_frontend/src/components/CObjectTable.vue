@@ -29,20 +29,20 @@
 
 <script>
 import {
+  checkIfItemIsLastOnPage,
+  getPaginationOptions,
   sortItems,
   parseDateTime,
   parseDateFromNow,
   getHumanReadableSize,
-  DEV,
-} from "@/common/conv";
+} from "@/common/tableFunctions";
 
 import {
+  DEV,
   toggleEditTagsModal,
   isFile,
   getFolderName,
   getPrefix,
-  getPaginationOptions,
-  checkIfItemIsLastOnPage,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {

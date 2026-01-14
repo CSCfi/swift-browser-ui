@@ -16,13 +16,14 @@ and consumed.
 */
 
 import {
+  DEV,
+  ensureObjectSizes,
   timeout,
 } from "./globalFunctions";
 import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
-import { DEV, ensureObjectSizes } from "./conv";
 import { awsListObjects } from "./s3commands";
 
 // Use 50 MiB as download slice size
@@ -357,7 +358,7 @@ export default class S3DownloadSocket {
 
     let ownerName = "";
     if (owner) {
-      let ids = await this.$store.state.client.projectCheckIDs(owner);
+      let ids = await this.$store.state.sharingClient.projectCheckIDs(owner);
       ownerName = ids.name;
     }
 

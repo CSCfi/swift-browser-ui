@@ -234,20 +234,20 @@
 </template>
 
 <script>
-import {
-  getHumanReadableSize,
-  truncate,
-  computeSHA256,
-  sortItems,
-} from "@/common/conv";
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
 
 import {
+  computeSHA256,
   getProjectNumber,
   validateBucketName,
-  checkIfItemIsLastOnPage,
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
+import {
+  checkIfItemIsLastOnPage,
+  getHumanReadableSize,
+  sortItems,
+  truncate,
+} from "@/common/tableFunctions";
 import {
   getFocusableElements,
   moveFocusOutOfModal,
@@ -811,7 +811,7 @@ export default {
       if (this.pubkey.length > 0 && !(this.$route.params.owner)) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
       } else if (this.$route.params.owner) {
-        let ids = await this.$store.state.client.projectCheckIDs(
+        let ids = await this.$store.state.sharingClient.projectCheckIDs(
           this.$route.params.owner,
         );
         owner = ids.id;

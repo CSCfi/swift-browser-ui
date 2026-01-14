@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import { truncate } from "@/common/conv";
+import { truncate } from "@/common/tableFunctions";
 
 
 export default {

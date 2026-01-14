@@ -21,14 +21,14 @@
 
 <script>
 import {
+  checkIfItemIsLastOnPage,
   getHumanReadableSize,
-  truncate,
+  getPaginationOptions,
   sortObjects,
   parseDateTime,
   parseDateFromNow,
-  deleteStaleSharedContainers,
-  DEV,
-} from "@/common/conv";
+  truncate,
+} from "@/common/tableFunctions";
 import {
   mdiTrayArrowDown,
   mdiShareVariantOutline,
@@ -36,15 +36,17 @@ import {
   mdiPail,
 } from "@mdi/js";
 import {
+  DEV,
   toggleEditTagsModal,
+  toggleCopyBucketModal,
+  addErrorToastOnMain,
+} from "@/common/globalFunctions";
+import {
+  deleteStaleShares,
   getSharingContainers,
   getSharedContainers,
   getAccessDetails,
-  getPaginationOptions,
-  toggleCopyBucketModal,
-  checkIfItemIsLastOnPage,
-  addErrorToastOnMain,
-} from "@/common/globalFunctions";
+} from "@/common/share";
 import {
   setPrevActiveElement,
   disableFocusOutsideModal,
@@ -513,14 +515,13 @@ export default {
               message: this.$t("message.container_ops.deleteSuccess")},
           );
           this.$emit("delete-container", bucket);
-          // Delete stale shared containers if the deleted container
+          // Delete stale shares if the deleted bucket
           // was shared with other projects
-          const sharedDetails = await this.$store.state.client.getShareDetails(
+          const sharedDetails = await this.$store.state.sharingClient.getShareDetails(
             this.$route.params.project,
             bucket,
           );
-          if (sharedDetails.length)
-            await deleteStaleSharedContainers(this.$store);
+          if (sharedDetails.length) await deleteStaleShares(this.active.id, bucket);
         });
       }
       this.paginationOptions.currentPage =

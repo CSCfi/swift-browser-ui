@@ -41,11 +41,7 @@
 </template>
 
 <script>
-import {
-// getTagsForObjects,
-// getTagsForContainer,
-} from "@/common/conv";
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
 
 import {
   addNewTag,

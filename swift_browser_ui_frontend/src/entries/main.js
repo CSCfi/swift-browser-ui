@@ -32,8 +32,8 @@ import SwiftXAccountSharing from "@/common/swift_x_account_sharing_bind";
 import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
-import { syncBucketPolicies, DEV } from "@/common/conv";
-import checkIDB from "@/common/idb_support";
+import { syncBucketPolicies } from "@/common/share";
+import { DEV } from "@/common/globalFunctions";
 
 // Import project state
 import store from "@/common/store";
@@ -47,7 +47,7 @@ import ProgressNotification from "@/components/ProgressNotification.vue";
 //Custom footer element
 import CFooter from "@/components/CFooter.vue";
 
-import { getDB } from "@/common/db";
+import { getDB, checkIDB } from "@/common/idb";
 
 // Import global functions
 import { removeFocusClass } from "@/common/keyboardNavigation";
@@ -275,7 +275,7 @@ const app = createApp({
         );
 
         // Cache id information
-        await this.$store.state.client.projectCacheIDs(
+        await this.$store.state.sharingClient.projectCacheIDs(
           this.$store.state.active.id,
           this.$store.state.active.name,
         );
@@ -318,7 +318,7 @@ const app = createApp({
   },
   methods: {
     containerSyncWrapper: function () {
-      syncBucketPolicies(this.$store);
+      syncBucketPolicies(this.active.id);
     },
     cancelUpload: function(bucket) {
       this.s3upload.cancelUpload(bucket);

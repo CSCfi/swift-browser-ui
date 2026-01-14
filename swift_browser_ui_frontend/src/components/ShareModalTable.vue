@@ -73,7 +73,7 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { DEV } from "@/common/conv";
+import { DEV } from "@/common/globalFunctions";
 import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 
@@ -293,20 +293,20 @@ export default {
         );
       } catch {}
 
-      await this.$store.state.client.shareEditAccess(
+      await this.$store.state.sharingClient.shareEditAccess(
         this.projectId,
         this.bucketName,
         [sharedProjectId],
         this.newPerms,
       );
 
-      await this.$store.state.client.shareEditAccess(
+      await this.$store.state.sharingClient.shareEditAccess(
         this.projectId,
         `${this.bucketName}_segments`,
         [sharedProjectId],
         this.newPerms,
       );
-      let projectIDs = await this.$store.state.client.projectCheckIDs(
+      let projectIDs = await this.$store.state.sharingClient.projectCheckIDs(
         sharedProjectId,
       );
 
@@ -355,18 +355,18 @@ export default {
         );
       } catch {}
 
-      await this.$store.state.client.shareDeleteAccess(
+      await this.$store.state.sharingClient.shareDeleteAccess(
         this.projectId,
         this.bucketName,
         [bucketData.projectId.value],
       );
-      await this.$store.state.client.shareDeleteAccess(
+      await this.$store.state.sharingClient.shareDeleteAccess(
         this.projectId,
         `${this.bucketName}_segments`,
         [bucketData.projectId.value],
       );
 
-      let projectIDs = await this.$store.state.client.projectCheckIDs(
+      let projectIDs = await this.$store.state.sharingClient.projectCheckIDs(
         bucketData.projectId.value,
       );
 

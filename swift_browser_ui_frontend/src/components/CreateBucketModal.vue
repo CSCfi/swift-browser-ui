@@ -88,15 +88,16 @@
 </template>
 
 <script>
-import { DEV, tokenize } from "@/common/conv";
-import { getDB } from "@/common/db";
+import { getDB } from "@/common/idb";
 
 import {
+  DEV,
   addNewTag,
   deleteTag,
   getProjectNumber,
   validateBucketName,
   getCurrentISOtime,
+  tokenize,
 } from "@/common/globalFunctions";
 import {
   getFocusableElements,

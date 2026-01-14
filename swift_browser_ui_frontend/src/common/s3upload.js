@@ -32,7 +32,7 @@ Parts cache schema:
 }
 */
 
-import { timeout } from "./globalFunctions";
+import { DEV, timeout } from "./globalFunctions";
 import { signedFetch, awsCreateBucket, awsAddBucketCors } from "./api";
 import {
   checkBucketAccessible,
@@ -40,7 +40,6 @@ import {
   awsCompleteMultipartUpload,
   awsAbortMultipartUpload,
 } from "./s3commands";
-import { DEV } from "./conv";
 
 const MAX_UPLOAD_WORKERS = 8;
 const FILE_PART_SIZE = 52428800;
