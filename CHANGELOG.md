@@ -16,6 +16,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fix upload not starting after cancelled uploads (#1295)
 - (users) header upload should no longer crash when hundreds of files are uploaded
 - header upload no longer overflows the event loop due to too many headers
 - Fix s3 command error logging
