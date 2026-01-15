@@ -232,17 +232,7 @@ export default class S3UploadSocket {
       if (DEV) {
         console.log("Upload has finished.");
       }
-
-      this.$store.commit("eraseDropFiles");
-      this.$store.commit("stopUploading");
-      this.$store.commit("eraseProgress");
-
-      if (DEV) console.log("Erasing files from storage");
-      for (const worker of this.upWorkers) {
-        for (const bucket of Object.keys(this.uploads)) {
-          worker.postMessage({ command: "uploadFinished", bucket: bucket });
-        }
-      }
+      this.finalizeUpload();
     }
   }
 
@@ -478,7 +468,7 @@ export default class S3UploadSocket {
     this.$store.commit("setEncryptedFile", "file pending...");
 
     for (const file of files) {
-      if (DEV) console.log(`Adding file ${file}`);
+      if (DEV) console.log(`Adding file ${file.relativePath}`);
       this.uploads[bucket][file.relativePath] = {
         size: file.size,
         isMultipart: file.size > 100 * 1024 * 1024,
@@ -514,8 +504,6 @@ export default class S3UploadSocket {
     // Cancel each file that's being uploaded
     if (DEV) console.log(`Terminating uploads in ${bucket}`);
     for (const key in this.uploads[bucket]) {
-      // Mark the object as finished to stop uploading
-      this.uploads[bucket][key].finished = true;
       // Cancel the multipart process
       await awsAbortMultipartUpload(
         bucket,
@@ -528,9 +516,19 @@ export default class S3UploadSocket {
         }
       });
     }
+    this.finalizeUpload();
+  }
 
-    // End the upload progress tracking
-    this.$store.commit("stopUploading", true);
+  finalizeUpload() {
+    if (DEV) console.log("Erasing files from storage");
+    for (const worker of this.upWorkers) {
+      for (const bucket of Object.keys(this.uploads)) {
+        this.uploads[bucket] = {};
+        worker.postMessage({ command: "uploadFinished", bucket: bucket });
+      }
+    }
+    this.$store.commit("eraseDropFiles");
+    this.$store.commit("stopUploading");
     this.$store.commit("setEncryptedFile", "");
     this.$store.commit("eraseProgress");
   }
