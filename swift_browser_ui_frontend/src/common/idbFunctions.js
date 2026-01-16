@@ -49,129 +49,154 @@ function sortContainer(containers) {
 }
 
 export async function updateContainers(projectID, signal) {
-  const existingContainers = await getDB()
+  // STEP 1. Process project-owned buckets.
+
+  // Get project buckets from IDB
+  const idbBuckets = await getDB()
     .containers.where({ projectID })
     .toArray();
+
+  // Create a bucket map for fast lookup
+  const idbBucketsByName = new Map(idbBuckets.map((bucket) => [bucket.name, bucket]));
+  // Track all existing buckets for IDB cleanup
+  const existingBucketNames = new Set();
 
   if (!signal) {
     const controller = new AbortController();
     signal = controller.signal;
   }
 
-  let buckets;
-  let continuationToken = undefined;
-  let newBuckets = [];
+  let buckets = [];
   let newBucketsPage = [];
+  let toAddCors = [];
+  let toUpdateCorsFlag = [];
 
-  do {
-    buckets = [];
+  const maxBuckets = 100;
 
-    // Get a list of buckets and check bucket CORS
-    buckets = await awsListBuckets(projectID, continuationToken, 100);
-    if (buckets?.Buckets?.length > 0) {
-      await awsBulkAddBucketListCors(projectID, buckets.Buckets.map(
-        bucket => bucket.Name,
-      ));
-    }
+  // Get a list of buckets
+  buckets = await awsListBuckets(projectID);
 
-    if (buckets?.Buckets?.length > 0) {
-      for (const bucket of buckets.Buckets) {
+  if (buckets?.Buckets?.length > 0) {
+    for (const bucket of buckets.Buckets) {
+      // If bucket doesn't exist in IDB, check/add CORS and add to IDB
+      // Otherwise check CORS flag
+      const bucketExists = idbBucketsByName.get(bucket.Name);
 
+      if (!bucketExists) {
+        // Bucket not in IDB, prepare new entry
+        // bytes, count, last_modified are updated in objects view
         let newBucket = {
           name: bucket.Name,
-          tokens: tokenize(bucket.Name),
-          projectID: projectID,
-          tags: [],
-          last_modified: bucket.CreationDate.toISOString(),
           bytes: 0,
           count: 0,
+          created: bucket.CreationDate.toISOString(),
+          last_modified: bucket.CreationDate.toISOString(),
+          projectID: projectID,
+          cors_added: true, // changed on failure
         };
         newBucketsPage.push(newBucket);
-
-        if (newBucketsPage.length >= 100) {
-          try {
-            await getDB().containers.bulkPut(newBucketsPage);
-          } catch (err) {
-            if (DEV) console.log(err);
-          }
-
-          newBucketsPage = [];
+        toAddCors.push(bucket.Name);
+      }
+      else {
+        // If bucket in IDB, check that CORS was added
+        if (bucketExists.cors_added === false) {
+          toAddCors.push(bucket.Name);
         }
+      }
+      // Track all existing buckets
+      existingBucketNames.add(bucket.Name);
 
-        newBuckets.push(newBucket);
+      if (newBucketsPage.length >= maxBuckets) {
+        await processBatch();
+      }
+    }
+    // Process any remaining buckets after loop
+    await processBatch();
+  }
+
+  async function processBatch() {
+    if (toAddCors.length) {
+      // Check/add CORS first
+      try {
+        await awsBulkAddBucketListCors(projectID, toAddCors);
+        // Update IDB existing buckets cors_added if successful
+        for (let i = 0; i < toAddCors.length; i++) {
+          const bucketInIDB = idbBucketsByName.get(toAddCors[i]);
+          if (bucketInIDB) toUpdateCorsFlag.push(toAddCors[i]);
+        }
+        try {
+          await getDB().containers
+            .where("name")
+            .anyOf(toUpdateCorsFlag)
+            .modify(bucket => bucket.cors_added = true);
+          toUpdateCorsFlag = [];
+        } catch { if (DEV) console.log("Error updating IDB bucket CORS flag"); }
+        toAddCors = [];
+      } catch (err) {
+        if (DEV) console.log("Error adding CORS", err);
+        // Update new buckets cors_added flag if unsuccessful
+        newBucketsPage = newBucketsPage.forEach((bucket) => bucket.cors_added = false);
       }
     }
 
-    if (buckets?.ContinuationToken) {
-      continuationToken = buckets.ContinuationToken;
-    } else {
-      break;
+    if (newBucketsPage.length) {
+      // Add buckets to IDB
+      try {
+        await getDB().containers.bulkPut(newBucketsPage);
+        newBucketsPage = [];
+      } catch (err) {
+        if (DEV) console.log("Error adding buckets to IDB:", err);
+      }
     }
-    // May be unnecessary, S3 should omit the continuation token on
-    // final page
-    if (buckets?.Buckets?.length < 10) {
-      break;
-    }
-  } while (buckets?.Buckets?.length > 0 && continuationToken);
-
-  const sharedContainers = await getSharedContainers(projectID, signal);
-
-  if (sharedContainers.length > 0) {
-    for (let i in sharedContainers) {
-      let cont = sharedContainers[i];
-      cont.tokens =  cont.container.endsWith("_segments") ?
-        [] : tokenize(cont.container);
-      cont.projectID = projectID;
-      cont.bytes = 0;
-      cont.count = 0;
-      cont.name = cont.container;
-
-      const idb_last_modified = getContainerLastmodified(
-        existingContainers, cont);
-      cont.last_modified = !cont.container.endsWith("_segments") &&
-        idb_last_modified  && idb_last_modified > cont.sharingdate ?
-        idb_last_modified : cont.sharingdate;
-    }
-
-    await getDB()
-      .containers.bulkPut(sharedContainers)
-      .catch(() => {});
-    newBuckets = newBuckets.concat(sharedContainers);
   }
 
+  // STEP 2. Process buckets your project has access to.
+  const sharedBuckets = await getSharedContainers(projectID, signal);
+
+  let newSharedBuckets = [];
+
+  if (sharedBuckets.length) {
+    for (const bucket of sharedBuckets) {
+
+      const sharedBucketExists = idbBucketsByName.get(bucket.container);
+
+      if (!sharedBucketExists) {
+        const newSharedBucket = {
+          name: bucket.container,
+          bytes: 0,
+          count: 0,
+          last_modified: bucket.sharingdate,
+          projectID: projectID,
+          owner: bucket.owner,
+        };
+        newSharedBuckets.push(newSharedBucket);
+      }
+      existingBucketNames.add(bucket.container);
+    }
+    if (newSharedBuckets.length) {
+      await getDB()
+        .containers.bulkPut(newSharedBuckets)
+        .catch(() => {});
+      newSharedBuckets = [];
+    }
+  }
+
+  // STEP 3. Delete non-existent buckets from IDB.
   const toDelete = [];
-  for (let i = 0; i < existingContainers.length; i++) {
-    const oldCont = existingContainers[i];
-    if (!newBuckets.find(cont => cont.name == oldCont.name)) {
-      toDelete.push(oldCont.id);
+
+  for (const [name, bucket] of idbBucketsByName) {
+    const bucketExists = existingBucketNames.has(name);
+    if (!bucketExists) {
+      // if bucket in IDB but not latest listing
+      toDelete.push(bucket.id);
     }
   }
 
   if (toDelete.length) {
-    await getDB().containers.bulkDelete(toDelete);
-  }
-  const containersFromDB = await getDB()
-    .containers.where({ projectID })
-    .toArray();
-
-  // sort "_segments" bucket before original bucket
-  // so that "_segments" bucket could be updated first
-  newBuckets = sortContainer(newBuckets);
-
-  for (let i = 0; i < newBuckets.length; i++) {
-    addSegmentContainerSize(newBuckets[i], newBuckets);
-  }
-
-  for (let i = 0; i < newBuckets.length; i++) {
-    const container = newBuckets[i];
-    const oldContainer = containersFromDB.find(
-      cont => cont.name === container.name,
-    );
-
-    if (oldContainer !== undefined) {
-      await getDB().containers.update(oldContainer.id, container);
-    } else {
-      await getDB().containers.put(container);
+    try {
+      await getDB().containers.bulkDelete(toDelete);
+    } catch (err) {
+      if (DEV) console.log(err);
     }
   }
 }
