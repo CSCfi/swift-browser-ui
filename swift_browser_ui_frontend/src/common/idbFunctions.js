@@ -1,12 +1,10 @@
 // Functions for managing indexedDB
 import {
   awsListBuckets,
-  awsBulkAddBucketListCors,
 } from "@/common/api";
 import { getDB } from "@/common/idb";
 import {
   DEV,
-  tokenize,
 } from "@/common/globalFunctions";
 import { getSharedContainers } from "@/common/share";
 
@@ -68,8 +66,6 @@ export async function updateContainers(projectID, signal) {
 
   let buckets = [];
   let newBucketsPage = [];
-  let toAddCors = [];
-  let toUpdateCorsFlag = [];
 
   const maxBuckets = 100;
 
@@ -78,8 +74,7 @@ export async function updateContainers(projectID, signal) {
 
   if (buckets?.Buckets?.length > 0) {
     for (const bucket of buckets.Buckets) {
-      // If bucket doesn't exist in IDB, check/add CORS and add to IDB
-      // Otherwise check CORS flag
+      // If bucket doesn't exist in IDB, add
       const bucketExists = idbBucketsByName.get(bucket.Name);
 
       if (!bucketExists) {
@@ -92,16 +87,9 @@ export async function updateContainers(projectID, signal) {
           created: bucket.CreationDate.toISOString(),
           last_modified: bucket.CreationDate.toISOString(),
           projectID: projectID,
-          cors_added: true, // changed on failure
+          cors_added: false, // added later
         };
         newBucketsPage.push(newBucket);
-        toAddCors.push(bucket.Name);
-      }
-      else {
-        // If bucket in IDB, check that CORS was added
-        if (bucketExists.cors_added === false) {
-          toAddCors.push(bucket.Name);
-        }
       }
       // Track all existing buckets
       existingBucketNames.add(bucket.Name);
@@ -115,30 +103,6 @@ export async function updateContainers(projectID, signal) {
   }
 
   async function processBatch() {
-    if (toAddCors.length) {
-      // Check/add CORS first
-      try {
-        await awsBulkAddBucketListCors(projectID, toAddCors);
-        // Update IDB existing buckets cors_added if successful
-        for (let i = 0; i < toAddCors.length; i++) {
-          const bucketInIDB = idbBucketsByName.get(toAddCors[i]);
-          if (bucketInIDB) toUpdateCorsFlag.push(toAddCors[i]);
-        }
-        try {
-          await getDB().containers
-            .where("name")
-            .anyOf(toUpdateCorsFlag)
-            .modify(bucket => bucket.cors_added = true);
-          toUpdateCorsFlag = [];
-        } catch { if (DEV) console.log("Error updating IDB bucket CORS flag"); }
-        toAddCors = [];
-      } catch (err) {
-        if (DEV) console.log("Error adding CORS", err);
-        // Update new buckets cors_added flag if unsuccessful
-        newBucketsPage = newBucketsPage.forEach((bucket) => bucket.cors_added = false);
-      }
-    }
-
     if (newBucketsPage.length) {
       // Add buckets to IDB
       try {
@@ -237,4 +201,15 @@ export async function saveBucketMetadata(projectID, bucket, metadata) {
 export async function getBucketMetadata(projectID, bucket) {
   return await getDB().containers
     .get({ projectID: projectID, name: bucket});
+}
+
+export async function updateCorsFlag(projectID, buckets, corsAdded) {
+  try {
+    await getDB().containers
+      .where("[projectID+name]")
+      .anyOf(buckets.map(name => [projectID, name]))
+      .modify(bucket => bucket.cors_added = corsAdded);
+  } catch {
+    if (DEV) console.log("Error updating IDB bucket CORS flag");
+  }
 }
