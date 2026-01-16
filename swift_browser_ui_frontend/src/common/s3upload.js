@@ -380,6 +380,10 @@ export default class S3UploadSocket {
 
     this.headerUploads++;
 
+    if (DEV && this.uploads[bucket][key].ownerName) {
+      console.log(`Shared upload, using ${this.uploads[bucket][key].ownerName} as owner.`);
+    }
+
     // Push header to Vault
     let headerBase = this.$store.state.uploadEndpoint;
     let headerPath = `/header/${this.project}/${bucket}/${key}.c4gh`;
@@ -388,6 +392,9 @@ export default class S3UploadSocket {
       headerBase,
       headerPath,
       header,
+      this.uploads[bucket][key].ownerName
+        ? {owner: this.uploads[bucket][key].ownerName}
+        : undefined,
     );
 
     this.headerUploads--;
@@ -405,7 +412,7 @@ export default class S3UploadSocket {
   }
 
   // Add files for encrypted upload
-  async addEncryptedUploads(bucket, files, receivers) {
+  async addEncryptedUploads(bucket, files, receivers, ownerName) {
     // If the upload is already defined, we're adding files to an ongoing
     // upload – no need to check existence or initialization.
     if (this.uploads[bucket] === undefined) {
@@ -477,6 +484,7 @@ export default class S3UploadSocket {
         multipartParts: {},
         finished: false,
         f: file,
+        ownerName: ownerName,
       };
 
       console.log(this.uploads[bucket][file.relativePath]);
