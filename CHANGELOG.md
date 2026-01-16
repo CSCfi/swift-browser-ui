@@ -16,6 +16,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) implicit project no longer causes share recipient created objects to be inaccessible to the bucket owner
+- (users) headers are uploaded using the correct owner when uploading to a shared bucket
+- implicit project no longer causes share recipient created objects to be inaccessible to the bucket owner
+- headers are uploaded using the correct owner when uploading to a shared bucket
 - Fix upload not starting after cancelled uploads (#1295)
 - (users) header upload should no longer crash when hundreds of files are uploaded
 - header upload no longer overflows the event loop due to too many headers
