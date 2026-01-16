@@ -172,14 +172,16 @@ export default class S3UploadSocket {
               if (DEV) console.log(`Checked if file ${e.data.bucket}/${e.data.key} is finished.`);
             });
           } else {
-            console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
+            if (DEV) {
+              console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
+            }
             this.uploads[e.data.bucket][e.data.key].finished = true;
           }
 
           // Schedule next part if there's more to process,
           // otherwise check if we're done.
           if (this.parts.length > 0) {
-            console.log("Sending next part to worker.");
+            if (DEV) console.log("Sending next part to worker.");
             this.getNextPart(worker);
           } else {
             this.checkFinished().then(
@@ -464,7 +466,7 @@ export default class S3UploadSocket {
 
     if (DEV) console.log("Adding the listed files to the worker filesystems.");
     for (const worker of this.upWorkers) {
-      console.log(worker);
+      if (DEV) console.log(worker);
       worker.postMessage({
         command: "mountFiles",
         bucket: bucket,
@@ -487,7 +489,7 @@ export default class S3UploadSocket {
         ownerName: ownerName,
       };
 
-      console.log(this.uploads[bucket][file.relativePath]);
+      if (DEV) console.log(this.uploads[bucket][file.relativePath]);
 
       this.headerWorker.postMessage({
         command: "createHeader",
