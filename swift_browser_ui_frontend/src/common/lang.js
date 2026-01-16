@@ -209,6 +209,8 @@ let default_translations = {
         warnTempFiles: "Opening temporary files or folders " +
           "(.crdownload, .crswap) may interrupt the process.",
         error: "Download has failed. Please try again.",
+        noRetain: "Error establishing bucket ownership. Please contact servicedesk@csc.fi " +
+          "(subject: Sensitive data).",
         cancel: "Download cancelled",
       },
       upload: {
@@ -772,6 +774,8 @@ let default_translations = {
         warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +
         "(.crdownload, .crswap) avaaminen voi keskeyttää latauksen.",
         error: "Lataus epäonnistui. Yritä uudelleen.",
+        noRetain: "Ämpärin omistusoikeuden varmennus epäonnistui. Ota yhteyttä " +
+          "servicedesk@csc.fi (aihe: sensitive data).",
         cancel: "Lataus peruutettu",
       },
       upload: {

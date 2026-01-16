@@ -24,7 +24,7 @@ import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
-import { awsListObjects } from "./s3commands";
+import { awsListObjects, ensureCollaborateAccessPolicy } from "./s3commands";
 
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
@@ -350,6 +350,27 @@ export default class S3DownloadSocket {
     owner = "",
     test = false,
   ) {
+    // Before adding the download, ensure that we have retained access as the owner
+    if (!owner) {
+      if (DEV) console.log("Not downloading from shared bucket, ensure access is retained.");
+      try {
+        await ensureCollaborateAccessPolicy(bucket);
+      } catch {
+        if (DEV) console.log(`Could not retain access in bucket ${bucket}`);
+
+        document.querySelector("#decryption-toasts").addToast(
+          {
+            ...this.toastMessage,
+            type: "error",
+            message: this.$t("message.download.noRetain"),
+          },
+        );
+
+        return;
+      }
+    }
+
+
     // get random id
     const sessionId = window.crypto.randomUUID();
     if (DEV) {

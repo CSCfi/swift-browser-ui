@@ -1,3 +1,4 @@
+
 <template>
   <c-card
     ref="uploadContainer"
@@ -844,6 +845,7 @@ export default {
         bucketName,
         this.$store.state.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
+        ownerName,
       );
     },
     beginEncryptedUpload() {

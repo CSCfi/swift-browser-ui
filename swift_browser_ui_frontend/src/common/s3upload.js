@@ -172,14 +172,16 @@ export default class S3UploadSocket {
               if (DEV) console.log(`Checked if file ${e.data.bucket}/${e.data.key} is finished.`);
             });
           } else {
-            console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
+            if (DEV) {
+              console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
+            }
             this.uploads[e.data.bucket][e.data.key].finished = true;
           }
 
           // Schedule next part if there's more to process,
           // otherwise check if we're done.
           if (this.parts.length > 0) {
-            console.log("Sending next part to worker.");
+            if (DEV) console.log("Sending next part to worker.");
             this.getNextPart(worker);
           } else {
             this.checkFinished().then(
@@ -380,6 +382,10 @@ export default class S3UploadSocket {
 
     this.headerUploads++;
 
+    if (DEV && this.uploads[bucket][key].ownerName) {
+      console.log(`Shared upload, using ${this.uploads[bucket][key].ownerName} as owner.`);
+    }
+
     // Push header to Vault
     let headerBase = this.$store.state.uploadEndpoint;
     let headerPath = `/header/${this.project}/${bucket}/${key}.c4gh`;
@@ -388,6 +394,9 @@ export default class S3UploadSocket {
       headerBase,
       headerPath,
       header,
+      this.uploads[bucket][key].ownerName
+        ? {owner: this.uploads[bucket][key].ownerName}
+        : undefined,
     );
 
     this.headerUploads--;
@@ -405,7 +414,7 @@ export default class S3UploadSocket {
   }
 
   // Add files for encrypted upload
-  async addEncryptedUploads(bucket, files, receivers) {
+  async addEncryptedUploads(bucket, files, receivers, ownerName) {
     // If the upload is already defined, we're adding files to an ongoing
     // upload – no need to check existence or initialization.
     if (this.uploads[bucket] === undefined) {
@@ -457,7 +466,7 @@ export default class S3UploadSocket {
 
     if (DEV) console.log("Adding the listed files to the worker filesystems.");
     for (const worker of this.upWorkers) {
-      console.log(worker);
+      if (DEV) console.log(worker);
       worker.postMessage({
         command: "mountFiles",
         bucket: bucket,
@@ -477,9 +486,10 @@ export default class S3UploadSocket {
         multipartParts: {},
         finished: false,
         f: file,
+        ownerName: ownerName,
       };
 
-      console.log(this.uploads[bucket][file.relativePath]);
+      if (DEV) console.log(this.uploads[bucket][file.relativePath]);
 
       this.headerWorker.postMessage({
         command: "createHeader",
