@@ -306,31 +306,38 @@ export default {
         [sharedProjectId],
         this.newPerms,
       );
+
       let projectIDs = await this.$store.state.sharingClient.projectCheckIDs(
         sharedProjectId,
       );
 
-      if (this.newPerms.length === 1 && this.newPerms[0] === "v") {
-        await signedFetch(
-          "DELETE",
-          this.$store.state.uploadEndpoint,
-          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
-          JSON.stringify([projectIDs.name]),
-          [],
-        ).then(() => {
-          if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
-        });
+      if (projectIDs !== undefined) {
+        if (this.newPerms.length === 1 && this.newPerms[0] === "v") {
+          await signedFetch(
+            "DELETE",
+            this.$store.state.uploadEndpoint,
+            `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+            JSON.stringify([projectIDs.name]),
+            [],
+          ).then(() => {
+            if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
+          });
+        } else {
+          await signedFetch(
+            "PUT",
+            this.$store.state.uploadEndpoint,
+            `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+            JSON.stringify([projectIDs]),
+            [],
+          ).then(() => {
+            if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
+          });
+        }
       } else {
-        await signedFetch(
-          "PUT",
-          this.$store.state.uploadEndpoint,
-          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
-          JSON.stringify([projectIDs]),
-          [],
-        ).then(() => {
-          if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
-        });
+        if (DEV) console.log("Unable to alter whitelist status without cached project name");
+        this.$emit("failUpdateSharedBucket");
       }
+
       this.$emit("updateSharedBucket");
     },
     confirmDelete: async function () {
@@ -346,12 +353,12 @@ export default {
     deleteBucketShare: async function (bucketData) {
       await removeAccessControlBucketPolicy(
         this.bucketName,
-        [this.projectId],
+        [bucketData.projectId.value],
       );
       try {
         await removeAccessControlBucketPolicy(
           `${this.bucketName}_segments`,
-          [this.projectId],
+          [bucketData.projectId.value],
         );
       } catch {}
 
@@ -370,23 +377,26 @@ export default {
         bucketData.projectId.value,
       );
 
-      await signedFetch(
-        "DELETE",
-        this.$store.state.uploadEndpoint,
-        `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
-        JSON.stringify([
-          projectIDs.name,
-        ]),
-        [],
-      ).then(() => {
-        if (DEV) console.log(
-          `Deleted sharing whitelist entry for ${bucketData.projectId.value}`,
+      if (projectIDs !== undefined) {
+        await signedFetch(
+          "DELETE",
+          this.$store.state.uploadEndpoint,
+          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+          JSON.stringify([
+            projectIDs.name,
+          ]),
+          [],
         );
-      }).finally(() => {
-        if (DEV) console.log(
-          `Share deletion for ${bucketData.projectId.value} finished.`,
-        );
-      });
+        if (DEV) {
+          console.log(
+            `Deleted sharing whitelist entry for ${bucketData.projectId.value}`,
+          );
+        }
+      } else {
+        if (DEV) console.log(`Skipping delete share whitelist for ${bucketData.projectId.value}`);
+      }
+
+      if (DEV) console.log(`Share deletion for ${bucketData.projectId.value} finished.`);
     },
   },
 };
