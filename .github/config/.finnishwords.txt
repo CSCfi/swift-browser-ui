@@ -1,4 +1,5 @@
 aakkosia
+aihe
 aika
 aikana
 aina
@@ -478,6 +479,7 @@ omaa
 ominaisuutta
 omistaja
 omistavan
+omistusoikeuden
 on
 ongelmat
 ongelmia
@@ -894,6 +896,7 @@ valmis
 valvontaviranomainen
 valvontaviranomaisen
 varmasti
+varmennus
 varmistaa
 varmistamme
 varmistathan

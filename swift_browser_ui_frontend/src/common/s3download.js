@@ -361,7 +361,7 @@ export default class S3DownloadSocket {
         document.querySelector("#decryption-toasts").addToast(
           {
             ...this.toastMessage,
-            type: "warning",
+            type: "error",
             message: this.$t("message.download.noRetain"),
           },
         );
