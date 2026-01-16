@@ -209,6 +209,7 @@ let default_translations = {
         warnTempFiles: "Opening temporary files or folders " +
           "(.crdownload, .crswap) may interrupt the process.",
         error: "Download has failed. Please try again.",
+        noRetain: "You have lost access to this bucket.",
         cancel: "Download cancelled",
       },
       upload: {
@@ -772,6 +773,7 @@ let default_translations = {
         warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +
         "(.crdownload, .crswap) avaaminen voi keskeyttää latauksen.",
         error: "Lataus epäonnistui. Yritä uudelleen.",
+        noRetain: "Ei käyttöoikeutta ämpäriin.",
         cancel: "Lataus peruutettu",
       },
       upload: {

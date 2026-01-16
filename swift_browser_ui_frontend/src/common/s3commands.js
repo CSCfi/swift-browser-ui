@@ -239,6 +239,42 @@ export async function putBucketPolicy(bucket, policy) {
   return response;
 }
 
+export async function ensureCollaborateAccessPolicy(bucket) {
+  // Check that the active project exists in owned bucket policy list
+  // prior to starting the download
+  let project = store.state.active;
+  let statements = await getBucketPolicyStatements(bucket);
+
+  // If the project already has the read and write policies, skip
+  for (const statement of statements) {
+    if (statement["Sid"] === "GrantSDConnectPreserveOwnerAccess") return;
+  }
+
+  // As the owner we want all access
+  statements.push({
+    "Sid": "GrantSDConnectPreserveOwnerAccess",
+    "Effect": "Allow",
+    "Principal": {
+      "AWS": `arn:aws:iam::${project.id}:root`,
+    },
+    "Action": [
+      "s3:*",
+    ],
+    "Resource": [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`],
+  });
+
+  if (DEV) console.log(`Pushing preserve statement ${statements}`);
+
+  let policy = {
+    "Version": "2012-10-17",
+    "Statement": statements,
+  };
+
+  // Override the old bucket policy
+  const response = await putBucketPolicy(bucket, policy);
+  return response;
+}
+
 export async function addAccessControlBucketPolicy(
   bucket,
   rights,
