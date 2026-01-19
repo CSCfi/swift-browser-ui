@@ -3,6 +3,8 @@ import store from "@/common/store";
 import { DEV } from "./globalFunctions";
 import { getDB } from "./idb";
 import { getBucketPolicyStatements } from "./s3commands";
+import { updateCorsFlag } from "./idbFunctions";
+import { awsBulkAddBucketListCors } from "./api";
 
 export async function getSharingContainers (projectId, signal) {
   // Get buckets a project has shared
@@ -53,28 +55,50 @@ export async function deleteStaleShares(project, bucket) {
 }
 
 export async function syncBucketPolicies(project) {
-  // Sync bucket policies to sharing DB according to s3 bucket policies
+  if (DEV) console.log("Starting sharing sync...");
+  // Add CORS and sync bucket policies to sharing DB according to s3 bucket policies
   const client = store.state.sharingClient;
 
   const buckets = await getDB()
     .containers
     .where({ projectID : project })
     .toArray();
-  const bucketnames = buckets.map(b => b.name);
+
+  const bucketsByName = new Map(buckets.map((bucket) => [bucket.name, bucket]));
 
   // Refresh current sharing information
   let currentSharingDB = await client.getShare(project);
   // Prune any entries outside of current up-to-date bucket list
   for (let container of currentSharingDB) {
-    if (!bucketnames.includes(container)) {
+    if (!bucketsByName.get(container)) {
       const shareDetails = await client.getShareDetails(project, container);
       const shares = shareDetails.map(item => item.sharedTo);
       await client.shareDeleteAccess(project, container, shares);
     }
   }
 
+  // Mass check CORS flag and add CORS
+  let toAddCors = [];
+
+  for (let [bucketName, bucket] of bucketsByName) {
+    if (bucket?.cors_added === false) {
+      toAddCors.push(bucketName);
+    }
+  }
+
+  if (toAddCors.length) {
+    // Check/add CORS first
+    try {
+      await awsBulkAddBucketListCors(project, toAddCors);
+      updateCorsFlag(project, toAddCors, true);
+    } catch (err) {
+      if (DEV) console.log("Error adding CORS", err);
+    }
+    toAddCors = [];
+  }
+
   // Check bucket policies and sync sharing db
-  for (let bucket of bucketnames) {
+  for (let [bucket] of bucketsByName) {
     // Get sharing information for bucket
     const shareDetails = await client.getShareDetails(project, bucket);
     let statements = [];
@@ -152,4 +176,5 @@ export async function syncBucketPolicies(project) {
       await client.shareDeleteAccess(project, bucket, toBeDeleted);
     }
   }
+  if (DEV) console.log("Sharing sync done.");
 }
