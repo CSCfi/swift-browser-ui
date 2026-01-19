@@ -18,6 +18,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (admins) missing project id-name mapping prevented deletion from finishing, leading to the "delete access" confirmation to not close after deletion
+- (admins) incorrect referred ID leading to share deletion not working properly
+- (users) deleted shares no longer reappear after refresh
+- missing project id-name mapping prevented deletion from finishing, leading to the "delete access" confirmation to not close after deletion
+- incorrect referred ID leading to share deletion not working properly
 - (users) implicit project no longer causes share recipient created objects to be inaccessible to the bucket owner
 - (users) headers are uploaded using the correct owner when uploading to a shared bucket
 - implicit project no longer causes share recipient created objects to be inaccessible to the bucket owner
