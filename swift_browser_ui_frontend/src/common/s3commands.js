@@ -324,10 +324,12 @@ export async function removeAccessControlBucketPolicy(
     let deleteBucketPolicyCommand = new DeleteBucketPolicyCommand({
       Bucket: bucket,
     });
-    await sendS3Command(deleteBucketPolicyCommand).catch((e) => {
+    try {
+      await sendS3Command(deleteBucketPolicyCommand);
+    } catch (e) {
       if (DEV) console.log("Failed to delete bucket policy.");
       if (DEV) console.log(e);
-    });
+    }
     return;
   }
 
