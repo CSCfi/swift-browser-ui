@@ -63,10 +63,7 @@
 
 <script>
 import { debounce } from "lodash";
-import {
-  copyBucket,
-  awsAddBucketCors,
-} from "@/common/api";
+import { copyBucket } from "@/common/api";
 import { getDB } from "@/common/idb";
 import { updateContainers } from "@/common/idbFunctions";
 import {
@@ -97,7 +94,6 @@ export default {
       loadingBucketname: true,
       tags: [],
       buckets: [],
-      checkpointsCompleted: 0,
       validationResult: {},
     };
   },
@@ -132,13 +128,6 @@ export default {
     bucketName() {
       if (this.bucketName) {
         this.checkValidity();
-      }
-    },
-    checkpointsCompleted() {
-      if (this.checkpointsCompleted > 1) {
-        this.$store.commit("setBucketCopiedStatus", true);
-        document.querySelector("#copyBucket-toasts")
-          .removeToast("copy-in-progress");
       }
     },
   },
@@ -199,7 +188,6 @@ export default {
       this.tags = [];
       this.loadingBucketname = true;
       this.validationResult = {};
-      document.querySelector("#copyBucket-toasts").removeToast("copy-error");
 
       /*
         Prev Active element is a popup menu and it is removed from DOM
@@ -219,7 +207,7 @@ export default {
         Object.values(this.validationResult).some(val => !val);
       if (validationError) return;
 
-      this.a_replicate_container(keypress).then(() => {});
+      await this.a_replicate_container(keypress);
     },
     a_replicate_container: async function (keypress) {
       this.$store.commit("toggleCopyBucketModal", false);
@@ -232,17 +220,16 @@ export default {
           custom: true,
         },
       );
-
-      await copyBucket(
-        this.active.id,
-        this.bucketName,
-        this.selectedBucketName,
-      ).then(async () => {
-        await awsAddBucketCors(this.active.id, this.bucketName);
-        await updateContainers(this.$route.params.project);
-
-        this.checkpointsCompleted = 0;
-
+      try {
+        await copyBucket(
+          this.active.id,
+          this.bucketName,
+          this.selectedBucketName,
+        );
+        await updateContainers(this.active.id);
+        // CORS for new bucket is added on bucket creation
+        // Source bucket CORS checked on bucket copy click
+        // Proceed with object fetch
         let objects = await awsListObjects(
           this.selectedBucketName,
         );
@@ -257,10 +244,7 @@ export default {
           copiedObjects = await awsListObjects(this.bucketName);
           await sleep(2000);
         }
-
-        this.checkpointsCompleted++;
-        this.cancelCopy(keypress);
-      }).catch(() => {
+      } catch {
         document.querySelector("#copyBucket-toasts").addToast(
           {
             id: "copy-error",
@@ -271,7 +255,10 @@ export default {
             message: this.$t("message.copyfail"),
           },
         );
-      });
+      } finally {
+        document.querySelector("#copyBucket-toasts").removeToast("copy-in-progress");
+        this.cancelCopy(keypress);
+      }
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
