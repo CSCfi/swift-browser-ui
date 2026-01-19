@@ -37,6 +37,7 @@ import {
   toggleEditTagsModal,
   toggleCopyBucketModal,
   addErrorToastOnMain,
+  checkAndAddBucketCors,
 } from "@/common/globalFunctions";
 import {
   deleteStaleShares,
@@ -395,6 +396,9 @@ export default {
       this.paginationOptions = paginationOptions;
     },
     ensureBucketState: async function (bucket, shouldBeEmpty, errorMsg) {
+      // There is no CORS check on bucket list fetch, only share sync
+      // Make sure it is in place before fetching objects
+      await checkAndAddBucketCors(this.active.id, bucket);
       const isEmpty = await checkBucketEmpty(bucket);
       if (isEmpty === shouldBeEmpty) {
         return true;

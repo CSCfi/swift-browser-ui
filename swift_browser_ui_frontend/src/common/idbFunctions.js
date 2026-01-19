@@ -203,6 +203,12 @@ export async function getBucketMetadata(projectID, bucket) {
     .get({ projectID: projectID, name: bucket});
 }
 
+export async function checkCorsFlag(projectID, bucket) {
+  const idbBucket = await getDB().containers
+    .get({ projectID: projectID, name: bucket});
+  return idbBucket?.cors_added; // undefined on shared buckets
+}
+
 export async function updateCorsFlag(projectID, buckets, corsAdded) {
   try {
     await getDB().containers
