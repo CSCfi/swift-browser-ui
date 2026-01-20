@@ -132,6 +132,7 @@ import {
   toggleDeleteModal,
   isFile,
   addErrorToastOnMain,
+  checkAndAddBucketCors,
 } from "@/common/globalFunctions";
 import {
   getSharedContainers,
@@ -196,6 +197,9 @@ export default {
     };
   },
   computed: {
+    readyToFetch() {
+      return (this.active?.id && this.containerName && this.sharingClient);
+    },
     prefix () {
       return this.$route.query.prefix || "";
     },
@@ -243,15 +247,12 @@ export default {
     },
   },
   watch: {
-    active: function() {
-      this.getData();
-    },
-    sharingClient: function() {
-      this.getData();
+    readyToFetch: function() {
+      this.fetchIfReady();
     },
     containerName: function() {
-      this.objsLoading = true;
-      this.getData();
+      // For cases of navigating with upload "view destination"
+      this.fetchIfReady();
     },
     searchQuery: function () {
       // Run debounced search every time the search box input changes
@@ -310,8 +311,7 @@ export default {
     this.getDirectCurrentPage();
   },
   mounted () {
-    this.objsLoading = true;
-    this.getData();
+    this.fetchIfReady();
   },
   beforeUnmount () {
     this.abortController.abort();
@@ -320,15 +320,20 @@ export default {
     if (this.breadcrumbClicked) this.breadcrumbClicked = false;
   },
   methods: {
-    getData: async function () {
-      if (this.containerName && this.active.id) {
-        // First look for bucket metadata in idb; it is updated after objects are fetched
-        const idbMetadata = await getBucketMetadata(this.active.id, this.containerName);
-        if (idbMetadata) this.metadata = {...idbMetadata};
-        await this.getSharedContainers();
-        await this.getBucketSharedStatus();
-        await this.updateObjectsAndMetadata();
+    fetchIfReady: async function () {
+      this.objsLoading = true;
+      if (this.readyToFetch) {
+        if (!this.owner) await checkAndAddBucketCors(this.active.id, this.containerName);
+        await this.getData();
       }
+    },
+    getData: async function () {
+      // First look for bucket metadata in idb; it is updated after objects are fetched
+      const idbMetadata = await getBucketMetadata(this.active.id, this.containerName);
+      if (idbMetadata) this.metadata = {...idbMetadata};
+      await this.getSharedContainers();
+      await this.getBucketSharedStatus();
+      await this.updateObjectsAndMetadata();
     },
     breadcrumbClickHandler(value) {
       this.breadcrumbClicked = value;

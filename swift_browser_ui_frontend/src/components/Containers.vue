@@ -93,9 +93,6 @@ export default {
     isBucketUploading() {
       return this.$store.state.isUploading;
     },
-    isBucketCopied() {
-      return this.$store.state.isBucketCopied;
-    },
     newBucket() {
       return this.$store.state.newBucket;
     },
@@ -161,12 +158,6 @@ export default {
           this.fetchContainers();
           this.contsLoading = false;
         }, 3000);
-      }
-    },
-    isBucketCopied: function () {
-      if (this.isBucketCopied) {
-        this.fetchContainers();
-        this.$store.commit("setBucketCopiedStatus", false);
       }
     },
     locale: function () {

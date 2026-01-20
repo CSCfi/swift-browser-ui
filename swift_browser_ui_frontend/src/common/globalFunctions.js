@@ -2,6 +2,8 @@
 
 import store from "@/common/store";
 import { checkBucketExists } from "@/common/s3commands";
+import { checkCorsFlag, updateCorsFlag } from "./idbFunctions";
+import { awsAddBucketCors } from "./api";
 
 export const DEV = import.meta.env.MODE === "development";
 
@@ -114,6 +116,20 @@ export async function ensureObjectSizes(
     // Otherwise just return the object as is
     return object;
   }));
+}
+
+export async function checkAndAddBucketCors(projectID, bucket) {
+  if (!projectID || !bucket) throw new Error("Missing projectID and/or bucket for CORS check");
+  const corsAdded = await checkCorsFlag(projectID, bucket);
+  if (corsAdded === false) {
+    if (DEV) console.log("Adding CORS for", bucket);
+    try {
+      await awsAddBucketCors(projectID, bucket);
+      await updateCorsFlag(projectID, [bucket], true);
+    } catch {
+      if (DEV) console.log(`Failed to add CORS to bucket ${bucket}`);
+    }
+  }
 }
 
 /** TAGS */

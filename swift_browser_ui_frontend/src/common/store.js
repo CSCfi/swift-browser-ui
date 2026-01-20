@@ -45,7 +45,6 @@ const store = createStore({
     openDeleteModal: false,
     openAPIKeyModal: false,
     deletableObjects: [],
-    isBucketCopied: false,
     sourceProjectId: "",
     uploadAbortReason: undefined,
     renderedFolders: true,
@@ -213,9 +212,6 @@ const store = createStore({
     },
     setDeletableObjects(state, payload) {
       state.deletableObjects = payload;
-    },
-    setBucketCopiedStatus(state, payload) {
-      state.isBucketCopied = payload;
     },
     setSourceProjectId(state, payload) {
       state.sourceProjectId = payload;

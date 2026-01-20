@@ -607,6 +607,9 @@ async def replicate_bucket(
                     text="Cannot create destination bucket"
                 )
 
+    # Add CORS entries for the newly created bucket to allow access via browser
+    await _update_bucket_cors(logger, s3session, dest_bucket)
+
     asyncio.create_task(_replicate_objects(s3_client, source_bucket, dest_bucket, logger))
     return aiohttp.web.HTTPAccepted(text="Replication started")
 

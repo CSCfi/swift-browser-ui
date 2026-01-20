@@ -66,6 +66,32 @@ export async function syncBucketPolicies(project) {
 
   const bucketsByName = new Map(buckets.map((bucket) => [bucket.name, bucket]));
 
+  // Check CORS flag and add CORS in batches
+  let toAddCors = [];
+  const batchSize = 20;
+
+  async function processBatch(buckets) {
+    if (toAddCors.length) {
+      try {
+        await awsBulkAddBucketListCors(project, buckets);
+        await updateCorsFlag(project, buckets, true);
+      } catch (err) {
+        if (DEV) console.log("Error adding CORS", err);
+      }
+    }
+  }
+
+  for (let [bucketName, bucket] of bucketsByName) {
+    if (bucket?.cors_added === false) {
+      toAddCors.push(bucketName);
+    }
+    if (toAddCors.length >= batchSize) {
+      await processBatch(toAddCors);
+      toAddCors = [];
+    }
+  }
+  await processBatch(toAddCors);
+
   // Refresh current sharing information
   let currentSharingDB = await client.getShare(project);
   // Prune any entries outside of current up-to-date bucket list
@@ -75,26 +101,6 @@ export async function syncBucketPolicies(project) {
       const shares = shareDetails.map(item => item.sharedTo);
       await client.shareDeleteAccess(project, container, shares);
     }
-  }
-
-  // Mass check CORS flag and add CORS
-  let toAddCors = [];
-
-  for (let [bucketName, bucket] of bucketsByName) {
-    if (bucket?.cors_added === false) {
-      toAddCors.push(bucketName);
-    }
-  }
-
-  if (toAddCors.length) {
-    // Check/add CORS first
-    try {
-      await awsBulkAddBucketListCors(project, toAddCors);
-      updateCorsFlag(project, toAddCors, true);
-    } catch (err) {
-      if (DEV) console.log("Error adding CORS", err);
-    }
-    toAddCors = [];
   }
 
   // Check bucket policies and sync sharing db
