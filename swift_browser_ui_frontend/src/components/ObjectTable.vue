@@ -442,7 +442,7 @@ export default {
       await this.updateBucketMetadata();
     },
     updateBucketMetadata: async function () {
-      let updated = { ...this.metadata, bytes: 0 };
+      let updated = { ...this.metadata, bytes: 0, count: 0 };
       if (this.oList?.length) {
         updated.count = this.oList.length;
 
