@@ -54,6 +54,7 @@ import { useObservable } from "@vueuse/rxjs";
 import { throttle } from "lodash";
 import { mdiPlus } from "@mdi/js";
 import { toggleCreateBucketModal } from "@/common/globalFunctions";
+import { getPaginationOptions } from "@/common/tableFunctions";
 import { getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
@@ -135,7 +136,8 @@ export default {
 
         // Explicitly toggle container loading off if we're done with
         // the first page
-        if (this.containers?.length > 10) this.contsLoading = false;
+        const defaultCount = getPaginationOptions(this.$t).itemsPerPage;
+        if (this.containers?.length > defaultCount) this.contsLoading = false;
 
         if (this.containers && this.newBucket) {
           const idx = this.containers.findIndex(c => c.name === this.newBucket);
