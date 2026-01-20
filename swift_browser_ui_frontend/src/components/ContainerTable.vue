@@ -351,19 +351,6 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
 
-      if (this.sortBy === "sharing") {
-        let allSharing = this.conts.map(x =>
-          this.sharingContainers.includes(x.name)
-            ? this.$t("message.table.sharing") : "");
-        let allShared = this.conts.map(x =>
-          this.sharedContainers.some(cont => cont.container === x.name)
-            ? this.$t("message.table.shared") : "");
-
-        let combined = allSharing.map((value, idx) =>
-          value !== "" ? value : allShared[idx]);
-        this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
-      }
-
       // Use toRaw to mutate the original array, not the proxy
       sortObjects(toRaw(this.conts), this.sortBy, this.sortDirection);
       this.getPage();
@@ -380,7 +367,7 @@ export default {
         {
           key: "sharing",
           value: this.$t("message.table.shared_status"),
-          sortable: true,
+          sortable: false,
         },
         {
           key: "actions",
