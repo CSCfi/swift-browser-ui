@@ -18,6 +18,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Copy progress stuck (#1300)
 - Fix bucket count not resetting to zero after object deletion
 - (admins) missing project id-name mapping prevented deletion from finishing, leading to the "delete access" confirmation to not close after deletion
 - (admins) incorrect referred ID leading to share deletion not working properly
