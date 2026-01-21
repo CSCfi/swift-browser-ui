@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- Hide showTimestamp option from bucket view
 - Do not overwrite indexedDB container data on each container update
 - Bucket size, item count, last modified moved to object view to avoid fetching objects in container view
 - add `.docker-volumes` to `.dockerignore` to reduce image build context size if there's a lot of test data
