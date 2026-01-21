@@ -191,6 +191,7 @@ export default {
           }));
 
       let containersPage = [];
+      sortObjects(mappedContainers, this.sortBy, this.sortDirection);
 
       mappedContainers
         .slice(offset, offset + limit).map((
@@ -332,11 +333,6 @@ export default {
           });
         });
 
-      // Remember to sort the page to preserve order lost with promises
-      containersPage = containersPage.sort((a, b) => {
-        return a.name.value.localeCompare(b.name.value);
-      });
-
       this.containers = containersPage;
 
       this.paginationOptions = {
@@ -350,8 +346,6 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
 
-      // Use toRaw to mutate the original array, not the proxy
-      sortObjects(toRaw(this.conts), this.sortBy, this.sortDirection);
       this.getPage();
     },
     setHeaders() {
