@@ -237,7 +237,6 @@ export default {
             actions: {
               value: null,
               sortable: null,
-              align: "end",
               children: [
                 {
                   value: this.$t("message.download.download"),
@@ -372,6 +371,7 @@ export default {
         {
           key: "actions",
           align: "end",
+          justify: "end",
           value: null,
           sortable: false,
           ariaLabel: "test",
