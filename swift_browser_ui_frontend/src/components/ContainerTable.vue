@@ -156,7 +156,7 @@ export default {
       let offset = 0;
       let limit = this.conts?.length;
 
-      if (!this.disablePagination || this.conts?.length > 100) {
+      if (!this.disablePagination || this.conts?.length > 500) {
         offset =
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
