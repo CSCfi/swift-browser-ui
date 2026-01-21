@@ -185,7 +185,7 @@ export default {
         hidePagination: this.renderFolders,
       };
       this.tableOptions = [
-        {
+        /*{
           name: this.showTimestamp
             ? this.$t("message.tableOptions.fromNow")
             : this.$t("message.tableOptions.timestamp"),
@@ -203,7 +203,7 @@ export default {
 
             this.updateTableOptions();
           },
-        },
+        },*/
         /*{
           name: this.hideTags
             ? this.$t("message.tableOptions.showTags")
