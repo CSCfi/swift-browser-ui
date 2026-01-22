@@ -156,7 +156,7 @@ export default {
       let offset = 0;
       let limit = this.conts?.length;
 
-      if (!this.disablePagination || this.conts?.length > 100) {
+      if (!this.disablePagination || this.conts?.length > 500) {
         offset =
           this.paginationOptions.currentPage
           * this.paginationOptions.itemsPerPage
@@ -182,7 +182,7 @@ export default {
           .map(async(cont) => {
             const sharedDetails = cont.owner ? await getAccessDetails(
               this.$route.params.project,
-              cont.container,
+              cont.name,
               cont.owner,
               this.abortController.signal) : null;
             const accessRights = sharedDetails ? sharedDetails.access : null;
@@ -191,6 +191,7 @@ export default {
           }));
 
       let containersPage = [];
+      sortObjects(mappedContainers, this.sortBy, this.sortDirection);
 
       mappedContainers
         .slice(offset, offset + limit).map((
@@ -237,7 +238,6 @@ export default {
             actions: {
               value: null,
               sortable: null,
-              align: "end",
               children: [
                 {
                   value: this.$t("message.download.download"),
@@ -320,8 +320,8 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
-                            disabled: item.owner &&
-                              (item.accessRights?.length === 0),
+                            disabled: (item.owner &&
+                              item.accessRights?.length === 0),
                           },
                         },
                       },
@@ -332,11 +332,6 @@ export default {
             },
           });
         });
-
-      // Remember to sort the page to preserve order lost with promises
-      containersPage = containersPage.sort((a, b) => {
-        return a.name.value.localeCompare(b.name.value);
-      });
 
       this.containers = containersPage;
 
@@ -351,21 +346,6 @@ export default {
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
 
-      if (this.sortBy === "sharing") {
-        let allSharing = this.conts.map(x =>
-          this.sharingContainers.includes(x.name)
-            ? this.$t("message.table.sharing") : "");
-        let allShared = this.conts.map(x =>
-          this.sharedContainers.some(cont => cont.container === x.name)
-            ? this.$t("message.table.shared") : "");
-
-        let combined = allSharing.map((value, idx) =>
-          value !== "" ? value : allShared[idx]);
-        this.conts.forEach((cont, idx) => (cont.sharing = combined[idx]));
-      }
-
-      // Use toRaw to mutate the original array, not the proxy
-      sortObjects(toRaw(this.conts), this.sortBy, this.sortDirection);
       this.getPage();
     },
     setHeaders() {
@@ -380,11 +360,12 @@ export default {
         {
           key: "sharing",
           value: this.$t("message.table.shared_status"),
-          sortable: true,
+          sortable: false,
         },
         {
           key: "actions",
           align: "end",
+          justify: "end",
           value: null,
           sortable: false,
           ariaLabel: "test",

@@ -193,9 +193,15 @@ export async function updateContainerLastmodified(
 }
 
 export async function saveBucketMetadata(projectID, bucket, metadata) {
+  // Modify only select fields that receive data from objects
+  const updatedMetadata = {
+    bytes: metadata.bytes,
+    count: metadata.count,
+    last_modified: metadata.last_modified,
+  };
   await getDB().containers
     .where({ projectID: projectID, name: bucket})
-    .modify(metadata);
+    .modify(updatedMetadata);
 }
 
 export async function getBucketMetadata(projectID, bucket) {

@@ -41,10 +41,10 @@ export function getPaginationOptions(t) {
 
   const paginationOptions = {
     itemCount: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 50,
     currentPage: 1,
     startFrom: 0,
-    endTo: 9,
+    endTo: 49,
     textOverrides: {
       itemsPerPageText: t("message.table.itemsPerPage"),
       nextPage: t("message.table.nextPage"),
