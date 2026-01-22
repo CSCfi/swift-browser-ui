@@ -109,7 +109,8 @@ export async function syncBucketPolicies(project) {
     const shareDetails = await client.getShareDetails(project, bucket);
     let statements = [];
     try {
-      statements = await getBucketPolicyStatements(bucket);
+      statements = (await getBucketPolicyStatements(bucket))
+        .filter(statement => statement?.Sid === "GrantSDConnectSharedAccessToProject");
     } catch (e) {
       if (DEV) console.log(e.message);
     }
