@@ -182,7 +182,7 @@ export default {
           .map(async(cont) => {
             const sharedDetails = cont.owner ? await getAccessDetails(
               this.$route.params.project,
-              cont.container,
+              cont.name,
               cont.owner,
               this.abortController.signal) : null;
             const accessRights = sharedDetails ? sharedDetails.access : null;
@@ -320,8 +320,8 @@ export default {
                             path: mdiDotsHorizontal,
                             title: this.$t("message.options"),
                             size: "small",
-                            disabled: item.owner &&
-                              (item.accessRights?.length === 0),
+                            disabled: (item.owner &&
+                              item.accessRights?.length === 0),
                           },
                         },
                       },
