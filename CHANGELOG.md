@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- filter out the bucket policy statements in ACL sync that don't match `GrantSDConnectSharedAccessToProject`
 - Bucket table UI updated
 - Hide showTimestamp option from bucket view
 - Do not overwrite indexedDB container data on each container update
@@ -20,6 +21,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) bucket ownership retention share no longer shows up as a shared bucket
 - Copy progress stuck (#1300)
 - Fix bucket count not resetting to zero after object deletion
 - (admins) missing project id-name mapping prevented deletion from finishing, leading to the "delete access" confirmation to not close after deletion
