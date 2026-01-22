@@ -895,6 +895,7 @@ valituksen
 valitut
 valmiina
 valmis
+valmistellaan
 valvontaviranomainen
 valvontaviranomaisen
 varmasti

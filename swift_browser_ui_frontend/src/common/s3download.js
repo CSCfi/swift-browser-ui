@@ -189,6 +189,8 @@ export default class S3DownloadSocket {
           break;
         case "abort":
           this.$store.commit("setDownloadAbortReason", e.data.reason);
+          this.$store.commit("setHeadersTotal", 0);
+          this.$store.commit("setHeadersProcessed", 0);
           if (!this.useServiceWorker) {
             this.$store.commit("removeDownload", true);
             this.$store.commit("eraseDownloadProgress");
@@ -273,6 +275,9 @@ export default class S3DownloadSocket {
     // Run function to check legacy object sizes for listing
     bucketFiles = await ensureObjectSizes(bucket, bucketFiles);
 
+    // Store total amount of required headers to display header progress
+    this.$store.commit("setHeadersTotal", bucketFiles.length);
+
     let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
       this.active,
@@ -289,6 +294,8 @@ export default class S3DownloadSocket {
         session: upInfo.id,
       },
     );
+
+    let headersRetrieved = 0;
 
     for (const file of bucketFiles) {
       // Get the file header
@@ -308,6 +315,9 @@ export default class S3DownloadSocket {
         header: Uint8Array.from(atob(header), c => c.charCodeAt(0)),
         size: file.bytes,
       };
+
+      headersRetrieved++;
+      this.$store.commit("setHeadersProcessed", headersRetrieved);
     }
 
     await signedFetch(
