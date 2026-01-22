@@ -170,7 +170,7 @@ export default {
 
       let projectID = this.$route.params.project;
       const bucketName = toRaw(this.bucketName);
-      const tags = toRaw(this.tags);
+      //const tags = toRaw(this.tags);
 
       let resp = await awsCreateBucket(projectID, bucketName);
       let errorMessage = this.$t("message.error.createFail");
@@ -182,15 +182,6 @@ export default {
           errorMessage = this.$t("message.error.invalidName");
           break;
       }
-      try {
-        await awsAddBucketCors(projectID, bucketName);
-      } catch (e) {
-        if (DEV) {
-          console.error(
-            `Failed to update CORS for the new bucket ${bucketName}`,
-          );
-        }
-      }
 
       if (resp.status != 204) {
         document.querySelector("#createModal-toasts").addToast(
@@ -201,7 +192,6 @@ export default {
             message: errorMessage,
           },
         );
-
         return;
       }
 
@@ -209,15 +199,28 @@ export default {
       // Let's just assume current time :)
       // Seen below as the bare getCurrentISOtime() call.
 
-      getDB().containers.add({
-        projectID: projectID,
+      let newBucket = {
         name: bucketName,
-        tokens: tokenize(bucketName),
-        tags: tags,
-        count: 0,
         bytes: 0,
+        count: 0,
+        created: getCurrentISOtime(),
         last_modified: getCurrentISOtime(),
-      });
+        projectID: projectID,
+      };
+
+      try {
+        await awsAddBucketCors(projectID, bucketName);
+        newBucket.cors_added = true;
+      } catch (e) {
+        if (DEV) {
+          console.error(
+            `Failed to update CORS for the new bucket ${bucketName}`,
+          );
+        }
+        newBucket.cors_added = false;
+      } finally {
+        await getDB().containers.add(newBucket);
+      }
 
       this.toggleCreateBucketModal(keypress);
 
