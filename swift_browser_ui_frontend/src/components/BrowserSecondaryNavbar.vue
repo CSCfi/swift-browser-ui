@@ -84,13 +84,17 @@
       <c-spacer />
       <div class="nav-item">
         <c-button
-          :disabled="isUploading || !canUpload"
+          :disabled="isUploading || !canUpload || workersInitializing"
           data-testid="upload-file"
           @click="toggleUploadModal(false)"
           @keyup.enter="toggleUploadModal(true)"
         >
           <c-icon :path="mdiTrayArrowUp" />
-          {{ $t("message.uploadSecondaryNav") }}
+          {{
+            workersInitializing
+              ? $t("message.uploadDisabledSecondaryNav")
+              : $t("message.uploadSecondaryNav")
+          }}
         </c-button>
       </div>
     </div>
@@ -162,6 +166,9 @@ export default {
     },
     downloadCount() {
       return this.$store.state.downloadCount;
+    },
+    workersInitializing() {
+      return this.$store.state.workersInitializing;
     },
   },
   watch: {

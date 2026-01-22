@@ -21,6 +21,10 @@ waitAsm().then(() => {
   console.log("Assembler initialized, initalizing entropy source...");
   Module.ccall("libinit", undefined, undefined, undefined);
   console.log("Entropy source initalized.");
+
+  postMessage({
+    eventType: "runtimeInitialized",
+  })
 });
 
 // Create an s3 client for the worker instance

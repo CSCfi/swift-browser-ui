@@ -57,6 +57,7 @@ const store = createStore({
     s3client: undefined,
     s3upload: undefined,
     s3download: undefined,
+    workersInitializing: true,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -245,6 +246,9 @@ const store = createStore({
     },
     setS3Download(state, payload) {
       state.s3download = payload;
+    },
+    setWorkersInitializing(state, payload) {
+      state.workersInitializing = payload;
     },
   },
 });

@@ -62,6 +62,7 @@ let default_translations = {
       selectProj: "Select project",
       createBucket: "Create bucket",
       uploadSecondaryNav: "Upload",
+      uploadDisabledSecondaryNav: "Upload initializing",
       logOut: "Log out",
       bucketTabs: {
         all: "All buckets",
@@ -627,6 +628,7 @@ let default_translations = {
       selectProj: "Valitse projekti",
       createBucket: "Luo ämpäri",
       uploadSecondaryNav: "Lähetä",
+      uploadDisabledSecondaryNav: "Lähetystä alustetaan",
       logOut: "Kirjaudu ulos",
       bucketTabs: {
         all: "Kaikki ämpärit",
