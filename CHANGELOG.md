@@ -21,6 +21,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) Uploading too quickly after refresh or login on a slow connection should no longer be possible, as upload button is disabled until upload works
 - (users) bucket ownership retention share no longer shows up as a shared bucket
 - Copy progress stuck (#1300)
 - Fix bucket count not resetting to zero after object deletion
@@ -58,6 +59,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- upload button is now blocked until the workers have finished loading
 - dev browser files are now persisted using docker volumes
 
 ### Security
