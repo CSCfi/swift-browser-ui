@@ -84,6 +84,8 @@ export default class S3UploadSocket {
     // of MAX_UPLOAD_WORKERS (Default: 8) threads will be used.
     // One download worker should suffice.
     this.upWorkers = [];
+    // Keep track of initialized workers to be able to block uploads until properly inited
+    this.workersInited = 0;
     for (
       let i = 0;
       i < window.navigator.hardwareConcurrency && i < MAX_UPLOAD_WORKERS;
@@ -202,8 +204,20 @@ export default class S3UploadSocket {
         case "filesRemoved":
           if (DEV) console.log("File handles closed in the WorkerFS");
           break;
+        case "runtimeInitialized":
+          if (DEV) console.log("Worker initialized Webassembly runtime.");
+          // Intentionally omit break to flow to next block
         case "s3ClientCreated":
-          if (DEV) console.log("Worker created an S3 client session.");
+          if (DEV && e.data.eventType === "s3ClientCreated") {
+            console.log("Worker created an S3 client session.");
+          }
+          // Bump init count and check if ready
+          this.workersInited++;
+          // We need two init steps per worker, for s3 and wasm
+          if (this.workersInited >= this.upWorkers.length * 2) {
+            if (DEV) console.log("Flagging upload workers as initialized");
+            this.$store.commit("setWorkersInitializing", false);
+          }
           break;
       }
     };

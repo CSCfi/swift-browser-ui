@@ -13,6 +13,7 @@ alkanut
 alla
 aloitettiin
 aloitettu
+alustetaan
 anna
 annetut
 apin
