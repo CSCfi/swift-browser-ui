@@ -482,6 +482,7 @@ export default class S3UploadSocket {
     this.headersNeeded = files.length;
     // Commit total header amount to the shared state, to display header progress
     this.$store.commit("setHeadersTotal", this.headersNeeded);
+    this.$store.commit("setEncryptedFile", "file pending...");
 
     if (DEV) console.log("Adding the listed files to the worker filesystems.");
     for (const worker of this.upWorkers) {
@@ -492,8 +493,6 @@ export default class S3UploadSocket {
         files: files,
       });
     }
-
-    this.$store.commit("setEncryptedFile", "file pending...");
 
     for (const file of files) {
       if (DEV) console.log(`Adding file ${file.relativePath}`);
