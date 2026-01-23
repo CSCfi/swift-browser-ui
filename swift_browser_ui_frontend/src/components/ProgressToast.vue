@@ -16,6 +16,16 @@
                 : isProgressing
                   ? $t("message.download.inProgress")
                   : $t("message.download.gathering")
+          }} {{
+            !finished
+              ? type === "upload"
+                ? $store.state.uploadProgress === undefined
+                  ? `(${$t("message.upload.addHeaders")} ${headersProcessed}/${headersTotal})`
+                  : ""
+                : !isProgressing
+                  ? `(${headersProcessed}/${headersTotal})`
+                  : ""
+              : ""
           }}
         </h3>
         <c-icon-button
@@ -117,6 +127,12 @@ export default {
       return !this.finished &&
         (!this.usingServiceWorker ||
           this.type === "upload");
+    },
+    headersTotal() {
+      return this.$store.state.headersTotal;
+    },
+    headersProcessed() {
+      return this.$store.state.headersProcessed;
     },
   },
   watch: {

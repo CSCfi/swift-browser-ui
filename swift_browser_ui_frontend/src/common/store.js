@@ -58,6 +58,8 @@ const store = createStore({
     s3upload: undefined,
     s3download: undefined,
     workersInitializing: true,
+    headersProcessed: 0,
+    headersTotal: 0,
   },
   mutations: {
     setProjects(state, newProjects) {
@@ -249,6 +251,12 @@ const store = createStore({
     },
     setWorkersInitializing(state, payload) {
       state.workersInitializing = payload;
+    },
+    setHeadersTotal(state, payload) {
+      state.headersTotal = payload;
+    },
+    setHeadersProcessed(state, payload) {
+      state.headersProcessed = payload;
     },
   },
 });
