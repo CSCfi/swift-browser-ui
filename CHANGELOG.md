@@ -59,6 +59,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- (users) header addition and retrieval progress is now displayed when uploading or downloading
+- Vuex store now saves the progress of header operations
 - upload button is now blocked until the workers have finished loading
 - dev browser files are now persisted using docker volumes
 
