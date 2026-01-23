@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- reduce header simultaneous request limit from 32 to 8
 - filter out the bucket policy statements in ACL sync that don't match `GrantSDConnectSharedAccessToProject`
 - Bucket table UI updated
 - Hide showTimestamp option from bucket view
