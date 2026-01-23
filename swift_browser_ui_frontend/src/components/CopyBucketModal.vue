@@ -221,10 +221,22 @@ export default {
         },
       );
       try {
+        // Fetch the source project id if it exists
+        let sourceProjectName = "";
+        if (this.sourceProjectId) {
+          let ids = await this.$store.state.sharingClient.projectCheckIDs(
+            this.sourceProjectId,
+          );
+          sourceProjectName = ids?.name;
+        }
+
         await copyBucket(
           this.active.id,
           this.bucketName,
+          this.sourceProjectId ? this.sourceProjectId : this.active.id,
           this.selectedBucketName,
+          this.active.name,
+          sourceProjectName,
         );
         await updateContainers(this.active.id);
         // CORS for new bucket is added on bucket creation

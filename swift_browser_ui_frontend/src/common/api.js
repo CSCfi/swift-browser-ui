@@ -87,7 +87,10 @@ export async function getProjects() {
 export async function copyBucket(
   project,
   bucket,
+  source_project,
   source_bucket,
+  project_name,
+  source_project_name,
 ) {
   // Replicate the bucket from a specified source to the location
   let fetchURL = new URL("/replicate/".concat(
@@ -96,6 +99,13 @@ export async function copyBucket(
   ), document.location.origin);
 
   fetchURL.searchParams.append("from_bucket", source_bucket);
+  fetchURL.searchParams.append("from_project", source_project);
+  if (project_name) {
+    fetchURL.searchParams.append("project_name", project_name);
+  }
+  if (source_project_name) {
+    fetchURL.searchParams.append("from_project_name", source_project_name);
+  }
 
   let ret = await POST(fetchURL);
 
