@@ -42,7 +42,7 @@ import {
 } from "./s3commands";
 
 const MAX_UPLOAD_WORKERS = 8;
-const MAX_SIMULTANEOUS_HEADER_UPLOADS = 32;
+const MAX_SIMULTANEOUS_HEADER_UPLOADS = 8;
 const FILE_PART_SIZE = 52428800;
 
 export default class S3UploadSocket {
