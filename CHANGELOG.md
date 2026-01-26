@@ -9,6 +9,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- add a placeholder active file to store earlier in the upload preparation process
+- upload modal start check is delayed more
 - reduce header simultaneous request limit from 32 to 8
 - filter out the bucket policy statements in ACL sync that don't match `GrantSDConnectSharedAccessToProject`
 - Bucket table UI updated
@@ -22,6 +24,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) upload should no longer be incorrectly flagged as failed due to a slow start
 - (users) Uploading too quickly after refresh or login on a slow connection should no longer be possible, as upload button is disabled until upload works
 - (users) bucket ownership retention share no longer shows up as a shared bucket
 - Copy progress stuck (#1300)
