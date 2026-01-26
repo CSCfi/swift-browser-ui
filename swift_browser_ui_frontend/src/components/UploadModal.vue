@@ -858,7 +858,7 @@ export default {
             this.$store.commit("stopUploading", true);
             this.$store.commit("toggleUploadNotification", false);
           }
-        }, 1000);
+        }, 3000);
         this.toggleUploadModal();
       });
     },
