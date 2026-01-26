@@ -1,3 +1,7 @@
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+
 stages:
   - verify
   - test
@@ -18,7 +22,7 @@ backend-lint:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
+  interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - pip install pre-commit tox mypy .[dev]
@@ -33,7 +37,7 @@ spellcheck:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
+  interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - pip install pyspelling
@@ -46,7 +50,7 @@ frontend-lint:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
+  interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install
@@ -60,6 +64,7 @@ backend-test:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       allow_failure: true
+  interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install --prod
@@ -78,6 +83,7 @@ wasm-test:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       allow_failure: true
+  interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - ruby --version
@@ -90,6 +96,7 @@ wasm-test:
 # This job creates the automated releases
 release-job:
   extends: .automated-release
+  interruptible: true
   release:
     description: $(cat release_changes.md)
     assets:
@@ -110,6 +117,7 @@ release-job:
 # This is a manual dry-run for developers to run in the merge request
 update-versions-dryrun:
   extends: .update-versions-dryrun
+  interruptible: true
   variables:
     UPDATE_VERSION_FILES_LIST: "docs/_static/openapi.yaml;docs/source/conf.py;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
 
