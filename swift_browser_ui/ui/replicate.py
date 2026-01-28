@@ -146,7 +146,9 @@ class ObjectReplicator:
                 key,
                 owner=self.source_project_name,
             )
-            await self.vault.put_header(self.project_name, self.bucket, key, header)
+            # Skip adding header if header was empty
+            if header:
+                await self.vault.put_header(self.project_name, self.bucket, key, header)
 
     async def replicate_objects(self) -> None:
         """Copy all bucket objects."""
