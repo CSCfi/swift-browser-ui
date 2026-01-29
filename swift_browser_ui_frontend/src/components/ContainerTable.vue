@@ -41,15 +41,11 @@ import {
 } from "@/common/globalFunctions";
 import {
   deleteStaleShares,
-  getSharingContainers,
-  getSharedContainers,
-  getAccessDetails,
 } from "@/common/share";
 import {
   setPrevActiveElement,
   disableFocusOutsideModal,
 } from "@/common/keyboardNavigation";
-import { toRaw } from "vue";
 import {
   awsDeleteBucket,
   awsDeleteObject,
@@ -80,8 +76,6 @@ export default {
   data() {
     return {
       containers: [],
-      sharingContainers: [],
-      sharedContainers: [],
       direction: "asc",
       footerOptions: {
         itemsPerPageOptions: [5, 10, 25, 50, 100],
@@ -89,7 +83,6 @@ export default {
       paginationOptions: {},
       sortBy: "name",
       sortDirection: "asc",
-      abortController: null,
     };
   },
   computed: {
@@ -99,8 +92,8 @@ export default {
     active() {
       return this.$store.state.active;
     },
-    sharingUpdated () {
-      return this.$store.state.sharingUpdated;
+    newBucket() {
+      return this.$store.state.newBucket;
     },
   },
   watch: {
@@ -111,8 +104,7 @@ export default {
       this.getPage();
     },
     conts() {
-      Promise.all([this.getSharingContainers(), this.getSharedContainers()])
-        .then(() => this.getPage());
+      this.getPage();
     },
     showTimestamp() {
       this.getPage();
@@ -122,37 +114,23 @@ export default {
       this.getPage();
       this.setPagination();
     },
-    sharingUpdated() {
-      if (this.sharingUpdated) {
-        this.getSharingContainers().then(() => this.getPage());
-        this.$store.commit("setSharingUpdated", false);
-      }
-    },
   },
   created() {
     this.setHeaders();
     this.setPagination();
   },
-  beforeMount () {
-    this.abortController = new AbortController();
-  },
-  beforeUnmount () {
-    this.abortController.abort();
-  },
-  expose: ["toFirstPage"],
   methods: {
-    toFirstPage() {
-      this.paginationOptions.currentPage = 1;
-    },
-    async getSharingContainers () {
-      this.sharingContainers =
-        await getSharingContainers(this.active.id, this.abortController.signal);
-    },
-    async getSharedContainers () {
-      this.sharedContainers =
-        await getSharedContainers(this.active.id, this.abortController.signal);
-    },
-    async getPage () {
+    getPage (event) {
+      if (this.newBucket) {
+        if (event?.detail?.currentPage > 1) {
+          // Moving from page 1, remove highlight
+          this.$store.commit("setNewBucket", "");
+        } else {
+          // Move to page 1 to highlight new bucket
+          this.paginationOptions.currentPage = 1;
+        }
+      }
+
       let offset = 0;
       let limit = this.conts?.length;
 
@@ -165,33 +143,23 @@ export default {
         limit = this.paginationOptions.itemsPerPage;
       }
 
-      const getSharedStatus = (bucketName) => {
-        if (this.sharingContainers.indexOf(bucketName) > -1) {
-          return this.$t("message.table.sharing");
-        } else if (this.sharedContainers.findIndex(
-          cont => cont.container === bucketName) > -1) {
-          return this.$t("message.table.shared");
-        }
-        return "";
+      const getSharedStatus = (bucketSharing) => {
+        let status = "";
+        if (bucketSharing === "sharing") status = this.$t("message.table.sharing");
+        else if (bucketSharing === "shared") status = this.$t("message.table.shared");
+        return status;
       };
 
-      // Filter out segment buckets for rendering
-      // Map the 'accessRights' to the container if it's a shared container
-      const mappedContainers = await Promise.all(
-        this.conts.filter(cont => !cont.name.endsWith("_segments"))
-          .map(async(cont) => {
-            const sharedDetails = cont.owner ? await getAccessDetails(
-              this.$route.params.project,
-              cont.name,
-              cont.owner,
-              this.abortController.signal) : null;
-            const accessRights = sharedDetails ? sharedDetails.access : null;
-            return sharedDetails && accessRights
-              ? {...cont, accessRights} : {...cont};
-          }));
-
+      const mappedContainers = this.conts;
       let containersPage = [];
       sortObjects(mappedContainers, this.sortBy, this.sortDirection);
+
+      if (this.newBucket) {
+        const idx = mappedContainers.findIndex(c => c.name === this.newBucket);
+        if (idx > 0) {
+          mappedContainers.unshift(mappedContainers.splice(idx, 1)[0]);
+        }
+      }
 
       mappedContainers
         .slice(offset, offset + limit).map((
@@ -233,7 +201,7 @@ export default {
               },
             },
             sharing: {
-              value: getSharedStatus(item.name),
+              value: getSharedStatus(item.sharing),
             },
             actions: {
               value: null,
@@ -340,7 +308,7 @@ export default {
         itemCount: mappedContainers.length,
       };
     },
-    async onSort(event) {
+    onSort(event) {
       this.$store.commit("setNewBucket", "");
 
       this.sortBy = event.detail.sortBy;
