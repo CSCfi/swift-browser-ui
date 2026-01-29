@@ -178,7 +178,6 @@ export default {
       renderFolders: true,
       //hideTags: false,
       searchQuery: "",
-      currentPage: 1,
       checkedRows: [],
       optionsKey: 1,
       abortController: null,
@@ -202,9 +201,6 @@ export default {
     },
     prefix () {
       return this.$route.query.prefix || "";
-    },
-    queryPage () {
-      return this.$route.query.page || 1;
     },
     project () {
       return this.$route.params.project;
@@ -258,9 +254,6 @@ export default {
       // Run debounced search every time the search box input changes
       this.debounceFilter();
     },
-    queryPage: function () {
-      this.currentPage = this.queryPage;
-    },
     currentContainer: async function() {
       if (this.currentContainer === undefined) return;
       const savedDisplayOptions = toRaw(this.currentContainer.displayOptions);
@@ -308,7 +301,6 @@ export default {
   },
   beforeMount () {
     this.abortController = new AbortController();
-    this.getDirectCurrentPage();
   },
   mounted () {
     this.fetchIfReady();
@@ -465,40 +457,6 @@ export default {
       }
       await saveBucketMetadata(this.active.id, this.containerName, updated);
       this.metadata = { ...updated } ;
-    },
-    addPageToURL: function (pageNumber) {
-      if (this.$route.name == "SharedObjects") {
-        this.$router.push({
-          name: "SharedObjects",
-          params: {
-            project: this.$route.params.project,
-            owner: this.owner,
-            container: this.containerName,
-          },
-          query: {
-            page: pageNumber,
-            prefix: this.getPrefix(),
-          },
-        });
-      } else {
-        this.$router.push({
-          name: "ObjectsView",
-          params: {
-            user: this.$route.params.user,
-            project: this.project,
-            container: this.containerName,
-          },
-          query: {
-            page: pageNumber,
-            prefix: this.getPrefix(),
-          },
-        });
-      }
-    },
-    getDirectCurrentPage: function () {
-      this.currentPage = this.$route.query.page ?
-        parseInt(this.$route.query.page) :
-        1;
     },
     getPrefix: function () {
       // Get current pseudofolder prefix

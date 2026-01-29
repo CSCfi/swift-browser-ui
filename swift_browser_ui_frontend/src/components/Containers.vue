@@ -73,11 +73,6 @@ export default {
       showTimestamp: false,
       hidePagination: false,
       //hideTags: false,
-      selected: undefined,
-      isPaginated: true,
-      perPage: 15,
-      direction: "asc",
-      currentPage: 1,
       showTags: true,
       optionsKey: 1,
       abortController: null,
@@ -171,7 +166,6 @@ export default {
   },
   beforeMount() {
     this.abortController = new AbortController();
-    this.getDirectCurrentPage();
   },
   mounted() {
     this.fetchContainers(true);
@@ -278,27 +272,6 @@ export default {
         projectID: this.active.id,
         name: `${container}_segments`,
       }).delete();
-    },
-    checkPageFromRoute: function () {
-      // Check if the pagination number is already specified in the link
-      if (this.$route.query.page) {
-        this.currentPage = parseInt(this.$route.query.page);
-      } else {
-        this.currentPage = 1;
-        this.$router.push("?page=" + this.currentPage);
-      }
-    },
-    getConAddr: function (container) {
-      return this.$route.params.project + "/" + container;
-    },
-    getDirectCurrentPage: function () {
-      this.currentPage = this.$route.query.page
-        ? parseInt(this.$route.query.page)
-        : 1;
-    },
-    addPageToURL: function (pageNumber) {
-      // Add pagination current page number to the URL in query string
-      this.$router.push("?page=" + pageNumber);
     },
     toggleCreateBucketModal: function (keypress) {
       toggleCreateBucketModal();
