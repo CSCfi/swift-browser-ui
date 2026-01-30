@@ -25,6 +25,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fix missing import
 - (users) upload should no longer be incorrectly flagged as failed due to a slow start
 - (users) Uploading too quickly after refresh or login on a slow connection should no longer be possible, as upload button is disabled until upload works
 - (users) bucket ownership retention share no longer shows up as a shared bucket
