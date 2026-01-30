@@ -1,7 +1,7 @@
 // Miscellaneous global functions
 
 import store from "@/common/store";
-import { checkBucketExists } from "@/common/s3commands";
+import { checkBucketExists, awsHeadObject } from "@/common/s3commands";
 import { checkCorsFlag, updateCorsFlag } from "./idbFunctions";
 import { awsAddBucketCors } from "./api";
 
