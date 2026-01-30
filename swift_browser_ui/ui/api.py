@@ -2,7 +2,6 @@
 
 import asyncio
 import json
-import math
 import ssl
 import time
 import typing
@@ -14,12 +13,15 @@ import aiohttp_session
 import botocore.exceptions
 import certifi
 
+from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.ui._convenience import (
     ldap_get_project_titles,
     open_upload_runner_session,
     sign,
 )
+from swift_browser_ui.ui.replicate import ObjectReplicator
 from swift_browser_ui.ui.settings import setd
+from swift_browser_ui.upload.common import VAULT_CLIENT
 
 ssl_context = ssl.create_default_context()
 ssl_context.load_verify_locations(certifi.where())
@@ -480,79 +482,6 @@ async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response
     return aiohttp.web.json_response(await _get_ec2_credentials(session, client, project))
 
 
-async def _multipart_copy(s3_client, dest_bucket, source_bucket, obj):
-    size = obj["Size"]
-    upload_id = (
-        await s3_client.create_multipart_upload(Bucket=dest_bucket, Key=obj["Key"])
-    )["UploadId"]
-
-    part_size = 50 * 1024 * 1024
-    # See limits https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
-    max_part_count = 10000
-    if size > part_size * max_part_count:
-        part_size = math.ceil(size / max_part_count)
-    parts = []
-    part_number = 1
-    byte_position = 0
-
-    try:
-        while byte_position < size:
-            last_byte = min(byte_position + part_size - 1, size - 1)
-
-            part = await s3_client.upload_part_copy(
-                Bucket=dest_bucket,
-                Key=obj["Key"],
-                CopySource={"Bucket": source_bucket, "Key": obj["Key"]},
-                CopySourceRange=f"bytes={byte_position}-{last_byte}",
-                PartNumber=part_number,
-                UploadId=upload_id,
-            )
-
-            parts.append(
-                {"ETag": part["CopyPartResult"]["ETag"], "PartNumber": part_number}
-            )
-
-            byte_position += part_size
-            part_number += 1
-
-        await s3_client.complete_multipart_upload(
-            Bucket=dest_bucket,
-            Key=obj["Key"],
-            UploadId=upload_id,
-            MultipartUpload={"Parts": parts},
-        )
-    except Exception:
-        await s3_client.abort_multipart_upload(
-            Bucket=dest_bucket, Key=obj["Key"], UploadId=upload_id
-        )
-        raise
-
-
-async def _replicate_objects(s3_client, source_bucket, dest_bucket, logger):
-    # 100MiB single copy limit (recommended to use multipart copy for 100MB and over)
-    rec_single_copy_size = 100 * 1024 * 1024
-    paginator = s3_client.get_paginator("list_objects_v2")
-
-    async for page in paginator.paginate(Bucket=source_bucket):
-        for obj in page.get("Contents", []):
-            key = obj["Key"]
-            if obj["Size"] < rec_single_copy_size:
-                try:
-                    await s3_client.copy_object(
-                        CopySource={"Bucket": source_bucket, "Key": key},
-                        Bucket=dest_bucket,
-                        Key=key,
-                    )
-                except Exception as e:
-                    logger.exception(f"Failed to copy {key}: {e}")
-            else:
-                try:
-                    await _multipart_copy(s3_client, dest_bucket, source_bucket, obj)
-                except Exception as e:
-                    logger.exception(f"Failed to multipart-copy {key}: {e}")
-    logger.info(f"Replication task for {source_bucket} finished")
-
-
 async def replicate_bucket(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:
@@ -560,12 +489,16 @@ async def replicate_bucket(
     session = await aiohttp_session.get_session(request)
     client = request.app["api_client"]
     logger = request.app["Log"]
+
     project = request.match_info["project"]
-    dest_bucket = request.match_info["bucket"]
+    bucket = request.match_info["bucket"]
     source_bucket = request.query["from_bucket"]
+    source_project = request.query["from_project"]
+
+    vault_client: VaultClient = request.app[VAULT_CLIENT]
 
     logger.info(
-        f"API call to replicate bucket {source_bucket} to {dest_bucket} from "
+        f"API call to replicate bucket {source_bucket} to {bucket} from "
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
 
@@ -583,34 +516,27 @@ async def replicate_bucket(
         verify=setd["check_certificate"],
     ) as s3_client:
 
-        # Destination bucket should not already exist
-        try:
-            await s3_client.head_bucket(Bucket=dest_bucket)
-            raise aiohttp.web.HTTPConflict(text="Bucket already exists")
-        except botocore.exceptions.ClientError as e:
-            error_code = e.response["Error"]["Code"]
-            if error_code == "404":
-                # Create the destination bucket
-                try:
-                    await s3_client.create_bucket(Bucket=dest_bucket)
-                    logger.info(f"Created destination bucket {dest_bucket}")
-                except botocore.exceptions.ClientError:
-                    raise aiohttp.web.HTTPInternalServerError(
-                        text="Failed to create destination bucket"
-                    )
-            elif error_code == "403":
-                raise aiohttp.web.HTTPConflict(
-                    text="Bucket already exists (Access denied)"
-                )
-            else:
-                raise aiohttp.web.HTTPInternalServerError(
-                    text="Cannot create destination bucket"
-                )
+        replicator = ObjectReplicator(
+            s3_client,
+            vault_client,
+            project,
+            bucket,
+            source_project,
+            source_bucket,
+            request.query["project_name"] if "project_name" in request.query else "",
+            (
+                request.query["from_project_name"]
+                if "from_project_name" in request.query
+                else ""
+            ),
+        )
 
+    # Create destination bucket
+    await replicator.create_destination_bucket()
     # Add CORS entries for the newly created bucket to allow access via browser
-    await _update_bucket_cors(logger, s3session, dest_bucket)
+    await _update_bucket_cors(logger, s3session, bucket)
 
-    asyncio.create_task(_replicate_objects(s3_client, source_bucket, dest_bucket, logger))
+    asyncio.create_task(replicator.replicate_objects())
     return aiohttp.web.HTTPAccepted(text="Replication started")
 
 

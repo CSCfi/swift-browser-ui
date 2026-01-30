@@ -197,7 +197,7 @@ export function toggleCopyBucketModal(bucketName, sourceProjectId) {
   if (bucketName) {
     store.commit("setBucketName", bucketName);
   }
-  if(sourceProjectId) {
+  if (sourceProjectId) {
     store.commit("setSourceProjectId", sourceProjectId);
   }
   store.commit("toggleCopyBucketModal", true);

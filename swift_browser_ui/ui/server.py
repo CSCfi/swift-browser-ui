@@ -17,6 +17,7 @@ import uvloop
 from oidcrp.rp_handler import RPHandler
 
 import swift_browser_ui.ui.middlewares
+from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.api import (
     aws_bulk_update_bucket_cors,
@@ -77,6 +78,7 @@ from swift_browser_ui.ui.signature import (
     handle_ext_token_remove,
     handle_signature_request,
 )
+from swift_browser_ui.upload.common import VAULT_CLIENT
 
 # temporarily ignore typecheck from mypy until
 # this issue is fixed https://github.com/MagicStack/uvloop/issues/575
@@ -86,11 +88,13 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())  # type: ignore
 async def open_client_to_app(app: aiohttp.web.Application) -> None:
     """Open a client session for download proxies."""
     if not setd["check_certificate"]:
-        app["api_client"] = aiohttp.ClientSession(
+        api_client = aiohttp.ClientSession(
             connector=aiohttp.TCPConnector(verify_ssl=False)
         )
     else:
-        app["api_client"] = aiohttp.ClientSession()
+        api_client = aiohttp.ClientSession()
+    app["api_client"] = api_client
+    app[VAULT_CLIENT] = VaultClient(api_client)
 
 
 async def kill_dload_client(app: aiohttp.web.Application) -> None:
