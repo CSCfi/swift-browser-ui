@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (admins) UI deployment now needs vault client credentials configured for copying headers
 - add a placeholder active file to store earlier in the upload preparation process
 - upload modal start check is delayed more
 - reduce header simultaneous request limit from 32 to 8
@@ -63,6 +64,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- Add header copy from previous implementation to bucket copy
 - interruptible keyword to pipeline jobs
 - (users) header addition and retrieval progress is now displayed when uploading or downloading
 - Vuex store now saves the progress of header operations
