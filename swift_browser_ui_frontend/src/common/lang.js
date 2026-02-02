@@ -245,7 +245,7 @@ let default_translations = {
       save: "Save",
       options: "Options",
       copysuccess: "Copying in progress",
-      copytime: "It may take few seconds",
+      copytime: "Please wait for copying to finish",
       copyfail: "Failed to copy the bucket",
       notDecryptable: "Some downloaded files need manual decryption.",
       tagName: "Tags (optional)",
@@ -777,7 +777,7 @@ let default_translations = {
         inProgress: "Lataus käynnissä",
         gathering: "Haetaan listaa tiedostoista",
         complete: "Lataus on valmis",
-        warnWait: "Odota, kunnes lataus on valmis. ",
+        warnWait: "Odota, kunnes lataus valmistuu. ",
         warnTempFiles: "Väliaikaisten tiedostojen tai kansioiden " +
         "(.crdownload, .crswap) avaaminen voi keskeyttää latauksen.",
         error: "Lataus epäonnistui. Yritä uudelleen.",
@@ -815,7 +815,7 @@ let default_translations = {
       save: "Tallenna",
       options: "Valinnat",
       copysuccess: "Ämpäriä kopioidaan",
-      copytime: "Se voi kestää muutaman sekunnin",
+      copytime: "Odota, kunnes kopiointi valmistuu",
       copyfail: "Ämpärin kopiointi epäonnistui",
       notDecryptable:
         "Joidenkin tiedostojen salaus on purettava erikseen latauksen " +

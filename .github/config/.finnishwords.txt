@@ -896,6 +896,7 @@ valitut
 valmiina
 valmis
 valmistellaan
+valmistuu
 valvontaviranomainen
 valvontaviranomaisen
 varmasti
