@@ -244,6 +244,7 @@ kohdistusjärjestys
 kohdistustoiminnoissa
 kohteen
 kohteet
+kohteiden
 kohteita
 koita
 kokeile

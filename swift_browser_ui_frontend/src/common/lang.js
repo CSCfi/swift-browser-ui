@@ -294,6 +294,7 @@ let default_translations = {
         deleteConfirm: "Delete items",
         deleteObjects: "Delete items",
         deleteInProgress: "Deletion in progress",
+        deleteObjectsError: "Item deletion failed. Please try again.",
         deleteManySuccess: " items deleted",
         deleteOneSuccess: " item deleted",
         deleteSharedObjects:
@@ -866,6 +867,7 @@ let default_translations = {
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
+        deleteObjectsError: "Kohteiden poistaminen epäonnistui. Yritä uudelleen.",
         deleteInProgress: "Poisto käynnissä",
         deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",

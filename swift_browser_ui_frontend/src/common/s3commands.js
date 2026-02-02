@@ -6,7 +6,7 @@ import {
   CreateMultipartUploadCommand,
   DeleteBucketCommand,
   DeleteBucketPolicyCommand,
-  DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetBucketPolicyCommand,
   HeadBucketCommand,
   HeadObjectCommand,
@@ -74,10 +74,13 @@ export async function checkBucketExists(bucket) {
 
 /** OBJECTS */
 
-export async function awsDeleteObject(bucket, object) {
-  const command = new DeleteObjectCommand({
+export async function awsDeleteObjects(bucket, objects) {
+  const keys = objects.map(obj => ({ Key: obj }));
+  const command = new DeleteObjectsCommand({
     Bucket: bucket,
-    Key: object,
+    Delete: {
+      Objects: keys,
+    },
   });
   const response = await sendS3Command(command);
   return response;
