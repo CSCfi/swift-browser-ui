@@ -259,6 +259,7 @@ let default_translations = {
         copyNotEmpty: "An empty bucket cannot be copied.",
         deleteEmpty: "Bucket must be empty before it can be deleted.",
         deleteSuccess: "Bucket was deleted.",
+        deleteFail: "Bucket deletion failed.",
         bucketName: "Bucket name",
       },
       nameValidation: {
@@ -832,7 +833,8 @@ let default_translations = {
         deleteEmpty:
           "Ämpärin poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
-        deleteSuccess: "Ämpäri poistettu",
+        deleteSuccess: "Ämpäri poistettu.",
+        deleteFail: "Ämpärin poistaminen epäonnistui.",
         bucketName: "Ämpärin nimi",
       },
       nameValidation: {

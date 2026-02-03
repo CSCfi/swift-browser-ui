@@ -396,6 +396,12 @@ export default {
             bucket,
           );
           if (sharedDetails.length) await deleteStaleShares(this.active.id, bucket);
+        }).catch(() => {
+          document.querySelector("#container-toasts").addToast(
+            { progress: false,
+              type: "error",
+              message: this.$t("message.container_ops.deleteFail")},
+          );
         });
       }
       this.paginationOptions.currentPage =
