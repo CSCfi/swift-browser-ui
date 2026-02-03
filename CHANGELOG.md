@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) Updated copy toast text
 - (admins) UI deployment now needs vault client credentials configured for copying headers
 - add a placeholder active file to store earlier in the upload preparation process
 - upload modal start check is delayed more
