@@ -90,10 +90,10 @@ export default {
       return this.$i18n.locale;
     },
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     newBucket() {
-      return this.$store.state.newBucket;
+      return this.$store.newBucket;
     },
   },
   watch: {
@@ -124,7 +124,7 @@ export default {
       if (this.newBucket) {
         if (event?.detail?.currentPage > 1) {
           // Moving from page 1, remove highlight
-          this.$store.commit("setNewBucket", "");
+          this.$store.setNewBucket("");
         } else {
           // Move to page 1 to highlight new bucket
           this.paginationOptions.currentPage = 1;
@@ -309,7 +309,7 @@ export default {
       };
     },
     onSort(event) {
-      this.$store.commit("setNewBucket", "");
+      this.$store.setNewBucket("");
 
       this.sortBy = event.detail.sortBy;
       this.sortDirection = event.detail.direction;
@@ -391,7 +391,7 @@ export default {
           this.$emit("delete-container", bucket);
           // Delete stale shares if the deleted bucket
           // was shared with other projects
-          const sharedDetails = await this.$store.state.sharingClient.getShareDetails(
+          const sharedDetails = await this.$store.sharingClient.getShareDetails(
             this.$route.params.project,
             bucket,
           );
@@ -425,7 +425,7 @@ export default {
       //automated testing creates untrusted events
       const test = eventTrusted === undefined ? false : !eventTrusted;
 
-      this.$store.state.s3download.addDownload(
+      this.$store.s3download.addDownload(
         container,
         [],
         owner,
@@ -448,9 +448,8 @@ export default {
       return this.$t("message.emptyProject.all");
     },
     onOpenShareModal(itemName, keypress) {
-      this.$store.commit("toggleShareModal", true);
-      this.$store.commit(
-        "setBucketName", itemName);
+      this.$store.toggleShareModal(true);
+      this.$store.setBucketName(itemName);
 
       if (keypress) {
         setPrevActiveElement();

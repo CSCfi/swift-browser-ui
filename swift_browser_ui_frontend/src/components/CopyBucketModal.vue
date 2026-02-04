@@ -99,18 +99,18 @@ export default {
   },
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     selectedBucketName() {
-      return this.$store.state.selectedBucketName.length > 0
-        ? this.$store.state.selectedBucketName
+      return this.$store.selectedBucketName.length > 0
+        ? this.$store.selectedBucketName
         : "";
     },
     sourceProjectId() {
-      return this.$store.state.sourceProjectId;
+      return this.$store.sourceProjectId;
     },
     visible() {
-      return this.$store.state.openCopyBucketModal;
+      return this.$store.openCopyBucketModal;
     },
   },
   watch: {
@@ -182,8 +182,8 @@ export default {
       }
     },
     cancelCopy: function (keypress) {
-      this.$store.commit("toggleCopyBucketModal", false);
-      this.$store.commit("setBucketName", "");
+      this.$store.toggleCopyBucketModal(false);
+      this.$store.setBucketName("");
       this.bucketName = "";
       this.tags = [];
       this.loadingBucketname = true;
@@ -210,7 +210,7 @@ export default {
       await this.a_replicate_container(keypress);
     },
     a_replicate_container: async function (keypress) {
-      this.$store.commit("toggleCopyBucketModal", false);
+      this.$store.toggleCopyBucketModal(false);
       document.querySelector("#copyBucket-toasts").addToast(
         {
           id: "copy-in-progress",
@@ -224,7 +224,7 @@ export default {
         // Fetch the source project id if it exists
         let sourceProjectName = "";
         if (this.sourceProjectId) {
-          let ids = await this.$store.state.sharingClient.projectCheckIDs(
+          let ids = await this.$store.sharingClient.projectCheckIDs(
             this.sourceProjectId,
           );
           sourceProjectName = ids?.name;

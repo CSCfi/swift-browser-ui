@@ -32,10 +32,10 @@ export default {
   name: "ConfirmRouteModal",
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     params() {
-      return this.$store.state.routeTo;
+      return this.$store.routeTo;
     },
   },
   methods: {
@@ -48,10 +48,10 @@ export default {
       this.closeConfirmRouteModal();
     },
     closeConfirmRouteModal() {
-      this.$store.commit("toggleConfirmRouteModal", false);
+      this.$store.toggleConfirmRouteModal(false);
       //routeTo project param is key for c-select:
       //updating it causes to rerender with correct value
-      this.$store.commit("setRouteTo", {});
+      this.$store.setRouteTo({});
     },
   },
 };

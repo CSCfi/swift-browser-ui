@@ -24,8 +24,8 @@ export default {
   computed: {
     progress() {
       return this.type === "upload"
-        ? this.$store.state.uploadProgress
-        : this.$store.state.downloadProgress;
+        ? this.$store.uploadProgress
+        : this.$store.downloadProgress;
     },
   },
 };

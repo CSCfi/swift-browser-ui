@@ -77,8 +77,8 @@ export default {
   },
   computed: {
     selectedObjects() {
-      return this.$store.state.deletableObjects.length > 0
-        ? this.$store.state.deletableObjects
+      return this.$store.deletableObjects.length > 0
+        ? this.$store.deletableObjects
         : [];
     },
     folders() {
@@ -98,10 +98,10 @@ export default {
       return this.$route.params.owner;
     },
     renderedFolders() {
-      return this.$store.state.renderedFolders;
+      return this.$store.renderedFolders;
     },
     modalVisible() {
-      return this.$store.state.openDeleteModal;
+      return this.$store.openDeleteModal;
     },
   },
   watch: {
@@ -115,8 +115,8 @@ export default {
   },
   methods: {
     toggleDeleteModal: function(keypress) {
-      this.$store.commit("toggleDeleteModal", false);
-      this.$store.commit("setDeletableObjects", []);
+      this.$store.toggleDeleteModal(false);
+      this.$store.setDeletableObjects([]);
 
       /*
         Prev Active element is a popup menu and it is removed from DOM
@@ -169,8 +169,7 @@ export default {
       }
 
       if (to_remove.length) {
-        this.$store.commit("setDeleting", true);
-        // Delete objects
+        this.$store.setDeleting(true);
         try {
           const resp = await awsDeleteObjects(this.container, to_remove);
           if (resp.Errors?.length) {
@@ -267,7 +266,7 @@ export default {
       }
     },
     clearDelete: function () {
-      this.$store.commit("setDeleting", false);
+      this.$store.setDeleting(false);
       const dataTable = document.getElementById("obj-table");
       dataTable.clearSelections();
       this.toggleDeleteModal();

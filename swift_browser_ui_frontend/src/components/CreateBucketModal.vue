@@ -128,19 +128,19 @@ export default {
   },
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     uname() {
-      return this.$store.state.uname;
+      return this.$store.uname;
     },
     controller() {
       return new AbortController();
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
     modalVisible() {
-      return this.$store.state.openCreateBucketModal;
+      return this.$store.openCreateBucketModal;
     },
   },
   watch: {
@@ -232,10 +232,10 @@ export default {
         },
       });
 
-      this.$store.commit("setNewBucket", bucketName);
+      this.$store.setNewBucket(bucketName);
     },
     toggleCreateBucketModal: function (keypress) {
-      this.$store.commit("toggleCreateBucketModal", false);
+      this.$store.toggleCreateBucketModal(false);
       this.bucketName = "";
       this.tags = [];
       this.create = true;

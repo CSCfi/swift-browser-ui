@@ -40,32 +40,32 @@ export default {
   computed: {
     finished() {
       return this.type === "upload"
-        ? !this.$store.state.isUploading
-        : this.$store.state.downloadCount < 1;
+        ? !this.$store.isUploading
+        : this.$store.downloadCount < 1;
     },
     maximized() {
       return this.type === "upload"
-        ? this.$store.state.uploadNotification.maximized
-        : this.$store.state.downloadNotification.maximized;
+        ? this.$store.uploadNotification.maximized
+        : this.$store.downloadNotification.maximized;
     },
     uploadContName() {
-      return this.$store.state.uploadBucket.name;
+      return this.$store.uploadBucket.name;
     },
     uploadContOwner() {
-      return this.$store.state.uploadBucket.owner;
+      return this.$store.uploadBucket.owner;
     },
   },
   methods: {
     toggleSize() {
       this.type === "upload"
-        ? this.$store.commit("toggleUploadNotificationSize")
-        : this.$store.commit("toggleDownloadNotificationSize");
+        ? this.$store.toggleUploadNotificationSize()
+        : this.$store.toggleDownloadNotificationSize();
     },
     onClose() {
       //close and reset to maximized
       this.type === "upload"
-        ? this.$store.commit("toggleUploadNotification", false)
-        : this.$store.commit("toggleDownloadNotification", false);
+        ? this.$store.toggleUploadNotification(false)
+        : this.$store.toggleDownloadNotification(false);
       if (!this.maximized) this.toggleSize();
     },
     onCancel() {

@@ -107,10 +107,10 @@ export default {
   },
   computed: {
     active () {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     uname () {
-      return this.$store.state.uname;
+      return this.$store.uname;
     },
     locale () {
       return this.$i18n.locale;
@@ -209,7 +209,7 @@ export default {
       }
     },
     openAPIKeyModal() {
-      this.$store.commit("toggleAPIKeyModal", true);
+      this.$store.toggleAPIKeyModal(true);
       setPrevActiveElement();
 
       const apiKeyModal = document.getElementById("api-key-modal");

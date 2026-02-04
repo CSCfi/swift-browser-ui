@@ -19,7 +19,7 @@
           }} {{
             !finished
               ? type === "upload"
-                ? $store.state.uploadProgress === undefined
+                ? $store.uploadProgress === undefined
                   ? `(${$t("message.upload.addHeaders")} ${headersProcessed}/${headersTotal})`
                   : ""
                 : !isProgressing
@@ -109,14 +109,14 @@ export default {
   computed: {
     otherNotification() {
       return this.type === "upload"
-        ? this.$store.state.downloadNotification
-        : this.$store.state.uploadNotification;
+        ? this.$store.downloadNotification
+        : this.$store.uploadNotification;
     },
     otherNotificationType() {
       return this.type === "upload" ? "download" : "upload";
     },
     isProgressing() {
-      return this.$store.state.downloadProgress !== undefined;
+      return this.$store.downloadProgress !== undefined;
     },
     usingServiceWorker() {
       return "serviceWorker" in navigator
@@ -129,10 +129,10 @@ export default {
           this.type === "upload");
     },
     headersTotal() {
-      return this.$store.state.headersTotal;
+      return this.$store.headersTotal;
     },
     headersProcessed() {
-      return this.$store.state.headersProcessed;
+      return this.$store.headersProcessed;
     },
   },
   watch: {

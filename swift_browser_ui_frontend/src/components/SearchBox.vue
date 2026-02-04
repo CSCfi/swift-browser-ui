@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
   },
   created: function () {

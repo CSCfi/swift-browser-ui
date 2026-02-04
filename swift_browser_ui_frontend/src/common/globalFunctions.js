@@ -1,6 +1,6 @@
 // Miscellaneous global functions
 
-import store from "@/common/store";
+import useStore from "@/common/store";
 import { checkBucketExists, awsHeadObject } from "@/common/s3commands";
 import { checkCorsFlag, updateCorsFlag } from "./idbFunctions";
 import { awsAddBucketCors } from "./api";
@@ -180,35 +180,39 @@ export function moveToast(toastToMove, otherElement, restore) {
 /** MODALS */
 
 export function toggleCreateBucketModal() {
-  store.commit("toggleCreateBucketModal", true);
+  const store = useStore();
+  store.toggleCreateBucketModal(true);
 }
 
 export function toggleEditTagsModal(objectName, containerName) {
+  const store = useStore();
   if (objectName) {
-    store.commit("setObjectName", objectName);
+    store.setObjectName(objectName);
   }
   if (containerName) {
-    store.commit("setBucketName", containerName);
+    store.setBucketName(containerName);
   }
-  store.commit("toggleEditTagsModal", true);
+  store.toggleEditTagsModal(true);
 }
 
 export function toggleCopyBucketModal(bucketName, sourceProjectId) {
+  const store = useStore();
   if (bucketName) {
-    store.commit("setBucketName", bucketName);
+    store.setBucketName(bucketName);
   }
   if (sourceProjectId) {
-    store.commit("setSourceProjectId", sourceProjectId);
+    store.setSourceProjectId(sourceProjectId);
   }
-  store.commit("toggleCopyBucketModal", true);
+  store.toggleCopyBucketModal(true);
 }
 
 export function toggleDeleteModal(objects, containerName) {
+  const store = useStore();
   if (objects) {
-    store.commit("setDeletableObjects", objects);
+    store.setDeletableObjects(objects);
   }
   if (containerName) {
-    store.commit("setBucketName", containerName);
+    store.setBucketName(containerName);
   }
-  store.commit("toggleDeleteModal", true);
+  store.toggleDeleteModal(true);
 }
