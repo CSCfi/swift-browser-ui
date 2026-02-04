@@ -175,8 +175,8 @@
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
           >
-            <c-container>
-              <c-flex>
+            <div class="container">
+              <div class="flex">
                 <h3 class="title is-6">
                   {{ $t('message.encrypt.multipleReceivers') }}
                 </h3>
@@ -207,8 +207,8 @@
                   :footerOptions.prop="{hideDetails: true}"
                   @click="checkPage($event,true)"
                 />
-              </c-flex>
-            </c-container>
+              </div>
+            </div>
           </c-accordion-item>
         </c-accordion>
       </c-card-content>

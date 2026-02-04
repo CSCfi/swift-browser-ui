@@ -1,5 +1,5 @@
 <template>
-  <c-main>
+  <div class="main">
     <MainToolbar :user="user" />
     <c-row
       class="title-row"
@@ -110,7 +110,7 @@
       </article>
     </div>
     <CFooter />
-  </c-main>
+  </div>
 </template>
 
 <script>
@@ -123,10 +123,7 @@ export default {
 </script>
 
 <style scoped>
-c-main {
-  height: unset;
-  min-height: 100vh;
-  justify-content: space-between;
+div.main {
   background-color: white;
 }
 .content {

@@ -1,5 +1,5 @@
 <template>
-  <c-container>
+  <div class="container">
     <h3 class="title is-5">
       {{ $t("message.share.shared_table_title") }}
     </h3>
@@ -68,7 +68,7 @@
       :footerOptions.prop="footer"
       horizontal-scrolling
     />
-  </c-container>
+  </div>
 </template>
 
 <script>
@@ -428,7 +428,7 @@ c-data-table {
   padding-bottom: 4rem;
 }
 
-c-container {
+div.container {
   min-width: 0;
 }
 </style>

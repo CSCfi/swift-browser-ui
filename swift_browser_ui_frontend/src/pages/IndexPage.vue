@@ -1,13 +1,11 @@
 <template>
-  <c-main>
+  <div class="main">
     <MainToolbar />
     <c-row v-if="!notindex && idb">
-      <c-flex>
-        <c-container class="padding">
+      <div class="flex">
+        <div class="container padding">
           <form>
-            <c-login-card
-              :src="bannerUrl"
-            >
+            <c-login-card :src="bannerUrl">
               <c-login-card-title>
                 {{ $t('message.program_name') }}
               </c-login-card-title>
@@ -33,12 +31,12 @@
               </c-login-card-actions>
             </c-login-card>
           </form>
-        </c-container>
-      </c-flex>
+        </div>
+      </div>
     </c-row>
     <c-row v-else>
-      <c-flex>
-        <c-container>
+      <div class="flex">
+        <div class="container">
           <c-card>
             <c-card-title v-if="!idb">
               {{ $t('message.error.idb') }}
@@ -108,11 +106,11 @@
               </c-button>
             </c-card-actions>
           </c-card>
-        </c-container>
-      </c-flex>
+        </div>
+      </div>
     </c-row>
     <CFooter />
-  </c-main>
+  </div>
 </template>
 
 <script>
@@ -121,22 +119,10 @@ export default {};
 
 <style>
 
-c-main {
-  height: unset;
-  min-height: 100vh;
-  justify-content: space-between;
-}
-
-c-card {
+c-card, c-login-card {
   margin: 2rem auto;
   max-width: 55rem;
-  height: 35rem;
-}
-
-c-login-card {
-  margin: 2rem auto;
-  max-width: 55rem;
-  height: 35rem;
+  max-height: 35rem;
 }
 
 c-button {

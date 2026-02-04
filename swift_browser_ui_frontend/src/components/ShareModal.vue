@@ -30,10 +30,8 @@
       id="share-card-modal-content"
       class="modal-content-wrapper"
     >
-      <c-container>
-        <c-flex
-          class="toggle-instructions"
-        >
+      <div class="container">
+        <div class="flex toggle-instructions">
           <c-link
             underline
             tabindex="0"
@@ -46,7 +44,7 @@
               : $t("message.share.instructions")
             }}
           </c-link>
-        </c-flex>
+        </div>
         <div
           v-show="openShareGuide"
           class="content guide-content"
@@ -127,7 +125,7 @@
         >
           {{ $t('message.share.confirm') }}
         </c-button>
-      </c-container>
+      </div>
       <c-alert
         v-show="isShared || isPermissionRemoved || isPermissionUpdated"
         type="success"
@@ -702,7 +700,7 @@ export default {
   z-index: 2;
 }
 
-c-container {
+div.container {
   width: 100%;
 }
 
@@ -751,7 +749,7 @@ c-link > span {
   font-size: 0.875rem;
 }
 
-c-flex, .shared-notification {
+div.flex, .shared-notification {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

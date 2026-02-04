@@ -1,9 +1,9 @@
 <template>
-  <c-main>
+  <div class="main">
     <MainToolbar />
     <c-row>
-      <c-flex>
-        <c-container class="padding">
+      <div class="flex">
+        <div class="container padding">
           <form>
             <c-login-card
               :src="bannerUrl"
@@ -33,11 +33,11 @@
               </c-login-card-actions>
             </c-login-card>
           </form>
-        </c-container>
-      </c-flex>
+        </div>
+      </div>
     </c-row>
     <CFooter />
-  </c-main>
+  </div>
 </template>
 
 <script>
@@ -53,11 +53,6 @@ export default {
 
 <style>
 
-c-main {
-  height: unset;
-  min-height: 100vh;
-  justify-content: space-between;
-}
 c-login-card {
   margin: 2rem auto;
   max-width: 55rem;
