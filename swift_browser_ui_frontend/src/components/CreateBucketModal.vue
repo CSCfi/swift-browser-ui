@@ -25,7 +25,7 @@
         <c-text-field
           id="newBucket-input"
           v-model="bucketName"
-          v-csc-control
+          v-control
           :label="$t('message.container_ops.bucketName')"
           name="bucketname"
           aria-required="true"

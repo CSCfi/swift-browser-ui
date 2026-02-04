@@ -59,7 +59,7 @@
       <!--<c-text-field
         id="search"
         v-model="searchQuery"
-        v-csc-control
+        v-control
         name="search"
         :placeholder="$t('message.objects.filterBy')"
         type="search"

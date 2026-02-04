@@ -7,7 +7,7 @@
       >
         <c-select
           :key="routeToParams ? routeToParams?.project : active.id"
-          v-csc-control
+          v-control
           v-bind="active"
           :items.prop="mappedProjects"
           :label="$t('message.selectProj')"

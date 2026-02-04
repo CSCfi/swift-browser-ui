@@ -4,17 +4,15 @@ import { i18n } from "@/common/i18n";
 
 import { checkIDB } from "@/common/idb";
 
-import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControl } from "@/common/csc-ui-vue-directive";
+import { defineCustomElements } from "@cscfi/csc-ui/loader";
+import { vControl } from "@cscfi/csc-ui-vue";
 
 import CFooter from "@/components/CFooter.vue";
 import MainToolbar from "@/components/MainToolbar.vue";
 
 import "@/assets/main.css";
 
-applyPolyfills().then(() => {
-  defineCustomElements();
-});
+defineCustomElements();
 
 export function newApp(name, data, Component) {
   return createApp({
@@ -43,5 +41,5 @@ export function newApp(name, data, Component) {
     ...Component,
   })
     .use(i18n)
-    .directive("csc-control", vControl);
+    .directive("control", vControl);
 }

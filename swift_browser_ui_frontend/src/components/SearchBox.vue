@@ -4,7 +4,7 @@
     class="search"
   >
     <c-autocomplete
-      v-csc-control
+      v-control
       data-testid="search-box"
       :items.prop="searchResults"
       :aria-label="$t('label.searchbox')"

@@ -1,5 +1,5 @@
 @charset "utf-8";
-@import "csc-ui/dist/styles/variables.css";
+@import url('@cscfi/csc-ui/css/theme.css');
 
 /* CSS file for integrating CSC brand colors */
 

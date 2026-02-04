@@ -32,13 +32,13 @@
               <c-login-card-content>
                 <p>{{ $t('message.pwdlogin.description') }}</p>
                 <c-text-field
-                  v-csc-control
+                  v-control
                   name="username"
                   :label="$t('message.pwdlogin.uname')"
                   type="text"
                 />
                 <c-text-field
-                  v-csc-control
+                  v-control
                   name="password"
                   :label="$t('message.pwdlogin.pwd')"
                   type="password"

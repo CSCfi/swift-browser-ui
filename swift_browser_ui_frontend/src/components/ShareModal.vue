@@ -98,7 +98,7 @@
           <c-select
             id="select-share-access"
             v-model="sharedAccessRight"
-            v-csc-control
+            v-control
             data-testid="select-permissions"
             :label="$t('message.share.permissions')"
             :placeholder="$t('message.share.permissions')"

@@ -13,14 +13,14 @@
     >
       <c-modal
         v-model="openConfirmRouteModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
       >
         <ConfirmRouteModal />
       </c-modal>
       <c-modal
         v-model="openCreateBucketModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >
@@ -28,7 +28,7 @@
       </c-modal>
       <c-modal
         v-model="openUploadModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >
@@ -37,7 +37,7 @@
       <c-modal
         id="edit-tags-modal"
         v-model="openEditTagsModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >
@@ -46,7 +46,7 @@
       <c-modal
         id="share-modal"
         v-model="openShareModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >
@@ -55,7 +55,7 @@
       <c-modal
         id="copy-bucket-modal"
         v-model="openCopyBucketModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >
@@ -64,7 +64,7 @@
       <c-modal
         id="delete-objs-modal"
         v-model="openDeleteModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
       >
         <DeleteModal />
@@ -72,7 +72,7 @@
       <c-modal
         id="api-key-modal"
         v-model="openAPIKeyModal"
-        v-csc-control
+        v-control
         disable-backdrop-blur
         width="64vw"
       >

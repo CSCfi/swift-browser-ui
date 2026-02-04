@@ -33,7 +33,7 @@
           <c-text-field
             id="upload-bucket-input"
             v-model="inputBucket"
-            v-csc-control
+            v-control
             data-testid="upload-bucket-input"
             :label="$t('message.container_ops.bucketName')"
             aria-required="true"
@@ -64,7 +64,7 @@
           <span>{{ $t("message.dropFiles") }}</span>
           <CUploadButton
             v-model="files"
-            v-csc-control
+            v-control
             @add-files="buttonAddingFiles=true"
             @cancel="buttonAddingFiles=false"
           >
@@ -182,7 +182,7 @@
                 </h3>
                 <c-text-field
                   v-model="addRecvkey"
-                  v-csc-control
+                  v-control
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
                   rows="2"

@@ -15,7 +15,7 @@
           <c-text-field
             id="new-copy-bucketName"
             v-model="bucketName"
-            v-csc-control
+            v-control
             :label="$t('message.replicate.name')"
             name="bucketname"
             aria-required="true"

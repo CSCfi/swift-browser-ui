@@ -17,8 +17,8 @@ import DeleteModal from "@/components/DeleteModal.vue";
 import APIKeyModal from "@/components/APIKeyModal.vue";
 
 // CSC UI things
-import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControl } from "@/common/csc-ui-vue-directive";
+import { defineCustomElements } from "@cscfi/csc-ui/loader";
+import { vControl } from "@cscfi/csc-ui-vue";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
@@ -75,9 +75,7 @@ window.addEventListener("rejectionhandled", function (event) {
 });
 
 // Configure csc-ui
-applyPolyfills().then(() => {
-  defineCustomElements();
-});
+defineCustomElements();
 
 const pinia = createPinia();
 const app = createApp({
@@ -339,7 +337,7 @@ const app = createApp({
 app.use(i18n);
 app.use(router);
 app.use(pinia);
-app.directive("csc-control", vControl);
+app.directive("control", vControl);
 
 // Pinia is geared toward multiple stores: ease migration and enforce single global store like Vuex
 app.config.globalProperties.$store = useStore();

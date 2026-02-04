@@ -30,7 +30,7 @@
       <c-text-field
         id="api-key-input"
         v-model="newIdentifier"
-        v-csc-control
+        v-control
         name="newIdentifier"
         :label="$t('message.apiKeys.identLabel')"
         :valid="!inputError"
