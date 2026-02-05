@@ -8,7 +8,7 @@
         :to="{ name: 'AllBuckets'}"
         @click="onClickBreadcrumb"
       >
-        <i class="mdi mdi-home" />
+        <c-icon :path="mdiHome" size="16" />
         <span>&nbsp;{{ $t("message.bucketTabs.all") }}</span>
       </router-link>
       <router-link
@@ -16,7 +16,7 @@
         :to="{name: currentRoute}"
         @click="onClickBreadcrumb"
       >
-        <i class="mdi mdi-chevron-right" />
+        <c-icon :path="mdiChevronRight" size="16" />
         <span :class="folders === '' ? 'last' : 'default'">
           &nbsp;{{ bucket }}
         </span>
@@ -28,7 +28,7 @@
         :to="getPath(i)"
         @click="onClickBreadcrumb"
       >
-        <i class="mdi mdi-chevron-right" />
+        <c-icon :path="mdiChevronRight" size="16" />
         <span :class="i === folders.length-1 ? 'last': 'default'">
           &nbsp;{{ item }}
         </span>
@@ -39,8 +39,16 @@
 
 <script>
 
+import { mdiHome, mdiChevronRight } from "@mdi/js";
+
 export default {
   name: "BreadcrumbNav",
+  data() {
+    return {
+      mdiHome,
+      mdiChevronRight,
+    };
+  },
   computed: {
     bucket() {
       return this.$route.params.container;
@@ -76,7 +84,7 @@ export default {
 
 <style scoped>
 
-i, p {
+p {
   color: var(--csc-primary);
 }
 

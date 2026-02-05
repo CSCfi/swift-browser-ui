@@ -72,13 +72,13 @@
           scope="global"
         >
           <template #authorityName>
-            <a
+            <c-link
               :href="$t('accessibilityPage.part4.authorityLink')"
               target="_blank"
             >
               {{ $t("accessibilityPage.part4.authorityName") }}
-              <i class="mdi mdi-open-in-new" />
-            </a>
+              <c-icon :path="mdiOpenInNew" />
+          </c-link>
           </template>
         </i18n-t>
       </article>
@@ -114,8 +114,14 @@
 </template>
 
 <script>
+import { mdiOpenInNew } from "@mdi/js";
 import { getUser } from "@/common/api";
 export default {
+  data() {
+    return {
+      mdiOpenInNew,
+    };
+  },
   async mounted() {
     this.user = await getUser();
   },

@@ -60,10 +60,7 @@
           @click="copyLatest"
           @keyup.enter="copyLatest"
         >
-          <i
-            slot="icon"
-            class="mdi mdi-content-copy"
-          />
+          <c-icon :path="mdiContentCopy" />
           {{ $t('message.apiKeys.copy') }}
         </c-button>
       </c-row>
@@ -95,7 +92,7 @@
 </template>
 
 <script>
-import { mdiClose, mdiDelete } from "@mdi/js";
+import { mdiClose, mdiDelete, mdiContentCopy } from "@mdi/js";
 import {
   createAPIKey,
   listAPIKeys,
@@ -120,6 +117,7 @@ export default {
       apiKeysPerPage: 5,
       mdiClose,
       mdiDelete,
+      mdiContentCopy,
       currentPage: 1,
       inputError: "",
     };

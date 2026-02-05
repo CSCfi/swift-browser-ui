@@ -61,7 +61,7 @@
           target="_blank"
         >
           {{ $t("message.container_ops.viewProjectMembers") }}
-          <i class="mdi mdi-open-in-new" />
+          <c-icon :path="mdiOpenInNew" />
         </c-link>
       </c-card-content>
     </div>
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { mdiOpenInNew } from "@mdi/js";
 import { getDB } from "@/common/idb";
 
 import {
@@ -119,6 +120,7 @@ export default {
   },
   data() {
     return {
+      mdiOpenInNew,
       bucketName: "",
       tags: [],
       projectInfoLink: "",

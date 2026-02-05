@@ -21,8 +21,8 @@
           :items.prop="tableOptions"
           data-testid="table-options-selector"
         >
+          <c-icon :path="mdiTune" size="20" />
           <span class="menu-active display-options-menu">
-            <i class="mdi mdi-tune" />
             {{ $t("message.tableOptions.displayOptions") }}
           </span>
         </c-menu>
@@ -50,7 +50,7 @@ import { liveQuery } from "dexie";
 import { getDB } from "@/common/idb";
 import { updateContainers } from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
-import { mdiPlus } from "@mdi/js";
+import { mdiPlus, mdiTune } from "@mdi/js";
 import { toggleCreateBucketModal } from "@/common/globalFunctions";
 import { getAccessDetails, getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
@@ -66,6 +66,7 @@ export default {
   data: function () {
     return {
       mdiPlus,
+      mdiTune,
       currentProject: {},
       showTimestamp: false,
       hidePagination: false,

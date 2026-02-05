@@ -16,10 +16,7 @@
       @changeQuery="onQueryChange"
       @changeValue="goToResult"
     >
-      <i
-        slot="pre"
-        class="mdi mdi-magnify"
-      />
+      <c-icon :path="mdiMagnify" />
       <div
         v-for="(item, index) in searchResults"
         :key="index"
@@ -48,6 +45,7 @@
 </template>
 
 <script>
+import { mdiMagnify } from "@mdi/js";
 import { tokenize } from "@/common/globalFunctions";
 import { getDB } from "@/common/idb";
 import escapeRegExp from "lodash/escapeRegExp";
@@ -62,6 +60,7 @@ export default {
   props: ["containers"],
   data: function () {
     return {
+      mdiMagnify,
       searchArray: [],
       searchResults: [],
       searchElements: [],

@@ -27,13 +27,12 @@
               (subItem.route || subItem.href) && handleItemRoute(subItem);
               subItem.action && subItem.action();
             },
-            icon: subItem.href && extLinkIcon,
+            icon: subItem.href && mdiOpenInNew,
           }))"
           :data-testid="item.testid"
         >
-          <i
-            class="mdi pr-3 menu-icon"
-            :class="item.icon"
+          <c-icon :path="item.icon" size="36"
+            class="pr-3 menu-icon"
           />
           <span class="menu-active">{{ item.title }}</span>
         </c-menu>
@@ -52,7 +51,7 @@
         :data-testid="item.testid + '-mobile'"
       >
         <div slot="main">
-          <span :class="'mdi ' + item.icon" />
+          <c-icon :path="item.icon" />
           {{ item.title }}
         </div>
 
@@ -72,9 +71,9 @@
             }"
           >
             {{ subItem.title }}
-            <i
+            <c-icon
               v-if="subItem.href"
-              class="mdi mdi-open-in-new"
+              :path="mdiOpenInNew"
             />
           </c-subnavigationitem>
         </div>
@@ -89,7 +88,7 @@ import {
   setPrevActiveElement,
   disableFocusOutsideModal,
 } from "@/common/keyboardNavigation";
-import { mdiOpenInNew } from "@mdi/js";
+import { mdiOpenInNew, mdiWeb, mdiHelpCircleOutline, mdiAccount } from "@mdi/js";
 
 export default {
   name: "BrowserMainNavbar",
@@ -101,8 +100,8 @@ export default {
       menuVisible: false,
       navigationMenuItems: [],
       currentLang: "",
-      extLinkIcon: mdiOpenInNew,
       projectInfoLink: "",
+      mdiOpenInNew,
     };
   },
   computed: {
@@ -139,7 +138,7 @@ export default {
       const menuArr = [
         {
           title: this.currentLang,
-          icon: "mdi-web",
+          icon: mdiWeb,
           testid: "language-selector",
           ariaLabel: this.$t("label.language_menu"),
           subs: this.langs
@@ -154,7 +153,7 @@ export default {
         },
         {
           title: this.$t("message.support"),
-          icon: "mdi-help-circle-outline",
+          icon: mdiHelpCircleOutline,
           id: "support-menu",
           testid: "support-menu",
           ariaLabel: this.$t("label.support_menu"),
@@ -175,7 +174,7 @@ export default {
         },
         {
           title: this.uname,
-          icon: "mdi-account",
+          icon: mdiAccount,
           testid: "user-menu",
           ariaLabel: this.$t("label.user_menu"),
           subs: [

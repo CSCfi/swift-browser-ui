@@ -48,10 +48,7 @@
                 <c-button
                   type="submit"
                 >
-                  <i
-                    slot="icon"
-                    class="mdi mdi-login"
-                  />
+                  <c-icon :path="mdiLogin" />
                   {{ $t('message.index.logIn') }}
                 </c-button>
                 <input

@@ -15,7 +15,7 @@
     </c-alert>
     <div class="bucket-info">
       <div class="bucket-info-heading">
-        <i class="mdi mdi-pail-outline" />
+        <c-icon :path="mdiPailOutline" />
         <span>{{ containerName }}</span>
       </div>
       <ul class="bucket-details">
@@ -64,18 +64,15 @@
         :placeholder="$t('message.objects.filterBy')"
         type="search"
       >
-        <i
-          slot="pre"
-          class="mdi mdi-filter-variant mdi-24px"
-        />
+        <c-icon :path="mdiFilterVariant" size="24" />
       </c-text-field>-->
       <c-menu
         :key="optionsKey"
         :items.prop="tableOptions"
         options-testid="table-options-selector"
       >
+        <c-icon :path="mdiTune" size="20" />
         <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
           {{ $t("message.tableOptions.displayOptions") }}
         </span>
       </c-menu>
@@ -85,7 +82,7 @@
       class="selection-bar"
     >
       <div class="info">
-        <i class="mdi mdi-information-outline" />
+        <c-icon :path="mdiInformationOutline" size="20" />
         <span>
           {{ checkedRows.length }}
           {{ checkedRows.length === 1
@@ -105,11 +102,8 @@
           @click="button.action"
           @keyup.enter="button.action"
         >
-          <i
-            slot="icon"
-            :class="button.icon"
-            class="mdi"
-          /> {{ button.label }}
+          <c-icon :path="button.icon" size="20" />
+          {{ button.label }}
         </c-button>
       </div>
     </div>
@@ -137,6 +131,13 @@
 </template>
 
 <script>
+import {
+  mdiPailOutline,
+  mdiTune,
+  mdiInformationOutline,
+  mdiRefresh,
+  mdiTrashCanOutline,
+} from "@mdi/js";
 import {
   DEV,
   toggleDeleteModal,
@@ -184,6 +185,9 @@ export default {
   },
   data: function () {
     return {
+      mdiPailOutline,
+      mdiTune,
+      mdiInformationOutline,
       accessRights: [],
       sharedStatus: "",
       sharedContainers: [],
@@ -622,13 +626,13 @@ export default {
       this.selectionActionButtons = [
         {
           label: this.$t("message.table.clearSelected"),
-          icon: "mdi-refresh",
+          icon: mdiRefresh,
           testid: "clear-checkboxes",
           action: () => this.clearSelections(),
         },
         {
           label: this.$t("message.table.deleteSelected"),
-          icon: "mdi-trash-can-outline",
+          icon: mdiTrashCanOutline,
           testid: "delete-checked-files",
           action: () => {
             // If only folders checked, don't show Delete modal
@@ -718,11 +722,8 @@ export default {
   font-weight: 700;
   background: var(--csc-primary);
   align-items: center;
-  & .mdi {
-    font-size: 1.5rem;
-    padding-right: .5rem
-  }
   & span {
+    margin-left: 0.5rem;
     align-self: center;
     display: inline-block;
   }
@@ -754,11 +755,8 @@ export default {
     flex: 1;
     min-width: 12rem;
     padding: 1rem;
-    & .mdi {
-      font-size: 1.5rem;
-      padding-right: .5rem
-    }
     & span {
+      margin-left: 0.5rem;
       align-self: center;
       display: inline-block;
     }

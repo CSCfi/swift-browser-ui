@@ -38,10 +38,7 @@
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
         >
-          <i
-            slot="icon"
-            class="mdi mdi-content-copy"
-          />
+          <c-icon :path="mdiContentCopy" />
           {{ $t("message.share.share_id_copy") }}
         </c-button>
         <div
@@ -106,6 +103,7 @@ import { addErrorToastOnMain, checkBucketBreaksS3 } from "@/common/globalFunctio
 import { getAccessDetails } from "@/common/share";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import {
+  mdiContentCopy,
   mdiInformationOutline,
   mdiTrayArrowUp,
 } from "@mdi/js";
@@ -115,6 +113,7 @@ export default {
   props: ["multipleProjects", "projects"],
   data: function () {
     return {
+      mdiContentCopy,
       mdiInformationOutline,
       mdiTrayArrowUp,
       copy: false,

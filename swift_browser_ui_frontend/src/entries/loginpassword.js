@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { mdiLogin } from "@mdi/js";
 import LoginPassword from "@/pages/LoginPassword.vue";
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 
@@ -29,6 +30,7 @@ const app = createApp({
       langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
       idb: true,
       bannerUrl,
+      mdiLogin,
     };
   },
   created() {

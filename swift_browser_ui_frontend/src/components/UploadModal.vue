@@ -87,10 +87,7 @@
                 size="small"
                 @click="error.show = false"
               >
-                <i
-                  slot="icon"
-                  class="mdi mdi-close"
-                />
+                <c-icon :path="mdiClose" />
                 {{ $t("message.close") }}
               </c-button>
             </div>
@@ -161,7 +158,7 @@
             target="_blank"
           >
             {{ $t("message.container_ops.viewProjectMembers") }}
-            <i class="mdi mdi-open-in-new" />
+            <c-icon :path="mdiOpenInNew" />
           </c-link>
           {{ !owner ? "" :
             ") " + $t("message.encrypt.uploadedToShared") }}
@@ -261,7 +258,7 @@ import { signedFetch } from "@/common/api";
 import { awsListObjects } from "@/common/s3commands";
 
 import { debounce, delay } from "lodash";
-import { mdiDelete } from "@mdi/js";
+import { mdiDelete, mdiClose, mdiOpenInNew } from "@mdi/js";
 
 export default {
   name: "UploadModal",
@@ -274,6 +271,8 @@ export default {
   },
   data() {
     return {
+      mdiClose,
+      mdiOpenInNew,
       inputBucket: "",
       addRecvkey: "",
       recvkeys: [],

@@ -22,10 +22,7 @@
                   target="_self"
                   type="button"
                 >
-                  <i
-                    slot="icon"
-                    class="mdi mdi-login"
-                  />
+                  <c-icon :path="mdiLogin" />
                   {{ item.msg }}
                 </c-button>
               </c-login-card-actions>
@@ -83,7 +80,7 @@
                   target="_blank"
                 >
                   {{ $t('message.error.UIdown_link_text') }}
-                  <i class="mdi mdi-open-in-new" />
+                  <c-icon :path="mdiOpenInNew" />
                 </c-link>
                 .
               </p>
