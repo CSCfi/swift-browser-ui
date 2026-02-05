@@ -73,6 +73,7 @@ export default {
       //hideTags: false,
       showTags: true,
       optionsKey: 1,
+      tableOptions: [],
       abortController: null,
       abortRenderingController: null,
       containers: [], // idb bucket data

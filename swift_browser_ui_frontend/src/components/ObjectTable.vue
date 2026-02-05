@@ -56,26 +56,28 @@
       id="optionsbar"
       justify="end"
     >
-      <!--<c-text-field
-        id="search"
-        v-model="searchQuery"
-        v-control
-        name="search"
-        :placeholder="$t('message.objects.filterBy')"
-        type="search"
-      >
-        <c-icon :path="mdiFilterVariant" size="24" />
-      </c-text-field>-->
-      <c-menu
-        :key="optionsKey"
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
-      >
-        <c-icon :path="mdiTune" size="20" />
-        <span class="menu-active display-options-menu">
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
+      <div>
+        <!--<c-text-field
+          id="search"
+          v-model="searchQuery"
+          v-control
+          name="search"
+          :placeholder="$t('message.objects.filterBy')"
+          type="search"
+        >
+          <c-icon :path="mdiFilterVariant" size="24" />
+        </c-text-field>-->
+        <c-menu
+          :key="optionsKey"
+          :items.prop="tableOptions"
+          data-testid="table-options-selector"
+        >
+          <c-icon :path="mdiTune" size="20" />
+          <span class="menu-active display-options-menu">
+            {{ $t("message.tableOptions.displayOptions") }}
+          </span>
+        </c-menu>
+      </div>
     </c-row>
     <div
       v-if="checkedRows.length"
