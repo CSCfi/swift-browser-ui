@@ -171,38 +171,51 @@ export default {
           const incompatible = checkBucketBreaksS3(item.name);
           containersPage.push({
             name: {
-              value: truncate(item.name),
-              component: {
-                tag: "c-link",
-                params: {
-                  href: "javascript:void(0)",
-                  color: "dark-grey",
-                  path: mdiPail,
-                  iconFill: "primary",
-                  iconStyle: {
-                    marginRight: "1rem",
-                    flexShrink: "0",
-                  },
-                  onClick: () => {
-                    if(item.owner) {
-                      this.$router.push({
-                        name: "SharedObjects",
-                        params: {
-                          container: item.name,
-                          owner: item.owner,
-                        },
-                      });
-                    } else {
-                      this.$router.push({
-                        name: "ObjectsView",
-                        params: {
-                          container: item.name,
-                        },
-                      });
-                    }
+              children: [
+                {
+                  value: "",
+                  component: {
+                    tag: "c-icon",
+                    params: {
+                      path: mdiPail,
+                      color: "var(--c-primary-600)",
+                      size: "18",
+                    },
                   },
                 },
-              },
+                {
+                  value: truncate(item.name),
+                  component: {
+                    tag: "c-link",
+                    params: {
+                      href: "javascript:void(0)",
+                      style: {
+                        "--c-link-color": "var(--c-tertiary-700)",
+                        "--c-link-hover": "none",
+                        marginLeft: "1rem",
+                      },
+                      onClick: () => {
+                        if(item.owner) {
+                          this.$router.push({
+                            name: "SharedObjects",
+                            params: {
+                              container: item.name,
+                              owner: item.owner,
+                            },
+                          });
+                        } else {
+                          this.$router.push({
+                            name: "ObjectsView",
+                            params: {
+                              container: item.name,
+                            },
+                          });
+                        }
+                      },
+                    },
+                  },
+                },
+              ],
             },
             sharing: {
               value: getSharedStatus(item.sharing),
@@ -221,14 +234,13 @@ export default {
               sortable: null,
               children: [
                 {
-                  value: this.$t("message.download.download"),
+                  value: "",
                   component: {
                     tag: "c-button",
                     params: {
                       testid: "download-container",
                       text: true,
                       size: "small",
-                      title: this.$t("message.download.download"),
                       onClick: ({ event }) => {
                         this.handleDownloadClick(
                           item.name,
@@ -237,25 +249,40 @@ export default {
                         );
                       },
                       target: "_blank",
-                      path: mdiTrayArrowDown,
                       disabled: (
                         (item.owner && item.accessRights?.length === 0) ||
                         incompatible
                       ),
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-icon",
+                        params: {
+                          path: mdiTrayArrowDown,
+                          size: "18",
+                        },
+                      },
+                    },
+                    {
+                      value: this.$t("message.download.download"),
+                      component: {
+                        tag: "span",
+                      },
+                    },
+                  ],
                 },
                 // Share button is disabled for Shared (with you) buckets
                 {
-                  value: this.$t("message.share.share"),
+                  value: "",
                   component: {
                     tag: "c-button",
                     params: {
                       testid: "share-container",
                       text: true,
                       size: "small",
-                      title: this.$t("message.share.share"),
-                      path: mdiShareVariantOutline,
                       onClick: () =>
                         this.onOpenShareModal(item.name),
                       onKeyUp: (event) => {
@@ -265,12 +292,31 @@ export default {
                       disabled: item.owner || incompatible,
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-icon",
+                        params: {
+                          path: mdiShareVariantOutline,
+                          size: "18",
+                        },
+                      },
+                    },
+                    {
+                      value: this.$t("message.share.share"),
+                      component: {
+                        tag: "span",
+                      },
+                    },
+                  ],
                 },
                 {
                   value: null,
                   component: {
                     tag: "c-menu",
                     params: {
+                      custom: true,
                       items: [
                         {
                           name: this.$t("message.copy"),
@@ -293,22 +339,40 @@ export default {
                           disabled: item.owner,
                         },
                       ],
-                      customTrigger: {
-                        value: this.$t("message.options"),
-                        component: {
-                          tag: "c-button",
-                          params: {
-                            text: true,
-                            path: mdiDotsHorizontal,
-                            title: this.$t("message.options"),
-                            size: "small",
-                            disabled: (item.owner &&
-                              item.accessRights?.length === 0) || incompatible,
-                          },
-                        },
-                      },
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-button",
+                        params: {
+                          text: true,
+                          size: "small",
+                          disabled: (item.owner &&
+                            item.accessRights?.length === 0) || incompatible,
+                        },
+                      },
+                      children: [
+                        {
+                          value: "",
+                          component: {
+                            tag: "c-icon",
+                            params: {
+                              path: mdiDotsHorizontal,
+                              size: "18",
+                            },
+                          },
+                        },
+                        {
+                          value: this.$t("message.options"),
+                          component: {
+                            tag: "span",
+                          },
+                        },
+                      ],
+                    },
+                  ],
                 },
               ],
             },

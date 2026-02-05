@@ -9,6 +9,7 @@
   --csc-grey: #595959;
   --csc-primary-light: #c2dbdf;
   --csc-primary-lighter: #d8e8ea;
+  --csc-primary-lightest: #f2f7f8;
   --csc-footer-grey: #dfe1e3;
   --csc-medium-grey: #757575;
   --body-font-size: 16px;
@@ -181,4 +182,9 @@ div.padding {
 
 c-menu {
   --c-menu-text-color: var(--c-primary-600);
+}
+
+c-data-table {
+  --c-data-table-background-color-hover: var(--csc-primary-lightest);
+  --c-data-table-highlighted-column-background-color: var(--csc-primary-lightest);
 }
