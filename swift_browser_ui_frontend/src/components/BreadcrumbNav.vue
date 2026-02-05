@@ -85,7 +85,7 @@ export default {
 <style scoped>
 
 p {
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .breadcrumb {
@@ -94,7 +94,7 @@ p {
 
 .breadcrumb a {
   align-items: center;
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
   display: flex;
   justify-content: center;
   padding: 0;

@@ -927,7 +927,7 @@ c-card-actions {
 }
 
 .over-dropArea {
-  border: 2px dashed var(--csc-primary);
+  border: 2px dashed var(--c-primary-600);
 }
 
 c-data-table.files-table {

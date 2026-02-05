@@ -719,7 +719,7 @@ c-card-actions > h2 {
 .toggle-instructions {
   justify-content: flex-end;
   align-items: center;
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .guide-content {

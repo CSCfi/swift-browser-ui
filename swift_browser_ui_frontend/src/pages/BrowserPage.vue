@@ -165,10 +165,10 @@ c-modal {
     width: 0.5rem;
   }
   &::-webkit-scrollbar-thumb {
-    background: var(--csc-mid-grey);
+    background: var(--c-tertiary-500);
     border-radius: 10px;
     &:hover {
-      background: var(--csc-dark-grey);
+      background: var(--c-tertiary-700);
     }
   }
 }
@@ -206,7 +206,7 @@ c-modal {
 
 .menu-active,
 .menu-icon {
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .menu-icon {
@@ -214,7 +214,7 @@ c-modal {
 }
 
 .menu-active, .menu-icon {
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .hero-body #login-center{
@@ -290,7 +290,7 @@ c-modal {
 }
 
 .button-focus {
-  outline: 2px var(--csc-primary) solid;
+  outline: 2px var(--c-primary-600) solid;
   outline-offset: 2px;
   border-radius: 4px;
 }

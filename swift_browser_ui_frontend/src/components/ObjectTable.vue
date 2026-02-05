@@ -707,7 +707,7 @@ export default {
 }
 
 .bucket-info {
-  border: 1px solid var(--csc-primary);
+  border: 1px solid var(--c-primary-600);
   margin: 1rem 0 0 0;
 }
 
@@ -720,7 +720,7 @@ export default {
   color: #FFF;
   font-size: 1rem;
   font-weight: 700;
-  background: var(--csc-primary);
+  background: var(--c-primary-600);
   align-items: center;
   & span {
     margin-left: 0.5rem;

@@ -75,7 +75,7 @@ export default {
 }
 
 .tags-list:focus-within {
-  border: 2px solid var(--csc-primary);
+  border: 2px solid var(--c-primary-600);
 }
 
 .tags-list input {

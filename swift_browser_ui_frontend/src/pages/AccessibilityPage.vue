@@ -154,7 +154,7 @@ c-row {
   &.title-row {
     margin: 0;
     padding: 2rem 0;
-    background-color: var(--csc-primary);
+    background-color: var(--c-primary-600);
     & h1 {
       margin: 0;
       color: white;

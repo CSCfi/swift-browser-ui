@@ -7,13 +7,11 @@
   --csc-blue: #025b96;
   --csc-dark: #2E3438;
   --csc-grey: #595959;
-  --csc-info: #025b97;
   --csc-primary-light: #c2dbdf;
   --csc-primary-lighter: #d8e8ea;
-  --body-font-size: 16px;
   --csc-footer-grey: #dfe1e3;
   --csc-medium-grey: #757575;
-
+  --body-font-size: 16px;
   --csc-font-family: 'museo-sans', sans-serif;
 }
 
@@ -106,13 +104,13 @@ img {
 }
 
 a {
-  color: var(--csc-link);
+  color: var(--c-info-700);
   cursor: pointer;
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--csc-link);
+  color: var(--c-info-700);
 }
 
 .pr-3 {
@@ -179,4 +177,8 @@ div.container {
 
 div.padding {
   padding: 24px;
+}
+
+c-menu {
+  --c-menu-text-color: var(--c-primary-600);
 }

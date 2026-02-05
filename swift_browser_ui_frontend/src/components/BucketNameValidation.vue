@@ -8,7 +8,7 @@
     nowrap
   >
     <c-icon
-      :color="`var(--csc-${item.type})`"
+      :color="`var(--c-${item.type}-600)`"
       :path="
         item.type === 'success'
           ? mdiCheckCircle
