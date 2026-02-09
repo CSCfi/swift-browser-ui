@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="copyBucketContainer"
-    class="copy-bucket"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
     <div class="modal-content-wrapper">
@@ -294,34 +294,6 @@ export default {
 </script>
 
 <style scoped>
-
-.copy-bucket {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-   .copy-bucket {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .copy-bucket {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .copy-bucket {
-    top: -13rem;
-  }
-}
 
 c-card-content {
   color: var(--csc-dark);

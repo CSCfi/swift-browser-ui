@@ -2,14 +2,14 @@
 <template>
   <c-card
     ref="editTagsContainer"
-    class="edit-tags"
+    class="modal-card"
     data-testid="edit-tags-modal"
     @keydown="handleKeyDown"
   >
-    <h2 class="title is-4 has-text-dark">
-      {{ $t('message.editTags') }}
-    </h2>
-    <c-card-content>
+    <c-card-content class="modal-card-content">
+      <h2 class="title is-4 has-text-dark">
+        {{ $t('message.editTags') }}
+      </h2>
       <TagInput
         id="edit-tags-input"
         data-testid="edit-tags-input"
@@ -214,21 +214,7 @@ export default {
 
 <style scoped>
 
-.edit-tags {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
 h2 { margin: 0 !important; }
-
-c-card-content {
-  color: var(--csc-dark);
-  padding: 0;
-}
 
 c-card-actions {
   padding: 0;

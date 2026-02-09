@@ -278,3 +278,29 @@ c-data-table {
   --c-data-table-background-color-hover: var(--csc-primary-lightest);
   --c-data-table-highlighted-column-background-color: var(--csc-primary-lightest);
 }
+
+.modal-content-wrapper {
+  overflow-y: scroll;
+  scrollbar-width: 0.5rem;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--c-tertiary-500);
+    border-radius: 10px;
+    &:hover {
+      background: var(--c-tertiary-700);
+    }
+  }
+}
+
+.modal-card {
+  padding: 1.5rem;
+  max-height: 75vh;
+}
+
+.modal-card-content {
+  color: var(--csc-dark);
+}

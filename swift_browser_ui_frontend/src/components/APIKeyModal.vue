@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="apiKeyContainer"
-    class="api-key-card"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
     <c-card-actions
@@ -344,16 +344,6 @@ export default {
 
 <style scoped>
 
-.api-key-card {
-  padding: 3rem 2rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-  overflow-y: scroll;
-}
-
 #create-api-key-button {
   width: max-content;
   margin-top: -1rem;
@@ -369,18 +359,6 @@ export default {
   #api-key {
     width: 100%;
     padding: 0.5rem 0;
-  }
-}
-
-@media screen and (max-width: 992px) {
-  .api-key-card {
-    max-height: 60vh;
-  }
-}
-
-@media screen and (max-width: 576px) {
-  .api-key-card {
-    padding: 1.5rem 1rem;
   }
 }
 

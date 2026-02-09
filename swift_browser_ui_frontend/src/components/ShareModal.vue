@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="shareContainer"
-    class="share-card"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
     <c-card-actions
@@ -35,11 +35,11 @@
           <c-link
             underline
             tabindex="0"
-            :path="mdiInformationOutline"
             :aria-label="$t('label.shareid_instructions')"
             @click="toggleShareGuide"
             @keyup.enter="toggleShareGuide"
           >
+            <c-icon :path="mdiInformationOutline" size="16" />
             {{ openShareGuide ? $t("message.share.close_instructions")
               : $t("message.share.instructions")
             }}
@@ -663,34 +663,6 @@ export default {
 
 <style scoped>
 
-.share-card {
-  padding: 2rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-  .share-card {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .share-card {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .share-card {
-    top: -13rem;
-  }
-}
-
 #share-select {
   width: 100%;
   margin-bottom: 1.5rem;
@@ -742,6 +714,7 @@ c-select {
 }
 
 c-link {
+  --c-link-hover: none;
   min-width: 60px;
 }
 
@@ -753,6 +726,10 @@ div.flex, .shared-notification {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+div.flex {
+  flex-direction: row-reverse;
 }
 
 c-alert[type="success"] {

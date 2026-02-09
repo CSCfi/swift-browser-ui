@@ -16,6 +16,7 @@
           ? mdiCloseCircle
           : mdiInformation
       "
+      :key="item.type+i"
     />
     <span
       :data-testid="`name-validation-${item.type}`"

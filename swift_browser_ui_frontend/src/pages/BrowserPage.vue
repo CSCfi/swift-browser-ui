@@ -139,29 +139,6 @@ div.main {
   z-index: 1;
 }
 
-c-modal {
-  position: relative;
-  margin: 0 auto;
-  display: inline-flex;
-}
-
-.modal-content-wrapper {
-  overflow-y: scroll;
-  scrollbar-width: 0.5rem;
-  padding-right: 0.5rem;
-
-  &::-webkit-scrollbar {
-    width: 0.5rem;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--c-tertiary-500);
-    border-radius: 10px;
-    &:hover {
-      background: var(--c-tertiary-700);
-    }
-  }
-}
-
 #copyBucket-toasts {
   position: sticky;
   bottom: 30vh;

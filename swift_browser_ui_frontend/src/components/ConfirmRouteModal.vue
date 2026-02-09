@@ -59,8 +59,14 @@ export default {
 
 <style scoped>
 
-.confirm-route-modal {
-  padding: 0px;
+c-card {
+  padding: 4rem important!;
+  margin: 0 important!;
+}
+
+c-alert {
+  margin: 0;
+  padding: 0;
 }
 
 </style>
