@@ -1,5 +1,5 @@
 <template>
-  <div id="mainContainer">
+  <div id="mainContainer" class="main">
     <nav>
       <BrowserMainNavbar :langs="langs" />
       <BrowserSecondaryNavbar
@@ -125,21 +125,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
-html, body {
-  height: 100vh;
-}
-
-body {
-  overflow-y: auto;
-}
-
-#mainContainer {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+div.main {
+  background-color: var(--c-white);
 }
 
 #mainContent {
@@ -173,125 +162,9 @@ c-modal {
   }
 }
 
-.content-wrapper {
-  margin: 0;
-  padding: 0;
-  padding-bottom: 3rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.contents {
-  flex: 1 0 auto;
-}
-
-.container-box {
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-
-.navbar .container .navbar-brand .navbar-item img {
-  max-height: 2.5rem;
-}
-
-.menu-active {
-  font-weight: 600 !important;
-  font-size: 14px;
-}
-
-.menu-icon {
-  font-size: 1.5rem;
-}
-
-.menu-active,
-.menu-icon {
-  color: var(--c-primary-600);
-}
-
-.menu-icon {
-  font-size: 1.5rem;
-}
-
-.menu-active, .menu-icon {
-  color: var(--c-primary-600);
-}
-
-.hero-body #login-center{
-    padding: 30px 20px 20px 20px;
-}
-
-.hero-body .footer {
-  margin: 15px 0;
-  padding: 0;
-}
-
-.searchBox {
-  max-width: 30%;
-  width: auto;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.uploadGroup {
-  margin-left: auto;
-}
-
-.dashboard {
-  margin-left: 5%;
-  margin-right: 5%;
-}
-
-#optionsbar {
-  display: block;
-  padding: 1.5rem 0;
-}
-
-.search {
-  flex: 0.4;
-}
-
-.display-options-menu {
-  display: flex;
-  align-items: center;
-  & .mdi {
-    padding-right: .5rem;
-    font-size: 18px;
-  }
-}
-
-#dropArea:before{
-  content:"";
-  width: 98%;
-  height:98%;
-  position:absolute;
-  border:2px dashed #b5b5b5;
-  margin: 0 1%;
-  padding: 0;
-  border-radius: 6px;
-}
-
 #copyBucket-toasts {
   position: sticky;
   bottom: 30vh;
 }
 
-.toasts-wrapper {
-  padding: 1rem;
-}
-
-.taginput-label {
-  font-weight: bold;
-  margin-bottom: -2rem;
-}
-
-#container-error-toasts {
-  margin-top: 50vh;
-}
-
-.button-focus {
-  outline: 2px var(--c-primary-600) solid;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
 </style>

@@ -219,4 +219,5 @@ h3 {
   flex-direction: inherit;
   gap: 0.5rem;
 }
+
 </style>

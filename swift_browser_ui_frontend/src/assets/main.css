@@ -16,6 +16,14 @@
   --csc-font-family: 'museo-sans', sans-serif;
 }
 
+html, body {
+  height: 100vh;
+}
+
+body {
+  overflow-y: auto;
+}
+
 html,
 body,
 p,
@@ -154,6 +162,88 @@ footer {
   margin-bottom: 1em;
 }
 
+.content-wrapper {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.contents {
+  flex: 1 0 auto;
+}
+
+.container-box {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.navbar .container .navbar-brand .navbar-item img {
+  max-height: 2.5rem;
+}
+
+.menu-active {
+  font-weight: 600 !important;
+  font-size: 14px;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active,
+.menu-icon {
+  color: var(--c-primary-600);
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active, .menu-icon {
+  color: var(--c-primary-600);
+}
+
+.footer {
+  margin: 15px 0;
+  padding: 0;
+}
+
+#optionsbar {
+  display: block;
+  padding: 1.5rem 0;
+}
+
+.search {
+  flex: 0.4;
+}
+
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
+  }
+}
+
+.taginput-label {
+  font-weight: bold;
+  margin-bottom: -2rem;
+}
+
+#container-error-toasts {
+  margin-top: 50vh;
+}
+
+.button-focus {
+  outline: 2px var(--c-primary-600) solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Replace deprecated csc-ui components with divs */
 
 div.main {
@@ -161,7 +251,7 @@ div.main {
   flex-direction: column;
   min-height: 100vh;
   justify-content: space-between;
-  background-color: #d8e8ea;
+  background-color: var(--csc-primary-lighter);
 }
 
 div.flex {
