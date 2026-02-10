@@ -50,9 +50,11 @@ git clone --recurse-submodules https://github.com/cscfi/swift-browser-ui
 
 cd swift-browser-ui
 
-make check-deps \
-	&& pyenv install 3.12 \
+# Environment checks, not needed after it's been run once
+pyenv install 3.12 \
 	&& pyenv virtualenv 3.12 sd-connect-dev \
+
+make check-deps \
 	&& pyenv activate sd-connect-dev \
 	&& pushd swift_browser_ui_frontend ; pnpm i ; popd \
 	&& cp .github/config/.env.test .env \
