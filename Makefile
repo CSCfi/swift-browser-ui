@@ -4,6 +4,8 @@ SHELL := /bin/bash
 # Dependencies without version are also supported, eg. "docker"
 REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
+.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
+
 dev-up:
 	# make ceph-up
 	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
@@ -117,6 +119,9 @@ check-deps:
 		}; \
 	done
 	$(MAKE) -C submodules/local-single-host-ceph check-deps
+
+refresh-submodules:
+	git submodule foreach "git pull"
 
 clean-browsers:
 	sudo rm -rf .docker-volumes
