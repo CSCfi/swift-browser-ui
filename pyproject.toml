@@ -39,10 +39,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-docs = [
-    "sphinx==8.2.3",
-    "sphinx_rtd_theme==3.0.2",
-]
 test = [
     "black==25.1.0",
     "coverage==7.8.0",
@@ -77,7 +73,6 @@ swift-x-account-sharing = "swift_browser_ui.launcher:run_sharing"
 
 [project.urls]
 Source = "https://github.com/CSCfi/swift-browser-ui"
-Documentation = "https://swift-browser-ui.readthedocs.io"
 
 [tool.hatch.version]
 path = "swift_browser_ui/__init__.py"

@@ -28,7 +28,6 @@ backend-lint:
     - pip install pre-commit tox mypy .[dev]
   script:
     - SKIP=no-commit-to-branch pre-commit run --all-files -c .pre-commit-config.yaml --show-diff-on-failure --color never
-    - tox -e docs
     - tox -e bandit
 
 spellcheck:
@@ -119,13 +118,13 @@ update-versions-dryrun:
   extends: .update-versions-dryrun
   interruptible: true
   variables:
-    UPDATE_VERSION_FILES_LIST: "docs/_static/openapi.yaml;docs/source/conf.py;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
+    UPDATE_VERSION_FILES_LIST: "openapi.yaml;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
 
 # This job updates the versions
 update-versions:
   extends: .update-versions
   variables:
-    UPDATE_VERSION_FILES_LIST: "docs/_static/openapi.yaml;docs/source/conf.py;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
+    UPDATE_VERSION_FILES_LIST: "openapi.yaml;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
 
 deploy:
   rules:
