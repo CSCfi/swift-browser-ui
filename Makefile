@@ -1,11 +1,17 @@
 SHELL := /bin/bash
 
+# Whitespace separated list of dependency:version, eg. "python:3.12", used for automatic dependency checking
+# Dependencies without version are also supported, eg. "docker"
+REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
+
 dev-up:
 	# make ceph-up
 	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 	# honcho start
 
 dev-all:
+	@echo Checking dependencies
+	make check-deps
 	@echo Building the whole development environment
 	make ceph-up
 	make dev-ca
@@ -88,6 +94,29 @@ volumes:
 	sudo chown -R 1111:1111 .docker-volumes/config-chrome
 	sudo chown -R 1111:1111 .docker-volumes/cache-chrome
 	sudo chown -R 1111:1111 .docker-volumes/local-chrome
+
+check-deps:
+	@for dep in $(REQ_CMDS); do \
+		cmd="$${dep%%:*}"; \
+		min="$${dep#*:}"; \
+		if ! command -v $$cmd >/dev/null 2>&1; then \
+			echo "Error: $$cmd is not installed or not in PATH"; \
+			exit 1; \
+		fi; \
+		if [ "$$dep" = "$$cmd" ]; then \
+			continue; \
+		fi; \
+		version="$$($$cmd --version 2>/dev/null | sed -E 's/[^0-9]*([0-9]+(\.[0-9]+)?).*/\1/')"; \
+		if [ -z "$$version" ]; then \
+			echo "Error: could not determine version for $$cmd"; \
+			exit 1; \
+		fi; \
+		printf "%s\n%s\n" "$$min" "$$version" | sort -V -C || { \
+			echo "Error: $$cmd must be >= $$min (currently $$version)"; \
+			exit 1; \
+		}; \
+	done
+	$(MAKE) -C submodules/local-single-host-ceph check-deps
 
 clean-browsers:
 	sudo rm -rf .docker-volumes
