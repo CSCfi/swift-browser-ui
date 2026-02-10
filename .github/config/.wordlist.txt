@@ -8,6 +8,7 @@ approle
 args
 auth
 authorityname
+autocompletion
 automodule
 autosummary
 backend
@@ -19,6 +20,7 @@ ceph
 certifi
 chmod
 cli
+codebase
 config
 configs
 containerport
@@ -38,6 +40,8 @@ devel
 devenv
 dockerfile
 dockerfiles
+doclet
+doclets
 drag'n'drop
 dropdown
 env
@@ -58,6 +62,7 @@ hvf
 imagepullpolicy
 javascript
 js
+jsdoc
 json
 kaj
 kvm
@@ -72,6 +77,7 @@ matchlabels
 maxdepth
 middleware
 middlewares
+moreso
 namespace
 navbar
 nginx
@@ -143,6 +149,7 @@ veryfast
 virsh
 virtualenv
 vm
+vscode
 vue
 wasm
 wcag
