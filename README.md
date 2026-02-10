@@ -101,7 +101,7 @@ and enable pre-commit.
 
 ```
 pyenv activate sd-connect-dev
-pip install -Ue .[docs,test,dev]
+pip install -Ue .[test,dev]
 pre-commit install
 ```
 </details>
