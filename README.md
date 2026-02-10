@@ -108,14 +108,13 @@ pre-commit install
 
 ### 🛠️  Contributing
 
-TODO: add
-
 <details><summary>Click to expand</summary>
 
-Here goes content
+Development team members should check internal [contributing guidelines for Gitlab](https://gitlab.ci.csc.fi/groups/sds-dev/-/wikis/Guides/Contributing).
+
+If you are not part of CSC and our development team, your help is nevertheless very welcome. Please see [contributing guidelines for Github](CONTRIBUTING.md).
 
 </details>
-
 
 ### 🧪 Testing
 
@@ -149,10 +148,10 @@ TODO: add generic deployment instructions.
 
 </details>
 
-### 📜 Additional Documentation
+### 📜 License
 
 <details><summary>Click to expand</summary>
 
-Here goes content
+Software is released under `MIT`, see [LICENSE](LICENSE).
 
 </details>
