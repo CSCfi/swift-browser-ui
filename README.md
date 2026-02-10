@@ -114,6 +114,17 @@ Development team members should check internal [contributing guidelines for Gitl
 
 If you are not part of CSC and our development team, your help is nevertheless very welcome. Please see [contributing guidelines for Github](CONTRIBUTING.md).
 
+#### Repository specific code guidelines
+
+For frontend development, please conform to using [JSDoc](https://jsdoc.app/about-getting-started) doclets for your JavaScript functions. The purpose of using doclets (as of now) is not necessarily for api document generation, but moreso for the developers to stay on track about the ever growing complexity of the codebase.
+
+The doclet should include at least:
+- a short general description of what is the purpose of the function
+- data types for the parameters and return values and
+- if they cannot be expressed with data types and/or descriptive parameter names, a short description
+
+Hint: VSCode offers helpful autocompletion for JSDoc doclets by typing `/**` + `[enter]`.
+
 </details>
 
 ### 🧪 Testing
