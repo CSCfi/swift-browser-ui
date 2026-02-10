@@ -6,7 +6,6 @@
 # Code Owners sections
 # disabled for now till we have more refined groups
 # [Documentation]
-# /docs/ @sds-dev/sd-connect
 # README.md @sds-dev/sd-connect
 
 # [Backend]

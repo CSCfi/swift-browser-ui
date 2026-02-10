@@ -70,7 +70,7 @@ repos:
       entry: ./scripts/pyspelling.sh
       language: script
       args: [markdown]
-      types_or: [markdown, rst]
+      types_or: [markdown]
       require_serial: true
 
     - id: pyspelling-frontend
