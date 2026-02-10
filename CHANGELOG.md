@@ -9,6 +9,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- readme to be up to date and compliant with the team readme standard
+- .env.test to be up to date
 - (users) Updated copy toast text
 - (admins) UI deployment now needs vault client credentials configured for copying headers
 - add a placeholder active file to store earlier in the upload preparation process
@@ -61,11 +63,13 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Removed
 
+- Removed irrelevant sphinx docs
 - Remove bulma remnants and sass dependency (#1292)
 - Purge SD Submit related code (#1275)
 
 ### Added
 
+- makefile dependency checks
 - Add header copy from previous implementation to bucket copy
 - interruptible keyword to pipeline jobs
 - (users) header addition and retrieval progress is now displayed when uploading or downloading
