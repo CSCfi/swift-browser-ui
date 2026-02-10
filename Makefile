@@ -6,13 +6,9 @@ REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
 .PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
 
-dev-up:
-	# make ceph-up
-	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
-	# honcho start
-
 dev-all:
 	@echo Checking dependencies
+	make refresh-submodules
 	make check-deps
 	@echo Building the whole development environment
 	make ceph-up
@@ -20,11 +16,25 @@ dev-all:
 	make volumes
 	docker compose -f docker-compose-dev.yml build
 	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
-	# honcho start
+
+dev-up:
+	make ceph-up
+	make volumes
+	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
+
+dev-docker-all:
+	@echo Checking dependencies
+	make refresh-submodules
+	make check-deps
+	@echo Building the docker-only development environment
+	make dev-ca
+	make volumes
+	docker compose -f docker-compose-dev.yml build
+	CURRENT_UID=$(id -u):$(id -g) docker compose -f docker-compose-dev.yml up
 
 dev-down:
 	docker compose -f docker-compose-dev.yml down
-	# make ceph-down
+	make ceph-down
 
 dev-ff: dev-ca
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox --width 1920 --height 1080 https://sd-connect.devenv
