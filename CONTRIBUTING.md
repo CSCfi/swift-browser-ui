@@ -6,8 +6,6 @@ If you're reading this, it means you saw something that is not right, you want t
 
 We have a handful of unit tests and UI tests. In our Git workflow unit tests are run on every Push and Pull Request, while UI tests run on every Pull Request.
 
-For more information this guide on [swift-browser-ui testing](https://swift-browser-ui.readthedocs.io/en/latest/testing.html) might be worth a read.
-
 ### Submitting Issues
 
 We have templates for submitting new issues, that you can fill out. For example if you found a bug, use the Bug Report template
