@@ -16,7 +16,7 @@ are in their separate files.
 * [Encryption resource APIs](README-runner.md)
 
 ### 💻 Development
-<details open><summary>Click to expand (your mind 🍄)</summary>
+<details open><summary>Click to expand</summary>
 
 #### Prerequisites
 
