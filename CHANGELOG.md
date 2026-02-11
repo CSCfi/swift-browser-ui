@@ -69,6 +69,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- make can now automatically pull fresh submodule branch versions
 - makefile dependency checks
 - Add header copy from previous implementation to bucket copy
 - interruptible keyword to pipeline jobs
