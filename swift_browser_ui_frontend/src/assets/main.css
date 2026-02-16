@@ -304,3 +304,7 @@ c-data-table {
 .modal-card-content {
   color: var(--csc-dark);
 }
+
+.no-padding-card {
+  --c-card-gap: 0;
+}

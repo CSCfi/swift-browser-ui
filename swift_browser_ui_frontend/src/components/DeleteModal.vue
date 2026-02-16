@@ -1,58 +1,52 @@
 <template>
   <c-card
     ref="deleteObjsModal"
-    class="delete-modal"
+    class="no-padding-card"
     @keydown="handleKeyDown"
   >
-    <c-card
-      ref="deleteObjsModal"
-      class="delete-modal"
-      @keydown="handleKeyDown"
+    <c-alert
+      v-if="!isDeleting"
+      type="error"
     >
-      <c-alert
-        v-if="!isDeleting"
-        type="error"
-      >
-        <div slot="title">
-          {{ $t("message.objects.deleteObjects") }}
-        </div>
+      <div slot="title">
+        {{ $t("message.objects.deleteObjects") }}
+      </div>
 
-        {{ owner ?
-          $t("message.objects.deleteSharedObjects") :
-          $t("message.objects.deleteObjectsMessage")
-        }}
+      {{ owner ?
+        $t("message.objects.deleteSharedObjects") :
+        $t("message.objects.deleteObjectsMessage")
+      }}
 
-        <c-card-actions justify="end">
-          <c-button
-            outlined
-            @click="toggleDeleteModal(false)"
-            @keyup.enter="toggleDeleteModal(true)"
-          >
-            {{ $t("message.cancel") }}
-          </c-button>
-          <c-button
-            id="delete-objs-btn"
-            data-testid="confirm-delete-objects"
-            @click="deleteObjects()"
-            @keyup.enter="deleteObjects()"
-          >
-            {{ $t("message.objects.deleteConfirm") }}
-          </c-button>
-        </c-card-actions>
-      </c-alert>
-      <c-alert
-        v-else
-        type="success"
-      >
-        <div slot="title">
-          {{ $t("message.objects.deleteInProgress") }}
-        </div>
-        <c-progress-bar
-          single-line
-          indeterminate
-        />
-      </c-alert>
-    </c-card>
+      <c-card-actions justify="end">
+        <c-button
+          outlined
+          @click="toggleDeleteModal(false)"
+          @keyup.enter="toggleDeleteModal(true)"
+        >
+          {{ $t("message.cancel") }}
+        </c-button>
+        <c-button
+          id="delete-objs-btn"
+          data-testid="confirm-delete-objects"
+          @click="deleteObjects()"
+          @keyup.enter="deleteObjects()"
+        >
+          {{ $t("message.objects.deleteConfirm") }}
+        </c-button>
+      </c-card-actions>
+    </c-alert>
+    <c-alert
+      v-else
+      type="success"
+    >
+      <div slot="title">
+        {{ $t("message.objects.deleteInProgress") }}
+      </div>
+      <c-progress-bar
+        single-line
+        indeterminate
+      />
+    </c-alert>
   </c-card>
 </template>
 
@@ -308,10 +302,6 @@ export default {
 </script>
 
 <style scoped>
-
-.delete-modal {
-  padding: 0px;
-}
 
 c-progress-bar {
   padding: 0.5rem;
