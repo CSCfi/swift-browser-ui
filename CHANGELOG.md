@@ -28,6 +28,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fixed shared with view permission bucket appearing empty to receiver
 - Fix missing import
 - (users) upload should no longer be incorrectly flagged as failed due to a slow start
 - (users) Uploading too quickly after refresh or login on a slow connection should no longer be possible, as upload button is disabled until upload works
