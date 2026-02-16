@@ -244,6 +244,14 @@ export async function ensureCollaborateAccessPolicy(bucket) {
   return response;
 }
 
+/**
+ * Adds access permissions to an S3 bucket policy.
+ * @param {string} bucket - Name of the S3 bucket.
+ * @param {string[]} rights - Array of permission flags: ["v"] or ["r"] or ["r","w"].
+ * @param {string[]} receivers - Array of project IDs to grant access to.
+ * @returns {Promise<object>} The response from the S3 PutBucketPolicy call.
+ */
+
 export async function addAccessControlBucketPolicy(
   bucket,
   rights,
@@ -261,7 +269,7 @@ export async function addAccessControlBucketPolicy(
   // Expand the policy with the new policy entries.
   for (const receiver of receivers) {
     let actions = [];
-    if (rights.indexOf("r") >= 0) {
+    if (rights.indexOf("r") >= 0 || rights.indexOf("v") >= 0) {
       actions = actions.concat([
         "s3:GetObject",
         "s3:ListBucket",

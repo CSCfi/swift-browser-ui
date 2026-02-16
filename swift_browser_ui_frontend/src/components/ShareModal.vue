@@ -437,11 +437,6 @@ export default {
         }
       }
 
-      // Add read rights after the share entry to make the db entry empty
-      if (this.view) {
-        rights.push("r");
-      }
-
       await addAccessControlBucketPolicy(
         bucket,
         rights,
