@@ -36,6 +36,7 @@ dependencies = [
     "msgpack==1.1.0",
     "ldap3==2.9.1",
     "aioboto3==15.2.0",
+    "setuptools==71.1.0",
 ]
 
 [project.optional-dependencies]
