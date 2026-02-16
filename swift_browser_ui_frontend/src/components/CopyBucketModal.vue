@@ -215,7 +215,6 @@ export default {
         {
           id: "copy-in-progress",
           type: "success",
-          indeterminate: true,
           message: "",
           custom: true,
         },

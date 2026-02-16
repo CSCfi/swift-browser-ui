@@ -70,13 +70,13 @@
       </div>
       <c-toasts
         id="copy-toasts"
-        vertical="center"
         data-testid="copy-toasts"
+        vertical="top"
       />
       <c-toasts
         id="decryption-toasts"
-        vertical="center"
         data-testid="decryption-toasts"
+        vertical="top"
       />
       <c-spacer />
       <div class="nav-item">

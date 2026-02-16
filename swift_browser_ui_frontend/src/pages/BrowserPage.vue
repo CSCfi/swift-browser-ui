@@ -100,11 +100,12 @@
           <p class="has-text-weight-semibold">
             {{ $t("message.copytime") }}
           </p>
+          <c-progress-bar indeterminate />
         </div>
       </c-toasts>
       <c-toasts
         id="container-error-toasts"
-        vertical="top"
+        vertical="bottom"
         horizontal="center"
       />
     </div>
