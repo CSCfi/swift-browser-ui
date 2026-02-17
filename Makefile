@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 # Whitespace separated list of dependency:version, eg. "python:3.12", used for automatic dependency checking
 # Dependencies without version are also supported, eg. "docker"
-REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
+REQ_CMDS := node:18 npm:9 pnpm:9 python:3.12 docker
 
 .PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
 
@@ -92,6 +92,9 @@ test-data:
 	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-4.bin bs=1M count=768
 
 volumes:
+	# Create volume folder and fix permissions
+	-mkdir -p .docker-volumes
+	sudo chown -R $(USER):$(USER) .docker-volumes
 	mkdir -p .docker-volumes/test-data
 	# Create volume mounts for firefox
 	mkdir -p .docker-volumes/config-ff
