@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- Replaced singular object deletion with batch deletion
 - Moved bucket data fetching and enrichment to Containers component
 - pin `setuptools` version by default to prevent builds breaking.
 - readme to be up to date and compliant with the team readme standard
@@ -30,6 +31,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fixed Delete modal allowing multiclicks
 - Fixed shared with view permission bucket appearing empty to receiver
 - Fix missing import
 - (users) upload should no longer be incorrectly flagged as failed due to a slow start
@@ -72,6 +74,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- Added basic bucket and object deletion error toasts (#1286)
 - make can now automatically pull fresh submodule branch versions
 - makefile dependency checks
 - Add header copy from previous implementation to bucket copy
