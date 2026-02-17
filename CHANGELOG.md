@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- pin `setuptools` version by default to prevent builds breaking.
 - readme to be up to date and compliant with the team readme standard
 - .env.test to be up to date
 - (users) Updated copy toast text
