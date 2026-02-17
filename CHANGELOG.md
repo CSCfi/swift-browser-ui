@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- Moved bucket data fetching and enrichment to Containers component
 - pin `setuptools` version by default to prevent builds breaking.
 - readme to be up to date and compliant with the team readme standard
 - .env.test to be up to date
