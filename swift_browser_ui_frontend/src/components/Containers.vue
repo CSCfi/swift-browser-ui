@@ -30,7 +30,6 @@
     </c-row>
     <div id="cont-table-wrapper">
       <ContainerTable
-        ref="containerTable"
         :conts="renderingContainers"
         :show-timestamp="showTimestamp"
         :disable-pagination="hidePagination"
@@ -51,11 +50,9 @@ import { liveQuery } from "dexie";
 import { getDB } from "@/common/idb";
 import { updateContainers } from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
-import { throttle } from "lodash";
 import { mdiPlus } from "@mdi/js";
 import { toggleCreateBucketModal } from "@/common/globalFunctions";
-import { getPaginationOptions } from "@/common/tableFunctions";
-import { getSharingContainers } from "@/common/share";
+import { getAccessDetails, getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
@@ -73,37 +70,35 @@ export default {
       showTimestamp: false,
       hidePagination: false,
       //hideTags: false,
-      selected: undefined,
-      isPaginated: true,
-      perPage: 15,
-      direction: "asc",
-      currentPage: 1,
       showTags: true,
       optionsKey: 1,
       abortController: null,
-      containers: [],
-      renderingContainers: [],
-      containersToUpdateObjs: [],
+      abortRenderingController: null,
+      containers: [], // idb bucket data
+      renderingContainers: [], // enriched and filtered data for table
       contsLoading: false,
     };
   },
   computed: {
+    readyToSetUp() {
+      return (this.active?.id && this.$store.state.sharingClient);
+    },
     active() {
       return this.$store.state.active;
     },
     isBucketUploading() {
       return this.$store.state.isUploading;
     },
-    newBucket() {
-      return this.$store.state.newBucket;
+    sharingUpdated() {
+      return this.$store.state.sharingUpdated;
     },
     locale() {
       return this.$i18n.locale;
     },
   },
   watch: {
-    active: function () {
-      this.fetchContainers(true);
+    readyToSetUp: function() {
+      this.setUpIfReady();
     },
     currentProject: function() {
       const savedDisplayOptions = this.currentProject.displayOptions;
@@ -114,52 +109,93 @@ export default {
         this.updateTableOptions();
       }
     },
-    // Throttle the updates to reduce rendering bugs
-    containers: throttle(function() {
-      if (this.$route.name === "SharedFrom") {
-        getSharingContainers(
+    containers: async function() {
+      if (!this.containers?.length)  {
+        this.renderingContainers = [];
+        return;
+      }
+
+      // Abort previous update
+      this.abortRenderingController?.abort({ reason: "Abort duplicate" });
+      this.abortRenderingController = new AbortController();
+      const { signal } = this.abortRenderingController;
+
+      // Segment buckets are never displayed
+      const bucketsNoSegments =  this.containers.filter(bucket =>
+        !bucket.name.endsWith("_segments"));
+
+      let finalBuckets = [];
+
+      if (this.$route.name === "SharedTo") {
+        // Shared to current project
+        finalBuckets = await this.enrichSharedBuckets(bucketsNoSegments, signal);
+      }
+      else if (this.$route.name === "SharedFrom") {
+        // Shared from current project
+        const sharingBuckets = await getSharingContainers(
           this.$route.params.project,
-          this.abortController.signal,
-        ).then(sharingContainers => {
-          this.renderingContainers = this.containers.filter(
-            cont => sharingContainers.some(item =>
-              item === cont.name,
-            ),
-          );
+          signal,
+        );
+        const sharingSet = new Set(sharingBuckets);
+        finalBuckets = bucketsNoSegments
+          .filter(
+            bucket => sharingSet.has(bucket.name))
+          .map((bucket) => ({...bucket, sharing: "sharing"}));
+      }
+      else {
+        // All buckets
+        const sharingBuckets = await getSharingContainers(
+          this.$route.params.project,
+          signal,
+        );
+        const sharingSet = new Set(sharingBuckets);
+
+        const sharedBuckets = await this.enrichSharedBuckets(bucketsNoSegments, signal);
+        const sharedMap = new Map(sharedBuckets.map(bucket => [bucket.name, bucket]));
+
+        // Combine buckets
+        finalBuckets = bucketsNoSegments.map(bucket => {
+          if (sharedMap.has(bucket.name)) {
+            return {
+              ...bucket,
+              ...sharedMap.get(bucket.name),
+              sharing: "shared",
+            };
+          }
+
+          else if (sharingSet.has(bucket.name)) {
+            return {
+              ...bucket,
+              sharing: "sharing",
+            };
+          }
+
+          return {
+            ...bucket,
+            sharing: "none",
+          };
         });
       }
-      else if (this.$route.name === "SharedTo") {
-        this.renderingContainers = this.containers ?
-          this.containers.filter(cont => cont.owner) : [];
-      } else {
-        this.renderingContainers = this.containers;
 
-        // Explicitly toggle container loading off if we're done with
-        // the first page
-        const defaultCount = getPaginationOptions(this.$t).itemsPerPage;
-        if (this.containers?.length > defaultCount) this.contsLoading = false;
-
-        if (this.containers && this.newBucket) {
-          const idx = this.containers.findIndex(c => c.name === this.newBucket);
-          if (idx > 0) {
-            this.containers.unshift(this.containers.splice(idx, 1)[0]);
-            this.$refs.containerTable.toFirstPage();
-          }
-        }
-      }
-    }, 500),
-    $route: function(to) {
-      if (to.name !== "AllBuckets") {
-        this.$store.commit("setNewBucket", "");
+      if (!signal?.aborted) {
+        // Assign once to prevent table re-renders
+        this.renderingContainers = finalBuckets;
+        this.contsLoading = false;
       }
     },
-    isBucketUploading: function () {
-      if (!this.isBucketUploading) {
+    isBucketUploading(newValue) {
+      if (newValue === false) {
         this.contsLoading = true;
         setTimeout(() => {
           this.fetchContainers();
           this.contsLoading = false;
         }, 3000);
+      }
+    },
+    sharingUpdated(newValue) {
+      if (newValue) {
+        this.fetchContainers(true);
+        this.$store.commit("setSharingUpdated", false);
       }
     },
     locale: function () {
@@ -168,23 +204,54 @@ export default {
   },
   created() {
     this.updateTableOptions();
-  },
-  beforeMount() {
     this.abortController = new AbortController();
-    this.getDirectCurrentPage();
-  },
-  mounted() {
-    this.fetchContainers(true);
+    this.abortRenderingController = new AbortController();
+    this.setUpIfReady();
   },
   beforeUnmount() {
-    this.abortController.abort();
+    this.abortController.abort({ reason: "Unmounting component" });
+    this.abortRenderingController.abort({ reason: "Unmounting component" });
+
   },
   methods: {
+    setUpIfReady: async function () {
+      // Check id: not available on created on page refresh
+      if (this.readyToSetUp) {
+        this.currentProject = await getDB().projects.get({
+          id: this.active.id,
+        });
+        this.fetchContainers(true);
+      }
+    },
+    enrichSharedBuckets: async function (buckets, signal) {
+      try {
+        let shared = await Promise.all(
+          buckets
+            .filter(bucket => bucket.owner)
+            // Get access details for each bucket
+            .map(async(bucket) => {
+              if (signal?.aborted) throw signal?.reason;
+              const sharedDetails = await getAccessDetails(
+                this.$route.params.project,
+                bucket.name,
+                bucket.owner,
+                signal);
+              const accessRights = sharedDetails ? sharedDetails.access : null;
+              if (accessRights !== null) return {...bucket, accessRights, sharing: "shared"};
+            }),
+        );
+        // Remove buckets that share details don't exist for
+        shared = shared.filter(bucket => !!bucket);
+        return shared;
+      } catch {
+        return [];
+      }
+    },
     updateTableOptions: function () {
       const displayOptions = {
         showTimestamp: this.showTimestamp,
         //hideTags: this.hideTags,
-        hidePagination: this.renderFolders,
+        hidePagination: this.hidePagination,
       };
       this.tableOptions = [
         /*{
@@ -253,10 +320,6 @@ export default {
       }
       if (withLoader) this.contsLoading = true;
 
-      this.currentProject = await getDB().projects.get({
-        id: this.active.id,
-      });
-
       this.containers = useObservable(
         liveQuery(() =>
           getDB().containers
@@ -266,7 +329,6 @@ export default {
       );
 
       await updateContainers(this.active.id, this.abortController.signal);
-      this.contsLoading = false;
     },
     removeContainer: async function(container) {
       await getDB().containers.where({
@@ -278,27 +340,6 @@ export default {
         projectID: this.active.id,
         name: `${container}_segments`,
       }).delete();
-    },
-    checkPageFromRoute: function () {
-      // Check if the pagination number is already specified in the link
-      if (this.$route.query.page) {
-        this.currentPage = parseInt(this.$route.query.page);
-      } else {
-        this.currentPage = 1;
-        this.$router.push("?page=" + this.currentPage);
-      }
-    },
-    getConAddr: function (container) {
-      return this.$route.params.project + "/" + container;
-    },
-    getDirectCurrentPage: function () {
-      this.currentPage = this.$route.query.page
-        ? parseInt(this.$route.query.page)
-        : 1;
-    },
-    addPageToURL: function (pageNumber) {
-      // Add pagination current page number to the URL in query string
-      this.$router.push("?page=" + pageNumber);
     },
     toggleCreateBucketModal: function (keypress) {
       toggleCreateBucketModal();
