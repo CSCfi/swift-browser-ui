@@ -48,7 +48,7 @@ import {
 } from "@/common/keyboardNavigation";
 import {
   awsDeleteBucket,
-  awsDeleteObject,
+  awsDeleteObjects,
   awsListObjects,
   checkBucketEmpty,
 } from "@/common/s3commands";
@@ -365,26 +365,22 @@ export default {
           // In case the bucket has a legacy segments bucket still in
           // existence we should take care of that as well
           const segmentsBucket = `${bucket}_segments`;
-          let segmentsBucketExists = false;
 
           // List and delete all segment objects matching the deleted bucket.
-          const segmentListResp = await awsListObjects(segmentsBucket);
-          for (const key of segmentListResp) {
-            try {
-              await awsDeleteObject(segmentsBucket, key.name);
-            } catch (e) {
-              if (DEV) {
-                console.log(
-                  `Failed deleting object ${key.name} in ${segmentsBucket}: `,
-                  e,
-                );
-              }
+          try {
+            const segmentObjList = await awsListObjects(segmentsBucket);
+            if (segmentObjList?.length) {
+              await awsDeleteObjects(segmentsBucket, segmentObjList);
             }
-          }
-
-          // Finally delete the segments bucket
-          if (segmentsBucketExists) {
+            // Finally delete the segments bucket
             await awsDeleteBucket(segmentsBucket);
+          } catch (e) {
+            if (DEV) {
+              console.log(
+                `Failed to delete ${segmentsBucket}: `,
+                e,
+              );
+            }
           }
 
           document.querySelector("#container-toasts").addToast(
@@ -400,6 +396,12 @@ export default {
             bucket,
           );
           if (sharedDetails.length) await deleteStaleShares(this.active.id, bucket);
+        }).catch(() => {
+          document.querySelector("#container-toasts").addToast(
+            { progress: false,
+              type: "error",
+              message: this.$t("message.container_ops.deleteFail")},
+          );
         });
       }
       this.paginationOptions.currentPage =

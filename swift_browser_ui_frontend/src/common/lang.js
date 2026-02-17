@@ -259,6 +259,7 @@ let default_translations = {
         copyNotEmpty: "An empty bucket cannot be copied.",
         deleteEmpty: "Bucket must be empty before it can be deleted.",
         deleteSuccess: "Bucket was deleted.",
+        deleteFail: "Bucket deletion failed.",
         bucketName: "Bucket name",
       },
       nameValidation: {
@@ -294,6 +295,7 @@ let default_translations = {
         deleteConfirm: "Delete items",
         deleteObjects: "Delete items",
         deleteInProgress: "Deletion in progress",
+        deleteObjectsError: "Item deletion failed. Please try again.",
         deleteManySuccess: " items deleted",
         deleteOneSuccess: " item deleted",
         deleteSharedObjects:
@@ -831,7 +833,8 @@ let default_translations = {
         deleteEmpty:
           "Ämpärin poistaminen edellyttää kaikkien " +
           "tiedostojen poistamista ensin.",
-        deleteSuccess: "Ämpäri poistettu",
+        deleteSuccess: "Ämpäri poistettu.",
+        deleteFail: "Ämpärin poistaminen epäonnistui.",
         bucketName: "Ämpärin nimi",
       },
       nameValidation: {
@@ -866,6 +869,7 @@ let default_translations = {
         filterBy: "Suodata nimellä tai asiasanalla",
         deleteConfirm: "Poista tiedostot",
         deleteObjects: "Poista tiedostot",
+        deleteObjectsError: "Kohteiden poistaminen epäonnistui. Yritä uudelleen.",
         deleteInProgress: "Poisto käynnissä",
         deleteManySuccess: " tiedostoa poistettu",
         deleteOneSuccess: " tiedosto poistettu",

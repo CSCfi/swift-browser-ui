@@ -65,7 +65,7 @@ import {
   removeFocusClass,
   moveFocusOutOfModal,
 } from "@/common/keyboardNavigation";
-import { awsDeleteObject, awsListObjects } from "@/common/s3commands";
+import { awsDeleteObjects, awsListObjects } from "@/common/s3commands";
 
 export default {
   name: "DeleteModal",
@@ -130,12 +130,7 @@ export default {
       }
     },
     deleteObjects: async function () {
-      let switchAlertType = false;
-      setTimeout(() => {
-        // to avoid alert flashing
-        // switch type only if mid-deletion after 250ms
-        switchAlertType = true;
-      }, 250);
+      this.isDeleting = true;
       let to_remove = [];
       let segments_to_remove = []; // Array for segment objects to be deleted
       let segment_container = null;
@@ -151,9 +146,6 @@ export default {
       }
 
       for (let object of this.selectedObjects) {
-        if (switchAlertType && !this.isDeleting) {
-          this.isDeleting = true;
-        }
         // Only files are able to delete
         //or when objects are shown as paths
         if (isFile(object.name, this.$route)
@@ -178,25 +170,34 @@ export default {
 
       if (to_remove.length) {
         this.$store.commit("setDeleting", true);
+        // Delete objects
         try {
-          for(const obj of to_remove) {
-            await awsDeleteObject(this.container, obj);
+          const resp = await awsDeleteObjects(this.container, to_remove);
+          if (resp.Errors?.length) {
+            throw new Error("Object deletion error");
           }
-          for(const obj of segments_to_remove) {
-            await awsDeleteObject(segment_container.name, obj);
-          }
-          this.bucketObjects = this.bucketObjects.filter(item => !to_remove.includes(item.name));
-        } finally {
-          this.$store.commit("setDeleting", false);
+        }
+        catch {
+          document.querySelector("#objects-toasts").addToast(
+            {
+              progress: false,
+              type: "error",
+              message: this.$t("message.objects.deleteObjectsError"),
+            },
+          );
+          this.clearDelete();
+          return;
+        }
+        // Delete segment objects
+        if (segments_to_remove?.length) {
+          try {
+            await awsDeleteObjects(segment_container.name, segments_to_remove);
+          } catch {}
         }
       }
-
-      const dataTable = document.getElementById("obj-table");
-      dataTable.clearSelections();
-
-      this.toggleDeleteModal();
-
+      this.bucketObjects = this.bucketObjects.filter(item => !to_remove.includes(item.name));
       this.getDeleteMessage(to_remove, selectedFolder);
+      this.clearDelete();
     },
     getDeleteMessage: async function(to_remove, selectedFolder) {
       // Only files can be deleted
@@ -264,6 +265,12 @@ export default {
           },
         );
       }
+    },
+    clearDelete: function () {
+      this.$store.commit("setDeleting", false);
+      const dataTable = document.getElementById("obj-table");
+      dataTable.clearSelections();
+      this.toggleDeleteModal();
     },
     handleKeyDown: function (e) {
       const focusableList = this.$refs.deleteObjsModal.querySelectorAll(
