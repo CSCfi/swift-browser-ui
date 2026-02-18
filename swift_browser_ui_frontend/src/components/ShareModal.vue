@@ -102,8 +102,6 @@
             :placeholder="$t('message.share.permissions')"
             hide-details
             @changeValue="onSelectPermission($event)"
-            @mouseenter="calculateSelectPosition(false)"
-            @mouseleave="calculateSelectPosition(true)"
           >
             <c-option
               v-for="(perm, i) in accessRights"
@@ -112,7 +110,9 @@
               :name="perm.name"
               :value="perm.value"
             >
-              <b>{{ perm.name }}</b>{{ perm.desc }}
+              <span style="white-space: normal;">
+                <b>{{ perm.name }}</b>{{ perm.desc }}
+              </span>
             </c-option>
           </c-select>
         </div>
@@ -272,28 +272,6 @@ export default {
         case "read and write":
           this.giveReadWriteAccess();
           break;
-      }
-    },
-    calculateSelectPosition: function(reset) {
-      const div = document.getElementById("share-select");
-      const divWidth = div.getBoundingClientRect().width;
-      const cselect = document.getElementById("select-share-access");
-      const cselectHeight = cselect.getBoundingClientRect().height;
-
-      if (reset) {
-        cselect.style.position = "relative";
-        cselect.style.maxWidth = "none";
-        div.style.minHeight  = "none";
-      }
-      else {
-        const content = document.getElementById("share-card-modal-content");
-        if (content.scrollTop <= 0) {
-          // don't apply fixed position if scrolled on modal
-          cselect.style.position = "fixed";
-          // fixed element leaves normal flow, adjust for it
-          div.style.minHeight = cselectHeight + "px";
-          cselect.style.maxWidth = divWidth + "px";
-        }
       }
     },
     setAccessRights: function () {
@@ -753,5 +731,4 @@ c-alert[type="success"] {
     color: var(--csc-dark);
   };
 }
-
 </style>
