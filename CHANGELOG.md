@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- update dev vault from 1.19 to 1.21
 - Replaced singular object deletion with batch deletion
 - Moved bucket data fetching and enrichment to Containers component
 - pin `setuptools` version by default to prevent builds breaking.
