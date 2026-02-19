@@ -38,28 +38,21 @@
         </c-menu>
       </div>
 
-      <c-navigationbutton class="pr-4" />
+      <c-navigation-button class="pr-4" />
     </div>
 
-    <c-sidenavigation
+    <c-side-navigation
       mobile="true"
-      :menu-visible="menuVisible"
+      :key="sideNavKey"
     >
-      <c-sidenavigationitem
+      <c-side-navigation-item
         v-for="item of navigationMenuItems"
         :key="item.title"
         :data-testid="item.testid + '-mobile'"
       >
-        <div slot="main">
-          <c-icon :path="item.icon" />
-          {{ item.title }}
-        </div>
-
-        <div
-          v-if="item.subs && item.subs.length"
-          slot="subnavitem"
-        >
-          <c-subnavigationitem
+        <c-icon :path="item.icon" />
+        {{ item.title }}
+          <c-sub-navigation-item
             v-for="subItem of item.subs"
             :key="subItem.title"
             :href="subItem.href"
@@ -75,10 +68,9 @@
               v-if="subItem.href"
               :path="mdiOpenInNew"
             />
-          </c-subnavigationitem>
-        </div>
-      </c-sidenavigationitem>
-    </c-sidenavigation>
+          </c-sub-navigation-item>
+      </c-side-navigation-item>
+    </c-side-navigation>
   </div>
 </template>
 
@@ -97,11 +89,11 @@ export default {
   ],
   data() {
     return {
-      menuVisible: false,
       navigationMenuItems: [],
       currentLang: "",
       projectInfoLink: "",
       mdiOpenInNew,
+      sideNavKey: 0,
     };
   },
   computed: {
@@ -134,7 +126,6 @@ export default {
   },
   methods: {
     setNavigationMenu() {
-      this.navigationMenuItems = [];
       const menuArr = [
         {
           title: this.currentLang,
@@ -187,6 +178,7 @@ export default {
         },
       ];
       this.navigationMenuItems = menuArr;
+      this.sideNavKey++;
     },
     setCookieLang: function () {
       const expiryDate = new Date();
@@ -260,7 +252,7 @@ c-menu {
 }
 
 @media screen and (min-width: 768px) {
-  c-navigationbutton, c-sidenavigation {
+  c-navigation-button, c-side-navigation {
     display: none;
   }
 }
