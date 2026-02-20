@@ -32,6 +32,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- issue where makefile fails if .docker-volumes folder is owned by root
 - Fixed Delete modal allowing multiclicks
 - Fixed shared with view permission bucket appearing empty to receiver
 - Fix missing import
