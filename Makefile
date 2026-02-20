@@ -92,6 +92,9 @@ test-data:
 	dd if=/dev/urandom of=.docker-volumes/test-data/test-data-4.bin bs=1M count=768
 
 volumes:
+	# Create volume folder and fix permissions
+	-mkdir -p .docker-volumes
+	sudo chown -R $(USER):$(USER) .docker-volumes
 	mkdir -p .docker-volumes/test-data
 	# Create volume mounts for firefox
 	mkdir -p .docker-volumes/config-ff
