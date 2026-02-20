@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- Migrated from Vuex to Pinia state management store (#1294)
 - update dev vault from 1.19 to 1.21
 - Replaced singular object deletion with batch deletion
 - Moved bucket data fetching and enrichment to Containers component
