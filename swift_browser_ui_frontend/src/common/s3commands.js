@@ -15,19 +15,20 @@ import {
 } from "@aws-sdk/client-s3";
 import { i18n } from "./i18n";
 import { initS3 } from "./s3init";
-import store from "./store";
+import useStore from "./store";
 import { DEV } from "./globalFunctions";
 
 async function sendS3Command(command) {
   // Wrapper for S3 commands
+  const store = useStore();
   await initS3(
-    store.state.active.id,
-    store.state.active.name,
+    store.active.id,
+    store.active.name,
     store,
     i18n.global.t,
   );
   try {
-    const resp = await store.state.s3client.send(command);
+    const resp = await store.s3client.send(command);
     return resp;
   } catch (e) {
     if (DEV) {
@@ -214,7 +215,8 @@ export async function putBucketPolicy(bucket, policy) {
 export async function ensureCollaborateAccessPolicy(bucket) {
   // Check that the active project exists in owned bucket policy list
   // prior to starting the download
-  let project = store.state.active;
+  const store = useStore();
+  let project = store.active;
   let statements = await getBucketPolicyStatements(bucket);
 
   // If the project already has the read and write policies, skip

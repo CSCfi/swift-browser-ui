@@ -72,16 +72,16 @@ export default {
   },
   computed: {
     visible() {
-      return this.$store.state.openEditTagsModal;
+      return this.$store.openEditTagsModal;
     },
     selectedObjectName() {
-      return this.$store.state.selectedObjectName.length > 0
-        ? this.$store.state.selectedObjectName
+      return this.$store.selectedObjectName.length > 0
+        ? this.$store.selectedObjectName
         : "";
     },
     selectedBucketName() {
-      return this.$store.state.selectedBucketName.length > 0
-        ? this.$store.state.selectedBucketName
+      return this.$store.selectedBucketName.length > 0
+        ? this.$store.selectedBucketName
         : "";
     },
     projectID() {
@@ -91,7 +91,7 @@ export default {
       return this.$route.params.container;
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
   },
   watch: {
@@ -147,9 +147,9 @@ export default {
       }
     },
     toggleEditTagsModal: function (keypress) {
-      this.$store.commit("toggleEditTagsModal", false);
-      this.$store.commit("setObjectName", "");
-      this.$store.commit("setBucketName", "");
+      this.$store.toggleEditTagsModal(false);
+      this.$store.setObjectName("");
+      this.$store.setBucketName("");
       this.tags = [];
 
       /*

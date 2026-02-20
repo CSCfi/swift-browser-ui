@@ -208,22 +208,22 @@ export default {
   },
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     bucketName() {
-      return this.$store.state.selectedBucketName;
+      return this.$store.selectedBucketName;
     },
     locale () {
       return this.$i18n.locale;
     },
     visible() {
-      return this.$store.state.openShareModal;
+      return this.$store.openShareModal;
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
     s3endpoint() {
-      return this.$store.state.s3endpoint;
+      return this.$store.s3endpoint;
     },
   },
   watch: {
@@ -403,15 +403,15 @@ export default {
         return false;
       }
       try {
-        await this.$store.state.sharingClient.shareNewAccess(
-          this.$store.state.active.id,
+        await this.$store.sharingClient.shareNewAccess(
+          this.$store.active.id,
           bucket,
           this.tags,
           rights,
           this.s3endpoint,
         );
-        await this.$store.state.sharingClient.shareNewAccess(
-          this.$store.state.active.id,
+        await this.$store.sharingClient.shareNewAccess(
+          this.$store.active.id,
           `${this.bucketName}_segments`,
           this.tags,
           rights,
@@ -453,7 +453,7 @@ export default {
       let toShare = [];
       for (const item of this.tags) {
         toShare.push(
-          await this.$store.state.sharingClient.projectCheckIDs(item),
+          await this.$store.sharingClient.projectCheckIDs(item),
         );
       }
 
@@ -461,23 +461,23 @@ export default {
       if (this.read | this.write) {
         await signedFetch(
           "PUT",
-          this.$store.state.uploadEndpoint,
-          `/cryptic/${this.$store.state.active.name}/${bucket}`,
+          this.$store.uploadEndpoint,
+          `/cryptic/${this.$store.active.name}/${bucket}`,
           JSON.stringify(toShare),
           [],
         );
       }
 
       // signal to update sharing containers in container table
-      this.$store.commit("setSharingUpdated", true);
+      this.$store.setSharingUpdated(true);
       return true;
     },
     toggleShareGuide: function () {
       this.openShareGuide = !this.openShareGuide;
     },
     toggleShareModal: function () {
-      this.$store.commit("toggleShareModal", false);
-      this.$store.commit("setBucketName", "");
+      this.$store.toggleShareModal(false);
+      this.$store.setBucketName("");
       this.sharedAccessRight = null;
       this.openShareGuide = false;
       this.tags = [];
@@ -504,7 +504,7 @@ export default {
       this.isPermissionUpdated = false;
     },
     getSharedDetails: function () {
-      this.$store.state.sharingClient.getShareDetails(
+      this.$store.sharingClient.getShareDetails(
         this.$route.params.project,
         this.bucketName,
       ).then((ret) => {

@@ -1,12 +1,11 @@
-// Vuex store for the variables that need to be globally available.
-import { createStore } from "vuex";
+// Pinia store for the variables that need to be globally available.
+import { defineStore } from "pinia";
 
-const store = createStore({
-  state: {
+const useStore = defineStore("global", {
+  state: () => ({
     projects: [],
     active: {},
     uname: "",
-    multipleProjects: false,
     langs: [
       { ph: "In English", value: "en" },
       { ph: "Suomeksi", value: "fi" },
@@ -60,98 +59,96 @@ const store = createStore({
     workersInitializing: true,
     headersProcessed: 0,
     headersTotal: 0,
+  }),
+  getters: {
+    multipleProjects: (state) => state.projects.length > 1,
   },
-  mutations: {
-    setProjects(state, newProjects) {
+  actions: {
+    setProjects(newProjects) {
       // Update the project listing in store
-      state.projects = newProjects;
-      if (newProjects.length > 1) {
-        state.multipleProjects = true;
-      } else {
-        state.multipleProjects = false;
-      }
+      this.projects = newProjects;
     },
-    setActive(state, newActive) {
+    setActive(newActive) {
       // Update the active project in store
-      state.active = newActive;
+      this.active = newActive;
     },
-    setUname(state, newUname) {
+    setUname(newUname) {
       // Update the username in store
-      state.uname = newUname;
+      this.uname = newUname;
     },
-    setSharingClient(state, newClient) {
-      state.sharingClient = newClient;
+    setSharingClient(newClient) {
+      this.sharingClient = newClient;
     },
-    setRequestClient(state, newClient) {
-      state.requestClient = newClient;
+    setRequestClient(newClient) {
+      this.requestClient = newClient;
     },
-    setUploading(state) {
-      state.isUploading = true;
-      if (!state.uploadNotification.visible) {
-        state.uploadNotification.visible = true;
+    setUploading() {
+      this.isUploading = true;
+      if (!this.uploadNotification.visible) {
+        this.uploadNotification.visible = true;
       }
     },
-    stopUploading(state, cancelled = false) {
-      state.isUploading = false;
-      if (!cancelled) state.isLoaderVisible = true;
+    stopUploading(cancelled = false) {
+      this.isUploading = false;
+      if (!cancelled) this.isLoaderVisible = true;
     },
-    setDeleting(state, payload) {
-      state.isDeleting = payload;
+    setDeleting(payload) {
+      this.isDeleting = payload;
     },
-    setEncryptedFile(state, file) {
-      state.encryptedFile = file;
+    setEncryptedFile(file) {
+      this.encryptedFile = file;
     },
-    toggleUploadNotification(state, payload) {
-      state.uploadNotification.visible = payload;
+    toggleUploadNotification(payload) {
+      this.uploadNotification.visible = payload;
     },
-    toggleUploadNotificationSize(state) {
-      state.uploadNotification.maximized =
-        !state.uploadNotification.maximized;
+    toggleUploadNotificationSize() {
+      this.uploadNotification.maximized =
+        !this.uploadNotification.maximized;
     },
-    toggleDownloadNotification(state, payload) {
-      state.downloadNotification.visible = payload;
+    toggleDownloadNotification(payload) {
+      this.downloadNotification.visible = payload;
     },
-    toggleDownloadNotificationSize(state) {
-      state.downloadNotification.maximized =
-        !state.downloadNotification.maximized;
+    toggleDownloadNotificationSize() {
+      this.downloadNotification.maximized =
+        !this.downloadNotification.maximized;
     },
-    updateProgress(state, progress) {
-      state.uploadProgress = progress;
+    updateProgress(progress) {
+      this.uploadProgress = progress;
     },
-    eraseProgress(state) {
-      state.uploadProgress = undefined;
+    eraseProgress() {
+      this.uploadProgress = undefined;
     },
-    setDownloadAbortReason(state, payload) {
-      state.downloadAbortReason = payload;
-      if (state.downloadNotification.visible) {
-        state.downloadNotification.visible = false;
+    setDownloadAbortReason(payload) {
+      this.downloadAbortReason = payload;
+      if (this.downloadNotification.visible) {
+        this.downloadNotification.visible = false;
       }
     },
-    addDownload(state) {
-      state.downloadCount += 1;
-      if (!state.downloadNotification.visible) {
-        state.downloadNotification.visible = true;
+    addDownload() {
+      this.downloadCount += 1;
+      if (!this.downloadNotification.visible) {
+        this.downloadNotification.visible = true;
       }
     },
-    removeDownload(state, all = false) {
-      if (all) state.downloadCount = 0;
-      else state.downloadCount -= 1;
+    removeDownload(all = false) {
+      if (all) this.downloadCount = 0;
+      else this.downloadCount -= 1;
     },
-    updateDownloadProgress(state, progress) {
-      state.downloadProgress = progress;
+    updateDownloadProgress(progress) {
+      this.downloadProgress = progress;
     },
-    eraseDownloadProgress(state) {
-      state.downloadProgress = undefined;
+    eraseDownloadProgress() {
+      this.downloadProgress = undefined;
     },
-    setUploadEndpoint(state, endpoint) {
-      state.uploadEndpoint = endpoint;
+    setUploadEndpoint(endpoint) {
+      this.uploadEndpoint = endpoint;
     },
-    appendDropFiles(state, file) {
-      state.dropFiles.push(file);
+    appendDropFiles(file) {
+      this.dropFiles.push(file);
     },
-    eraseDropFile(state, file) {
-      state.dropFiles.splice(
-        state.dropFiles.findIndex(
+    eraseDropFile(file) {
+      this.dropFiles.splice(
+        this.dropFiles.findIndex(
           ({ name, relativePath }) =>
             relativePath === file.relativePath &&
             name === file.name,
@@ -159,106 +156,106 @@ const store = createStore({
         1,
       );
     },
-    eraseDropFiles(state) {
-      state.dropFiles = [];
+    eraseDropFiles() {
+      this.dropFiles = [];
     },
-    appendPubKey(state, key) {
-      state.pubkey.push(key);
+    appendPubKey(key) {
+      this.pubkey.push(key);
     },
-    erasePubKey(state) {
-      state.pubkey = [];
+    erasePubKey() {
+      this.pubkey = [];
     },
-    toggleConfirmRouteModal(state, payload) {
-      state.openConfirmRouteModal = payload;
+    toggleConfirmRouteModal(payload) {
+      this.openConfirmRouteModal = payload;
     },
-    setRouteTo(state, payload) {
-      state.routeTo = payload;
+    setRouteTo(payload) {
+      this.routeTo = payload;
     },
-    toggleCreateBucketModal(state, payload) {
-      state.openCreateBucketModal = payload;
+    toggleCreateBucketModal(payload) {
+      this.openCreateBucketModal = payload;
     },
-    setBucketName(state, payload) {
-      state.selectedBucketName = payload;
+    setBucketName(payload) {
+      this.selectedBucketName = payload;
     },
-    setUploadBucket(state, payload) {
+    setUploadBucket(payload) {
       //separate for upload because it's needed
       //for the duration of upload for "view destination"
-      state.uploadBucket.name = payload.name;
-      state.uploadBucket.owner = payload.owner;
+      this.uploadBucket.name = payload.name;
+      this.uploadBucket.owner = payload.owner;
     },
-    toggleUploadModal(state, payload) {
-      state.openUploadModal = payload;
+    toggleUploadModal(payload) {
+      this.openUploadModal = payload;
     },
-    toggleShareModal(state, payload) {
-      state.openShareModal = payload;
+    toggleShareModal(payload) {
+      this.openShareModal = payload;
     },
-    setUploadAbortReason(state, payload) {
-      state.uploadAbortReason = payload;
+    setUploadAbortReason(payload) {
+      this.uploadAbortReason = payload;
     },
-    setSocket(state, payload) {
-      state.socket = payload;
+    setSocket(payload) {
+      this.socket = payload;
     },
-    toggleEditTagsModal(state, payload) {
-      state.openEditTagsModal = payload;
+    toggleEditTagsModal(payload) {
+      this.openEditTagsModal = payload;
     },
-    setObjectName(state, payload) {
-      state.selectedObjectName = payload;
+    setObjectName(payload) {
+      this.selectedObjectName = payload;
     },
-    toggleCopyBucketModal(state, payload) {
-      state.openCopyBucketModal = payload;
+    toggleCopyBucketModal(payload) {
+      this.openCopyBucketModal = payload;
     },
-    toggleDeleteModal(state, payload) {
-      state.openDeleteModal = payload;
+    toggleDeleteModal(payload) {
+      this.openDeleteModal = payload;
     },
-    toggleAPIKeyModal(state, payload) {
-      state.openAPIKeyModal = payload;
+    toggleAPIKeyModal(payload) {
+      this.openAPIKeyModal = payload;
     },
-    setDeletableObjects(state, payload) {
-      state.deletableObjects = payload;
+    setDeletableObjects(payload) {
+      this.deletableObjects = payload;
     },
-    setSourceProjectId(state, payload) {
-      state.sourceProjectId = payload;
+    setSourceProjectId(payload) {
+      this.sourceProjectId = payload;
     },
-    toggleRenderedFolders(state, payload) {
-      state.renderedFolders = payload;
+    toggleRenderedFolders(payload) {
+      this.renderedFolders = payload;
     },
-    setFilesAdded(state, payload) {
-      state.addUploadFiles = payload;
+    setFilesAdded(payload) {
+      this.addUploadFiles = payload;
     },
-    setLoaderVisible(state, payload) {
-      state.isLoaderVisible = payload;
+    setLoaderVisible(payload) {
+      this.isLoaderVisible = payload;
     },
-    setPreviousActiveEl(state, payload) {
-      state.prevActiveEl = payload;
+    setPreviousActiveEl(payload) {
+      this.prevActiveEl = payload;
     },
-    setNewBucket(state, payload) {
-      state.newBucket = payload;
+    setNewBucket(payload) {
+      this.newBucket = payload;
     },
-    setSharingUpdated(state, payload) {
-      state.sharingUpdated = payload;
+    setSharingUpdated(payload) {
+      this.sharingUpdated = payload;
     },
-    setS3Endpoint(state, payload) {
-      state.s3endpoint = payload;
+    setS3Endpoint(payload) {
+      this.s3endpoint = payload;
     },
-    setS3Client(state, payload) {
-      state.s3client = payload;
+    setS3Client(payload) {
+      this.s3client = payload;
     },
-    setS3Upload(state, payload) {
-      state.s3upload = payload;
+    setS3Upload(payload) {
+      this.s3upload = payload;
     },
-    setS3Download(state, payload) {
-      state.s3download = payload;
+    setS3Download(payload) {
+      this.s3download = payload;
     },
-    setWorkersInitializing(state, payload) {
-      state.workersInitializing = payload;
+    setWorkersInitializing(payload) {
+      this.workersInitializing = payload;
     },
-    setHeadersTotal(state, payload) {
-      state.headersTotal = payload;
+    setHeadersTotal(payload) {
+      this.headersTotal = payload;
     },
-    setHeadersProcessed(state, payload) {
-      state.headersProcessed = payload;
+    setHeadersProcessed(payload) {
+      this.headersProcessed = payload;
     },
   },
 });
 
-export default store;
+export default useStore;

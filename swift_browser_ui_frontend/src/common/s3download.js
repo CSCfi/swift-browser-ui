@@ -33,7 +33,7 @@ export default class S3DownloadSocket {
   constructor(
     active, // project id
     project = "", // project name
-    store, // shared vuex store
+    store, // shared pinia store
     t, // i18n bindings
     s3access,
     s3secret,
@@ -93,15 +93,15 @@ export default class S3DownloadSocket {
           if (DEV) console.log("Socket got call to retrieve headers");
           if (DEV) console.log(`Fetching headers for bucket ${e.data.bucket}`);
           if (DEV) console.log(`Fetching headers for files: ${e.data.files}`);
-          if (this.$store.state.downloadCount >= 0) {
+          if (this.$store.downloadCount >= 0) {
             if (DEV) {
               console.log(
                 "Overriding existing download progress with the new one.",
               );
             }
-            this.$store.commit("eraseDownloadProgress");
+            this.$store.eraseDownloadProgress();
           }
-          this.$store.commit("addDownload");
+          this.$store.addDownload();
           this.getHeaders(
             e.data.id,
             e.data.bucket,
@@ -110,11 +110,11 @@ export default class S3DownloadSocket {
             e.data.ownerName,
           ).then(() => {
             if (this.useServiceWorker) {
-              this.$store.commit("removeDownload");
-              this.$store.commit("toggleDownloadNotification", false);
+              this.$store.removeDownload();
+              this.$store.toggleDownloadNotification(false);
             } else {
-              if (this.$store.state.downloadProgress === undefined) {
-                this.$store.commit("updateDownloadProgress", 0);
+              if (this.$store.downloadProgress === undefined) {
+                this.$store.updateDownloadProgress(0);
               }
             }
             if (DEV) {
@@ -188,16 +188,16 @@ export default class S3DownloadSocket {
           );
           break;
         case "abort":
-          this.$store.commit("setDownloadAbortReason", e.data.reason);
-          this.$store.commit("setHeadersTotal", 0);
-          this.$store.commit("setHeadersProcessed", 0);
+          this.$store.setDownloadAbortReason(e.data.reason);
+          this.$store.setHeadersTotal(0);
+          this.$store.setHeadersProcessed(0);
           if (!this.useServiceWorker) {
-            this.$store.commit("removeDownload", true);
-            this.$store.commit("eraseDownloadProgress");
+            this.$store.removeDownload(true);
+            this.$store.eraseDownloadProgress();
           }
           break;
         case "progress":
-          this.$store.commit("updateDownloadProgress", e.data.progress);
+          this.$store.updateDownloadProgress(e.data.progress);
           break;
         case "finished":
           if (DEV) {
@@ -206,8 +206,8 @@ export default class S3DownloadSocket {
             );
           }
           if (!this.useServiceWorker) {
-            if (this.$store.state.downloadCount === 1) {
-              this.$store.commit("updateDownloadProgress", 1);
+            if (this.$store.downloadCount === 1) {
+              this.$store.updateDownloadProgress(1);
               this.downWorker.postMessage({
                 command: "clear",
               });
@@ -215,7 +215,7 @@ export default class S3DownloadSocket {
                 console.log("Clearing download progress interval");
               }
             }
-            this.$store.commit("removeDownload");
+            this.$store.removeDownload();
           }
           else {
             this.downloadFinished = true;
@@ -276,7 +276,7 @@ export default class S3DownloadSocket {
     bucketFiles = await ensureObjectSizes(bucket, bucketFiles);
 
     // Store total amount of required headers to display header progress
-    this.$store.commit("setHeadersTotal", bucketFiles.length);
+    this.$store.setHeadersTotal(bucketFiles.length);
 
     let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
@@ -286,7 +286,7 @@ export default class S3DownloadSocket {
     );
     await signedFetch(
       "PUT",
-      this.$store.state.uploadEndpoint,
+      this.$store.uploadEndpoint,
       whitelistPath,
       pubkey,
       {
@@ -301,7 +301,7 @@ export default class S3DownloadSocket {
       // Get the file header
       let header = await signedFetch(
         "GET",
-        this.$store.state.uploadEndpoint,
+        this.$store.uploadEndpoint,
         `/header/${this.project}/${bucket}/${file.name}`,
         undefined,
         {
@@ -317,12 +317,12 @@ export default class S3DownloadSocket {
       };
 
       headersRetrieved++;
-      this.$store.commit("setHeadersProcessed", headersRetrieved);
+      this.$store.setHeadersProcessed(headersRetrieved);
     }
 
     await signedFetch(
       "DELETE",
-      this.$store.state.uploadEndpoint,
+      this.$store.uploadEndpoint,
       whitelistPath,
       undefined,
       {
@@ -389,7 +389,7 @@ export default class S3DownloadSocket {
 
     let ownerName = "";
     if (owner) {
-      let ids = await this.$store.state.sharingClient.projectCheckIDs(owner);
+      let ids = await this.$store.sharingClient.projectCheckIDs(owner);
       ownerName = ids.name;
     }
 

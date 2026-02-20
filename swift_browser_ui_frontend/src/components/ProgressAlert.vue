@@ -87,7 +87,7 @@ export default {
   },
   computed: {
     isProgressing() {
-      return this.$store.state.downloadProgress !== undefined;
+      return this.$store.downloadProgress !== undefined;
     },
   },
 };

@@ -5,7 +5,7 @@ import SharedObjects from "@/views/SharedObjects.vue";
 import { getProjects } from "@/common/api.js";
 import { getDB } from "@/common/idb";
 import { updateContainers } from "./idbFunctions";
-import store from "@/common/store";
+import useStore from "@/common/store";
 
 async function checkProject (to, from, next){
 
@@ -29,8 +29,9 @@ async function checkProject (to, from, next){
 }
 
 async function checkContainer (to, from, next){
+  const store = useStore();
 
-  if(to.params.container === store.state.uploadBucket.name) {
+  if(to.params.container === store.uploadBucket.name) {
     //When new bucket is created with upload but containers not updated yet
     next();
   }

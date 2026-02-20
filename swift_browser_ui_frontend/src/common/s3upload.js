@@ -49,7 +49,7 @@ export default class S3UploadSocket {
   constructor(
     active, // project id
     project = "", // project name
-    store, // shared vuex store
+    store, // shared pinia store
     t, // i18n bindings
     s3access,
     s3secret,
@@ -216,7 +216,7 @@ export default class S3UploadSocket {
           // We need two init steps per worker, for s3 and wasm
           if (this.workersInited >= this.upWorkers.length * 2) {
             if (DEV) console.log("Flagging upload workers as initialized");
-            this.$store.commit("setWorkersInitializing", false);
+            this.$store.setWorkersInitializing(false);
           }
           break;
       }
@@ -229,7 +229,7 @@ export default class S3UploadSocket {
       `Updating progress to ${this.totalCompleted / this.totalSize}`;
     }
 
-    this.$store.commit("updateProgress", this.totalCompleted / this.totalSize);
+    this.$store.updateProgress(this.totalCompleted / this.totalSize);
   }
 
   // Check if all the parts are done
@@ -294,7 +294,7 @@ export default class S3UploadSocket {
       return;
     }
 
-    this.$store.commit("setEncryptedFile", nextPart.key);
+    this.$store.setEncryptedFile(nextPart.key);
 
     if (this.uploads[nextPart.bucket][nextPart.key].multipartKeyPending){
       while (
@@ -401,7 +401,7 @@ export default class S3UploadSocket {
     }
 
     // Push header to Vault
-    let headerBase = this.$store.state.uploadEndpoint;
+    let headerBase = this.$store.uploadEndpoint;
     let headerPath = `/header/${this.project}/${bucket}/${key}.c4gh`;
     await signedFetch(
       "PUT",
@@ -417,13 +417,13 @@ export default class S3UploadSocket {
     this.headersAdded++;
 
     // Update uploaded header amount to display header progress
-    this.$store.commit("setHeadersProcessed", this.headersAdded);
+    this.$store.setHeadersProcessed(this.headersAdded);
 
     if (this.headersNeeded == this.headersAdded) {
       if (DEV) console.log("All headers are done, starting upload");
       this.headersAdded = 0;
       this.headersNeeded = 0;
-      this.$store.commit("updateProgress", 0);
+      this.$store.updateProgress(0);
       this.beginUpload().then(() => {
         if (DEV) console.log("Upload started successfully.");
       });
@@ -481,8 +481,8 @@ export default class S3UploadSocket {
     }
     this.headersNeeded = files.length;
     // Commit total header amount to the shared state, to display header progress
-    this.$store.commit("setHeadersTotal", this.headersNeeded);
-    this.$store.commit("setEncryptedFile", "file pending...");
+    this.$store.setHeadersTotal(this.headersNeeded);
+    this.$store.setEncryptedFile("file pending...");
 
     if (DEV) console.log("Adding the listed files to the worker filesystems.");
     for (const worker of this.upWorkers) {
@@ -520,8 +520,8 @@ export default class S3UploadSocket {
       this.totalSize += file.size;
     }
     if (DEV) console.log(`Scheduled files for uploading in bucket ${bucket}`);
-    this.$store.commit("eraseProgress");
-    this.$store.commit("setUploading");
+    this.$store.eraseProgress();
+    this.$store.setUploading();
   }
 
   // Cancel the ongoing upload in bucket
@@ -555,11 +555,11 @@ export default class S3UploadSocket {
         worker.postMessage({ command: "uploadFinished", bucket: bucket });
       }
     }
-    this.$store.commit("eraseDropFiles");
-    this.$store.commit("stopUploading");
-    this.$store.commit("setEncryptedFile", "");
-    this.$store.commit("eraseProgress");
-    this.$store.commit("setHeadersProcessed", 0);
-    this.$store.commit("setHeadersTotal", 0);
+    this.$store.eraseDropFiles();
+    this.$store.stopUploading();
+    this.$store.setEncryptedFile("");
+    this.$store.eraseProgress();
+    this.$store.setHeadersProcessed(0);
+    this.$store.setHeadersTotal(0);
   }
 }

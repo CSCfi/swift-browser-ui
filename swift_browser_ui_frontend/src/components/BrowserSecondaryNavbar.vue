@@ -123,14 +123,14 @@ export default {
   },
   computed: {
     active() {
-      const activeObject = this.$store.state.active;
+      const activeObject = this.$store.active;
       return { ...activeObject, value: activeObject.id };
     },
     routeToParams() {
-      return this.$store.state.routeTo.params;
+      return this.$store.routeTo.params;
     },
     uname() {
-      return this.$store.state.uname;
+      return this.$store.uname;
     },
     // C-select component handles options by name and value props
     // Append value-prop to projects
@@ -150,7 +150,7 @@ export default {
       return width + "px";
     },
     isUploading() {
-      return this.$store.state.isUploading;
+      return this.$store.isUploading;
     },
     owner() {
       return this.$route.params.owner;
@@ -159,16 +159,16 @@ export default {
       return this.$route.params.container;
     },
     sharingClient() {
-      return this.$store.state.sharingClient;
+      return this.$store.sharingClient;
     },
     downloadAbortReason() {
-      return this.$store.state.downloadAbortReason;
+      return this.$store.downloadAbortReason;
     },
     downloadCount() {
-      return this.$store.state.downloadCount;
+      return this.$store.downloadCount;
     },
     workersInitializing() {
-      return this.$store.state.workersInitializing;
+      return this.$store.workersInitializing;
     },
   },
   watch: {
@@ -181,7 +181,7 @@ export default {
     downloadAbortReason() {
       if (this.downloadAbortReason) {
         addErrorToastOnMain(this.$t(`message.download.${this.downloadAbortReason}`));
-        this.$store.commit("setDownloadAbortReason", undefined);
+        this.$store.setDownloadAbortReason(undefined);
       }
     },
   },
@@ -202,14 +202,14 @@ export default {
         }
         else {
           //ask user confirmation to interrupt upload / download
-          this.$store.commit("setRouteTo", navigationParams);
-          this.$store.commit("toggleConfirmRouteModal", true);
+          this.$store.setRouteTo(navigationParams);
+          this.$store.toggleConfirmRouteModal(true);
         }
       }
     },
     toggleUploadModal: function (keypress) {
-      this.$store.commit("setFilesAdded", true);
-      this.$store.commit("toggleUploadModal", true);
+      this.$store.setFilesAdded(true);
+      this.$store.toggleUploadModal(true);
       if (keypress) setPrevActiveElement();
       if (!this.container) {
         setTimeout(() => {

@@ -93,10 +93,10 @@ export default {
   },
   computed: {
     projectId () {
-      return this.$store.state.active.id;
+      return this.$store.active.id;
     },
     shareModalOpen () {
-      return this.$store.state.openShareModal;
+      return this.$store.openShareModal;
     },
     headers () {
       return [
@@ -293,21 +293,21 @@ export default {
         );
       } catch {}
 
-      await this.$store.state.sharingClient.shareEditAccess(
+      await this.$store.sharingClient.shareEditAccess(
         this.projectId,
         this.bucketName,
         [sharedProjectId],
         this.newPerms,
       );
 
-      await this.$store.state.sharingClient.shareEditAccess(
+      await this.$store.sharingClient.shareEditAccess(
         this.projectId,
         `${this.bucketName}_segments`,
         [sharedProjectId],
         this.newPerms,
       );
 
-      let projectIDs = await this.$store.state.sharingClient.projectCheckIDs(
+      let projectIDs = await this.$store.sharingClient.projectCheckIDs(
         sharedProjectId,
       );
 
@@ -315,8 +315,8 @@ export default {
         if (this.newPerms.length === 1 && this.newPerms[0] === "v") {
           await signedFetch(
             "DELETE",
-            this.$store.state.uploadEndpoint,
-            `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+            this.$store.uploadEndpoint,
+            `/cryptic/${this.$store.active.name}/${this.bucketName}`,
             JSON.stringify([projectIDs.name]),
             [],
           ).then(() => {
@@ -325,8 +325,8 @@ export default {
         } else {
           await signedFetch(
             "PUT",
-            this.$store.state.uploadEndpoint,
-            `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+            this.$store.uploadEndpoint,
+            `/cryptic/${this.$store.active.name}/${this.bucketName}`,
             JSON.stringify([projectIDs]),
             [],
           ).then(() => {
@@ -344,7 +344,7 @@ export default {
       this.$emit("removeSharedBucket", this.toDelete);
       await this.deleteBucketShare(this.toDelete);
       this.clearDelete();
-      this.$store.commit("setSharingUpdated", true);
+      this.$store.setSharingUpdated(true);
     },
     clearDelete: function () {
       this.clickedDelete = false;
@@ -362,26 +362,26 @@ export default {
         );
       } catch {}
 
-      await this.$store.state.sharingClient.shareDeleteAccess(
+      await this.$store.sharingClient.shareDeleteAccess(
         this.projectId,
         this.bucketName,
         [bucketData.projectId.value],
       );
-      await this.$store.state.sharingClient.shareDeleteAccess(
+      await this.$store.sharingClient.shareDeleteAccess(
         this.projectId,
         `${this.bucketName}_segments`,
         [bucketData.projectId.value],
       );
 
-      let projectIDs = await this.$store.state.sharingClient.projectCheckIDs(
+      let projectIDs = await this.$store.sharingClient.projectCheckIDs(
         bucketData.projectId.value,
       );
 
       if (projectIDs !== undefined) {
         await signedFetch(
           "DELETE",
-          this.$store.state.uploadEndpoint,
-          `/cryptic/${this.$store.state.active.name}/${this.bucketName}`,
+          this.$store.uploadEndpoint,
+          `/cryptic/${this.$store.active.name}/${this.bucketName}`,
           JSON.stringify([
             projectIDs.name,
           ]),

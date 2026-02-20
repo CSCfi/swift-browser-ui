@@ -209,28 +209,28 @@ export default {
       return this.$route.params.container;
     },
     sharingClient () {
-      return this.$store.state.sharingClient;
+      return this.$store.sharingClient;
     },
     active () {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     openCreateBucketModal() {
-      return this.$store.state.openCreateBucketModal;
+      return this.$store.openCreateBucketModal;
     },
     locale () {
       return this.$i18n.locale;
     },
     isBucketUploading() {
-      return this.$store.state.isUploading;
+      return this.$store.isUploading;
     },
     isDeletingObjects() {
-      return this.$store.state.isDeleting;
+      return this.$store.isDeleting;
     },
     owner() {
       return this.$route.params.owner;
     },
     shareModal() {
-      return this.$store.state.openShareModal;
+      return this.$store.openShareModal;
     },
     bucketSize() {
       return getHumanReadableSize(this.metadata.bytes, this.locale);
@@ -389,8 +389,8 @@ export default {
       }
     },
     toggleShareModal: function () {
-      this.$store.commit("toggleShareModal", true);
-      this.$store.commit("setBucketName", this.containerName);
+      this.$store.toggleShareModal(true);
+      this.$store.setBucketName(this.containerName);
     },
     confirmDelete: function(item, keypress) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
@@ -433,7 +433,7 @@ export default {
       this.oList = await awsListObjects(
         this.containerName,
       );
-      this.$store.commit("setLoaderVisible", false);
+      this.$store.setLoaderVisible(false);
 
       // Update bucket metadata if needed
       await this.updateBucketMetadata();
@@ -517,7 +517,7 @@ export default {
       dataTable.clearSelections();
     },
     setTableOptionsMenu() {
-      this.$store.commit("toggleRenderedFolders", this.renderFolders);
+      this.$store.toggleRenderedFolders(this.renderFolders);
       const displayOptions = {
         renderFolders: this.renderFolders,
         showTimestamp: this.showTimestamp,

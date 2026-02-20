@@ -1,8 +1,9 @@
-import store from "@/common/store";
+import useStore from "@/common/store";
 
 export function setPrevActiveElement() {
+  const store = useStore();
   const prevActiveEl = document.activeElement;
-  store.commit("setPreviousActiveEl", prevActiveEl);
+  store.setPreviousActiveEl(prevActiveEl);
 }
 
 export function getFocusableElements(focusableList) {
@@ -38,9 +39,10 @@ export function disableFocusOutsideModal (modal) {
 
 export function moveFocusOutOfModal(prevActiveEl, isParentEl = false,
   addFocus = true) {
+  const store = useStore();
   removeFocusClass(document.activeElement);
   if (isParentEl) {
-    store.commit("setPreviousActiveEl", prevActiveEl);
+    store.setPreviousActiveEl(prevActiveEl);
   }
   const nav = document.querySelector("nav");
   Array.from(nav.children).forEach((child) => {

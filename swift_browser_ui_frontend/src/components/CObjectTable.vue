@@ -115,15 +115,15 @@ export default {
       return this.$i18n.locale;
     },
     active () {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     selectable () {
       return this.$route.name !== "SharedObjects"
         || this.accessRights.length === 2;
     },
     isLoaderVisible() {
-      return this.$store.state.isLoaderVisible
-        && this.$store.state.uploadBucket.name === this.container;
+      return this.$store.isLoaderVisible
+        && this.$store.uploadBucket.name === this.container;
     },
     owner() {
       return this.$route.params.owner;
@@ -315,7 +315,7 @@ export default {
         });
 
       if (this.objs.length > 0 && filteredObjs.length == 0 &&
-        !this.$store.state.openDeleteModal) {
+        !this.$store.openDeleteModal) {
         window.location.pathname = "/notfound";
       }
 
@@ -429,7 +429,7 @@ export default {
           })
           .map(item => item.name);
 
-        this.$store.state.s3download.addDownload(
+        this.$store.s3download.addDownload(
           this.$route.params.container,
           folderFiles,
           this.$route.params.owner ? this.$route.params.owner : "",
@@ -443,7 +443,7 @@ export default {
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       } else {
-        this.$store.state.s3download.addDownload(
+        this.$store.s3download.addDownload(
           this.$route.params.container,
           [object.name],
           this.$route.params.owner ? this.$route.params.owner : "",

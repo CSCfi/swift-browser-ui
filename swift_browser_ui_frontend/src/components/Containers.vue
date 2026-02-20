@@ -81,16 +81,16 @@ export default {
   },
   computed: {
     readyToSetUp() {
-      return (this.active?.id && this.$store.state.sharingClient);
+      return (this.active?.id && this.$store.sharingClient);
     },
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     isBucketUploading() {
-      return this.$store.state.isUploading;
+      return this.$store.isUploading;
     },
     sharingUpdated() {
-      return this.$store.state.sharingUpdated;
+      return this.$store.sharingUpdated;
     },
     locale() {
       return this.$i18n.locale;
@@ -195,7 +195,7 @@ export default {
     sharingUpdated(newValue) {
       if (newValue) {
         this.fetchContainers(true);
-        this.$store.commit("setSharingUpdated", false);
+        this.$store.setSharingUpdated(false);
       }
     },
     locale: function () {

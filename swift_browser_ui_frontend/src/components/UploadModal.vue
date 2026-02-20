@@ -305,28 +305,28 @@ export default {
   },
   computed: {
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     locale() {
       return this.$i18n.locale;
     },
     pubkey() {
-      return this.$store.state.pubkey;
+      return this.$store.pubkey;
     },
     currentBucket() {
       return this.$route.params.container;
     },
     modalVisible() {
-      return this.$store.state.openUploadModal;
+      return this.$store.openUploadModal;
     },
     owner() {
       return this.$route.params.owner;
     },
     s3socket() {
-      return this.$store.state.s3upload;
+      return this.$store.s3upload;
     },
     abortReason() {
-      return this.$store.state.uploadAbortReason;
+      return this.$store.uploadAbortReason;
     },
     fileHeaders() {
       return [
@@ -407,11 +407,11 @@ export default {
       ];
     },
     dropFiles() {
-      return this.$store.state.dropFiles;
+      return this.$store.dropFiles;
     },
     files: {
       get() {
-        return this.$store.state.dropFiles.message;
+        return this.$store.dropFiles.message;
       },
       set(value) {
         const files = Array.from(value);
@@ -432,10 +432,10 @@ export default {
       };
     },
     addFiles() {
-      return this.$store.state.addUploadFiles;
+      return this.$store.addUploadFiles;
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
     existingFileNames() {
       return this.existingFiles.reduce((array, item) => {
@@ -501,7 +501,7 @@ export default {
         else if (this.abortReason?.match("cancel")) {
           this.uploadError = this.$t("message.upload.cancelled");
         }
-        this.$store.commit("setUploadAbortReason", undefined);
+        this.$store.setUploadAbortReason(undefined);
       }
     },
     uploadError() {
@@ -552,7 +552,7 @@ export default {
             return;
           }
         }
-        this.$store.commit("appendDropFiles", file);
+        this.$store.appendDropFiles(file);
       } else {
         this.dropFileErrors[0].show = true;
         setTimeout(() => this.dropFileErrors[0].show = false, 6000);
@@ -615,7 +615,7 @@ export default {
       this.getDropTablePage();
     },
     deleteDropFile(file) {
-      this.$store.commit("eraseDropFile", file);
+      this.$store.eraseDropFile(file);
       const i = this.filesToOverwrite.findIndex(
         (f) => f.relativePath === file.relativePath);
       if (i > -1) {
@@ -742,8 +742,8 @@ export default {
       this.addRecvkey = "";
     },
     cancelUpload() {
-      this.$store.commit("setFilesAdded", false);
-      this.$store.commit("eraseDropFiles");
+      this.$store.setFilesAdded(false);
+      this.$store.eraseDropFiles();
       this.toggleUploadModal();
     },
     resetAccordionVal() {
@@ -756,7 +756,7 @@ export default {
       for (let i = 0; i < this.dropFileErrors.length; i++) {
         this.dropFileErrors[i].show = false;
       }
-      this.$store.commit("toggleUploadModal", false);
+      this.$store.toggleUploadModal(false);
       this.addingFiles = false;
       this.tags = [];
       this.files = [];
@@ -812,7 +812,7 @@ export default {
       if (this.pubkey.length > 0 && !(this.$route.params.owner)) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
       } else if (this.$route.params.owner) {
-        let ids = await this.$store.state.sharingClient.projectCheckIDs(
+        let ids = await this.$store.sharingClient.projectCheckIDs(
           this.$route.params.owner,
         );
         owner = ids.id;
@@ -823,7 +823,7 @@ export default {
       if (this.$route.params.owner) {
         let sharedKey = await signedFetch(
           "GET",
-          this.$store.state.uploadEndpoint,
+          this.$store.uploadEndpoint,
           `/cryptic/${ownerName}/keys`,
         );
         sharedKey = await sharedKey.text();
@@ -835,15 +835,14 @@ export default {
         this.currentBucket :
         this.inputBucket;
 
-      this.$store.commit(
-        "setUploadBucket",
+      this.$store.setUploadBucket(
         { name: bucketName, owner: this.$route.params.owner },
       );
-      this.$store.commit("setNewBucket", bucketName);
+      this.$store.setNewBucket(bucketName);
 
       this.s3socket.addEncryptedUploads(
         bucketName,
-        this.$store.state.dropFiles.map(item => item),
+        this.$store.dropFiles.map(item => item),
         this.recvkeys.map(item => item),
         ownerName,
       );
@@ -851,12 +850,12 @@ export default {
     beginEncryptedUpload() {
       this.aBeginEncryptedUpload().then(() => {
         delay(() => {
-          if (this.$store.state.encryptedFile == ""
+          if (this.$store.encryptedFile == ""
             && this.dropFiles.length) {
             //upload didn't start
             this.uploadError = this.$t("message.upload.error");
-            this.$store.commit("stopUploading", true);
-            this.$store.commit("toggleUploadNotification", false);
+            this.$store.stopUploading(true);
+            this.$store.toggleUploadNotification(false);
           }
         }, 3000);
         this.toggleUploadModal();

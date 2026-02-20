@@ -1,5 +1,6 @@
 // Project main imports
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import BrowserPage from "@/pages/BrowserPage.vue";
 import router from "@/common/router";
 
@@ -36,7 +37,7 @@ import { syncBucketPolicies } from "@/common/share";
 import { DEV } from "@/common/globalFunctions";
 
 // Import project state
-import store from "@/common/store";
+import useStore from "@/common/store";
 
 // Import project css
 import "@/assets/main.css";
@@ -78,6 +79,7 @@ applyPolyfills().then(() => {
   defineCustomElements();
 });
 
+const pinia = createPinia();
 const app = createApp({
   components: {
     CFooter,
@@ -100,32 +102,32 @@ const app = createApp({
   },
   computed: {
     projects() {
-      return this.$store.state.projects;
+      return this.$store.projects;
     },
     multipleProjects() {
-      return this.$store.state.multipleProjects;
+      return this.$store.multipleProjects;
     },
     langs() {
-      return this.$store.state.langs;
+      return this.$store.langs;
     },
     active() {
-      return this.$store.state.active;
+      return this.$store.active;
     },
     user() {
-      return this.$store.state.uname;
+      return this.$store.uname;
     },
     isUploading() {
-      return this.$store.state.isUploading;
+      return this.$store.isUploading;
     },
     displayUploadNotification() {
-      return this.$store.state.uploadNotification.visible;
+      return this.$store.uploadNotification.visible;
     },
     displayDownloadNotification() {
-      return this.$store.state.downloadNotification.visible;
+      return this.$store.downloadNotification.visible;
     },
     openConfirmRouteModal: {
       get() {
-        return this.$store.state.openConfirmRouteModal;
+        return this.$store.openConfirmRouteModal;
       },
       set(newState) {
         return newState;
@@ -133,7 +135,7 @@ const app = createApp({
     },
     openCreateBucketModal: {
       get() {
-        return this.$store.state.openCreateBucketModal;
+        return this.$store.openCreateBucketModal;
       },
       set(newState) {
         return newState;
@@ -141,7 +143,7 @@ const app = createApp({
     },
     openUploadModal: {
       get() {
-        return this.$store.state.openUploadModal;
+        return this.$store.openUploadModal;
       },
       set(newState) {
         return newState;
@@ -149,7 +151,7 @@ const app = createApp({
     },
     openEditTagsModal: {
       get() {
-        return this.$store.state.openEditTagsModal;
+        return this.$store.openEditTagsModal;
       },
       set(newState) {
         return newState;
@@ -157,7 +159,7 @@ const app = createApp({
     },
     openCopyBucketModal: {
       get() {
-        return this.$store.state.openCopyBucketModal;
+        return this.$store.openCopyBucketModal;
       },
       set(newState) {
         return newState;
@@ -165,7 +167,7 @@ const app = createApp({
     },
     openDeleteModal: {
       get() {
-        return this.$store.state.openDeleteModal;
+        return this.$store.openDeleteModal;
       },
       set(newState) {
         return newState;
@@ -173,24 +175,24 @@ const app = createApp({
     },
     openShareModal: {
       get() {
-        return this.$store.state.openShareModal;
+        return this.$store.openShareModal;
       },
       set() { },
     },
     openAPIKeyModal: {
       get() {
-        return this.$store.state.openAPIKeyModal;
+        return this.$store.openAPIKeyModal;
       },
       set() { },
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
     s3download() {
-      return this.$store.state.s3download;
+      return this.$store.s3download;
     },
     s3upload() {
-      return this.$store.state.s3upload;
+      return this.$store.s3upload;
     },
   },
   watch: {
@@ -216,8 +218,8 @@ const app = createApp({
       let active;
       let user = await getUser();
       let projects = await getProjects();
-      this.$store.commit("setUname", user);
-      this.$store.commit("setProjects", projects);
+      this.$store.setUname(user);
+      this.$store.setProjects(projects);
 
       const existingProjects = await getDB().projects
         .toCollection()
@@ -252,7 +254,7 @@ const app = createApp({
             )
           ];
       }
-      this.$store.commit("setActive", active);
+      this.$store.setActive(active);
 
       if (document.location.pathname == "/browse") {
         this.$router.replace({
@@ -266,8 +268,7 @@ const app = createApp({
       let discovery = await fetch("/discover");
       discovery = await discovery.json();
       if (discovery.sharing_endpoint) {
-        this.$store.commit(
-          "setSharingClient",
+        this.$store.setSharingClient(
           new SwiftXAccountSharing(
             discovery.sharing_endpoint,
             document.location.origin,
@@ -275,14 +276,13 @@ const app = createApp({
         );
 
         // Cache id information
-        await this.$store.state.sharingClient.projectCacheIDs(
-          this.$store.state.active.id,
-          this.$store.state.active.name,
+        await this.$store.sharingClient.projectCacheIDs(
+          this.$store.active.id,
+          this.$store.active.name,
         );
       }
       if (discovery.request_endpoint) {
-        this.$store.commit(
-          "setRequestClient",
+        this.$store.setRequestClient(
           new SwiftSharingRequest(
             discovery.request_endpoint,
             document.location.origin,
@@ -290,10 +290,7 @@ const app = createApp({
         );
       }
       if (discovery.upload_endpoint) {
-        this.$store.commit(
-          "setUploadEndpoint",
-          discovery.upload_endpoint,
-        );
+        this.$store.setUploadEndpoint(discovery.upload_endpoint);
 
         let key = await signedFetch(
           "GET",
@@ -302,7 +299,7 @@ const app = createApp({
         );
         key = await key.text();
         key = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${key}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
-        this.$store.commit("appendPubKey", key);
+        this.$store.appendPubKey(key);
       }
       await initS3(this.active.id, this.active.name, this.$store, this.$t);
     };
@@ -331,7 +328,7 @@ const app = createApp({
         e.target === this.prevActiveEl) {
         if(this.prevActiveEl.classList.contains("button-focus")) {
           removeFocusClass(this.prevActiveEl);
-          this.$store.commit("setPreviousActiveEl", null);
+          this.$store.setPreviousActiveEl(null);
         }
       }
     },
@@ -341,8 +338,11 @@ const app = createApp({
 
 app.use(i18n);
 app.use(router);
-app.use(store);
+app.use(pinia);
 app.directive("csc-control", vControl);
+
+// Pinia is geared toward multiple stores: ease migration and enforce single global store like Vuex
+app.config.globalProperties.$store = useStore();
 
 app.config.errorHandler = function (err, vm, info) {
   if (DEV) console.log("Vue error: ", err, vm, info);

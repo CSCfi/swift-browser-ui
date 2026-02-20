@@ -1,22 +1,29 @@
 // Functions for managing sharing
-import store from "@/common/store";
+import useStore from "@/common/store";
 import { DEV } from "./globalFunctions";
 import { getDB } from "./idb";
 import { getBucketPolicyStatements } from "./s3commands";
 import { updateCorsFlag } from "./idbFunctions";
 import { awsBulkAddBucketListCors } from "./api";
 
+function getSharingClient() {
+  const store = useStore();
+  return store.sharingClient;
+}
+
 export async function getSharingContainers (projectId, signal) {
+  const sharingClient = getSharingClient();
   // Get buckets a project has shared
-  return store.state.sharingClient && projectId
-    ? await store.state.sharingClient.getShare(projectId, signal)
+  return sharingClient && projectId
+    ? await sharingClient.getShare(projectId, signal)
     : [];
 }
 
 export async function getSharedContainers (projectId, signal) {
+  const sharingClient = getSharingClient();
   // Get buckets shared to a project
-  let ret = store.state.sharingClient
-    ? await store.state.sharingClient.getAccess(projectId, signal)
+  let ret = sharingClient
+    ? await sharingClient.getAccess(projectId, signal)
     : [];
 
   return ret.filter(accessEntry => {
@@ -30,8 +37,9 @@ export async function getAccessDetails (
   sourceProjectId,
   signal)
 {
-  return store.state.sharingClient
-    ? await store.state.sharingClient.getAccessDetails(
+  const sharingClient = getSharingClient();
+  return sharingClient
+    ? await sharingClient.getAccessDetails(
       projectId,
       bucketName,
       sourceProjectId,
@@ -41,7 +49,7 @@ export async function getAccessDetails (
 
 export async function deleteStaleShares(project, bucket) {
   // Delete share entries of a deleted bucket in DB
-  const client = store.state.sharingClient;
+  const client = getSharingClient();
 
   async function deleteShareEntries(bucketName) {
     const shareDetails = await client.getShareDetails(project, bucketName);
@@ -56,8 +64,9 @@ export async function deleteStaleShares(project, bucket) {
 
 export async function syncBucketPolicies(project) {
   if (DEV) console.log("Starting sharing sync...");
+
+  const client = getSharingClient();
   // Add CORS and sync bucket policies to sharing DB according to s3 bucket policies
-  const client = store.state.sharingClient;
 
   const buckets = await getDB()
     .containers

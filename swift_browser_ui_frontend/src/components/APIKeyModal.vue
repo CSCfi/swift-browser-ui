@@ -126,10 +126,10 @@ export default {
   },
   computed: {
     visible() {
-      return this.$store.state.openAPIKeyModal;
+      return this.$store.openAPIKeyModal;
     },
     activeId() {
-      return this.$store.state.active.id;
+      return this.$store.active.id;
     },
     headers () {
       return [
@@ -195,7 +195,7 @@ export default {
       };
     },
     prevActiveEl() {
-      return this.$store.state.prevActiveEl;
+      return this.$store.prevActiveEl;
     },
   },
   watch: {
@@ -209,7 +209,7 @@ export default {
     },
     closeModal: function (addFocus) {
       this.currentPage = 1;
-      this.$store.commit("toggleAPIKeyModal", false);
+      this.$store.toggleAPIKeyModal(false);
       this.newIdentifier = "";
       this.latest = { apiKey: undefined, id: undefined };
       this.copied = false;

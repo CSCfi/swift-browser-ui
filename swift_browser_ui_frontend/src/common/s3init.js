@@ -45,7 +45,7 @@ export async function initS3(projectID, projectName, store, t) {
   initPromise = (async () => {
     if (DEV) console.log("Initializing S3 client...");
     const s3endpoint = await discoverEndpoint();
-    store.commit("setS3Endpoint", s3endpoint);
+    store.setS3Endpoint(s3endpoint);
 
     const ec2creds = await getEC2Credentials(projectID);
 
@@ -55,7 +55,7 @@ export async function initS3(projectID, projectName, store, t) {
       ec2creds.secret,
       s3endpoint,
     );
-    store.commit("setS3Client", s3client);
+    store.setS3Client(s3client);
 
     // Initialize the S3 upload implementation
     const s3upsocket = new S3UploadSocket(
@@ -67,7 +67,7 @@ export async function initS3(projectID, projectName, store, t) {
       ec2creds.secret,
       s3endpoint,
     );
-    store.commit("setS3Upload", s3upsocket);
+    store.setS3Upload(s3upsocket);
 
     // Initialize the S3 download implementation
     const s3downsocket = new S3DownloadSocket(
@@ -79,7 +79,7 @@ export async function initS3(projectID, projectName, store, t) {
       ec2creds.secret,
       s3endpoint,
     );
-    store.commit("setS3Download", s3downsocket);
+    store.setS3Download(s3downsocket);
   })()
     .then(() => {
       if (DEV) console.log("S3 client initialized");
