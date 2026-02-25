@@ -31,81 +31,75 @@
         </div>
       </div>
     </c-row>
-    <c-row v-else>
-      <div class="flex">
-        <div class="container">
-          <c-card>
-            <c-card-title v-if="!idb">
-              {{ $t('message.error.idb') }}
-            </c-card-title>
-            <c-card-title v-else-if="badrequest">
-              {{ $t('message.error.BadRequest') }}
-            </c-card-title>
-            <c-card-title v-else-if="unauth">
-              {{ $t('message.error.Unauthorized') }}
-            </c-card-title>
-            <c-card-title v-else-if="forbid">
-              {{ $t('message.error.Forbidden') }}
-            </c-card-title>
-            <c-card-title v-else-if="notfound">
-              {{ $t('message.error.Notfound') }}
-            </c-card-title>
-            <c-card-title v-else-if="uidown">
-              {{ $t('message.error.UIdown') }}
-            </c-card-title>
-            <c-card-content v-if="!idb">
-              {{ $t('message.error.idb_text') }}
-            </c-card-content>
-            <c-card-content v-else-if="badrequest">
-              {{ $t('message.error.BadRequest_text') }}
-            </c-card-content>
-            <c-card-content v-else-if="unauth">
-              {{ $t('message.error.Unauthorized_text') }}
-            </c-card-content>
-            <c-card-content v-else-if="forbid">
-              <div>{{ $t('message.error.Forbidden_text') }}</div>
-            </c-card-content>
-            <c-card-content v-else-if="notfound">
-              {{ $t('message.error.Notfound_text') }}
-            </c-card-content>
-            <c-card-content v-else-if="uidown">
-              <p>
-                {{ $t('message.error.UIdown_text1') }}
-              </p>
-              <p>
-                {{ $t('message.error.UIdown_text2') }}
-                <c-link
-                  :href="$t('message.error.UIdown_link')"
-                  underline
-                  target="_blank"
-                >
-                  {{ $t('message.error.UIdown_link_text') }}
-                  <c-icon :path="mdiOpenInNew" />
-                </c-link>
-                .
-              </p>
-            </c-card-content>
-            <c-card-actions v-if="unauth">
-              <c-button
-                data-testid="return-to-login"
-                href="/"
-                target="_self"
-              >
-                {{ $t('message.error.login') }}
-              </c-button>
-            </c-card-actions>
-            <c-card-actions v-else-if="forbid || notfound">
-              <c-button
-                href="/browse"
-                target="_self"
-              >
-                {{ $t('message.error.prevPage') }}
-              </c-button>
-            </c-card-actions>
-          </c-card>
-        </div>
-      </div>
-    </c-row>
+    <c-card v-else>
+      <c-card-title v-if="!idb">
+        {{ $t('message.error.idb') }}
+      </c-card-title>
+      <c-card-title v-else-if="badrequest">
+        {{ $t('message.error.BadRequest') }}
+      </c-card-title>
+      <c-card-title v-else-if="unauth">
+        {{ $t('message.error.Unauthorized') }}
+      </c-card-title>
+      <c-card-title v-else-if="forbid">
+        {{ $t('message.error.Forbidden') }}
+      </c-card-title>
+      <c-card-title v-else-if="notfound">
+        {{ $t('message.error.Notfound') }}
+      </c-card-title>
+      <c-card-title v-else-if="uidown">
+        {{ $t('message.error.UIdown') }}
+      </c-card-title>
+      <c-card-content v-if="!idb">
+        {{ $t('message.error.idb_text') }}
+      </c-card-content>
+      <c-card-content v-else-if="badrequest">
+        {{ $t('message.error.BadRequest_text') }}
+      </c-card-content>
+      <c-card-content v-else-if="unauth">
+        {{ $t('message.error.Unauthorized_text') }}
+      </c-card-content>
+      <c-card-content v-else-if="forbid">
+        <div>{{ $t('message.error.Forbidden_text') }}</div>
+      </c-card-content>
+      <c-card-content v-else-if="notfound">
+        {{ $t('message.error.Notfound_text') }}
+      </c-card-content>
+      <c-card-content v-else-if="uidown">
+        <p>
+          {{ $t('message.error.UIdown_text1') }}
+        </p>
+        <p>
+          {{ $t('message.error.UIdown_text2') }}
+          <c-link
+            :href="$t('message.error.UIdown_link')"
+            underline
+            target="_blank"
+          >
+            {{ $t('message.error.UIdown_link_text') }}
+            <c-icon :path="mdiOpenInNew" />
+          </c-link>
+          .
+        </p>
+      </c-card-content>
+      <c-card-actions v-if="unauth">
+        <c-button
+          data-testid="return-to-login"
+          href="/"
+          target="_self"
+        >
+          {{ $t('message.error.login') }}
+        </c-button>
+      </c-card-actions>
+      <c-card-actions v-else-if="forbid || notfound">
+        <c-button
+          href="/browse"
+          target="_self"
+        >
+          {{ $t('message.error.prevPage') }}
+        </c-button>
+      </c-card-actions>
+    </c-card>
     <CFooter />
   </div>
 </template>
@@ -114,12 +108,15 @@
 export default {};
 </script>
 
-<style>
+<style scoped>
+
+c-card {
+  height: 35rem;
+}
 
 c-card, c-login-card {
   margin: 2rem auto;
-  max-width: 55rem;
-  max-height: 35rem;
+  width: 55rem;
 }
 
 c-button {
