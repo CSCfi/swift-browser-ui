@@ -9,8 +9,9 @@ import typing
 # aiohttp
 import aiohttp.web
 import aiohttp_session
+from idpyoidc.client.exception import OidcServiceError
+from idpyoidc.exception import OidcMsgError
 from multidict import MultiDictProxy
-from oidcrp.exception import OidcServiceError
 
 from swift_browser_ui.ui._convenience import (
     disable_cache,
@@ -32,7 +33,7 @@ HAKA_OIDC_ENDPOINT = (
 async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Redirect to OpenID Connect provider."""
     try:
-        oidc = request.app["oidc_client"].begin("oidc")
+        oidc_url = request.app["oidc_client"].begin("default")
     except Exception as e:
         # This can be caused if config is improperly configured, and
         # oidcrp is unable to fetch oidc configuration from the given URL
@@ -42,7 +43,7 @@ async def oidc_start(request: aiohttp.web.Request) -> aiohttp.web.Response:
         )
 
     response = aiohttp.web.Response(status=302, reason="Redirection to login")
-    response.headers["Location"] = oidc["url"]
+    response.headers["Location"] = oidc_url
     return response
 
 
@@ -66,16 +67,16 @@ async def oidc_end(
         request.app["Log"].error(f"OIDC not initialised: {e}")
         raise aiohttp.web.HTTPForbidden(reason="Bad OIDC session.")
 
-    oidc_session["auth_request"]["code"] = params["code"]
+    oidc_session["code"] = params["code"]
     # finalize requests id_token and access_token with code, validates them and requests userinfo data
     try:
         oidc_result = request.app["oidc_client"].finalize(
-            oidc_session["iss"], oidc_session["auth_request"]
+            oidc_session["iss"], oidc_session
         )
     except KeyError as e:
         request.app["Log"].error(f"Issuer {oidc_session['iss']} not found: {e}.")
         raise aiohttp.web.HTTPBadRequest(reason="Token issuer not found.")
-    except OidcServiceError as e:
+    except (OidcMsgError, OidcServiceError) as e:
         # This exception is raised if RPHandler encounters an error due to:
         # 1. "code" is wrong, so token request failed
         # 2. token validation failed

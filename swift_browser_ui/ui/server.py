@@ -14,7 +14,7 @@ import aiohttp_session
 import aiohttp_session.redis_storage
 import cryptography.fernet
 import uvloop
-from oidcrp.rp_handler import RPHandler
+from idpyoidc.client.rp_handler import RPHandler
 
 import swift_browser_ui.ui.middlewares
 from swift_browser_ui.common.vault_client import VaultClient
@@ -149,19 +149,20 @@ async def servinit(
 
     if setd["oidc_enabled"]:
         oidc_url = "{}/.well-known/openid-configuration".format(setd["oidc_url"])
-        oidc_conf = {
-            "oidc": {
+        client_config = {
+            "default": {
                 "issuer": setd["oidc_url"],
                 "client_id": setd["oidc_client_id"],
                 "client_secret": setd["oidc_client_secret"],
+                "client_type": "oidc",
                 "redirect_uris": str(setd["oidc_redirect_uris"]).split(" "),
-                "behaviour": {
+                "preference": {
                     "response_types": ["code"],
                     "scope": ["openid", "profile", "email"],
                 },
             },
         }
-        app["oidc_client"] = RPHandler(oidc_url, client_configs=oidc_conf)
+        app["oidc_client"] = RPHandler(oidc_url, client_configs=client_config)
 
     # Setup static folder during development, if it has been specified
     if setd["static_directory"] is not None:
