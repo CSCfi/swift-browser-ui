@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- refactored oidcrp out in favor of idpy-oidc
 - Migrated from Vuex to Pinia state management store (#1294)
 - update dev vault from 1.19 to 1.21
 - Replaced singular object deletion with batch deletion
