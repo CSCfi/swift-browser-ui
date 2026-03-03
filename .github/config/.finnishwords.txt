@@ -613,6 +613,7 @@ päivitä
 päivitämme
 päivän
 päivätty
+päivää
 päänäkymään
 pääsy
 pääsyä
@@ -670,6 +671,7 @@ sallittu
 sallittuja
 samat
 se
+seitsemän
 sekunnin
 sekä
 selaamiseen
