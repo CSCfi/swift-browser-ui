@@ -7,8 +7,12 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.3.0] - 2026-03-04
+
 ### Changed
 
+- (users) API tokens are now valid for a week instead of one day
+- API tokens are now valid for a week instead of one day
 - refactored oidcrp out in favor of idpy-oidc
 - Migrated from Vuex to Pinia state management store (#1294)
 - update dev vault from 1.19 to 1.21
@@ -696,7 +700,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.12.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.3.0...HEAD
+[2026.3.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.12.0...2026.3.0
 [2025.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.6.0...2025.12.0
 [2025.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.1...2025.6.0
 [2025.4.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.0...2025.4.1
