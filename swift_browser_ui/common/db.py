@@ -72,7 +72,7 @@ class BaseDBConn:
                 FROM Tokens
                 WHERE token_owner = $1
                 OR token_owner_name = $1
-                AND created > NOW() - INTERVAL '1 day'
+                AND created > NOW() - INTERVAL '7 days'
                 ;
                 """,
                 token_owner,
@@ -387,7 +387,7 @@ class SharingDBConn(BaseDBConn):
                         DELETE FROM Tokens
                         WHERE
                             token_owner = $1 AND
-                            created < NOW() - INTERVAL '1 day'
+                            created < NOW() - INTERVAL '7 days'
                         ;
                         """,
                         token_owner,

@@ -325,7 +325,7 @@ let default_translations = {
           "and recovering it is not be possible. " +
           "Please store the key somewhere " +
           "safe before closing this modal. " +
-          "The key will be valid for 24 hours, and " +
+          "The key will be valid for seven days, and " +
           "will be deleted after this time period.",
         copied: "API key copied.",
         removed: "API key removed.",
@@ -900,7 +900,7 @@ let default_translations = {
           "eikä sen kopiointi tai palautus ole mahdollista jälkeenpäin. " +
           "Tallenna avain turvalliseen paikkaan " +
           "ennen kuin suljet tämän ikkunan. " +
-          "Avain on luomisen jälkeen voimassa 24 tuntia, jonka jälkeen " +
+          "Avain on luomisen jälkeen voimassa seitsemän päivää, jonka jälkeen " +
           "se poistetaan automaattisesti.",
         copied: "Avain kopioitu.",
         removed: "Avain poistettu.",
