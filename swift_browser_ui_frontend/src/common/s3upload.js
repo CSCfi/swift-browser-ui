@@ -485,12 +485,14 @@ export default class S3UploadSocket {
     this.$store.setEncryptedFile("file pending...");
 
     if (DEV) console.log("Adding the listed files to the worker filesystems.");
+    // Preserve file paths
+    const filesWithPath = files.map((file) => ({ file: file, relativePath: file.relativePath }));
     for (const worker of this.upWorkers) {
       if (DEV) console.log(worker);
       worker.postMessage({
         command: "mountFiles",
         bucket: bucket,
-        files: files,
+        files: filesWithPath,
       });
     }
 
