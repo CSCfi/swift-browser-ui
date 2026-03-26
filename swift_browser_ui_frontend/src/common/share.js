@@ -168,7 +168,7 @@ export async function syncBucketPolicies(project) {
         accesslist.push("w");
       }
 
-      if (currentPolicies?.shareID) {
+      if (currentPolicy) {
         // Existing shares need to be edited
         await client.shareEditAccess(
           project,
