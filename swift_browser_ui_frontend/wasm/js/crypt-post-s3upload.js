@@ -134,14 +134,18 @@ self.addEventListener("message", (e) => {
   switch(e.data.command) {
     case "mountFiles":
       console.log(`Adding files to bucket ${e.data.bucket}`);
+      const filesToMount = e.data.files.map((obj) => {
+        // Use relative path to preserve folder structure in WORKERFS
+        const fileName = obj.relativePath || obj.file.name;
+        console.log(`Mapping file ${fileName}`);
+        return new File([obj.file], fileName, {
+          type: obj.file?.type || "", lastModified: obj.file?.lastModified || Date.now() });
+      });
       FS.mkdir(`/${e.data.bucket}`);
       FS.mount(
         WORKERFS,
         {
-          files: e.data.files.map(file => {
-            console.log(`Mapping file with the name ${file.name}`);
-            return file;
-          }),
+          files: filesToMount,
         },
         `/${e.data.bucket}`,
       );

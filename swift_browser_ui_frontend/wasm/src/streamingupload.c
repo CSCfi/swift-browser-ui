@@ -122,7 +122,8 @@ CHUNK *encrypt_file_part(
 
     printf("Opening input file in path %s for encryption.\n", fpath);
     int fdinput = open(fpath, O_RDONLY);
-    if (fdinput == 0) {
+    if (fdinput < 0) {
+        printf("Failed to open file. Errno is %d.\n", errno);
         return NULL;
     }
     printf("Seeking %u bytes from file %s.\n", segment_offset, fpath);
