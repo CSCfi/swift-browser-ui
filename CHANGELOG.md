@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- (users) Fixed drag-and-drop folder upload (#1326)
+
 ## [2026.3.0] - 2026-03-04
 
 ### Changed
