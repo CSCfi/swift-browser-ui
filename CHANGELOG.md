@@ -7,9 +7,15 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.3.1] - 2026-03-31
+
 ### Fixed
 
 - (users) Fixed drag-and-drop folder upload (#1326)
+
+### Changed
+
+- prune newlines from vault exception reason fields to allow errors correctly bubble through
 
 ## [2026.3.0] - 2026-03-04
 
@@ -704,7 +710,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.3.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.3.1...HEAD
+[2026.3.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.3.0...2026.3.1
 [2026.3.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.12.0...2026.3.0
 [2025.12.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.6.0...2025.12.0
 [2025.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2025.4.1...2025.6.0
