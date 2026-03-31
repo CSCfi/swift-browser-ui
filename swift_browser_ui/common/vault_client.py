@@ -68,7 +68,7 @@ def _make_exception(reason: str, status: int) -> HTTPError:
         return HTTPInternalServerError(
             reason="Server encountered an unexpected situation."
         )
-    reason = f"Vault error: {reason}"
+    reason = f"Vault error: {reason.replace('\n', ' ')}"
     if status >= 500:
         return VaultServerError(text=reason, reason=reason)
     return VaultClientError(text=reason, reason=reason, status_code=status)
@@ -135,7 +135,7 @@ class VaultClient:
                     message = _process_error(VaultError(**response))
                     reason = f"Vault client was unable to authenticate: {message}"
                     LOGGER.error(reason)
-                    raise VaultServerError(reason=reason)
+                    raise VaultServerError(reason=reason.replace("\n", " "))
 
         return self._vault_token
 
@@ -215,7 +215,9 @@ class VaultClient:
 
                     if response.status >= 400:
                         message = _process_error(VaultError(**content))
-                        raise VaultServerError(text=message, reason=message)
+                        raise VaultServerError(
+                            text=message, reason=message.replace("\n", " ")
+                        )
 
                     break
             return None
@@ -233,7 +235,9 @@ class VaultClient:
                 "%s request to %r raised an unexpected exception.", method, url
             )
             message = "Unexpected issue when connecting to service provider."
-            raise VaultServerError(text=message, reason=message) from exc
+            raise VaultServerError(
+                text=message, reason=message.replace("\n", " ")
+            ) from exc
 
     async def get_public_key(self, project: str, skip_create: bool = False) -> str:
         """Get a project specific public key.
