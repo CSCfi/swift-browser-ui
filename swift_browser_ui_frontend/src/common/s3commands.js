@@ -196,9 +196,11 @@ export async function getBucketPolicyStatements(bucket) {
   } catch(e) {
     if (e.name === "NoSuchBucket") {
       if (DEV) console.error(`Error retrieving bucket ${bucket} policy: bucket does not exist`);
-      throw e;
     }
-    return [];
+    else if (e.name === "NoSuchBucketPolicy") {
+      return [];
+    }
+    throw e;
   }
 }
 
