@@ -46,14 +46,18 @@ function sortContainer(containers) {
   });
 }
 
+export async function getBucketsIDB(projectID) {
+  if (!projectID) return [];
+  return await getDB()
+    .containers.where({ projectID: projectID })
+    .toArray();
+}
+
 export async function updateContainers(projectID, signal) {
   // STEP 1. Process project-owned buckets.
 
   // Get project buckets from IDB
-  const idbBuckets = await getDB()
-    .containers.where({ projectID })
-    .toArray();
-
+  const idbBuckets = await getBucketsIDB(projectID);
   // Create a bucket map for fast lookup
   const idbBucketsByName = new Map(idbBuckets.map((bucket) => [bucket.name, bucket]));
   // Track all existing buckets for IDB cleanup
