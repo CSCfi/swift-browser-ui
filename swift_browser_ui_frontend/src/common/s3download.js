@@ -278,6 +278,20 @@ export default class S3DownloadSocket {
     // Store total amount of required headers to display header progress
     this.$store.setHeadersTotal(bucketFiles.length);
 
+    // Get an UUID for the header retrieval key to prevent clashing with other
+    // ongoing download or copy sessions
+    let keyUUID;
+    if (crypto.randomUUID !== undefined) {
+      keyUUID = crypto.randomUUID();
+      if (DEV) {
+        console.log(`Using ${keyUUID} as key name for the duration of header retrieval.`);
+      }
+    } else {
+      if (DEV) {
+        console.log("Crypto unavailable, falling back to default key name.");
+      }
+    }
+
     let whitelistPath = `/cryptic/${this.project}/whitelist`;
     let upInfo = await getUploadEndpoint(
       this.active,
@@ -292,6 +306,7 @@ export default class S3DownloadSocket {
       {
         flavor: "crypt4gh",
         session: upInfo.id,
+        ...(keyUUID !== undefined ? {key_name: keyUUID} : {}),
       },
     );
 
@@ -307,6 +322,7 @@ export default class S3DownloadSocket {
         {
           session: upInfo.id,
           owner: ownerName,
+          ...(keyUUID !== undefined ? {key_name: keyUUID} : {}),
         },
       );
       header = await header.text();
@@ -327,6 +343,7 @@ export default class S3DownloadSocket {
       undefined,
       {
         session: upInfo.id,
+        ...(keyUUID !== undefined ? {key_name: keyUUID}: {}),
       },
     );
 
