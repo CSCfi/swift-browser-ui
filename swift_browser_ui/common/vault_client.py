@@ -101,7 +101,6 @@ class VaultClient:
         self._role = os.environ.get("VAULT_ROLE", "")
         self._secret = os.environ.get("VAULT_SECRET", "")
 
-        # TODO: The key name should be set by the `swift-browser-ui` client
         self._key_name = os.environ.get("VAULT_KEY_NAME", "")
         self._token_expires = 0
 
@@ -278,7 +277,11 @@ class VaultClient:
         return key
 
     async def put_whitelist_key(
-        self, project: str, flavor: str, public_key: bytes
+        self,
+        project: str,
+        flavor: str,
+        public_key: bytes,
+        key_name: str = "",
     ) -> None:
         """Update the project's whitelisted key.
 
@@ -288,20 +291,21 @@ class VaultClient:
         """
         await self._request(
             "POST",
-            f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}",
+            f"c4ghtransit/whitelist/{project}/{self.service}/{key_name if key_name else self._key_name}",
             json_data={
                 "flavor": flavor,
                 "pubkey": standard_b64encode(public_key).decode("ascii"),
             },
         )
 
-    async def remove_whitelist_key(self, project: str) -> None:
+    async def remove_whitelist_key(self, project: str, key_name: str = "") -> None:
         """Delete the project's whitelisted key.
 
         :param project: Project ID
         """
         await self._request(
-            "DELETE", f"c4ghtransit/whitelist/{project}/{self.service}/{self._key_name}"
+            "DELETE",
+            f"c4ghtransit/whitelist/{project}/{self.service}/{key_name if key_name else self._key_name}",
         )
 
     async def put_project_whitelist(
@@ -362,7 +366,12 @@ class VaultClient:
         )
 
     async def get_header(
-        self, project: str, container: str, path: str, owner: str = ""
+        self,
+        project: str,
+        container: str,
+        path: str,
+        owner: str = "",
+        key_name: str = "",
     ) -> str:
         """Retrieve header.
 
@@ -374,13 +383,20 @@ class VaultClient:
             header_response = await self._request(
                 "GET",
                 f"c4ghtransit/files/{project}/{container}/{path}",
-                params={"service": self.service, "key": self._key_name, "owner": owner},
+                params={
+                    "service": self.service,
+                    "key": key_name if key_name else self._key_name,
+                    "owner": owner,
+                },
             )
         else:
             header_response = await self._request(
                 "GET",
                 f"c4ghtransit/files/{project}/{container}/{path}",
-                params={"service": self.service, "key": self._key_name},
+                params={
+                    "service": self.service,
+                    "key": key_name if key_name else self._key_name,
+                },
             )
         if isinstance(header_response, dict) and "data" in header_response:
             return str(

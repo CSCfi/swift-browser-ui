@@ -319,7 +319,11 @@ async def handle_get_object_header(request: aiohttp.web.Request) -> aiohttp.web.
     owner = ""
     if "owner" in request.query:
         owner = request.query["owner"]
-    header = await vault_client.get_header(project, container, obj, owner)
+    key_name = ""
+    if "key_name" in request.query:
+        key_name = request.query["key_name"]
+
+    header = await vault_client.get_header(project, container, obj, owner, key_name)
 
     return aiohttp.web.Response(
         text=header,
@@ -331,9 +335,13 @@ async def handle_project_whitelist(request: aiohttp.web.Request) -> aiohttp.web.
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     flavor = request.query.get("flavor", "crypt4gh")
+    key_name = ""
+    if "key_name" in request.query:
+        key_name = request.query["key_name"]
+
     public_key = await request.read()
 
-    await vault_client.put_whitelist_key(project, flavor, public_key)
+    await vault_client.put_whitelist_key(project, flavor, public_key, key_name)
 
     return aiohttp.web.HTTPNoContent()
 
@@ -344,7 +352,11 @@ async def handle_delete_project_whitelist(
     """Delete the project's whitelisted key."""
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
-    await vault_client.remove_whitelist_key(project)
+    key_name = ""
+    if "key_name" in request.query:
+        key_name = request.query["key_name"]
+
+    await vault_client.remove_whitelist_key(project, key_name)
 
     return aiohttp.web.HTTPNoContent()
 
