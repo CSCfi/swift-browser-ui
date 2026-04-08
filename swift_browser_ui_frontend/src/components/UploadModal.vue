@@ -166,50 +166,52 @@
           {{ !owner ? "" :
             ") " + $t("message.encrypt.uploadedToShared") }}
         </p>
-        <c-accordion
-          id="accordion"
-          value="advancedOptions"
-        >
-          <c-accordion-item
-            :heading="$t('message.encrypt.advancedOptions')"
-            :value="$t('message.encrypt.advancedOptions')"
+        <div v-show="false">
+          <c-accordion
+            id="accordion"
+            value="advancedOptions"
           >
-            <c-container>
-              <c-flex>
-                <h3 class="title is-6">
-                  {{ $t('message.encrypt.multipleReceivers') }}
-                </h3>
-                <c-text-field
-                  v-model="addRecvkey"
-                  v-csc-control
-                  :label="$t('message.encrypt.pubkey')"
-                  type="text"
-                  rows="2"
-                  :valid="validatePubkey(addRecvkey) || addRecvkey.length === 0"
-                  :validation="$t('message.encrypt.pubkeyError')"
-                />
-                <c-button
-                  :disabled="!validatePubkey(addRecvkey)"
-                  @click="appendPublicKey"
-                  @keyup.enter="appendPublicKey"
-                >
-                  {{ $t("message.encrypt.addkey") }}
-                </c-button>
-                <!-- Footer options needs to be in CamelCase,
-                because csc-ui wont recognise it otherwise. -->
-                <c-data-table
-                  class="publickey-table"
-                  :data.prop="recvHashedKeys"
-                  :headers.prop="publickeyHeaders"
-                  :no-data-text="$t('message.encrypt.noRecipients')"
-                  :pagination.prop="keyPagination"
-                  :footerOptions.prop="{hideDetails: true}"
-                  @click="checkPage($event,true)"
-                />
-              </c-flex>
-            </c-container>
-          </c-accordion-item>
-        </c-accordion>
+            <c-accordion-item
+              :heading="$t('message.encrypt.advancedOptions')"
+              :value="$t('message.encrypt.advancedOptions')"
+            >
+              <c-container>
+                <c-flex>
+                  <h3 class="title is-6">
+                    {{ $t('message.encrypt.multipleReceivers') }}
+                  </h3>
+                  <c-text-field
+                    v-model="addRecvkey"
+                    v-csc-control
+                    :label="$t('message.encrypt.pubkey')"
+                    type="text"
+                    rows="2"
+                    :valid="validatePubkey(addRecvkey) || addRecvkey.length === 0"
+                    :validation="$t('message.encrypt.pubkeyError')"
+                  />
+                  <c-button
+                    :disabled="!validatePubkey(addRecvkey)"
+                    @click="appendPublicKey"
+                    @keyup.enter="appendPublicKey"
+                  >
+                    {{ $t("message.encrypt.addkey") }}
+                  </c-button>
+                  <!-- Footer options needs to be in CamelCase,
+                  because csc-ui wont recognise it otherwise. -->
+                  <c-data-table
+                    class="publickey-table"
+                    :data.prop="recvHashedKeys"
+                    :headers.prop="publickeyHeaders"
+                    :no-data-text="$t('message.encrypt.noRecipients')"
+                    :pagination.prop="keyPagination"
+                    :footerOptions.prop="{hideDetails: true}"
+                    @click="checkPage($event,true)"
+                  />
+                </c-flex>
+              </c-container>
+            </c-accordion-item>
+          </c-accordion>
+        </div>
       </c-card-content>
     </div>
     <c-card-actions justify="space-between">
