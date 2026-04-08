@@ -169,6 +169,7 @@
         <c-accordion
           id="accordion"
           value="advancedOptions"
+          v-show="false"
         >
           <c-accordion-item
             :heading="$t('message.encrypt.advancedOptions')"
