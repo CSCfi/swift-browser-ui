@@ -139,12 +139,13 @@ deploy:
     - sds
   variables:
     GITLAB_PROJECT_ID: $GITLAB_SWIFT_BROWSER_CONFIG_BUILD
+    TRIGGER_TOKEN: $CONFIG_BUILD_TRIGGER_TOKEN
     GITLAB_REF: main
     BUILD_BRANCH: $CI_COMMIT_REF_NAME
   script:
     - >
       curl --request POST
-      --form "token=$CI_JOB_TOKEN"
+      --form "token=$TRIGGER_TOKEN"
       --form "ref=$GITLAB_REF"
       --form "variables[ENVIRONMENT]=$BUILD_BRANCH"
       "$GITLAB_CI_URL/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
