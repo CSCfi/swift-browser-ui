@@ -133,7 +133,6 @@ deploy:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: manual
     - if: '$CI_COMMIT_TAG !~ "/^$/"'
-    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
   stage: deploy
   tags:
     - sds
@@ -141,12 +140,12 @@ deploy:
     GITLAB_PROJECT_ID: $GITLAB_SWIFT_BROWSER_CONFIG_BUILD
     TRIGGER_TOKEN: $CONFIG_BUILD_TRIGGER_TOKEN
     GITLAB_REF: main
-    BUILD_BRANCH: $CI_COMMIT_REF_NAME
   script:
+    - export BUILD_TAG="${CI_COMMIT_TAG:-latest}"
     - >
       curl --request POST
       --form "token=$TRIGGER_TOKEN"
       --form "ref=$GITLAB_REF"
-      --form "variables[ENVIRONMENT]=$BUILD_BRANCH"
+      --form "variables[ENVIRONMENT]=$BUILD_TAG"
       "$GITLAB_CI_URL/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
   allow_failure: true
