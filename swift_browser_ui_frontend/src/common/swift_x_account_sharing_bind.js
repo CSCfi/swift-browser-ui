@@ -332,6 +332,29 @@ class SwiftXAccountSharing {
 
     return check;
   }
+
+  async projectBatchCheckIDs(projects) {
+    const url = new URL(this.address.concat("/ids"));
+    const signed = await this._getSignature(60, "/ids");
+
+    if (projects[0].startsWith("project_")) {
+      url.searchParams.append("names", projects.join(","));
+    } else {
+      url.searchParams.append("ids", projects.join(","));
+    }
+
+    url.searchParams.append("valid", signed.valid);
+    url.searchParams.append("signature", signed.signature);
+    const check = fetch(url, { method: "GET" }).then(
+      (resp) => {
+        if (resp.status == 200) {
+          return resp.json();
+        }
+        else return undefined;
+      },
+    );
+    return check;
+  }
 }
 
 export default SwiftXAccountSharing;

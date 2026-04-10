@@ -450,12 +450,7 @@ export default {
         );
       } catch {}
 
-      let toShare = [];
-      for (const item of this.tags) {
-        toShare.push(
-          await this.$store.sharingClient.projectCheckIDs(item),
-        );
-      }
+      const toShare = await this.$store.sharingClient.projectBatchCheckIDs(this.tags);
 
       // Add access to cross-project sharing in case of read or read+write
       if (this.read | this.write) {
@@ -503,14 +498,25 @@ export default {
       this.isPermissionRemoved = false;
       this.isPermissionUpdated = false;
     },
-    getSharedDetails: function () {
-      this.$store.sharingClient.getShareDetails(
+    getSharedDetails: async function () {
+      // Get share details
+      const shares = await this.$store.sharingClient.getShareDetails(
         this.$route.params.project,
         this.bucketName,
-      ).then((ret) => {
-        this.sharedDetails = ret;
-        this.tags = [];
-      });
+      );
+      this.tags = [];
+      // Get an array of share receivers and corresponding project names
+      const shareIDs = shares?.map((share) => share.sharedTo);
+      if (shareIDs.length) {
+        const projectInfo = await this.$store.sharingClient.projectBatchCheckIDs(shareIDs);
+        // Add project name to shared details
+        this.sharedDetails = shares.map((share) => {
+          const project = projectInfo.find((prj) => prj.id === share.sharedTo);
+          return { ...share, sharedToName: project?.name || null };
+        });
+      } else {
+        this.sharedDetails = shares;
+      }
     },
     updateSharedBucket: function () {
       this.closeSharedNotification();

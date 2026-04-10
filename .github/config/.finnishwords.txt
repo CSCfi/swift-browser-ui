@@ -437,6 +437,7 @@ nimetä
 nimeä
 nimi
 nimiä
+numero
 numeroinen
 numeroisen
 numeroita

@@ -151,6 +151,7 @@ let default_translations = {
           "project. Provide the Share ID to members " +
           "of other projects (e.g., via email) so that they can " +
           "share buckets with you.",
+        project_name: "Project number",
         close: "Close",
         instructions: "How to share a bucket",
         close_instructions: "Hide",
@@ -740,6 +741,7 @@ let default_translations = {
           "32-numeroisen koodin, joka on yhdistetty {tooltipb} " +
           "projektiin. Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa ämpäreitä sinulle.",
+        project_name: "Projektin numero",
         close: "Sulje",
         instructions: "Kuinka jaan ämpärin",
         close_instructions: "Sulje ohjeet",

@@ -455,35 +455,49 @@ class SharingDBConn(BaseDBConn):
                         id,
                     )
 
-    async def match_id_name(self, id: str) -> list:
-        """Match an id to the correct name."""
+    async def match_ids_names(self, ids: str | list) -> list:
+        """Match id(s) to the correct name(s)."""
         if self.pool is not None:
-            query = await self.pool.fetch(
-                """
+            if isinstance(ids, str):
+                query = """
                 SELECT *
                 FROM ProjectIDs
                 WHERE id = $1
                 ;
-                """,
-                id,
-            )
-            return list(query)
+                """
+            else:
+                query = """
+                SELECT *
+                FROM ProjectIDs
+                WHERE id = ANY($1)
+                ;
+                """
+            rows = await self.pool.fetch(query, ids)
+
+            return list(rows)
 
         return []
 
-    async def match_name_id(self, name: str) -> list:
-        """Match a name to the correct id."""
+    async def match_names_ids(self, names: str | list) -> list:
+        """Match name(s) to the correct id(s)."""
         if self.pool is not None:
-            query = await self.pool.fetch(
-                """
+            if isinstance(names, str):
+                query = """
                 SELECT *
                 FROM ProjectIDs
                 WHERE name = $1
                 ;
-                """,
-                name,
-            )
-            return list(query)
+                """
+            else:
+                query = """
+                SELECT *
+                FROM ProjectIDs
+                WHERE name = ANY($1)
+                ;
+                """
+            rows = await self.pool.fetch(query, names)
+
+            return list(rows)
 
         return []
 

@@ -101,13 +101,26 @@ export default {
     headers () {
       return [
         {
-          key: "projectId",
-          value: this.$t("message.share.share_id"),
-          width: "50%",
+          key: "projectName",
+          value: this.$t("message.share.project_name"),
           sortable: true,
           align: "center",
           component: {
-            tag: "div",
+            tag: "span",
+            params: {
+              style: {
+                fontSize: "0.875rem",
+              },
+            },
+          },
+        },
+        {
+          key: "projectId",
+          value: this.$t("message.share.share_id"),
+          sortable: true,
+          align: "center",
+          component: {
+            tag: "span",
             params: {
               style: {
                 fontSize: "0.875rem",
@@ -191,6 +204,7 @@ export default {
   methods: {
     getTableData: function () {
       this.tableData = this.sharedDetails.map(item => ({
+        projectName: {value: item.sharedToName || ""},
         projectId: {value: item.sharedTo},
         permissions: {
           value: null,

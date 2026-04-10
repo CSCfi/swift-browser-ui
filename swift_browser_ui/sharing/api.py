@@ -200,7 +200,7 @@ async def handle_project_add_ids(request: aiohttp.web.Request) -> aiohttp.web.Re
     project = request.match_info["project"]
     name = await request.text()
 
-    if not await request.app["db_conn"].match_id_name(project):
+    if not await request.app["db_conn"].match_ids_names(project):
         await request.app["db_conn"].add_id(project, name)
 
     return aiohttp.web.HTTPNoContent()
@@ -211,7 +211,7 @@ async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Respo
     key = request.match_info["project"]
 
     # Try with key as identifier
-    ret = await request.app["db_conn"].match_id_name(key)
+    ret = await request.app["db_conn"].match_ids_names(key)
     if ret:
         return aiohttp.web.json_response(
             {
@@ -221,7 +221,7 @@ async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Respo
         )
 
     # Try with key as name
-    ret = await request.app["db_conn"].match_name_id(key)
+    ret = await request.app["db_conn"].match_names_ids(key)
     if ret:
         return aiohttp.web.json_response(
             {
@@ -231,6 +231,26 @@ async def handle_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Respo
         )
 
     return aiohttp.web.HTTPNotFound()
+
+
+async def handle_batch_get_id_cache(request: aiohttp.web.Request) -> aiohttp.web.Response:
+    """Get project ID information from database in a batch, by id or by name."""
+    ret = []
+
+    if "ids" in request.query:
+        ids = request.query["ids"].split(",")
+        ret = await request.app["db_conn"].match_ids_names(ids)
+
+    elif "names" in request.query:
+        names = request.query["names"].split(",")
+        ret = await request.app["db_conn"].match_names_ids(names)
+
+    else:
+        return aiohttp.web.HTTPBadRequest(reason="Missing ids/names query")
+
+    results = [{"id": row["id"], "name": row["name"]} for row in ret]
+
+    return aiohttp.web.json_response(results)
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:
