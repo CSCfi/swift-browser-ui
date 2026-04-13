@@ -84,6 +84,17 @@ let default_translations = {
           "You can copy this bucket and download files in decrypted format. " +
           "You can upload new files or delete existing files from this " +
           "bucket. (@:message.share.write_perm)",
+        convert_urgent_title: "This bucket must be converted",
+        convert_urgent_text: "This bucket seems empty because the bucket's name is incompatible " +
+        "with the new version of {title}. " +
+        "It must be converted to regain access to the files.",
+        convert_end_of_year_title:
+          "This bucket was created with the previous version of {title}",
+        convert_end_of_year_text: "Files show a size 0 because they were uploaded with an older " +
+        "version of {title}. " +
+        "Please convert this bucket or create a new one before uploading new files.",
+        convert_link: "#",
+        convert_link_name: "See detailed instructions",
       },
       table: {
         name: "Name",
@@ -114,6 +125,9 @@ let default_translations = {
         back_to_all_buckets: "Back to all buckets",
         back_to_sharing_buckets: "Back to buckets you have shared",
         back_to_shared_buckets: "Back to buckets shared with you",
+        conversion_need: "Conversion need",
+        urgent_label: "Urgent",
+        end_of_year_label: "By the end of 2026",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -655,6 +669,17 @@ let default_translations = {
           "tiedostoja, sekä purkaa ämpärin sisällön salauksen. " +
           "Voit lähettää uusia tai poistaa jo ämpärissä olevia tiedostoja. " +
           "(@:message.share.write_perm)",
+        convert_urgent_title: "Tämä ämpäri on muunnettava",
+        convert_urgent_text: "Ämpärin sisältöä ei voida näyttää, koska sen nimi " +
+        "ei ole yhteensopiva {title}in uuden version kanssa. " +
+        "Ämpäri on muunnettava ennen tiedostojen käyttöä.",
+        convert_end_of_year_title:
+          "Tämä ämpäri on luotu {title}in aiemmalla versiolla",
+        convert_end_of_year_text: "Tiedostojen koko on virheellinen, koska ne on ladattu " +
+          "vanhemmalla {title}in versiolla. " +
+          "Muunna tämä ämpäri tai luo uusi ämpäri ennen uusien tiedostojen lataamista.",
+        convert_link: "#",
+        convert_link_name: "Katso tarkemmat ohjeet (englanniksi)",
       },
       table: {
         name: "Nimi",
@@ -690,6 +715,9 @@ let default_translations = {
         back_to_all_buckets: "Takaisin",
         back_to_sharing_buckets: "Takaisin",
         back_to_shared_buckets: "Takaisin",
+        conversion_need: "Muuntotarve",
+        urgent_label: "Kiireellinen",
+        end_of_year_label: "Vuoden 2026 loppuun mennessä",
       },
       tableOptions: {
         displayOptions: "Näyttöasetukset",

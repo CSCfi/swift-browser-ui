@@ -3,6 +3,16 @@
     id="object-table"
   >
     <BreadcrumbNav @breadcrumbClicked="breadcrumbClickHandler" />
+    <c-alert v-if="bucketConversionNeed" :type="bucketConversionNeed.type">
+      <div slot="title">{{ bucketConversionNeed.title }}</div>
+      <c-row nowrap gap="50" align="center" class="alert-row">
+        <p>{{ bucketConversionNeed.text }}</p>
+        <c-link :href="$t('message.bucketDetails.convert_link')" target="_blank" underline>
+          {{ $t("message.bucketDetails.convert_link_name") }}
+          <c-icon :path="mdiOpenInNew" />
+        </c-link>
+      </c-row>
+    </c-alert>
     <div class="bucket-info">
       <div class="bucket-info-heading">
         <i class="mdi mdi-pail-outline" />
@@ -133,6 +143,7 @@ import {
   isFile,
   addErrorToastOnMain,
   checkAndAddBucketCors,
+  getRecommendedAction,
 } from "@/common/globalFunctions";
 import {
   getSharedContainers,
@@ -149,12 +160,18 @@ import {
   addFocusClass,
 } from "@/common/keyboardNavigation";
 import { getDB } from "@/common/idb";
-import { getBucketMetadata, saveBucketMetadata, updateContainers } from "@/common/idbFunctions";
+import {
+  getBucketMetadata,
+  saveBucketMetadata,
+  updateContainers,
+  getBucketsIDB,
+} from "@/common/idbFunctions";
 import CObjectTable from "@/components/CObjectTable.vue";
 import { debounce, escapeRegExp } from "lodash";
 import BreadcrumbNav from "@/components/BreadcrumbNav.vue";
 import { toRaw } from "vue";
 import { awsListObjects } from "@/common/s3commands";
+import { mdiOpenInNew } from "@mdi/js/mdi";
 
 export default {
   name: "ObjectTable",
@@ -193,6 +210,8 @@ export default {
         created: null,
         last_modified: null,
       },
+      mdiOpenInNew,
+      idbBuckets: [],
     };
   },
   computed: {
@@ -240,6 +259,10 @@ export default {
     },
     bucketLastModified() {
       return parseDateTime(this.locale, this.metadata.last_modified, this.$t, true);
+    },
+    bucketConversionNeed() {
+      return this.currentContainer && this.idbBuckets?.length ?
+        this.getConversionNeedAlert(this.idbBuckets, this.currentContainer) : {};
     },
   },
   watch: {
@@ -326,6 +349,7 @@ export default {
       await this.getSharedContainers();
       await this.getBucketSharedStatus();
       await this.updateObjectsAndMetadata();
+      this.idbBuckets = await getBucketsIDB(this.active.id);
     },
     breadcrumbClickHandler(value) {
       this.breadcrumbClicked = value;
@@ -650,6 +674,20 @@ export default {
         addFocusClass(deleteObjsBtn);
       }, 300);
     },
+    getConversionNeedAlert: function(buckets, bucket) {
+      const statusNum = getRecommendedAction(buckets, bucket);
+
+      if (statusNum > 0) {
+        const title = this.$t("message.program_name");
+        const urgency = statusNum === 2 ? "urgent" : "end_of_year";
+        const alertType = statusNum === 2 ? "error" : "warning";
+        return {
+          type: alertType,
+          title: this.$t(`message.bucketDetails.convert_${urgency}_title`, { title: title }),
+          text: this.$t(`message.bucketDetails.convert_${urgency}_text`, { title: title }),
+        };
+      }
+    },
   },
 };
 </script>
@@ -666,7 +704,7 @@ export default {
 
 .bucket-info {
   border: 1px solid var(--csc-primary);
-  margin: 0rem 0rem;
+  margin: 1rem 0 0 0;
 }
 
 .bucket-info-heading, .bucket-details {
@@ -741,4 +779,8 @@ export default {
   position: relative;
 }
 
+.alert-row > c-link {
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
 </style>

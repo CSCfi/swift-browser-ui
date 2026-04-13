@@ -4,6 +4,7 @@ import useStore from "@/common/store";
 import { checkBucketExists, awsHeadObject } from "@/common/s3commands";
 import { checkCorsFlag, updateCorsFlag } from "./idbFunctions";
 import { awsAddBucketCors } from "./api";
+import { NEW_VERSION_DATE } from "../../config/config";
 
 export const DEV = import.meta.env.MODE === "development";
 
@@ -35,6 +36,10 @@ export function isFile(path, route) {
   return path.replace(getPrefix(route), "").match("/") ? false : true;
 }
 
+function isLowerCaseOrNum(char) {
+  return /[\p{L}0-9]/u.test(char) && char === char.toLowerCase();
+}
+
 export async function validateBucketName(input) {
   let result = {
     lowerCaseOrNum: undefined,
@@ -43,10 +48,6 @@ export async function validateBucketName(input) {
     ownable: undefined,
   };
   if (!input) return result;
-
-  function isLowerCaseOrNum(char) {
-    return /[\p{L}0-9]/u.test(char) && char === char.toLowerCase();
-  }
 
   result.lowerCaseOrNum = isLowerCaseOrNum(input[0]) &&
     isLowerCaseOrNum(input[input.length - 1]);
@@ -215,4 +216,54 @@ export function toggleDeleteModal(objects, containerName) {
     store.setBucketName(containerName);
   }
   store.toggleDeleteModal(true);
+}
+
+
+/**
+ * Function to determine the severity of conversion need
+ * Adapted from sd-connect-s3-migrate
+ * @param {Array} buckets in project
+ * @param {Object} bucket the conversion need of which is being determined
+ * @returns int between 0-2 to reflect none, end-of-year, urgent
+ */
+export function getRecommendedAction(buckets, bucket) {
+  // If the bucket contains whitespace, it's guaranteed to break S3
+  if (/[\s]/u.test(bucket.name)) {
+    return 2;
+  }
+
+  // If the bucket doesn't have any bytes, but has content, it has likely
+  // been filled with swift large objects
+  if (!bucket.bytes && bucket.count) {
+    return 1;
+  }
+
+  // If the bucket has a matching segemnts bucket with content, it likely
+  // contains swift large objects
+  if (buckets.find((nb) => nb.name == `${bucket.name}_segments`)?.count > 0) {
+    return 1;
+  }
+
+  // If the bucket name is too long, it will likely have to be truncated
+  if (bucket.name.length < 3 || bucket.name.length > 63) {
+    return 1;
+  }
+
+  // If the bucket doesn't start with lowercase alphanumeric, it should
+  // probably be migrated
+  if (!isLowerCaseOrNum(bucket.name[0]) || !isLowerCaseOrNum(bucket.name[bucket.name.length - 1])) {
+    return 1;
+  }
+
+  // If the bucket contains non-alphanumeric characters, it should probably
+  // be migrated with a conforming name
+  if (!bucket.name.match(/^[a-z0-9-]+$/g)) {
+    return 1;
+  }
+
+  // No need to migrate buckets created with V3
+  if (Date.parse(bucket.created) > NEW_VERSION_DATE) {
+    return 0;
+  }
+  return 1;
 }

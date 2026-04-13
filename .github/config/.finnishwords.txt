@@ -1,4 +1,5 @@
 aakkosia
+aiemmalla
 aihe
 aika
 aikana
@@ -198,6 +199,7 @@ kanssa
 kanssasi
 katoaa
 katsele
+katso
 kehittäessämme
 kehittänyt
 kelpaa
@@ -215,6 +217,7 @@ kielletty
 kiellettyä
 kielletyn
 kiinni
+kiireellinen
 kirjaimella
 kirjaimet
 kirjaudu
@@ -313,6 +316,7 @@ käytössä
 käytöstä
 ladata
 ladattavat
+ladattu
 lakia
 laskettu
 laskutuksesta
@@ -320,6 +324,7 @@ laskutusyksiköiden
 laskutusysiköiden
 lataa
 lataamisen
+lataamista
 latauksen
 lataukset
 lataus
@@ -341,6 +346,7 @@ lisätäksesi
 lisää
 loogisesti
 loppuminen
+loppuun
 luettelo
 luku
 lukuoikeus
@@ -377,6 +383,7 @@ mahdotonta
 megatavun
 meille
 meiltä
+mennessä
 merkkiä
 mikä
 mikäli
@@ -400,6 +407,9 @@ muokattu
 muokkaa
 mutta
 muun
+muunna
+muunnettava
+muuntotarve
 muussa
 muuta
 muutaman
@@ -445,6 +455,7 @@ näppäimistöä
 näytetyistä
 näytetään
 näyttäminen
+näyttää
 näyttöasetukset
 näytä
 näytöillä
@@ -758,6 +769,7 @@ tarjoamisesta
 tarkastele
 tarkastella
 tarkat
+tarkemmat
 tarkistathan
 tarkistussumma
 tarkka
@@ -876,6 +888,7 @@ uudelleen
 uuden
 uusi
 uusia
+uusien
 vaatii
 vaatimusten
 vaativat
@@ -902,6 +915,7 @@ valmistellaan
 valmistuu
 valvontaviranomainen
 valvontaviranomaisen
+vanhemmalla
 varmasti
 varmennus
 varmistaa
@@ -925,6 +939,7 @@ verkkosivusto
 verkkosivustolla
 verkkosivuston
 verkkosivustossa
+versiolla
 vielä
 viimeisimmän
 viimeisimmästä
@@ -941,6 +956,7 @@ voidaksesi
 voimassa
 voit
 voivat
+vuoden
 vuoksi
 vähintään
 väliaikaiseen
@@ -951,6 +967,7 @@ yhdelle
 yhden
 yhdistetty
 yhteenlaskettu
+yhteensopiva
 yhteensopivia
 yhteiskäyttö
 yhteydenottoosi

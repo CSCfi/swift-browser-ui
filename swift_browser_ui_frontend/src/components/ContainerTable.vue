@@ -38,6 +38,7 @@ import {
   toggleCopyBucketModal,
   addErrorToastOnMain,
   checkAndAddBucketCors,
+  getRecommendedAction,
 } from "@/common/globalFunctions";
 import {
   deleteStaleShares,
@@ -165,6 +166,7 @@ export default {
         .slice(offset, offset + limit).map((
           item,
         ) => {
+          const status = this.getBucketStatus(this.conts, item);
           containersPage.push({
             name: {
               value: truncate(item.name),
@@ -203,6 +205,15 @@ export default {
             sharing: {
               value: getSharedStatus(item.sharing),
             },
+            conversionNeed: status ? {
+              value: status.value,
+              component: {
+                tag: "c-status",
+                params: {
+                  type: status.type,
+                },
+              },
+            } : { value: null },
             actions: {
               value: null,
               sortable: null,
@@ -323,11 +334,16 @@ export default {
           key: "name",
           value: this.$t("message.table.name"),
           sortable: true,
-          width: "50%",
+          width: "40%",
         },
         {
           key: "sharing",
           value: this.$t("message.table.shared_status"),
+          sortable: false,
+        },
+        {
+          key: "conversionNeed",
+          value: this.$t("message.table.conversion_need"),
           sortable: false,
         },
         {
@@ -493,6 +509,15 @@ export default {
           .querySelector("#new-copy-bucketName input");
         copyBucketInput.focus();
       }, 300);
+    },
+    getBucketStatus: function(buckets, bucket) {
+      const statusNum = getRecommendedAction(buckets, bucket);
+      if (statusNum === 2) {
+        return { type: "error", value: this.$t("message.table.urgent_label") };
+      }
+      if (statusNum === 1) {
+        return { type: "warning", value: this.$t("message.table.end_of_year_label") };
+      }
     },
   },
 };
