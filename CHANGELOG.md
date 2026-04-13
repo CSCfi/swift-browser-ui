@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- (users) Added conversion need status column and alerts (#1315)
+
 ## [2026.4.1] - 2026-04-08
 
 ### Fixed
