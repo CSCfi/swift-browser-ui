@@ -104,20 +104,35 @@ export async function syncBucketPolicies(project) {
   await processBatch(toAddCors);
 
   // Refresh current sharing information
-  let currentSharingDB = await client.getShare(project);
+  let currentSharingDB = [];
+  try {
+    currentSharingDB = await client.getShare(project);
+  } catch(e) {
+    console.error(`Failed to get share details for ${project}:`, e);
+  }
   // Prune any entries outside of current up-to-date bucket list
   for (let container of currentSharingDB) {
     if (!bucketsByName.get(container)) {
-      const shareDetails = await client.getShareDetails(project, container);
-      const shares = shareDetails.map(item => item.sharedTo);
-      await client.shareDeleteAccess(project, container, shares);
+      try {
+        const shareDetails = await client.getShareDetails(project, container);
+        const shares = shareDetails.map(item => item.sharedTo);
+        await client.shareDeleteAccess(project, container, shares);
+      } catch(e) {
+        console.error(`Failed to prune share entries for ${container}:`, e);
+      }
     }
   }
 
   // Check bucket policies and sync sharing db
   for (let [bucket] of bucketsByName) {
     // Get sharing information for bucket
-    const shareDetails = await client.getShareDetails(project, bucket);
+    let shareDetails = [];
+    try {
+      shareDetails = await client.getShareDetails(project, bucket);
+    } catch(e) {
+      console.error(`Failed to retrieve share details for ${bucket}:`, e);
+      continue;
+    }
     let statements = [];
     try {
       statements = (await getBucketPolicyStatements(bucket))
@@ -220,7 +235,11 @@ export async function syncBucketPolicies(project) {
     }
     // delete unused shares
     if (toBeDeleted.length !== 0) {
-      await client.shareDeleteAccess(project, bucket, toBeDeleted);
+      try {
+        await client.shareDeleteAccess(project, bucket, toBeDeleted);
+      } catch(e) {
+        console.error(`Failed to delete stale share entries for ${bucket}:`, e);
+      }
     }
   }
   if (DEV) console.log("Sharing sync done.");
