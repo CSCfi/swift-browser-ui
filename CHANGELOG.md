@@ -11,6 +11,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 - (users) Added conversion need status column and alerts (#1315)
 
+### Fixed
+
+- Fix ACL sync getting interrupted on async errors (#1330)
+
 ## [2026.4.1] - 2026-04-08
 
 ### Fixed
