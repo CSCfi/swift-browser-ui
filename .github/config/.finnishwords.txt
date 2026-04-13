@@ -437,7 +437,6 @@ nimetä
 nimeä
 nimi
 nimiä
-numero
 numeroinen
 numeroisen
 numeroita
@@ -596,6 +595,7 @@ projektilla
 projektille
 projektilta
 projektin
+projektinumero
 projektisi
 projektissa
 projektista

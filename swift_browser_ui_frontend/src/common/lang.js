@@ -741,7 +741,7 @@ let default_translations = {
           "32-numeroisen koodin, joka on yhdistetty {tooltipb} " +
           "projektiin. Lähetä tunnus (esim. sähköpostilla) muiden projektien " +
           "jäsenille, niin he voivat jakaa ämpäreitä sinulle.",
-        project_name: "Projektin numero",
+        project_name: "Projektinumero",
         close: "Sulje",
         instructions: "Kuinka jaan ämpärin",
         close_instructions: "Sulje ohjeet",
