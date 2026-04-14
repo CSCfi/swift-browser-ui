@@ -9,6 +9,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- (users) Display project numbers in shareID input field (#1332)
+- (users) Display project numbers in ShareModal table (#1209)
 - (users) Added conversion need status column and alerts (#1315)
 
 ### Fixed
