@@ -327,8 +327,8 @@ export default {
             .toArray(),
         ),
       );
-
       await updateContainers(this.active.id, this.abortController.signal);
+      if (!this.containers.length) this.contsLoading = false;
     },
     removeContainer: async function(container) {
       await getDB().containers.where({
