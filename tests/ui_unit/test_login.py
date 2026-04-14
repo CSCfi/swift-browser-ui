@@ -46,7 +46,9 @@ class LoginTestClass(tests.common.mockups.APITestBase):
         ):
             resp = await swift_browser_ui.ui.login.oidc_start(self.mock_request)
             self.assertEqual(resp.status, 302)
-            self.assertEqual(resp.headers["Location"], "/should_be_oidc_provider")
+            self.assertEqual(
+                resp.headers["Location"], {"url": "/should_be_oidc_provider"}
+            )
 
     async def test_oidc_end(self):
         """Test oidc initial request."""
@@ -301,6 +303,7 @@ class LoginTestClass(tests.common.mockups.APITestBase):
             "token": {
                 "user": {
                     "name": "test-user",
+                    "id": "test-id",
                 },
                 "roles": [
                     {

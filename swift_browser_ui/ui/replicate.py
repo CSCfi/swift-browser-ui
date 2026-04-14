@@ -4,6 +4,8 @@ import base64
 import logging
 import math
 import os
+import secrets
+import uuid
 from typing import Any
 
 import aiohttp.web
@@ -44,6 +46,10 @@ class ObjectReplicator:
         self.source_bucket = source_bucket
         self.project_name = project_name
         self.source_project_name = source_project_name
+
+        # Create a temporary key name for the replicator
+        # Doesn't need to be guaranteed to be unique
+        self._key_name = str(uuid.UUID(bytes=secrets.token_bytes(16)))
 
     async def create_destination_bucket(self) -> None:
         """Create destination bucket required for copying."""
@@ -145,6 +151,7 @@ class ObjectReplicator:
                 self.source_bucket,
                 key,
                 owner=self.source_project_name,
+                key_name=self._key_name,
             )
             # Skip adding header if header was empty
             if header:
@@ -171,10 +178,15 @@ class ObjectReplicator:
                 f"Add public key of {self.project_name} temporarily for re-encryption."
             )
             await self.vault.put_whitelist_key(
-                self.project_name, "crypt4gh", base64.urlsafe_b64decode(pubkey)
+                self.project_name,
+                "crypt4gh",
+                base64.urlsafe_b64decode(pubkey),
+                key_name=self._key_name,
             )
 
     async def remove_public_key(self) -> None:
         """Remove the project public key from whitelist if it's been added."""
         if self.project_name:
-            await self.vault.remove_whitelist_key(self.project_name)
+            await self.vault.remove_whitelist_key(
+                self.project_name, key_name=self._key_name
+            )
