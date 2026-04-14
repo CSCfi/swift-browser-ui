@@ -91,8 +91,8 @@
           :tags="tags"
           aria-label="label.list_of_shareids"
           placeholder="message.share.field_placeholder"
-          @addTag="addingTag"
-          @deleteTag="deletingTag"
+          @addTag="addTag"
+          @deleteTag="deleteTag"
         />
         <div id="share-select">
           <c-select
@@ -170,10 +170,7 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import {
-  addNewTag,
-  deleteTag,
-} from "@/common/globalFunctions";
+import { taginputConfirmKeys } from "@/common/globalFunctions";
 import {
   addFocusClass,
   removeFocusClass,
@@ -224,6 +221,9 @@ export default {
     },
     s3endpoint() {
       return this.$store.s3endpoint;
+    },
+    shareIDs() {
+      return this.tags.map((item) => item.shareID);
     },
   },
   watch: {
@@ -368,7 +368,7 @@ export default {
         );
         return false;
       }
-      if (this.tags.length < 1) {
+      if (this.shareIDs.length < 1) {
         document.querySelector("#shareModal-toasts").addToast(
           {
             id: "error-noid",
@@ -381,13 +381,13 @@ export default {
         );
         return false;
       }
-      let invalidTags = this.tags.filter(
-        item => this.validateTag(item) === false);
+      let invalidIDs = this.shareIDs.filter(
+        item => this.validateShareID(item) === false);
 
-      if (invalidTags.length) {
-        let msg = invalidTags.join(", ");
+      if (invalidIDs.length) {
+        let msg = invalidIDs.join(", ");
 
-        if (invalidTags.length > 1) {
+        if (invalidIDs.length > 1) {
           msg += this.$t("message.share.invalid_share_ids");
         } else {
           msg += this.$t("message.share.invalid_share_id");
@@ -406,14 +406,14 @@ export default {
         await this.$store.sharingClient.shareNewAccess(
           this.$store.active.id,
           bucket,
-          this.tags,
+          this.shareIDs,
           rights,
           this.s3endpoint,
         );
         await this.$store.sharingClient.shareNewAccess(
           this.$store.active.id,
           `${this.bucketName}_segments`,
-          this.tags,
+          this.shareIDs,
           rights,
           this.s3endpoint,
         );
@@ -440,22 +440,17 @@ export default {
       await addAccessControlBucketPolicy(
         bucket,
         rights,
-        this.tags,
+        this.shareIDs,
       );
       try {
         await addAccessControlBucketPolicy(
           `${bucket}_segments`,
           rights,
-          this.tags,
+          this.shareIDs,
         );
       } catch {}
 
-      let toShare = [];
-      for (const item of this.tags) {
-        toShare.push(
-          await this.$store.sharingClient.projectCheckIDs(item),
-        );
-      }
+      const toShare = await this.$store.sharingClient.projectBatchCheckIDs(this.shareIDs);
 
       // Add access to cross-project sharing in case of read or read+write
       if (this.read | this.write) {
@@ -503,14 +498,25 @@ export default {
       this.isPermissionRemoved = false;
       this.isPermissionUpdated = false;
     },
-    getSharedDetails: function () {
-      this.$store.sharingClient.getShareDetails(
+    getSharedDetails: async function () {
+      // Get share details
+      const shares = await this.$store.sharingClient.getShareDetails(
         this.$route.params.project,
         this.bucketName,
-      ).then((ret) => {
-        this.sharedDetails = ret;
-        this.tags = [];
-      });
+      );
+      this.tags = [];
+      // Get an array of share receivers and corresponding project names
+      const shareIDs = shares?.map((share) => share.sharedTo);
+      if (shareIDs.length) {
+        const projectInfo = await this.$store.sharingClient.projectBatchCheckIDs(shareIDs);
+        // Add project name to shared details
+        this.sharedDetails = shares.map((share) => {
+          const project = projectInfo.find((prj) => prj.id === share.sharedTo);
+          return { ...share, sharedToName: project?.name || null };
+        });
+      } else {
+        this.sharedDetails = shares;
+      }
     },
     updateSharedBucket: function () {
       this.closeSharedNotification();
@@ -527,13 +533,31 @@ export default {
       this.isPermissionRemoved = true;
       this.closeSharedNotificationWithTimeout();
     },
-    addingTag: function (e, onBlur) {
-      this.tags = addNewTag(e, this.tags, onBlur);
+    addTag: function (event, onBlur) {
+      if (taginputConfirmKeys.includes(event.key) || onBlur) {
+        event.preventDefault();
+        const newID = event.target.value.trim();
+        event.target.value = "";
+        if (newID !== "" && !this.shareIDs.includes(newID)) {
+          this.tags.push({ shareID: newID, projectName: "" });
+          if (this.validateShareID(newID)) {
+            this.getProjectName(newID);
+          }
+        }
+      }
     },
-    deletingTag: function (e, tag) {
-      this.tags = deleteTag(e, tag, this.tags);
+    deleteTag: function (event, tag) {
+      event.preventDefault();
+      this.tags = this.tags.filter(el => el.shareID !== tag.shareID);
     },
-    validateTag: function (tag) {
+    getProjectName: async function (shareID) {
+      const project = await this.$store.sharingClient.projectCheckIDs(shareID);
+      if (project?.name) {
+        const index = this.tags.findIndex(item => item.shareID === shareID);
+        if (index > -1) this.tags[index].projectName = project.name;
+      }
+    },
+    validateShareID: function (tag) {
       //tag should be 32 alphanumeric chars
       //and not own project
       return tag.length === 32 &&
