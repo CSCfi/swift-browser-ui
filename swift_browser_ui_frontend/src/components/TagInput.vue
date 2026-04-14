@@ -29,6 +29,7 @@
       :placeholder="$t(placeholder)"
       @blur="$emit('addTag', $event, true)"
       @keydown="$emit('addTag', $event)"
+      :disabled="disabled"
     >
   </div>
 </template>
@@ -50,6 +51,10 @@ export default {
     placeholder: {
       type: String,
       default: "message.tagPlaceholder",
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

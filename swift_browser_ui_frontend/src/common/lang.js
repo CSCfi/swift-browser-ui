@@ -88,6 +88,8 @@ let default_translations = {
         convert_urgent_text: "This bucket seems empty because the bucket's name is incompatible " +
         "with the new version of {title}. " +
         "It must be converted to regain access to the files.",
+        convert_urgent_share_text: "Actions cannot be performed on this bucket, because it is " +
+        "incompatible with the new version of {title}. Please convert this bucket.",
         convert_end_of_year_title:
           "This bucket was created with the previous version of {title}",
         convert_end_of_year_text: "Files show a size 0 because they were uploaded with an older " +
@@ -674,6 +676,8 @@ let default_translations = {
         convert_urgent_text: "Ämpärin sisältöä ei voida näyttää, koska sen nimi " +
         "ei ole yhteensopiva {title}in uuden version kanssa. " +
         "Ämpäri on muunnettava ennen tiedostojen käyttöä.",
+        convert_urgent_share_text: "Tälle ämpärelle ei voi suorittaa toimintoja, koska se " +
+        "ei ole yhteensopiva {title}in uuden version kanssa. Muunna tämä ämpäri.",
         convert_end_of_year_title:
           "Tämä ämpäri on luotu {title}in aiemmalla versiolla",
         convert_end_of_year_text: "Tiedostojen koko on virheellinen, koska ne on ladattu " +
