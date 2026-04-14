@@ -15,7 +15,7 @@ import aiohttp.web
 import aiohttp_session
 import certifi
 import redis.asyncio as redis
-from ldap3 import Connection, Server
+from ldap3 import Connection, Server, Tls
 from redis.asyncio.sentinel import Sentinel
 
 import swift_browser_ui.common.signature
@@ -219,6 +219,13 @@ async def ldap_get_project_titles(projects: dict[str, dict]) -> dict[str, str]:
     password = str(os.environ.get("LDAP_SERVER_PASSWORD", ""))
     distinguished_name = str(os.environ.get("LDAP_SERVER_DISTINGUISHED_NAME", ""))
 
+    # Allow toggling server cert check off for debug
+    check_certificate = (
+        ssl.CERT_NONE
+        if str(os.environ.get("LDAP_CHECK_CERTIFICATE", "True")) == "False"
+        else ssl.CERT_REQUIRED
+    )
+
     attributes = ["CSCPrjTitle", "CSCPrjNum"]
     filter = "(&(objectClass=CSCProject)(|{projects}))"
     project_template = "(CSCPrjNum={project})"  # goes inside FILTER many times
@@ -237,11 +244,15 @@ async def ldap_get_project_titles(projects: dict[str, dict]) -> dict[str, str]:
         logging.error("Missing envs, unable to fetch project titles info from LDAP")
         return titles
 
+    # Allow client to implicitly trust whatever cipher the server suggests
+    tls = Tls(ciphers="ALL", validate=check_certificate, version=ssl.PROTOCOL_TLS)
+
     server = Server(
         host=address,
         port=port,
         use_ssl=True,
         connect_timeout=5,
+        tls=tls,
     )
 
     with Connection(server=server, user=bind, password=password) as conn:
