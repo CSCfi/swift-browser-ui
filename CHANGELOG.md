@@ -15,6 +15,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- (users) Fix persistent bucket loader when there are no buckets in project (#1327)
 - Fix ACL sync getting interrupted on async errors (#1330)
 
 ## [2026.4.1] - 2026-04-08
