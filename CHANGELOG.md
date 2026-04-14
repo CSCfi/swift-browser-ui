@@ -9,12 +9,14 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Added
 
+- the runner API header retrieval and whitelist operations are now aware of the whitelisted key name
 - (users) Display project numbers in shareID input field (#1332)
 - (users) Display project numbers in ShareModal table (#1209)
 - (users) Added conversion need status column and alerts (#1315)
 
 ### Fixed
 
+- (users) the whitelisted keys now use unique names and can no longer collide when multiple download sessions are open.
 - (users) Fix persistent bucket loader when there are no buckets in project (#1327)
 - Fix ACL sync getting interrupted on async errors (#1330)
 
