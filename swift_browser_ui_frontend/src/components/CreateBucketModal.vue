@@ -70,16 +70,16 @@
         outlined
         size="large"
         data-testid="cancel-save-bucket"
-        @click="toggleCreateBucketModal(false)"
-        @keyup.enter="toggleCreateBucketModal(true)"
+        @click="toggleCreateBucketModal()"
+        @keyup.enter="toggleCreateBucketModal()"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
         data-testid="save-bucket"
-        @click="() => createContainer(false)"
-        @keyup.enter="() => createContainer(true)"
+        @click="() => createContainer()"
+        @keyup.enter="() => createContainer()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -100,11 +100,7 @@ import {
   getCurrentISOtime,
   tokenize,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavigation } from "@/common/keyboardNavigation";
 // import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 
@@ -163,7 +159,7 @@ export default {
       this.validationResult = await validateBucketName(
         this.bucketName);
     }, 300),
-    createContainer: async function (keypress) {
+    createContainer: async function () {
       this.validationResult = await validateBucketName(
         this.bucketName);
       const validationError =
@@ -224,7 +220,7 @@ export default {
         await getDB().containers.add(newBucket);
       }
 
-      this.toggleCreateBucketModal(keypress);
+      this.toggleCreateBucketModal();
 
       this.$router.push({
         name: "AllBuckets",
@@ -236,15 +232,13 @@ export default {
 
       this.$store.setNewBucket(bucketName);
     },
-    toggleCreateBucketModal: function (keypress) {
+    toggleCreateBucketModal: function () {
       this.$store.toggleCreateBucketModal(false);
       this.bucketName = "";
       this.tags = [];
       this.create = true;
       this.validationResult = {};
       document.querySelector("#createModal-toasts").removeToast("create-toast");
-
-      if (keypress) moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
@@ -253,11 +247,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.createBucketContainer.querySelectorAll(
-        "input, c-link, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      captureKeyboardNavigation(e, this.$refs.createBucketContainer);
     },
   },
 };

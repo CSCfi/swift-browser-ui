@@ -9,6 +9,7 @@
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
+      tabindex="-1"
     >
       <c-toasts
         id="uploadModal-toasts"
@@ -247,11 +248,7 @@ import {
   sortItems,
   truncate,
 } from "@/common/tableFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 import { signedFetch } from "@/common/api";
@@ -768,8 +765,6 @@ export default {
       this.sortDirection = "asc";
       this.filesPagination.currentPage = 1;
       this.uploadError = "";
-
-      moveFocusOutOfModal(this.prevActiveEl);
     },
     checkIfCanUpload() {
       if (this.dropFiles.length === 0) {
@@ -862,11 +857,7 @@ export default {
       });
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.uploadContainer.querySelectorAll(
-        "c-link, c-button, textarea, c-text-field, c-data-table",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last, true);
+      captureKeyboardNavInsideModal(e, this.$refs.uploadContainer);
     },
   },
 };

@@ -71,11 +71,7 @@ import {
   deleteTag,
   validateBucketName,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 //import TagInput from "@/components/TagInput.vue";
@@ -181,35 +177,24 @@ export default {
         this.loadingBucketname = false;
       }
     },
-    cancelCopy: function (keypress) {
+    cancelCopy: function () {
       this.$store.toggleCopyBucketModal(false);
       this.$store.setBucketName("");
       this.bucketName = "";
       this.tags = [];
       this.loadingBucketname = true;
       this.validationResult = {};
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Copy Modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      if (keypress) {
-        const prevActiveElParent = document.getElementById("container-table");
-        moveFocusOutOfModal(prevActiveElParent, true);
-      }
     },
-    replicateContainer: async function (keypress) {
+    replicateContainer: async function () {
       this.validationResult = await validateBucketName(
         this.bucketName);
       const validationError =
         Object.values(this.validationResult).some(val => !val);
       if (validationError) return;
 
-      await this.a_replicate_container(keypress);
+      await this.a_replicate_container();
     },
-    a_replicate_container: async function (keypress) {
+    a_replicate_container: async function () {
       this.$store.toggleCopyBucketModal(false);
       document.querySelector("#copyBucket-toasts").addToast(
         {
@@ -268,7 +253,7 @@ export default {
         );
       } finally {
         document.querySelector("#copyBucket-toasts").removeToast("copy-in-progress");
-        this.cancelCopy(keypress);
+        this.cancelCopy();
       }
     },
     addingTag: function (e, onBlur) {
@@ -282,11 +267,7 @@ export default {
         this.bucketName);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.copyBucketContainer.querySelectorAll(
-        "input, c-icon, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      captureKeyboardNavInsideModal(e, this.$refs.copyBucketContainer);
     },
   },
 };
