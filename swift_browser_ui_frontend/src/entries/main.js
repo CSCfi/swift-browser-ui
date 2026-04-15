@@ -51,7 +51,6 @@ import CFooter from "@/components/CFooter.vue";
 import { getDB, checkIDB } from "@/common/idb";
 
 // Import global functions
-import { removeFocusClass } from "@/common/keyboardNavigation";
 import { initS3 } from "@/common/s3init";
 
 checkIDB().then(result => {
@@ -306,11 +305,6 @@ const app = createApp({
     });
     setTimeout(this.containerSyncWrapper, 10000);
   },
-  mounted() {
-    document
-      .getElementById("mainContainer")
-      .addEventListener("keydown", this.onKeydown);
-  },
   methods: {
     containerSyncWrapper: function () {
       syncBucketPolicies(this.active.id);
@@ -320,15 +314,6 @@ const app = createApp({
     },
     cancelDownload: function() {
       this.s3download.cancelDownload();
-    },
-    onKeydown: function (e) {
-      if (e.key === "Tab" && this.prevActiveEl &&
-        e.target === this.prevActiveEl) {
-        if(this.prevActiveEl.classList.contains("button-focus")) {
-          removeFocusClass(this.prevActiveEl);
-          this.$store.setPreviousActiveEl(null);
-        }
-      }
     },
   },
   ...BrowserPage,

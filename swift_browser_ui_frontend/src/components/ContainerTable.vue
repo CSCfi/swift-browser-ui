@@ -45,10 +45,6 @@ import {
   deleteStaleShares,
 } from "@/common/share";
 import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-} from "@/common/keyboardNavigation";
-import {
   awsDeleteBucket,
   awsDeleteObjects,
   awsListObjects,
@@ -287,7 +283,7 @@ export default {
                         this.onOpenShareModal(item.name),
                       onKeyUp: (event) => {
                         if(event.keyCode === 13)
-                          this.onOpenShareModal(item.name, true);
+                          this.onOpenShareModal(item.name);
                       },
                       disabled: item.owner || incompatible,
                     },
@@ -327,7 +323,7 @@ export default {
                             menuItems.addEventListener("keydown", (e) =>{
                               if (e.keyCode === 13) {
                                 this.handleCopyClick(
-                                  item.name, item.owner, true,
+                                  item.name, item.owner,
                                 );
                               }
                             });
@@ -530,34 +526,11 @@ export default {
 
       return this.$t("message.emptyProject.all");
     },
-    onOpenShareModal(itemName, keypress) {
+    onOpenShareModal(itemName) {
       this.$store.toggleShareModal(true);
       this.$store.setBucketName(itemName);
-
-      if (keypress) {
-        setPrevActiveElement();
-        const shareModal = document.getElementById("share-modal");
-        disableFocusOutsideModal(shareModal);
-      }
-      setTimeout(() => {
-        const shareIDsInput = document.getElementById("share-ids")?.children[0];
-        shareIDsInput.focus();
-      }, 300);
     },
-    openEditTagsModal(itemName, keypress) {
-      toggleEditTagsModal(null, itemName);
-      if (keypress) {
-        setPrevActiveElement();
-        const editTagsModal = document.getElementById("edit-tags-modal");
-        disableFocusOutsideModal(editTagsModal);
-      }
-      setTimeout(() => {
-        const editTagsInput = document.getElementById("edit-tags-input")
-          ?.children[0];
-        editTagsInput.focus();
-      }, 300);
-    },
-    handleCopyClick: async function(bucket, owner, keypress) {
+    handleCopyClick: async function(bucket, owner) {
       // Don't attempt to copy an empty bucket
       const bucketHasContent = await this.ensureBucketState(
         bucket, false, this.$t("message.container_ops.copyNotEmpty"));
@@ -566,16 +539,6 @@ export default {
       owner
         ? toggleCopyBucketModal(bucket, owner)
         : toggleCopyBucketModal(bucket);
-      if (keypress) {
-        setPrevActiveElement();
-        const copyBucketModal = document.getElementById("copy-bucket-modal");
-        disableFocusOutsideModal(copyBucketModal);
-      }
-      setTimeout(() => {
-        const copyBucketInput = document
-          .querySelector("#new-copy-bucketName input");
-        copyBucketInput.focus();
-      }, 300);
     },
     getBucketStatus: function(buckets, bucket) {
       const statusNum = getRecommendedAction(buckets, bucket);

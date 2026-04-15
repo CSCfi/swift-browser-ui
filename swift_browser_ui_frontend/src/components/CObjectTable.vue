@@ -46,10 +46,6 @@ import {
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-} from "@/common/keyboardNavigation";
-import {
   mdiTrayArrowDown,
   //mdiPencilOutline,
   mdiDeleteOutline,
@@ -287,10 +283,10 @@ export default {
                   title: "Edit tags",
                   path: mdiPencilOutline,
                   onClick: () =>
-                    this.onOpenEditTagsModal(item.name),
+                    toggleEditTagsModal(item.name, null);
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      this.onOpenEditTagsModal(item.name, true);
+                      toggleEditTagsModal(item.name, null);
                     }
                   },
                   disabled: item?.folder ||
@@ -537,19 +533,6 @@ export default {
           sortable: false,
         },
       ];
-    },
-    onOpenEditTagsModal(itemName, keypress) {
-      toggleEditTagsModal(itemName, null);
-      if (keypress) {
-        setPrevActiveElement();
-        const editTagsModal = document.getElementById("edit-tags-modal");
-        disableFocusOutsideModal(editTagsModal);
-      }
-      setTimeout(() => {
-        const editTagsInput = document.getElementById("edit-tags-input")
-          ?.children[0];
-        editTagsInput.focus();
-      }, 300);
     },
   },
 };

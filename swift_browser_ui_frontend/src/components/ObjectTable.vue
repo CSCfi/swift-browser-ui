@@ -157,11 +157,6 @@ import {
   getHumanReadableSize,
   truncate,
 } from "@/common/tableFunctions";
-import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-  addFocusClass,
-} from "@/common/keyboardNavigation";
 import { getDB } from "@/common/idb";
 import {
   getBucketMetadata,
@@ -422,10 +417,9 @@ export default {
       this.$store.toggleShareModal(true);
       this.$store.setBucketName(this.containerName);
     },
-    confirmDelete: function(item, keypress) {
+    confirmDelete: function(item) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
-        if (keypress) this.moveFocusToDeleteModal();
       } else {
         addErrorToastOnMain(this.$t("message.folders.deleteNote"));
       }
@@ -648,12 +642,12 @@ export default {
               }
             }
             // Otherwise get user confirmation from modal
-            this.onOpenDeleteModal(this.checkedRows);
+            toggleDeleteModal(this.checkedRows);
             const deleteSelectionsBtn = document
               .querySelector("#delete-selections");
             deleteSelectionsBtn.addEventListener("keydown", (e) =>{
               if (e.keyCode === 13) {
-                this.onOpenDeleteModal(this.checkedRows, true);
+                toggleDeleteModal(this.checkedRows);
               }
             });
           },
@@ -663,22 +657,6 @@ export default {
     setLocalizedContent() {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
-    },
-    onOpenDeleteModal(checkedRows, keypress) {
-      toggleDeleteModal(checkedRows);
-      if (keypress) this.moveFocusToDeleteModal();
-    },
-    moveFocusToDeleteModal() {
-      const deleteObjsModal = document.getElementById("delete-objs-modal");
-      setPrevActiveElement();
-      disableFocusOutsideModal(deleteObjsModal);
-
-      setTimeout(() => {
-        const deleteObjsBtn = document.getElementById("delete-objs-btn");
-        deleteObjsBtn.tabIndex = "0";
-        deleteObjsBtn.focus();
-        addFocusClass(deleteObjsBtn);
-      }, 300);
     },
     getConversionNeedAlert: function(buckets, bucket) {
       const statusNum = getRecommendedAction(buckets, bucket);

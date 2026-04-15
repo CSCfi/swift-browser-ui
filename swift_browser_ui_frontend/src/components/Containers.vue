@@ -10,8 +10,8 @@
           size="small"
           outlined
           data-testid="create-bucket"
-          @click="toggleCreateBucketModal(false)"
-          @keyup.enter="toggleCreateBucketModal(true)"
+          @click="toggleCreateBucketModal"
+          @keyup.enter="toggleCreateBucketModal"
         >
           <c-icon :path="mdiPlus" />
           {{ $t("message.createBucket") }}
@@ -55,7 +55,6 @@ import { toggleCreateBucketModal } from "@/common/globalFunctions";
 import { getAccessDetails, getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
-import { setPrevActiveElement } from "@/common/keyboardNavigation";
 
 export default {
   name: "ContainersView",
@@ -342,18 +341,6 @@ export default {
         projectID: this.active.id,
         name: `${container}_segments`,
       }).delete();
-    },
-    toggleCreateBucketModal: function (keypress) {
-      toggleCreateBucketModal();
-      if (keypress) {
-        setPrevActiveElement();
-      }
-      setTimeout(() => {
-        const newBucketInput = document
-          .querySelector("#newBucket-input input");
-        newBucketInput.tabIndex = "0";
-        newBucketInput.focus();
-      }, 300);
     },
   },
 };
