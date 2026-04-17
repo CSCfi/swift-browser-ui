@@ -70,8 +70,8 @@
         outlined
         size="large"
         data-testid="cancel-save-bucket"
-        @click="toggleCreateBucketModal()"
-        @keyup.enter="toggleCreateBucketModal()"
+        @click="toggleCreateBucketModal"
+        @keyup.enter="toggleCreateBucketModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
@@ -100,7 +100,7 @@ import {
   getCurrentISOtime,
   tokenize,
 } from "@/common/globalFunctions";
-import { captureKeyboardNavigation } from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 // import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 
@@ -247,7 +247,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavigation(e, this.$refs.createBucketContainer);
+      captureKeyboardNavInsideModal(e, this.$refs.createBucketContainer);
     },
   },
 };

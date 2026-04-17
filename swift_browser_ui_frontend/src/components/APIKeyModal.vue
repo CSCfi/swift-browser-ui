@@ -14,8 +14,8 @@
       <c-button
         id="close-api-key-modal-btn"
         text
-        @click="closeModal(false)"
-        @keyup.enter="closeModal(true)"
+        @click="closeModal"
+        @keyup.enter="closeModal"
       >
         <c-icon
           :path="mdiClose"
@@ -45,7 +45,7 @@
         {{ $t("message.apiKeys.create") }}
       </c-button>
       <c-row
-        v-show="latest.apiKey"
+        v-if="latest.apiKey"
         align="start"
         justify="space-between"
       >
@@ -65,7 +65,7 @@
         </c-button>
       </c-row>
       <c-alert
-        v-show="latest.apiKey"
+        v-if="latest.apiKey"
         type="warning"
       >
         <p>{{ $t('message.apiKeys.copyWarning') }}</p>
@@ -98,11 +98,7 @@ import {
   listAPIKeys,
   removeAPIKey,
 } from "@/common/api";
-import {
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 export default {
   name: "APIKeyModal",
   data() {
@@ -205,7 +201,7 @@ export default {
     checkPage: function(event){
       this.currentPage = event.target.pagination.currentPage;
     },
-    closeModal: function (addFocus) {
+    closeModal: function () {
       this.currentPage = 1;
       this.$store.toggleAPIKeyModal(false);
       this.newIdentifier = "";
@@ -216,16 +212,6 @@ export default {
       document.querySelector("#api-key-toasts").removeToast("error-in-use");
       document.querySelector("#api-key-toasts").removeToast("success-copied");
       document.querySelector("#api-key-toasts").removeToast("success-removed");
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open the modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      const prevActiveElParent = document
-        .querySelector("[data-testid='support-menu']");
-      moveFocusOutOfModal(prevActiveElParent, true, addFocus);
     },
     getAPIKeys: function () {
       listAPIKeys(this.activeId).then((ret) => {this.apiKeys = ret;});
@@ -306,37 +292,7 @@ export default {
       }
     },
     handleKeyDown: function (e) {
-      const eTarget = e.target;
-      const shadowDomTarget = eTarget.shadowRoot?.activeElement;
-
-      const first = document.getElementById("close-api-key-modal-btn");
-
-      // last element is different between with or without API key list
-      let last = null;
-
-      if (this.tableAPIKeys.length === 0) {
-        last = document.getElementById("create-api-key-button");
-      } else {
-        const table = this.$refs.apiKeyContainer.querySelector("c-data-table");
-        const removeButtons = table.shadowRoot.querySelectorAll("c-button");
-        last = removeButtons[removeButtons.length -1];
-      }
-
-      if (e.key === "Tab" && !e.shiftKey &&
-        (eTarget === last || (shadowDomTarget === last))
-      ) {
-        first.tabIndex = "0";
-        first.focus();
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (eTarget === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          addFocusClass(last);
-        } else if (eTarget === last || shadowDomTarget === last) {
-          removeFocusClass(last);
-        }
-      }
+      captureKeyboardNavInsideModal(e, this.$refs.apiKeyContainer);
     },
   },
 };

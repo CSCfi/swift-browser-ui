@@ -1,98 +1,55 @@
-/*import useStore from "@/common/store";
-
-export function setPrevActiveElement() {
-  const store = useStore();
-  const prevActiveEl = document.activeElement;
-  store.setPreviousActiveEl(prevActiveEl);
-}
-
-export function addFocusClass(element) {
-  element.classList.add("button-focus");
-}
-
-export function removeFocusClass(element) {
-  element.removeAttribute("tabIndex");
-  element.classList.remove("button-focus");
-}
-
-export function disableFocusOutsideModal (modal) {
-  const nav = document.querySelector("nav");
-  Array.from(nav.children).forEach((child) =>
-    child.setAttribute("inert", "true"));
-
-  const mainContent = document.getElementById("mainContent");
-  Array.from(mainContent.children).forEach((child) => {
-    if (child !== modal) child.setAttribute("inert", "true");
-  });
-
-  const footer = document.querySelector("footer");
-  Array.from(footer.children).forEach((child) =>
-    child.setAttribute("inert", "true"));
-}
-
-export function moveFocusOutOfModal(prevActiveEl, isParentEl = false,
-  addFocus = true) {
-  const store = useStore();
-  removeFocusClass(document.activeElement);
-  if (isParentEl) {
-    store.setPreviousActiveEl(prevActiveEl);
-  }
-  const nav = document.querySelector("nav");
-  Array.from(nav.children).forEach((child) => {
-    child.removeAttribute("inert");
-  });
-
-  const mainContent = document.getElementById("mainContent");
-  Array.from(mainContent.children).forEach((child) => {
-    child.removeAttribute("inert");
-  });
-
-  const footer = document.querySelector("footer");
-  Array.from(footer.children).forEach((child) =>
-    child.removeAttribute("inert"));
-
-  if (prevActiveEl) {
-    prevActiveEl.tabIndex = "0";
-    prevActiveEl?.focus();
-    if (prevActiveEl === document.activeElement && addFocus) {
-      addFocusClass(prevActiveEl);
-    }
-  }
-}*/
-
-export function getFocusableElements(focusableList) {
-  const first = focusableList[0];
-  let last = focusableList[focusableList.length - 1];
-  return { first, last };
-}
-
-const FOCUSABLE_SELECTORS = "c-button, c-link, c-text-field";
-
-/*
-  Basic standard function for navigating keyboard when inside a modal.
-  It doesn't apply to all modals because modals are different and
-  some modals need more configs than this.
-*/
-
+/**
+ * Moves keyboard focus between first and last focusable elements
+ * @param {*} e - keydown event
+ * @param {*} first - first focusable modal element
+ * @param {*} last - last focusable modal element
+ */
 export function keyboardNavigationInsideModal(
   e,
   first,
   last,
 ) {
-  if (e.key === "Tab" && !e.shiftKey && e.target === last) {
-    if (last.tagName === "c-text-field") e.preventDefault();
+  if (e.key === "Tab" && !e.shiftKey &&
+    (e.target === last || e.target?.shadowRoot?.activeElement === last)) {
     first.tabIndex = "0";
     first.focus();
-  } else if (e.key === "Tab" && e.shiftKey && e.target === first) {
-    e.preventDefault();
+  } else if (e.key === "Tab" && e.shiftKey &&
+      (e.target === first || e.target?.shadowRoot?.activeElement === first)) {
     last.tabIndex = "0";
     last.focus();
   }
 }
 
+const FOCUSABLE_SELECTORS = "c-button:not([disabled]), c-icon-button:not([disabled]), " +
+  "c-link:not([disabled]), c-text-field:not([disabled]), input:not([disabled])";
+const WITH_NESTED_SELECTORS = "c-data-table";
+
+/**
+ * Function for restricting keyboard navigation to modal's content
+ * @param {*} e - keydown event
+ * @param {*} ref - modal c-card ref
+ */
 export function captureKeyboardNavInsideModal(e, ref) {
   if (e.key !== "Tab") return;
-  const focusableList = ref.querySelectorAll(FOCUSABLE_SELECTORS);
-  const { first, last } = getFocusableElements(focusableList);
+
+  const focusableList = Array.from(
+    ref.querySelectorAll(FOCUSABLE_SELECTORS.concat(" ,", WITH_NESTED_SELECTORS)));
+  let finalList = [];
+
+  focusableList.forEach((el) => {
+    // Skip hidden elements
+    if (el.offsetParent !== null) {
+      if (WITH_NESTED_SELECTORS.includes(el.tagName.toLowerCase())) {
+        const nestedEls = Array.from(el.shadowRoot.querySelectorAll(FOCUSABLE_SELECTORS));
+        if (nestedEls.length) {
+          finalList.push(...nestedEls);
+        }
+      } else {
+        finalList.push(el);
+      }
+    }
+  });
+  const first = finalList[0];
+  const last = finalList[finalList.length - 1];
   keyboardNavigationInsideModal(e, first, last);
 }

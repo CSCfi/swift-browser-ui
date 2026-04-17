@@ -22,17 +22,17 @@
       <c-button
         outlined
         size="large"
-        @click="toggleEditTagsModal(false)"
-        @keyup.enter="toggleEditTagsModal(true)"
+        @click="toggleEditTagsModal"
+        @keyup.enter="toggleEditTagsModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         data-testid="save-edit-tags"
         size="large"
-        @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
+        @click="isObject ? saveObjectTags() : saveContainerTags()"
         @keyup.enter="isObject ?
-          saveObjectTags(true) : saveContainerTags(true)"
+          saveObjectTags() : saveContainerTags()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -48,11 +48,7 @@ import {
   deleteTag,
   getCurrentISOtime,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
 
@@ -146,26 +142,13 @@ export default {
         this.tags = this.container.tags;
       }
     },
-    toggleEditTagsModal: function (keypress) {
+    toggleEditTagsModal: function () {
       this.$store.toggleEditTagsModal(false);
       this.$store.setObjectName("");
       this.$store.setBucketName("");
       this.tags = [];
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Edit Tags Modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      if (keypress) {
-        const prevActiveElParent = this.containerName ?
-          document.getElementById("obj-table") :
-          document.getElementById("container-table");
-        moveFocusOutOfModal(prevActiveElParent, true);
-      }
     },
-    saveObjectTags: function (keypress) {
+    saveObjectTags: function () {
       const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
@@ -189,11 +172,11 @@ export default {
           })
           .modify({ last_modified: currentTime });
 
-        this.toggleEditTagsModal(keypress);
+        this.toggleEditTagsModal();
       });
     },
-    saveContainerTags: function (keypress) {
-      this.toggleEditTagsModal(keypress);
+    saveContainerTags: function () {
+      this.toggleEditTagsModal();
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
@@ -202,11 +185,7 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function(e) {
-      const focusableList = this.$refs.editTagsContainer.querySelectorAll(
-        "input, c-icon, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      captureKeyboardNavInsideModal(e, this.$refs.editTagsContainer);
     },
   },
 };

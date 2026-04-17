@@ -215,6 +215,7 @@ export default {
 
   },
   methods: {
+    toggleCreateBucketModal,
     setUpIfReady: async function () {
       // Check id: not available on created on page refresh
       if (this.readyToSetUp) {

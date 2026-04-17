@@ -49,7 +49,6 @@ const useStore = defineStore("global", {
     renderedFolders: true,
     addUploadFiles: false,
     isLoaderVisible: false,
-    prevActiveEl: null,
     newBucket: "",
     sharingUpdated: false,
     s3endpoint: "",
@@ -224,9 +223,6 @@ const useStore = defineStore("global", {
     },
     setLoaderVisible(payload) {
       this.isLoaderVisible = payload;
-    },
-    setPreviousActiveEl(payload) {
-      this.prevActiveEl = payload;
     },
     setNewBucket(payload) {
       this.newBucket = payload;
