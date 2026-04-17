@@ -220,4 +220,7 @@ h3 {
   gap: 0.5rem;
 }
 
+c-button {
+  width: max-content;
+}
 </style>
