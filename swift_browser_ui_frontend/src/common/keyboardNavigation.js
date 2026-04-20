@@ -1,37 +1,13 @@
-/**
- * Moves keyboard focus between first and last focusable elements
- * @param {*} e - keydown event
- * @param {*} first - first focusable modal element
- * @param {*} last - last focusable modal element
- */
-export function keyboardNavigationInsideModal(
-  e,
-  first,
-  last,
-) {
-  if (e.key === "Tab" && !e.shiftKey &&
-    (e.target === last || e.target?.shadowRoot?.activeElement === last)) {
-    first.tabIndex = "0";
-    first.focus();
-  } else if (e.key === "Tab" && e.shiftKey &&
-      (e.target === first || e.target?.shadowRoot?.activeElement === first)) {
-    last.tabIndex = "0";
-    last.focus();
-  }
-}
-
 const FOCUSABLE_SELECTORS = "c-button:not([disabled]), c-icon-button:not([disabled]), " +
   "c-link:not([disabled]), c-text-field:not([disabled]), input:not([disabled])";
 const WITH_NESTED_SELECTORS = "c-data-table";
 
 /**
- * Function for restricting keyboard navigation to modal's content
- * @param {*} e - keydown event
- * @param {*} ref - modal c-card ref
+ * Get a list of focusable elements within a given ref
+ * @param {HTMLElement} ref
+ * @returns a list of focusable elements
  */
-export function captureKeyboardNavInsideModal(e, ref) {
-  if (e.key !== "Tab") return;
-
+function getFocusableElements(ref) {
   const focusableList = Array.from(
     ref.querySelectorAll(FOCUSABLE_SELECTORS.concat(" ,", WITH_NESTED_SELECTORS)));
   let finalList = [];
@@ -49,7 +25,41 @@ export function captureKeyboardNavInsideModal(e, ref) {
       }
     }
   });
-  const first = finalList[0];
-  const last = finalList[finalList.length - 1];
+  return finalList;
+}
+
+/**
+ * Moves keyboard focus between first and last focusable elements
+ * @param {KeyboardEvent} e - keydown event
+ * @param {HTMLElement} first - first focusable modal element
+ * @param {HTMLElement} last - last focusable modal element
+ */
+function keyboardNavigationInsideModal(
+  e,
+  first,
+  last,
+) {
+  if (e.key === "Tab" && !e.shiftKey &&
+    (e.target === last || e.target?.shadowRoot?.activeElement === last)) {
+    first.tabIndex = "0";
+    first.focus();
+  } else if (e.key === "Tab" && e.shiftKey &&
+      (e.target === first || e.target?.shadowRoot?.activeElement === first)) {
+    last.tabIndex = "0";
+    last.focus();
+  }
+}
+
+/**
+ * Function for restricting keyboard navigation to modal's content
+ * @param {KeyboardEvent} e - keydown event
+ * @param {HTMLElement} ref - modal c-card ref
+ */
+export function captureKeyboardNavInsideModal(e, ref) {
+  if (e.key !== "Tab") return;
+
+  const focusableEls = getFocusableElements(ref);
+  const first = focusableEls[0];
+  const last = focusableEls[focusableEls.length - 1];
   keyboardNavigationInsideModal(e, first, last);
 }

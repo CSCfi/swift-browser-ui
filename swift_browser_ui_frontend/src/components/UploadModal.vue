@@ -431,9 +431,6 @@ export default {
     addFiles() {
       return this.$store.addUploadFiles;
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
     existingFileNames() {
       return this.existingFiles.reduce((array, item) => {
         array.push(item.name);
@@ -857,7 +854,11 @@ export default {
       });
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.uploadContainer);
+      if (e.key === "Escape") {
+        this.toggleUploadModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.uploadContainer);
+      }
     },
   },
 };

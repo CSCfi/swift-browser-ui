@@ -127,7 +127,7 @@ const app = createApp({
         return this.$store.openConfirmRouteModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleConfirmRouteModal(newState);
       },
     },
     openCreateBucketModal: {
@@ -135,7 +135,7 @@ const app = createApp({
         return this.$store.openCreateBucketModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleCreateBucketModal(newState);
       },
     },
     openUploadModal: {
@@ -143,7 +143,7 @@ const app = createApp({
         return this.$store.openUploadModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleUploadModal(newState);
       },
     },
     openEditTagsModal: {
@@ -151,7 +151,7 @@ const app = createApp({
         return this.$store.openEditTagsModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleEditTagsModal(newState);
       },
     },
     openCopyBucketModal: {
@@ -159,7 +159,7 @@ const app = createApp({
         return this.$store.openCopyBucketModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleCopyBucketModal(newState);
       },
     },
     openDeleteModal: {
@@ -167,23 +167,24 @@ const app = createApp({
         return this.$store.openDeleteModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleDeleteModal(newState);
       },
     },
     openShareModal: {
       get() {
         return this.$store.openShareModal;
       },
-      set() { },
+      set(newState) {
+        this.$store.toggleShareModal(newState);
+      },
     },
     openAPIKeyModal: {
       get() {
         return this.$store.openAPIKeyModal;
       },
-      set() { },
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
+      set(newState) {
+        this.$store.toggleAPIKeyModal(newState);
+      },
     },
     s3download() {
       return this.$store.s3download;

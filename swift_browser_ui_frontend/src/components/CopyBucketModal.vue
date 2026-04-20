@@ -267,7 +267,11 @@ export default {
         this.bucketName);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.copyBucketContainer);
+      if (e.key === "Escape") {
+        this.cancelCopy();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.copyBucketContainer);
+      }
     },
   },
 };

@@ -134,9 +134,6 @@ export default {
     controller() {
       return new AbortController();
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
     modalVisible() {
       return this.$store.openCreateBucketModal;
     },
@@ -247,7 +244,11 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.createBucketContainer);
+      if (e.key === "Escape") {
+        this.toggleCreateBucketModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.createBucketContainer);
+      }
     },
   },
 };

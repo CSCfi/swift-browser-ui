@@ -188,9 +188,6 @@ export default {
         hideDetails: true,
       };
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
   },
   watch: {
     visible () {
@@ -292,7 +289,11 @@ export default {
       }
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.apiKeyContainer);
+      if (e.key === "Escape") {
+        this.closeModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.apiKeyContainer);
+      }
     },
   },
 };

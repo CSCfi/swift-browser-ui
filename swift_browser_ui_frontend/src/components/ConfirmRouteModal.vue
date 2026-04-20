@@ -1,6 +1,8 @@
 <template>
   <c-card
+    ref="confirmRouteModal"
     class="no-padding-card"
+    @keydown="handleKeyDown"
   >
     <c-alert type="warning">
       <div slot="title">
@@ -10,14 +12,14 @@
       <c-card-actions justify="end">
         <c-button
           outlined
-          @click="closeConfirmRouteModal(false)"
-          @keyup.enter="closeConfirmRouteModal(true)"
+          @click="closeConfirmRouteModal"
+          @keyup.enter="closeConfirmRouteModal"
         >
           {{ $t("message.route.cancel") }}
         </c-button>
         <c-button
-          @click="confirm(false)"
-          @keyup.enter="confirm(true)"
+          @click="confirm"
+          @keyup.enter="confirm"
         >
           {{ $t("message.route.confirm") }}
         </c-button>
@@ -27,6 +29,8 @@
 </template>
 
 <script>
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
+
 
 export default {
   name: "ConfirmRouteModal",
@@ -52,6 +56,13 @@ export default {
       //routeTo project param is key for c-select:
       //updating it causes to rerender with correct value
       this.$store.setRouteTo({});
+    },
+    handleKeyDown(e) {
+      if (e.key === "Escape") {
+        this.$store.toggleConfirmRouteModal(false);
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.confirmRouteModal);
+      }
     },
   },
 };

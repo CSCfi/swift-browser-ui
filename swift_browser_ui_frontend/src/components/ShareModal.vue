@@ -221,9 +221,6 @@ export default {
     visible() {
       return this.$store.openShareModal;
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
     s3endpoint() {
       return this.$store.s3endpoint;
     },
@@ -550,7 +547,11 @@ export default {
         tag.match(/^[a-z0-9]+$/) != null;
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.shareContainer);
+      if (e.key === "Escape") {
+        this.toggleShareModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.shareContainer);
+      }
     },
   },
 };

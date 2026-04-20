@@ -250,7 +250,11 @@ export default {
       this.toggleDeleteModal();
     },
     handleKeyDown: function (e) {
-      captureKeyboardNavInsideModal(e, this.$refs.deleteObjsModal);
+      if (e.key === "Escape") {
+        this.toggleDeleteModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.deleteObjsModal);
+      }
     },
   },
 };

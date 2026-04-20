@@ -86,9 +86,6 @@ export default {
     containerName() {
       return this.$route.params.container;
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
   },
   watch: {
     visible: function () {
@@ -185,7 +182,11 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function(e) {
-      captureKeyboardNavInsideModal(e, this.$refs.editTagsContainer);
+      if (e.key === "Escape") {
+        this.toggleEditTagsModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.editTagsContainer);
+      }
     },
   },
 };
