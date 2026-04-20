@@ -225,8 +225,8 @@ export function toggleDeleteModal(objects, containerName) {
  * @returns bool
  */
 export function checkBucketBreaksS3(bucketName) {
-  // If the bucket contains whitespace, it's guaranteed to break S3
-  return /[\s]/u.test(bucketName);
+  // If the bucket contains whitespace or non-Latin letters, it's guaranteed to break S3
+  return !/^[a-zA-Z0-9_.-]+$/.test(bucketName);
 }
 
 /**
