@@ -36,6 +36,20 @@ const app = createApp({
   created() {
     document.title = this.$t("message.program_name");
   },
+  mounted() {
+    // Login card content doesn't fill the card due to an invisible svg
+    const targetNode = document.querySelector("form");
+    if (!targetNode) return;
+    const observer = new MutationObserver(() => {
+      // Remove the svg once it appears in DOM
+      const svg = targetNode.querySelector("c-login-card > article > svg");
+      if (svg) {
+        svg.remove();
+        observer.disconnect();
+      }
+    });
+    observer.observe(targetNode, { childList: true, subtree: true });
+  },
   methods: {
     setCookieLang: function() {
       const expiryDate = new Date();
