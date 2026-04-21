@@ -44,13 +44,17 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
         f"{request.remote}, sess: {session} :: {time.ctime()}"
     )
     # Fetch project title information from ldap
-    titles = await ldap_get_project_titles(session["projects"])
+    try:
+        titles = await ldap_get_project_titles(session["projects"])
+    except Exception:
+        request.app["Log"].error("Failed to fetch project titles from LDAP")
+        titles = {}
     # Filter out the tokens contained in session token
     return aiohttp.web.json_response(
         [
             {
                 "name": v["name"],
-                "title": titles.get(v["name"].split("_")[-1]),
+                "title": titles.get(v["name"].split("_")[-1], ""),
                 "id": v["id"],
                 "tainted": v["tainted"],
             }
