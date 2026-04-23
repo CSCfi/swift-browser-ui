@@ -218,6 +218,16 @@ export function toggleDeleteModal(objects, containerName) {
   store.toggleDeleteModal(true);
 }
 
+/**
+ * Function to determine if bucket breaks S3
+ * Used to determine if bucket actions will fail before bucket is converted
+ * @param {String} bucketName
+ * @returns bool
+ */
+export function checkBucketBreaksS3(bucketName) {
+  // If the bucket contains whitespace or non-Latin letters, it's guaranteed to break S3
+  return !/^[a-zA-Z0-9_.-]+$/.test(bucketName);
+}
 
 /**
  * Function to determine the severity of conversion need
@@ -227,8 +237,7 @@ export function toggleDeleteModal(objects, containerName) {
  * @returns int between 0-2 to reflect none, end-of-year, urgent
  */
 export function getRecommendedAction(buckets, bucket) {
-  // If the bucket contains whitespace, it's guaranteed to break S3
-  if (/[\s]/u.test(bucket.name)) {
+  if (checkBucketBreaksS3(bucket.name)) {
     return 2;
   }
 

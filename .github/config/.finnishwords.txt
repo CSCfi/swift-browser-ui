@@ -821,6 +821,7 @@ toiminnolla
 toiminnon
 toiminta
 toiminto
+toimintoja
 toiseen
 toiselle
 toisen
@@ -994,6 +995,7 @@ yritä
 ämpäreiden
 ämpäreille
 ämpäreitä
+ämpärelle
 ämpäri
 ämpäriin
 ämpärin

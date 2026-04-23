@@ -84,7 +84,7 @@
       <c-spacer />
       <div class="nav-item">
         <c-button
-          :disabled="isUploading || !canUpload || workersInitializing"
+          :disabled="isUploading || !canUpload || workersInitializing || incompatibleBucketName"
           data-testid="upload-file"
           @click="toggleUploadModal(false)"
           @keyup.enter="toggleUploadModal(true)"
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { addErrorToastOnMain } from "@/common/globalFunctions";
+import { addErrorToastOnMain, checkBucketBreaksS3 } from "@/common/globalFunctions";
 import { getAccessDetails } from "@/common/share";
 import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import {
@@ -169,6 +169,10 @@ export default {
     },
     workersInitializing() {
       return this.$store.workersInitializing;
+    },
+    incompatibleBucketName() {
+      const bucketInRoute = this.$route.params.container;
+      return bucketInRoute && checkBucketBreaksS3(bucketInRoute);
     },
   },
   watch: {

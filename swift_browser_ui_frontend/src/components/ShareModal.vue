@@ -31,6 +31,19 @@
       class="modal-content-wrapper"
     >
       <c-container>
+        <div class="alert-wrapper">
+          <c-alert v-if="incompatibleBucketName" type="error" id="legacy-alert">
+            <div slot="title">{{ $t("message.bucketDetails.convert_urgent_title") }}</div>
+            <c-row nowrap gap="50" align="center" class="alert-row">
+              <p>{{ $t("message.bucketDetails.convert_urgent_share_text",
+              { title: $t("message.program_name")}) }}</p>
+              <c-link :href="$t('message.bucketDetails.convert_link')" target="_blank" underline>
+                {{ $t("message.bucketDetails.convert_link_name") }}
+                <c-icon :path="mdiOpenInNew" />
+              </c-link>
+            </c-row>
+          </c-alert>
+        </div>
         <c-flex
           class="toggle-instructions"
         >
@@ -93,6 +106,7 @@
           placeholder="message.share.field_placeholder"
           @addTag="addTag"
           @deleteTag="deleteTag"
+          :disabled="incompatibleBucketName"
         />
         <div id="share-select">
           <c-select
@@ -106,6 +120,7 @@
             @changeValue="onSelectPermission($event)"
             @mouseenter="calculateSelectPosition(false)"
             @mouseleave="calculateSelectPosition(true)"
+            :disabled="incompatibleBucketName"
           >
             <c-option
               v-for="(perm, i) in accessRights"
@@ -124,6 +139,7 @@
           :loading="loading"
           @click="shareSubmit"
           @keyup.enter="shareSubmit"
+          :disabled="incompatibleBucketName"
         >
           {{ $t('message.share.confirm') }}
         </c-button>
@@ -159,6 +175,7 @@
         :access-rights="accessRights"
         @removeSharedBucket="removeSharedBucket"
         @updateSharedBucket="updateSharedBucket"
+        :disable-actions="incompatibleBucketName"
       />
     </c-card-content>
     <c-toasts
@@ -170,7 +187,7 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { taginputConfirmKeys } from "@/common/globalFunctions";
+import { taginputConfirmKeys, checkBucketBreaksS3 } from "@/common/globalFunctions";
 import {
   addFocusClass,
   removeFocusClass,
@@ -179,7 +196,7 @@ import {
 import { addAccessControlBucketPolicy } from "@/common/s3commands";
 import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
-import { mdiClose, mdiInformationOutline } from "@mdi/js";
+import { mdiClose, mdiInformationOutline, mdiOpenInNew } from "@mdi/js";
 
 export default {
   name: "ShareModal",
@@ -201,6 +218,7 @@ export default {
       timeout: null,
       mdiClose,
       mdiInformationOutline,
+      mdiOpenInNew,
     };
   },
   computed: {
@@ -224,6 +242,9 @@ export default {
     },
     shareIDs() {
       return this.tags.map((item) => item.shareID);
+    },
+    incompatibleBucketName() {
+      return checkBucketBreaksS3(this.bucketName);
     },
   },
   watch: {
@@ -765,4 +786,12 @@ c-alert[type="success"] {
   };
 }
 
+.alert-wrapper {
+  margin-bottom: 1rem;
+}
+
+.alert-row > c-link {
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
 </style>

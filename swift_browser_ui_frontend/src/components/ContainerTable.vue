@@ -39,6 +39,7 @@ import {
   addErrorToastOnMain,
   checkAndAddBucketCors,
   getRecommendedAction,
+  checkBucketBreaksS3,
 } from "@/common/globalFunctions";
 import {
   deleteStaleShares,
@@ -167,6 +168,7 @@ export default {
           item,
         ) => {
           const status = this.getBucketStatus(this.conts, item);
+          const incompatible = checkBucketBreaksS3(item.name);
           containersPage.push({
             name: {
               value: truncate(item.name),
@@ -237,7 +239,8 @@ export default {
                       target: "_blank",
                       path: mdiTrayArrowDown,
                       disabled: (
-                        item.owner && item.accessRights?.length === 0
+                        (item.owner && item.accessRights?.length === 0) ||
+                        incompatible
                       ),
                     },
                   },
@@ -300,7 +303,7 @@ export default {
                             title: this.$t("message.options"),
                             size: "small",
                             disabled: (item.owner &&
-                              item.accessRights?.length === 0),
+                              item.accessRights?.length === 0) || incompatible,
                           },
                         },
                       },
