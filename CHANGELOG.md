@@ -7,6 +7,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.4.4] - 2026-04-23
+
+### Changed
+
+- (users) Disable failing bucket actions on incompatible legacy buckets (#1306)
+
+### Fixed
+
+- (users) Expand the check for incompatible legacy buckets (#1337)
+
 ## [2026.4.3] - 2026-04-14
 
 ### Security
@@ -745,7 +755,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.3...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.4...HEAD
+[2026.4.4]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.3...2026.4.4
 [2026.4.3]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.2...2026.4.3
 [2026.4.2]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.1...2026.4.2
 [2026.4.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.0...2026.4.1
