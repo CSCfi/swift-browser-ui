@@ -73,13 +73,13 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { checkBucketBreaksS3, DEV } from "@/common/globalFunctions";
+import { DEV } from "@/common/globalFunctions";
 import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 
 export default {
   name: "ShareModalTable",
-  props: ["sharedDetails", "bucketName", "accessRights", "disableActions"],
+  props: ["sharedDetails", "bucketName", "accessRights"],
 
   data: function () {
     return {
@@ -148,7 +148,6 @@ export default {
                   size: "small",
                   title: this.$t("message.delete"),
                   path: mdiDelete,
-                  disabled: this.disableActions,
                   onClick: ({ data }) => {
                     this.toDelete = data;
                     this.clickedDelete = true;
@@ -188,9 +187,6 @@ export default {
       return {
         hideDetails: true,
       };
-    },
-    incompatibleBucketName() {
-      return checkBucketBreaksS3(this.bucketName);
     },
   },
   watch: {
@@ -257,7 +253,6 @@ export default {
                       }
                     }, 150);
                   },
-                  disabled: this.disableActions,
                 },
               },
             },
