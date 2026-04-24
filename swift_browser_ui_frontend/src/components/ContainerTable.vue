@@ -262,7 +262,7 @@ export default {
                         if(event.keyCode === 13)
                           this.onOpenShareModal(item.name, true);
                       },
-                      disabled: item.owner,
+                      disabled: item.owner || incompatible,
                     },
                   },
                 },
