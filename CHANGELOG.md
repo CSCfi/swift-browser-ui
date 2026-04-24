@@ -7,6 +7,12 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.4.5] - 2026-04-24
+
+### Changed
+
+- (users) Disable share modal opening for incompatible buckets (#1339)
+
 ## [2026.4.4] - 2026-04-23
 
 ### Changed
@@ -755,7 +761,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.4...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.5...HEAD
+[2026.4.5]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.4...2026.4.5
 [2026.4.4]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.3...2026.4.4
 [2026.4.3]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.2...2026.4.3
 [2026.4.2]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.1...2026.4.2
