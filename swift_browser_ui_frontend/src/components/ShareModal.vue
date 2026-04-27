@@ -152,6 +152,13 @@
           </c-button>
         </div>
       </c-alert>
+      <c-alert v-show="bucketIsV3 === false" type="warning">
+        <p>{{ $t("message.share.missing_shares", {title: $t("message.program_name")}) }}</p>
+        <c-link :href="$t('message.bucketDetails.convert_link')" target="_blank" underline>
+          {{ $t("message.bucketDetails.convert_link_name") }}
+          <c-icon :path="mdiOpenInNew" />
+        </c-link>
+      </c-alert>
       <ShareModalTable
         v-show="sharedDetails.length > 0"
         :shared-details="sharedDetails"
@@ -170,7 +177,8 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { taginputConfirmKeys } from "@/common/globalFunctions";
+import { checkBucketCreatedV3, taginputConfirmKeys } from "@/common/globalFunctions";
+import { getBucketMetadata } from "@/common/idbFunctions";
 import {
   addFocusClass,
   removeFocusClass,
@@ -202,6 +210,7 @@ export default {
       mdiClose,
       mdiInformationOutline,
       mdiOpenInNew,
+      bucketIsV3: true,
     };
   },
   computed: {
@@ -231,8 +240,12 @@ export default {
     locale: function () {
       this.setAccessRights();
     },
-    visible: function () {
-      if (this.visible && this.bucketName) this.getSharedDetails();
+    visible: async function () {
+      if (this.visible && this.bucketName) {
+        await this.getSharedDetails();
+        const bucket = await getBucketMetadata(this.active.id, this.bucketName);
+        this.bucketIsV3 = checkBucketCreatedV3(bucket);
+      }
     },
     read: function () {
       if(!this.read) {
