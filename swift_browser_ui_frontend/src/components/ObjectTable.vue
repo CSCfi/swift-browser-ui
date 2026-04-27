@@ -262,7 +262,7 @@ export default {
     },
     bucketConversionNeed() {
       return this.currentContainer && this.idbBuckets?.length ?
-        this.getConversionNeedAlert(this.idbBuckets, this.currentContainer) : {};
+        this.getConversionNeedAlert(this.idbBuckets, this.currentContainer) : null;
     },
   },
   watch: {
