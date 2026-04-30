@@ -4,90 +4,95 @@
     class="modal-card"
     @keydown="handleKeyDown"
   >
-    <c-card-actions
-      justify="space-between"
-      align="center"
+    <div
+      class="modal-content-wrapper"
+      tabindex="0"
     >
-      <h2 class="title is-4">
-        {{ $t("message.apiKeys.title") }}
-      </h2>
-      <c-button
-        id="close-api-key-modal-btn"
-        text
-        @click="closeModal"
-        @keyup.enter="closeModal"
-      >
-        <c-icon
-          :path="mdiClose"
-          alt=""
-          aria-hidden="true"
-        />
-        {{ $t("message.close") }}
-      </c-button>
-    </c-card-actions>
-    <c-card-content>
-      <p>{{ $t("message.apiKeys.identHint") }}</p>
-      <c-text-field
-        id="api-key-input"
-        v-model="newIdentifier"
-        v-control
-        name="newIdentifier"
-        :label="$t('message.apiKeys.identLabel')"
-        :valid="!inputError"
-        :validation="inputError"
-        @changeValue="inputError = ''"
-      />
-      <c-button
-        id="create-api-key-button"
-        @click="addAPIKey(newIdentifier)"
-        @keyup.enter="addAPIKey(newIdentifier)"
-      >
-        {{ $t("message.apiKeys.create") }}
-      </c-button>
-      <c-row
-        v-if="latest.apiKey"
-        align="start"
+      <c-card-actions
         justify="space-between"
+        align="center"
       >
-        <p>
-          <strong>{{ $t("message.apiKeys.latest") }}</strong>
-        </p>
-        <div id="api-key">
-          <p>{{ latest.apiKey }}</p>
-        </div>
+        <h2 class="title is-4">
+          {{ $t("message.apiKeys.title") }}
+        </h2>
         <c-button
-          size="small"
-          @click="copyLatest"
-          @keyup.enter="copyLatest"
+          id="close-api-key-modal-btn"
+          text
+          @click="closeModal"
+          @keyup.enter="closeModal"
         >
-          <c-icon :path="mdiContentCopy" />
-          {{ $t('message.apiKeys.copy') }}
+          <c-icon
+            :path="mdiClose"
+            alt=""
+            aria-hidden="true"
+          />
+          {{ $t("message.close") }}
         </c-button>
-      </c-row>
-      <c-alert
-        v-if="latest.apiKey"
-        type="warning"
-      >
-        <p>{{ $t('message.apiKeys.copyWarning') }}</p>
-      </c-alert>
-      <!-- Footer options needs to be in CamelCase,
-      because csc-ui wont recognise it otherwise. -->
-      <c-data-table
-        sort-by="identifier"
-        sort-direction="asc"
-        :no-data-text="$t('message.apiKeys.empty')"
-        :data.prop="tableAPIKeys"
-        :headers.prop="headers"
-        :pagination.prop="apiKeyPagination"
-        :footerOptions.prop="footer"
-        :hide-footer="apiKeys.length <= apiKeysPerPage"
-        @click="checkPage"
-      />
-      <c-toasts
-        id="api-key-toasts"
-        data-testid="api-key-toasts"
-      />
-    </c-card-content>
+      </c-card-actions>
+      <c-card-content>
+        <p>{{ $t("message.apiKeys.identHint") }}</p>
+        <c-text-field
+          id="api-key-input"
+          v-model="newIdentifier"
+          v-control
+          name="newIdentifier"
+          :label="$t('message.apiKeys.identLabel')"
+          :valid="!inputError"
+          :validation="inputError"
+          @changeValue="inputError = ''"
+        />
+        <c-button
+          id="create-api-key-button"
+          @click="addAPIKey(newIdentifier)"
+          @keyup.enter="addAPIKey(newIdentifier)"
+        >
+          {{ $t("message.apiKeys.create") }}
+        </c-button>
+        <c-row
+          v-if="latest.apiKey"
+          align="start"
+          justify="space-between"
+        >
+          <p>
+            <strong>{{ $t("message.apiKeys.latest") }}</strong>
+          </p>
+          <div id="api-key">
+            <p>{{ latest.apiKey }}</p>
+          </div>
+          <c-button
+            size="small"
+            @click="copyLatest"
+            @keyup.enter="copyLatest"
+          >
+            <c-icon :path="mdiContentCopy" />
+            {{ $t('message.apiKeys.copy') }}
+          </c-button>
+        </c-row>
+        <c-alert
+          v-if="latest.apiKey"
+          type="warning"
+        >
+          <p>{{ $t('message.apiKeys.copyWarning') }}</p>
+        </c-alert>
+        <!-- Footer options needs to be in CamelCase,
+        because csc-ui wont recognise it otherwise. -->
+        <c-data-table
+          sort-by="identifier"
+          sort-direction="asc"
+          :no-data-text="$t('message.apiKeys.empty')"
+          :data.prop="tableAPIKeys"
+          :headers.prop="headers"
+          :pagination.prop="apiKeyPagination"
+          :footerOptions.prop="footer"
+          :hide-footer="apiKeys.length <= apiKeysPerPage"
+          @click="checkPage"
+        />
+        <c-toasts
+          id="api-key-toasts"
+          data-testid="api-key-toasts"
+        />
+      </c-card-content>
+    </div>
   </c-card>
 </template>
 
