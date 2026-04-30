@@ -7,6 +7,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.4.6] - 2026-04-30
+
+### Added
+
+- (users) Added an alert about shares from v2 missing in v3 (#1342)
+
+### Fixed
+
+- Fixed a flash of default-type alert
+
 ## [2026.4.5] - 2026-04-24
 
 ### Changed
@@ -761,7 +771,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.5...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.6...HEAD
+[2026.4.6]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.5...2026.4.6
 [2026.4.5]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.4...2026.4.5
 [2026.4.4]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.3...2026.4.4
 [2026.4.3]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.2...2026.4.3
