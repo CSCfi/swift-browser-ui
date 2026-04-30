@@ -207,6 +207,8 @@ let default_translations = {
           "Are you sure you want to " +
           "delete the sharing permissions?",
         share_delete_confirm: "Delete permissions",
+        missing_shares: "Shares made before the current version of " +
+        "{title} was released won't show up until the bucket is converted.",
       },
       emptyContainer: "This bucket has no content.",
       emptyProject: {
@@ -796,6 +798,8 @@ let default_translations = {
         perm_change_confirm: "Muuta käyttöoikeus",
         share_delete_text: "Haluatko varmasti poistaa käyttöoikeuden?",
         share_delete_confirm: "Poista käyttöoikeus",
+        missing_shares: "Ennen {title}in nykyisen version julkaisua " +
+        "luodut jakamiset näkyvät vasta, kun ämpäri on muunnettu.",
       },
       emptyContainer: "Tämä ämpäri on tyhjä.",
       emptyProject: {

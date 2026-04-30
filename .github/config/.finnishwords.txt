@@ -138,6 +138,7 @@ jakaa
 jakamaan
 jakamasi
 jakaminen
+jakamiset
 jakamispäivämäärä
 jakamista
 jakamistunnuksen
@@ -168,6 +169,7 @@ joskus
 jota
 jotka
 jotkin
+julkaisua
 julkinen
 julkiset
 julkisia
@@ -352,6 +354,7 @@ luku
 lukuoikeus
 luo
 luodaan
+luodut
 luomisen
 luonnin
 luonti
@@ -409,6 +412,7 @@ mutta
 muun
 muunna
 muunnettava
+muunnettu
 muuntotarve
 muussa
 muuta
@@ -449,6 +453,7 @@ nähdä
 näkyvissä
 näkyvä
 näkyvän
+näkyvät
 nämä
 näppäimistöllä
 näppäimistöä
@@ -925,6 +930,7 @@ varmistamme
 varmistathan
 varmuuden
 varten
+vasta
 vastaamme
 vastaanottaja
 vastaanottajan
@@ -942,6 +948,7 @@ verkkosivustolla
 verkkosivuston
 verkkosivustossa
 versiolla
+version
 vielä
 viimeisimmän
 viimeisimmästä

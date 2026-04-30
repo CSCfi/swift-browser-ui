@@ -230,6 +230,15 @@ export function checkBucketBreaksS3(bucketName) {
 }
 
 /**
+ * Function to determine if bucket was created with v3
+ * @param {Object} bucket
+ * @returns bool
+ */
+export function checkBucketCreatedV3(bucket) {
+  return Date.parse(bucket.created) > NEW_VERSION_DATE;
+}
+
+/**
  * Function to determine the severity of conversion need
  * Adapted from sd-connect-s3-migrate
  * @param {Array} buckets in project
@@ -271,7 +280,7 @@ export function getRecommendedAction(buckets, bucket) {
   }
 
   // No need to migrate buckets created with V3
-  if (Date.parse(bucket.created) > NEW_VERSION_DATE) {
+  if (checkBucketCreatedV3(bucket)) {
     return 0;
   }
   return 1;
