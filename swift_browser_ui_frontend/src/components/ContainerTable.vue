@@ -313,15 +313,15 @@ export default {
                     tag: "c-menu",
                     params: {
                       custom: true,
-                      items: [
+                      items: (item.owner && item.accessRights?.length === 0) || incompatible ? [] :[
                         {
                           name: this.$t("message.copy"),
                           action: () => {
                             this.handleCopyClick(item.name, item.owner);
                             const menuItems = document
                               .querySelector("c-menu-items");
-                            menuItems.addEventListener("keydown", (e) =>{
-                              if (e.keyCode === 13) {
+                            menuItems.addEventListener("keydown", (e) => {
+                              if (e.key === "Enter") {
                                 this.handleCopyClick(
                                   item.name, item.owner,
                                 );
