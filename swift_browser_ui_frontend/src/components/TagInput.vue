@@ -91,4 +91,8 @@ span {
   text-overflow: ellipsis;
 }
 
+input[type="text"] {
+  font-size: 1rem;
+}
+
 </style>
