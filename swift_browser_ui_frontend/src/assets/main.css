@@ -21,7 +21,8 @@ html, body {
 }
 
 body {
-  overflow-y: auto;
+  /* Prevent open c-select from hiding overflow-y */
+  overflow-y: scroll !important;
 }
 
 html,
