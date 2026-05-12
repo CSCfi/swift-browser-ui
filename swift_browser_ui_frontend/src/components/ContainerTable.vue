@@ -45,10 +45,6 @@ import {
   deleteStaleShares,
 } from "@/common/share";
 import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-} from "@/common/keyboardNavigation";
-import {
   awsDeleteBucket,
   awsDeleteObjects,
   awsListObjects,
@@ -171,38 +167,51 @@ export default {
           const incompatible = checkBucketBreaksS3(item.name);
           containersPage.push({
             name: {
-              value: truncate(item.name),
-              component: {
-                tag: "c-link",
-                params: {
-                  href: "javascript:void(0)",
-                  color: "dark-grey",
-                  path: mdiPail,
-                  iconFill: "primary",
-                  iconStyle: {
-                    marginRight: "1rem",
-                    flexShrink: "0",
-                  },
-                  onClick: () => {
-                    if(item.owner) {
-                      this.$router.push({
-                        name: "SharedObjects",
-                        params: {
-                          container: item.name,
-                          owner: item.owner,
-                        },
-                      });
-                    } else {
-                      this.$router.push({
-                        name: "ObjectsView",
-                        params: {
-                          container: item.name,
-                        },
-                      });
-                    }
+              children: [
+                {
+                  value: "",
+                  component: {
+                    tag: "c-icon",
+                    params: {
+                      path: mdiPail,
+                      color: "var(--c-primary-600)",
+                      size: "18",
+                    },
                   },
                 },
-              },
+                {
+                  value: truncate(item.name),
+                  component: {
+                    tag: "c-link",
+                    params: {
+                      href: "javascript:void(0)",
+                      style: {
+                        "--c-link-color": "var(--c-tertiary-700)",
+                        "--c-link-hover": "none",
+                        marginLeft: "1rem",
+                      },
+                      onClick: () => {
+                        if(item.owner) {
+                          this.$router.push({
+                            name: "SharedObjects",
+                            params: {
+                              container: item.name,
+                              owner: item.owner,
+                            },
+                          });
+                        } else {
+                          this.$router.push({
+                            name: "ObjectsView",
+                            params: {
+                              container: item.name,
+                            },
+                          });
+                        }
+                      },
+                    },
+                  },
+                },
+              ],
             },
             sharing: {
               value: getSharedStatus(item.sharing),
@@ -221,14 +230,13 @@ export default {
               sortable: null,
               children: [
                 {
-                  value: this.$t("message.download.download"),
+                  value: "",
                   component: {
                     tag: "c-button",
                     params: {
                       testid: "download-container",
                       text: true,
                       size: "small",
-                      title: this.$t("message.download.download"),
                       onClick: ({ event }) => {
                         this.handleDownloadClick(
                           item.name,
@@ -237,51 +245,85 @@ export default {
                         );
                       },
                       target: "_blank",
-                      path: mdiTrayArrowDown,
                       disabled: (
                         (item.owner && item.accessRights?.length === 0) ||
                         incompatible
                       ),
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-icon",
+                        params: {
+                          path: mdiTrayArrowDown,
+                          size: "18",
+                        },
+                      },
+                    },
+                    {
+                      value: this.$t("message.download.download"),
+                      component: {
+                        tag: "span",
+                      },
+                    },
+                  ],
                 },
                 // Share button is disabled for Shared (with you) buckets
                 {
-                  value: this.$t("message.share.share"),
+                  value: "",
                   component: {
                     tag: "c-button",
                     params: {
                       testid: "share-container",
                       text: true,
                       size: "small",
-                      title: this.$t("message.share.share"),
-                      path: mdiShareVariantOutline,
                       onClick: () =>
                         this.onOpenShareModal(item.name),
                       onKeyUp: (event) => {
                         if(event.keyCode === 13)
-                          this.onOpenShareModal(item.name, true);
+                          this.onOpenShareModal(item.name);
                       },
                       disabled: item.owner || incompatible,
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-icon",
+                        params: {
+                          path: mdiShareVariantOutline,
+                          size: "18",
+                        },
+                      },
+                    },
+                    {
+                      value: this.$t("message.share.share"),
+                      component: {
+                        tag: "span",
+                      },
+                    },
+                  ],
                 },
                 {
                   value: null,
                   component: {
                     tag: "c-menu",
                     params: {
-                      items: [
+                      custom: true,
+                      items: (item.owner && item.accessRights?.length === 0) || incompatible ? [] :[
                         {
                           name: this.$t("message.copy"),
                           action: () => {
                             this.handleCopyClick(item.name, item.owner);
                             const menuItems = document
                               .querySelector("c-menu-items");
-                            menuItems.addEventListener("keydown", (e) =>{
-                              if (e.keyCode === 13) {
+                            menuItems.addEventListener("keydown", (e) => {
+                              if (e.key === "Enter") {
                                 this.handleCopyClick(
-                                  item.name, item.owner, true,
+                                  item.name, item.owner,
                                 );
                               }
                             });
@@ -293,22 +335,40 @@ export default {
                           disabled: item.owner,
                         },
                       ],
-                      customTrigger: {
-                        value: this.$t("message.options"),
-                        component: {
-                          tag: "c-button",
-                          params: {
-                            text: true,
-                            path: mdiDotsHorizontal,
-                            title: this.$t("message.options"),
-                            size: "small",
-                            disabled: (item.owner &&
-                              item.accessRights?.length === 0) || incompatible,
-                          },
-                        },
-                      },
                     },
                   },
+                  children: [
+                    {
+                      value: "",
+                      component: {
+                        tag: "c-button",
+                        params: {
+                          text: true,
+                          size: "small",
+                          disabled: (item.owner &&
+                            item.accessRights?.length === 0) || incompatible,
+                        },
+                      },
+                      children: [
+                        {
+                          value: "",
+                          component: {
+                            tag: "c-icon",
+                            params: {
+                              path: mdiDotsHorizontal,
+                              size: "18",
+                            },
+                          },
+                        },
+                        {
+                          value: this.$t("message.options"),
+                          component: {
+                            tag: "span",
+                          },
+                        },
+                      ],
+                    },
+                  ],
                 },
               ],
             },
@@ -466,34 +526,11 @@ export default {
 
       return this.$t("message.emptyProject.all");
     },
-    onOpenShareModal(itemName, keypress) {
+    onOpenShareModal(itemName) {
       this.$store.toggleShareModal(true);
       this.$store.setBucketName(itemName);
-
-      if (keypress) {
-        setPrevActiveElement();
-        const shareModal = document.getElementById("share-modal");
-        disableFocusOutsideModal(shareModal);
-      }
-      setTimeout(() => {
-        const shareIDsInput = document.getElementById("share-ids")?.children[0];
-        shareIDsInput.focus();
-      }, 300);
     },
-    openEditTagsModal(itemName, keypress) {
-      toggleEditTagsModal(null, itemName);
-      if (keypress) {
-        setPrevActiveElement();
-        const editTagsModal = document.getElementById("edit-tags-modal");
-        disableFocusOutsideModal(editTagsModal);
-      }
-      setTimeout(() => {
-        const editTagsInput = document.getElementById("edit-tags-input")
-          ?.children[0];
-        editTagsInput.focus();
-      }, 300);
-    },
-    handleCopyClick: async function(bucket, owner, keypress) {
+    handleCopyClick: async function(bucket, owner) {
       // Don't attempt to copy an empty bucket
       const bucketHasContent = await this.ensureBucketState(
         bucket, false, this.$t("message.container_ops.copyNotEmpty"));
@@ -502,16 +539,6 @@ export default {
       owner
         ? toggleCopyBucketModal(bucket, owner)
         : toggleCopyBucketModal(bucket);
-      if (keypress) {
-        setPrevActiveElement();
-        const copyBucketModal = document.getElementById("copy-bucket-modal");
-        disableFocusOutsideModal(copyBucketModal);
-      }
-      setTimeout(() => {
-        const copyBucketInput = document
-          .querySelector("#new-copy-bucketName input");
-        copyBucketInput.focus();
-      }, 300);
     },
     getBucketStatus: function(buckets, bucket) {
       const statusNum = getRecommendedAction(buckets, bucket);

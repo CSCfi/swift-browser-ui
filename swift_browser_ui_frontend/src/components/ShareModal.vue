@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="shareContainer"
-    class="share-card"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
     <c-card-actions
@@ -30,23 +30,21 @@
       id="share-card-modal-content"
       class="modal-content-wrapper"
     >
-      <c-container>
-        <c-flex
-          class="toggle-instructions"
-        >
+      <div class="container">
+        <div class="flex toggle-instructions">
           <c-link
             underline
             tabindex="0"
-            :path="mdiInformationOutline"
             :aria-label="$t('label.shareid_instructions')"
             @click="toggleShareGuide"
             @keyup.enter="toggleShareGuide"
           >
+            <c-icon :path="mdiInformationOutline" size="16" />
             {{ openShareGuide ? $t("message.share.close_instructions")
               : $t("message.share.instructions")
             }}
           </c-link>
-        </c-flex>
+        </div>
         <div
           v-show="openShareGuide"
           class="content guide-content"
@@ -98,14 +96,13 @@
           <c-select
             id="select-share-access"
             v-model="sharedAccessRight"
-            v-csc-control
+            v-control
             data-testid="select-permissions"
             :label="$t('message.share.permissions')"
             :placeholder="$t('message.share.permissions')"
             hide-details
+            return-object
             @changeValue="onSelectPermission($event)"
-            @mouseenter="calculateSelectPosition(false)"
-            @mouseleave="calculateSelectPosition(true)"
           >
             <c-option
               v-for="(perm, i) in accessRights"
@@ -114,7 +111,9 @@
               :name="perm.name"
               :value="perm.value"
             >
-              <b>{{ perm.name }}</b>{{ perm.desc }}
+              <span style="white-space: normal;">
+                <b>{{ perm.name }}</b>{{ perm.desc }}
+              </span>
             </c-option>
           </c-select>
         </div>
@@ -127,7 +126,7 @@
         >
           {{ $t('message.share.confirm') }}
         </c-button>
-      </c-container>
+      </div>
       <c-alert
         v-show="isShared || isPermissionRemoved || isPermissionUpdated"
         type="success"
@@ -179,11 +178,7 @@
 import { signedFetch } from "@/common/api";
 import { checkBucketCreatedV3, taginputConfirmKeys } from "@/common/globalFunctions";
 import { getBucketMetadata } from "@/common/idbFunctions";
-import {
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import { addAccessControlBucketPolicy } from "@/common/s3commands";
 import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
@@ -225,9 +220,6 @@ export default {
     },
     visible() {
       return this.$store.openShareModal;
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
     },
     s3endpoint() {
       return this.$store.s3endpoint;
@@ -274,28 +266,6 @@ export default {
         case "read and write":
           this.giveReadWriteAccess();
           break;
-      }
-    },
-    calculateSelectPosition: function(reset) {
-      const div = document.getElementById("share-select");
-      const divWidth = div.getBoundingClientRect().width;
-      const cselect = document.getElementById("select-share-access");
-      const cselectHeight = cselect.getBoundingClientRect().height;
-
-      if (reset) {
-        cselect.style.position = "relative";
-        cselect.style.maxWidth = "none";
-        div.style.minHeight  = "none";
-      }
-      else {
-        const content = document.getElementById("share-card-modal-content");
-        if (content.scrollTop <= 0) {
-          // don't apply fixed position if scrolled on modal
-          cselect.style.position = "fixed";
-          // fixed element leaves normal flow, adjust for it
-          div.style.minHeight = cselectHeight + "px";
-          cselect.style.maxWidth = divWidth + "px";
-        }
       }
     },
     setAccessRights: function () {
@@ -496,8 +466,6 @@ export default {
       document.querySelector("#shareModal-toasts").removeToast("error-noid");
       document.querySelector("#shareModal-toasts")
         .removeToast("error-duplicate");
-
-      moveFocusOutOfModal(this.prevActiveEl);
     },
     closeSharedNotificationWithTimeout() {
       document.getElementById("share-card-modal-content").scrollTo(0, 0);
@@ -579,84 +547,10 @@ export default {
         tag.match(/^[a-z0-9]+$/) != null;
     },
     handleKeyDown: function (e) {
-      const eTarget = e.target;
-      const shadowDomTarget = eTarget.shadowRoot?.activeElement;
-
-      const first = document.getElementById("close-share-modal-btn");
-
-      // last element is different between with or without shared list
-      let last = null;
-
-      // The real DOM's active element is nested under shadowDOM
-      // and cannot be accessed if using event target alone
-      let shadowRootActiveEl = null;
-
-      // If there is no shared projects, there is no data table,
-      // the last element is Share button
-      if (this.sharedDetails.length === 0) {
-        last = document.getElementById("share-btn");
+      if (e.key === "Escape") {
+        this.toggleShareModal();
       } else {
-        /*
-          If there is shared list table, the last element in the modal
-          would be inside c-pagination and
-          it is the last arrow icon used to move to Next page
-        */
-
-        if (eTarget.tagName.toLowerCase() === "c-data-table") {
-          const pagination = eTarget.shadowRoot.querySelector("c-pagination");
-          //  Assign the "last" element when the focus is on pagination
-          if (e.composedPath().includes(pagination)) {
-            last = pagination.shadowRoot?.querySelectorAll("li")[2];
-            shadowRootActiveEl = shadowDomTarget?.shadowRoot?.activeElement;
-          }
-        }
-      }
-
-      if (e.key === "Tab" && !e.shiftKey) {
-        // Check if "Tab" is on Share button or the last data-table's arrow
-        if (eTarget === last ||
-          (last && shadowRootActiveEl === last?.firstChild)) {
-          first.tabIndex="0";
-          first.focus();
-        }
-        /*
-          If the focus is on the whole data-table, there is no
-          specific active shadowDOM element. Therefore, we could remove
-          the focus class on table when doing "Tab".
-        */
-        else if (eTarget.tagName.toLowerCase() === "c-data-table" &&
-          shadowDomTarget === null) {
-          if (eTarget.classList.contains("button-focus")) {
-            removeFocusClass(eTarget);
-          }
-        }
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (eTarget === first) {
-          e.preventDefault();
-          /*
-            When shiftTab is on "first" element, originally the focus
-            should move to the previous "last" element -
-            which is table's arrow icon for Next page.
-            But it is difficult to get that el when the focus is not
-            on the table, we focus on the whole table itself instead.
-          */
-          if (this.sharedDetails.length > 0) {
-            last = document.getElementById("shared-projects-table");
-          }
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            addFocusClass(last);
-          }
-        }
-        // Remove focus class if either the "last" el is
-        // Share button or the whole data-table
-        else if (eTarget === last ||
-          (eTarget.tagName.toLowerCase() === "c-data-table" &&
-            shadowDomTarget === null)
-        ) {
-          removeFocusClass(last ? last : eTarget);
-        }
+        captureKeyboardNavInsideModal(e, this.$refs.shareContainer);
       }
     },
   },
@@ -664,34 +558,6 @@ export default {
 </script>
 
 <style scoped>
-
-.share-card {
-  padding: 2rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-  .share-card {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .share-card {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .share-card {
-    top: -13rem;
-  }
-}
 
 #share-select {
   width: 100%;
@@ -702,7 +568,7 @@ export default {
   z-index: 2;
 }
 
-c-container {
+div.container {
   width: 100%;
 }
 
@@ -721,7 +587,7 @@ c-card-actions > h2 {
 .toggle-instructions {
   justify-content: flex-end;
   align-items: center;
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .guide-content {
@@ -744,6 +610,7 @@ c-select {
 }
 
 c-link {
+  --c-link-hover: none;
   min-width: 60px;
 }
 
@@ -751,10 +618,14 @@ c-link > span {
   font-size: 0.875rem;
 }
 
-c-flex, .shared-notification {
+div.flex, .shared-notification {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+div.flex {
+  flex-direction: row-reverse;
 }
 
 c-alert[type="success"] {
@@ -778,5 +649,4 @@ c-alert[type="success"] {
     color: var(--csc-dark);
   };
 }
-
 </style>

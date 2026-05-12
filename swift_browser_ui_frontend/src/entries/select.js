@@ -1,8 +1,8 @@
 import { createApp } from "vue";
 import SelectPage from "@/pages/SelectPage.vue";
 
-import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControl } from "@/common/csc-ui-vue-directive";
+import { defineCustomElements } from "@cscfi/csc-ui/loader";
+import { vControl } from "@cscfi/csc-ui-vue";
 
 import { i18n } from "@/common/i18n";
 
@@ -11,9 +11,7 @@ import { getProjects } from "@/common/api";
 // Import project css
 import "@/assets/main.css";
 
-applyPolyfills().then(() => {
-  defineCustomElements();
-});
+defineCustomElements();
 
 const app = createApp({
   data: function() {
@@ -46,6 +44,6 @@ const app = createApp({
 });
 
 app.use(i18n);
-app.directive("csc-control", vControl);
+app.directive("control", vControl);
 
 app.mount("#app");

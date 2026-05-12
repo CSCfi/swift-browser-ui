@@ -1,6 +1,6 @@
 <template>
-  <c-flex
-    class="container-box"
+  <div
+    class="flex container-box"
     role="region"
   >
     <BucketTabs />
@@ -13,7 +13,7 @@
         v-if="activeRouteName === component.name"
       />
     </div>
-  </c-flex>
+  </div>
 </template>
 
 <script>

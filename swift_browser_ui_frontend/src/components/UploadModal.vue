@@ -2,13 +2,14 @@
 <template>
   <c-card
     ref="uploadContainer"
-    class="upload-card"
+    class="modal-card"
     data-testid="upload-modal"
     @keydown="handleKeyDown"
   >
     <div
       id="upload-modal-content"
       class="modal-content-wrapper"
+      tabindex="-1"
     >
       <c-toasts
         id="uploadModal-toasts"
@@ -16,10 +17,10 @@
         vertical="bottom"
         absolute
       />
-      <h2 class="title is-4">
-        {{ $t("message.encrypt.uploadFiles") }}
-      </h2>
-      <c-card-content>
+      <c-card-content class="modal-card-content">
+        <h2 class="title is-4">
+          {{ $t("message.encrypt.uploadFiles") }}
+        </h2>
         <div v-if="!currentBucket" class="content-div">
           <h3 class="title is-6">
             1. {{ $t("message.encrypt.uploadStep1.title") }}
@@ -33,7 +34,7 @@
           <c-text-field
             id="upload-bucket-input"
             v-model="inputBucket"
-            v-csc-control
+            v-control
             data-testid="upload-bucket-input"
             :label="$t('message.container_ops.bucketName')"
             aria-required="true"
@@ -64,7 +65,7 @@
           <span>{{ $t("message.dropFiles") }}</span>
           <CUploadButton
             v-model="files"
-            v-csc-control
+            v-control
             @add-files="buttonAddingFiles=true"
             @cancel="buttonAddingFiles=false"
           >
@@ -87,10 +88,7 @@
                 size="small"
                 @click="error.show = false"
               >
-                <i
-                  slot="icon"
-                  class="mdi mdi-close"
-                />
+                <c-icon :path="mdiClose" />
                 {{ $t("message.close") }}
               </c-button>
             </div>
@@ -161,7 +159,7 @@
             target="_blank"
           >
             {{ $t("message.container_ops.viewProjectMembers") }}
-            <i class="mdi mdi-open-in-new" />
+            <c-icon :path="mdiOpenInNew" />
           </c-link>
           {{ !owner ? "" :
             ") " + $t("message.encrypt.uploadedToShared") }}
@@ -175,14 +173,14 @@
             :heading="$t('message.encrypt.advancedOptions')"
             :value="$t('message.encrypt.advancedOptions')"
           >
-            <c-container>
-              <c-flex>
+            <div class="container">
+              <div class="flex">
                 <h3 class="title is-6">
                   {{ $t('message.encrypt.multipleReceivers') }}
                 </h3>
                 <c-text-field
                   v-model="addRecvkey"
-                  v-csc-control
+                  v-control
                   :label="$t('message.encrypt.pubkey')"
                   type="text"
                   rows="2"
@@ -207,8 +205,8 @@
                   :footerOptions.prop="{hideDetails: true}"
                   @click="checkPage($event,true)"
                 />
-              </c-flex>
-            </c-container>
+              </div>
+            </div>
           </c-accordion-item>
         </c-accordion>
       </c-card-content>
@@ -250,18 +248,14 @@ import {
   sortItems,
   truncate,
 } from "@/common/tableFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import CUploadButton from "@/components/CUploadButton.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 import { signedFetch } from "@/common/api";
 import { awsListObjects } from "@/common/s3commands";
 
 import { debounce, delay } from "lodash";
-import { mdiDelete } from "@mdi/js";
+import { mdiDelete, mdiClose, mdiOpenInNew } from "@mdi/js";
 
 export default {
   name: "UploadModal",
@@ -274,6 +268,8 @@ export default {
   },
   data() {
     return {
+      mdiClose,
+      mdiOpenInNew,
       inputBucket: "",
       addRecvkey: "",
       recvkeys: [],
@@ -434,9 +430,6 @@ export default {
     },
     addFiles() {
       return this.$store.addUploadFiles;
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
     },
     existingFileNames() {
       return this.existingFiles.reduce((array, item) => {
@@ -769,8 +762,6 @@ export default {
       this.sortDirection = "asc";
       this.filesPagination.currentPage = 1;
       this.uploadError = "";
-
-      moveFocusOutOfModal(this.prevActiveEl);
     },
     checkIfCanUpload() {
       if (this.dropFiles.length === 0) {
@@ -863,50 +854,17 @@ export default {
       });
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.uploadContainer.querySelectorAll(
-        "c-link, c-button, textarea, c-text-field, c-data-table",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last, true);
+      if (e.key === "Escape") {
+        this.toggleUploadModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.uploadContainer);
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-
-.upload-card {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-   .upload-card {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .upload-card {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .upload-card {
-    top: -13rem;
-  }
-}
-
-c-card-content {
-  padding: 1rem 0 0 0;
-  color: var(--csc-dark);
-}
 
 c-card-actions {
   padding: 0;
@@ -928,7 +886,7 @@ c-card-actions {
 }
 
 .over-dropArea {
-  border: 2px dashed var(--csc-primary);
+  border: 2px dashed var(--c-primary-600);
 }
 
 c-data-table.files-table {

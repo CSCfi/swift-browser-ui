@@ -10,8 +10,8 @@
           size="small"
           outlined
           data-testid="create-bucket"
-          @click="toggleCreateBucketModal(false)"
-          @keyup.enter="toggleCreateBucketModal(true)"
+          @click="toggleCreateBucketModal"
+          @keyup.enter="toggleCreateBucketModal"
         >
           <c-icon :path="mdiPlus" />
           {{ $t("message.createBucket") }}
@@ -21,8 +21,8 @@
           :items.prop="tableOptions"
           data-testid="table-options-selector"
         >
+          <c-icon :path="mdiTune" size="20" />
           <span class="menu-active display-options-menu">
-            <i class="mdi mdi-tune" />
             {{ $t("message.tableOptions.displayOptions") }}
           </span>
         </c-menu>
@@ -50,12 +50,11 @@ import { liveQuery } from "dexie";
 import { getDB } from "@/common/idb";
 import { updateContainers } from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
-import { mdiPlus } from "@mdi/js";
+import { mdiPlus, mdiTune } from "@mdi/js";
 import { toggleCreateBucketModal } from "@/common/globalFunctions";
 import { getAccessDetails, getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
-import { setPrevActiveElement } from "@/common/keyboardNavigation";
 
 export default {
   name: "ContainersView",
@@ -66,12 +65,14 @@ export default {
   data: function () {
     return {
       mdiPlus,
+      mdiTune,
       currentProject: {},
       showTimestamp: false,
       hidePagination: false,
       //hideTags: false,
       showTags: true,
       optionsKey: 1,
+      tableOptions: [],
       abortController: null,
       abortRenderingController: null,
       containers: [], // idb bucket data
@@ -214,6 +215,7 @@ export default {
 
   },
   methods: {
+    toggleCreateBucketModal,
     setUpIfReady: async function () {
       // Check id: not available on created on page refresh
       if (this.readyToSetUp) {
@@ -340,18 +342,6 @@ export default {
         projectID: this.active.id,
         name: `${container}_segments`,
       }).delete();
-    },
-    toggleCreateBucketModal: function (keypress) {
-      toggleCreateBucketModal();
-      if (keypress) {
-        setPrevActiveElement();
-      }
-      setTimeout(() => {
-        const newBucketInput = document
-          .querySelector("#newBucket-input input");
-        newBucketInput.tabIndex = "0";
-        newBucketInput.focus();
-      }, 300);
     },
   },
 };

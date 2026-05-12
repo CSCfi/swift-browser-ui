@@ -75,14 +75,12 @@ export default {
 
 
 <style scoped>
-
 c-tab-buttons {
-  display: block;
-  padding-top: 1rem;
+  margin-top: 1rem;
 }
 
-.tab-button {
-  flex-basis: 0;
+c-button {
+  width: 33%;
 }
 
 </style>

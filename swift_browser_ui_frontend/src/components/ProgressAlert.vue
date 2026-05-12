@@ -9,12 +9,11 @@
       align="center"
     >
       <h3>
-        <i
-          slot="icon"
-          :class="
+        <c-icon
+          :path="
             type === 'upload'
-              ? 'mdi mdi-tray-arrow-up'
-              : 'mdi mdi-tray-arrow-down'
+              ? mdiTrayArrowUp
+              : mdiTrayArrowDown
           "
         />
         {{
@@ -70,7 +69,12 @@
 
 <script>
 import ProgressBar from "@/components/ProgressBar.vue";
-import { mdiClose, mdiArrowExpand } from "@mdi/js";
+import {
+  mdiClose,
+  mdiArrowExpand,
+  mdiTrayArrowUp,
+  mdiTrayArrowDown,
+} from "@mdi/js";
 
 export default {
   name: "ProgressAlert",
@@ -83,6 +87,8 @@ export default {
     return {
       mdiClose,
       mdiArrowExpand,
+      mdiTrayArrowUp,
+      mdiTrayArrowDown,
     };
   },
   computed: {
@@ -100,10 +106,11 @@ c-alert {
 
 h3 {
   font-size: 18px;
-  i {
+  c-icon {
     margin-right: 0.5rem;
   }
 }
+
 .actions {
   display: inherit;
   flex-direction: inherit;

@@ -1,5 +1,5 @@
 <template>
-  <c-main>
+  <div class="main">
     <MainToolbar :user="user" />
     <c-row
       class="title-row"
@@ -72,13 +72,13 @@
           scope="global"
         >
           <template #authorityName>
-            <a
+            <c-link
               :href="$t('accessibilityPage.part4.authorityLink')"
               target="_blank"
             >
               {{ $t("accessibilityPage.part4.authorityName") }}
-              <i class="mdi mdi-open-in-new" />
-            </a>
+              <c-icon :path="mdiOpenInNew" />
+          </c-link>
           </template>
         </i18n-t>
       </article>
@@ -110,12 +110,18 @@
       </article>
     </div>
     <CFooter />
-  </c-main>
+  </div>
 </template>
 
 <script>
+import { mdiOpenInNew } from "@mdi/js";
 import { getUser } from "@/common/api";
 export default {
+  data() {
+    return {
+      mdiOpenInNew,
+    };
+  },
   async mounted() {
     this.user = await getUser();
   },
@@ -123,10 +129,7 @@ export default {
 </script>
 
 <style scoped>
-c-main {
-  height: unset;
-  min-height: 100vh;
-  justify-content: space-between;
+div.main {
   background-color: white;
 }
 .content {
@@ -151,7 +154,7 @@ c-row {
   &.title-row {
     margin: 0;
     padding: 2rem 0;
-    background-color: var(--csc-primary);
+    background-color: var(--c-primary-600);
     & h1 {
       margin: 0;
       color: white;

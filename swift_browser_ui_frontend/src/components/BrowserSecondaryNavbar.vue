@@ -7,7 +7,7 @@
       >
         <c-select
           :key="routeToParams ? routeToParams?.project : active.id"
-          v-csc-control
+          v-control
           v-bind="active"
           :items.prop="mappedProjects"
           :label="$t('message.selectProj')"
@@ -38,10 +38,7 @@
           @click="copyProjectId"
           @keyup.enter="copyProjectId"
         >
-          <i
-            slot="icon"
-            class="mdi mdi-content-copy"
-          />
+          <c-icon :path="mdiContentCopy" />
           {{ $t("message.share.share_id_copy") }}
         </c-button>
         <div
@@ -73,21 +70,21 @@
       </div>
       <c-toasts
         id="copy-toasts"
-        vertical="center"
         data-testid="copy-toasts"
+        vertical="top"
       />
       <c-toasts
         id="decryption-toasts"
-        vertical="center"
         data-testid="decryption-toasts"
+        vertical="top"
       />
       <c-spacer />
       <div class="nav-item">
         <c-button
           :disabled="isUploading || !canUpload || workersInitializing || incompatibleBucketName"
           data-testid="upload-file"
-          @click="toggleUploadModal(false)"
-          @keyup.enter="toggleUploadModal(true)"
+          @click="toggleUploadModal"
+          @keyup.enter="toggleUploadModal"
         >
           <c-icon :path="mdiTrayArrowUp" />
           {{
@@ -104,8 +101,8 @@
 <script>
 import { addErrorToastOnMain, checkBucketBreaksS3 } from "@/common/globalFunctions";
 import { getAccessDetails } from "@/common/share";
-import { setPrevActiveElement } from "@/common/keyboardNavigation";
 import {
+  mdiContentCopy,
   mdiInformationOutline,
   mdiTrayArrowUp,
 } from "@mdi/js";
@@ -115,6 +112,7 @@ export default {
   props: ["multipleProjects", "projects"],
   data: function () {
     return {
+      mdiContentCopy,
       mdiInformationOutline,
       mdiTrayArrowUp,
       copy: false,
@@ -211,17 +209,9 @@ export default {
         }
       }
     },
-    toggleUploadModal: function (keypress) {
+    toggleUploadModal: function () {
       this.$store.setFilesAdded(true);
       this.$store.toggleUploadModal(true);
-      if (keypress) setPrevActiveElement();
-      if (!this.container) {
-        setTimeout(() => {
-          const uploadBucketInput = document
-            .querySelector("#upload-bucket-input input");
-          uploadBucketInput.focus();
-        }, 300);
-      }
     },
     checkIfCanReadWrite: async function () {
       //disable upload if user doesn't have rw perms
@@ -316,7 +306,7 @@ c-toasts {
 
 .tooltip c-icon {
   margin-left: 0.5rem;
-  color: var(--csc-primary);
+  color: var(--c-primary-600);
 }
 
 .tooltip-content {
@@ -324,7 +314,7 @@ c-toasts {
   text-align: left;
   width: 20rem;
   background-color: white;
-  border: 1px solid var(--csc-primary);
+  border: 1px solid var(--c-primary-600);
   border-radius: 0.375rem;
   padding: 1rem;
   font-size: 14px;
@@ -350,7 +340,7 @@ c-toasts {
   width: 0;
   height: 0;
   border: 0.7rem solid transparent;
-  border-bottom-color: var(--csc-primary);
+  border-bottom-color: var(--c-primary-600);
 }
 .tooltip-content::after {
   content: " ";

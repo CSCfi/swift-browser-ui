@@ -46,10 +46,6 @@ import {
   addErrorToastOnMain,
 } from "@/common/globalFunctions";
 import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-} from "@/common/keyboardNavigation";
-import {
   mdiTrayArrowDown,
   //mdiPencilOutline,
   mdiDeleteOutline,
@@ -176,23 +172,38 @@ export default {
 
       return {
         name: {
-          value: name,
           ...(item?.folder ? {
-            component: {
-              tag: "c-link",
-              params: {
-                href: "javascript:void(0)",
-                color: "dark-grey",
-                path: mdiFolder,
-                iconFill: "primary",
-                iconStyle: {
-                  marginRight: "1rem",
-                  flexShrink: "0",
+            value: "",
+            children: [
+              {
+                value: "",
+                component: {
+                  tag: "c-icon",
+                  params: {
+                    path: mdiFolder,
+                    color: "var(--c-primary-600)",
+                    size: "18",
+                  },
                 },
-                onClick: () => this.changeFolder(name),
               },
-            },
-          } : {}),
+              {
+                value: name,
+                component: {
+                  tag: "c-link",
+                  params: {
+                    href: "javascript:void(0)",
+                    style: {
+                      "--c-link-color": "var(--c-tertiary-700)",
+                      "--c-link-hover": "none",
+                      marginLeft: "1rem",
+                    },
+                    path: mdiFolder,
+                    onClick: () => this.changeFolder(name),
+                  },
+                },
+              },
+            ],
+          } : { value: name }),
         },
         size: {
           value: getHumanReadableSize(item.bytes, this.locale),
@@ -226,15 +237,13 @@ export default {
           align: "end",
           children: [
             {
-              value: this.$t("message.download.download"),
+              value: "",
               component: {
                 tag: "c-button",
                 params: {
                   testid: "download-object",
                   text: true,
                   size: "small",
-                  title: "Download",
-                  path: mdiTrayArrowDown,
                   onClick: ({ event }) => {
                     item.name.match(".c4gh") || item?.folder
                       ? this.beginDownload(item, event.isTrusted)
@@ -244,6 +253,24 @@ export default {
                     this.accessRights.length === 0,
                 },
               },
+              children: [
+                {
+                  value: "",
+                  component: {
+                    tag: "c-icon",
+                    params: {
+                      path: mdiTrayArrowDown,
+                      size: "18",
+                    },
+                  },
+                },
+                {
+                  value: this.$t("message.download.download"),
+                  component: {
+                    tag: "span",
+                  },
+                },
+              ],
             },
             /*{
               value: this.$t("message.table.editTags"),
@@ -256,10 +283,10 @@ export default {
                   title: "Edit tags",
                   path: mdiPencilOutline,
                   onClick: () =>
-                    this.onOpenEditTagsModal(item.name),
+                    toggleEditTagsModal(item.name, null);
                   onKeyUp: (event) => {
                     if(event.keyCode === 13) {
-                      this.onOpenEditTagsModal(item.name, true);
+                      toggleEditTagsModal(item.name, null);
                     }
                   },
                   disabled: item?.folder ||
@@ -268,15 +295,13 @@ export default {
               },
             },*/
             {
-              value: this.$t("message.delete"),
+              value: "",
               component: {
                 tag: "c-button",
                 params: {
                   testid: "delete-object",
                   text: true,
                   size: "small",
-                  title: "Delete object",
-                  path: mdiDeleteOutline,
                   onClick: () => {
                     this.$emit("delete-object", item);
                   },
@@ -289,6 +314,24 @@ export default {
                     this.owner != undefined && this.accessRights.length <= 1,
                 },
               },
+              children: [
+                {
+                  value: "",
+                  component: {
+                    tag: "c-icon",
+                    params: {
+                      path: mdiDeleteOutline,
+                      size: "18",
+                    },
+                  },
+                },
+                {
+                  value: this.$t("message.delete"),
+                  component: {
+                    tag: "span",
+                  },
+                },
+              ],
             },
           ],
         },
@@ -490,19 +533,6 @@ export default {
           sortable: false,
         },
       ];
-    },
-    onOpenEditTagsModal(itemName, keypress) {
-      toggleEditTagsModal(itemName, null);
-      if (keypress) {
-        setPrevActiveElement();
-        const editTagsModal = document.getElementById("edit-tags-modal");
-        disableFocusOutsideModal(editTagsModal);
-      }
-      setTimeout(() => {
-        const editTagsInput = document.getElementById("edit-tags-input")
-          ?.children[0];
-        editTagsInput.focus();
-      }, 300);
     },
   },
 };

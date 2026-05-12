@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="createBucketContainer"
-    class="add-bucket"
+    class="modal-card"
     data-testid="create-bucket-modal"
     @keydown="handleKeyDown"
   >
@@ -15,17 +15,17 @@
         vertical="bottom"
         absolute
       />
-      <h2 class="title is-4">
-        {{ $t("message.container_ops.addContainer") }}
-      </h2>
-      <c-card-content>
+      <c-card-content class="modal-card-content">
+        <h2 class="title is-4">
+          {{ $t("message.container_ops.addContainer") }}
+        </h2>
         <p class="info-text">
           {{ $t("message.encrypt.uploadStep1.nonModifiable") }}
         </p>
         <c-text-field
           id="newBucket-input"
           v-model="bucketName"
-          v-csc-control
+          v-control
           :label="$t('message.container_ops.bucketName')"
           name="bucketname"
           aria-required="true"
@@ -61,7 +61,7 @@
           target="_blank"
         >
           {{ $t("message.container_ops.viewProjectMembers") }}
-          <i class="mdi mdi-open-in-new" />
+          <c-icon :path="mdiOpenInNew" />
         </c-link>
       </c-card-content>
     </div>
@@ -70,16 +70,16 @@
         outlined
         size="large"
         data-testid="cancel-save-bucket"
-        @click="toggleCreateBucketModal(false)"
-        @keyup.enter="toggleCreateBucketModal(true)"
+        @click="toggleCreateBucketModal"
+        @keyup.enter="toggleCreateBucketModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         size="large"
         data-testid="save-bucket"
-        @click="() => createContainer(false)"
-        @keyup.enter="() => createContainer(true)"
+        @click="() => createContainer()"
+        @keyup.enter="() => createContainer()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { mdiOpenInNew } from "@mdi/js";
 import { getDB } from "@/common/idb";
 
 import {
@@ -99,11 +100,7 @@ import {
   getCurrentISOtime,
   tokenize,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 // import TagInput from "@/components/TagInput.vue";
 import BucketNameValidation from "./BucketNameValidation.vue";
 
@@ -119,6 +116,7 @@ export default {
   },
   data() {
     return {
+      mdiOpenInNew,
       bucketName: "",
       tags: [],
       projectInfoLink: "",
@@ -135,9 +133,6 @@ export default {
     },
     controller() {
       return new AbortController();
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
     },
     modalVisible() {
       return this.$store.openCreateBucketModal;
@@ -161,7 +156,7 @@ export default {
       this.validationResult = await validateBucketName(
         this.bucketName);
     }, 300),
-    createContainer: async function (keypress) {
+    createContainer: async function () {
       this.validationResult = await validateBucketName(
         this.bucketName);
       const validationError =
@@ -222,7 +217,7 @@ export default {
         await getDB().containers.add(newBucket);
       }
 
-      this.toggleCreateBucketModal(keypress);
+      this.toggleCreateBucketModal();
 
       this.$router.push({
         name: "AllBuckets",
@@ -234,15 +229,13 @@ export default {
 
       this.$store.setNewBucket(bucketName);
     },
-    toggleCreateBucketModal: function (keypress) {
+    toggleCreateBucketModal: function () {
       this.$store.toggleCreateBucketModal(false);
       this.bucketName = "";
       this.tags = [];
       this.create = true;
       this.validationResult = {};
       document.querySelector("#createModal-toasts").removeToast("create-toast");
-
-      if (keypress) moveFocusOutOfModal(this.prevActiveEl);
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
@@ -251,50 +244,17 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.createBucketContainer.querySelectorAll(
-        "input, c-link, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      if (e.key === "Escape") {
+        this.toggleCreateBucketModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.createBucketContainer);
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-
-.add-bucket {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-   .add-bucket {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .add-bucket {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .add-bucket {
-    top: -13rem;
-  }
-}
-
-c-card-content {
-  color: var(--csc-dark);
-  padding: 1.5rem 0 0 0;
-}
 
 c-card-actions {
   padding: 0;

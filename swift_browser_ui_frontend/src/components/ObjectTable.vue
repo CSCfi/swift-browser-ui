@@ -15,7 +15,7 @@
     </c-alert>
     <div class="bucket-info">
       <div class="bucket-info-heading">
-        <i class="mdi mdi-pail-outline" />
+        <c-icon :path="mdiPailOutline" />
         <span>{{ containerName }}</span>
       </div>
       <ul class="bucket-details">
@@ -56,36 +56,35 @@
       id="optionsbar"
       justify="end"
     >
-      <!--<c-text-field
-        id="search"
-        v-model="searchQuery"
-        v-csc-control
-        name="search"
-        :placeholder="$t('message.objects.filterBy')"
-        type="search"
-      >
-        <i
-          slot="pre"
-          class="mdi mdi-filter-variant mdi-24px"
-        />
-      </c-text-field>-->
-      <c-menu
-        :key="optionsKey"
-        :items.prop="tableOptions"
-        options-testid="table-options-selector"
-      >
-        <span class="menu-active display-options-menu">
-          <i class="mdi mdi-tune" />
-          {{ $t("message.tableOptions.displayOptions") }}
-        </span>
-      </c-menu>
+      <div>
+        <!--<c-text-field
+          id="search"
+          v-model="searchQuery"
+          v-control
+          name="search"
+          :placeholder="$t('message.objects.filterBy')"
+          type="search"
+        >
+          <c-icon :path="mdiFilterVariant" size="24" />
+        </c-text-field>-->
+        <c-menu
+          :key="optionsKey"
+          :items.prop="tableOptions"
+          data-testid="table-options-selector"
+        >
+          <c-icon :path="mdiTune" size="20" />
+          <span class="menu-active display-options-menu">
+            {{ $t("message.tableOptions.displayOptions") }}
+          </span>
+        </c-menu>
+      </div>
     </c-row>
     <div
       v-if="checkedRows.length"
       class="selection-bar"
     >
       <div class="info">
-        <i class="mdi mdi-information-outline" />
+        <c-icon :path="mdiInformationOutline" size="20" />
         <span>
           {{ checkedRows.length }}
           {{ checkedRows.length === 1
@@ -105,11 +104,8 @@
           @click="button.action"
           @keyup.enter="button.action"
         >
-          <i
-            slot="icon"
-            :class="button.icon"
-            class="mdi"
-          /> {{ button.label }}
+          <c-icon :path="button.icon" size="20" />
+          {{ button.label }}
         </c-button>
       </div>
     </div>
@@ -138,6 +134,13 @@
 
 <script>
 import {
+  mdiPailOutline,
+  mdiTune,
+  mdiInformationOutline,
+  mdiRefresh,
+  mdiTrashCanOutline,
+} from "@mdi/js";
+import {
   DEV,
   toggleDeleteModal,
   isFile,
@@ -154,11 +157,6 @@ import {
   getHumanReadableSize,
   truncate,
 } from "@/common/tableFunctions";
-import {
-  setPrevActiveElement,
-  disableFocusOutsideModal,
-  addFocusClass,
-} from "@/common/keyboardNavigation";
 import { getDB } from "@/common/idb";
 import {
   getBucketMetadata,
@@ -184,6 +182,9 @@ export default {
   },
   data: function () {
     return {
+      mdiPailOutline,
+      mdiTune,
+      mdiInformationOutline,
       accessRights: [],
       sharedStatus: "",
       sharedContainers: [],
@@ -416,10 +417,9 @@ export default {
       this.$store.toggleShareModal(true);
       this.$store.setBucketName(this.containerName);
     },
-    confirmDelete: function(item, keypress) {
+    confirmDelete: function(item) {
       if (isFile(item.name, this.$route) || !this.renderFolders) {
         toggleDeleteModal([item]);
-        if (keypress) this.moveFocusToDeleteModal();
       } else {
         addErrorToastOnMain(this.$t("message.folders.deleteNote"));
       }
@@ -622,13 +622,13 @@ export default {
       this.selectionActionButtons = [
         {
           label: this.$t("message.table.clearSelected"),
-          icon: "mdi-refresh",
+          icon: mdiRefresh,
           testid: "clear-checkboxes",
           action: () => this.clearSelections(),
         },
         {
           label: this.$t("message.table.deleteSelected"),
-          icon: "mdi-trash-can-outline",
+          icon: mdiTrashCanOutline,
           testid: "delete-checked-files",
           action: () => {
             // If only folders checked, don't show Delete modal
@@ -642,12 +642,12 @@ export default {
               }
             }
             // Otherwise get user confirmation from modal
-            this.onOpenDeleteModal(this.checkedRows);
+            toggleDeleteModal(this.checkedRows);
             const deleteSelectionsBtn = document
               .querySelector("#delete-selections");
             deleteSelectionsBtn.addEventListener("keydown", (e) =>{
               if (e.keyCode === 13) {
-                this.onOpenDeleteModal(this.checkedRows, true);
+                toggleDeleteModal(this.checkedRows);
               }
             });
           },
@@ -657,22 +657,6 @@ export default {
     setLocalizedContent() {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
-    },
-    onOpenDeleteModal(checkedRows, keypress) {
-      toggleDeleteModal(checkedRows);
-      if (keypress) this.moveFocusToDeleteModal();
-    },
-    moveFocusToDeleteModal() {
-      const deleteObjsModal = document.getElementById("delete-objs-modal");
-      setPrevActiveElement();
-      disableFocusOutsideModal(deleteObjsModal);
-
-      setTimeout(() => {
-        const deleteObjsBtn = document.getElementById("delete-objs-btn");
-        deleteObjsBtn.tabIndex = "0";
-        deleteObjsBtn.focus();
-        addFocusClass(deleteObjsBtn);
-      }, 300);
     },
     getConversionNeedAlert: function(buckets, bucket) {
       const statusNum = getRecommendedAction(buckets, bucket);
@@ -703,7 +687,7 @@ export default {
 }
 
 .bucket-info {
-  border: 1px solid var(--csc-primary);
+  border: 1px solid var(--c-primary-600);
   margin: 1rem 0 0 0;
 }
 
@@ -716,13 +700,10 @@ export default {
   color: #FFF;
   font-size: 1rem;
   font-weight: 700;
-  background: var(--csc-primary);
+  background: var(--c-primary-600);
   align-items: center;
-  & .mdi {
-    font-size: 1.5rem;
-    padding-right: .5rem
-  }
   & span {
+    margin-left: 0.5rem;
     align-self: center;
     display: inline-block;
   }
@@ -754,11 +735,8 @@ export default {
     flex: 1;
     min-width: 12rem;
     padding: 1rem;
-    & .mdi {
-      font-size: 1.5rem;
-      padding-right: .5rem
-    }
     & span {
+      margin-left: 0.5rem;
       align-self: center;
       display: inline-block;
     }

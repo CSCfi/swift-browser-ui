@@ -2,14 +2,14 @@
 <template>
   <c-card
     ref="editTagsContainer"
-    class="edit-tags"
+    class="modal-card"
     data-testid="edit-tags-modal"
     @keydown="handleKeyDown"
   >
-    <h2 class="title is-4 has-text-dark">
-      {{ $t('message.editTags') }}
-    </h2>
-    <c-card-content>
+    <c-card-content class="modal-card-content">
+      <h2 class="title is-4 has-text-dark">
+        {{ $t('message.editTags') }}
+      </h2>
       <TagInput
         id="edit-tags-input"
         data-testid="edit-tags-input"
@@ -22,17 +22,17 @@
       <c-button
         outlined
         size="large"
-        @click="toggleEditTagsModal(false)"
-        @keyup.enter="toggleEditTagsModal(true)"
+        @click="toggleEditTagsModal"
+        @keyup.enter="toggleEditTagsModal"
       >
         {{ $t("message.cancel") }}
       </c-button>
       <c-button
         data-testid="save-edit-tags"
         size="large"
-        @click="isObject ? saveObjectTags(false) : saveContainerTags(false)"
+        @click="isObject ? saveObjectTags() : saveContainerTags()"
         @keyup.enter="isObject ?
-          saveObjectTags(true) : saveContainerTags(true)"
+          saveObjectTags() : saveContainerTags()"
       >
         {{ $t("message.save") }}
       </c-button>
@@ -48,11 +48,7 @@ import {
   deleteTag,
   getCurrentISOtime,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose } from "@mdi/js";
 
@@ -89,9 +85,6 @@ export default {
     },
     containerName() {
       return this.$route.params.container;
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
     },
   },
   watch: {
@@ -146,26 +139,13 @@ export default {
         this.tags = this.container.tags;
       }
     },
-    toggleEditTagsModal: function (keypress) {
+    toggleEditTagsModal: function () {
       this.$store.toggleEditTagsModal(false);
       this.$store.setObjectName("");
       this.$store.setBucketName("");
       this.tags = [];
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Edit Tags Modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      if (keypress) {
-        const prevActiveElParent = this.containerName ?
-          document.getElementById("obj-table") :
-          document.getElementById("container-table");
-        moveFocusOutOfModal(prevActiveElParent, true);
-      }
     },
-    saveObjectTags: function (keypress) {
+    saveObjectTags: function () {
       const tags = toRaw(this.tags);
       let objectMeta = [
         this.object.name,
@@ -189,11 +169,11 @@ export default {
           })
           .modify({ last_modified: currentTime });
 
-        this.toggleEditTagsModal(keypress);
+        this.toggleEditTagsModal();
       });
     },
-    saveContainerTags: function (keypress) {
-      this.toggleEditTagsModal(keypress);
+    saveContainerTags: function () {
+      this.toggleEditTagsModal();
     },
     addingTag: function (e, onBlur) {
       this.tags = addNewTag(e, this.tags, onBlur);
@@ -202,11 +182,11 @@ export default {
       this.tags = deleteTag(e, tag, this.tags);
     },
     handleKeyDown: function(e) {
-      const focusableList = this.$refs.editTagsContainer.querySelectorAll(
-        "input, c-icon, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      if (e.key === "Escape") {
+        this.toggleEditTagsModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.editTagsContainer);
+      }
     },
   },
 };
@@ -214,21 +194,7 @@ export default {
 
 <style scoped>
 
-.edit-tags {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
 h2 { margin: 0 !important; }
-
-c-card-content {
-  color: var(--csc-dark);
-  padding: 0;
-}
 
 c-card-actions {
   padding: 0;

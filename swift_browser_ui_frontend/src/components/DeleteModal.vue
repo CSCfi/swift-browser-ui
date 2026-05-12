@@ -1,70 +1,59 @@
 <template>
   <c-card
     ref="deleteObjsModal"
-    class="delete-modal"
+    class="no-padding-card"
     @keydown="handleKeyDown"
   >
-    <c-card
-      ref="deleteObjsModal"
-      class="delete-modal"
-      @keydown="handleKeyDown"
+    <c-alert
+      v-if="!isDeleting"
+      type="error"
     >
-      <c-alert
-        v-if="!isDeleting"
-        type="error"
-      >
-        <div slot="title">
-          {{ $t("message.objects.deleteObjects") }}
-        </div>
+      <div slot="title">
+        {{ $t("message.objects.deleteObjects") }}
+      </div>
 
-        {{ owner ?
-          $t("message.objects.deleteSharedObjects") :
-          $t("message.objects.deleteObjectsMessage")
-        }}
+      {{ owner ?
+        $t("message.objects.deleteSharedObjects") :
+        $t("message.objects.deleteObjectsMessage")
+      }}
 
-        <c-card-actions justify="end">
-          <c-button
-            outlined
-            @click="toggleDeleteModal(false)"
-            @keyup.enter="toggleDeleteModal(true)"
-          >
-            {{ $t("message.cancel") }}
-          </c-button>
-          <c-button
-            id="delete-objs-btn"
-            data-testid="confirm-delete-objects"
-            @click="deleteObjects()"
-            @keyup.enter="deleteObjects()"
-          >
-            {{ $t("message.objects.deleteConfirm") }}
-          </c-button>
-        </c-card-actions>
-      </c-alert>
-      <c-alert
-        v-else
-        type="success"
-      >
-        <div slot="title">
-          {{ $t("message.objects.deleteInProgress") }}
-        </div>
-        <c-progress-bar
-          single-line
-          indeterminate
-        />
-      </c-alert>
-    </c-card>
+      <c-card-actions justify="end">
+        <c-button
+          outlined
+          @click="toggleDeleteModal()"
+          @keyup.enter="toggleDeleteModal()"
+        >
+          {{ $t("message.cancel") }}
+        </c-button>
+        <c-button
+          id="delete-objs-btn"
+          data-testid="confirm-delete-objects"
+          @click="deleteObjects()"
+          @keyup.enter="deleteObjects()"
+        >
+          {{ $t("message.objects.deleteConfirm") }}
+        </c-button>
+      </c-card-actions>
+    </c-alert>
+    <c-alert
+      v-else
+      type="success"
+    >
+      <div slot="title">
+        {{ $t("message.objects.deleteInProgress") }}
+      </div>
+      <c-progress-bar
+        single-line
+        indeterminate
+      />
+    </c-alert>
   </c-card>
 </template>
 
 <script>
 import { getDB } from "@/common/idb";
 import { isFile } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import { awsDeleteObjects, awsListObjects } from "@/common/s3commands";
 
 export default {
@@ -114,20 +103,9 @@ export default {
     },
   },
   methods: {
-    toggleDeleteModal: function(keypress) {
+    toggleDeleteModal: function() {
       this.$store.toggleDeleteModal(false);
       this.$store.setDeletableObjects([]);
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Delete Modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      if (keypress) {
-        const prevActiveElParent = document.getElementById("obj-table");
-        moveFocusOutOfModal(prevActiveElParent, true);
-      }
     },
     deleteObjects: async function () {
       this.isDeleting = true;
@@ -272,35 +250,10 @@ export default {
       this.toggleDeleteModal();
     },
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.deleteObjsModal.querySelectorAll(
-        "c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-
-      if (e.key === "Tab" && !e.shiftKey) {
-        if (e.target === last) {
-          removeFocusClass(last);
-          first.tabIndex="0";
-          first.focus();
-          addFocusClass(first);
-        } else if (e.target === first) {
-          removeFocusClass(first);
-          last.tabIndex="0";
-          last.focus();
-          addFocusClass(last);
-        }
-      }
-      else if (e.key === "Tab" && e.shiftKey) {
-        if (e.target === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          if (last === document.activeElement) {
-            addFocusClass(last);
-          }
-        } else if (e.target === last) {
-          removeFocusClass(last);
-        }
+      if (e.key === "Escape") {
+        this.toggleDeleteModal();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.deleteObjsModal);
       }
     },
   },
@@ -308,10 +261,6 @@ export default {
 </script>
 
 <style scoped>
-
-.delete-modal {
-  padding: 0px;
-}
 
 c-progress-bar {
   padding: 0.5rem;

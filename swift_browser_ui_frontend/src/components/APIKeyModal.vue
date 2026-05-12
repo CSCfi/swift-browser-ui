@@ -1,111 +1,109 @@
 <template>
   <c-card
     ref="apiKeyContainer"
-    class="api-key-card"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
-    <c-card-actions
-      justify="space-between"
-      align="center"
+    <div
+      class="modal-content-wrapper"
+      tabindex="0"
     >
-      <h2 class="title is-4">
-        {{ $t("message.apiKeys.title") }}
-      </h2>
-      <c-button
-        id="close-api-key-modal-btn"
-        text
-        @click="closeModal(false)"
-        @keyup.enter="closeModal(true)"
-      >
-        <c-icon
-          :path="mdiClose"
-          alt=""
-          aria-hidden="true"
-        />
-        {{ $t("message.close") }}
-      </c-button>
-    </c-card-actions>
-    <c-card-content>
-      <p>{{ $t("message.apiKeys.identHint") }}</p>
-      <c-text-field
-        id="api-key-input"
-        v-model="newIdentifier"
-        v-csc-control
-        name="newIdentifier"
-        :label="$t('message.apiKeys.identLabel')"
-        :valid="!inputError"
-        :validation="inputError"
-        @changeValue="inputError = ''"
-      />
-      <c-button
-        id="create-api-key-button"
-        @click="addAPIKey(newIdentifier)"
-        @keyup.enter="addAPIKey(newIdentifier)"
-      >
-        {{ $t("message.apiKeys.create") }}
-      </c-button>
-      <c-row
-        v-show="latest.apiKey"
-        align="start"
+      <c-card-actions
         justify="space-between"
+        align="center"
       >
-        <p>
-          <strong>{{ $t("message.apiKeys.latest") }}</strong>
-        </p>
-        <div id="api-key">
-          <p>{{ latest.apiKey }}</p>
-        </div>
+        <h2 class="title is-4">
+          {{ $t("message.apiKeys.title") }}
+        </h2>
         <c-button
-          size="small"
-          @click="copyLatest"
-          @keyup.enter="copyLatest"
+          id="close-api-key-modal-btn"
+          text
+          @click="closeModal"
+          @keyup.enter="closeModal"
         >
-          <i
-            slot="icon"
-            class="mdi mdi-content-copy"
+          <c-icon
+            :path="mdiClose"
+            alt=""
+            aria-hidden="true"
           />
-          {{ $t('message.apiKeys.copy') }}
+          {{ $t("message.close") }}
         </c-button>
-      </c-row>
-      <c-alert
-        v-show="latest.apiKey"
-        type="warning"
-      >
-        <p>{{ $t('message.apiKeys.copyWarning') }}</p>
-      </c-alert>
-      <!-- Footer options needs to be in CamelCase,
-      because csc-ui wont recognise it otherwise. -->
-      <c-data-table
-        sort-by="identifier"
-        sort-direction="asc"
-        :no-data-text="$t('message.apiKeys.empty')"
-        :data.prop="tableAPIKeys"
-        :headers.prop="headers"
-        :pagination.prop="apiKeyPagination"
-        :footerOptions.prop="footer"
-        :hide-footer="apiKeys.length <= apiKeysPerPage"
-        @click="checkPage"
-      />
-      <c-toasts
-        id="api-key-toasts"
-        data-testid="api-key-toasts"
-      />
-    </c-card-content>
+      </c-card-actions>
+      <c-card-content>
+        <p>{{ $t("message.apiKeys.identHint") }}</p>
+        <c-text-field
+          id="api-key-input"
+          v-model="newIdentifier"
+          v-control
+          name="newIdentifier"
+          :label="$t('message.apiKeys.identLabel')"
+          :valid="!inputError"
+          :validation="inputError"
+          @changeValue="inputError = ''"
+        />
+        <c-button
+          id="create-api-key-button"
+          @click="addAPIKey(newIdentifier)"
+          @keyup.enter="addAPIKey(newIdentifier)"
+        >
+          {{ $t("message.apiKeys.create") }}
+        </c-button>
+        <c-row
+          v-if="latest.apiKey"
+          align="start"
+          justify="space-between"
+        >
+          <p>
+            <strong>{{ $t("message.apiKeys.latest") }}</strong>
+          </p>
+          <div id="api-key">
+            <p>{{ latest.apiKey }}</p>
+          </div>
+          <c-button
+            size="small"
+            @click="copyLatest"
+            @keyup.enter="copyLatest"
+          >
+            <c-icon :path="mdiContentCopy" />
+            {{ $t('message.apiKeys.copy') }}
+          </c-button>
+        </c-row>
+        <c-alert
+          v-if="latest.apiKey"
+          type="warning"
+        >
+          <p>{{ $t('message.apiKeys.copyWarning') }}</p>
+        </c-alert>
+        <!-- Footer options needs to be in CamelCase,
+        because csc-ui wont recognise it otherwise. -->
+        <c-data-table
+          sort-by="identifier"
+          sort-direction="asc"
+          :no-data-text="$t('message.apiKeys.empty')"
+          :data.prop="tableAPIKeys"
+          :headers.prop="headers"
+          :pagination.prop="apiKeyPagination"
+          :footerOptions.prop="footer"
+          :hide-footer="apiKeys.length <= apiKeysPerPage"
+          @click="checkPage"
+        />
+        <c-toasts
+          id="api-key-toasts"
+          data-testid="api-key-toasts"
+        />
+      </c-card-content>
+    </div>
   </c-card>
 </template>
 
 <script>
-import { mdiClose, mdiDelete } from "@mdi/js";
+import { mdiClose, mdiDelete, mdiContentCopy } from "@mdi/js";
 import {
   createAPIKey,
   listAPIKeys,
   removeAPIKey,
 } from "@/common/api";
-import {
-  addFocusClass,
-  removeFocusClass,
-  moveFocusOutOfModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 export default {
   name: "APIKeyModal",
   data() {
@@ -120,6 +118,7 @@ export default {
       apiKeysPerPage: 5,
       mdiClose,
       mdiDelete,
+      mdiContentCopy,
       currentPage: 1,
       inputError: "",
     };
@@ -194,9 +193,6 @@ export default {
         hideDetails: true,
       };
     },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
-    },
   },
   watch: {
     visible () {
@@ -207,7 +203,7 @@ export default {
     checkPage: function(event){
       this.currentPage = event.target.pagination.currentPage;
     },
-    closeModal: function (addFocus) {
+    closeModal: function () {
       this.currentPage = 1;
       this.$store.toggleAPIKeyModal(false);
       this.newIdentifier = "";
@@ -218,16 +214,6 @@ export default {
       document.querySelector("#api-key-toasts").removeToast("error-in-use");
       document.querySelector("#api-key-toasts").removeToast("success-copied");
       document.querySelector("#api-key-toasts").removeToast("success-removed");
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open the modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      const prevActiveElParent = document
-        .querySelector("[data-testid='support-menu']");
-      moveFocusOutOfModal(prevActiveElParent, true, addFocus);
     },
     getAPIKeys: function () {
       listAPIKeys(this.activeId).then((ret) => {this.apiKeys = ret;});
@@ -308,36 +294,10 @@ export default {
       }
     },
     handleKeyDown: function (e) {
-      const eTarget = e.target;
-      const shadowDomTarget = eTarget.shadowRoot?.activeElement;
-
-      const first = document.getElementById("close-api-key-modal-btn");
-
-      // last element is different between with or without API key list
-      let last = null;
-
-      if (this.tableAPIKeys.length === 0) {
-        last = document.getElementById("create-api-key-button");
+      if (e.key === "Escape") {
+        this.closeModal();
       } else {
-        const table = this.$refs.apiKeyContainer.querySelector("c-data-table");
-        const removeButtons = table.shadowRoot.querySelectorAll("c-button");
-        last = removeButtons[removeButtons.length -1];
-      }
-
-      if (e.key === "Tab" && !e.shiftKey &&
-        (eTarget === last || (shadowDomTarget === last))
-      ) {
-        first.tabIndex = "0";
-        first.focus();
-      } else if (e.key === "Tab" && e.shiftKey) {
-        if (eTarget === first) {
-          e.preventDefault();
-          last.tabIndex = "0";
-          last.focus();
-          addFocusClass(last);
-        } else if (eTarget === last || shadowDomTarget === last) {
-          removeFocusClass(last);
-        }
+        captureKeyboardNavInsideModal(e, this.$refs.apiKeyContainer);
       }
     },
   },
@@ -345,16 +305,6 @@ export default {
 </script>
 
 <style scoped>
-
-.api-key-card {
-  padding: 3rem 2rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-  overflow-y: scroll;
-}
 
 #create-api-key-button {
   width: max-content;
@@ -371,18 +321,6 @@ export default {
   #api-key {
     width: 100%;
     padding: 0.5rem 0;
-  }
-}
-
-@media screen and (max-width: 992px) {
-  .api-key-card {
-    max-height: 60vh;
-  }
-}
-
-@media screen and (max-width: 576px) {
-  .api-key-card {
-    padding: 1.5rem 1rem;
   }
 }
 

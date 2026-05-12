@@ -17,8 +17,8 @@ import DeleteModal from "@/components/DeleteModal.vue";
 import APIKeyModal from "@/components/APIKeyModal.vue";
 
 // CSC UI things
-import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControl } from "@/common/csc-ui-vue-directive";
+import { defineCustomElements } from "@cscfi/csc-ui/loader";
+import { vControl } from "@cscfi/csc-ui-vue";
 
 // Project JS functions
 import { i18n } from "@/common/i18n";
@@ -51,7 +51,6 @@ import CFooter from "@/components/CFooter.vue";
 import { getDB, checkIDB } from "@/common/idb";
 
 // Import global functions
-import { removeFocusClass } from "@/common/keyboardNavigation";
 import { initS3 } from "@/common/s3init";
 
 checkIDB().then(result => {
@@ -75,9 +74,7 @@ window.addEventListener("rejectionhandled", function (event) {
 });
 
 // Configure csc-ui
-applyPolyfills().then(() => {
-  defineCustomElements();
-});
+defineCustomElements();
 
 const pinia = createPinia();
 const app = createApp({
@@ -130,7 +127,7 @@ const app = createApp({
         return this.$store.openConfirmRouteModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleConfirmRouteModal(newState);
       },
     },
     openCreateBucketModal: {
@@ -138,7 +135,7 @@ const app = createApp({
         return this.$store.openCreateBucketModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleCreateBucketModal(newState);
       },
     },
     openUploadModal: {
@@ -146,7 +143,7 @@ const app = createApp({
         return this.$store.openUploadModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleUploadModal(newState);
       },
     },
     openEditTagsModal: {
@@ -154,7 +151,7 @@ const app = createApp({
         return this.$store.openEditTagsModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleEditTagsModal(newState);
       },
     },
     openCopyBucketModal: {
@@ -162,7 +159,7 @@ const app = createApp({
         return this.$store.openCopyBucketModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleCopyBucketModal(newState);
       },
     },
     openDeleteModal: {
@@ -170,23 +167,24 @@ const app = createApp({
         return this.$store.openDeleteModal;
       },
       set(newState) {
-        return newState;
+        this.$store.toggleDeleteModal(newState);
       },
     },
     openShareModal: {
       get() {
         return this.$store.openShareModal;
       },
-      set() { },
+      set(newState) {
+        this.$store.toggleShareModal(newState);
+      },
     },
     openAPIKeyModal: {
       get() {
         return this.$store.openAPIKeyModal;
       },
-      set() { },
-    },
-    prevActiveEl() {
-      return this.$store.prevActiveEl;
+      set(newState) {
+        this.$store.toggleAPIKeyModal(newState);
+      },
     },
     s3download() {
       return this.$store.s3download;
@@ -308,11 +306,6 @@ const app = createApp({
     });
     setTimeout(this.containerSyncWrapper, 10000);
   },
-  mounted() {
-    document
-      .getElementById("mainContainer")
-      .addEventListener("keydown", this.onKeydown);
-  },
   methods: {
     containerSyncWrapper: function () {
       syncBucketPolicies(this.active.id);
@@ -323,15 +316,6 @@ const app = createApp({
     cancelDownload: function() {
       this.s3download.cancelDownload();
     },
-    onKeydown: function (e) {
-      if (e.key === "Tab" && this.prevActiveEl &&
-        e.target === this.prevActiveEl) {
-        if(this.prevActiveEl.classList.contains("button-focus")) {
-          removeFocusClass(this.prevActiveEl);
-          this.$store.setPreviousActiveEl(null);
-        }
-      }
-    },
   },
   ...BrowserPage,
 });
@@ -339,7 +323,7 @@ const app = createApp({
 app.use(i18n);
 app.use(router);
 app.use(pinia);
-app.directive("csc-control", vControl);
+app.directive("control", vControl);
 
 // Pinia is geared toward multiple stores: ease migration and enforce single global store like Vuex
 app.config.globalProperties.$store = useStore();

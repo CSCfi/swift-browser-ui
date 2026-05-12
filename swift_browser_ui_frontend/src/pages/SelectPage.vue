@@ -31,7 +31,7 @@
       <p>
         <c-select
           v-model="$i18n.locale"
-          v-csc-control
+          v-control
           class="locale-changed block center"
           placeholder="Language"
           :items="langs"

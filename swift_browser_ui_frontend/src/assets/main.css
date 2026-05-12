@@ -1,5 +1,5 @@
 @charset "utf-8";
-@import "csc-ui/dist/styles/variables.css";
+@import url('@cscfi/csc-ui/css/theme.css');
 
 /* CSS file for integrating CSC brand colors */
 
@@ -7,12 +7,22 @@
   --csc-blue: #025b96;
   --csc-dark: #2E3438;
   --csc-grey: #595959;
-  --csc-info: #025b97;
   --csc-primary-light: #c2dbdf;
   --csc-primary-lighter: #d8e8ea;
-  --body-font-size: 16px;
+  --csc-primary-lightest: #f2f7f8;
   --csc-footer-grey: #dfe1e3;
   --csc-medium-grey: #757575;
+  --body-font-size: 16px;
+  --csc-font-family: 'museo-sans', sans-serif;
+}
+
+html, body {
+  height: 100vh;
+}
+
+body {
+  /* Prevent open c-select from hiding overflow-y */
+  overflow-y: scroll !important;
 }
 
 html,
@@ -104,13 +114,13 @@ img {
 }
 
 a {
-  color: var(--csc-link);
+  color: var(--c-info-700);
   cursor: pointer;
   text-decoration: none;
 }
 
 a:hover {
-  color: var(--csc-link);
+  color: var(--c-info-700);
 }
 
 .pr-3 {
@@ -151,4 +161,151 @@ footer {
 
 .content p {
   margin-bottom: 1em;
+}
+
+.content-wrapper {
+  margin: 0;
+  padding: 0;
+  padding-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.contents {
+  flex: 1 0 auto;
+}
+
+.container-box {
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.navbar .container .navbar-brand .navbar-item img {
+  max-height: 2.5rem;
+}
+
+.menu-active {
+  font-weight: 600 !important;
+  font-size: 14px;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active,
+.menu-icon {
+  color: var(--c-primary-600);
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+}
+
+.menu-active, .menu-icon {
+  color: var(--c-primary-600);
+}
+
+.footer {
+  margin: 15px 0;
+  padding: 0;
+}
+
+#optionsbar {
+  display: block;
+  padding: 1.5rem 0;
+}
+
+.search {
+  flex: 0.4;
+}
+
+.display-options-menu {
+  display: flex;
+  align-items: center;
+  & .mdi {
+    padding-right: .5rem;
+    font-size: 18px;
+  }
+}
+
+.taginput-label {
+  font-weight: bold;
+  margin-bottom: -2rem;
+}
+
+#container-error-toasts {
+  margin-top: 50vh;
+}
+
+.button-focus {
+  outline: 2px var(--c-primary-600) solid;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Replace deprecated csc-ui components with divs */
+
+div.main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: space-between;
+  background-color: var(--csc-primary-lighter);
+}
+
+div.flex {
+  display: block;
+  flex: 1;
+}
+
+div.container {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1200px;
+}
+
+div.padding {
+  padding: 24px;
+}
+
+c-menu {
+  --c-menu-text-color: var(--c-primary-600);
+}
+
+c-data-table {
+  --c-data-table-background-color-hover: var(--csc-primary-lightest);
+  --c-data-table-highlighted-column-background-color: var(--csc-primary-lightest);
+}
+
+.modal-content-wrapper {
+  overflow-y: scroll;
+  scrollbar-width: 0.5rem;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--c-tertiary-500);
+    border-radius: 10px;
+    &:hover {
+      background: var(--c-tertiary-700);
+    }
+  }
+}
+
+.modal-card {
+  padding: 1.5rem;
+  max-height: 75vh;
+}
+
+.modal-card-content {
+  color: var(--csc-dark);
+}
+
+.no-padding-card {
+  --c-card-gap: 0;
 }

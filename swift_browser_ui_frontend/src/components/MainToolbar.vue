@@ -3,7 +3,6 @@
     <c-link
       :href="user ? '/browse' : '/'"
       target="_self"
-      color="dark-grey"
       weight="400"
     >
       <c-csc-logo />
@@ -25,6 +24,11 @@ export default {
 </script>
 
 <style scoped>
+c-link {
+  --_c-link-color: var(--csc-dark-grey);
+  --_c-link-hover: none;
+}
+
 c-toolbar span {
   display: inline-flex;
   align-items: center;

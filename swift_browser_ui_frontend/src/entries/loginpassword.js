@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { mdiLogin } from "@mdi/js";
 import LoginPassword from "@/pages/LoginPassword.vue";
 import LanguageSelector from "@/components/CLanguageSelector.vue";
 
@@ -8,16 +9,15 @@ import { i18n } from "@/common/i18n";
 
 import CFooter from "@/components/CFooter.vue";
 
-import { applyPolyfills, defineCustomElements } from "csc-ui/dist/loader";
-import { vControl } from "@/common/csc-ui-vue-directive";
+import { defineCustomElements } from "@cscfi/csc-ui/loader";
+import { vControl } from "@cscfi/csc-ui-vue";
 
 
 // Import project css
 import "@/assets/main.css";
 
-applyPolyfills().then(() => {
-  defineCustomElements();
-});
+defineCustomElements();
+
 
 const app = createApp({
   name: "LoginPassword",
@@ -30,10 +30,25 @@ const app = createApp({
       langs: [{ph: "In English", value: "en"}, {ph: "Suomeksi", value: "fi"}],
       idb: true,
       bannerUrl,
+      mdiLogin,
     };
   },
   created() {
     document.title = this.$t("message.program_name");
+  },
+  mounted() {
+    // Login card content doesn't fill the card due to an invisible svg
+    const targetNode = document.querySelector("form");
+    if (!targetNode) return;
+    const observer = new MutationObserver(() => {
+      // Remove the svg once it appears in DOM
+      const svg = targetNode.querySelector("c-login-card > article > svg");
+      if (svg) {
+        svg.remove();
+        observer.disconnect();
+      }
+    });
+    observer.observe(targetNode, { childList: true, subtree: true });
   },
   methods: {
     setCookieLang: function() {
@@ -49,6 +64,6 @@ const app = createApp({
 });
 
 app.use(i18n);
-app.directive("csc-control", vControl);
+app.directive("control", vControl);
 
 app.mount("#app");

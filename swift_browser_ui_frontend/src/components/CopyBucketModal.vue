@@ -1,7 +1,7 @@
 <template>
   <c-card
     ref="copyBucketContainer"
-    class="copy-bucket"
+    class="modal-card"
     @keydown="handleKeyDown"
   >
     <div class="modal-content-wrapper">
@@ -15,7 +15,7 @@
           <c-text-field
             id="new-copy-bucketName"
             v-model="bucketName"
-            v-csc-control
+            v-control
             :label="$t('message.replicate.name')"
             name="bucketname"
             aria-required="true"
@@ -71,11 +71,7 @@ import {
   deleteTag,
   validateBucketName,
 } from "@/common/globalFunctions";
-import {
-  getFocusableElements,
-  moveFocusOutOfModal,
-  keyboardNavigationInsideModal,
-} from "@/common/keyboardNavigation";
+import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
 import { useObservable } from "@vueuse/rxjs";
 import { liveQuery } from "dexie";
 //import TagInput from "@/components/TagInput.vue";
@@ -181,41 +177,29 @@ export default {
         this.loadingBucketname = false;
       }
     },
-    cancelCopy: function (keypress) {
+    cancelCopy: function () {
       this.$store.toggleCopyBucketModal(false);
       this.$store.setBucketName("");
       this.bucketName = "";
       this.tags = [];
       this.loadingBucketname = true;
       this.validationResult = {};
-
-      /*
-        Prev Active element is a popup menu and it is removed from DOM
-        when we click it to open Copy Modal.
-        Therefore, we need to make its focusable parent
-        to be focused instead after we close the modal.
-      */
-      if (keypress) {
-        const prevActiveElParent = document.getElementById("container-table");
-        moveFocusOutOfModal(prevActiveElParent, true);
-      }
     },
-    replicateContainer: async function (keypress) {
+    replicateContainer: async function () {
       this.validationResult = await validateBucketName(
         this.bucketName);
       const validationError =
         Object.values(this.validationResult).some(val => !val);
       if (validationError) return;
 
-      await this.a_replicate_container(keypress);
+      await this.a_replicate_container();
     },
-    a_replicate_container: async function (keypress) {
+    a_replicate_container: async function () {
       this.$store.toggleCopyBucketModal(false);
       document.querySelector("#copyBucket-toasts").addToast(
         {
           id: "copy-in-progress",
           type: "success",
-          indeterminate: true,
           message: "",
           custom: true,
         },
@@ -269,7 +253,7 @@ export default {
         );
       } finally {
         document.querySelector("#copyBucket-toasts").removeToast("copy-in-progress");
-        this.cancelCopy(keypress);
+        this.cancelCopy();
       }
     },
     addingTag: function (e, onBlur) {
@@ -283,45 +267,17 @@ export default {
         this.bucketName);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
-      const focusableList = this.$refs.copyBucketContainer.querySelectorAll(
-        "input, c-icon, c-button",
-      );
-      const { first, last } = getFocusableElements(focusableList);
-      keyboardNavigationInsideModal(e, first, last);
+      if (e.key === "Escape") {
+        this.cancelCopy();
+      } else {
+        captureKeyboardNavInsideModal(e, this.$refs.copyBucketContainer);
+      }
     },
   },
 };
 </script>
 
 <style scoped>
-
-.copy-bucket {
-  padding: 3rem;
-  position: absolute;
-  top: -1rem;
-  left: 0;
-  right: 0;
-  max-height: 75vh;
-}
-
-@media screen and (max-width: 767px), (max-height: 580px) {
-   .copy-bucket {
-    top: -5rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 767px),
-(max-width: 525px) {
-  .copy-bucket {
-    top: -9rem;
-  }
-}
-
-@media screen and (max-height: 580px) and (max-width: 525px) {
-  .copy-bucket {
-    top: -13rem;
-  }
-}
 
 c-card-content {
   color: var(--csc-dark);
