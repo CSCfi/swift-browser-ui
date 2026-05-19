@@ -50,11 +50,26 @@ export async function getAccessDetails (
 export async function deleteStaleShares(project, bucket) {
   // Delete share entries of a deleted bucket in DB
   const client = getSharingClient();
+  const store = useStore();
 
   async function deleteShareEntries(bucketName) {
     const shareDetails = await client.getShareDetails(project, bucketName);
     const shares = shareDetails.map(item => item.sharedTo);
-    if (shares.length) await client.shareDeleteAccess(project, bucketName, shares);
+
+    if (shares.length) {
+      await client.shareContainerDeleteAccess(project, bucketName);
+      const projectInfo = await client.projectBatchCheckIDs(shares);
+      const projectNames = projectInfo.map(project => project.name);
+
+      if (projectNames?.length) {
+        await signedFetch(
+          "DELETE",
+          store.uploadEndpoint,
+          `/cryptic/${store.active.name}/${bucketName}`,
+          JSON.stringify(projectNames),
+        );
+      }
+    }
   }
 
   await deleteShareEntries(bucket);
