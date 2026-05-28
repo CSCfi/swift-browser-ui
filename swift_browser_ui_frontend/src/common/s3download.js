@@ -29,6 +29,8 @@ import { awsListObjects, ensureCollaborateAccessPolicy } from "./s3commands";
 // Use 50 MiB as download slice size
 const FILE_PART_SIZE = 52428800;
 
+const UNENCRYPTED_FILE = "migration-report-latest.json";
+
 export default class S3DownloadSocket {
   constructor(
     active, // project id
@@ -177,15 +179,19 @@ export default class S3DownloadSocket {
           break;
         case "notDecryptable":
           if (DEV) {
-            console.log(`Could not decrypt all files in bucket ${e.data.bucket}`);
+            console.log(`Could not decrypt files in bucket ${e.data.bucket}: ${e.data.undecryptable}`);
           }
-          document.querySelector("#decryption-toasts").addToast(
-            {
-              ...this.toastMessage,
-              type: "warning",
-              message: this.$t("message.notDecryptable"),
-            },
-          );
+          // Don't show alert if only migration report undecryptable (unencrypted)
+          const undecryptableFiles = e.data.undecryptable.filter(file => file != UNENCRYPTED_FILE);
+          if (undecryptableFiles.length) {
+            document.querySelector("#decryption-toasts").addToast(
+              {
+                ...this.toastMessage,
+                type: "warning",
+                message: this.$t("message.notDecryptable"),
+              },
+            );
+          }
           break;
         case "abort":
           this.$store.setDownloadAbortReason(e.data.reason);
