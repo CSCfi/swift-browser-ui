@@ -40,6 +40,7 @@
           :valid="!inputError"
           :validation="inputError"
           @changeValue="inputError = ''"
+          trim-whitespace
         />
         <c-button
           id="create-api-key-button"
