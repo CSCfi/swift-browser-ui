@@ -19,17 +19,13 @@ import {
   DEV,
   ensureObjectSizes,
   timeout,
+  UNENCRYPTED_FILE,
 } from "./globalFunctions";
 import {
   getUploadEndpoint,
   signedFetch,
 } from "./api";
 import { awsListObjects, ensureCollaborateAccessPolicy } from "./s3commands";
-
-// Use 50 MiB as download slice size
-const FILE_PART_SIZE = 52428800;
-
-const UNENCRYPTED_FILE = "migration-report-latest.json";
 
 export default class S3DownloadSocket {
   constructor(

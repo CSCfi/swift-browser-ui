@@ -8,6 +8,8 @@ import { NEW_VERSION_DATE } from "../../config/config";
 
 export const DEV = import.meta.env.MODE === "development";
 
+export const UNENCRYPTED_FILE = "migration-report-latest.json";
+
 export function getProjectNumber(project) {
   if (project.name) {
     const splitProjectName = project.name.split("_");
