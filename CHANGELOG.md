@@ -7,6 +7,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Trim whitespace for API key name text field (#1344)
+- Fix shares not removed from Vault whitelist when bucket is deleted (#1343)
+
 ## [2026.5.0] - 2026-05-12
 
 ### Changed
