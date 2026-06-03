@@ -446,11 +446,11 @@ async function addSessionFiles(
   container,
   headers,
 ) {
-  let undecryptable = false;
+  let undecryptable = [];
 
   for (const file in headers) {
     if (!createDownloadSessionFile(id, container, file, headers[file].header, headers[file].url, headers[file].size)) {
-      undecryptable = true;
+      undecryptable.push(file);
     }
   }
 
@@ -753,16 +753,18 @@ self.addEventListener("message", async (e) => {
       break;
     case "addHeaders":
       console.log("Got headers for the files scheduled for downloading.");
-      addSessionFiles(e.data.id, e.data.bucket, e.data.headers).then(ret => {
-        if (ret && inServiceWorker) {
+      addSessionFiles(e.data.id, e.data.bucket, e.data.headers).then(undecryptable => {
+        if (undecryptable.length && inServiceWorker) {
           e.source.postMessage({
             eventType: "notDecryptable",
             bucket: e.data.bucket,
+            undecryptable: undecryptable,
           });
-        } else if (ret) {
+        } else if (undecryptable.length) {
           postMessage({
             eventType: "notDecryptable",
             bucket: e.data.bucket,
+            undecryptable: undecryptable,
           });
         }
       }).catch(async (err) => {

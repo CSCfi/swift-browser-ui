@@ -44,6 +44,7 @@ import {
   getFolderName,
   getPrefix,
   addErrorToastOnMain,
+  UNENCRYPTED_FILE,
 } from "@/common/globalFunctions";
 import {
   mdiTrayArrowDown,
@@ -245,7 +246,7 @@ export default {
                   text: true,
                   size: "small",
                   onClick: ({ event }) => {
-                    item.name.match(".c4gh") || item?.folder
+                    item.name.match(".c4gh") || item.name === UNENCRYPTED_FILE || item?.folder
                       ? this.beginDownload(item, event.isTrusted)
                       : this.navDownload(item.url);
                   },
