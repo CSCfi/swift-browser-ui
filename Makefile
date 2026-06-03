@@ -57,7 +57,7 @@ dev-ca-clean:
 	rm -rf .devres
 	ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3022' ; ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3122'
 
-dev-docker-build:
+dev-docker-build: prepare-ui-build
 	docker compose -f docker-compose-dev.yml build
 
 dev-docker-up:
@@ -138,6 +138,28 @@ refresh-submodules:
 
 clean-browsers:
 	sudo rm -rf .docker-volumes
+
+clean-ui-build:
+	sudo rm -rf swift_browser_ui_frontend/build
+	sudo rm -rf swift_browser_ui_frontend/node_modules
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-headers.js.map
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3download.js.map
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3upload.js.map
+	sudo rm -f swift_browser_ui_frontend/public/downworker.js
+	sudo rm -f swift_browser_ui_frontend/public/downworker-post.js.map
+	sudo rm -f swift_browser_ui_frontend/public/downworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3downworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3downworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3upworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3upworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/upworker.js
+	sudo rm -f swift_browser_ui_frontend/public/upworker-post.js.map
+	sudo rm -f swift_browser_ui_frontend/public/upworker.wasm
+
+prepare-ui-build: clean-ui-build
+	cd swift_browser_ui_frontend; CI=true pnpm i; pnpm run build
 
 clean:
 	make dev-ca-clean
