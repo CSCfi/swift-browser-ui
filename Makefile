@@ -6,6 +6,13 @@ REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
 .PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
 
+# On linux "chown $USER:$USER" is fine, on MacOS not so much
+GROUP := $(USER)
+ifeq ($(shell uname -s),Darwin)
+GROUP := $(shell id -gn)
+endif
+export GROUP
+
 dev-all:
 	@echo Checking dependencies
 	make refresh-submodules
@@ -94,7 +101,7 @@ test-data:
 volumes:
 	# Create volume folder and fix permissions
 	-mkdir -p .docker-volumes
-	sudo chown -R $(USER):$(USER) .docker-volumes
+	sudo chown -R $(USER):$(GROUP) .docker-volumes
 	mkdir -p .docker-volumes/test-data
 	# Create volume mounts for firefox
 	mkdir -p .docker-volumes/config-ff
@@ -109,6 +116,8 @@ volumes:
 	sudo chown -R 1111:1111 .docker-volumes/config-chrome
 	sudo chown -R 1111:1111 .docker-volumes/cache-chrome
 	sudo chown -R 1111:1111 .docker-volumes/local-chrome
+	# Make absolutely sure the volume mounts are writeable
+	sudo chmod -R 777 .docker-volumes
 
 check-deps:
 	@for dep in $(REQ_CMDS); do \
