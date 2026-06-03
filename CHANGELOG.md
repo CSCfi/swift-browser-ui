@@ -7,8 +7,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.6.0] - 2026-06-03
+
 ### Fixed
 
+- Fixed migration report download and hide unnecessary alert (#1347)
 - Trim whitespace for API key name text field (#1344)
 - Fix shares not removed from Vault whitelist when bucket is deleted (#1343)
 
@@ -782,7 +785,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.5.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.6.0...HEAD
+[2026.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.5.0...2026.6.0
 [2026.5.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.6...2026.5.0
 [2026.4.6]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.5...2026.4.6
 [2026.4.5]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.4...2026.4.5
