@@ -30,6 +30,7 @@ Bare minimum
 * git
 * ssh (client)
 * dev python dependencies (`pip install .[dev]`)
+* X11 support
 
 Testing
 * test python dependencies (`pip install .[test]`)
