@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Dependencies without version are also supported, eg. "docker"
 REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
-.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
+.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps check-deps-ceph clean clean-browsers clean-ui-build dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up prepare-ui-build refresh-submodules switch-env test-data volumes
 
 # On linux "chown $USER:$USER" is fine, on MacOS not so much
 GROUP := $(USER)
@@ -140,7 +140,14 @@ check-deps:
 			exit 1; \
 		}; \
 	done
+
+check-deps-ceph: check-deps
 	$(MAKE) -C submodules/local-single-host-ceph check-deps
+
+ENV_KEYS := BROWSER_START_AUTH_ENDPOINT_URL OS_AUTH_URL OS_ACCEPTED_ROLES S3_ENDPOINT
+switch-env:
+	@perl -pi -e 'my @k = split(" ", "$(ENV_KEYS)"); for my $$key (@k) { s/^# ($$key=)/## $$1/; s/^($$key=)/# $$1/; s/^## ($$key=)/$$1/; }' .env
+	@echo "Currently using env $$(grep '^S3_ENDPOINT=' .env | cut -d= -f2-)"
 
 refresh-submodules:
 	git submodule foreach "git pull"
