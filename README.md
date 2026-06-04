@@ -55,14 +55,32 @@ cd swift-browser-ui
 pyenv install 3.12 \
 	&& pyenv virtualenv 3.12 sd-connect-dev \
 
-make check-deps \
+make check-deps-ceph \
 	&& pyenv activate sd-connect-dev \
 	&& pushd swift_browser_ui_frontend ; pnpm i ; popd \
 	&& cp .github/config/.env.test .env \
 	&& make
 ```
 
-> TODO: Reduced installation (without local Ceph):
+Installation and with Allas integration:
+
+```bash
+git clone --recurse-submodules ssh://git@gitlab.ci.csc.fi:10022/sds-dev/sd-connect/swift-browser-ui.git
+# OR from the public repo
+git clone --recurse-submodules https://github.com/cscfi/swift-browser-ui
+
+cd swift-browser-ui
+
+# Env checks and necessary ca certificates, no need to run after the first time
+make check-deps \
+	&& make dev-ca \
+	&& cp .github/config/.env.test .env \
+	$$ make switch-env
+
+# Running
+make dev-docker-build \
+	&& make dev-docker-up
+```
 
 #### Running
 
