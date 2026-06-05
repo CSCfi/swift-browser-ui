@@ -81,7 +81,7 @@ Alternate installation with Allas integration - in project root:
 make check-deps \
 	&& make dev-ca \
 	&& cp .github/config/.env.test .env \
-	$$ make switch-env
+	&& make switch-env
 
 # Running
 make dev-docker-build \
