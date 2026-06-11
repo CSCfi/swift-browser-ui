@@ -4,7 +4,7 @@ SHELL := /bin/bash
 # Dependencies without version are also supported, eg. "docker"
 REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
-.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps check-deps-ceph clean clean-browsers clean-ui-build dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up prepare-ui-build refresh-submodules switch-env test-data volumes
+.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps check-deps-ceph clean clean-browsers clean-chromium-locks clean-ui-build dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up prepare-ui-build refresh-submodules switch-env test-data volumes
 
 # On linux "chown $USER:$USER" is fine, on MacOS not so much
 GROUP := $(USER)
@@ -42,11 +42,13 @@ dev-docker-all:
 dev-down:
 	docker compose -f docker-compose-dev.yml down
 	make ceph-down
+	make clean-chromium-locks
 
 dev-ff: dev-ca
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox --width 1920 --height 1080 https://sd-connect.devenv
 
 dev-chromium: dev-ca
+	@trap '$(MAKE) clean-chromium-locks' EXIT; \
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox --window-size=1920,1080 --window-position=0,0 https://sd-connect.devenv
 
 dev-ca:
@@ -73,6 +75,7 @@ dev-docker-up:
 
 dev-docker-down:
 	docker compose -f docker-compose-dev.yml down
+	make clean-chromium-locks
 
 ceph-up:
 	$(MAKE) -C submodules/local-single-host-ceph up || make ceph-bootstrap
@@ -154,6 +157,11 @@ refresh-submodules:
 
 clean-browsers:
 	sudo rm -rf .docker-volumes
+
+clean-chromium-locks:
+	rm -f .docker-volumes/config-chrome/chromium/SingletonCookie
+	rm -f .docker-volumes/config-chrome/chromium/SingletonLock
+	rm -f .docker-volumes/config-chrome/chromium/SingletonSocket
 
 clean-ui-build:
 	sudo rm -rf swift_browser_ui_frontend/build
