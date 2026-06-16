@@ -44,20 +44,22 @@ dev-down:
 	make ceph-down
 	make clean-chromium-locks
 
-dev-ff: dev-ca
+dev-ff:
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox --width 1920 --height 1080 https://sd-connect.devenv
 
-dev-chromium: dev-ca
+dev-chromium:
 	@trap '$(MAKE) clean-chromium-locks' EXIT; \
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox --window-size=1920,1080 --window-position=0,0 https://sd-connect.devenv
 
 dev-ca:
 	mkdir -p $(CURDIR)/.devres/ca
 	mkdir -p $(CURDIR)/.devres/ssh
-	if [[ -z $$(ls $(CURDIR)/.devres/ca) ]]; then \
+	if [[ -z "$$(ls "$(CURDIR)/.devres/ca" 2>/dev/null)" ]]; then \
 		$(CURDIR)/scripts/gen_ca.sh; \
 	fi
-	if [[ -z $$(ls $(CURDIR)/.devres/ssh) ]]; then \
+	if [[ -z "$$(ls "$(CURDIR)/.devres/ssh" 2>/dev/null)" ]]; then \
+		ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3022'; \
+		ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3122'; \
 		ssh-keygen -t ed25519 -f .devres/ssh/ff-dev -q -N ""; \
 		ssh-keygen -t ed25519 -f .devres/ssh/chrome-dev -q -N ""; \
 	fi
