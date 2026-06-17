@@ -4,7 +4,14 @@ SHELL := /bin/bash
 # Dependencies without version are also supported, eg. "docker"
 REQ_CMDS := node:22 npm:9 pnpm:9 python:3.12 docker
 
-.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps clean clean-browsers dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up refresh-submodules test-data volumes
+.PHONY: ceph-attach ceph-bootstrap ceph-clean ceph-down ceph-install-ssl ceph-up check-deps check-deps-ceph clean clean-browsers clean-chromium-locks clean-ui-build dev-all dev-ca dev-ca-clean dev-chromium dev-docker-build dev-docker-down dev-docker-up dev-down dev-ff dev-up prepare-ui-build refresh-submodules switch-env test-data volumes
+
+# On linux "chown $USER:$USER" is fine, on MacOS not so much
+GROUP := $(USER)
+ifeq ($(shell uname -s),Darwin)
+GROUP := $(shell id -gn)
+endif
+export GROUP
 
 dev-all:
 	@echo Checking dependencies
@@ -35,20 +42,24 @@ dev-docker-all:
 dev-down:
 	docker compose -f docker-compose-dev.yml down
 	make ceph-down
+	make clean-chromium-locks
 
-dev-ff: dev-ca
+dev-ff:
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/ff-dev -XC -p 3022 root@localhost firefox --width 1920 --height 1080 https://sd-connect.devenv
 
-dev-chromium: dev-ca
+dev-chromium:
+	@trap '$(MAKE) clean-chromium-locks' EXIT; \
 	ssh -o StrictHostKeyChecking=no -i .devres/ssh/chrome-dev -XC -p 3122 chromeuser@localhost chromium --no-sandbox --window-size=1920,1080 --window-position=0,0 https://sd-connect.devenv
 
 dev-ca:
 	mkdir -p $(CURDIR)/.devres/ca
 	mkdir -p $(CURDIR)/.devres/ssh
-	if [[ -z $$(ls $(CURDIR)/.devres/ca) ]]; then \
+	if [[ -z "$$(ls "$(CURDIR)/.devres/ca" 2>/dev/null)" ]]; then \
 		$(CURDIR)/scripts/gen_ca.sh; \
 	fi
-	if [[ -z $$(ls $(CURDIR)/.devres/ssh) ]]; then \
+	if [[ -z "$$(ls "$(CURDIR)/.devres/ssh" 2>/dev/null)" ]]; then \
+		ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3022'; \
+		ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3122'; \
 		ssh-keygen -t ed25519 -f .devres/ssh/ff-dev -q -N ""; \
 		ssh-keygen -t ed25519 -f .devres/ssh/chrome-dev -q -N ""; \
 	fi
@@ -57,7 +68,7 @@ dev-ca-clean:
 	rm -rf .devres
 	ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3022' ; ssh-keygen -f "$(HOME)/.ssh/known_hosts" -R '[localhost]:3122'
 
-dev-docker-build:
+dev-docker-build: prepare-ui-build
 	docker compose -f docker-compose-dev.yml build
 
 dev-docker-up:
@@ -66,6 +77,7 @@ dev-docker-up:
 
 dev-docker-down:
 	docker compose -f docker-compose-dev.yml down
+	make clean-chromium-locks
 
 ceph-up:
 	$(MAKE) -C submodules/local-single-host-ceph up || make ceph-bootstrap
@@ -94,7 +106,7 @@ test-data:
 volumes:
 	# Create volume folder and fix permissions
 	-mkdir -p .docker-volumes
-	sudo chown -R $(USER):$(USER) .docker-volumes
+	sudo chown -R $(USER):$(GROUP) .docker-volumes
 	mkdir -p .docker-volumes/test-data
 	# Create volume mounts for firefox
 	mkdir -p .docker-volumes/config-ff
@@ -109,6 +121,8 @@ volumes:
 	sudo chown -R 1111:1111 .docker-volumes/config-chrome
 	sudo chown -R 1111:1111 .docker-volumes/cache-chrome
 	sudo chown -R 1111:1111 .docker-volumes/local-chrome
+	# Make absolutely sure the volume mounts are writeable
+	sudo chmod -R 777 .docker-volumes
 
 check-deps:
 	@for dep in $(REQ_CMDS); do \
@@ -131,13 +145,47 @@ check-deps:
 			exit 1; \
 		}; \
 	done
+
+check-deps-ceph: check-deps
 	$(MAKE) -C submodules/local-single-host-ceph check-deps
+
+ENV_KEYS := BROWSER_START_AUTH_ENDPOINT_URL OS_AUTH_URL OS_ACCEPTED_ROLES S3_ENDPOINT
+switch-env:
+	@perl -pi -e 'my @k = split(" ", "$(ENV_KEYS)"); for my $$key (@k) { s/^# ($$key=)/## $$1/; s/^($$key=)/# $$1/; s/^## ($$key=)/$$1/; }' .env
+	@echo "Currently using env $$(grep '^S3_ENDPOINT=' .env | cut -d= -f2-)"
 
 refresh-submodules:
 	git submodule foreach "git pull"
 
 clean-browsers:
 	sudo rm -rf .docker-volumes
+
+clean-chromium-locks:
+	rm -f .docker-volumes/config-chrome/chromium/SingletonCookie
+	rm -f .docker-volumes/config-chrome/chromium/SingletonLock
+	rm -f .docker-volumes/config-chrome/chromium/SingletonSocket
+
+clean-ui-build:
+	sudo rm -rf swift_browser_ui_frontend/build
+	sudo rm -rf swift_browser_ui_frontend/node_modules
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-headers.js.map
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3download.js.map
+	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3upload.js.map
+	sudo rm -f swift_browser_ui_frontend/public/downworker.js
+	sudo rm -f swift_browser_ui_frontend/public/downworker-post.js.map
+	sudo rm -f swift_browser_ui_frontend/public/downworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3downworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3downworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/s3upworker.js
+	sudo rm -f swift_browser_ui_frontend/public/s3upworker.wasm
+	sudo rm -f swift_browser_ui_frontend/public/upworker.js
+	sudo rm -f swift_browser_ui_frontend/public/upworker-post.js.map
+	sudo rm -f swift_browser_ui_frontend/public/upworker.wasm
+
+prepare-ui-build: clean-ui-build
+	cd swift_browser_ui_frontend; CI=true pnpm i; pnpm run build
 
 clean:
 	make dev-ca-clean

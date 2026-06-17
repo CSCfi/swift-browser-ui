@@ -30,6 +30,7 @@ Bare minimum
 * git
 * ssh (client)
 * dev python dependencies (`pip install .[dev]`)
+* X11 support
 
 Testing
 * test python dependencies (`pip install .[test]`)
@@ -41,7 +42,7 @@ Local ceph
 * 60 GiB available disk space
 * 8 GiB RAM to spare (32 GiB on the laptop)
 
-Default installation (with local Ceph):
+Cloning repository:
 
 ```bash
 git clone --recurse-submodules ssh://git@gitlab.ci.csc.fi:10022/sds-dev/sd-connect/swift-browser-ui.git
@@ -49,19 +50,43 @@ git clone --recurse-submodules ssh://git@gitlab.ci.csc.fi:10022/sds-dev/sd-conne
 git clone --recurse-submodules https://github.com/cscfi/swift-browser-ui
 
 cd swift-browser-ui
+```
 
+Before using make commands, you need to point submodules to correct branches, as they initialize detached:
+
+```bash
+# Only needed once
+pushd submodules/c4gh-transit; git checkout main; popd
+pushd submodules/local-single-host-ceph; git checkout master; popd
+```
+
+Default installation (with local Ceph) - in project root:
+
+```bash
 # Environment checks, not needed after it's been run once
 pyenv install 3.12 \
 	&& pyenv virtualenv 3.12 sd-connect-dev \
 
-make check-deps \
+make check-deps-ceph \
 	&& pyenv activate sd-connect-dev \
 	&& pushd swift_browser_ui_frontend ; pnpm i ; popd \
 	&& cp .github/config/.env.test .env \
 	&& make
 ```
 
-> TODO: Reduced installation (without local Ceph):
+Alternate installation with Allas integration - in project root:
+
+```bash
+# Env checks and necessary ca certificates, no need to run after the first time
+make check-deps \
+	&& make dev-ca \
+	&& cp .github/config/.env.test .env \
+	&& make switch-env
+
+# Running
+make dev-docker-build \
+	&& make dev-docker-up
+```
 
 #### Running
 

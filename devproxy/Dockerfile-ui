@@ -12,7 +12,7 @@ RUN cd tmpsrc && pip install --break-system-packages . && pip install --break-sy
 
 RUN apt-get -y update && apt-get -y upgrade && apt-get -y install
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-RUN bash -l -c "nvm install 22 && npm install --global corepack@latest && corepack enable npm"
+RUN bash -l -c "nvm install 24 && npm install --global corepack@latest pnpm@11 && corepack enable npm"
 RUN echo "PATH=/emsdk:/emsdk/upstream/emscripten:/emsdk/node/18.20.3_64bit/bin:${PATH}" > /etc/environment
 
 COPY --from=ghcr.io/cscfi/docker-emscripten-crypt4gh /emsdk /emsdk

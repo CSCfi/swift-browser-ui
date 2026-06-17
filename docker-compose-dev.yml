@@ -115,6 +115,8 @@ services:
     build:
       context: .
       dockerfile: devproxy/Dockerfile-ui
+      platforms:
+        - linux/amd64
     image: swiftui-dev-ui:dev-latest
     networks:
       - sd-connect-dev
