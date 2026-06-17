@@ -7,6 +7,18 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- multiple small compatibility fixes in Makefile for MacOS
+
+### Added
+
+- more comprehensive documentation and running instructions using make
+- force `CI=true` when running pnpm in scripts
+- pnpm platform file for build script whitelist
+- frontend build cleanup and rebuild when building the docker images
+- nssdb initialization as default in `Dockerfile-chrome`
+
 ## [2026.6.0] - 2026-06-03
 
 ### Fixed
