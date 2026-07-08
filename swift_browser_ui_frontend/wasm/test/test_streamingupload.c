@@ -6,6 +6,7 @@
 #include "mock_stub_crypt4gh.h"
 #include "mock_stub_sodium.h"
 #include "mock_stub_unistd.h"
+#include "mock_upinit.h"
 #include "mock_upcommon.h"
 #include "uptypes.h"
 #include "streamingupload.h"
