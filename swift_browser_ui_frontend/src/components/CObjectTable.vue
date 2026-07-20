@@ -174,7 +174,14 @@ export default {
       return {
         name: {
           ...(item?.folder ? {
-            value: "",
+            // Hidden wrapper to preserve top-level value for row selection
+            value: name,
+            component: {
+              tag: "span",
+              params: {
+                style: { display: "none" },
+              },
+            },
             children: [
               {
                 value: "",
