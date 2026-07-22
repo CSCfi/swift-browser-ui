@@ -31,9 +31,7 @@
     <div id="cont-table-wrapper">
       <ContainerTable
         :conts="renderingContainers"
-        :show-timestamp="showTimestamp"
         :disable-pagination="hidePagination"
-        :hide-tags="true"
         @delete-container="(cont) => removeContainer(cont)"
       />
       <c-loader v-show="contsLoading" />
@@ -48,7 +46,11 @@
 <script>
 import { liveQuery } from "dexie";
 import { getDB } from "@/common/idb";
-import { updateContainers } from "@/common/idbFunctions";
+import {
+  getSavedDisplayOptions,
+  updateContainers,
+  updateDisplayOptions,
+} from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
 import { mdiPlus, mdiTune } from "@mdi/js";
 import { toggleCreateBucketModal } from "@/common/globalFunctions";
@@ -66,10 +68,8 @@ export default {
     return {
       mdiPlus,
       mdiTune,
-      currentProject: {},
-      showTimestamp: false,
+      savedDisplayOptions: null,
       hidePagination: false,
-      //hideTags: false,
       showTags: true,
       optionsKey: 1,
       tableOptions: [],
@@ -100,15 +100,6 @@ export default {
   watch: {
     readyToSetUp: function() {
       this.setUpIfReady();
-    },
-    currentProject: function() {
-      const savedDisplayOptions = this.currentProject.displayOptions;
-      if (savedDisplayOptions) {
-        //this.hideTags = savedDisplayOptions.hideTags;
-        this.hidePagination = savedDisplayOptions.hidePagination;
-        this.showTimestamp = savedDisplayOptions.showTimestamp;
-        this.updateTableOptions();
-      }
     },
     containers: async function() {
       if (!this.containers?.length)  {
@@ -203,10 +194,14 @@ export default {
       this.updateTableOptions();
     },
   },
-  created() {
-    this.updateTableOptions();
+  async created() {
     this.abortController = new AbortController();
     this.abortRenderingController = new AbortController();
+    this.savedDisplayOptions = await getSavedDisplayOptions();
+    if (this.savedDisplayOptions?.hidePagination !== undefined) {
+      this.hidePagination = this.savedDisplayOptions.hidePagination;
+    }
+    this.updateTableOptions();
     this.setUpIfReady();
   },
   beforeUnmount() {
@@ -219,9 +214,6 @@ export default {
     setUpIfReady: async function () {
       // Check id: not available on created on page refresh
       if (this.readyToSetUp) {
-        this.currentProject = await getDB().projects.get({
-          id: this.active.id,
-        });
         this.fetchContainers(true);
       }
     },
@@ -250,50 +242,7 @@ export default {
       }
     },
     updateTableOptions: function () {
-      const displayOptions = {
-        showTimestamp: this.showTimestamp,
-        //hideTags: this.hideTags,
-        hidePagination: this.hidePagination,
-      };
       this.tableOptions = [
-        /*{
-          name: this.showTimestamp
-            ? this.$t("message.tableOptions.fromNow")
-            : this.$t("message.tableOptions.timestamp"),
-          action: async () => {
-            this.showTimestamp = !(this.showTimestamp);
-
-            const newProject = {
-              ...this.currentProject,
-              displayOptions: {
-                ...displayOptions,
-                showTimestamp: this.showTimestamp,
-              },
-            };
-            await getDB().projects.put(newProject);
-
-            this.updateTableOptions();
-          },
-        },*/
-        /*{
-          name: this.hideTags
-            ? this.$t("message.tableOptions.showTags")
-            : this.$t("message.tableOptions.hideTags"),
-          action: async () => {
-            this.hideTags = !(this.hideTags);
-
-            const newProject = {
-              ...this.currentProject,
-              displayOptions: {
-                ...displayOptions,
-                hideTags: this.hideTags,
-              },
-            };
-            await getDB().projects.put(newProject);
-
-            this.updateTableOptions();
-          },
-        },*/
         {
           name: this.hidePagination
             ? this.$t("message.tableOptions.showPagination")
@@ -301,14 +250,11 @@ export default {
           action: async () => {
             this.hidePagination = !(this.hidePagination);
 
-            const newProject = {
-              ...this.currentProject,
-              displayOptions: {
-                ...displayOptions,
-                hidePagination: this.hidePagination,
-              },
+            const newPreferences = {
+              ...this.savedDisplayOptions,
+              hidePagination: this.hidePagination,
             };
-            await getDB().projects.put(newProject);
+            await updateDisplayOptions(newPreferences);
             this.updateTableOptions();
           },
         },
@@ -322,13 +268,17 @@ export default {
       }
       if (withLoader) this.contsLoading = true;
 
+      // Define initial value to prevent rerenders:
+      // returns undefined initially
       this.containers = useObservable(
         liveQuery(() =>
           getDB().containers
             .where({ projectID: this.active.id })
             .toArray(),
         ),
+        { initialValue: [] },
       );
+
       await updateContainers(this.active.id, this.abortController.signal);
       if (!this.containers.length) this.contsLoading = false;
     },

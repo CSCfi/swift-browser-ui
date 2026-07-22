@@ -1,5 +1,6 @@
 // Functions for displaying and sorting data in tables
 import { DateTime } from "luxon";
+import { getSavedPaginationOptions } from "./idbFunctions";
 
 export function checkIfItemIsLastOnPage(paginationOptions){
   //Checks if item is last on page and reverts to previous page
@@ -35,16 +36,19 @@ export function getHumanReadableSize(val, locale) {
   return `${result} ${BYTE_UNITS[unitIndex]}`;
 }
 
-export function getPaginationOptions(t) {
+export async function getPaginationOptions(t) {
+  const savedOptions = await getSavedPaginationOptions();
+  const itemsPerPage = savedOptions?.itemsPerPage || 50;
+
   const itemText = count => count === 1 ? t("message.table.item")
     : t("message.table.items").toLowerCase();
 
   const paginationOptions = {
     itemCount: 0,
-    itemsPerPage: 50,
+    itemsPerPage: itemsPerPage,
     currentPage: 1,
     startFrom: 0,
-    endTo: 49,
+    endTo: itemsPerPage - 1,
     textOverrides: {
       itemsPerPageText: t("message.table.itemsPerPage"),
       nextPage: t("message.table.nextPage"),
