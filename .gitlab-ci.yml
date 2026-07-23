@@ -62,7 +62,6 @@ backend-test:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      allow_failure: true
   interruptible: true
   image: $BUILD_IMAGE
   before_script:
@@ -81,13 +80,12 @@ wasm-test:
     - docker-exec
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      allow_failure: true
   interruptible: true
   image: $BUILD_IMAGE
   before_script:
     - ruby --version
     - gem --version
-    - gem install ceedling
+    - gem install ceedling --no-document
   script:
     - cd swift_browser_ui_frontend/wasm
     - ceedling --verbosity debug
