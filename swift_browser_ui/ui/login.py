@@ -207,7 +207,7 @@ async def sso_query_begin_oidc(
 
 
 def test_token(
-    formdata: MultiDictProxy[typing.Union[str, bytes, aiohttp.web.FileField]],
+    formdata: MultiDictProxy[typing.Union[str, bytes, bytearray, aiohttp.web.FileField]],
     request: aiohttp.web.Request,
 ) -> str:
     """Validate unscoped token."""

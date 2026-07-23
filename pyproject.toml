@@ -45,7 +45,7 @@ test = [
     "coverage==7.8.0",
     "flake8-docstrings==1.7.0",
     "flake8==7.2.0",
-    "mypy==1.15.0",
+    "mypy==2.3.0",
     "pytest-cov==6.1.1",
     "pytest-xdist==3.6.1",
     "pytest==9.0.3",
