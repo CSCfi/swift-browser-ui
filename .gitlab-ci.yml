@@ -87,7 +87,7 @@ wasm-test:
   before_script:
     - ruby --version
     - gem --version
-    - gem install ceedling
+    - gem install ceedling --no-document
   script:
     - cd swift_browser_ui_frontend/wasm
     - ceedling --verbosity debug
