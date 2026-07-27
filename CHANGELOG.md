@@ -19,6 +19,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - frontend build cleanup and rebuild when building the docker images
 - nssdb initialization as default in `Dockerfile-chrome`
 
+### Fixed
+
+- Fixed folder deletion via selection (#1350)
+
 ## [2026.6.0] - 2026-06-03
 
 ### Fixed
