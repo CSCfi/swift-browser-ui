@@ -348,7 +348,6 @@ lisätäksesi
 lisää
 loogisesti
 loppuminen
-loppuun
 luettelo
 luku
 lukuoikeus
@@ -386,7 +385,6 @@ mahdotonta
 megatavun
 meille
 meiltä
-mennessä
 merkkiä
 mikä
 mikäli
@@ -965,7 +963,6 @@ voidaksesi
 voimassa
 voit
 voivat
-vuoden
 vuoksi
 vähintään
 väliaikaiseen
