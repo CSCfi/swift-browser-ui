@@ -9,6 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Changed
 
+- (users) Updated non-urgent conversion status text (#1353)
 - multiple small compatibility fixes in Makefile for MacOS
 
 ### Added
