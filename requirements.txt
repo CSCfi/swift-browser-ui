@@ -10,6 +10,6 @@ keystoneauth1==5.10.0
 idpyoidc==5.0.0
 python-swiftclient==4.7.0
 uvloop==0.22.1
-msgpack==1.1.0
+msgpack==1.2.1
 ldap3==2.9.1
 aioboto3==15.2.0
