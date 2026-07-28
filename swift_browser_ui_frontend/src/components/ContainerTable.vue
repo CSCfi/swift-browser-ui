@@ -2,11 +2,11 @@
   <!-- Footer options needs to be in CamelCase,
   because csc-ui wont recognise it otherwise. -->
   <c-data-table
+    v-if="paginationReady"
     id="container-table"
     data-testid="container-table"
     :data.prop="containers"
-    :headers.prop="hideTags ?
-      headers.filter(header => header.key !== 'tags'): headers"
+    :headers.prop="headers"
     :pagination.prop="disablePagination ? null : paginationOptions"
     :hide-footer="disablePagination"
     :footerOptions.prop="footerOptions"
@@ -34,7 +34,6 @@ import {
 } from "@mdi/js";
 import {
   DEV,
-  toggleEditTagsModal,
   toggleCopyBucketModal,
   addErrorToastOnMain,
   checkAndAddBucketCors,
@@ -50,6 +49,7 @@ import {
   awsListObjects,
   checkBucketEmpty,
 } from "@/common/s3commands";
+import { updatePaginationOptions } from "@/common/idbFunctions";
 
 export default {
   name: "ContainerTable",
@@ -58,15 +58,7 @@ export default {
       type: Array,
       default: () => {return [];},
     },
-    showTimestamp: {
-      type: Boolean,
-      default: false,
-    },
     disablePagination: {
-      type: Boolean,
-      default: false,
-    },
-    hideTags: {
       type: Boolean,
       default: false,
     },
@@ -93,32 +85,39 @@ export default {
     newBucket() {
       return this.$store.newBucket;
     },
+    paginationReady() {
+      return this.disablePagination || !!this.paginationOptions?.itemsPerPage;
+    },
   },
   watch: {
     disablePagination() {
       this.getPage();
     },
-    hideTags() {
-      this.getPage();
-    },
     conts() {
-      this.getPage();
+      if (this.conts.length && this.paginationReady) {
+        this.getPage();
+      }
     },
-    showTimestamp() {
-      this.getPage();
-    },
-    locale() {
+    async locale() {
       this.setHeaders();
+      await this.setPagination();
       this.getPage();
-      this.setPagination();
+    },
+    "paginationOptions.itemsPerPage": async function (newVal, oldVal) {
+      if (oldVal && newVal) {
+        await updatePaginationOptions({ itemsPerPage: newVal });
+      }
     },
   },
-  created() {
+  async created() {
     this.setHeaders();
-    this.setPagination();
+    await this.setPagination();
   },
   methods: {
     getPage (event) {
+      if (!this.paginationReady) {
+        return;
+      }
       if (this.newBucket) {
         if (event?.detail?.currentPage > 1) {
           // Moving from page 1, remove highlight
@@ -419,8 +418,8 @@ export default {
         },
       ];
     },
-    setPagination: function () {
-      const paginationOptions = getPaginationOptions(this.$t);
+    setPagination: async function () {
+      const paginationOptions = await getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
     ensureBucketState: async function (bucket, shouldBeEmpty, errorMsg) {

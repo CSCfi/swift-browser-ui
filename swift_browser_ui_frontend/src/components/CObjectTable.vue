@@ -3,11 +3,11 @@
     <!-- Footer options needs to be in CamelCase,
     because csc-ui wont recognise it otherwise. -->
     <c-data-table
+      v-if="paginationReady"
       id="obj-table"
       data-testid="object-table"
       :data.prop="objects"
-      :headers.prop="hideTags ?
-        headers.filter(header => header.key !== 'tags'): headers"
+      :headers.prop="headers"
       :pagination.prop="disablePagination ? null : paginationOptions"
       :hide-footer="disablePagination"
       :footerOptions.prop="footerOptions"
@@ -39,7 +39,6 @@ import {
 
 import {
   DEV,
-  toggleEditTagsModal,
   isFile,
   getFolderName,
   getPrefix,
@@ -48,10 +47,10 @@ import {
 } from "@/common/globalFunctions";
 import {
   mdiTrayArrowDown,
-  //mdiPencilOutline,
   mdiDeleteOutline,
-  mdiFolder ,
+  mdiFolder,
 } from "@mdi/js";
+import { updatePaginationOptions } from "@/common/idbFunctions";
 
 export default {
   name: "CObjectTable",
@@ -61,10 +60,6 @@ export default {
       default: () => [],
     },
     disablePagination: {
-      type: Boolean,
-      default: false,
-    },
-    hideTags: {
       type: Boolean,
       default: false,
     },
@@ -125,19 +120,27 @@ export default {
     owner() {
       return this.$route.params.owner;
     },
+    paginationReady() {
+      return this.disablePagination || !!this.paginationOptions?.itemsPerPage;
+    },
   },
   watch: {
     prefix() {
       this.getPage();
     },
-    locale() {
+    async locale() {
       this.setHeaders();
-      this.setPagination();
+      await this.setPagination();
+    },
+    "paginationOptions.itemsPerPage": async function (newVal, oldVal) {
+      if (oldVal && newVal) {
+        await updatePaginationOptions({ itemsPerPage: newVal });
+      }
     },
   },
-  created() {
+  async created() {
     this.setHeaders();
-    this.setPagination();
+    await this.setPagination();
   },
   beforeUpdate() {
     this.getPage();
@@ -221,24 +224,6 @@ export default {
             this.locale, item.last_modified, this.$t, false) :
             parseDateFromNow(this.locale, item.last_modified, this.$t),
         },
-        ...(this.hideTags ? {} : {
-          tags: {
-            value: null,
-            children: [
-              ...(item.tags?.length ?
-                item.tags.map((tag, index) => ({
-                  key: "tag_" + index + "",
-                  value: tag,
-                  component: {
-                    tag: "c-tag",
-                    params: {
-                      flat: true,
-                    },
-                  },
-                })) : [{ key: "no_tags", value: "-" }]),
-            ],
-          },
-        }),
         actions: {
           value: null,
           sortable: null,
@@ -280,28 +265,6 @@ export default {
                 },
               ],
             },
-            /*{
-              value: this.$t("message.table.editTags"),
-              component: {
-                tag: "c-button",
-                params: {
-                  testid: "edit-object-tags",
-                  text: true,
-                  size: "small",
-                  title: "Edit tags",
-                  path: mdiPencilOutline,
-                  onClick: () =>
-                    toggleEditTagsModal(item.name, null);
-                  onKeyUp: (event) => {
-                    if(event.keyCode === 13) {
-                      toggleEditTagsModal(item.name, null);
-                    }
-                  },
-                  disabled: item?.folder ||
-                    (this.owner != undefined && this.accessRights.length <= 1),
-                },
-              },
-            },*/
             {
               value: "",
               component: {
@@ -347,6 +310,9 @@ export default {
     },
 
     getPage: function () {
+      if (!this.paginationReady) {
+        return;
+      }
       let offset = 0;
       let limit = this.objs.length;
       if (!this.disablePagination || this.objs.length > 500) {
@@ -402,7 +368,6 @@ export default {
               name: fullName,
               bytes: folderSize,
               last_modified: folderObjs[0].last_modified,
-              tags: [],
               folder: true,
             };
             items.push(folder);
@@ -419,37 +384,9 @@ export default {
         ...this.paginationOptions,
         itemCount: pagedLength,
       };
-      if (this.objs.length > 0) this.setPageByFileName(this.$route.query.file);
     },
-    setPageByFileName: function(file){
-      if(file != undefined){
-        let objectList = this.objs;
-        // check if file is in folder
-        if(file.includes("/")){
-          let folderItems = [];
-          objectList.forEach(element => {
-            if(element.name.substr(0, element.name.lastIndexOf("/") + 1)
-              === file.substr(0, file.lastIndexOf("/") + 1)){
-              folderItems.push(element);
-            }
-          });
-          objectList = folderItems;
-        }
-        let index = objectList.findIndex(item => item.name == file);
-        if(index <= 0){
-          index = 1;
-        }
-        this.paginationOptions.currentPage =
-          Math.floor(index  / this.paginationOptions.itemsPerPage) + 1;
-        let queryWithOutFile = {
-          ...this.$route.query,
-          file: null,
-        };
-        this.$router.replace({"query": queryWithOutFile});
-      }
-    },
-    setPagination: function () {
-      const paginationOptions = getPaginationOptions(this.$t);
+    setPagination: async function () {
+      const paginationOptions = await getPaginationOptions(this.$t);
       this.paginationOptions = paginationOptions;
     },
     onSort(event) {
@@ -522,11 +459,6 @@ export default {
         {
           key: "size",
           value: this.$t("message.table.size"),
-          sortable: true,
-        },
-        {
-          key: "tags",
-          value: this.$t("message.table.tags"),
           sortable: true,
         },
         {
