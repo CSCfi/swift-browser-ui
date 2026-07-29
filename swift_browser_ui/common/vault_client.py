@@ -68,7 +68,7 @@ def _make_exception(reason: str, status: int) -> HTTPError:
         return HTTPInternalServerError(
             reason="Server encountered an unexpected situation."
         )
-    reason = f"Vault error: {reason.replace('\n', ' ')}"
+    reason = "Vault error: " + reason.replace("\n", " ")
     if status >= 500:
         return VaultServerError(text=reason, reason=reason)
     return VaultClientError(text=reason, reason=reason, status_code=status)
