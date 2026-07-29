@@ -60,19 +60,6 @@ export async function checkBucketAccessible(bucket) {
   }
 }
 
-export async function checkBucketExists(bucket) {
-  const command = new HeadBucketCommand({
-    Bucket: bucket,
-  });
-  try {
-    const resp = await sendS3Command(command);
-    if (resp?.$metadata?.httpStatusCode === 200) return true;
-  } catch (e) {
-    if (e?.$metadata?.httpStatusCode === 403) return true;
-    return false;
-  }
-}
-
 /** OBJECTS */
 
 export async function awsDeleteObjects(bucket, objects) {

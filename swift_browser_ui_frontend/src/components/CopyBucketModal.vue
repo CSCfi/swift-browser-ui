@@ -187,7 +187,7 @@ export default {
     },
     replicateContainer: async function () {
       this.validationResult = await validateBucketName(
-        this.bucketName);
+        this.active.id, this.bucketName);
       const validationError =
         Object.values(this.validationResult).some(val => !val);
       if (validationError) return;
@@ -264,7 +264,7 @@ export default {
     },
     checkValidity: debounce(async function () {
       this.validationResult = await validateBucketName(
-        this.bucketName);
+        this.active.id, this.bucketName);
     }, 300, { leading: true }),
     handleKeyDown: function (e) {
       if (e.key === "Escape") {

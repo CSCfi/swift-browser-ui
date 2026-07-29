@@ -630,7 +630,7 @@ export default {
     },
     checkBucketName: debounce(async function () {
       this.validationResult = await validateBucketName(
-        this.inputBucket);
+        this.active.id, this.inputBucket);
     }, 300),
     setFile: function (item, path) {
       let entry = undefined;
@@ -775,7 +775,7 @@ export default {
     async onUploadClick() {
       if (!this.currentBucket) {
         this.validationResult =
-          await validateBucketName(this.inputBucket);
+          await validateBucketName(this.active.id, this.inputBucket);
         const validationError =
           Object.values(this.validationResult).some(val => !val);
         if (validationError) return;

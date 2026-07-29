@@ -22,6 +22,7 @@ from swift_browser_ui.ui._convenience import get_redis_client
 from swift_browser_ui.ui.api import (
     aws_bulk_update_bucket_cors,
     aws_create_bucket,
+    aws_head_bucket,
     aws_list_buckets,
     aws_update_bucket_cors,
     close_upload_session,
@@ -244,6 +245,7 @@ async def servinit(
     app.add_routes(
         [
             aiohttp.web.get("/api/s3/{project}", aws_list_buckets),
+            aiohttp.web.head("/api/s3/{project}/{bucket}", aws_head_bucket),
             aiohttp.web.post("/api/s3/{project}/cors", aws_bulk_update_bucket_cors),
             aiohttp.web.put("/api/s3/{project}/{bucket}", aws_create_bucket),
             aiohttp.web.post("/api/s3/{project}/{bucket}/cors", aws_update_bucket_cors),

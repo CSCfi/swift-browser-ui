@@ -154,11 +154,11 @@ export default {
   methods: {
     checkBucketName: debounce(async function () {
       this.validationResult = await validateBucketName(
-        this.bucketName);
+        this.active.id, this.bucketName);
     }, 300),
     createContainer: async function () {
       this.validationResult = await validateBucketName(
-        this.bucketName);
+        this.active.id, this.bucketName);
       const validationError =
         Object.values(this.validationResult).some(val => !val);
       if (validationError) return;
