@@ -323,7 +323,10 @@ const app = createApp({
       if (needsSync) {
         setTimeout(async () => {
           const synced = await syncBucketPolicies(project.id);
-          if (synced) await updateProjectSharingSyncTime(project.id);
+          if (synced) {
+            await updateProjectSharingSyncTime(project.id);
+            this.$store.setSharingUpdated(true);
+          }
         }, delayMs);
       }
     },
