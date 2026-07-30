@@ -320,3 +320,17 @@ export async function awsAddBucketCors(
     throw new Error("Failed to fix the bucket cors.");
   }
 }
+
+// Check if bucket with given name exists
+export async function checkBucketExists(
+  project,
+  bucket,
+) {
+  let fetchURL = new URL(`/api/s3/${encodeURI(project)}/${encodeURI(bucket)}`, document.location.origin);
+  let resp = await fetch(fetchURL, {
+    method: "HEAD",
+    credentials: "same-origin",
+  });
+  if (resp.status === 404) return false;
+  if (resp.status === 200 || resp.status === 403) return true;
+}

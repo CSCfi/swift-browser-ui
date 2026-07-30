@@ -11,4 +11,4 @@ if ! test -f swift_browser_ui_frontend/node_modules/.bin/eslint; then
   exit 0
 fi
 
-pnpm --prefix swift_browser_ui_frontend run lint
+CI=true pnpm --prefix swift_browser_ui_frontend run lint

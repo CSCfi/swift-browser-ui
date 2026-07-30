@@ -288,6 +288,41 @@ async def _update_bucket_cors(
             )
 
 
+async def aws_head_bucket(
+    request: aiohttp.web.Request,
+) -> aiohttp.web.Response:
+    """Proxy a head bucket request to check bucket existence."""
+    session = await aiohttp_session.get_session(request)
+    client = request.app["api_client"]
+    logger = request.app["Log"]
+    project = request.match_info["project"]
+    bucket = request.match_info["bucket"]
+
+    logger.info(
+        f"API call to head bucket {bucket} from project {project}"
+        f"{request.remote}, sess: {session} :: {time.ctime()}"
+    )
+
+    creds = await _get_ec2_credentials(session, client, project)
+    s3session = aioboto3.Session(
+        aws_access_key_id=creds["access"],
+        aws_secret_access_key=creds["secret"],
+    )
+
+    async with s3session.client(
+        "s3",
+        region_name="us-east-1",
+        endpoint_url=setd["s3api_endpoint"],
+        verify=setd["check_certificate"],
+    ) as s3_client:
+        try:
+            await s3_client.head_bucket(Bucket=bucket)
+            return aiohttp.web.Response(status=200)
+        except botocore.exceptions.ClientError as e:
+            status = e.response["ResponseMetadata"]["HTTPStatusCode"]
+            return aiohttp.web.Response(status=status)
+
+
 async def aws_update_bucket_cors(
     request: aiohttp.web.Request,
 ) -> aiohttp.web.Response:

@@ -43,7 +43,6 @@ repos:
     - id: eslint
       name: Lint frontend
       entry: ./scripts/eslint.sh
-      args: [--prefix, swift_browser_ui_frontend, run, lint]
       files: ^swift_browser_ui_frontend
       language: system
       pass_filenames: false
