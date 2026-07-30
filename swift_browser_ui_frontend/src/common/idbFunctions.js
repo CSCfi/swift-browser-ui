@@ -259,3 +259,13 @@ export async function updatePaginationOptions(options) {
     if (DEV) console.log("Error updating pagination options in IDB");
   }
 }
+
+export async function updateProjectSharingSyncTime(projectID) {
+  try {
+    await getDB().projects.where({ "id": projectID }).modify(project => {
+      project.last_share_sync = new Date();
+    });
+  } catch {
+    if (DEV) console.log("Error updating project last share sync time in IDB");
+  }
+}
