@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed bucket name uniqueness check (#1357)
+
 ## [2026.7.0] - 2026-07-28
 
 ### Changed
