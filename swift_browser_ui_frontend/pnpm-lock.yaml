@@ -28,7 +28,7 @@ importers:
         version: 6.0.8(vite@7.3.6(@types/node@26.1.2)(sass@1.87.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.40(typescript@5.6.2))
       '@vueuse/rxjs':
         specifier: ^14.1.0
-        version: 14.1.0(rxjs@7.8.2)(vue@3.5.40(typescript@5.6.2))
+        version: 14.3.0(rxjs@7.8.2)(vue@3.5.40(typescript@5.6.2))
       '@ygoe/msgpack':
         specifier: ^1.0.3
         version: 1.0.3
@@ -1859,14 +1859,14 @@ packages:
   '@vue/test-utils@2.4.6':
     resolution: {integrity: sha512-FMxEjOpYNYiFe0GkaHsnJPXFHxQ6m4t8vI/ElPGpMWxZKpmRvQ33OIrvRXemy6yha03RxhOlQuy+gZMC3CQSow==}
 
-  '@vueuse/rxjs@14.1.0':
-    resolution: {integrity: sha512-g/tZS++oS1/xhtpsdh9JYPB6QvdBKajcMM23KycDr8EPIV3sVeEvH1Yu7+iH6XpA0Py/pkWWTxan2+a6lWFJXw==}
+  '@vueuse/rxjs@14.3.0':
+    resolution: {integrity: sha512-sSmwVjbq3Jv7Dxdvf+YTzupTxtwqRPbVDJicQ9jII5HyjSQZNn5ypfuMaRvA0oqNmGzZjqJHNn/NQ67iMIpmvQ==}
     peerDependencies:
       rxjs: '>=6.0.0'
       vue: ^3.5.0
 
-  '@vueuse/shared@14.1.0':
-    resolution: {integrity: sha512-EcKxtYvn6gx1F8z9J5/rsg3+lTQnvOruQd8fUecW99DCK04BkWD7z5KQ/wTAx+DazyoEE9dJt/zV8OIEQbM6kw==}
+  '@vueuse/shared@14.3.0':
+    resolution: {integrity: sha512-bZpge9eSXwa4ToSiqJ7j6KRwhAsneMFoSz3LMWKQDkqimm3D/tbFlrklrs/IOqC8tEcYmXQZJ6N0UrjhBirVCg==}
     peerDependencies:
       vue: ^3.5.0
 
@@ -6607,13 +6607,13 @@ snapshots:
       js-beautify: 1.15.1
       vue-component-type-helpers: 2.0.19
 
-  '@vueuse/rxjs@14.1.0(rxjs@7.8.2)(vue@3.5.40(typescript@5.6.2))':
+  '@vueuse/rxjs@14.3.0(rxjs@7.8.2)(vue@3.5.40(typescript@5.6.2))':
     dependencies:
-      '@vueuse/shared': 14.1.0(vue@3.5.40(typescript@5.6.2))
+      '@vueuse/shared': 14.3.0(vue@3.5.40(typescript@5.6.2))
       rxjs: 7.8.2
       vue: 3.5.40(typescript@5.6.2)
 
-  '@vueuse/shared@14.1.0(vue@3.5.40(typescript@5.6.2))':
+  '@vueuse/shared@14.3.0(vue@3.5.40(typescript@5.6.2))':
     dependencies:
       vue: 3.5.40(typescript@5.6.2)
 
