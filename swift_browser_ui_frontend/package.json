@@ -14,7 +14,7 @@
     "docker-build-devel": "vite build --mode development"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.964.0",
+    "@aws-sdk/client-s3": "3.1095.0",
     "@cscfi/csc-ui": "^3.0.18",
     "@cscfi/csc-ui-vue": "^0.0.2",
     "@intlify/unplugin-vue-i18n": "^11.0.3",
