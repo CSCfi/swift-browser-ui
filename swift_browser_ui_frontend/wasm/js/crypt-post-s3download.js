@@ -435,7 +435,7 @@ async function abortDownload(id, stream = null) {
     //remove temp files
     if (stream) await stream.abort();
     await downloads[id].handle.remove().catch(err => {
-      console.log("Tried to remove a not-yet created file.");
+      console.error("Tried to remove a not-yet created file.");
     });
   }
   finishDownloadSession(id);
@@ -547,15 +547,15 @@ async function beginDownloadInSession(
     if (downloads[id].files[file].key <= 0) {
       console.log(`No key for ${file}, concatenating content as is.`);
       res = await concatFile(fileStream, id, file).catch(err => {
-        console.log(`Failed concatenating file ${file}`);
-        console.log(err);
+        console.error(`Failed concatenating file ${file}`);
+        console.error(err);
         return false;
       });
     } else {
       console.log(`Key available for ${file}, decrypting content.`);
       res = await sliceFile(fileStream, id, file).catch(err => {
-        console.log(`Failed slicing file ${file}`);
-        console.log(err);
+        console.error(`Failed slicing file ${file}`);
+        console.error(err);
         return false;
       });
     }
@@ -768,8 +768,8 @@ self.addEventListener("message", async (e) => {
           });
         }
       }).catch(async (err) => {
-        console.log(`Failed to add session files for ${e.data.id}, aborting`);
-        console.log(err);
+        console.error(`Failed to add session files for ${e.data.id}, aborting`);
+        console.error(err);
         if (!aborted) startAbort(!inServiceWorker, "error");
         await abortDownload(e.data.id);
       });

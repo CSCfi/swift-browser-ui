@@ -135,8 +135,8 @@ export default defineConfig(({ command, mode }) => {
       console.log(process.env.VITE_GIT_LINK);
     }
     catch(error){
-      console.log("Failed to get version from git");
-      console.log(error);
+      console.error("Failed to get version from git");
+      console.error(error);
     }
   }
   let base = undefined;

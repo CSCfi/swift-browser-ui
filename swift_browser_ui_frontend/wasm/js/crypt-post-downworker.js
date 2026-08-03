@@ -229,7 +229,7 @@ class FileSlicer {
         },
       },
     ).catch(e => {
-      console.log(e);
+      console.error(e);
     });
     this.segmentOffset += DOWNLOAD_SEGMENT_SIZE;
     this.reader = resp.body.getReader();

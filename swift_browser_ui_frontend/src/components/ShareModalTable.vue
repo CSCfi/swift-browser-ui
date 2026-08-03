@@ -73,7 +73,6 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { DEV } from "@/common/globalFunctions";
 import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 
@@ -320,7 +319,7 @@ export default {
             JSON.stringify([projectIDs.name]),
             [],
           ).then(() => {
-            if (DEV) console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
+            console.log(`Deleted sharing whitelist entry for ${sharedProjectId}`);
           });
         } else {
           await signedFetch(
@@ -330,11 +329,11 @@ export default {
             JSON.stringify([projectIDs]),
             [],
           ).then(() => {
-            if (DEV) console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
+            console.log(`Edited sharing whitelist entry for ${sharedProjectId}`);
           });
         }
       } else {
-        if (DEV) console.log("Unable to alter whitelist status without cached project name");
+        console.warn("Unable to alter whitelist status without cached project name");
         this.$emit("failUpdateSharedBucket");
       }
 
@@ -387,16 +386,12 @@ export default {
           ]),
           [],
         );
-        if (DEV) {
-          console.log(
-            `Deleted sharing whitelist entry for ${bucketData.projectId.value}`,
-          );
-        }
+        console.log(`Deleted sharing whitelist entry for ${bucketData.projectId.value}`);
       } else {
-        if (DEV) console.log(`Skipping delete share whitelist for ${bucketData.projectId.value}`);
+        console.log(`Skipping delete share whitelist for ${bucketData.projectId.value}`);
       }
 
-      if (DEV) console.log(`Share deletion for ${bucketData.projectId.value} finished.`);
+      console.log(`Share deletion for ${bucketData.projectId.value} finished.`);
     },
   },
 };

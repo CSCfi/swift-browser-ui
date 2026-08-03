@@ -100,10 +100,8 @@ export default class S3UploadSocket {
         this.upWorkers.push(new Worker("/static/s3upworker.js"));
       }
     }
-    if (DEV) {
-      console.log(`${this.upWorkers.length} upload worker threads were created`);
-      console.log(this.upWorkers);
-    }
+    console.log(`${this.upWorkers.length} upload worker threads were created:`);
+    console.log(this.upWorkers);
 
     // Initialize the header worker
     if (DEV) {
@@ -118,11 +116,11 @@ export default class S3UploadSocket {
     let headerWorkerHandler = (e) => {
       switch(e.data.eventType) {
         case "headerDone":
-          if (DEV) console.log("File header done");
+          console.log("File header done");
           this.processFile(
             e.data.bucket, e.data.key, e.data.header, e.data.secret,
           ).then(() => {
-            if (DEV) console.log(`Initialized file ${e.data.bucket}/${e.data.key}`);
+            console.log(`Initialized file ${e.data.bucket}/${e.data.key}`);
           });
           break;
       }
@@ -154,68 +152,62 @@ export default class S3UploadSocket {
     return (e) => {
       switch(e.data.eventType) {
         case "uploadPartComplete":
-          if (DEV) {
-            console.log(
-              `A segment for ${e.data.bucket}/${e.data.key} was finished.`,
-            );
-          }
+          console.log(
+            `A segment for ${e.data.bucket}/${e.data.key} was finished.`,
+          );
           if (this.uploads[e.data.bucket][e.data.key].isMultipart) {
-            if (DEV) {
-              console.log(
-                `Multipart chunk ${e.data.orderNumber} for object ${e.data.key} was completed. ETag was ${e.data.ETag}`,
-              );
-            }
+            console.log(
+              `Multipart chunk ${e.data.orderNumber} for object ${e.data.key} was completed. ETag was ${e.data.ETag}`,
+            );
 
             this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].ETag =
             e.data.ETag;
             this.uploads[e.data.bucket][e.data.key].multipartParts[e.data.orderNumber].done = true;
 
             this.checkFinishedFile(e.data.bucket, e.data.key).then(() => {
-              if (DEV) console.log(`Checked if file ${e.data.bucket}/${e.data.key} is finished.`);
+              console.log(`Checked if file ${e.data.bucket}/${e.data.key} is finished.`);
             });
           } else {
-            if (DEV) {
-              console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
-            }
+            console.log(`Flagging regular object ${e.data.bucket}/${e.data.key} as finished.`);
             this.uploads[e.data.bucket][e.data.key].finished = true;
           }
 
           // Schedule next part if there's more to process,
           // otherwise check if we're done.
           if (this.parts.length > 0) {
-            if (DEV) console.log("Sending next part to worker.");
+            console.log("Sending next part to worker.");
             this.getNextPart(worker);
           } else {
             this.checkFinished().then(
               () => {
-                if (DEV) console.log("Checked if all the parts are finished.");
+                console.log("Checked if all the parts are finished.");
               },
             );
           }
           break;
         case "filesAdded":
-          if (DEV) console.log("Files added to WorkerFS");
+          console.log("Files added to WorkerFS");
           break;
         case "progress":
-          if (DEV) console.log(`Incrementing completed amount by ${e.data.amount}`);
+          console.log(`Incrementing completed amount by ${e.data.amount}`);
           this.totalCompleted += e.data.amount;
           this.updateProgress();
           break;
         case "filesRemoved":
-          if (DEV) console.log("File handles closed in the WorkerFS");
+          console.log("File handles closed in the WorkerFS");
           break;
         case "runtimeInitialized":
-          if (DEV) console.log("Worker initialized Webassembly runtime.");
+          console.log("Worker initialized Webassembly runtime.");
           // Intentionally omit break to flow to next block
         case "s3ClientCreated":
-          if (DEV && e.data.eventType === "s3ClientCreated") {
+          if (e.data.eventType === "s3ClientCreated") {
             console.log("Worker created an S3 client session.");
           }
           // Bump init count and check if ready
           this.workersInited++;
           // We need two init steps per worker, for s3 and wasm
           if (this.workersInited >= this.upWorkers.length * 2) {
-            if (DEV) console.log("Flagging upload workers as initialized");
+            console.log("Flagging upload workers as initialized");
             this.$store.setWorkersInitializing(false);
           }
           break;
@@ -225,10 +217,7 @@ export default class S3UploadSocket {
 
   // Wrapper for updating upload progress
   updateProgress() {
-    if (DEV) {
-      `Updating progress to ${this.totalCompleted / this.totalSize}`;
-    }
-
+    console.log(`Updating progress to ${this.totalCompleted / this.totalSize}`);
     this.$store.updateProgress(this.totalCompleted / this.totalSize);
   }
 
@@ -245,9 +234,7 @@ export default class S3UploadSocket {
     }
 
     if (finished) {
-      if (DEV) {
-        console.log("Upload has finished.");
-      }
+      console.log("Upload has finished.");
       this.finalizeUpload();
     }
   }
@@ -262,7 +249,7 @@ export default class S3UploadSocket {
     }
 
     if (finished) {
-      if (DEV) console.log(`File ${bucket}/${key} is finished, completing multipart.`);
+      console.log(`File ${bucket}/${key} is finished, completing multipart.`);
       this.uploads[bucket][key].finished = true;
 
       let parts = [];
@@ -281,9 +268,7 @@ export default class S3UploadSocket {
         parts,
         this.uploads[bucket][key].multipartSession,
       );
-      if (DEV) {
-        console.log(`Got following response when completing multipart upload ${this.uploads[bucket][key]}: ${response}`);
-      }
+      console.log(`Got following response when completing multipart upload ${this.uploads[bucket][key]}: ${response}`);
     }
   }
 
@@ -318,9 +303,7 @@ export default class S3UploadSocket {
 
       this.uploads[nextPart.bucket][nextPart.key].multipartSession = response.UploadId;
 
-      if (DEV) {
-        console.log(`Starting upload for ${nextPart.bucket}/${nextPart.key} with upload id ${response.UploadId}`);
-      }
+      console.log(`Starting upload for ${nextPart.bucket}/${nextPart.key} with upload id ${response.UploadId}`);
     }
     worker.postMessage({
       command: "nextPart",
@@ -386,7 +369,7 @@ export default class S3UploadSocket {
       });
     }
 
-    if (DEV) console.log(`Header for ${bucket}/${key}: ${header}`);
+    console.log(`Header for ${bucket}/${key}: ${header}`);
 
     // Throttle header pushes to stay under fetch pending request limit
     while (this.headerUploads >= MAX_SIMULTANEOUS_HEADER_UPLOADS) {
@@ -396,7 +379,7 @@ export default class S3UploadSocket {
 
     this.headerUploads++;
 
-    if (DEV && this.uploads[bucket][key].ownerName) {
+    if (this.uploads[bucket][key].ownerName) {
       console.log(`Shared upload, using ${this.uploads[bucket][key].ownerName} as owner.`);
     }
 
@@ -420,12 +403,12 @@ export default class S3UploadSocket {
     this.$store.setHeadersProcessed(this.headersAdded);
 
     if (this.headersNeeded == this.headersAdded) {
-      if (DEV) console.log("All headers are done, starting upload");
+      console.log("All headers are done, starting upload");
       this.headersAdded = 0;
       this.headersNeeded = 0;
       this.$store.updateProgress(0);
       this.beginUpload().then(() => {
-        if (DEV) console.log("Upload started successfully.");
+        console.log("Upload started successfully.");
       });
     }
   }
@@ -446,23 +429,19 @@ export default class S3UploadSocket {
           let resp = await awsCreateBucket(this.active, bucket);
           switch (resp) {
             case 400:
-              if (DEV) {
-                console.log(`Couldn't create bucket ${bucket} due to a client error.`);
-              }
+              console.error(`Couldn't create bucket ${bucket} due to a client error.`);
               return;
             case 403:
-              if (DEV) {
-                console.log(
-                  `Couldn't create bucket ${bucket} due to it being forbidden.`,
-                );
-                console.log(
-                  "The bucket is probably owned by some other project.",
-                );
-              }
+              console.error(
+                `Couldn't create bucket ${bucket} due to it being forbidden.`,
+              );
+              console.log(
+                "The bucket is probably owned by some other project.",
+              );
               return;
           }
         } catch (e) {
-          if (DEV) console.log("Coudln't start upload, reason: ", e);
+          console.error("Couldn't start upload, reason: ", e);
           return;
         }
 
@@ -470,9 +449,7 @@ export default class S3UploadSocket {
         try {
           await awsAddBucketCors(this.active, bucket);
         } catch (e) {
-          if (DEV) {
-            console.error(`Couldn't add CORS for bucket ${bucket}`);
-          }
+          console.error(`Couldn't add CORS for bucket ${bucket}`);
           return;
         }
       }
@@ -484,11 +461,10 @@ export default class S3UploadSocket {
     this.$store.setHeadersTotal(this.headersNeeded);
     this.$store.setEncryptedFile("file pending...");
 
-    if (DEV) console.log("Adding the listed files to the worker filesystems.");
+    console.log("Adding the listed files to the worker filesystems.");
     // Preserve file paths
     const filesWithPath = files.map((file) => ({ file: file, relativePath: file.relativePath }));
     for (const worker of this.upWorkers) {
-      if (DEV) console.log(worker);
       worker.postMessage({
         command: "mountFiles",
         bucket: bucket,
@@ -497,7 +473,7 @@ export default class S3UploadSocket {
     }
 
     for (const file of files) {
-      if (DEV) console.log(`Adding file ${file.relativePath}`);
+      console.log(`Adding file ${file.relativePath}`);
       this.uploads[bucket][file.relativePath] = {
         size: file.size,
         isMultipart: file.size > 100 * 1024 * 1024,
@@ -509,7 +485,7 @@ export default class S3UploadSocket {
         ownerName: ownerName,
       };
 
-      if (DEV) console.log(this.uploads[bucket][file.relativePath]);
+      console.log(this.uploads[bucket][file.relativePath]);
 
       this.headerWorker.postMessage({
         command: "createHeader",
@@ -521,7 +497,7 @@ export default class S3UploadSocket {
 
       this.totalSize += file.size;
     }
-    if (DEV) console.log(`Scheduled files for uploading in bucket ${bucket}`);
+    console.log(`Scheduled files for uploading in bucket ${bucket}`);
     this.$store.eraseProgress();
     this.$store.setUploading();
   }
@@ -532,7 +508,7 @@ export default class S3UploadSocket {
     this.parts = this.parts.filter(part => part.bucket == bucket);
 
     // Cancel each file that's being uploaded
-    if (DEV) console.log(`Terminating uploads in ${bucket}`);
+    console.log(`Terminating uploads in ${bucket}`);
     for (const key in this.uploads[bucket]) {
       // Cancel the multipart process
       await awsAbortMultipartUpload(
@@ -540,17 +516,15 @@ export default class S3UploadSocket {
         key.concat(".c4gh"),
         this.uploads[bucket][key].multipartSession,
       ).catch((err) => {
-        if (DEV) {
-          console.log("Failed to abort multipart on cancel.");
-          console.log(err);
-        }
+        console.error("Failed to abort multipart on cancel.");
+        console.error(err);
       });
     }
     this.finalizeUpload();
   }
 
   finalizeUpload() {
-    if (DEV) console.log("Erasing files from storage");
+    console.log("Erasing files from storage");
     for (const worker of this.upWorkers) {
       for (const bucket of Object.keys(this.uploads)) {
         this.uploads[bucket] = {};

@@ -2,7 +2,6 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { GET } from "./api";
-import { DEV } from "./globalFunctions";
 import S3UploadSocket from "./s3upload";
 import S3DownloadSocket from "./s3download";
 
@@ -43,7 +42,7 @@ function createClient(accessKey, secretKey, endpoint) {
 export async function initS3(projectID, projectName, store, t) {
   if (initPromise) return initPromise;
   initPromise = (async () => {
-    if (DEV) console.log("Initializing S3 client...");
+    console.log("Initializing S3 client...");
     const s3endpoint = await discoverEndpoint();
     store.setS3Endpoint(s3endpoint);
 
@@ -82,7 +81,7 @@ export async function initS3(projectID, projectName, store, t) {
     store.setS3Download(s3downsocket);
   })()
     .then(() => {
-      if (DEV) console.log("S3 client initialized");
+      console.log("S3 client initialized");
     })
     .catch((error) => {
       initPromise = null;

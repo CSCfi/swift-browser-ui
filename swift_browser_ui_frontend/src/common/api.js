@@ -28,9 +28,7 @@ async function fetchWithCookie({method, url, body, signal}) {
     })
     .catch(error => {
       if (!signal?.aborted) {
-        if (DEV) {
-          console.log("Fetch error. Might be a networking issue", error);
-        }
+        console.log("Fetch error. Might be a networking issue", error);
         throw new Error(error);
       }
     });
@@ -265,7 +263,7 @@ export async function awsListBuckets(
     bucket.CreationDate = new Date(bucket.CreationDate);
   }
 
-  if (DEV) console.log(ret);
+  console.log(ret);
 
   return ret;
 }

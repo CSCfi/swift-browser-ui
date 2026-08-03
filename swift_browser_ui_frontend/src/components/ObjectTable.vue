@@ -129,7 +129,6 @@ import {
   mdiTrashCanOutline,
 } from "@mdi/js";
 import {
-  DEV,
   toggleDeleteModal,
   isFile,
   addErrorToastOnMain,
@@ -425,7 +424,7 @@ export default {
         await updateContainers(this.active.id, this.abortController.signal);
         this.currentContainer = await this.getCurrentContainer();
         if (this.currentContainer === undefined) {
-          if (DEV) console.log("Error with uploaded container");
+          console.error("Error with uploaded container");
           return;
         }
       }

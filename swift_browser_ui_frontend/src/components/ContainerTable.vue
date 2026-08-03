@@ -33,7 +33,6 @@ import {
   mdiPail,
 } from "@mdi/js";
 import {
-  DEV,
   toggleCopyBucketModal,
   addErrorToastOnMain,
   checkAndAddBucketCors,
@@ -453,12 +452,7 @@ export default {
             // Finally delete the segments bucket
             await awsDeleteBucket(segmentsBucket);
           } catch (e) {
-            if (DEV) {
-              console.log(
-                `Failed to delete ${segmentsBucket}: `,
-                e,
-              );
-            }
+            console.error(`Failed to delete ${segmentsBucket}: `, e);
           }
 
           document.querySelector("#container-toasts").addToast(
@@ -509,7 +503,7 @@ export default {
         owner,
         test,
       ).then(() => {
-        if (DEV) console.log(`Started downloading all objects from container ${container}`);
+        console.log(`Started downloading all objects from container ${container}`);
       }).catch(() => {
         addErrorToastOnMain(this.$t("message.download.error"));
       });

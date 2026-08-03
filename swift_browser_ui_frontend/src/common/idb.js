@@ -1,7 +1,6 @@
 // Functions for indexedDB initialization and support
 
 import Dexie from "dexie";
-import { DEV } from "@/common/globalFunctions";
 
 let DB;
 let privateModeCheckResult;
@@ -32,7 +31,7 @@ export function getDB() {
       idb.transaction("preferences").abort();
       return DB;
     } catch (e) {
-      if (DEV) console.log("DB error", e);
+      console.error("IndexedDB error", e);
     }
     DB.close();
     DB = initDB();
@@ -92,7 +91,7 @@ export async function checkIDB() {
   try {
     IDBKeyRange.only([1]);
   } catch {
-    if (DEV) console.log("Buggy Microsoft IndexedDB implementation");
+    console.error("Buggy Microsoft IndexedDB implementation");
     return false;
   }
 

@@ -34,7 +34,6 @@ import SwiftSharingRequest from "@/common/swift_sharing_request_bind";
 
 // Import container ACL sync
 import { syncBucketPolicies } from "@/common/share";
-import { DEV } from "@/common/globalFunctions";
 
 // Import project state
 import useStore from "@/common/store";
@@ -61,15 +60,15 @@ checkIDB().then(result => {
 });
 
 window.onerror = function (error) {
-  if (DEV) console.log("Global error", error);
+  console.error("Global error", error);
 };
 window.addEventListener("unhandledrejection", function (event) {
-  if (DEV) console.log("unhandledrejection", event);
+  console.error("unhandledrejection", event);
   event.preventDefault();
   event.stopPropagation();
 });
 window.addEventListener("rejectionhandled", function (event) {
-  if (DEV) console.log("rejectionhandled", event);
+  console.log("rejectionhandled", event);
   event.preventDefault();
   event.stopPropagation();
 });
@@ -304,7 +303,7 @@ const app = createApp({
     };
 
     await initialize();
-    if (DEV) console.log("Initialized successfully.");
+    console.log("Initialized successfully.");
 
     await this.syncSharingIfStale();
   },
@@ -349,10 +348,10 @@ app.directive("control", vControl);
 app.config.globalProperties.$store = useStore();
 
 app.config.errorHandler = function (err, vm, info) {
-  if (DEV) console.log("Vue error: ", err, vm, info);
+  console.error("Vue error: ", err, vm, info);
 };
 app.config.warnHandler = function (msg, vm, info) {
-  if (DEV) console.log("Vue warning: ", msg, vm, info);
+  console.warn("Vue warning: ", msg, vm, info);
 };
 
 router.afterEach((to) => {
