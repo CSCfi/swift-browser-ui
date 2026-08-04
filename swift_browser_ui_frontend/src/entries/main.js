@@ -49,6 +49,7 @@ import ProgressNotification from "@/components/ProgressNotification.vue";
 import CFooter from "@/components/CFooter.vue";
 
 import { getDB, checkIDB } from "@/common/idb";
+import { updateProjectSharingSyncTime } from "@/common/idbFunctions";
 
 // Import global functions
 import { initS3 } from "@/common/s3init";
@@ -209,7 +210,7 @@ const app = createApp({
       }
     },
   },
-  created() {
+  async created() {
     document.title = this.$t("message.program_name");
 
     let initialize = async () => {
@@ -219,18 +220,18 @@ const app = createApp({
       this.$store.setUname(user);
       this.$store.setProjects(projects);
 
-      const existingProjects = await getDB().projects
+      // Sync projects instead of bulkPut to preserve last share sync data
+      const existingProjectIDs = await getDB().projects
         .toCollection()
         .primaryKeys();
-      await getDB().projects.bulkPut(projects);
 
+      const toPut = projects.filter(proj => !existingProjectIDs.includes(proj.id));
+      const toDelete = existingProjectIDs.filter(id => !projects.some(proj => proj.id === id));
 
-      const toDelete = [];
-      existingProjects.map(async oldProj => {
-        if (!projects.find(proj => proj.id === oldProj)) {
-          toDelete.push(oldProj);
-        }
-      });
+      if (toPut.length) {
+        await getDB().projects.bulkPut(toPut);
+      }
+
       if (toDelete.length) {
         await getDB().projects.bulkDelete(toDelete);
         await getDB().containers
@@ -301,14 +302,33 @@ const app = createApp({
       }
       await initS3(this.active.id, this.active.name, this.$store, this.$t);
     };
-    initialize().then(() => {
-      if(DEV) console.log("Initialized successfully.");
-    });
-    setTimeout(this.containerSyncWrapper, 10000);
+
+    await initialize();
+    if (DEV) console.log("Initialized successfully.");
+
+    await this.syncSharingIfStale();
   },
   methods: {
-    containerSyncWrapper: function () {
-      syncBucketPolicies(this.active.id);
+    /**
+     * Run project share sync and update last_share_sync time in IDB after a delay
+     * if project data in IDB shows that it hasn't been done in the past hour
+     */
+    syncSharingIfStale: async function () {
+      const staleAfterMs = 60 * 60 * 1000; // 1 hour
+      const delayMs = 10000;
+
+      const project = await getDB().projects.get(this.active.id);
+      const needsSync = !project.last_share_sync ||
+        Date.now() - project.last_share_sync.getTime() > staleAfterMs;
+      if (needsSync) {
+        setTimeout(async () => {
+          const synced = await syncBucketPolicies(project.id);
+          if (synced) {
+            await updateProjectSharingSyncTime(project.id);
+            this.$store.setSharingUpdated(true);
+          }
+        }, delayMs);
+      }
     },
     cancelUpload: function(bucket) {
       this.s3upload.cancelUpload(bucket);

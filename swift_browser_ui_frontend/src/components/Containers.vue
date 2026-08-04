@@ -185,6 +185,7 @@ export default {
       }
     },
     sharingUpdated(newValue) {
+      // Sharing updated by user or via sharing sync
       if (newValue) {
         this.fetchContainers(true);
         this.$store.setSharingUpdated(false);
