@@ -9,6 +9,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ### Fixed
 
+- Fixed bucket table not updating after the sharing sync (#1331)
+- Throttle running the sharing sync (#1355)
 - Fixed bucket name uniqueness check (#1357)
 
 ## [2026.7.0] - 2026-07-28
