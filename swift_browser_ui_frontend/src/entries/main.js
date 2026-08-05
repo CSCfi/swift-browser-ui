@@ -52,6 +52,7 @@ import { updateProjectSharingSyncTime } from "@/common/idbFunctions";
 
 // Import global functions
 import { initS3 } from "@/common/s3init";
+import { captureConsole } from "@/common/logger";
 
 checkIDB().then(result => {
   if (!result) {
@@ -212,12 +213,15 @@ const app = createApp({
   async created() {
     document.title = this.$t("message.program_name");
 
+    captureConsole();
+
     let initialize = async () => {
       let active;
       let user = await getUser();
       let projects = await getProjects();
       this.$store.setUname(user);
       this.$store.setProjects(projects);
+      console.log(`User ${user} has ${projects?.length} projects`);
 
       // Sync projects instead of bulkPut to preserve last share sync data
       const existingProjectIDs = await getDB().projects
