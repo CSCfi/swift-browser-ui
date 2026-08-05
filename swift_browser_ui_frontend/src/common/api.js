@@ -1,7 +1,5 @@
 // API fetch functions.
 
-import { DEV } from "@/common/globalFunctions";
-
 async function fetchWithCookie({method, url, body, signal}) {
   return fetch(url, {
     method,
@@ -262,8 +260,6 @@ export async function awsListBuckets(
   for (const bucket of ret.Buckets) {
     bucket.CreationDate = new Date(bucket.CreationDate);
   }
-
-  console.log(ret);
 
   return ret;
 }

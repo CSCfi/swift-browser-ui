@@ -223,7 +223,8 @@ export async function ensureCollaborateAccessPolicy(bucket) {
     "Resource": [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`],
   });
 
-  console.log(`Pushing preserve statement ${statements}`);
+  console.log("Pushing preserve statement:");
+  console.log(statements);
 
   let policy = {
     "Version": "2012-10-17",

@@ -74,6 +74,7 @@ export async function updateContainers(projectID, signal) {
   buckets = await awsListBuckets(projectID);
 
   if (buckets?.Buckets?.length > 0) {
+    console.log(`Updating buckets. Retrieved ${buckets.Buckets.length} buckets.`);
     for (const bucket of buckets.Buckets) {
       // If bucket doesn't exist in IDB, add
       const bucketExists = idbBucketsByName.get(bucket.Name);

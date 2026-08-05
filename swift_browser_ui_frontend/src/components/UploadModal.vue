@@ -838,6 +838,7 @@ export default {
         this.recvkeys.map(item => item),
         ownerName,
       );
+      console.log("Starting upload in ", bucketName);
     },
     beginEncryptedUpload() {
       this.aBeginEncryptedUpload().then(() => {

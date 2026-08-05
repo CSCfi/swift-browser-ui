@@ -85,10 +85,14 @@ export default class S3DownloadSocket {
     // Add message handler for the download worker
     let handleDownloadWorker = (e) => {
       switch(e.data.eventType) {
+        case "runtimeInitialized":
+          console.log("Download worker initialized Webassembly runtime.");
+          break;
+        case "s3ClientCreated":
+          console.log("Download worker created an S3 client session.");
+          break;
         case "getHeaders":
-          console.log("Socket got call to retrieve headers");
-          console.log(`Fetching headers for bucket ${e.data.bucket}`);
-          console.log(`Fetching headers for files: ${e.data.files}`);
+          console.log(`Socket got call to retrieve headers for bucket ${e.data.bucket} files: ${e.data.files}`);
           if (this.$store.downloadCount >= 0) {
             console.log("Overriding existing download progress with the new one.");
             this.$store.eraseDownloadProgress();
@@ -204,6 +208,10 @@ export default class S3DownloadSocket {
           else {
             this.downloadFinished = true;
           }
+          break;
+        case "log":
+          // Use same console instance
+          console.log(e.data.msg);
           break;
       }
     };
