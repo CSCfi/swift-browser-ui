@@ -1,6 +1,5 @@
 // Functions for managing sharing
 import useStore from "@/common/store";
-import { DEV } from "./globalFunctions";
 import { getDB } from "./idb";
 import { getBucketPolicyStatements } from "./s3commands";
 import { updateCorsFlag } from "./idbFunctions";
@@ -78,7 +77,7 @@ export async function deleteStaleShares(project, bucket) {
 }
 
 export async function syncBucketPolicies(project) {
-  if (DEV) console.log("Starting sharing sync...");
+  console.log("Starting sharing sync...");
   const store = useStore();
   const projectName = store.active.name;
 
@@ -102,7 +101,7 @@ export async function syncBucketPolicies(project) {
         await awsBulkAddBucketListCors(project, buckets);
         await updateCorsFlag(project, buckets, true);
       } catch (err) {
-        if (DEV) console.log("Error adding CORS", err);
+        console.error("Error adding CORS", err);
       }
     }
   }
@@ -228,7 +227,7 @@ export async function syncBucketPolicies(project) {
               accesslist,
               "none",
             );
-            if (DEV) console.log("Updated a sharing entry for", bucket);
+            console.log("Updated a sharing entry for", bucket);
           } catch(e) {
             console.error(`Failed to update a sharing entry for ${bucket}:`, e);
           }
@@ -242,7 +241,7 @@ export async function syncBucketPolicies(project) {
             accesslist,
             "none",
           );
-          if (DEV) console.log("Added a new sharing entry for", bucket);
+          console.log("Added a new sharing entry for", bucket);
         } catch(e) {
           console.error(`Failed to update a sharing entry for ${bucket}:`, e);
         }
@@ -257,6 +256,6 @@ export async function syncBucketPolicies(project) {
       }
     }
   }
-  if (DEV) console.log("Sharing sync done.");
+  console.log("Sharing sync done.");
   return true;
 }

@@ -52,13 +52,13 @@ export default class S3DownloadSocket {
     this.useServiceWorker = "serviceWorker" in navigator
       && window.showSaveFilePicker === undefined;
     if (this.useServiceWorker) {
-      if (DEV) console.log("Registering download script as service worker");
+      console.log("Registering download script as service worker");
       let workerUrl = new URL("/s3downworker.js", document.location.origin);
       navigator.serviceWorker.register(workerUrl).then(reg => {
         reg.update();
       }).catch((err) => {
-        if (DEV) console.log("Failed to register the service worker.");
-        if (DEV) console.log(err);
+        console.error("Failed to register the service worker.");
+        console.error(err);
       });
       this.downWorker = undefined;
     } else if (window.showSaveFilePicker !== undefined) {
@@ -70,12 +70,10 @@ export default class S3DownloadSocket {
         // In production worker is defined in the static folder
         this.downWorker = new Worker("/static/s3downworker.js");
       }
-      if (DEV) {
-        console.log("Created a conventional worker for downloads.");
-      }
+      console.log("Created a conventional worker for downloads.");
     } else {
-      if (DEV) console.log("Could not register a worker for download.");
-      if (DEV) console.log("Decrypted downloads are not available.");
+      console.error("Could not register a worker for download.");
+      console.warn("Decrypted downloads are not available.");
     }
 
     this.toastMessage = {
@@ -87,16 +85,16 @@ export default class S3DownloadSocket {
     // Add message handler for the download worker
     let handleDownloadWorker = (e) => {
       switch(e.data.eventType) {
+        case "runtimeInitialized":
+          console.log("Download worker initialized Webassembly runtime.");
+          break;
+        case "s3ClientCreated":
+          console.log("Download worker created an S3 client session.");
+          break;
         case "getHeaders":
-          if (DEV) console.log("Socket got call to retrieve headers");
-          if (DEV) console.log(`Fetching headers for bucket ${e.data.bucket}`);
-          if (DEV) console.log(`Fetching headers for files: ${e.data.files}`);
+          console.log(`Socket got call to retrieve headers for bucket ${e.data.bucket} files: ${e.data.files}`);
           if (this.$store.downloadCount >= 0) {
-            if (DEV) {
-              console.log(
-                "Overriding existing download progress with the new one.",
-              );
-            }
+            console.log("Overriding existing download progress with the new one.");
             this.$store.eraseDownloadProgress();
           }
           this.$store.addDownload();
@@ -115,15 +113,11 @@ export default class S3DownloadSocket {
                 this.$store.updateDownloadProgress(0);
               }
             }
-            if (DEV) {
-              console.log(
-                `Got headers for download in bucket ${e.data.bucket}`,
-              );
-            }
+            console.log(`Got headers for download in bucket ${e.data.bucket}`);
           }).catch(err => {
-            if (DEV) {
-              console.log(err);
-            }
+            console.error("Error getting headers:");
+            console.error(err);
+
             if (this.useServiceWorker) {
               navigator.serviceWorker.ready.then((reg) => {
                 reg.active.postMessage({
@@ -141,7 +135,7 @@ export default class S3DownloadSocket {
           });
           break;
         case "downloadStarted":
-          if (DEV) console.log(`Started download in ${e.data.bucket}`);
+          console.log(`Started download in ${e.data.bucket}`);
           if (this.useServiceWorker) {
             this.downloadFinished = false;
             let downloadUrl = undefined;
@@ -156,7 +150,7 @@ export default class S3DownloadSocket {
                 document.location.origin,
               );
             }
-            if (DEV) console.log(downloadUrl);
+            console.log("Download url:", downloadUrl);
             window.open(downloadUrl, "_blank");
           }
           break;
@@ -174,9 +168,7 @@ export default class S3DownloadSocket {
           }
           break;
         case "notDecryptable":
-          if (DEV) {
-            console.log(`Could not decrypt files in bucket ${e.data.bucket}: ${e.data.undecryptable}`);
-          }
+          console.warn(`Could not decrypt files in bucket ${e.data.bucket}: ${e.data.undecryptable}`);
           // Don't show alert if only migration report undecryptable (unencrypted)
           const undecryptableFiles = e.data.undecryptable.filter(file => file != UNENCRYPTED_FILE);
           if (undecryptableFiles.length) {
@@ -202,26 +194,24 @@ export default class S3DownloadSocket {
           this.$store.updateDownloadProgress(e.data.progress);
           break;
         case "finished":
-          if (DEV) {
-            console.log(
-              `Finished a download in bucket ${e.data.bucket}`,
-            );
-          }
+          console.log(`Finished a download in bucket ${e.data.bucket}`);
           if (!this.useServiceWorker) {
             if (this.$store.downloadCount === 1) {
               this.$store.updateDownloadProgress(1);
               this.downWorker.postMessage({
                 command: "clear",
               });
-              if (DEV) {
-                console.log("Clearing download progress interval");
-              }
+              console.log("Clearing download progress interval");
             }
             this.$store.removeDownload();
           }
           else {
             this.downloadFinished = true;
           }
+          break;
+        case "log":
+          // Use same console instance
+          console.log(e.data.msg);
           break;
       }
     };
@@ -285,13 +275,9 @@ export default class S3DownloadSocket {
     let keyUUID;
     if (crypto.randomUUID !== undefined) {
       keyUUID = crypto.randomUUID();
-      if (DEV) {
-        console.log(`Using ${keyUUID} as key name for the duration of header retrieval.`);
-      }
+      console.log(`Using ${keyUUID} as key name for the duration of header retrieval.`);
     } else {
-      if (DEV) {
-        console.log("Crypto unavailable, falling back to default key name.");
-      }
+      console.log("Crypto unavailable, falling back to default key name.");
     }
 
     let whitelistPath = `/cryptic/${this.project}/whitelist`;
@@ -370,7 +356,7 @@ export default class S3DownloadSocket {
 
   cancelDownload() {
     this.downWorker.postMessage({ command: "abort", reason: "cancel" });
-    if (DEV) console.log("Cancel direct downloads");
+    console.log("Cancel direct downloads");
   }
 
   async addDownload(
@@ -381,11 +367,11 @@ export default class S3DownloadSocket {
   ) {
     // Before adding the download, ensure that we have retained access as the owner
     if (!owner) {
-      if (DEV) console.log("Not downloading from shared bucket, ensure access is retained.");
+      console.log("Not downloading from shared bucket, ensure access is retained.");
       try {
         await ensureCollaborateAccessPolicy(bucket);
       } catch {
-        if (DEV) console.log(`Could not retain access in bucket ${bucket}`);
+        console.error(`Could not retain access in bucket ${bucket}`);
 
         document.querySelector("#decryption-toasts").addToast(
           {
@@ -402,9 +388,7 @@ export default class S3DownloadSocket {
 
     // get random id
     const sessionId = window.crypto.randomUUID();
-    if (DEV) {
-      console.log(`Beginning download session with UUID ${sessionId}`);
-    }
+    console.log(`Beginning download session with UUID ${sessionId}`);
 
     let ownerName = "";
     if (owner) {
@@ -445,7 +429,7 @@ export default class S3DownloadSocket {
           fileHandle = await window.showSaveFilePicker(opts);
         }
 
-        if (DEV) console.log(`Posting file ${fileName} to download worker`);
+        console.log(`Posting file ${fileName} to download worker`);
         this.downWorker.postMessage({
           command: "downloadFile",
           id: sessionId,
@@ -457,13 +441,9 @@ export default class S3DownloadSocket {
           test: test,
         });
 
-        if (DEV) console.log(`Posted file ${fileName} to download worker`);
+        console.log(`Posted file ${fileName} to download worker`);
       } else {
-        if (DEV) {
-          console.log(
-            "Instructing ServiceWorker to add a file to the downloads.",
-          );
-        }
+        console.log("Instructing ServiceWorker to add a file to the downloads.");
         navigator.serviceWorker.ready.then(reg => {
           reg.active.postMessage({
             command: "downloadFile",

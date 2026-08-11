@@ -125,12 +125,12 @@ export async function checkAndAddBucketCors(projectID, bucket) {
   if (!projectID || !bucket) throw new Error("Missing projectID and/or bucket for CORS check");
   const corsAdded = await checkCorsFlag(projectID, bucket);
   if (corsAdded === false) {
-    if (DEV) console.log("Adding CORS for", bucket);
+    console.log("Adding CORS for", bucket);
     try {
       await awsAddBucketCors(projectID, bucket);
       await updateCorsFlag(projectID, [bucket], true);
     } catch {
-      if (DEV) console.log(`Failed to add CORS to bucket ${bucket}`);
+      console.error(`Failed to add CORS to bucket ${bucket}`);
     }
   }
 }

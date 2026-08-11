@@ -116,6 +116,7 @@ ilmoittaminen
 ilmoituksen
 informaatio
 isot
+istuintolokit
 ja
 jaa
 jaan

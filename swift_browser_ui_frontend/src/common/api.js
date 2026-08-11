@@ -1,7 +1,5 @@
 // API fetch functions.
 
-import { DEV } from "@/common/globalFunctions";
-
 async function fetchWithCookie({method, url, body, signal}) {
   return fetch(url, {
     method,
@@ -28,9 +26,7 @@ async function fetchWithCookie({method, url, body, signal}) {
     })
     .catch(error => {
       if (!signal?.aborted) {
-        if (DEV) {
-          console.log("Fetch error. Might be a networking issue", error);
-        }
+        console.log("Fetch error. Might be a networking issue", error);
         throw new Error(error);
       }
     });
@@ -264,8 +260,6 @@ export async function awsListBuckets(
   for (const bucket of ret.Buckets) {
     bucket.CreationDate = new Date(bucket.CreationDate);
   }
-
-  if (DEV) console.log(ret);
 
   return ret;
 }

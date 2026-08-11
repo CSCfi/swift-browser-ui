@@ -1,9 +1,10 @@
 // JS code for the header creation worker
 
 waitAsm().then(() => {
-  console.log("Assembler initialized, initalizing entropy source...");
   Module.ccall("libinit", undefined, undefined, undefined);
-  console.log("Entropy source initalized.");
+  postMessage({
+    eventType: "runtimeInitialized",
+  });
 });
 
 // Create a c4ghtransit header for the file with the given parameters

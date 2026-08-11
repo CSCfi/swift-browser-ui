@@ -38,7 +38,6 @@ import {
 } from "@/common/tableFunctions";
 
 import {
-  DEV,
   isFile,
   getFolderName,
   getPrefix,
@@ -423,11 +422,10 @@ export default {
           this.$route.params.owner ? this.$route.params.owner : "",
           test,
         ).then(() => {
-          if (DEV) console.log(`Started downloading folder ${object.name}`);
-        }).catch(() => {
-          if (DEV) {
-            console.log(error);
-          }
+          console.log(`Started downloading folder ${object.name}`);
+        }).catch((error) => {
+          console.error("Error adding a download:");
+          console.error(error);
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       } else {
@@ -437,11 +435,10 @@ export default {
           this.$route.params.owner ? this.$route.params.owner : "",
           test,
         ).then(() => {
-          if (DEV) console.log(`Started downloading object ${object.name}`);
+          console.log(`Started downloading object ${object.name}`);
         }).catch((error) => {
-          if (DEV) {
-            console.log(error);
-          }
+          console.error("Error adding an object download:");
+          console.error(error);
           addErrorToastOnMain(this.$t("message.download.error"));
         });
       }

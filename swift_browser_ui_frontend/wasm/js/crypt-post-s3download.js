@@ -21,7 +21,6 @@ Schema for storing the download information:
 let downloads = {};
 // Text encoder for quickly encoding tar headers
 let enc = new TextEncoder();
-let libinitDone = false;
 let downProgressInterval = undefined;
 let totalDone = 0;
 let totalToDo = 0;
@@ -33,10 +32,9 @@ const DOWNLOAD_UNENCRYPTED_SEGMENT_SIZE = 52428800; // 50 MiB
 
 let s3client = undefined;
 
-waitAsm().then(() => {
-  console.log("Assembler initialized, initalizing entropy source...");
+const runtimeReady = waitAsm().then(() => {
   Module.ccall("libinit", undefined, undefined, undefined);
-  console.log("Entropy source initalized.");
+  if (!inServiceWorker) postMessage({ eventType: "runtimeInitialized" });
 });
 
 /*
@@ -68,10 +66,6 @@ function createS3Client(access, secret, endpoint) {
       secretAccessKey: secret,
     },
   });
-
-  postMessage({
-    eventType: "s3ClientCreated",
-  });
 }
 
 // Example: https://devenv:8443/file/session-id/test-container/examplefile.txt.c4gh
@@ -81,17 +75,24 @@ const archiveUrl = new RegExp("/archive/[^/]*/[^/]*\\.tar$");
 const fileUrlStart = new RegExp("/file/[^/]*/[^/]*/");
 const archiveUrlStart = new RegExp("/archive/[^/]*/");
 
+async function activateServiceWorker() {
+  await runtimeReady;
+  await self.clients.claim();
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => client.postMessage({ eventType: "runtimeInitialized" }));
+}
+
 if (inServiceWorker) {
   self.addEventListener("install", (event) => {
-    event.waitUntil(waitAsm());
+    event.waitUntil(runtimeReady);
   });
   self.addEventListener("activate", (event) => {
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(activateServiceWorker());
   });
 }
 
 // Create a download session
-function createDownloadSession(id, bucket, handle, archive, test = false) {
+function createDownloadSession(id, bucket, handle, archive, client, test = false) {
   aborted = false; // reset
 
   let keypairPtr = Module.ccall(
@@ -115,6 +116,7 @@ function createDownloadSession(id, bucket, handle, archive, test = false) {
     direct: !inServiceWorker,
     archive: archive,
     bucket: bucket,
+    client: client,
     test: test,
     files: {},
   };
@@ -130,7 +132,8 @@ function getFileSize(size, key) {
 
 // Add a file to the download session
 function createDownloadSessionFile(id, bucket, path, header, url, size) {
-  console.log(`Creating file entry for ${path}`);
+  log(id, `Creating file entry for ${path}`);
+
   if (checkPollutingName(path)) return;
 
   let headerPath = `header_${bucket}_`
@@ -155,50 +158,18 @@ function createDownloadSessionFile(id, bucket, path, header, url, size) {
     realsize: getFileSize(size, 0),
   };
 
-  console.log("Unlinking the old header");
   // Remove the header after parsing
   FS.unlink(headerPath);
+  log(id, "Unlinked the old header");
 
   // Cache the header if no suitable key couldn't be found
   if (sessionKeyPtr <= 0) {
     downloads[id].files[path].header = header;
   }
 
-  console.log(`Successfully created file entry for ${path}`);
+  log(id, `Successfully created file entry for ${path}`);
 
   return sessionKeyPtr > 0;
-}
-
-// Decrypt a single chunk of a download
-function decryptChunk(id, path, enChunk) {
-  let chunk = Module.ccall(
-    "decrypt_chunk",
-    "number",
-    ["number", "array", "number"],
-    [
-      downloads[id].files[path].key,
-      enChunk,
-      enChunk.length,
-    ],
-  );
-  let chunkPtr = Module.ccall(
-    "wrap_chunk_content",
-    "number",
-    ["number"],
-    [chunk],
-  );
-  let chunkLen = Module.ccall(
-    "wrap_chunk_len",
-    "number",
-    ["number"],
-    [chunk],
-  );
-  // Don't clone the view, as async writes can't happen in parallel.
-  // ServiceWorker download takes care of cloning as needed.
-  let ret = HEAPU8.subarray(chunkPtr, chunkPtr + chunkLen);
-  totalDone += chunkLen;
-
-  return ret;
 }
 
 function startProgressInterval() {
@@ -258,7 +229,7 @@ async function sliceFile(output, id, path) {
 
   let totalBytes = 0;
 
-  console.log(`Slicing file ${path} in bucket ${id} to output`);
+  log(id, `Slicing file ${path} in bucket ${id} to output`);
   // Slice all segments of the file to output as decrypted
   for (let i = 0; i < totalSegments; i++) {
     if (aborted) break;
@@ -269,9 +240,8 @@ async function sliceFile(output, id, path) {
     };
     const command = new GetObjectCommand(input);
     const resp = await s3client.send(command);
-    console.log(`Got object ${resp}`);
     const body = await resp.Body.transformToByteArray();
-    console.log("Transformed object into a byte array");
+    log(id, "Transformed object into a byte array");
 
     for (let j = 0; j < DOWNLOAD_ENCRYPTED_SEGMENT_SIZE; j += 65564) {
       totalBytes += await sliceChunk(output, id, path, body, j);
@@ -326,7 +296,7 @@ async function concatFile(output, id, path) {
   let lastSegment = downloads[id].files[path].realsize % DOWNLOAD_UNENCRYPTED_SEGMENT_SIZE;
   let totalBytes = 0;
 
-  console.log(`Concatenating ${downloads[id].bucket}/${path} to output`);
+  log(id, `Concatenating ${downloads[id].bucket}/${path} to output`);
 
   // Slice through the file as unencrypted content
   for (let i = 0; i < totalSegments; i++) {
@@ -338,9 +308,8 @@ async function concatFile(output, id, path) {
     };
     const command = new GetObjectCommand(input);
     const resp = await s3client.send(command);
-    console.log(`Got object ${resp}`);
     const body = await resp.Body.transformToByteArray();
-    console.log("Transformed object into a byte array");
+    log(id, "Transformed object into a byte array");
 
     if (output instanceof WritableStream) {
       await output.write(body);
@@ -430,12 +399,12 @@ function finishDownloadSession(id) {
 }
 
 async function abortDownload(id, stream = null) {
-  console.log(`Aborting download ${id}`);
+  log(id, `Aborting download ${id}`);
   if (downloads[id].direct) {
     //remove temp files
     if (stream) await stream.abort();
     await downloads[id].handle.remove().catch(err => {
-      console.log("Tried to remove a not-yet created file.");
+      log(id, "Tried to remove a not-yet created file.");
     });
   }
   finishDownloadSession(id);
@@ -464,16 +433,15 @@ async function beginDownloadInSession(
   let fileHandle = downloads[id].handle;
   let fileStream;
   if (downloads[id].direct) {
-    console.log("Creating a writable stream for the file.");
     fileStream = await fileHandle.createWritable();
-    console.log("Created a writable stream for the file.");
+    log(id, "Created a writable stream for the file.");
   } else {
     fileStream = fileHandle;
   }
 
   // Add the archive folder structure
   if (downloads[id].archive) {
-    console.log("Creating the archive header.");
+    log(id, "Creating the archive header.");
     let folderPaths = Object.keys(downloads[id].files)
       .map(path => path.split("/"))  // split paths to items
       .map(path => path.slice(0, -1))  // remove the file names from paths
@@ -499,7 +467,7 @@ async function beginDownloadInSession(
   }
 
   if (downloads[id].direct) {
-    console.log("Starting progress interval.");
+    log(id, "Starting progress interval.");
     //get total download size and periodically report download progress
     for (const file in downloads[id].files) {
       totalToDo += downloads[id].files[file].size;
@@ -511,7 +479,6 @@ async function beginDownloadInSession(
 
   for (const file in downloads[id].files) {
     if (aborted) {
-      console.log(`Download is aborted, aborting at ${file}`);
       await abortDownload(id, fileStream);
       return;
     }
@@ -525,10 +492,10 @@ async function beginDownloadInSession(
     }
 
     let path = file.replace(".c4gh", "");
-    console.log(`Created path ${path} from filename ${file}`);
+    log(id, `Created path ${path} from filename ${file}`);
 
     if (downloads[id].archive) {
-      console.log(`Creating tar archive header for file ${file}`);
+      log(id, `Creating tar archive header for file ${file}`);
       const size = downloads[id].files[file].size;
 
       let fileHeader = addTarFile(
@@ -545,17 +512,17 @@ async function beginDownloadInSession(
 
     let res = true;
     if (downloads[id].files[file].key <= 0) {
-      console.log(`No key for ${file}, concatenating content as is.`);
+      log(id, `No key for ${file}, concatenating content as is.`);
       res = await concatFile(fileStream, id, file).catch(err => {
-        console.log(`Failed concatenating file ${file}`);
-        console.log(err);
+        log(id, `Failed concatenating file ${file}:`);
+        log(id, err);
         return false;
       });
     } else {
-      console.log(`Key available for ${file}, decrypting content.`);
+      log(id, `Key available for ${file}, decrypting content.`);
       res = await sliceFile(fileStream, id, file).catch(err => {
-        console.log(`Failed slicing file ${file}`);
-        console.log(err);
+        log(id, `Failed slicing file ${file}:`);
+        log(id, err);
         return false;
       });
     }
@@ -604,6 +571,7 @@ async function beginDownloadInSession(
         }));
     });
   }
+  log(id, "Finishing download session");
   finishDownloadSession(id);
   return;
 }
@@ -664,6 +632,13 @@ if (inServiceWorker) {
   });
 }
 
+function log(id, msg) {
+  if (!inServiceWorker) postMessage({ eventType: "log", msg: msg });
+  else if (downloads[id]?.client) {
+    downloads[id].client.postMessage({ eventType: "log", msg: msg });
+  }
+}
+
 self.addEventListener("message", async (e) => {
   // Sanity check bucket name
   if (checkPollutingName(e.data.bucket)) return;
@@ -671,36 +646,34 @@ self.addEventListener("message", async (e) => {
   switch(e.data.command) {
     case "createS3Client":
       createS3Client(e.data.access, e.data.secret, e.data.endpoint);
-      console.log("Download worker created an S3 client.");
+      if (s3client !== undefined) {
+        if (inServiceWorker) {
+          e.source.postMessage({ eventType: "s3ClientCreated" });
+        } else {
+          postMessage({ eventType: "s3ClientCreated" });
+        }
+      }
       break;
     case "downloadFile":
       if (inServiceWorker) {
-        while (!libinitDone) {
-          await timeout(250);
-        }
-        if (libinitDone) {
-          createDownloadSession(e.data.id, e.data.bucket, undefined, false);
-          console.log(`Created a download session for ${e.data.id}, ${e.data.bucket}`);
-          console.log(`Download worker requesting headers for files in bucket ${e.data.bucket}`);
-          console.log(`File listing: ${e.data.file}`);
-          e.source.postMessage({
-            eventType: "getHeaders",
-            id: e.data.id,
-            bucket: e.data.bucket,
-            files: [
-              e.data.file,
-            ],
-            pubkey: downloads[e.data.id].pubkey,
-            owner: e.data.owner,
-            ownerName: e.data.ownerName,
-          });
-        }
+        await runtimeReady;
+
+        createDownloadSession(e.data.id, e.data.bucket, undefined, false, e.source, false);
+        e.source.postMessage({
+          eventType: "getHeaders",
+          id: e.data.id,
+          bucket: e.data.bucket,
+          files: [
+            e.data.file,
+          ],
+          pubkey: downloads[e.data.id].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
+        });
+
       } else {
         createDownloadSession(
-          e.data.id, e.data.bucket, e.data.handle, false, e.data.test);
-        console.log(`Created a download session for ${e.data.id}, ${e.data.bucket}`);
-        console.log(`Download worker requesting headers for files in bucket ${e.data.bucket}`);
-        console.log(`File listing: ${e.data.file}`);
+          e.data.id, e.data.bucket, e.data.handle, false, undefined, e.data.test);
         postMessage({
           eventType: "getHeaders",
           id: e.data.id,
@@ -713,33 +686,27 @@ self.addEventListener("message", async (e) => {
           ownerName: e.data.ownerName,
         });
       }
+      log(e.data.id, `Created a download session for ${e.data.id}, ${e.data.bucket}`);
       break;
     case "downloadFiles":
       if (inServiceWorker) {
-        while (!libinitDone) {
-          await timeout(250);
-        }
-        if (libinitDone) {
-          createDownloadSession(e.data.id, e.data.bucket, undefined, true);
-          console.log(`Created a download session for ${e.data.id}, ${e.data.bucket}`);
-          console.log(`Download worker requesting headers for files in bucket ${e.data.bucket}`);
-          console.log(`File listing: ${e.data.files}`);
-          e.source.postMessage({
-            eventType: "getHeaders",
-            id: e.data.id,
-            bucket: e.data.bucket,
-            files: e.data.files,
-            pubkey: downloads[e.data.id].pubkey,
-            owner: e.data.owner,
-            ownerName: e.data.ownerName,
-          });
-        }
+        await runtimeReady;
+
+        createDownloadSession(e.data.id, e.data.bucket, undefined, true, e.source, false);
+        log(e.data.id, `Created a download session for ${e.data.id}, ${e.data.bucket}`);
+        e.source.postMessage({
+          eventType: "getHeaders",
+          id: e.data.id,
+          bucket: e.data.bucket,
+          files: e.data.files,
+          pubkey: downloads[e.data.id].pubkey,
+          owner: e.data.owner,
+          ownerName: e.data.ownerName,
+        });
       } else {
         createDownloadSession(
-          e.data.id, e.data.bucket, e.data.handle, true, e.data.test);
-        console.log(`Created a download session for ${e.data.id}, ${e.data.bucket}`);
-        console.log(`Download worker requesting headers for files in bucket ${e.data.bucket}`);
-        console.log(`File listing: ${e.data.files}`);
+          e.data.id, e.data.bucket, e.data.handle, true, undefined, e.data.test);
+        log(e.data.id, `Created a download session for ${e.data.id}, ${e.data.bucket}`);
         postMessage({
           eventType: "getHeaders",
           id: e.data.id,
@@ -752,7 +719,6 @@ self.addEventListener("message", async (e) => {
       }
       break;
     case "addHeaders":
-      console.log("Got headers for the files scheduled for downloading.");
       addSessionFiles(e.data.id, e.data.bucket, e.data.headers).then(undecryptable => {
         if (undecryptable.length && inServiceWorker) {
           e.source.postMessage({
@@ -768,11 +734,10 @@ self.addEventListener("message", async (e) => {
           });
         }
       }).catch(async (err) => {
-        console.log(`Failed to add session files for ${e.data.id}, aborting`);
-        console.log(err);
         if (!aborted) startAbort(!inServiceWorker, "error");
         await abortDownload(e.data.id);
       });
+      log(e.data.id, "Added session files");
       if (inServiceWorker) {
         e.source.postMessage({
           eventType: "downloadStarted",
@@ -799,11 +764,6 @@ self.addEventListener("message", async (e) => {
       if (!aborted) startAbort(!inServiceWorker, e.data.reason);
       break;
   }
-});
-
-waitAsm().then(() => {
-  Module.ccall("libinit", undefined, undefined, undefined);
-  libinitDone = true;
 });
 
 export var downloadRuntime = Module;

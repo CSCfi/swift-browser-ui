@@ -3,9 +3,6 @@ import {
   awsListBuckets,
 } from "@/common/api";
 import { getDB } from "@/common/idb";
-import {
-  DEV,
-} from "@/common/globalFunctions";
 import { getSharedContainers } from "@/common/share";
 
 // Find the segments container matching a container (if it exists) and
@@ -77,6 +74,7 @@ export async function updateContainers(projectID, signal) {
   buckets = await awsListBuckets(projectID);
 
   if (buckets?.Buckets?.length > 0) {
+    console.log(`Updating buckets. Retrieved ${buckets.Buckets.length} buckets.`);
     for (const bucket of buckets.Buckets) {
       // If bucket doesn't exist in IDB, add
       const bucketExists = idbBucketsByName.get(bucket.Name);
@@ -113,7 +111,7 @@ export async function updateContainers(projectID, signal) {
         await getDB().containers.bulkPut(newBucketsPage);
         newBucketsPage = [];
       } catch (err) {
-        if (DEV) console.log("Error adding buckets to IDB:", err);
+        console.error("Error adding buckets to IDB:", err);
       }
     }
   }
@@ -164,7 +162,7 @@ export async function updateContainers(projectID, signal) {
     try {
       await getDB().containers.bulkDelete(toDelete);
     } catch (err) {
-      if (DEV) console.log(err);
+      console.error("Error deleting buckets from IndexedDB:", err);
     }
   }
 }
@@ -226,7 +224,7 @@ export async function updateCorsFlag(projectID, buckets, corsAdded) {
       .anyOf(buckets.map(name => [projectID, name]))
       .modify(bucket => bucket.cors_added = corsAdded);
   } catch {
-    if (DEV) console.log("Error updating IDB bucket CORS flag");
+    console.error("Error updating IDB bucket CORS flag");
   }
 }
 
@@ -245,7 +243,7 @@ export async function updateDisplayOptions(options) {
       ...options,
     });
   } catch {
-    if (DEV) console.log("Error updating display options in IDB");
+    console.error("Error updating display options in IDB");
   }
 }
 
@@ -256,7 +254,7 @@ export async function updatePaginationOptions(options) {
       ...options,
     });
   } catch {
-    if (DEV) console.log("Error updating pagination options in IDB");
+    console.error("Error updating pagination options in IDB");
   }
 }
 

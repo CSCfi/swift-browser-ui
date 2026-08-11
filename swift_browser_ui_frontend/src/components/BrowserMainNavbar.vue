@@ -27,7 +27,7 @@
               (subItem.route || subItem.href) && handleItemRoute(subItem);
               subItem.action && subItem.action();
             },
-            icon: subItem.href && mdiOpenInNew,
+            icon: subItem.href && mdiOpenInNew  || subItem?.icon,
           }))"
           :data-testid="item.testid"
         >
@@ -68,6 +68,10 @@
               v-if="subItem.href"
               :path="mdiOpenInNew"
             />
+            <c-icon
+              v-if="subItem.icon"
+              :path="subItem.icon"
+            />
           </c-sub-navigation-item>
       </c-side-navigation-item>
     </c-side-navigation>
@@ -75,8 +79,9 @@
 </template>
 
 <script>
+import { mdiOpenInNew, mdiWeb, mdiHelpCircleOutline, mdiAccount, mdiTrayArrowDown } from "@mdi/js";
 import { getProjectNumber } from "@/common/globalFunctions";
-import { mdiOpenInNew, mdiWeb, mdiHelpCircleOutline, mdiAccount } from "@mdi/js";
+import { getLogs } from "@/common/logger";
 
 export default {
   name: "BrowserMainNavbar",
@@ -157,6 +162,11 @@ export default {
               title: this.$t("message.supportMenu.createAPIKeys"),
               action: () => this.openAPIKeyModal(),
             },
+            {
+              title: this.$t("message.supportMenu.exportLogs"),
+              action: () => this.exportLogs(),
+              icon: mdiTrayArrowDown,
+            },
           ],
         },
         {
@@ -197,6 +207,47 @@ export default {
     },
     openAPIKeyModal() {
       this.$store.toggleAPIKeyModal(true);
+    },
+    exportLogs() {
+      const content = [];
+      const date = new Date();
+      content.push(`User: ${this.$store.uname}`);
+      content.push(`Date: ${date.toISOString()}`);
+      content.push(`Locale: ${this.$i18n.locale}`);
+      content.push(`User-Agent: ${window.navigator.userAgent}`);
+      content.push("");
+      content.push("----- Session logs -----");
+      content.push(...getLogs());
+
+      const link = document.createElement("a");
+      const file = new Blob([content.join("\n")], {
+        type: "text/plain",
+      });
+      link.href = URL.createObjectURL(file);
+      link.download = this.getFilename(date);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
+    /**
+     * Get log filename based on a date, readable to users (sd-connect-log-2026-08-05-00-00-00.log)
+     * @param date
+     * @returns filename
+     */
+    getFilename(date) {
+      const timestamp = new Intl.DateTimeFormat("sv-SE", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23",
+      })
+        .format(date)
+        .replace(" ", "-")
+        .replaceAll(":", "-");
+
+      return `sd-connect-log-${timestamp}.log`;
     },
   },
 };

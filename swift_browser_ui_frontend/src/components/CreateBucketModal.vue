@@ -92,7 +92,6 @@ import { mdiOpenInNew } from "@mdi/js";
 import { getDB } from "@/common/idb";
 
 import {
-  DEV,
   addNewTag,
   deleteTag,
   getProjectNumber,
@@ -207,11 +206,7 @@ export default {
         await awsAddBucketCors(projectID, bucketName);
         newBucket.cors_added = true;
       } catch (e) {
-        if (DEV) {
-          console.error(
-            `Failed to update CORS for the new bucket ${bucketName}`,
-          );
-        }
+        console.error(`Failed to update CORS for the new bucket ${bucketName}`);
         newBucket.cors_added = false;
       } finally {
         await getDB().containers.add(newBucket);

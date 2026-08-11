@@ -16,7 +16,6 @@ import {
 import { i18n } from "./i18n";
 import { initS3 } from "./s3init";
 import useStore from "./store";
-import { DEV } from "./globalFunctions";
 
 async function sendS3Command(command) {
   // Wrapper for S3 commands
@@ -31,9 +30,7 @@ async function sendS3Command(command) {
     const resp = await store.s3client.send(command);
     return resp;
   } catch (e) {
-    if (DEV) {
-      console.error(`Error executing ${command?.constructor?.name} on bucket ${command?.input?.Bucket}`);
-    }
+    console.error(`Error executing ${command?.constructor?.name} on bucket ${command?.input?.Bucket}`);
     throw e;
   }
 }
@@ -113,8 +110,8 @@ export async function awsListObjects(bucket, prefix = undefined) {
       continuationToken = response?.NextContinuationToken;
     } while (continuationToken);
   } catch (e) {
-    if (DEV) console.error(`Failed to list objects for bucket ${bucket}`, e);
-    if (DEV) console.error(`Returning empty listing for bucket ${bucket}`);
+    console.error(`Failed to list objects for bucket ${bucket}`, e);
+    console.error(`Returning empty listing for bucket ${bucket}`);
   }
   return objects;
 }
@@ -182,7 +179,7 @@ export async function getBucketPolicyStatements(bucket) {
     }
   } catch(e) {
     if (e.name === "NoSuchBucket") {
-      if (DEV) console.error(`Error retrieving bucket ${bucket} policy: bucket does not exist`);
+      console.error(`Error retrieving bucket ${bucket} policy: bucket does not exist`);
     }
     else if (e.name === "NoSuchBucketPolicy") {
       return [];
@@ -226,7 +223,8 @@ export async function ensureCollaborateAccessPolicy(bucket) {
     "Resource": [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`],
   });
 
-  if (DEV) console.log(`Pushing preserve statement ${statements}`);
+  console.log("Pushing preserve statement:");
+  console.log(statements);
 
   let policy = {
     "Version": "2012-10-17",
@@ -313,11 +311,8 @@ export async function removeAccessControlBucketPolicy(
   // Filter out the old policy entries
   for (const receiver of receivers) {
     policy.Statement = policy.Statement.filter((statement) => {
-      if (DEV) {
-        console.log(statement);
-        console.log(receiver);
-        console.log(statement.Principal.AWS.match(receiver) == null);
-      }
+      console.log("Statement:", statement);
+      console.log("Receiver:", receiver);
       return statement.Principal.AWS.match(receiver) == null;
     });
   }
@@ -329,8 +324,8 @@ export async function removeAccessControlBucketPolicy(
     try {
       await sendS3Command(deleteBucketPolicyCommand);
     } catch (e) {
-      if (DEV) console.log("Failed to delete bucket policy.");
-      if (DEV) console.log(e);
+      console.error("Failed to delete bucket policy:");
+      console.error(e);
     }
     return;
   }

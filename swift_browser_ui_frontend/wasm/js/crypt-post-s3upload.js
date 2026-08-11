@@ -18,13 +18,10 @@ import { checkPollutingName } from "./nameCheck";
 let s3client = undefined;
 
 waitAsm().then(() => {
-  console.log("Assembler initialized, initalizing entropy source...");
   Module.ccall("libinit", undefined, undefined, undefined);
-  console.log("Entropy source initalized.");
-
   postMessage({
     eventType: "runtimeInitialized",
-  })
+  });
 });
 
 // Create an s3 client for the worker instance
@@ -50,7 +47,7 @@ function createS3Client(access, secret, endpoint) {
 }
 
 async function encryptSegment (e) {
-  console.log("Encrypting segment");
+  postMessage({ eventType: "log", msg: "Encrypting segment" });
   let enChunk = Module.ccall(
     "encrypt_file_part",
     "number",
@@ -76,7 +73,7 @@ async function encryptSegment (e) {
   );
 
   // Create the AWS request and push the upload part
-  console.log("Chunk encrypted, pushing chunk to multipart upload.");
+  postMessage({ eventType: "log", msg: "Chunk encrypted, pushing chunk to multipart upload." });
   let command = undefined;
   let enBody = new Uint8Array(HEAPU8.subarray(enChunkPtr, enChunkPtr + enChunkLen));
   if (e.data.session !== "") {
@@ -95,11 +92,11 @@ async function encryptSegment (e) {
       Bucket: e.data.part.bucket,
       ContentLength: enChunkLen,
       Key: e.data.part.key.concat(".c4gh"),
-    }
+    };
     command = new PutObjectCommand(input);
   }
 
-  console.log("Sending encrypted chunk via s3 client.")
+  postMessage({ eventType: "log", msg: "Sending encrypted chunk via s3 client." });
   const completedPart = await s3client.send(command);
 
   postMessage({
@@ -108,7 +105,7 @@ async function encryptSegment (e) {
   });
 
   // Free the encrypted chunk content buffer
-  console.log("Freeing encrypted chunk from buffer.");
+  postMessage({ eventType: "log", msg: "Freeing encrypted chunk from buffer." });
   Module.ccall(
     "free_chunk",
     "number",
@@ -133,11 +130,10 @@ self.addEventListener("message", (e) => {
 
   switch(e.data.command) {
     case "mountFiles":
-      console.log(`Adding files to bucket ${e.data.bucket}`);
+      postMessage({ eventType: "log", msg: `Adding files to bucket ${e.data.bucket}` });
       const filesToMount = e.data.files.map((obj) => {
         // Use relative path to preserve folder structure in WORKERFS
         const fileName = obj.relativePath || obj.file.name;
-        console.log(`Mapping file ${fileName}`);
         return new File([obj.file], fileName, {
           type: obj.file?.type || "", lastModified: obj.file?.lastModified || Date.now() });
       });
@@ -149,7 +145,6 @@ self.addEventListener("message", (e) => {
         },
         `/${e.data.bucket}`,
       );
-      console.log("Successfully added the listed files.");
       postMessage({
         eventType: "filesAdded",
       });

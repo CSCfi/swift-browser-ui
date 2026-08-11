@@ -305,6 +305,7 @@ export default {
     shareSubmit: function () {
       this.loading = true;
       this.shareContainer(this.bucketName).then((ret) => {
+        console.log(`Shared bucket ${bucket} to ${this.shareIDs}`);
         if (ret) {
           this.getSharedDetails();
           this.closeSharedNotification();

@@ -434,6 +434,7 @@ let default_translations = {
         projectInfo: "Project information",
         projectInfoBaseLink: "#",
         createAPIKeys: "Create API keys",
+        exportLogs: "Export session logs",
       },
       footerMenu: {
         title: "Swift browser",
@@ -1026,6 +1027,7 @@ let default_translations = {
         projectInfo: "Projektin tiedot",
         projectInfoBaseLink: "#",
         createAPIKeys: "Luo API-avaimia",
+        exportLogs: "Lataa istuintolokit",
       },
       footerMenu: {
         title: "Swift browser",
