@@ -7,11 +7,17 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.8.0] - 2026-08-11
+
 ### Fixed
 
 - Fixed bucket table not updating after the sharing sync (#1331)
 - Throttle running the sharing sync (#1355)
 - Fixed bucket name uniqueness check (#1357)
+
+### Added
+
+- (users) Added the option to export session logs (#1354)
 
 ## [2026.7.0] - 2026-07-28
 
@@ -812,7 +818,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.7.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.8.0...HEAD
+[2026.8.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.7.0...2026.8.0
 [2026.7.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.6.0...2026.7.0
 [2026.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.5.0...2026.6.0
 [2026.5.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.4.6...2026.5.0
