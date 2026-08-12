@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed unintended bucket share fail notification showing (#1358)
+
 ## [2026.8.0] - 2026-08-11
 
 ### Fixed
