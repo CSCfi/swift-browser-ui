@@ -305,7 +305,7 @@ export default {
     shareSubmit: function () {
       this.loading = true;
       this.shareContainer(this.bucketName).then((ret) => {
-        console.log(`Shared bucket ${bucket} to ${this.shareIDs}`);
+        console.log(`Shared bucket ${this.bucketName} to ${this.shareIDs}`);
         if (ret) {
           this.getSharedDetails();
           this.closeSharedNotification();
@@ -313,7 +313,9 @@ export default {
           this.closeSharedNotificationWithTimeout();
         }
         this.sharedAccessRight = null;
-      }).catch(() => {
+      }).catch((e) => {
+        console.error("Share error:");
+        console.error(e);
         // In case of uncaught errors, show generic error
         document.querySelector("#shareModal-toasts").addToast(
           {
