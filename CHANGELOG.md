@@ -7,9 +7,16 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.8.1] - 2026-08-20
+
 ### Fixed
 
 - Fixed unintended bucket share fail notification showing (#1358)
+
+### Security
+
+- (users) Prevent authenticated users from forging signatures with a valid session allowing them to access cross-project resources in API.
+- Prevent authenticated users from forging signatures with a valid session allowing them to access cross-project resources in API.
 
 ## [2026.8.0] - 2026-08-11
 
@@ -822,7 +829,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.8.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.8.1...HEAD
+[2026.8.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.8.0...2026.8.1
 [2026.8.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.7.0...2026.8.0
 [2026.7.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.6.0...2026.7.0
 [2026.6.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.5.0...2026.6.0
