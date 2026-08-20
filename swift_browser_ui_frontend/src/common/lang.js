@@ -129,7 +129,7 @@ let default_translations = {
         back_to_shared_buckets: "Back to buckets shared with you",
         conversion_need: "Conversion need",
         urgent_label: "Urgent",
-        end_of_year_label: "Convert later",
+        end_of_year_label: "By the end of 2026",
       },
       tableOptions: {
         displayOptions: "Display options",
@@ -725,7 +725,7 @@ let default_translations = {
         back_to_shared_buckets: "Takaisin",
         conversion_need: "Muuntotarve",
         urgent_label: "Kiireellinen",
-        end_of_year_label: "Muunna myöhemmin",
+        end_of_year_label: "Vuoden 2026 loppuun mennessä",
       },
       tableOptions: {
         displayOptions: "Näyttöasetukset",
