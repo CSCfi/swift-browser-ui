@@ -32,8 +32,9 @@ class SignatureMiscTestClass(
         )
 
         self.mock_request.match_info = {"valid": 600, "count": 60, "project": "test-id-0"}
+        self.mock_request.method = "GET"
         self.mock_request.query = {
-            "path": "/test/path",
+            "path": "/test-id-0/path",
             "count": "60",
         }
 
@@ -67,6 +68,40 @@ class SignatureMiscTestClass(
         with self.assertRaises(aiohttp.web_exceptions.HTTPClientError):
             with self.p_get_sess, self.sign_patch:
                 await handle_signature_request(self.mock_request_noval)
+
+    async def test_handle_signature_mismatched_project(self):
+        """Test signature request when project doesn't exist in session."""
+        self.mock_request.query["path"] = "/cryptic/another-project"
+
+        with self.assertRaises(aiohttp.web_exceptions.HTTPForbidden):
+            with self.p_get_sess, self.sign_patch:
+                await handle_signature_request(self.mock_request)
+
+    async def test_handle_signature_for_ids_success(self):
+        """Test signature request for fetching the id cache."""
+        self.mock_request.query["path"] = "/ids/test-id-0"
+
+        with self.p_get_sess, self.sign_patch:
+            resp = await handle_signature_request(self.mock_request)
+        self.assertIsInstance(resp, aiohttp.web.Response)
+
+    async def test_handle_signature_for_ids_put_fail(self):
+        """Test signature request for adding id to cache for other project."""
+        self.mock_request.method = "PUT"
+        self.mock_request.query["path"] = "/ids/another-project"
+
+        with self.assertRaises(aiohttp.web_exceptions.HTTPForbidden):
+            with self.p_get_sess, self.sign_patch:
+                await handle_signature_request(self.mock_request)
+
+    async def test_handle_signature_for_ids_put_success(self):
+        """Test signature request for adding id to cache for own project."""
+        self.mock_request.method = "PUT"
+        self.mock_request.query["path"] = "/ids/test-id-0"
+
+        with self.p_get_sess, self.sign_patch:
+            resp = await handle_signature_request(self.mock_request)
+        self.assertIsInstance(resp, aiohttp.web.Response)
 
 
 class SignatureTokenTestClass(
