@@ -224,6 +224,7 @@ class APITestBase(unittest.IsolatedAsyncioTestCase):
                 "json": None,
                 "read": self.mock_response_read,
                 "post": unittest.mock.AsyncMock(),
+                "method": "GET",
                 "app": {
                     "api_client": self.mock_client,
                     "client": self.mock_client,
