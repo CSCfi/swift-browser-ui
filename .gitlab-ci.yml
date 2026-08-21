@@ -117,12 +117,14 @@ update-versions-dryrun:
   interruptible: true
   variables:
     UPDATE_VERSION_FILES_LIST: "openapi.yaml;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
+    VERSION_UPDATE_INDICATOR: "version"
 
 # This job updates the versions
 update-versions:
   extends: .update-versions
   variables:
     UPDATE_VERSION_FILES_LIST: "openapi.yaml;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
+    VERSION_UPDATE_INDICATOR: "version"
 
 deploy:
   rules:
