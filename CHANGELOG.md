@@ -7,6 +7,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- (admins) UI no longer logs sensitive session information when log level is `INFO`
+- UI no longer logs sensitive session information when log level is `INFO`
+
 ## [2026.9.0] - 2026-09-01
 
 ### Changed
