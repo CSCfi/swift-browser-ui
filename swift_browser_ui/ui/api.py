@@ -17,6 +17,7 @@ from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.ui._convenience import (
     ldap_get_project_titles,
     open_upload_runner_session,
+    prune_sensitive_session_info,
     sign,
 )
 from swift_browser_ui.ui.replicate import ObjectReplicator
@@ -31,7 +32,7 @@ async def get_os_user(request: aiohttp.web.Request) -> aiohttp.web.Response:
     """Fetch the session owning OS user."""
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
-        f"API call for username from {request.remote}, sess: {session} :: {time.ctime()}"
+        f"API call for username from {request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     return aiohttp.web.json_response(session["uname"])
 
@@ -41,7 +42,7 @@ async def os_list_projects(request: aiohttp.web.Request) -> aiohttp.web.Response
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call for project listing from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     # Fetch project title information from ldap
     try:
@@ -73,7 +74,7 @@ async def swift_list_containers(
     project = request.match_info["project"]
     request.app["Log"].info(
         "API call for list buckets from "
-        f"{request.remote}, session: {session} :: {time.ctime()}"
+        f"{request.remote}, session: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     # as of v 3.9.1 the return type of query is "MultiMapping[str]"
@@ -120,7 +121,7 @@ async def aws_list_buckets(
 
     logger.info(
         f"API call to list buckets in {project} from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     logger.debug(
         f"Using {max_buckets} as max buckets and {continuation_token} "
@@ -155,7 +156,7 @@ async def aws_list_buckets(
                 )
             else:
                 raise aiohttp.web.HTTPInternalServerError(
-                    text="Coudln't retrieve the bucket page from storage."
+                    text="Couldn't retrieve the bucket page from storage."
                 )
 
     bucket_page["Buckets"] = [
@@ -181,7 +182,7 @@ async def aws_create_bucket(
 
     logger.info(
         f"API call to create bucket {bucket} in {project} from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -300,7 +301,7 @@ async def aws_head_bucket(
 
     logger.info(
         f"API call to head bucket {bucket} from project {project}"
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -335,7 +336,7 @@ async def aws_update_bucket_cors(
 
     logger.info(
         f"API call to update {bucket} CORS in {project} from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -362,7 +363,7 @@ async def aws_bulk_update_bucket_cors(
 
     logger.info(
         f"API call to allow CORS for all buckets in {project} from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -438,7 +439,7 @@ async def _check_last_modified(
     client = request.app["api_client"]
     request.app["Log"].info(
         "API call for project listing from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     project = request.match_info["project"]
     endpoint = session["projects"][project]["endpoint"]
@@ -514,7 +515,7 @@ async def keystone_gen_ec2(request: aiohttp.web.Request) -> aiohttp.web.Response
     project = request.match_info["project"]
 
     request.app["Log"].info(
-        f"API call for fetching ec2 credentials from {request.remote}, sess {session}"
+        f"API call for fetching ec2 credentials from {request.remote}, sess {prune_sensitive_session_info(session)}"
     )
 
     # Fetch the ec2 credentials if they're not already cached in the session.
@@ -538,7 +539,7 @@ async def replicate_bucket(
 
     logger.info(
         f"API call to replicate bucket {source_bucket} to {bucket} from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
 
     creds = await _get_ec2_credentials(session, client, project)
@@ -586,7 +587,7 @@ async def get_upload_session(
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call for object upload runner info request from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     project = ""
     if "project" in request.query:
@@ -611,7 +612,7 @@ async def get_crypted_upload_session(
     session = await aiohttp_session.get_session(request)
     request.app["Log"].info(
         "API call for object upload runner info request from "
-        f"{request.remote}, sess: {session} :: {time.ctime()}"
+        f"{request.remote}, sess: {prune_sensitive_session_info(session)} :: {time.ctime()}"
     )
     project = ""
     if "project" in request.query:

@@ -4,6 +4,7 @@ Module contains funcions for e.g. authenticating against openstack v3 identity
 API, cache manipulation, cookies etc.
 """
 
+import copy
 import logging
 import os
 import secrets
@@ -268,3 +269,23 @@ async def ldap_get_project_titles(projects: dict[str, dict]) -> dict[str, str]:
             titles[str(entry["CSCPrjNum"])] = str(entry["CSCPrjTitle"])
 
     return titles
+
+
+def prune_sensitive_session_info(session):
+    """Prune sensitive information from a logged session."""
+    ret_session = copy.deepcopy(dict(session))
+
+    if "token" in ret_session:
+        ret_session["token"] = "###"  # nosec # noqa
+    if "oidc" in ret_session:
+        if "userinfo" in ret_session["oidc"]:
+            ret_session["oidc"]["userinfo"] = "{###}"  # nosec # noqa
+        if "access_token" in ret_session["oidc"]:
+            ret_session["oidc"]["access_token"] = "###"  # nosec # noqa
+
+    if "projects" in ret_session:
+        for project in ret_session["projects"].keys():
+            if "token" in ret_session["projects"][project]:
+                ret_session["projects"][project]["token"] = "###"  # nosec # noqa
+
+    return ret_session

@@ -6,6 +6,7 @@ import typing
 import aiohttp_session
 from aiohttp import web
 
+import swift_browser_ui.ui._convenience
 from swift_browser_ui.ui.settings import setd
 
 AiohttpHandler = typing.Callable[
@@ -60,7 +61,10 @@ async def check_session(
             return await handler(request)
 
         session = await aiohttp_session.get_session(request)
-        request.app["Log"].info("Identified session: %r", session)
+        request.app["Log"].info(
+            "Identified session: %r",
+            swift_browser_ui.ui._convenience.prune_sensitive_session_info(session),
+        )
 
         if session.empty:
             request.app["Log"].debug("Empty session")
@@ -69,7 +73,8 @@ async def check_session(
 
         if not all(k in session for k in {"projects", "uname", "at"}):
             request.app["Log"].error(
-                "Session is invalid %r. This could be a bug or abuse.", session
+                "Session is invalid %r. This could be a bug or abuse.",
+                swift_browser_ui.ui._convenience.prune_sensitive_session_info(session),
             )
             session.invalidate()
             raise _unauthorized("Invalid session, authenticate again.")

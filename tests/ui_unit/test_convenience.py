@@ -107,6 +107,7 @@ class TestConvenienceFunctions(
         self.assertEqual(ret, "test-key")
 
     async def test_ldap_get_project_titles(self):
+        """Test the ldap get project titles handler."""
         os.environ["LDAP_SERVER_HOST"] = "host"
         os.environ["LDAP_SERVER_PORT"] = "636"
         os.environ["LDAP_SERVER_BIND"] = "bind"
@@ -137,3 +138,21 @@ class TestConvenienceFunctions(
                 "456": "Second Project",
             },
         )
+
+    async def test_prune_sensitive_session_info(self):
+        """Test session info prune prunes sensitive session info."""
+        # Check that the session prune works correctly with normal sessions
+        censored_session = swift_browser_ui.ui._convenience.prune_sensitive_session_info(
+            self.session_return
+        )
+        self.assertEqual(censored_session["token"], "###")
+        for project in censored_session["projects"].keys():
+            self.assertEqual(censored_session["projects"][project]["token"], "###")
+
+        # Check that the session prune works correctly with oidc sessions
+        censored_session = swift_browser_ui.ui._convenience.prune_sensitive_session_info(
+            self.oidc_session_return
+        )
+        self.assertIn("oidc", censored_session)
+        self.assertEqual(censored_session["oidc"]["userinfo"], "{###}")
+        self.assertEqual(censored_session["oidc"]["access_token"], "###")
