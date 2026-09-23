@@ -195,7 +195,7 @@ export default {
             this.folders.length > 1 ?
               msg = this.$t("message.folders.deleteManySuccess") :
               msg = this.$t("message.folders.deleteOneSuccess");
-            this.$router.push({name: "ObjectsView"});
+            this.$router.push({ name: this.owner ? "SharedObjects" : "ObjectsView" });
           }
           else {
             let newPrefix = this.prefix;
@@ -212,7 +212,10 @@ export default {
                     msg = this.$t("message.folders.deleteManySuccess") :
                     msg = this.$t("message.folders.deleteOneSuccess");
                   let path =
-                    {name: "ObjectsView", query: { prefix: newPrefix}};
+                    {
+                      name: this.owner ? "SharedObjects" : "ObjectsView",
+                      query: { prefix: newPrefix },
+                    };
                   this.$router.push(path);
                 }
                 break;
