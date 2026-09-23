@@ -283,8 +283,10 @@ async def handle_project_key(request: aiohttp.web.Request) -> aiohttp.web.Respon
     vault_client: VaultClient = request.app[VAULT_CLIENT]
     project = request.match_info["project"]
     # Skip creating public keys for x-project access
-    skip_create = "for" in request.query
-    public_key = await vault_client.get_public_key(project, skip_create=skip_create)
+    owner_exists = "for" in request.query
+    if owner_exists:
+        project = request.query["for"]
+    public_key = await vault_client.get_public_key(project, skip_create=owner_exists)
 
     return aiohttp.web.Response(
         text=public_key,

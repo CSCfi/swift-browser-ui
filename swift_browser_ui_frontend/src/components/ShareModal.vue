@@ -397,13 +397,6 @@ export default {
           rights,
           this.s3endpoint,
         );
-        await this.$store.sharingClient.shareNewAccess(
-          this.$store.active.id,
-          `${this.bucketName}_segments`,
-          this.shareIDs,
-          rights,
-          this.s3endpoint,
-        );
       }
       catch(error) {
         if (error.message.match("Container already shared.")) {
@@ -434,6 +427,15 @@ export default {
           `${bucket}_segments`,
           rights,
           this.shareIDs,
+        );
+        // Only add a share entry to DB on the segments if bucket policy addition succeeded
+        // Otherwise the receiver gets _segments bucket in the IDB and sees wrong conversion need
+        await this.$store.sharingClient.shareNewAccess(
+          this.$store.active.id,
+          `${this.bucketName}_segments`,
+          this.shareIDs,
+          rights,
+          this.s3endpoint,
         );
       } catch {}
 
