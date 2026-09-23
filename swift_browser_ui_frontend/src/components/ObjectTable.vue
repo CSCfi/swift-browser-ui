@@ -249,7 +249,8 @@ export default {
         this.getConversionNeedAlert(this.idbBuckets, this.currentContainer) : null;
     },
     isBucketUrgent() {
-      return this.isUrgent(this.idbBuckets, this.currentContainer);
+      return this.currentContainer && this.idbBuckets?.length ?
+        this.isUrgent(this.idbBuckets, this.currentContainer) : false;
     },
   },
   watch: {
