@@ -12,6 +12,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - (admins) UI no longer logs sensitive session information when log level is `INFO`
 - UI no longer logs sensitive session information when log level is `INFO`
 
+### Removed
+
+- (users) sharing of urgent buckets
+
 ## [2026.9.0] - 2026-09-01
 
 ### Changed
