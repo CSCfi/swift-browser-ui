@@ -27,7 +27,7 @@
           <b>{{ $t("message.table.shared_status") }}: </b>
           {{ sharedStatus }}&nbsp;
           <c-link
-            v-show="!owner"
+            v-show="!owner && !isBucketUrgent"
             underline
             tabindex="0"
             data-testid="edit-sharing"
@@ -247,6 +247,9 @@ export default {
     bucketConversionNeed() {
       return this.currentContainer && this.idbBuckets?.length ?
         this.getConversionNeedAlert(this.idbBuckets, this.currentContainer) : null;
+    },
+    isBucketUrgent() {
+      return this.isUrgent(this.idbBuckets, this.currentContainer);
     },
   },
   watch: {
@@ -581,6 +584,9 @@ export default {
     setLocalizedContent() {
       this.setTableOptionsMenu();
       this.setSelectionActionButtons();
+    },
+    isUrgent: function(buckets, bucket) {
+      return getRecommendedAction(buckets, bucket) === 2;
     },
     getConversionNeedAlert: function(buckets, bucket) {
       const statusNum = getRecommendedAction(buckets, bucket);
