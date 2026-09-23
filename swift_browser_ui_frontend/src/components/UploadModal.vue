@@ -794,12 +794,12 @@ export default {
         return;
       }
       else {
+        console.log("Beginning upload");
         this.beginEncryptedUpload();
       }
     },
     async aBeginEncryptedUpload() {
       // We need the proper IDs for the other project for Vault access
-      let owner = "";
       let ownerName = "";
       if (this.pubkey.length > 0 && !(this.$route.params.owner)) {
         this.recvkeys = this.recvkeys.concat(this.pubkey);
@@ -807,7 +807,6 @@ export default {
         let ids = await this.$store.sharingClient.projectCheckIDs(
           this.$route.params.owner,
         );
-        owner = ids.id;
         ownerName = ids.name;
       }
 
@@ -816,7 +815,9 @@ export default {
         let sharedKey = await signedFetch(
           "GET",
           this.$store.uploadEndpoint,
-          `/cryptic/${ownerName}/keys`,
+          `/cryptic/${this.active.name}/keys`,
+          undefined,
+          { for: ownerName },
         );
         sharedKey = await sharedKey.text();
         sharedKey = `-----BEGIN CRYPT4GH PUBLIC KEY-----\n${sharedKey}\n-----END CRYPT4GH PUBLIC KEY-----\n`;
