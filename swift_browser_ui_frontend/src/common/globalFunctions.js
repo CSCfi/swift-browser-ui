@@ -237,7 +237,7 @@ export function checkBucketBreaksS3(bucketName) {
  * @returns bool
  */
 export function checkBucketCreatedV3(bucket) {
-  return Date.parse(bucket.created) > NEW_VERSION_DATE;
+  return Date.parse(bucket?.created) > NEW_VERSION_DATE;
 }
 
 /**
@@ -282,7 +282,8 @@ export function getRecommendedAction(buckets, bucket) {
   }
 
   // No need to migrate buckets created with V3
-  if (checkBucketCreatedV3(bucket)) {
+  // Shared bucket has no created date
+  if (bucket?.owner || checkBucketCreatedV3(bucket)) {
     return 0;
   }
   return 1;
