@@ -86,6 +86,7 @@ async def handle_validate_authentication(
 
     if "db_conn" in request.app:
         project = ""
+        # Remember, removed the unnecessary for-check from here
         if "project" in request.match_info:
             LOGGER.debug(f"Using main project for {request}.")
             project = request.match_info["project"]
