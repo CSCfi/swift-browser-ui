@@ -283,8 +283,8 @@ export function getRecommendedAction(buckets, bucket) {
 
   // No need to migrate buckets created with V3
   // Shared bucket has no created date
-  if (bucket?.owner || checkBucketCreatedV3(bucket)) {
+  /*if (bucket?.owner || checkBucketCreatedV3(bucket)) {
     return 0;
-  }
-  return 1;
+  }*/
+  return 0;
 }
