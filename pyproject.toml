@@ -30,7 +30,7 @@ dependencies = [
     "cryptography==48.0.1",
     "gunicorn==23.0.0",
     "keystoneauth1==5.15.0",
-    "idpyoidc==5.0.0",
+    "idpyoidc==4.1.0",
     "python-swiftclient==4.10.0",
     "uvloop==0.22.1",
     "msgpack==1.2.1",
