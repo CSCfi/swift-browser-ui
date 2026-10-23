@@ -73,7 +73,11 @@
 
 <script>
 import { signedFetch } from "@/common/api";
-import { addAccessControlBucketPolicy, removeAccessControlBucketPolicy } from "@/common/s3commands";
+import {
+  addAccessControlBucketPolicy,
+  ensureCollaborateAccessPolicy,
+  removeAccessControlBucketPolicy,
+} from "@/common/s3commands";
 import { mdiDelete } from "@mdi/js";
 
 export default {
@@ -271,6 +275,10 @@ export default {
       // Delete the old access rights and replace them with new ones.
       // Don't bother with editing on S3 API since in the frontend
       // the operations will end up being identical.
+      if (this.newPerms?.length === 2) {
+        console.log("Sharing bucket with collaborate access, ensure owner access is retained.");
+        await ensureCollaborateAccessPolicy(this.bucketName);
+      }
       await removeAccessControlBucketPolicy(
         this.bucketName,
         [sharedProjectId],
@@ -281,6 +289,9 @@ export default {
         [sharedProjectId],
       );
       try {
+        if (this.newPerms?.length === 2) {
+          await ensureCollaborateAccessPolicy(`${this.bucketName}_segments`);
+        }
         await removeAccessControlBucketPolicy(
           `${this.bucketName}_segments`,
           [sharedProjectId],
@@ -290,7 +301,10 @@ export default {
           this.newPerms,
           [sharedProjectId],
         );
-      } catch {}
+      } catch (error) {
+        console.warn(`Sharing segments bucket ${this.bucketName}_segments failed:`);
+        console.warn(error);
+      }
 
       await this.$store.sharingClient.shareEditAccess(
         this.projectId,

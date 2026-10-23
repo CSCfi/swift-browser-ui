@@ -179,7 +179,7 @@ import { signedFetch } from "@/common/api";
 import { checkBucketCreatedV3, taginputConfirmKeys } from "@/common/globalFunctions";
 import { getBucketMetadata } from "@/common/idbFunctions";
 import { captureKeyboardNavInsideModal } from "@/common/keyboardNavigation";
-import { addAccessControlBucketPolicy } from "@/common/s3commands";
+import { addAccessControlBucketPolicy, ensureCollaborateAccessPolicy } from "@/common/s3commands";
 import ShareModalTable from "@/components/ShareModalTable.vue";
 import TagInput from "@/components/TagInput.vue";
 import { mdiClose, mdiInformationOutline, mdiOpenInNew } from "@mdi/js";
@@ -389,6 +389,25 @@ export default {
         );
         return false;
       }
+      if (rights.length === 3) {
+        console.log("Sharing bucket with collaborate access, ensure owner access is retained.");
+        try {
+          await ensureCollaborateAccessPolicy(bucket);
+        } catch (error) {
+          console.error(`Could not retain owner access to bucket ${bucket}`);
+
+          document.querySelector("#shareModal-toasts").addToast(
+            {
+              type: "error",
+              persistent: false,
+              progress: false,
+              message: this.$t("message.download.noRetain"),
+            },
+          );
+          // show both generic sharing error and the toast above
+          throw error;
+        }
+      }
       try {
         await this.$store.sharingClient.shareNewAccess(
           this.$store.active.id,
@@ -423,6 +442,9 @@ export default {
         this.shareIDs,
       );
       try {
+        if (rights.length === 3) {
+          await ensureCollaborateAccessPolicy(`${bucket}_segments`);
+        }
         await addAccessControlBucketPolicy(
           `${bucket}_segments`,
           rights,
@@ -437,7 +459,10 @@ export default {
           rights,
           this.s3endpoint,
         );
-      } catch {}
+      } catch (error) {
+        console.warn(`Sharing segments bucket ${bucket}_segments failed:`);
+        console.warn(error);
+      }
 
       const toShare = await this.$store.sharingClient.projectBatchCheckIDs(this.shareIDs);
 
