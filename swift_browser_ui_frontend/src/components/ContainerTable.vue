@@ -448,7 +448,8 @@ export default {
           try {
             const segmentObjList = await awsListObjects(segmentsBucket);
             if (segmentObjList?.length) {
-              await awsDeleteObjects(segmentsBucket, segmentObjList);
+              const objectNames = segmentObjList.map((obj) => obj.name);
+              await awsDeleteObjects(segmentsBucket, objectNames);
             }
             // Finally delete the segments bucket
             await awsDeleteBucket(segmentsBucket);
