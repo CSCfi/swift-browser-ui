@@ -424,6 +424,8 @@ export default {
       // There is no CORS check on bucket list fetch, only share sync
       // Make sure it is in place before fetching objects
       await checkAndAddBucketCors(this.active.id, bucket);
+      // Make sure segments CORS is added for bucket deletion and sharing
+      await checkAndAddBucketCors(this.active.id, `${bucket}_segments`);
       const isEmpty = await checkBucketEmpty(bucket);
       if (isEmpty === shouldBeEmpty) {
         return true;
