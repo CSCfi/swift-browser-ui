@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- (users) issue where conversion status only updated after opening bucket once
+
 ## [2026.10.0] - 2026-10-02
 
 ### Changed
