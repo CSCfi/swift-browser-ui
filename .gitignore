@@ -42,6 +42,7 @@ tests/cypress/fixtures
 # Node files
 **/node_modules/
 **/.node_modules/
+**/.pnpm-store/
 
 # wasm build files
 swift_browser_ui_frontend/wasm/build/

@@ -258,9 +258,9 @@ export function getRecommendedAction(buckets, bucket) {
     return 1;
   }
 
-  // If the bucket has a matching segemnts bucket with content, it likely
+  // If the bucket has a matching segments bucket, it likely
   // contains swift large objects
-  if (buckets.find((nb) => nb.name == `${bucket.name}_segments`)?.count > 0) {
+  if (buckets.find((nb) => nb.name == `${bucket.name}_segments`)) {
     return 1;
   }
 

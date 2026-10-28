@@ -53,7 +53,10 @@ import {
 } from "@/common/idbFunctions";
 import { useObservable } from "@vueuse/rxjs";
 import { mdiPlus, mdiTune } from "@mdi/js";
-import { toggleCreateBucketModal } from "@/common/globalFunctions";
+import {
+  getRecommendedAction,
+  toggleCreateBucketModal,
+} from "@/common/globalFunctions";
 import { getAccessDetails, getSharingContainers } from "@/common/share";
 import ContainerTable from "@/components/ContainerTable.vue";
 //import SearchBox from "@/components/SearchBox.vue";
@@ -168,6 +171,12 @@ export default {
           };
         });
       }
+
+      // Add conversion status
+      finalBuckets = finalBuckets.map(bucket => ({
+        ...bucket,
+        recommendedAction: getRecommendedAction(this.containers, bucket),
+      }));
 
       if (!signal?.aborted) {
         // Assign once to prevent table re-renders

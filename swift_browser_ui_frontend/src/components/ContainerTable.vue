@@ -36,7 +36,6 @@ import {
   toggleCopyBucketModal,
   addErrorToastOnMain,
   checkAndAddBucketCors,
-  getRecommendedAction,
   checkBucketBreaksS3,
 } from "@/common/globalFunctions";
 import {
@@ -161,7 +160,7 @@ export default {
         .slice(offset, offset + limit).map((
           item,
         ) => {
-          const status = this.getBucketStatus(this.conts, item);
+          const status = this.getBucketStatus(item.recommendedAction);
           const incompatible = checkBucketBreaksS3(item.name);
           containersPage.push({
             name: {
@@ -533,8 +532,7 @@ export default {
         ? toggleCopyBucketModal(bucket, owner)
         : toggleCopyBucketModal(bucket);
     },
-    getBucketStatus: function(buckets, bucket) {
-      const statusNum = getRecommendedAction(buckets, bucket);
+    getBucketStatus: function(statusNum) {
       if (statusNum === 2) {
         return { type: "error", value: this.$t("message.table.urgent_label") };
       }
