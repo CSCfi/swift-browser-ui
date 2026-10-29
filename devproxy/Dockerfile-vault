@@ -1,4 +1,6 @@
-FROM docker.io/hashicorp/vault:1.21
+FROM docker.io/hashicorp/vault:2.1.1
+
+USER root
 
 VOLUME /gosrc
 

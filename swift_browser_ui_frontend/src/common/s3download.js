@@ -383,6 +383,11 @@ export default class S3DownloadSocket {
 
         return;
       }
+
+      // Preserve owner access to segments
+      try {
+        await ensureCollaborateAccessPolicy(`${bucket}_segments`);
+      } catch {}
     }
 
 

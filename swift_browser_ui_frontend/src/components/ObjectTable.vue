@@ -310,7 +310,10 @@ export default {
     fetchIfReady: async function () {
       this.objsLoading = true;
       if (this.readyToFetch) {
-        if (!this.owner) await checkAndAddBucketCors(this.active.id, this.containerName);
+        if (!this.owner) {
+          await checkAndAddBucketCors(this.active.id, this.containerName);
+          await checkAndAddBucketCors(this.active.id, `${this.containerName}_segments`);
+        }
         await this.getData();
       }
     },
