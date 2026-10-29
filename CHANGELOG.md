@@ -7,9 +7,18 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.10.1] - 2026-10-29
+
 ### Fixed
 
+- Fix segments buckets' multi-object deletion
+- Fix segments buckets' CORS issue in container and object views in addition to share sync (#1405)
+- Ensure bucket owner access is preserved whilst sharing the bucket (#1402)
 - (users) issue where conversion status only updated after opening bucket once
+
+### Changed
+
+- Updated development vault image version (#1404)
 
 ## [2026.10.0] - 2026-10-02
 
@@ -891,7 +900,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.0...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.1...HEAD
+[2026.10.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.0...2026.10.1
 [2026.10.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.9.4...2026.10.0
 [2026.9.4]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.9.3...2026.9.4
 [2026.9.3]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.9.2...2026.9.3
