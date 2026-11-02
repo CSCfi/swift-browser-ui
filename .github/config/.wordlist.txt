@@ -28,7 +28,6 @@ cp
 crdownload
 crswap
 cryptfiles
-cryptupload
 csc
 csc's
 cscfi

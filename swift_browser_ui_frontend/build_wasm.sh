@@ -41,14 +41,6 @@ else
     buildWasm "docker"
 fi
 
-cp "${WASM_ROOT}/build/upworker.js" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker.js" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/upworker-post.js.map" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker-post.js.map" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/upworker.wasm" "${SCRIPT_ROOT}/public/"
-cp "${WASM_ROOT}/build/downworker.wasm" "${SCRIPT_ROOT}/public/"
-
-# Copy over the S3 compatible versions as well
 cp "${WASM_ROOT}/build/s3upworker.js" "${SCRIPT_ROOT}/public/"
 cp "${WASM_ROOT}/build/s3upworker.wasm" "${SCRIPT_ROOT}/public/"
 cp "${WASM_ROOT}/build/crypt-post-s3upload.js.map" "${SCRIPT_ROOT}/public/"

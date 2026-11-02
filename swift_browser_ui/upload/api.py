@@ -5,12 +5,9 @@ import base64
 import logging
 import os
 import time
-import typing
 
 import aiohttp.web
-import msgpack
 
-import swift_browser_ui.upload.cryptupload as cryptupload
 from swift_browser_ui.common.vault_client import VaultClient
 from swift_browser_ui.upload.common import (
     VAULT_CLIENT,
@@ -208,54 +205,6 @@ async def handle_whitelist_options(
         }
     )
     return resp
-
-
-async def handle_upload_ws(
-    request: aiohttp.web.Request,
-) -> aiohttp.web.WebSocketResponse:
-    """Handle parallel file upload data via a websocket."""
-    upload_session: cryptupload.UploadSession = cryptupload.get_encrypted_upload_session(
-        request
-    )
-
-    ws = aiohttp.web.WebSocketResponse()
-    await ws.prepare(request)
-
-    upload_session.set_ws(ws)
-
-    LOGGER.info(f"Upload session websocket opened for {request.url.path}")
-
-    async for msg in ws:
-        if msg.type == "close":
-            await upload_session.handle_close()
-            LOGGER.info(f"Closing the websocket for {request.url.path}")
-            await ws.close()
-
-        # Open msgpack and handle message
-        try:
-            msg_unpacked: typing.Dict[str, typing.Any] = msgpack.unpackb(msg.data)
-
-            if msg_unpacked["command"] == "add_header":
-                await upload_session.handle_begin_upload(msg_unpacked)
-            if msg_unpacked["command"] == "add_chunk":
-                await upload_session.handle_upload_chunk(msg_unpacked)
-            if msg_unpacked["command"] == "add_chunks":
-                await upload_session.handle_upload_chunks(msg_unpacked)
-            if msg_unpacked["command"] == "cancel":
-                await upload_session.handle_close()
-            if msg_unpacked["command"] == "finish":
-                await upload_session.handle_finish_upload(msg_unpacked)
-        except ValueError:
-            LOGGER.error("Received an empty message.")
-            LOGGER.debug(msg.data)
-        except msgpack.exceptions.ExtraData:
-            LOGGER.error("Extra data in message.")
-            LOGGER.debug(msg.data)
-        except msgpack.exceptions.FormatError:
-            LOGGER.error("Incorrectly formatted message.")
-            LOGGER.error(msg.data)
-
-    return ws
 
 
 async def handle_health_check(request: aiohttp.web.Request) -> aiohttp.web.Response:

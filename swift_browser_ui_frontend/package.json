@@ -21,7 +21,6 @@
     "@mdi/js": "^7.4.47",
     "@vitejs/plugin-vue": "^6.0.3",
     "@vueuse/rxjs": "^14.1.0",
-    "@ygoe/msgpack": "^1.0.3",
     "dexie": "^4.2.1",
     "lodash": "^4.17.21",
     "luxon": "^3.7.2",

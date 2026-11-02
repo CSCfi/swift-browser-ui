@@ -33,7 +33,6 @@ dependencies = [
     "idpyoidc==4.1.0",
     "python-swiftclient==4.10.0",
     "uvloop==0.22.1",
-    "msgpack==1.2.1",
     "ldap3==2.9.1",
     "aioboto3==15.5.0",
 ]

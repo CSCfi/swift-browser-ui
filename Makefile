@@ -171,18 +171,12 @@ clean-ui-build:
 	sudo rm -f swift_browser_ui_frontend/public/crypt-post-headers.js.map
 	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3download.js.map
 	sudo rm -f swift_browser_ui_frontend/public/crypt-post-s3upload.js.map
-	sudo rm -f swift_browser_ui_frontend/public/downworker.js
-	sudo rm -f swift_browser_ui_frontend/public/downworker-post.js.map
-	sudo rm -f swift_browser_ui_frontend/public/downworker.wasm
 	sudo rm -f swift_browser_ui_frontend/public/s3downworker.js
 	sudo rm -f swift_browser_ui_frontend/public/s3downworker.wasm
 	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.js
 	sudo rm -f swift_browser_ui_frontend/public/s3headerworker.wasm
 	sudo rm -f swift_browser_ui_frontend/public/s3upworker.js
 	sudo rm -f swift_browser_ui_frontend/public/s3upworker.wasm
-	sudo rm -f swift_browser_ui_frontend/public/upworker.js
-	sudo rm -f swift_browser_ui_frontend/public/upworker-post.js.map
-	sudo rm -f swift_browser_ui_frontend/public/upworker.wasm
 
 prepare-ui-build: clean-ui-build
 	cd swift_browser_ui_frontend; CI=true pnpm i; pnpm run build
