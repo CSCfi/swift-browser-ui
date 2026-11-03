@@ -3,13 +3,12 @@ workflow:
     on_new_commit: conservative
 
 stages:
-  - verify
   - test
   - release
   - deploy
 
-variables:
-  BUILD_IMAGE: $ARTIFACTORY_SERVER/sds/sdd-common-ci
+default:
+  image: "${ARTIFACTORY_SERVER}/sds/sdd-common-ci:2026.10.0@sha256:4dbef76cae6000a9fed4636a748d6411a7c0959e2f9e5562090eaec572f74c26"
 
 include:
   - project: 'sds-dev/releases'
@@ -17,13 +16,12 @@ include:
     file: 'releases.yml'
 
 backend-lint:
-  stage: verify
+  stage: test
   tags:
-    - docker-exec
+    - sds-test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   interruptible: true
-  image: $BUILD_IMAGE
   before_script:
     - pip install pre-commit tox mypy .[dev]
   script:
@@ -31,26 +29,24 @@ backend-lint:
     - tox -e bandit
 
 spellcheck:
-  stage: verify
+  stage: test
   tags:
-    - docker-exec
+    - sds-test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   interruptible: true
-  image: $BUILD_IMAGE
   before_script:
     - pip install pyspelling
   script:
     - pyspelling
 
 frontend-lint:
-  stage: verify
+  stage: test
   tags:
-    - docker-exec
+    - sds-test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   interruptible: true
-  image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install
   script:
@@ -59,11 +55,10 @@ frontend-lint:
 backend-test:
   stage: test
   tags:
-    - docker-exec
+    - sds-test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   interruptible: true
-  image: $BUILD_IMAGE
   before_script:
     - pnpm --prefix swift_browser_ui_frontend install --prod
     - pip install .[test]
@@ -77,11 +72,10 @@ backend-test:
 wasm-test:
   stage: test
   tags:
-    - docker-exec
+    - sds-test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   interruptible: true
-  image: $BUILD_IMAGE
   before_script:
     - ruby --version
     - gem --version
@@ -126,26 +120,22 @@ update-versions:
     UPDATE_VERSION_FILES_LIST: "openapi.yaml;swift_browser_ui/__init__.py;swift_browser_ui_frontend/package.json"
     VERSION_UPDATE_INDICATOR: "version"
 
+# Trigger build pipelines downstream
 deploy:
   rules:
-    # until this is https://gitlab.com/groups/gitlab-org/-/epics/4529 is merged
-    # ENVIRONMENT env var will not be sent downstream and it will default to devel branch
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
+      variables:
+        DEPLOY_TAG: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
+        BUILD_DEPLOYMENT: "false"
     - if: '$CI_COMMIT_TAG !~ "/^$/"'
+      variables:
+        DEPLOY_TAG: $CI_COMMIT_TAG
+        BUILD_DEPLOYMENT: "true"
   stage: deploy
-  tags:
-    - sds
-  variables:
-    GITLAB_PROJECT_ID: $GITLAB_SWIFT_BROWSER_CONFIG_BUILD
-    TRIGGER_TOKEN: $CONFIG_BUILD_TRIGGER_TOKEN
-    GITLAB_REF: main
-  script:
-    - export BUILD_TAG="${CI_COMMIT_TAG:-latest}"
-    - >
-      curl --request POST
-      --form "token=$TRIGGER_TOKEN"
-      --form "ref=$GITLAB_REF"
-      --form "variables[ENVIRONMENT]=$BUILD_TAG"
-      "$GITLAB_CI_URL/api/v4/projects/$GITLAB_PROJECT_ID/trigger/pipeline"
-  allow_failure: true
+  trigger:
+    project: sds-dev/sd-connect/swift-ui-csc-deployment
+    branch: feature/new-runners
+    strategy: depend
+    inputs:
+      build_tag: $DEPLOY_TAG
+      build_deployment: $BUILD_DEPLOYMENT
