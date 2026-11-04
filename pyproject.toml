@@ -40,7 +40,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    "black==26.5.1",
+    "black==26.10.1",
     "coverage==7.15.2",
     "flake8-docstrings==1.7.0",
     "flake8==7.3.0",
