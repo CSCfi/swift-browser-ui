@@ -7,11 +7,13 @@ Upload service worker handlers
 #include <stdint.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #ifdef TEST
 #include "stub_crypt4gh_header.h"
 #include "stub_crypt4gh_segment.h"
 #include "stub_crypt4gh.h"
+#include "stub_unistd.h"
 #include <stdlib.h>
 #else
 #include <crypt4gh/header.h>
