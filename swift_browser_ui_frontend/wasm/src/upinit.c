@@ -9,6 +9,7 @@ Init functions for folder upload
 #include "stub_crypt4gh_key.h"
 #include "stub_ftw.h"
 #include "stub_fcntl.h"
+#include "stub_unistd.h"
 #else
 #include <fcntl.h>
 #include <sodium.h>
