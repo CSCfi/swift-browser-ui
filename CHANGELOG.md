@@ -7,6 +7,20 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2026.11.0] - 2026-11-05
+
+### Changed
+
+- bumped certifi version
+- bumped python and node images for dockerfiles
+- migrated pipelines to new runners
+- major changes to triggering build pipeline downstream
+
+### Fixed
+
+- `nftw_function_ptr` local definition in stub library contained incorrect call signature
+- WASM sources now contain required stub imports in `upcommon.c` and `upinit.c`
+
 ## [2026.10.1] - 2026-10-29
 
 ### Fixed
@@ -900,7 +914,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - GH (GH #493) redesign upload UI
   - removed vue-material-design-icons
 
-[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.1...HEAD
+[Unreleased]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.11.0...HEAD
+[2026.11.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.1...2026.11.0
 [2026.10.1]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.10.0...2026.10.1
 [2026.10.0]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.9.4...2026.10.0
 [2026.9.4]: https://gitlab.ci.csc.fi/sds-dev/sd-connect/swift-browser-ui/compare/2026.9.3...2026.9.4
