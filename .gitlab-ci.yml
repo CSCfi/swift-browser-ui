@@ -134,7 +134,7 @@ deploy:
   stage: deploy
   trigger:
     project: sds-dev/sd-connect/swift-ui-csc-deployment
-    branch: feature/new-runners
+    branch: main
     strategy: depend
     inputs:
       build_tag: $DEPLOY_TAG
