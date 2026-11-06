@@ -9,16 +9,6 @@ module.exports = {
         path: path.resolve(__dirname, ''),
     },
     entry: {
-        downworker: {
-            import: "./js/crypt-post-downworker.js",
-            filename: "./build/downworker-post.js",
-            chunkLoading: false,
-        },
-        upworker: {
-            import: "./js/crypt-post-upworker.js",
-            filename: "./build/upworker-post.js",
-            chunkLoading: false,
-        },
         s3upworker: {
             import: "./js/crypt-post-s3upload.js",
             filename: "./build/crypt-post-s3upload.js",

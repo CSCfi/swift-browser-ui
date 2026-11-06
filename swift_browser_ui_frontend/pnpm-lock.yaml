@@ -29,9 +29,6 @@ importers:
       '@vueuse/rxjs':
         specifier: ^14.1.0
         version: 14.4.0(rxjs@7.8.2)(vue@3.5.44(typescript@5.6.2))
-      '@ygoe/msgpack':
-        specifier: ^1.0.3
-        version: 1.0.3
       dexie:
         specifier: ^4.2.1
         version: 4.4.4
@@ -1688,9 +1685,6 @@ packages:
 
   '@xtuc/long@4.2.2':
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
-
-  '@ygoe/msgpack@1.0.3':
-    resolution: {integrity: sha512-Sjp0O/sNgOJxTOO1c2Zuu7nsHRIGu2iGPYyhUedKKbcHyUl73jbCaomEFJZHNb/6i94B+ZNZHVnFgpo0ENSXxQ==}
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -5859,8 +5853,6 @@ snapshots:
   '@xtuc/ieee754@1.2.0': {}
 
   '@xtuc/long@4.2.2': {}
-
-  '@ygoe/msgpack@1.0.3': {}
 
   abbrev@2.0.0: {}
 
