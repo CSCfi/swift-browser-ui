@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+### Removed
+
+- Remove v2 upload/download implementation and msgpack (#1407)
+
 ## [2026.11.0] - 2026-11-05
 
 ### Changed
